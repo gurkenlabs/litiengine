@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="litiengine">
+	<!--ANT 1.7 is required-->
+	<!--define folder properties-->
+	<property name="dir.buildfile" value="." />
+	<property name="dir.tmxbuildfile" value="../tmx-deserializer" />
+	<property name="dir.jar" value="dist" />
+
+	<target name="clean">
+		<delete dir="${dir.jar}" />
+		<mkdir dir="${dir.jar}" />
+	</target>
+
+	<target name="create_run_jar">
+		<jar destfile="${dir.jar}/${ant.project.name}.jar">
+			<fileset dir="${dir.buildfile}/bin" />
+			<fileset dir="${dir.tmxbuildfile}/bin" />
+		</jar>
+	</target>
+</project>
