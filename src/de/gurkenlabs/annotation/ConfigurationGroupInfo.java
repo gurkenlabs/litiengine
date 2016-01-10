@@ -22,5 +22,5 @@ public @interface ConfigurationGroupInfo {
    *
    * @return the string
    */
-  String prefix();
+  String prefix() default "";
 }

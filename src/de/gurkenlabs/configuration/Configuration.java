@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 
-public abstract class Configuration {
+public class Configuration {
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
@@ -35,21 +35,10 @@ public abstract class Configuration {
     }
   }
 
-  protected static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
-    try {
-      final Properties groupProperties = new Properties();
-      group.storeProperties(groupProperties);
-      groupProperties.store(out, group.getPrefix() + "SETTINGS");
-      out.flush();
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
-      if (group.getPrefix().startsWith(groupClass.getAnnotation(ConfigurationGroupInfo.class).prefix())) {
+      if (group.getClass().equals(groupClass)) {
         return (T) group;
       }
     }
@@ -63,6 +52,21 @@ public abstract class Configuration {
 
   public void load() {
     this.loadFromFile();
+  }
+
+  public List<ConfigurationGroup> getConfigurationGroups() {
+    return this.configurationGroups;
+  }
+
+  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
+    try {
+      final Properties groupProperties = new Properties();
+      group.storeProperties(groupProperties);
+      groupProperties.store(out, group.getPrefix() + "SETTINGS");
+      out.flush();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private void loadFromFile() {
@@ -96,17 +100,13 @@ public abstract class Configuration {
     System.out.printf("Configuration %s loaded \n", this.getFileName());
   }
 
-  protected void createDefaultSettingsFile(final OutputStream out) {
+  private void createDefaultSettingsFile(final OutputStream out) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
       storeConfigurationGroup(out, group);
     }
   }
 
-  protected List<ConfigurationGroup> getConfigurationGroups() {
-    return this.configurationGroups;
-  }
-
-  protected void initializeSettingsByProperties(final Properties properties) {
+  private void initializeSettingsByProperties(final Properties properties) {
     for (final String key : properties.stringPropertyNames()) {
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
         if (key.startsWith(group.getPrefix())) {

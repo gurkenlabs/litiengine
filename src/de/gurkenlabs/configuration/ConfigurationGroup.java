@@ -15,6 +15,7 @@ import de.gurkenlabs.annotation.ConfigurationGroupInfo;
  * the SettingsGroupInfo annotation and reads out the prefix that is used when
  * reading/ writing the settings into a property file.
  */
+@ConfigurationGroupInfo
 public abstract class ConfigurationGroup {
 
   /** The prefix. */
@@ -45,7 +46,7 @@ public abstract class ConfigurationGroup {
    * @param value
    *          the value
    */
-  public void initializeByProperty(final String key, final String value) {
+  protected void initializeByProperty(final String key, final String value) {
     final String propertyName = key.substring(this.getPrefix().length());
     this.initializeProperty(propertyName, value);
   }
@@ -60,9 +61,13 @@ public abstract class ConfigurationGroup {
    * @param properties
    *          the properties
    */
-  public void storeProperties(final Properties properties) {
+  protected void storeProperties(final Properties properties) {
     try {
       for (final Field field : this.getClass().getDeclaredFields()) {
+        if (!field.isAccessible()) {
+          field.setAccessible(true);
+        }
+
         if (field.getType().equals(boolean.class)) {
           properties.setProperty(this.getPrefix() + field.getName(), Boolean.toString(field.getBoolean(this)));
         } else if (field.getType().equals(int.class)) {
@@ -80,58 +85,6 @@ public abstract class ConfigurationGroup {
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
     } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private Field getField(final String fieldName) {
-    for (final Field field : this.getClass().getDeclaredFields()) {
-      if (field.getName().equalsIgnoreCase(fieldName)) {
-        return field;
-      }
-    }
-
-    return null;
-  }
-
-  private Method getSetter(final String fieldName, final Class<?> fieldType) {
-    for (final Method method : this.getClass().getMethods()) {
-      // method must start with "set" and have only one parameter, mathich the
-      // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1
-          && method.getParameters()[0].getType().equals(fieldType)) {
-        return method;
-      }
-    }
-
-    return null;
-  }
-
-  private <T> void setPropertyValue(final String propertyName, final T value) {
-    try {
-      final Method method = this.getSetter(propertyName, value.getClass());
-      if (method != null) {
-        // set the new value with the setter
-        method.invoke(this, value);
-      } else {
-        // if no setter is present, try to set the field directly
-        for (final Field field : this.getClass().getDeclaredFields()) {
-          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
-            if (!field.isAccessible()) {
-              field.setAccessible(true);
-            }
-
-            field.set(this, value);
-          }
-        }
-      }
-    } catch (final SecurityException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final InvocationTargetException e) {
       e.printStackTrace();
     }
   }
@@ -173,6 +126,62 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final NumberFormatException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private Field getField(final String fieldName) {
+    for (final Field field : this.getClass().getDeclaredFields()) {
+      if (field.getName().equalsIgnoreCase(fieldName)) {
+        return field;
+      }
+    }
+
+    return null;
+  }
+
+  private Method getSetter(final String fieldName, final Class<?> fieldType) {
+    for (final Method method : this.getClass().getMethods()) {
+      // method must start with "set" and have only one parameter, mathich the
+      // specified fieldType
+      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1
+          && method.getParameters()[0].getType().equals(fieldType)) {
+        if (!method.isAccessible()) {
+          method.setAccessible(true);
+        }
+
+        return method;
+      }
+    }
+
+    return null;
+  }
+
+  private <T> void setPropertyValue(final String propertyName, final T value) {
+    try {
+      final Method method = this.getSetter(propertyName, value.getClass());
+      if (method != null) {
+        // set the new value with the setter
+        method.invoke(this, value);
+      } else {
+        // if no setter is present, try to set the field directly
+        for (final Field field : this.getClass().getDeclaredFields()) {
+          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
+            if (!field.isAccessible()) {
+              field.setAccessible(true);
+            }
+
+            field.set(this, value);
+          }
+        }
+      }
+    } catch (final SecurityException e) {
+      e.printStackTrace();
+    } catch (final IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (final IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (final InvocationTargetException e) {
       e.printStackTrace();
     }
   }
