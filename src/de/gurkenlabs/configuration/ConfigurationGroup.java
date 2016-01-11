@@ -52,12 +52,11 @@ public abstract class ConfigurationGroup {
     for (final Method method : this.getClass().getMethods()) {
       // method must start with "set" and have only one parameter, mathich the
       // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1
-          && method.getParameters()[0].getType().equals(fieldType)) {
+      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
         if (!method.isAccessible()) {
           method.setAccessible(true);
         }
-
+        
         return method;
       }
     }
