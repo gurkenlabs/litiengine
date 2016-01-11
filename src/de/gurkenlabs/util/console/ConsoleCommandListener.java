@@ -11,11 +11,11 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
   private final List<ICommandManager> commandManagers;
   private boolean gameIsRunning = true;
 
-  public ConsoleCommandListener(ICommandManager... commandManagers) {
+  public ConsoleCommandListener(final ICommandManager... commandManagers) {
     this.commandManagers = new ArrayList<>();
 
     if (commandManagers != null && commandManagers.length > 0) {
-      for (ICommandManager manager : commandManagers) {
+      for (final ICommandManager manager : commandManagers) {
         if (!this.commandManagers.contains(manager)) {
           this.commandManagers.add(manager);
         }
@@ -24,7 +24,7 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
   }
 
   @Override
-  public void register(ICommandManager manager) {
+  public void register(final ICommandManager manager) {
     if (!this.commandManagers.contains(manager)) {
       this.commandManagers.add(manager);
     }
@@ -47,6 +47,7 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
     }
   }
 
+  @Override
   public void terminate() {
     this.gameIsRunning = false;
   }

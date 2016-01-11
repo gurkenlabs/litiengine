@@ -38,98 +38,6 @@ public abstract class ConfigurationGroup {
     return this.prefix;
   }
 
-  /**
-   * Initialize by property.
-   *
-   * @param key
-   *          the key
-   * @param value
-   *          the value
-   */
-  protected void initializeByProperty(final String key, final String value) {
-    final String propertyName = key.substring(this.getPrefix().length());
-    this.initializeProperty(propertyName, value);
-  }
-
-  /**
-   * Store properties. By default, it is supported to store the following types:
-   * boolean, int, double, float, String and enum values. If you need to store
-   * any other object, you should overwrite this method as well as the
-   * initializeProperty method and implement a custom approach.
-   *
-   *
-   * @param properties
-   *          the properties
-   */
-  protected void storeProperties(final Properties properties) {
-    try {
-      for (final Field field : this.getClass().getDeclaredFields()) {
-        if (!field.isAccessible()) {
-          field.setAccessible(true);
-        }
-
-        if (field.getType().equals(boolean.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Boolean.toString(field.getBoolean(this)));
-        } else if (field.getType().equals(int.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Integer.toString(field.getInt(this)));
-        } else if (field.getType().equals(float.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Float.toString(field.getFloat(this)));
-        } else if (field.getType().equals(double.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Double.toString(field.getDouble(this)));
-        } else if (field.getType().equals(String.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), (String) field.get(this));
-        } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
-          properties.setProperty(this.getPrefix() + field.getName(), field.get(this).toString());
-        }
-      }
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Initialize property.
-   *
-   * @param propertyName
-   *          the property name
-   * @param value
-   *          the value
-   */
-  protected void initializeProperty(final String propertyName, final String value) {
-    // if a setter is present, this method will use it, otherwise it will
-    // directly try to set the field.
-    final Field field = this.getField(propertyName);
-    if (field == null) {
-      return;
-    }
-
-    try {
-      if (field.getType().equals(boolean.class)) {
-        this.setPropertyValue(propertyName, Boolean.parseBoolean(value));
-      } else if (field.getType().equals(int.class)) {
-        this.setPropertyValue(propertyName, Integer.parseInt(value));
-      } else if (field.getType().equals(float.class)) {
-        this.setPropertyValue(propertyName, Float.parseFloat(value));
-      } else if (field.getType().equals(double.class)) {
-        this.setPropertyValue(propertyName, Double.parseDouble(value));
-      } else if (field.getType().equals(String.class)) {
-        this.setPropertyValue(propertyName, value);
-      } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
-        final Object[] enumArray = field.getType().getEnumConstants();
-
-        for (final Object enumConst : enumArray) {
-          if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
-            this.setPropertyValue(propertyName, field.getType().cast(enumConst));
-          }
-        }
-      }
-    } catch (final NumberFormatException e) {
-      e.printStackTrace();
-    }
-  }
-
   private Field getField(final String fieldName) {
     for (final Field field : this.getClass().getDeclaredFields()) {
       if (field.getName().equalsIgnoreCase(fieldName)) {
@@ -182,6 +90,98 @@ public abstract class ConfigurationGroup {
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
     } catch (final InvocationTargetException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Initialize by property.
+   *
+   * @param key
+   *          the key
+   * @param value
+   *          the value
+   */
+  protected void initializeByProperty(final String key, final String value) {
+    final String propertyName = key.substring(this.getPrefix().length());
+    this.initializeProperty(propertyName, value);
+  }
+
+  /**
+   * Initialize property.
+   *
+   * @param propertyName
+   *          the property name
+   * @param value
+   *          the value
+   */
+  protected void initializeProperty(final String propertyName, final String value) {
+    // if a setter is present, this method will use it, otherwise it will
+    // directly try to set the field.
+    final Field field = this.getField(propertyName);
+    if (field == null) {
+      return;
+    }
+
+    try {
+      if (field.getType().equals(boolean.class)) {
+        this.setPropertyValue(propertyName, Boolean.parseBoolean(value));
+      } else if (field.getType().equals(int.class)) {
+        this.setPropertyValue(propertyName, Integer.parseInt(value));
+      } else if (field.getType().equals(float.class)) {
+        this.setPropertyValue(propertyName, Float.parseFloat(value));
+      } else if (field.getType().equals(double.class)) {
+        this.setPropertyValue(propertyName, Double.parseDouble(value));
+      } else if (field.getType().equals(String.class)) {
+        this.setPropertyValue(propertyName, value);
+      } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+        final Object[] enumArray = field.getType().getEnumConstants();
+
+        for (final Object enumConst : enumArray) {
+          if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
+            this.setPropertyValue(propertyName, field.getType().cast(enumConst));
+          }
+        }
+      }
+    } catch (final NumberFormatException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Store properties. By default, it is supported to store the following types:
+   * boolean, int, double, float, String and enum values. If you need to store
+   * any other object, you should overwrite this method as well as the
+   * initializeProperty method and implement a custom approach.
+   *
+   *
+   * @param properties
+   *          the properties
+   */
+  protected void storeProperties(final Properties properties) {
+    try {
+      for (final Field field : this.getClass().getDeclaredFields()) {
+        if (!field.isAccessible()) {
+          field.setAccessible(true);
+        }
+
+        if (field.getType().equals(boolean.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Boolean.toString(field.getBoolean(this)));
+        } else if (field.getType().equals(int.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Integer.toString(field.getInt(this)));
+        } else if (field.getType().equals(float.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Float.toString(field.getFloat(this)));
+        } else if (field.getType().equals(double.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Double.toString(field.getDouble(this)));
+        } else if (field.getType().equals(String.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), (String) field.get(this));
+        } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+          properties.setProperty(this.getPrefix() + field.getName(), field.get(this).toString());
+        }
+      }
+    } catch (final IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (final IllegalAccessException e) {
       e.printStackTrace();
     }
   }
