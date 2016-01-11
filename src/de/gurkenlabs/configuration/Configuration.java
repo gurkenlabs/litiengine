@@ -88,7 +88,7 @@ public class Configuration {
     if (!settingsFile.exists() || !settingsFile.isFile()) {
       try {
         final OutputStream out = new FileOutputStream(settingsFile);
-        this.createDefaultSettingsFile(out);
+       this.createDefaultSettingsFile(out);
         out.close();
       } catch (final IOException e) {
         e.printStackTrace();

@@ -35,7 +35,7 @@ public abstract class ConfigurationGroup {
    * @return the prefix
    */
   public String getPrefix() {
-    return this.prefix;
+    return this.prefix != null ? this.prefix : "";
   }
 
   private Field getField(final String fieldName) {
@@ -56,7 +56,7 @@ public abstract class ConfigurationGroup {
         if (!method.isAccessible()) {
           method.setAccessible(true);
         }
-        
+
         return method;
       }
     }
@@ -131,6 +131,12 @@ public abstract class ConfigurationGroup {
         this.setPropertyValue(propertyName, Float.parseFloat(value));
       } else if (field.getType().equals(double.class)) {
         this.setPropertyValue(propertyName, Double.parseDouble(value));
+      } else if (field.getType().equals(short.class)) {
+        this.setPropertyValue(propertyName, Short.parseShort(value));
+      } else if (field.getType().equals(byte.class)) {
+        this.setPropertyValue(propertyName, Byte.parseByte(value));
+      } else if (field.getType().equals(long.class)) {
+        this.setPropertyValue(propertyName, Long.parseLong(value));
       } else if (field.getType().equals(String.class)) {
         this.setPropertyValue(propertyName, value);
       } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
@@ -172,8 +178,14 @@ public abstract class ConfigurationGroup {
           properties.setProperty(this.getPrefix() + field.getName(), Float.toString(field.getFloat(this)));
         } else if (field.getType().equals(double.class)) {
           properties.setProperty(this.getPrefix() + field.getName(), Double.toString(field.getDouble(this)));
+        } else if (field.getType().equals(byte.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Byte.toString(field.getByte(this)));
+        } else if (field.getType().equals(short.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Short.toString(field.getShort(this)));
+        } else if (field.getType().equals(long.class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), Long.toString(field.getLong(this)));
         } else if (field.getType().equals(String.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), (String) field.get(this));
+          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this).toString());
         }
