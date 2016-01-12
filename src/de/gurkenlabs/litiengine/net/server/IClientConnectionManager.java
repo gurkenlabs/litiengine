@@ -34,6 +34,6 @@ public interface IClientConnectionManager extends List<ClientConnection> {
    * @return true, if is connected
    */
   public boolean isConnected(int connectionId, InetAddress address, int port);
-  
+
   public void setSignOfLife(final int clientId);
 }

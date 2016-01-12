@@ -187,7 +187,7 @@ public abstract class ConfigurationGroup {
         } else if (field.getType().equals(String.class)) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
-          String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
+          final String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
           properties.setProperty(this.getPrefix() + field.getName(), value);
         }
       }

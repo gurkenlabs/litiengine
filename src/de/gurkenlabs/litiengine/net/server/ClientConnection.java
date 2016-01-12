@@ -140,6 +140,7 @@ public class ClientConnection implements Serializable {
    */
   @Override
   public String toString() {
-    return "Client(" + this.getId() + "): " + this.getIpAddress().getHostAddress() + ":" + this.getPort() + "; last sign of life: " + this.getLastSignOfLifeInMs() + "ms ago";
+    return "Client(" + this.getId() + "): " + this.getIpAddress().getHostAddress() + ":" + this.getPort() + "; last sign of life: "
+        + this.getLastSignOfLifeInMs() + "ms ago";
   }
 }
