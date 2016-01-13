@@ -19,4 +19,8 @@ public @interface GameInfo {
   public String getSubTitle() default "";
 
   public float getVersion();
+
+  public String getIcon() default "";
+
+  public String getLogo() default "";
 }
