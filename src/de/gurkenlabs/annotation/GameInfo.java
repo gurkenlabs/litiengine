@@ -8,19 +8,19 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GameInfo {
-  public String getCooperation() default "";
+  public String cooperation() default "";
 
-  public String getDescription() default "";
+  public String description() default "";
 
-  public String[] getDevelopers() default {};
+  public String[] developers() default {};
 
-  public String getName();
+  public String name();
 
-  public String getSubTitle() default "";
+  public String subTitle() default "";
 
-  public float getVersion();
+  public float version();
 
-  public String getIcon() default "";
+  public String icon() default "";
 
-  public String getLogo() default "";
+  public String logo() default "";
 }

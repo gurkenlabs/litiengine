@@ -24,8 +24,6 @@ public class MessagePackage<T> extends Package {
    */
   private final int ContentLengthByteCount = 7;
 
-  private byte[] gameInfoHash;
-
   /** The object. */
   private T object;
 
