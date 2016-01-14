@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.annotation.GameInfo;
+import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.core.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;

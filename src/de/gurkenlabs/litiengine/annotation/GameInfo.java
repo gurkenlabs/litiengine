@@ -1,4 +1,4 @@
-package de.gurkenlabs.annotation;
+package de.gurkenlabs.litiengine.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

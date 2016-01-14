@@ -2,9 +2,9 @@ package de.gurkenlabs.litiengine;
 
 import java.util.function.Consumer;
 
-import de.gurkenlabs.annotation.GameInfo;
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.core.ILaunchable;
+import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.core.IGameLoop;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
