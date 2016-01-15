@@ -47,6 +47,10 @@ public abstract class Game implements IGame {
 
     this.renderLoop = new RenderLoop();
     this.gameLoop = new GameLoop();
+    
+    // init configuration before init method in order to use configured values to initialize components
+    this.configuration = this.createConfiguration();
+    this.getConfiguration().load();
   }
 
   protected GameConfiguration createConfiguration() {
@@ -83,10 +87,6 @@ public abstract class Game implements IGame {
 
   @Override
   public void init() {
-    // init configuration
-    this.configuration = this.createConfiguration();
-    this.getConfiguration().load();
-
     // init screens
     this.getScreenManager().init(this.getConfiguration().GRAPHICS.getResolutionWidth(), this.getConfiguration().GRAPHICS.getResolutionHeight(),
         this.getConfiguration().GRAPHICS.isFullscreen());
