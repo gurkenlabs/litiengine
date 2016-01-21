@@ -35,17 +35,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The back ground color. */
   private Color backGroundColor;
 
-  /** The bounding box. */
-  private final Rectangle2D boundingBox;
-
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer;
 
   /** The components. */
   private final List<GuiComponent> components;
-
-  /** The height. */
-  private final int height;
 
   /** The id. */
   private final int id;
@@ -66,13 +60,35 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private boolean visible;
 
   /** The width. */
-  private final int width;
+  private int width;
+
+  /** The height. */
+  private int height;
 
   /** The x. */
   private int x;
 
   /** The y. */
   private int y;
+
+  protected GuiComponent(final int x, final int y) {
+    this.components = new ArrayList<>();
+    this.clickConsumer = new ArrayList<Consumer<ComponentMouseEvent>>();
+
+    this.setTextColor(DEFAULT_COLOR);
+    this.setBackGroundColor(DEFAULT_BG_COLOR);
+    this.id = ++componentId;
+    this.x = x;
+    this.y = y;
+
+    this.setVisible(true);
+    this.setSuspended(true);
+    this.setSelected(false);
+
+    this.initializeComponents();
+    Input.MOUSE.registerMouseListener(this);
+    Input.MOUSE.registerMouseMotionListener(this);
+  }
 
   /**
    * Instantiates a new gui component.
@@ -87,26 +103,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the height
    */
   protected GuiComponent(final int x, final int y, final int width, final int height) {
-    this.components = new ArrayList<>();
-    this.clickConsumer = new ArrayList<Consumer<ComponentMouseEvent>>();
-
-    this.setTextColor(DEFAULT_COLOR);
-    this.setBackGroundColor(DEFAULT_BG_COLOR);
-    this.id = ++componentId;
-    this.x = x;
-    this.y = y;
+    this(x, y);
     this.width = width;
     this.height = height;
-    this.boundingBox = new Rectangle(x, y, this.width, this.height);
-
-    this.setVisible(true);
-    this.setSuspended(true);
-    this.setSelected(false);
-
-    this.initializeComponents();
-    final ComponentMouseListener listener = new ComponentMouseListener(this);
-    Input.MOUSE.registerMouseListener(listener);
-    Input.MOUSE.registerMouseMotionListener(listener);
   }
 
   /**
@@ -124,7 +123,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    return this.boundingBox;
+    return new Rectangle(x, y, this.width, this.height);
   }
 
   /**
@@ -143,15 +142,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public int getComponentId() {
     return this.id;
-  }
-
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
-  public int getHeight() {
-    return this.height;
   }
 
   /**
@@ -186,8 +176,19 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the width
    */
+  @Override
   public int getWidth() {
     return this.width;
+  }
+
+  /**
+   * Gets the height.
+   *
+   * @return the height
+   */
+  @Override
+  public int getHeight() {
+    return this.height;
   }
 
   /**
@@ -195,6 +196,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the x
    */
+  @Override
   public int getX() {
     return this.x;
   }
@@ -204,6 +206,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the y
    */
+  @Override
   public int getY() {
     return this.y;
   }
@@ -248,6 +251,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.visible;
   }
 
+  @Override
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  @Override
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -255,9 +268,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (this.isVisible()) {
-      this.getClickConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      return;
     }
+
+    this.getClickConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /*
@@ -268,6 +283,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseDragged(final MouseEvent e) {
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      return;
+    }
   }
 
   /*
@@ -277,9 +295,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if (!this.isHovered()) {
-      this.isHovered = true;
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      this.isHovered = false;
+      return;
     }
+
+    this.isHovered = true;
   }
 
   /*
@@ -289,10 +310,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseExited(final MouseEvent e) {
-    if (this.isHovered()) {
-      this.isHovered = false;
-      this.isPressed = false;
-    }
+    this.isHovered = false;
+    this.isPressed = false;
   }
 
   /*
@@ -303,6 +322,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseMoved(final MouseEvent e) {
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      this.mouseExited(e);
+      return;
+    }
+
+    // also throw enter event if the mouse did not hover the component
+    // before
+    if (!this.isHovered()) {
+      this.mouseEntered(e);
+    }
   }
 
   /*
@@ -312,9 +341,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mousePressed(final MouseEvent e) {
-    if (!this.isPressed()) {
-      this.isPressed = true;
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      return;
     }
+
+    this.isPressed = true;
   }
 
   /*
@@ -324,9 +355,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if (this.isPressed()) {
-      this.isPressed = false;
+    if (!this.mouseEventShouldBeForwarded(e)) {
+      return;
     }
+
+    this.isPressed = false;
   }
 
   /**
@@ -473,159 +506,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   protected abstract void initializeComponents();
 
   /**
-   * The listener interface for receiving componentMouse events. The class that
-   * is interested in processing a componentMouse event implements this
-   * interface, and the object created with that class is registered with a
-   * component using the component's <code>addComponentMouseListener
-   * <code> method. When the componentMouse event occurs, that object's
-   * appropriate method is invoked.
+   * Mouse event should be forwarded.
    *
-   * @see ComponentMouseEvent
+   * @param e
+   *          the e
+   * @return true, if successful
    */
-  private class ComponentMouseListener implements MouseListener, MouseMotionListener {
-
-    /** The component. */
-    private final GuiComponent component;
-
-    /**
-     * Instantiates a new component mouse listener.
-     *
-     * @param component
-     *          the component
-     */
-    private ComponentMouseListener(final GuiComponent component) {
-      this.component = component;
-    }
-
-    /**
-     * Gets the component.
-     *
-     * @return the component
-     */
-    public GuiComponent getComponent() {
-      return this.component;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseClicked(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-
-      this.getComponent().mouseClicked(e);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.
-     * MouseEvent)
-     */
-    @Override
-    public void mouseDragged(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-
-      this.getComponent().mouseDragged(e);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseEntered(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-      this.getComponent().mouseEntered(e);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseExited(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-
-      this.getComponent().mouseExited(e);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseMoved(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        // throw exited event if the mouse hovered the component before
-        if (this.getComponent().isHovered()) {
-          this.getComponent().mouseExited(e);
-        }
-
-        return;
-      }
-
-      this.getComponent().mouseMoved(e);
-
-      // also throw enter event if the mouse did not hover the component
-      // before
-      if (!this.getComponent().isHovered()) {
-        this.getComponent().mouseEntered(e);
-      }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mousePressed(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-
-      this.getComponent().mousePressed(e);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseReleased(final MouseEvent e) {
-      if (!this.mouseEventShouldBeForwarded(e)) {
-        return;
-      }
-
-      this.getComponent().mouseReleased(e);
-    }
-
-    /**
-     * Mouse event should be forwarded.
-     *
-     * @param e
-     *          the e
-     * @return true, if successful
-     */
-    private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-      return this.getComponent().getBoundingBox().contains(e.getPoint()) && this.getComponent().isVisible() && !this.getComponent().isSuspended();
-    }
+  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
   }
 }

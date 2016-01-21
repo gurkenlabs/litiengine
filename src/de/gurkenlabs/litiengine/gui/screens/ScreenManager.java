@@ -69,6 +69,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public void addScreen(final IScreen screen) {
     this.screens.add(screen);
+    screen.setWidth(this.getWidth());
+    screen.setHeight(this.getHeight());
   }
 
   @Override
