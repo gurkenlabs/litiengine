@@ -11,8 +11,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.core.IUpdateable;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Mouse.

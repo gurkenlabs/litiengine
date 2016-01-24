@@ -45,7 +45,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   /** The frame count. */
   private int frameCount = 0;
 
-  public ScreenManager(String gameTitle) {
+  public ScreenManager(final String gameTitle) {
     super(gameTitle);
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
@@ -71,19 +71,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.screens.add(screen);
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
-  }
-
-  @Override
-  public void init(int width, int height, boolean fullscreen) {
-    if (fullscreen) {
-      this.setUndecorated(true);
-      this.device.setFullScreenWindow(this);
-    } else {
-      this.setSize(new Dimension(width, height));
-    }
-
-    this.setVisible(true);
-    this.requestFocus();
   }
 
   @Override
@@ -117,21 +104,30 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
+  public Component getRenderComponent() {
+    return this.renderCanvas;
+  }
+
+  @Override
   public Dimension getResolution() {
     return this.getSize();
   }
 
   @Override
-  public void onResolutionChanged(Consumer<Dimension> resolutionConsumer) {
-    if (this.resolutionChangedConsumer.contains(resolutionConsumer)) {
-      return;
+  public void init(final int width, final int height, final boolean fullscreen) {
+    if (fullscreen) {
+      this.setUndecorated(true);
+      this.device.setFullScreenWindow(this);
+    } else {
+      this.setSize(new Dimension(width, height));
     }
 
-    this.resolutionChangedConsumer.add(resolutionConsumer);
+    this.setVisible(true);
+    this.requestFocus();
   }
 
   @Override
-  public void onFpsChanged(Consumer<Integer> fpsConsumer) {
+  public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
     if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
     }
@@ -140,11 +136,20 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void renderCurrentScreen() {
-    if(this.getCurrentScreen() == null){
+  public void onResolutionChanged(final Consumer<Dimension> resolutionConsumer) {
+    if (this.resolutionChangedConsumer.contains(resolutionConsumer)) {
       return;
     }
-    
+
+    this.resolutionChangedConsumer.add(resolutionConsumer);
+  }
+
+  @Override
+  public void renderCurrentScreen() {
+    if (this.getCurrentScreen() == null) {
+      return;
+    }
+
     final long currentMillis = System.currentTimeMillis();
     final BufferStrategy bs = this.renderCanvas.getBufferStrategy();
     if (bs == null) {
@@ -168,11 +173,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
       this.frameCount = 0;
     }
-  }
-
-  @Override
-  public Component getRenderComponent() {
-    return this.renderCanvas;
   }
 
   /**

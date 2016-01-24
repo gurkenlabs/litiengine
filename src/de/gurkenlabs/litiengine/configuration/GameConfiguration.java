@@ -8,7 +8,7 @@ public class GameConfiguration extends Configuration {
   public final SoundConfiguration SOUND;
   public final GraphicConfiguration GRAPHICS;
 
-  public GameConfiguration(ConfigurationGroup... groups) {
+  public GameConfiguration(final ConfigurationGroup... groups) {
     super(groups);
     this.CLIENT = new ClientConfiguration();
     this.SOUND = new SoundConfiguration();

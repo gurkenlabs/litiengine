@@ -10,6 +10,9 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.core.IUpdateable;
+import de.gurkenlabs.litiengine.graphics.DefaultCamera;
+import de.gurkenlabs.litiengine.graphics.GraphicsEngine;
+import de.gurkenlabs.litiengine.graphics.IGraphicsEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -19,8 +22,9 @@ public abstract class Game implements IGame {
   private final List<Consumer<Integer>> upsChangedConsumer;
 
   private final GameInfo info;
-  private GameConfiguration configuration;
+  private final GameConfiguration configuration;
   private final IScreenManager screenManager;
+  private final IGraphicsEngine graphicsEngine;
 
   private final RenderLoop renderLoop;
   private final GameLoop gameLoop;
@@ -31,7 +35,7 @@ public abstract class Game implements IGame {
   private long gameTicks;
 
   protected Game() {
-    GameInfo info = this.getClass().getAnnotation(GameInfo.class);
+    final GameInfo info = this.getClass().getAnnotation(GameInfo.class);
     if (info == null) {
       throw new AnnotationFormatError("No GameInfo annotation found on game implementation " + this.getClass());
     }
@@ -39,7 +43,7 @@ public abstract class Game implements IGame {
     this.upsChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.info = info;
-    ScreenManager screenManager = this.createScreenManager(this.getInfo().name() + " " +this.getInfo().version());
+    final ScreenManager screenManager = this.createScreenManager(this.getInfo().name() + " " + this.getInfo().version());
 
     // ensures that we terminate the game, when the window is closed
     screenManager.addWindowListener(new WindowHandler());
@@ -47,18 +51,27 @@ public abstract class Game implements IGame {
 
     this.renderLoop = new RenderLoop();
     this.gameLoop = new GameLoop();
-    
-    // init configuration before init method in order to use configured values to initialize components
+
+    // init configuration before init method in order to use configured values
+    // to initialize components
     this.configuration = this.createConfiguration();
     this.getConfiguration().load();
+    this.graphicsEngine = new GraphicsEngine(this.getConfiguration().GRAPHICS, new DefaultCamera(this, this.getScreenManager()), this.info.orientation());
   }
 
-  protected GameConfiguration createConfiguration() {
-    return new GameConfiguration();
+  @Override
+  public long convertToMs(final long ticks) {
+    return (long) (ticks / (this.getConfiguration().CLIENT.getUpdaterate() / 1000.0));
   }
 
-  protected ScreenManager createScreenManager(String gameTitle) {
-    return new ScreenManager(gameTitle);
+  @Override
+  public GameConfiguration getConfiguration() {
+    return this.configuration;
+  }
+
+  @Override
+  public IGraphicsEngine getGraphicsEngine() {
+    return this.graphicsEngine;
   }
 
   @Override
@@ -67,22 +80,13 @@ public abstract class Game implements IGame {
   }
 
   @Override
+  public IScreenManager getScreenManager() {
+    return this.screenManager;
+  }
+
+  @Override
   public long getTicks() {
     return this.gameTicks;
-  }
-
-  @Override
-  public void registerForUpdate(IUpdateable updatable) {
-    if (!this.updatables.contains(updatable)) {
-      this.updatables.add(updatable);
-    }
-  }
-
-  @Override
-  public void unregisterFromUpdate(IUpdateable updatable) {
-    if (this.updatables.contains(updatable)) {
-      this.updatables.remove(updatable);
-    }
   }
 
   @Override
@@ -101,6 +105,20 @@ public abstract class Game implements IGame {
   }
 
   @Override
+  public void onUpsChanged(final Consumer<Integer> upsConsumer) {
+    if (!this.upsChangedConsumer.contains(upsConsumer)) {
+      this.upsChangedConsumer.add(upsConsumer);
+    }
+  }
+
+  @Override
+  public void registerForUpdate(final IUpdateable updatable) {
+    if (!this.updatables.contains(updatable)) {
+      this.updatables.add(updatable);
+    }
+  }
+
+  @Override
   public void start() {
     this.gameLoop.start();
     this.renderLoop.start();
@@ -113,19 +131,9 @@ public abstract class Game implements IGame {
   }
 
   @Override
-  public IScreenManager getScreenManager() {
-    return this.screenManager;
-  }
-
-  @Override
-  public GameConfiguration getConfiguration() {
-    return this.configuration;
-  }
-
-  @Override
-  public void onUpsChanged(Consumer<Integer> upsConsumer) {
-    if (!this.upsChangedConsumer.contains(upsConsumer)) {
-      this.upsChangedConsumer.add(upsConsumer);
+  public void unregisterFromUpdate(final IUpdateable updatable) {
+    if (this.updatables.contains(updatable)) {
+      this.updatables.remove(updatable);
     }
   }
 
@@ -143,6 +151,14 @@ public abstract class Game implements IGame {
       this.upsChangedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
       this.updateCount = 0;
     }
+  }
+
+  protected GameConfiguration createConfiguration() {
+    return new GameConfiguration();
+  }
+
+  protected ScreenManager createScreenManager(final String gameTitle) {
+    return new ScreenManager(gameTitle);
   }
 
   /**

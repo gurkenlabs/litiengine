@@ -17,7 +17,7 @@ public class Input {
   /** The mouse. */
   public static IMouse MOUSE;
 
-  public static void init(IGame gameLoop) {
+  public static void init(final IGame gameLoop) {
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
 

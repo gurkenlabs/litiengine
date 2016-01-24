@@ -9,6 +9,8 @@ package de.gurkenlabs.litiengine.core;
  * every update tick.
  */
 public interface IGameLoop {
+  public long convertToMs(long ticks);
+
   /**
    * Gets the ticks.
    *

@@ -123,7 +123,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    return new Rectangle(x, y, this.width, this.height);
+    return new Rectangle(this.x, this.y, this.width, this.height);
   }
 
   /**
@@ -142,6 +142,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public int getComponentId() {
     return this.id;
+  }
+
+  /**
+   * Gets the height.
+   *
+   * @return the height
+   */
+  @Override
+  public int getHeight() {
+    return this.height;
   }
 
   /**
@@ -179,16 +189,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public int getWidth() {
     return this.width;
-  }
-
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
-  @Override
-  public int getHeight() {
-    return this.height;
   }
 
   /**
@@ -249,16 +249,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public boolean isVisible() {
     return this.visible;
-  }
-
-  @Override
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
-  @Override
-  public void setHeight(int height) {
-    this.height = height;
   }
 
   /*
@@ -425,6 +415,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.backGroundColor = backGroundColor;
   }
 
+  @Override
+  public void setHeight(final int height) {
+    this.height = height;
+  }
+
   public void setSelected(final boolean bool) {
     this.isSelected = bool;
   }
@@ -475,6 +470,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
+  @Override
+  public void setWidth(final int width) {
+    this.width = width;
+  }
+
   /**
    * Suspend.
    */
@@ -492,6 +492,17 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   /**
+   * Mouse event should be forwarded.
+   *
+   * @param e
+   *          the e
+   * @return true, if successful
+   */
+  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+  }
+
+  /**
    * Gets the components.
    *
    * @return the components
@@ -504,15 +515,4 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * Initialize components.
    */
   protected abstract void initializeComponents();
-
-  /**
-   * Mouse event should be forwarded.
-   *
-   * @param e
-   *          the e
-   * @return true, if successful
-   */
-  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
-  }
 }

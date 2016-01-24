@@ -27,14 +27,13 @@ public abstract class Screen extends GuiComponent implements IScreen {
    */
   protected Screen() {
     super(0, 0);
-    ScreenInfo info = this.getClass().getAnnotation(ScreenInfo.class);
+    final ScreenInfo info = this.getClass().getAnnotation(ScreenInfo.class);
     if (info == null) {
       throw new AnnotationFormatError("No ScreenInfo annotation found on screen " + this.getClass());
     }
-    
+
     this.name = info.name();
   }
-
 
   @Override
   public String getName() {

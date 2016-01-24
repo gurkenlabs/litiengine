@@ -27,9 +27,9 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   /** The resolution. */
   private int resolutionHeight;
-  
+
   private int resolutionWidth;
-  
+
   private float gameScale;
 
   /**
@@ -41,6 +41,10 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
     this.setGameScale(3.0f);
+  }
+
+  public float getGameScale() {
+    return this.gameScale;
   }
 
   /**
@@ -68,6 +72,14 @@ public class GraphicConfiguration extends ConfigurationGroup {
     return new Dimension(this.resolutionWidth, this.resolutionHeight);
   }
 
+  public int getResolutionHeight() {
+    return this.resolutionHeight;
+  }
+
+  public int getResolutionWidth() {
+    return this.resolutionWidth;
+  }
+
   /**
    * Checks if is fullscreen.
    *
@@ -91,6 +103,10 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.fullscreen = fullscreen;
   }
 
+  public void setGameScale(final float gameScale) {
+    this.gameScale = gameScale;
+  }
+
   /**
    * Sets the graphic quality.
    *
@@ -101,27 +117,11 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.graphicQuality = graphicQuality;
   }
 
-  public int getResolutionHeight() {
-    return this.resolutionHeight;
-  }
-
-  public void setResolutionHeight(int resolutionHeight) {
+  public void setResolutionHeight(final int resolutionHeight) {
     this.resolutionHeight = resolutionHeight;
   }
 
-  public int getResolutionWidth() {
-    return this.resolutionWidth;
-  }
-
-  public void setResolutionWidth(int resolutionWidth) {
+  public void setResolutionWidth(final int resolutionWidth) {
     this.resolutionWidth = resolutionWidth;
-  }
-
-  public float getGameScale() {
-    return gameScale;
-  }
-
-  public void setGameScale(float gameScale) {
-    this.gameScale = gameScale;
   }
 }

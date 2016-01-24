@@ -11,6 +11,6 @@ import de.gurkenlabs.litiengine.graphics.IGuiComponent;
  * @param <TData>
  *          the generic type
  */
-public interface IScreen extends IGuiComponent{
+public interface IScreen extends IGuiComponent {
   public String getName();
 }

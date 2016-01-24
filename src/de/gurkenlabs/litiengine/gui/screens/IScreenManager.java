@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * manager.
  */
 public interface IScreenManager {
-  public void init(int width, int height, boolean fullscreen);
+  public void addScreen(final IScreen screen);
 
   /**
    * Change screen.
@@ -31,7 +31,7 @@ public interface IScreenManager {
    */
   public IScreen getCurrentScreen();
 
-  public void addScreen(final IScreen screen);
+  public Component getRenderComponent();
 
   /**
    * Gets the frame size.
@@ -40,14 +40,14 @@ public interface IScreenManager {
    */
   public Dimension getResolution();
 
-  public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
+  public void init(int width, int height, boolean fullscreen);
 
   public void onFpsChanged(Consumer<Integer> fpsConsumer);
+
+  public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
   /**
    * Render the current screen.
    */
   public void renderCurrentScreen();
-
-  public Component getRenderComponent();
 }

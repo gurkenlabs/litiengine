@@ -22,7 +22,6 @@ public class MessageType {
   public static MessageType LOGOUT = new MessageType("LOGOUT", (byte) 1);
   public static MessageType PING = new MessageType("PING", (byte) 4);
 
-
   private final String name;
   /** The packet id. */
   private final byte packetId;

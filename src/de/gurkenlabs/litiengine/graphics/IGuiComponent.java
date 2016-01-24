@@ -3,14 +3,11 @@ package de.gurkenlabs.litiengine.graphics;
 public interface IGuiComponent extends IRenderable {
 
   /**
-   * Prepare.
+   * Gets the height.
+   *
+   * @return the height
    */
-  public void prepare();
-
-  /**
-   * Suspend.
-   */
-  public void suspend();
+  public int getHeight();
 
   /**
    * Gets the width.
@@ -18,13 +15,6 @@ public interface IGuiComponent extends IRenderable {
    * @return the width
    */
   public int getWidth();
-
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
-  public int getHeight();
 
   /**
    * Gets the x.
@@ -39,7 +29,18 @@ public interface IGuiComponent extends IRenderable {
    * @return the y
    */
   public int getY();
-  
-  public void setWidth(int width);
+
+  /**
+   * Prepare.
+   */
+  public void prepare();
+
   public void setHeight(int height);
+
+  public void setWidth(int width);
+
+  /**
+   * Suspend.
+   */
+  public void suspend();
 }

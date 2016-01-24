@@ -9,10 +9,10 @@ public class LoggingConfigurationGroup extends ConfigurationGroup {
   private Level level;
 
   public Level getLevel() {
-    return level;
+    return this.level;
   }
 
-  public void setLevel(Level level) {
+  public void setLevel(final Level level) {
     this.level = level;
   }
 }

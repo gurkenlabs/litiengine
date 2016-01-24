@@ -7,12 +7,15 @@ import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.core.IGameLoop;
+import de.gurkenlabs.litiengine.graphics.IGraphicsEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 
 public interface IGame extends IGameLoop, IInitializable, ILaunchable {
-  public GameInfo getInfo();
-
   public GameConfiguration getConfiguration();
+
+  public IGraphicsEngine getGraphicsEngine();
+
+  public GameInfo getInfo();
 
   /**
    * Gets the screen manager.
@@ -22,6 +25,4 @@ public interface IGame extends IGameLoop, IInitializable, ILaunchable {
   public IScreenManager getScreenManager();
 
   public void onUpsChanged(Consumer<Integer> upsConsumer);
-
-  public long getTicks();
 }
