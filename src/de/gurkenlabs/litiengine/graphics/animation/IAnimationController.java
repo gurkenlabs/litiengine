@@ -6,17 +6,17 @@ import java.util.List;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
 public interface IAnimationController {
-  public List<IImageEffect> getImageEffects();
-  
-  public void add(IImageEffect effect);
-  
   public void add(Animation animation);
+
+  public void add(IImageEffect effect);
 
   public List<Animation> getAnimations();
 
   public Animation getCurrentAnimation();
 
   public BufferedImage getCurrentSprite();
+
+  public List<IImageEffect> getImageEffects();
 
   public void playAnimation(final String animationName);
 

@@ -15,7 +15,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -96,8 +95,8 @@ public class GraphicsEngine implements IGraphicsEngine {
       return compatibleImg;
     } catch (final IOException e) {
       e.printStackTrace();
-    } 
-    
+    }
+
     return null;
   }
 

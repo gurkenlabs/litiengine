@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +38,16 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
+  public void add(final IImageEffect effect) {
+    final List<IImageEffect> effects = this.getImageEffects();
+    if (effects.contains(effect)) {
+      effects.remove(effect);
+    }
+
+    effects.add(effect);
+  }
+
+  @Override
   public List<Animation> getAnimations() {
     return this.animations;
   }
@@ -55,11 +64,17 @@ public abstract class AnimationController implements IAnimationController {
     }
 
     BufferedImage sprite = this.getCurrentAnimation().getSpritesheet().getSprite(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
-    for (IImageEffect effect : this.getImageEffects()) {
+    for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
 
     return sprite;
+  }
+
+  @Override
+  public List<IImageEffect> getImageEffects() {
+    this.removeFinishedImageEffects();
+    return this.imageEffects;
   }
 
   @Override
@@ -93,25 +108,9 @@ public abstract class AnimationController implements IAnimationController {
     }
   }
 
-  @Override
-  public List<IImageEffect> getImageEffects() {
-    this.removeFinishedImageEffects();
-    return this.imageEffects;
-  }
-
-  @Override
-  public void add(IImageEffect effect) {
-    List<IImageEffect> effects = this.getImageEffects();
-    if (effects.contains(effect)) {
-      effects.remove(effect);
-    }
-
-    effects.add(effect);
-  }
-
   private void removeFinishedImageEffects() {
     for (int i = 0; i < this.imageEffects.size(); i++) {
-      IImageEffect effect = this.imageEffects.get(i);
+      final IImageEffect effect = this.imageEffects.get(i);
       if (effect == null) {
         continue;
       }

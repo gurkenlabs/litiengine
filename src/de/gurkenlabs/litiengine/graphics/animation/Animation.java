@@ -16,7 +16,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private final List<KeyFrame> keyframes;
   private final boolean loop;
 
-  private int frameDuration = DEFAULT_FRAME_DURATION;
+  private int frameDuration = this.DEFAULT_FRAME_DURATION;
   private boolean playing;
   private KeyFrame currentFrame;
   private long elapsedTicks;
@@ -38,6 +38,10 @@ public class Animation implements IUpdateable, ILaunchable {
     return this.currentFrame;
   }
 
+  public int getFrameDuration() {
+    return this.frameDuration;
+  }
+
   public List<KeyFrame> getKeyframes() {
     return this.keyframes;
   }
@@ -56,6 +60,12 @@ public class Animation implements IUpdateable, ILaunchable {
 
   public boolean isPlaying() {
     return this.keyframes.size() > 0 && this.playing;
+  }
+
+  public void setFrameDuration(final int frameDuration) {
+    this.frameDuration = frameDuration;
+
+    // TODO: update frame durations
   }
 
   @Override
@@ -102,7 +112,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   private void initKeyFrames(final int[] keyFrames) {
-    
+
     // if no keyframes are specified, the animation takes in the whole
     // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
     // keyframe
@@ -121,15 +131,5 @@ public class Animation implements IUpdateable, ILaunchable {
 
   private boolean isLastKeyFrame() {
     return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
-  }
-
-  public int getFrameDuration() {
-    return this.frameDuration;
-  }
-
-  public void setFrameDuration(int frameDuration) {
-    this.frameDuration = frameDuration;
-    
-    // TODO: update frame durations
   }
 }

@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.core.IGameLoop;
@@ -16,7 +15,7 @@ public class FlashPixelsImageEffect extends ImageEffect {
   }
 
   @Override
-  public BufferedImage apply(BufferedImage image) {
+  public BufferedImage apply(final BufferedImage image) {
     return ImageProcessing.flashVisiblePixels(image, this.color);
   }
 }

@@ -8,7 +8,7 @@ public abstract class ImageEffect implements IImageEffect {
 
   private final long aliveTick;
 
-  protected ImageEffect(final IGameLoop gameLoop, int ttl) {
+  protected ImageEffect(final IGameLoop gameLoop, final int ttl) {
     this.gameLoop = gameLoop;
     this.ttl = ttl;
     this.aliveTick = this.gameLoop.getTicks();

@@ -4,6 +4,6 @@ import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.core.ITimeToLive;
 
-public interface IImageEffect extends ITimeToLive{
+public interface IImageEffect extends ITimeToLive {
   public BufferedImage apply(BufferedImage image);
 }
