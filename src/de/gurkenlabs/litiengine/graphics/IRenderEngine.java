@@ -22,10 +22,12 @@ public interface IRenderEngine {
 
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
 
-  public void renderEntities(Graphics g, List<IEntity> entities);
+  public void renderEntities(Graphics g, List<? extends IEntity> entities);
 
-  public void renderEntities(Graphics g, List<IEntity> entities, IVision vision);
+  public void renderEntities(Graphics g, List<? extends IEntity> entities, IVision vision);
 
+  public void render(Graphics g, List<? extends IRenderable> renderables);
+  
   /**
    * Render map.
    *

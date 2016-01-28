@@ -86,6 +86,8 @@ public interface ICamera {
    * @return the render location
    */
   public Point2D getViewPortLocation(IEntity entity);
+  
+  public Point2D getViewPortDimensionCenter(IEntity entity);
 
   /**
    * This method calculates to location for the specified point in relation to

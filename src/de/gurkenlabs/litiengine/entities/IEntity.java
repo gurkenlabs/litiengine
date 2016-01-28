@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
-public interface IEntity extends IRenderable {
+public interface IEntity {
   public IAnimationController getAnimationController();
 
   public Rectangle2D getBoundingBox();

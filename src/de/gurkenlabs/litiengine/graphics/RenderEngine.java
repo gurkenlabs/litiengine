@@ -124,7 +124,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics g, final List<IEntity> entities) {
+  public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
     Collections.sort(entities, new EntityYComparator());
@@ -139,7 +139,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics g, final List<IEntity> entities, final IVision vision) {
+  public void renderEntities(final Graphics g, final List<? extends IEntity> entities, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -149,6 +149,11 @@ public class RenderEngine implements IRenderEngine {
     this.renderEntities(g, entities);
 
     g.setClip(oldClip);
+  }
+
+  @Override
+  public void render(Graphics g, List<? extends IRenderable> renderables) {
+    renderables.forEach(r -> r.render(g));
   }
 
   /**
@@ -181,7 +186,14 @@ public class RenderEngine implements IRenderEngine {
    *          the entity
    */
   private void renderEntity(final Graphics g, final IEntity entity) {
-    entity.render(g);
+    if (entity.getAnimationController() == null) {
+      return;
+    }
+
+    entity.getAnimationController().updateAnimation();
+
+    final BufferedImage img = entity.getAnimationController().getCurrentSprite();
+    RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
 
     for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
       consumer.accept(new RenderEvent<IEntity>(g, entity));
