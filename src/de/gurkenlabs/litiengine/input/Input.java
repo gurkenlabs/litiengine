@@ -3,7 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
-import de.gurkenlabs.litiengine.IGame;
+import de.gurkenlabs.litiengine.Game;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -17,11 +17,11 @@ public class Input {
   /** The mouse. */
   public static IMouse MOUSE;
 
-  public static void init(final IGame gameLoop) {
+  public static void init() {
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
 
-    gameLoop.registerForUpdate(KEYBOARD);
-    gameLoop.registerForUpdate(MOUSE);
+    Game.registerForUpdate(KEYBOARD);
+    Game.registerForUpdate(MOUSE);
   }
 }

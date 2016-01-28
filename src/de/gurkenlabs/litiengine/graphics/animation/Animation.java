@@ -5,13 +5,11 @@ import java.util.List;
 
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class Animation implements IUpdateable, ILaunchable {
   private final int DEFAULT_FRAME_DURATION = 120;
-  private final IGameLoop gameLoop;
   private final String name;
   private final Spritesheet spritesheet;
   private final List<KeyFrame> keyframes;
@@ -22,7 +20,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private KeyFrame currentFrame;
   private long elapsedTicks;
 
-  public Animation(final IGameLoop gameLoop, final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
+  public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this.name = name;
     this.spritesheet = spritesheet;
     this.loop = loop;
@@ -31,8 +29,8 @@ public class Animation implements IUpdateable, ILaunchable {
     if (this.getKeyframes().size() == 0) {
       System.out.println("No keyframes defined for animation " + this.getName());
     }
-    this.gameLoop = gameLoop;
-    this.gameLoop.registerForUpdate(this);
+    
+    Game.registerForUpdate(this);
   }
 
   public KeyFrame getCurrentKeyFrame() {

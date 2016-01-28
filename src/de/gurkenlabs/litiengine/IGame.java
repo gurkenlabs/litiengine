@@ -9,8 +9,7 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.graphics.IGraphicsEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 
-public interface IGame extends IGameLoop, IInitializable, ILaunchable {
-  public GameConfiguration getConfiguration();
+public interface IGame extends IInitializable, ILaunchable {
 
   public IGraphicsEngine getGraphicsEngine();
 

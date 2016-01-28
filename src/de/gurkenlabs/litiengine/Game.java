@@ -28,7 +28,7 @@ public abstract class Game implements IGame {
   private static long gameTicks;
   private final GameInfo info;
 
-  private final GameConfiguration configuration;
+  private static final GameConfiguration configuration = new GameConfiguration();
   private final IScreenManager screenManager;
   private final IGraphicsEngine graphicsEngine;
   private final RenderLoop renderLoop;
@@ -50,14 +50,13 @@ public abstract class Game implements IGame {
 
     // init configuration before init method in order to use configured values
     // to initialize components
-    this.configuration = this.createConfiguration();
-    this.getConfiguration().load();
-    updateRate = this.getConfiguration().CLIENT.getUpdaterate();
+    getConfiguration().load();
+    updateRate = getConfiguration().CLIENT.getUpdaterate();
 
     this.renderLoop = new RenderLoop();
     this.gameLoop = new GameLoop();
 
-    this.graphicsEngine = new GraphicsEngine(this.getConfiguration().GRAPHICS, new DefaultCamera(this.getScreenManager()), this.info.orientation());
+    this.graphicsEngine = new GraphicsEngine(getConfiguration().GRAPHICS, new DefaultCamera(this.getScreenManager()), this.info.orientation());
   }
 
   public static long convertToMs(final long ticks) {
@@ -102,9 +101,8 @@ public abstract class Game implements IGame {
     lastUpdateTime = currentMillis;
   }
 
-  @Override
-  public GameConfiguration getConfiguration() {
-    return this.configuration;
+  public static GameConfiguration getConfiguration() {
+    return configuration;
   }
 
   @Override
@@ -125,13 +123,12 @@ public abstract class Game implements IGame {
   @Override
   public void init() {
     // init screens
-    this.getScreenManager().init(this.getConfiguration().GRAPHICS.getResolutionWidth(), this.getConfiguration().GRAPHICS.getResolutionHeight(),
-        this.getConfiguration().GRAPHICS.isFullscreen());
+    this.getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
 
     // TODO: init sounds
 
     // init inputs
-    Input.init(this);
+    Input.init();
     this.getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     this.getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     this.getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
@@ -144,10 +141,15 @@ public abstract class Game implements IGame {
     }
   }
 
-  @Override
-  public void registerForUpdate(final IUpdateable updatable) {
+  public static void registerForUpdate(final IUpdateable updatable) {
     if (!updatables.contains(updatable)) {
       updatables.add(updatable);
+    }
+  }
+
+  public static void unregisterFromUpdate(final IUpdateable updatable) {
+    if (updatables.contains(updatable)) {
+      updatables.remove(updatable);
     }
   }
 
@@ -161,17 +163,6 @@ public abstract class Game implements IGame {
   public void terminate() {
     this.gameLoop.terminate();
     this.renderLoop.terminate();
-  }
-
-  @Override
-  public void unregisterFromUpdate(final IUpdateable updatable) {
-    if (updatables.contains(updatable)) {
-      updatables.remove(updatable);
-    }
-  }
-
-  protected GameConfiguration createConfiguration() {
-    return new GameConfiguration();
   }
 
   protected ScreenManager createScreenManager(final String gameTitle) {
@@ -233,7 +224,7 @@ public abstract class Game implements IGame {
     @Override
     public void run() {
       while (this.gameIsRunning) {
-        final int SKIP_FRAMES = 1000 / Game.this.getConfiguration().CLIENT.getMaxFps();
+        final int SKIP_FRAMES = 1000 / Game.getConfiguration().CLIENT.getMaxFps();
 
         if (System.currentTimeMillis() > this.nextRenderTick) {
           Game.this.getGraphicsEngine().getCamera().updateFocus();
