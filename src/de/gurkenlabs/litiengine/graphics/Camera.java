@@ -23,7 +23,7 @@ public abstract class Camera implements ICamera {
 
   /** The shake tick. */
   private long shakeTick;
-  
+
   /**
    * Instantiates a new camera.
    */
@@ -121,7 +121,7 @@ public abstract class Camera implements ICamera {
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
   }
-  
+
   /**
    * Apply shake effect.
    *

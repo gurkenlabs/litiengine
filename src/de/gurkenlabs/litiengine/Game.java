@@ -20,20 +20,20 @@ public abstract class Game implements IGame {
   private static final List<IUpdateable> updatables = new CopyOnWriteArrayList<>();
   private static final List<Consumer<Integer>> upsChangedConsumer = new CopyOnWriteArrayList<>();
 
-  private final GameInfo info;
-  private final GameConfiguration configuration;
-  private final IScreenManager screenManager;
-  private final IGraphicsEngine graphicsEngine;
-
-  private final RenderLoop renderLoop;
-  private final GameLoop gameLoop;
-
   private static int updateRate;
   private static int updateCount;
   private static long lastUpsTime;
   private static long lastUpdateTime;
 
   private static long gameTicks;
+  private final GameInfo info;
+
+  private final GameConfiguration configuration;
+  private final IScreenManager screenManager;
+  private final IGraphicsEngine graphicsEngine;
+  private final RenderLoop renderLoop;
+
+  private final GameLoop gameLoop;
 
   protected Game() {
     final GameInfo info = this.getClass().getAnnotation(GameInfo.class);
@@ -60,16 +60,22 @@ public abstract class Game implements IGame {
     this.graphicsEngine = new GraphicsEngine(this.getConfiguration().GRAPHICS, new DefaultCamera(this.getScreenManager()), this.info.orientation());
   }
 
+  public static long convertToMs(final long ticks) {
+    return (long) (ticks / (updateRate / 1000.0));
+  }
+
   public static long getDeltaTime() {
     return System.currentTimeMillis() - lastUpdateTime;
   }
 
   /**
-   * Calculates the deltatime between the current game time and the specified ticks in ms.
+   * Calculates the deltatime between the current game time and the specified
+   * ticks in ms.
+   * 
    * @param ticks
    * @return The delta time in ms.
    */
-  public static long getDeltaTime(long ticks){
+  public static long getDeltaTime(final long ticks) {
     return convertToMs(gameTicks - ticks);
   }
 
@@ -77,8 +83,23 @@ public abstract class Game implements IGame {
     return gameTicks;
   }
 
-  public static long convertToMs(final long ticks) {
-    return (long) (ticks / (updateRate / 1000.0));
+  /**
+   * Update.
+   */
+  private static void update() {
+    ++gameTicks;
+    updatables.forEach(updatable -> updatable.update());
+
+    updateCount++;
+
+    final long currentMillis = System.currentTimeMillis();
+    if (currentMillis - lastUpsTime >= 1000) {
+      lastUpsTime = currentMillis;
+      upsChangedConsumer.forEach(consumer -> consumer.accept(updateCount));
+      updateCount = 0;
+    }
+
+    lastUpdateTime = currentMillis;
   }
 
   @Override
@@ -147,25 +168,6 @@ public abstract class Game implements IGame {
     if (updatables.contains(updatable)) {
       updatables.remove(updatable);
     }
-  }
-
-  /**
-   * Update.
-   */
-  private static void update() {
-    ++gameTicks;
-    updatables.forEach(updatable -> updatable.update());
-
-    updateCount++;
-
-    final long currentMillis = System.currentTimeMillis();
-    if (currentMillis - lastUpsTime >= 1000) {
-      lastUpsTime = currentMillis;
-      upsChangedConsumer.forEach(consumer -> consumer.accept(updateCount));
-      updateCount = 0;
-    }
-
-    lastUpdateTime = currentMillis;
   }
 
   protected GameConfiguration createConfiguration() {

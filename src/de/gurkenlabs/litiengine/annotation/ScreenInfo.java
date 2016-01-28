@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface ScreenInfo {
-  String name();
   boolean applyRenderScale() default true;
+
+  String name();
 }

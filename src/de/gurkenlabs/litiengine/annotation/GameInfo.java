@@ -24,9 +24,9 @@ public @interface GameInfo {
 
   public MapOrientation orientation() default MapOrientation.orthogonal;
 
+  public float renderScale() default 3.0f;
+
   public String subTitle() default "";
 
   public float version();
-
-  public float renderScale() default 3.0f;
 }

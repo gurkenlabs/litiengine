@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 
 /**
