@@ -3,7 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
-import de.gurkenlabs.litiengine.core.IUpdateable;
+import de.gurkenlabs.litiengine.IUpdateable;
 
 /**
  * The Interface IKeyboard.

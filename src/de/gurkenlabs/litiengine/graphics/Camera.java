@@ -5,16 +5,14 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.core.IGameLoop;
-import de.gurkenlabs.litiengine.core.IUpdateable;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
  * The Class Camera.
  */
-public abstract class Camera implements ICamera, IUpdateable {
+public abstract class Camera implements ICamera {
 
-  private final IGameLoop gameLoop;
   private Point2D focus;
 
   /** The shake duration. */
@@ -24,17 +22,12 @@ public abstract class Camera implements ICamera, IUpdateable {
   private int shakeIntensity = 1;
 
   /** The shake tick. */
-  private int shakeTick;
-
-  /** The update count. */
-  private int updateCount;
-
+  private long shakeTick;
+  
   /**
    * Instantiates a new camera.
    */
-  protected Camera(final IGameLoop gameLoop) {
-    this.gameLoop = gameLoop;
-    this.gameLoop.registerForUpdate(this);
+  protected Camera() {
   }
 
   @Override
@@ -124,21 +117,11 @@ public abstract class Camera implements ICamera, IUpdateable {
    */
   @Override
   public void shake(final int intensity, final int shakeDuration) {
-    this.shakeTick = this.updateCount;
+    this.shakeTick = Game.getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
   }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
-  @Override
-  public void update() {
-    this.updateCount++;
-  }
-
+  
   /**
    * Apply shake effect.
    *
@@ -148,7 +131,7 @@ public abstract class Camera implements ICamera, IUpdateable {
    */
   protected Point2D applyShakeEffect(final Point2D cameraLocation) {
     final boolean rnd = Math.random() > 0.5;
-    if (this.getShakeTick() != 0 && this.gameLoop.convertToMs(this.getUpdateCount() - this.getShakeTick()) < this.getShakeDuration()) {
+    if (this.getShakeTick() != 0 && Game.getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
       return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * (rnd ? -1 : 1), cameraLocation.getY() + this.getShakeOffset() * (rnd ? -1 : 1));
     }
 
@@ -178,17 +161,8 @@ public abstract class Camera implements ICamera, IUpdateable {
    *
    * @return the shake tick
    */
-  protected int getShakeTick() {
+  protected long getShakeTick() {
     return this.shakeTick;
-  }
-
-  /**
-   * Gets the update count.
-   *
-   * @return the update count
-   */
-  protected int getUpdateCount() {
-    return this.updateCount;
   }
 
   protected void setFocus(final Point2D focus) {

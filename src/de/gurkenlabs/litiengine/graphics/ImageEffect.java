@@ -1,22 +1,20 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import de.gurkenlabs.litiengine.core.IGameLoop;
+import de.gurkenlabs.litiengine.Game;
 
 public abstract class ImageEffect implements IImageEffect {
-  private final IGameLoop gameLoop;
   private final int ttl;
 
   private final long aliveTick;
 
-  protected ImageEffect(final IGameLoop gameLoop, final int ttl) {
-    this.gameLoop = gameLoop;
+  protected ImageEffect(final int ttl) {
     this.ttl = ttl;
-    this.aliveTick = this.gameLoop.getTicks();
+    this.aliveTick = Game.getTicks();
   }
 
   @Override
-  public int getAliveTime() {
-    return (int) this.gameLoop.convertToMs(this.gameLoop.getTicks() - this.aliveTick);
+  public long getAliveTime() {
+    return Game.getDeltaTime(this.aliveTick);
   }
 
   @Override
@@ -26,6 +24,6 @@ public abstract class ImageEffect implements IImageEffect {
 
   @Override
   public boolean timeToLiveReached() {
-    return this.getTimeToLive() > 0 && this.gameLoop.convertToMs(this.gameLoop.getTicks() - this.aliveTick) > this.getTimeToLive();
+    return this.getTimeToLive() > 0 && this.getAliveTime() > this.getTimeToLive();
   }
 }

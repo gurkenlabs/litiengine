@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
-import de.gurkenlabs.litiengine.core.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.DefaultCamera;
 import de.gurkenlabs.litiengine.graphics.GraphicsEngine;
 import de.gurkenlabs.litiengine.graphics.IGraphicsEngine;
@@ -18,8 +17,8 @@ import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 
 public abstract class Game implements IGame {
-  private final List<IUpdateable> updatables;
-  private final List<Consumer<Integer>> upsChangedConsumer;
+  private static final List<IUpdateable> updatables = new CopyOnWriteArrayList<>();
+  private static final List<Consumer<Integer>> upsChangedConsumer = new CopyOnWriteArrayList<>();
 
   private final GameInfo info;
   private final GameConfiguration configuration;
@@ -29,18 +28,18 @@ public abstract class Game implements IGame {
   private final RenderLoop renderLoop;
   private final GameLoop gameLoop;
 
-  private int updateCount;
-  private long lastUpsTime;
+  private static int updateRate;
+  private static int updateCount;
+  private static long lastUpsTime;
+  private static long lastUpdateTime;
 
-  private long gameTicks;
+  private static long gameTicks;
 
   protected Game() {
     final GameInfo info = this.getClass().getAnnotation(GameInfo.class);
     if (info == null) {
       throw new AnnotationFormatError("No GameInfo annotation found on game implementation " + this.getClass());
     }
-    this.updatables = new CopyOnWriteArrayList<>();
-    this.upsChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.info = info;
     final ScreenManager screenManager = this.createScreenManager(this.getInfo().name() + " " + this.getInfo().version());
@@ -49,19 +48,37 @@ public abstract class Game implements IGame {
     screenManager.addWindowListener(new WindowHandler());
     this.screenManager = screenManager;
 
-    this.renderLoop = new RenderLoop();
-    this.gameLoop = new GameLoop();
-
     // init configuration before init method in order to use configured values
     // to initialize components
     this.configuration = this.createConfiguration();
     this.getConfiguration().load();
-    this.graphicsEngine = new GraphicsEngine(this.getConfiguration().GRAPHICS, new DefaultCamera(this, this.getScreenManager()), this.info.orientation());
+    updateRate = this.getConfiguration().CLIENT.getUpdaterate();
+
+    this.renderLoop = new RenderLoop();
+    this.gameLoop = new GameLoop();
+
+    this.graphicsEngine = new GraphicsEngine(this.getConfiguration().GRAPHICS, new DefaultCamera(this.getScreenManager()), this.info.orientation());
   }
 
-  @Override
-  public long convertToMs(final long ticks) {
-    return (long) (ticks / (this.getConfiguration().CLIENT.getUpdaterate() / 1000.0));
+  public static long getDeltaTime() {
+    return System.currentTimeMillis() - lastUpdateTime;
+  }
+
+  /**
+   * Calculates the deltatime between the current game time and the specified ticks in ms.
+   * @param ticks
+   * @return The delta time in ms.
+   */
+  public static long getDeltaTime(long ticks){
+    return convertToMs(gameTicks - ticks);
+  }
+
+  public static long getTicks() {
+    return gameTicks;
+  }
+
+  public static long convertToMs(final long ticks) {
+    return (long) (ticks / (updateRate / 1000.0));
   }
 
   @Override
@@ -85,11 +102,6 @@ public abstract class Game implements IGame {
   }
 
   @Override
-  public long getTicks() {
-    return this.gameTicks;
-  }
-
-  @Override
   public void init() {
     // init screens
     this.getScreenManager().init(this.getConfiguration().GRAPHICS.getResolutionWidth(), this.getConfiguration().GRAPHICS.getResolutionHeight(),
@@ -106,15 +118,15 @@ public abstract class Game implements IGame {
 
   @Override
   public void onUpsChanged(final Consumer<Integer> upsConsumer) {
-    if (!this.upsChangedConsumer.contains(upsConsumer)) {
-      this.upsChangedConsumer.add(upsConsumer);
+    if (!upsChangedConsumer.contains(upsConsumer)) {
+      upsChangedConsumer.add(upsConsumer);
     }
   }
 
   @Override
   public void registerForUpdate(final IUpdateable updatable) {
-    if (!this.updatables.contains(updatable)) {
-      this.updatables.add(updatable);
+    if (!updatables.contains(updatable)) {
+      updatables.add(updatable);
     }
   }
 
@@ -132,25 +144,28 @@ public abstract class Game implements IGame {
 
   @Override
   public void unregisterFromUpdate(final IUpdateable updatable) {
-    if (this.updatables.contains(updatable)) {
-      this.updatables.remove(updatable);
+    if (updatables.contains(updatable)) {
+      updatables.remove(updatable);
     }
   }
 
   /**
    * Update.
    */
-  private void update() {
-    ++this.gameTicks;
-    this.updatables.forEach(updatable -> updatable.update());
+  private static void update() {
+    ++gameTicks;
+    updatables.forEach(updatable -> updatable.update());
 
-    this.updateCount++;
+    updateCount++;
+
     final long currentMillis = System.currentTimeMillis();
-    if (currentMillis - this.lastUpsTime >= 1000) {
-      this.lastUpsTime = currentMillis;
-      this.upsChangedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
-      this.updateCount = 0;
+    if (currentMillis - lastUpsTime >= 1000) {
+      lastUpsTime = currentMillis;
+      upsChangedConsumer.forEach(consumer -> consumer.accept(updateCount));
+      updateCount = 0;
     }
+
+    lastUpdateTime = currentMillis;
   }
 
   protected GameConfiguration createConfiguration() {
@@ -180,10 +195,10 @@ public abstract class Game implements IGame {
     @Override
     public void run() {
       while (this.gameIsRunning) {
-        final int SKIP_TICKS = 1000 / Game.this.getConfiguration().CLIENT.getUpdaterate();
+        final int SKIP_TICKS = 1000 / Game.updateRate;
 
         if (System.currentTimeMillis() > this.nextGameTick) {
-          Game.this.update();
+          Game.update();
           this.nextGameTick += SKIP_TICKS;
         }
       }
@@ -219,6 +234,7 @@ public abstract class Game implements IGame {
         final int SKIP_FRAMES = 1000 / Game.this.getConfiguration().CLIENT.getMaxFps();
 
         if (System.currentTimeMillis() > this.nextRenderTick) {
+          Game.this.getGraphicsEngine().getCamera().updateFocus();
           Game.this.getScreenManager().renderCurrentScreen();
           this.nextRenderTick += SKIP_FRAMES;
         }

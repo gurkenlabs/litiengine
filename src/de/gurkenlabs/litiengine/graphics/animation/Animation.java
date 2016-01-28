@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.gurkenlabs.core.ILaunchable;
-import de.gurkenlabs.litiengine.core.IGameLoop;
-import de.gurkenlabs.litiengine.core.IUpdateable;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class Animation implements IUpdateable, ILaunchable {
@@ -94,7 +95,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public void update() {
     // do nothing if the animation is not playing of the current keyframe is not
     // finished
-    if (!this.isPlaying() || this.gameLoop.convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
+    if (!this.isPlaying() || Game.convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
       return;
     }
 

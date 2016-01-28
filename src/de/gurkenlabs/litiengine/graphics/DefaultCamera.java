@@ -6,7 +6,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.core.IGameLoop;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 
 /**
@@ -16,8 +16,7 @@ public class DefaultCamera extends Camera {
 
   private final IScreenManager screenManager;
 
-  public DefaultCamera(final IGameLoop gameLoop, final IScreenManager screenManager) {
-    super(gameLoop);
+  public DefaultCamera(final IScreenManager screenManager) {
     this.screenManager = screenManager;
   }
 

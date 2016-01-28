@@ -1,7 +1,7 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.core;
+package de.gurkenlabs.litiengine;
 
 /**
  * The Interface IUpdateable provides the functionality to update an instance

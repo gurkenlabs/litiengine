@@ -1,7 +1,7 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.core;
+package de.gurkenlabs.litiengine;
 
 /**
  * The interface IGameLoop defines methods for the basic loop of a game. All
@@ -9,15 +9,6 @@ package de.gurkenlabs.litiengine.core;
  * every update tick.
  */
 public interface IGameLoop {
-  public long convertToMs(long ticks);
-
-  /**
-   * Gets the ticks.
-   *
-   * @return the ticks
-   */
-  public long getTicks();
-
   /**
    * Register for update.
    *

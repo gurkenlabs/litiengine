@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ScreenInfo {
   String name();
+  boolean applyRenderScale() default true;
 }

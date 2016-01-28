@@ -1,7 +1,7 @@
-package de.gurkenlabs.litiengine.core;
+package de.gurkenlabs.litiengine;
 
 public interface ITimeToLive {
-  int getAliveTime();
+  long getAliveTime();
 
   int getTimeToLive();
 
