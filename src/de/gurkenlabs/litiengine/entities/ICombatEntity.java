@@ -23,7 +23,7 @@ public interface ICombatEntity extends IEntity {
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 
   public void setTeam(int team);
-  
+
   public class CombatEntityHitArgument {
     private final ICombatEntity entity;
     private final float damage;

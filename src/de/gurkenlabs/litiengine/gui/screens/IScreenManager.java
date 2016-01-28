@@ -5,7 +5,10 @@ package de.gurkenlabs.litiengine.gui.screens;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.util.function.Consumer;
+
+import de.gurkenlabs.litiengine.graphics.ICamera;
 
 /**
  * The screen manager manages all screens of a game. The method
@@ -23,6 +26,8 @@ public interface IScreenManager {
    *          the type
    */
   public void changeScreen(String screenName);
+
+  public ICamera getCamera();
 
   /**
    * Gets the current screen.
@@ -50,4 +55,14 @@ public interface IScreenManager {
    * Render the current screen.
    */
   public void renderCurrentScreen();
+
+  /**
+   * Sets the camera.
+   *
+   * @param camera
+   *          the new camera
+   */
+  public void setCamera(ICamera camera);
+
+  public void setIconImage(Image image);
 }

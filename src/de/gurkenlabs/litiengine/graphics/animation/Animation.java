@@ -29,7 +29,7 @@ public class Animation implements IUpdateable, ILaunchable {
     if (this.getKeyframes().size() == 0) {
       System.out.println("No keyframes defined for animation " + this.getName());
     }
-    
+
     Game.registerForUpdate(this);
   }
 

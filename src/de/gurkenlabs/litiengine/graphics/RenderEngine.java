@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -35,7 +36,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 /**
  * The Class GraphicsEngine.
  */
-public class GraphicsEngine implements IGraphicsEngine {
+public class RenderEngine implements IRenderEngine {
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
 
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
@@ -43,16 +44,13 @@ public class GraphicsEngine implements IGraphicsEngine {
   /** The map renderer. */
   private final IMapRenderer mapRenderer;
 
-  /** The camera. */
-  private ICamera camera;
-
   /**
    * Instantiates a new graphics engine.
    *
    * @param mapRenderer
    *          the map renderer
    */
-  public GraphicsEngine(final GraphicConfiguration config, final ICamera camera, final MapOrientation mapOrientation) {
+  public RenderEngine(final GraphicConfiguration config, final MapOrientation mapOrientation) {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
 
@@ -66,7 +64,6 @@ public class GraphicsEngine implements IGraphicsEngine {
     }
 
     this.mapRenderer = renderer;
-    this.camera = camera;
   }
 
   /**
@@ -107,16 +104,6 @@ public class GraphicsEngine implements IGraphicsEngine {
     ((Graphics2D) g).drawImage(image, t, null);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IGraphicsEngine#getCamera()
-   */
-  @Override
-  public ICamera getCamera() {
-    return this.camera;
-  }
-
   @Override
   public IMapRenderer getMapRenderer() {
     return this.mapRenderer;
@@ -143,7 +130,7 @@ public class GraphicsEngine implements IGraphicsEngine {
     Collections.sort(entities, new EntityYComparator());
 
     for (final IEntity entity : entities) {
-      if (!this.camera.getViewPort().intersects(entity.getBoundingBox())) {
+      if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
         continue;
       }
 
@@ -169,7 +156,7 @@ public class GraphicsEngine implements IGraphicsEngine {
    *
    * @param g
    *          the g
-   * @see de.gurkenlabs.litiengine.graphics.IGraphicsEngine#renderMap(java.awt.Graphics)
+   * @see de.gurkenlabs.litiengine.graphics.IRenderEngine#renderMap(java.awt.Graphics)
    */
   @Override
   public void renderMap(final Graphics g, final IMap map) {
@@ -178,24 +165,11 @@ public class GraphicsEngine implements IGraphicsEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.render(g, this.camera.getViewPortLocation(0, 0), map);
+    this.mapRenderer.render(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map);
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<IMap>(g, map));
     }
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.graphics.IGraphicsEngine#setCamera(de.gurkenlabs.liti.
-   * graphics.ICamera)
-   */
-  @Override
-  public void setCamera(final ICamera camera) {
-    this.camera = camera;
-    this.getCamera().updateFocus();
   }
 
   /**

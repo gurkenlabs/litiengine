@@ -16,6 +16,9 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
+import de.gurkenlabs.litiengine.graphics.DefaultCamera;
+import de.gurkenlabs.litiengine.graphics.ICamera;
+
 public class ScreenManager extends JFrame implements IScreenManager {
   private static final long serialVersionUID = 7958549828482285935L;
   private static final int SCREENCHANGETIMEOUT = 200;
@@ -29,6 +32,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private final List<IScreen> screens;
 
   private final GraphicsDevice device;
+
+  /** The camera. */
+  private ICamera camera;
 
   /** The Render canvas. */
   private final Canvas renderCanvas;
@@ -99,6 +105,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
+  public ICamera getCamera() {
+    return this.camera;
+  }
+
+  @Override
   public IScreen getCurrentScreen() {
     return this.currentScreen;
   }
@@ -115,6 +126,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void init(final int width, final int height, final boolean fullscreen) {
+    this.setCamera(new DefaultCamera());
     if (fullscreen) {
       this.setUndecorated(true);
       this.device.setFullScreenWindow(this);
@@ -161,6 +173,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+    this.getCamera().updateFocus();
     this.getCurrentScreen().render(g);
 
     g.dispose();
@@ -173,6 +187,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
       this.frameCount = 0;
     }
+  }
+
+  @Override
+  public void setCamera(final ICamera camera) {
+    this.camera = camera;
+    this.getCamera().updateFocus();
   }
 
   /**

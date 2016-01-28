@@ -7,16 +7,17 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.core.IInitializable;
+import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
-import de.gurkenlabs.litiengine.graphics.DefaultCamera;
-import de.gurkenlabs.litiengine.graphics.GraphicsEngine;
-import de.gurkenlabs.litiengine.graphics.IGraphicsEngine;
+import de.gurkenlabs.litiengine.graphics.IRenderEngine;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 
-public abstract class Game implements IGame {
+public abstract class Game implements IInitializable, ILaunchable {
   private static final List<IUpdateable> updatables = new CopyOnWriteArrayList<>();
   private static final List<Consumer<Integer>> upsChangedConsumer = new CopyOnWriteArrayList<>();
 
@@ -26,27 +27,29 @@ public abstract class Game implements IGame {
   private static long lastUpdateTime;
 
   private static long gameTicks;
-  private final GameInfo info;
+  private static GameInfo info;
 
   private static final GameConfiguration configuration = new GameConfiguration();
-  private final IScreenManager screenManager;
-  private final IGraphicsEngine graphicsEngine;
+  private static IScreenManager screenManager;
+  private static IRenderEngine graphicsEngine;
   private final RenderLoop renderLoop;
 
   private final GameLoop gameLoop;
 
   protected Game() {
-    final GameInfo info = this.getClass().getAnnotation(GameInfo.class);
-    if (info == null) {
+    final GameInfo inf = this.getClass().getAnnotation(GameInfo.class);
+    if (inf == null) {
       throw new AnnotationFormatError("No GameInfo annotation found on game implementation " + this.getClass());
     }
 
-    this.info = info;
-    final ScreenManager screenManager = this.createScreenManager(this.getInfo().name() + " " + this.getInfo().version());
+    info = inf;
+
+    final ScreenManager scrMgr = new ScreenManager(getInfo().name() + " " + getInfo().version());
 
     // ensures that we terminate the game, when the window is closed
-    screenManager.addWindowListener(new WindowHandler());
-    this.screenManager = screenManager;
+    scrMgr.addWindowListener(new WindowHandler());
+    screenManager = scrMgr;
+    graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -55,12 +58,14 @@ public abstract class Game implements IGame {
 
     this.renderLoop = new RenderLoop();
     this.gameLoop = new GameLoop();
-
-    this.graphicsEngine = new GraphicsEngine(getConfiguration().GRAPHICS, new DefaultCamera(this.getScreenManager()), this.info.orientation());
   }
 
   public static long convertToMs(final long ticks) {
     return (long) (ticks / (updateRate / 1000.0));
+  }
+
+  public static GameConfiguration getConfiguration() {
+    return configuration;
   }
 
   public static long getDeltaTime() {
@@ -70,7 +75,7 @@ public abstract class Game implements IGame {
   /**
    * Calculates the deltatime between the current game time and the specified
    * ticks in ms.
-   * 
+   *
    * @param ticks
    * @return The delta time in ms.
    */
@@ -78,8 +83,38 @@ public abstract class Game implements IGame {
     return convertToMs(gameTicks - ticks);
   }
 
+  public static GameInfo getInfo() {
+    return info;
+  }
+
+  public static IRenderEngine getRenderEngine() {
+    return graphicsEngine;
+  }
+
+  public static IScreenManager getScreenManager() {
+    return screenManager;
+  }
+
   public static long getTicks() {
     return gameTicks;
+  }
+
+  public static void onUpsChanged(final Consumer<Integer> upsConsumer) {
+    if (!upsChangedConsumer.contains(upsConsumer)) {
+      upsChangedConsumer.add(upsConsumer);
+    }
+  }
+
+  public static void registerForUpdate(final IUpdateable updatable) {
+    if (!updatables.contains(updatable)) {
+      updatables.add(updatable);
+    }
+  }
+
+  public static void unregisterFromUpdate(final IUpdateable updatable) {
+    if (updatables.contains(updatable)) {
+      updatables.remove(updatable);
+    }
   }
 
   /**
@@ -101,56 +136,18 @@ public abstract class Game implements IGame {
     lastUpdateTime = currentMillis;
   }
 
-  public static GameConfiguration getConfiguration() {
-    return configuration;
-  }
-
-  @Override
-  public IGraphicsEngine getGraphicsEngine() {
-    return this.graphicsEngine;
-  }
-
-  @Override
-  public GameInfo getInfo() {
-    return this.info;
-  }
-
-  @Override
-  public IScreenManager getScreenManager() {
-    return this.screenManager;
-  }
-
   @Override
   public void init() {
     // init screens
-    this.getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
+    getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
 
     // TODO: init sounds
 
     // init inputs
     Input.init();
-    this.getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
-    this.getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
-    this.getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
-  }
-
-  @Override
-  public void onUpsChanged(final Consumer<Integer> upsConsumer) {
-    if (!upsChangedConsumer.contains(upsConsumer)) {
-      upsChangedConsumer.add(upsConsumer);
-    }
-  }
-
-  public static void registerForUpdate(final IUpdateable updatable) {
-    if (!updatables.contains(updatable)) {
-      updatables.add(updatable);
-    }
-  }
-
-  public static void unregisterFromUpdate(final IUpdateable updatable) {
-    if (updatables.contains(updatable)) {
-      updatables.remove(updatable);
-    }
+    getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
+    getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
+    getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
   }
 
   @Override
@@ -163,10 +160,6 @@ public abstract class Game implements IGame {
   public void terminate() {
     this.gameLoop.terminate();
     this.renderLoop.terminate();
-  }
-
-  protected ScreenManager createScreenManager(final String gameTitle) {
-    return new ScreenManager(gameTitle);
   }
 
   /**
@@ -227,8 +220,7 @@ public abstract class Game implements IGame {
         final int SKIP_FRAMES = 1000 / Game.getConfiguration().CLIENT.getMaxFps();
 
         if (System.currentTimeMillis() > this.nextRenderTick) {
-          Game.this.getGraphicsEngine().getCamera().updateFocus();
-          Game.this.getScreenManager().renderCurrentScreen();
+          Game.getScreenManager().renderCurrentScreen();
           this.nextRenderTick += SKIP_FRAMES;
         }
       }

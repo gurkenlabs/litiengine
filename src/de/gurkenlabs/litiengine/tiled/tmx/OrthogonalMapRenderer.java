@@ -15,8 +15,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 
-import de.gurkenlabs.litiengine.graphics.GraphicsEngine;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.ITile;
@@ -82,7 +82,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      GraphicsEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
     }
 
     g.dispose();
@@ -111,7 +111,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   public void render(final Graphics g, final Point2D offset, final IMap map) {
     // draw all tile layers to the graphics object
     final BufferedImage mapImage = this.getMapImage(map);
-    GraphicsEngine.renderImage(g, mapImage, offset);
+    RenderEngine.renderImage(g, mapImage, offset);
   }
 
   /**

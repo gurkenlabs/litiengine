@@ -14,7 +14,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 /**
  * The Interface IGraphicsEngine.
  */
-public interface IGraphicsEngine extends ICameraProvider {
+public interface IRenderEngine {
 
   public IMapRenderer getMapRenderer();
 
@@ -33,12 +33,4 @@ public interface IGraphicsEngine extends ICameraProvider {
    *          the g
    */
   public void renderMap(Graphics g, final IMap map);
-
-  /**
-   * Sets the camera.
-   *
-   * @param camera
-   *          the new camera
-   */
-  public void setCamera(ICamera camera);
 }

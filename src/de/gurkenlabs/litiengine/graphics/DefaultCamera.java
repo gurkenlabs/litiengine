@@ -6,18 +6,12 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
+import de.gurkenlabs.litiengine.Game;
 
 /**
  * The Class DefaultCamera.
  */
 public class DefaultCamera extends Camera {
-
-  private final IScreenManager screenManager;
-
-  public DefaultCamera(final IScreenManager screenManager) {
-    this.screenManager = screenManager;
-  }
 
   /*
    * (non-Javadoc)
@@ -26,7 +20,7 @@ public class DefaultCamera extends Camera {
    */
   @Override
   public double getCenterX() {
-    return this.screenManager.getResolution().width / 2.0;
+    return Game.getScreenManager().getResolution().width / 2.0;
   }
 
   /*
@@ -36,7 +30,7 @@ public class DefaultCamera extends Camera {
    */
   @Override
   public double getCenterY() {
-    return this.screenManager.getResolution().height / 2.0;
+    return Game.getScreenManager().getResolution().height / 2.0;
   }
 
   /*
@@ -46,7 +40,7 @@ public class DefaultCamera extends Camera {
    */
   @Override
   public Rectangle2D getViewPort() {
-    return new Rectangle2D.Double(this.getFocus().getX(), this.getFocus().getY(), this.screenManager.getResolution().width, this.screenManager.getResolution().height);
+    return new Rectangle2D.Double(this.getFocus().getX(), this.getFocus().getY(), Game.getScreenManager().getResolution().width, Game.getScreenManager().getResolution().height);
   }
 
   @Override

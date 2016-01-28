@@ -107,7 +107,7 @@ public class Spritesheet {
       return ImageCache.SPRITES.get(imageCacheKey);
     }
 
-    final BufferedImage bigImg = GraphicsEngine.getImage(this.getPath());
+    final BufferedImage bigImg = RenderEngine.getImage(this.getPath());
     if (bigImg == null) {
       return null;
     }
