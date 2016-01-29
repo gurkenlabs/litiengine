@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Ellipse2D;
 import java.util.function.Consumer;
 
-public interface ICombatEntity extends IEntity {
+public interface ICombatEntity extends ICollisionEntity {
   public CombatAttributes getAttributes();
 
   public Ellipse2D getHitBox();

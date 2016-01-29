@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
@@ -16,6 +17,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
  * The Class AttackableEntity.
  */
 @CombatAttributesInfo
+@CollisionInfo(collision = true)
 public abstract class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
