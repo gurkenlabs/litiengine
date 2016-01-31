@@ -100,6 +100,11 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
+  public boolean move(IMovableEntity entity, float delta) {
+    return this.move(entity, entity.getFacingAngle(), delta);
+  }
+
+  @Override
   public void remove(final ICollisionEntity entity) {
     if (this.collisionEntities.contains(entity)) {
       this.collisionEntities.remove(entity);
@@ -192,6 +197,10 @@ public class PhysicsEngine implements IPhysicsEngine {
    * @return true, if is in map
    */
   private boolean isInMap(final Shape collisionBox) {
+    if (this.environmentBounds == null) {
+      return true;
+    }
+    
     return this.environmentBounds.contains(collisionBox.getBounds());
   }
 }

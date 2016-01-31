@@ -9,7 +9,9 @@ public interface IMovableEntity extends ICollisionEntity {
 
   public float getFacingAngle();
 
-  public FacingDirection getFacingDirection();
+  public Direction getFacingDirection();
+  
+  public void setFacingDirection(Direction facingDirection);
 
   public IEntityNavigator getNavigator();
 

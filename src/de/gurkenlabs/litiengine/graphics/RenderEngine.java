@@ -177,15 +177,8 @@ public class RenderEngine implements IRenderEngine {
     }
   }
 
-  /**
-   * Draw entity.
-   *
-   * @param g
-   *          the g
-   * @param entity
-   *          the entity
-   */
-  private void renderEntity(final Graphics g, final IEntity entity) {
+  @Override
+  public void renderEntity(final Graphics g, final IEntity entity) {
     if (entity.getAnimationController() == null) {
       return;
     }

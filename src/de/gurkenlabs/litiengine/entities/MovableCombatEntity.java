@@ -40,26 +40,47 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public FacingDirection getFacingDirection() {
+  public Direction getFacingDirection() {
     if (this.getFacingAngle() >= 0 && this.getFacingAngle() < 45) {
-      return FacingDirection.DOWN;
+      return Direction.DOWN;
     }
     if (this.getFacingAngle() >= 45 && this.getFacingAngle() < 135) {
-      return FacingDirection.RIGHT;
+      return Direction.RIGHT;
     }
     if (this.getFacingAngle() >= 135 && this.getFacingAngle() < 225) {
-      return FacingDirection.UP;
+      return Direction.UP;
     }
     if (this.getFacingAngle() >= 225 && this.getFacingAngle() < 315) {
-      return FacingDirection.LEFT;
+      return Direction.LEFT;
     }
 
     if (this.getFacingAngle() >= 315 && this.getFacingAngle() <= 360) {
-      return FacingDirection.DOWN;
+      return Direction.DOWN;
     }
 
     System.out.println("unknown facing angle " + this.getFacingAngle());
-    return FacingDirection.UNDEFINED;
+    return Direction.UNDEFINED;
+  }
+
+  @Override
+  public void setFacingDirection(Direction facingDirection) {
+    switch (facingDirection) {
+    case DOWN:
+      this.setFacingAngle(0);
+      break;
+    case RIGHT:
+      this.setFacingAngle(90);
+      break;
+    case UP:
+      this.setFacingAngle(180);
+      break;
+    case LEFT:
+      this.setFacingAngle(270);
+      break;
+
+    default:
+      return;
+    }
   }
 
   @Override

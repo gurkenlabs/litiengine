@@ -29,9 +29,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   private int resolutionHeight;
 
   private int resolutionWidth;
-
-  private float gameScale;
-
+  
   /**
    * Instantiates a new graphic configuration.
    */
@@ -40,11 +38,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.fullscreen = false;
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
-    this.setGameScale(3.0f);
-  }
-
-  public float getGameScale() {
-    return this.gameScale;
   }
 
   /**
@@ -102,11 +95,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
     this.fullscreen = fullscreen;
   }
-
-  public void setGameScale(final float gameScale) {
-    this.gameScale = gameScale;
-  }
-
+  
   /**
    * Sets the graphic quality.
    *
