@@ -101,6 +101,51 @@ public class GeometricPathFinder implements IPathFinder {
     return new Path(start, target, path);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.gurkenlabs.liti.physics.IPhysicsEngine#getFirstIntersectedCollisionBox(
+   * de.gurkenlabs.liti.entities.Entity, java.awt.geom.Point2D,
+   * java.awt.geom.Point2D)
+   */
+  private Rectangle2D getFirstIntersectedCollisionBox(final ICollisionEntity entity, final Point2D start, final Point2D target) {
+    final List<Rectangle2D> allCollisionBoxes = Game.getPhysicsEngine().getAllCollisionBoxes();
+
+    final Line2D line = new Line2D.Double(start, target);
+    final HashMap<Rectangle2D, Point2D> intersectedShapes = new HashMap<>();
+    for (final Rectangle2D collisionBox : allCollisionBoxes) {
+      if (collisionBox.equals(entity.getCollisionBox())) {
+        continue;
+      }
+
+      // apply a margin for the path calculation in order to take the entities
+      // collision box into consideration
+      final Rectangle2D rectangleWithMargin = this.applyPathMargin(entity, collisionBox);
+      final Point2D intersection = GeometricUtilities.intersects(line, rectangleWithMargin);
+      if (intersection != null) {
+        intersectedShapes.put(rectangleWithMargin, intersection);
+      }
+    }
+
+    Rectangle2D min = null;
+    double minDist = 0;
+    for (final Rectangle2D shape : intersectedShapes.keySet()) {
+      final double dist = intersectedShapes.get(shape).distance(start);
+      if (min == null) {
+        min = shape;
+        minDist = dist;
+        continue;
+      }
+
+      if (dist < minDist) {
+        min = shape;
+      }
+    }
+
+    return min;
+  }
+
   private Point2D getNextPoint(final IMovableEntity entity, final Point2D currentPoint, final Point2D target) {
     // 1. get first intersected collision box
     final Rectangle2D currentCollisionBox = this.getFirstIntersectedCollisionBox(entity, currentPoint, target);
@@ -138,50 +183,5 @@ public class GeometricPathFinder implements IPathFinder {
     }
 
     return null;
-  }
-  
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.physics.IPhysicsEngine#getFirstIntersectedCollisionBox(
-   * de.gurkenlabs.liti.entities.Entity, java.awt.geom.Point2D,
-   * java.awt.geom.Point2D)
-   */
-  private Rectangle2D getFirstIntersectedCollisionBox(final ICollisionEntity entity, final Point2D start, final Point2D target) {
-    final List<Rectangle2D> allCollisionBoxes = Game.getPhysicsEngine().getAllCollisionBoxes();
-
-    final Line2D line = new Line2D.Double(start, target);
-    final HashMap<Rectangle2D, Point2D> intersectedShapes = new HashMap<>();
-    for (final Rectangle2D collisionBox : allCollisionBoxes) {
-      if(collisionBox.equals(entity.getCollisionBox())){
-        continue;
-      }
-      
-      // apply a margin for the path calculation in order to take the entities
-      // collision box into consideration
-      final Rectangle2D rectangleWithMargin = this.applyPathMargin(entity, collisionBox);
-      final Point2D intersection = GeometricUtilities.intersects(line, rectangleWithMargin);
-      if (intersection != null) {
-        intersectedShapes.put(rectangleWithMargin, intersection);
-      }
-    }
-
-    Rectangle2D min = null;
-    double minDist = 0;
-    for (final Rectangle2D shape : intersectedShapes.keySet()) {
-      final double dist = intersectedShapes.get(shape).distance(start);
-      if (min == null) {
-        min = shape;
-        minDist = dist;
-        continue;
-      }
-
-      if (dist < minDist) {
-        min = shape;
-      }
-    }
-
-    return min;
   }
 }

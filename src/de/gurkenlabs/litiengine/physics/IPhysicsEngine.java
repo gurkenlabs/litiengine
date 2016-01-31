@@ -15,19 +15,13 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 public interface IPhysicsEngine {
 
   public void add(ICollisionEntity entity);
-  
-  public void remove(ICollisionEntity entity);
-  
+
   public void add(Rectangle2D staticCollisionBox);
-  
-  public void remove(Rectangle2D staticCollisionBox);
-  
+
   public void clear();
-  
-  public void setBounds(Rectangle2D environmentBounds);
-  
+
   public List<Rectangle2D> getAllCollisionBoxes();
-  
+
   /**
    * Moves the specified entity by the delta in the direction of the angle.
    *
@@ -41,4 +35,10 @@ public interface IPhysicsEngine {
    *         collision.
    */
   public boolean move(IMovableEntity entity, double angle, float delta);
+
+  public void remove(ICollisionEntity entity);
+
+  public void remove(Rectangle2D staticCollisionBox);
+
+  public void setBounds(Rectangle2D environmentBounds);
 }

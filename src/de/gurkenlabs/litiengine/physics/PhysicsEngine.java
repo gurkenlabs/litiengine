@@ -33,15 +33,33 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
   }
 
-  /**
-   * Checks if is in map.
-   *
-   * @param collisionBox
-   *          the collision box
-   * @return true, if is in map
-   */
-  private boolean isInMap(final Shape collisionBox) {
-    return this.environmentBounds.contains(collisionBox.getBounds());
+  @Override
+  public void add(final ICollisionEntity entity) {
+    if (!this.collisionEntities.contains(entity)) {
+      this.collisionEntities.add(entity);
+    }
+  }
+
+  @Override
+  public void add(final Rectangle2D staticCollisionBox) {
+    if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
+      this.staticCollisionBoxes.add(staticCollisionBox);
+    }
+  }
+
+  @Override
+  public void clear() {
+    this.staticCollisionBoxes.clear();
+    this.collisionEntities.clear();
+  }
+
+  @Override
+  public List<Rectangle2D> getAllCollisionBoxes() {
+    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
+    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.staticCollisionBoxes);
+
+    return allCollisionBoxes;
   }
 
   /*
@@ -70,7 +88,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     // don't set new location if it is outside the boundaries of the map
-    if (!isInMap(entity.getCollisionBox(newPosition))) {
+    if (!this.isInMap(entity.getCollisionBox(newPosition))) {
       return false;
     }
 
@@ -79,6 +97,25 @@ public class PhysicsEngine implements IPhysicsEngine {
     entity.setFacingAngle(Math.round(angle));
 
     return success;
+  }
+
+  @Override
+  public void remove(final ICollisionEntity entity) {
+    if (this.collisionEntities.contains(entity)) {
+      this.collisionEntities.remove(entity);
+    }
+  }
+
+  @Override
+  public void remove(final Rectangle2D staticCollisionBox) {
+    if (this.staticCollisionBoxes.contains(staticCollisionBox)) {
+      this.staticCollisionBoxes.remove(staticCollisionBox);
+    }
+  }
+
+  @Override
+  public void setBounds(final Rectangle2D environmentBounds) {
+    this.environmentBounds = environmentBounds;
   }
 
   /**
@@ -147,51 +184,14 @@ public class PhysicsEngine implements IPhysicsEngine {
     return mob.getLocation();
   }
 
-  @Override
-  public void add(ICollisionEntity entity) {
-    if (!this.collisionEntities.contains(entity)) {
-      this.collisionEntities.add(entity);
-    }
-  }
-
-  @Override
-  public void remove(ICollisionEntity entity) {
-    if (this.collisionEntities.contains(entity)) {
-      this.collisionEntities.remove(entity);
-    }
-  }
-
-  @Override
-  public void add(Rectangle2D staticCollisionBox) {
-    if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
-      this.staticCollisionBoxes.add(staticCollisionBox);
-    }
-  }
-
-  @Override
-  public void remove(Rectangle2D staticCollisionBox) {
-    if (this.staticCollisionBoxes.contains(staticCollisionBox)) {
-      this.staticCollisionBoxes.remove(staticCollisionBox);
-    }
-  }
-
-  @Override
-  public void clear() {
-    this.staticCollisionBoxes.clear();
-    this.collisionEntities.clear();
-  }
-
-  @Override
-  public void setBounds(Rectangle2D environmentBounds) {
-    this.environmentBounds = environmentBounds;
-  }
-
-  @Override
-  public List<Rectangle2D> getAllCollisionBoxes() {
-    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
-    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
-    allCollisionBoxes.addAll(this.staticCollisionBoxes);
-
-    return allCollisionBoxes;
+  /**
+   * Checks if is in map.
+   *
+   * @param collisionBox
+   *          the collision box
+   * @return true, if is in map
+   */
+  private boolean isInMap(final Shape collisionBox) {
+    return this.environmentBounds.contains(collisionBox.getBounds());
   }
 }

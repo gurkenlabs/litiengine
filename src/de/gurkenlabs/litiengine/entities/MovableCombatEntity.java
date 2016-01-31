@@ -63,6 +63,11 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
+  public IEntityNavigator getNavigator() {
+    return this.navigator;
+  }
+
+  @Override
   public float getVelocityInPixelsPerSecond() {
     return this.pixelsPerSecond * this.getAttributes().getVelocity().getCurrentValue();
   }
@@ -119,12 +124,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public IEntityNavigator getNavigator() {
-    return this.navigator;
-  }
-
-  @Override
-  public void setNavigator(IEntityNavigator navigator) {
+  public void setNavigator(final IEntityNavigator navigator) {
     this.navigator = navigator;
   }
 }

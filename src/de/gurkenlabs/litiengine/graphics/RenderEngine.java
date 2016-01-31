@@ -124,6 +124,11 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void render(final Graphics g, final List<? extends IRenderable> renderables) {
+    renderables.forEach(r -> r.render(g));
+  }
+
+  @Override
   public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
@@ -149,11 +154,6 @@ public class RenderEngine implements IRenderEngine {
     this.renderEntities(g, entities);
 
     g.setClip(oldClip);
-  }
-
-  @Override
-  public void render(Graphics g, List<? extends IRenderable> renderables) {
-    renderables.forEach(r -> r.render(g));
   }
 
   /**

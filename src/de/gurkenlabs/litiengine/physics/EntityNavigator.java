@@ -37,8 +37,18 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public Path getPath() {
+    return this.path;
+  }
+
+  @Override
   public IPathFinder getPathFinder() {
     return this.pathFinder;
+  }
+
+  @Override
+  public void navigate(final Point2D target) {
+    this.path = this.getPathFinder().findPath(this.entity, target);
   }
 
   /*
@@ -62,7 +72,7 @@ public class EntityNavigator implements IEntityNavigator {
    *          the entity
    */
   private void navigateAlongPath() {
-    int currentSegment = this.currentSegment;
+    final int currentSegment = this.currentSegment;
 
     final PathIterator pi = this.path.getPath().getPathIterator(null);
     final double[] startCoordinates = new double[6];
@@ -80,24 +90,14 @@ public class EntityNavigator implements IEntityNavigator {
 
     pi.currentSegment(coordinates);
 
-    final double distance = GeometricUtilities.calcDistance(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
+    final double distance = GeometricUtilities.calcDistance(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     if (distance < ACCEPTABLE_ERROR) {
       ++this.currentSegment;
       return;
     }
 
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    final float pixelsPerTick = entity.getVelocityInPixelsPerSecond() / Game.getConfiguration().CLIENT.getUpdaterate();
-    Game.getPhysicsEngine().move(entity, angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
-  }
-
-  @Override
-  public void navigate(Point2D target) {
-    this.path = this.getPathFinder().findPath(this.entity, target);
-  }
-
-  @Override
-  public Path getPath() {
-    return this.path;
+    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
+    final float pixelsPerTick = this.entity.getVelocityInPixelsPerSecond() / Game.getConfiguration().CLIENT.getUpdaterate();
+    Game.getPhysicsEngine().move(this.entity, angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }

@@ -11,7 +11,11 @@ public interface IMovableEntity extends ICollisionEntity {
 
   public FacingDirection getFacingDirection();
 
+  public IEntityNavigator getNavigator();
+
   public float getVelocityInPixelsPerSecond();
+
+  public boolean isIdle();
 
   public void onMoved(Consumer<IMovableEntity> consumer);
 
@@ -30,10 +34,6 @@ public interface IMovableEntity extends ICollisionEntity {
    *          the new map location
    */
   public void setLocation(Point2D location);
-  
-  public boolean isIdle();
-  
-  public IEntityNavigator getNavigator();
-  
+
   public void setNavigator(IEntityNavigator navigator);
 }

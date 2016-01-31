@@ -67,7 +67,7 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
     for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
       consumer.accept(this);
     }
-    
+
     this.setCollision(false);
   }
 

@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.entities;
 
 public enum FacingDirection {
-  DOWN, LEFT, RIGHT, UNDEFINED, UP
+  DOWN,
+  LEFT,
+  RIGHT,
+  UNDEFINED,
+  UP
 }

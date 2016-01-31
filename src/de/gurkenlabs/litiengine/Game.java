@@ -35,7 +35,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static IScreenManager screenManager;
   private static IRenderEngine graphicsEngine;
   private static IPhysicsEngine physicsEngine;
-  
+
   private final RenderLoop renderLoop;
 
   private final GameLoop gameLoop;
@@ -54,8 +54,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
     graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
-    physicsEngine = new PhysicsEngine();   
-    
+    physicsEngine = new PhysicsEngine();
+
     // init configuration before init method in order to use configured values
     // to initialize components
     getConfiguration().load();
@@ -92,12 +92,12 @@ public abstract class Game implements IInitializable, ILaunchable {
     return info;
   }
 
+  public static IPhysicsEngine getPhysicsEngine() {
+    return physicsEngine;
+  }
+
   public static IRenderEngine getRenderEngine() {
     return graphicsEngine;
-  }
-  
-  public static IPhysicsEngine getPhysicsEngine(){
-    return physicsEngine;
   }
 
   public static IScreenManager getScreenManager() {

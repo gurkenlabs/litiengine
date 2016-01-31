@@ -68,6 +68,17 @@ public abstract class Camera implements ICamera {
     return this.getCenterY() - this.getFocus().getY();
   }
 
+  @Override
+  public Point2D getViewPortDimensionCenter(final IEntity entity) {
+    final Point2D viewPortLocation = this.getViewPortLocation(entity);
+    if (entity.getAnimationController() == null || entity.getAnimationController().getCurrentAnimation() == null) {
+      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() / 2, viewPortLocation.getY() + entity.getHeight() / 2);
+    }
+
+    final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
+    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() / 2, viewPortLocation.getY() + spriteSheet.getSpriteHeight() / 2);
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -95,17 +106,6 @@ public abstract class Camera implements ICamera {
     }
 
     return this.getViewPortLocation(entity.getLocation());
-  }
-  
-  @Override
-  public Point2D getViewPortDimensionCenter(final IEntity entity) {
-    final Point2D viewPortLocation = this.getViewPortLocation(entity);
-    if (entity.getAnimationController() == null || entity.getAnimationController().getCurrentAnimation() == null) {
-      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() / 2, viewPortLocation.getY() + entity.getHeight() / 2);
-    }
-
-    final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() / 2, viewPortLocation.getY() + spriteSheet.getSpriteHeight() / 2);
   }
 
   /*
