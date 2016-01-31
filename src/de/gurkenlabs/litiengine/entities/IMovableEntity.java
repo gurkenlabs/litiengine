@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.physics.IEntityNavigator;
+
 public interface IMovableEntity extends ICollisionEntity {
 
   public float getFacingAngle();
@@ -30,4 +32,8 @@ public interface IMovableEntity extends ICollisionEntity {
   public void setLocation(Point2D location);
   
   public boolean isIdle();
+  
+  public IEntityNavigator getNavigator();
+  
+  public void setNavigator(IEntityNavigator navigator);
 }

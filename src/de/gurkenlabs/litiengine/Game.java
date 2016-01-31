@@ -16,6 +16,8 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
+import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 
 public abstract class Game implements IInitializable, ILaunchable {
   private static final List<IUpdateable> updatables = new CopyOnWriteArrayList<>();
@@ -32,6 +34,8 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static final GameConfiguration configuration = new GameConfiguration();
   private static IScreenManager screenManager;
   private static IRenderEngine graphicsEngine;
+  private static IPhysicsEngine physicsEngine;
+  
   private final RenderLoop renderLoop;
 
   private final GameLoop gameLoop;
@@ -50,7 +54,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
     graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
-
+    physicsEngine = new PhysicsEngine();   
+    
     // init configuration before init method in order to use configured values
     // to initialize components
     getConfiguration().load();
@@ -89,6 +94,10 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   public static IRenderEngine getRenderEngine() {
     return graphicsEngine;
+  }
+  
+  public static IPhysicsEngine getPhysicsEngine(){
+    return physicsEngine;
   }
 
   public static IScreenManager getScreenManager() {

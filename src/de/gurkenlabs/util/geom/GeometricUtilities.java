@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class GeometricUtilities {
 
@@ -88,6 +89,52 @@ public class GeometricUtilities {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  /**
+   * Gets the points between the specified points using the Bresenham algorithm.
+   *
+   * @param point1
+   *          the point1
+   * @param point2
+   *          the point2
+   * @return the points between points
+   */
+  public static List<Point2D> getPointsBetweenPoints(final Point2D point1, final Point2D point2) {
+    double x0 = point1.getX();
+    double y0 = point1.getY();
+    final double x1 = point2.getX();
+    final double y1 = point2.getY();
+    final List<Point2D> line = new ArrayList<Point2D>();
+
+    final int dx = (int) Math.abs(x1 - x0);
+    final int dy = (int) Math.abs(y1 - y0);
+
+    final int sx = x0 < x1 ? 1 : -1;
+    final int sy = y0 < y1 ? 1 : -1;
+
+    int err = dx - dy;
+    int e2;
+
+    while (true) {
+      line.add(new Point2D.Double(x0, y0));
+
+      if (Math.abs(x0 - x1) < 1 && Math.abs(y0 - y1) < 1) {
+        break;
+      }
+
+      e2 = 2 * err;
+      if (e2 > -dy) {
+        err = err - dy;
+        x0 = x0 + sx;
+      }
+
+      if (e2 < dx) {
+        err = err + dx;
+        y0 = y0 + sy;
+      }
+    }
+    return line;
+  }
+  
   /**
    * Gets the connecting lines.
    *

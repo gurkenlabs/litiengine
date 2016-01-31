@@ -6,12 +6,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
 public abstract class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
+  private final short pixelsPerSecond;
 
   /** The direction. */
   private float facingAngle;
@@ -19,7 +21,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   /** The last moved. */
   private long lastMoved;
 
-  private final short pixelsPerSecond;
+  private IEntityNavigator navigator;
 
   public MovableCombatEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -114,5 +116,15 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
     }
+  }
+
+  @Override
+  public IEntityNavigator getNavigator() {
+    return this.navigator;
+  }
+
+  @Override
+  public void setNavigator(IEntityNavigator navigator) {
+    this.navigator = navigator;
   }
 }

@@ -67,6 +67,8 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
     for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
       consumer.accept(this);
     }
+    
+    this.setCollision(false);
   }
 
   /**
@@ -182,6 +184,7 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
    */
   public void resurrect() {
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, this.getAttributes().getHealth().getMaxValue()));
+    this.setCollision(true);
   }
 
   /**

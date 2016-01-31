@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
@@ -14,7 +13,7 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  * The Class Entity.
  */
 @EntityInfo
-public abstract class Entity implements IEntity {
+public abstract class Entity implements IEntity {  
   private float height;
 
   private int mapId;
@@ -102,7 +101,7 @@ public abstract class Entity implements IEntity {
     this.width = width;
     this.height = height;
   }
-
+  
   /**
    * Sets the map location.
    *
