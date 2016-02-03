@@ -63,27 +63,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setFacingDirection(Direction facingDirection) {
-    switch (facingDirection) {
-    case DOWN:
-      this.setFacingAngle(0);
-      break;
-    case RIGHT:
-      this.setFacingAngle(90);
-      break;
-    case UP:
-      this.setFacingAngle(180);
-      break;
-    case LEFT:
-      this.setFacingAngle(270);
-      break;
-
-    default:
-      return;
-    }
-  }
-
-  @Override
   public IEntityNavigator getNavigator() {
     return this.navigator;
   }
@@ -122,6 +101,27 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public void setFacingAngle(final float angle) {
     this.facingAngle = angle;
+  }
+
+  @Override
+  public void setFacingDirection(final Direction facingDirection) {
+    switch (facingDirection) {
+    case DOWN:
+      this.setFacingAngle(0);
+      break;
+    case RIGHT:
+      this.setFacingAngle(90);
+      break;
+    case UP:
+      this.setFacingAngle(180);
+      break;
+    case LEFT:
+      this.setFacingAngle(270);
+      break;
+
+    default:
+      return;
+    }
   }
 
   /*

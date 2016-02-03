@@ -29,7 +29,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   private int resolutionHeight;
 
   private int resolutionWidth;
-  
+
   /**
    * Instantiates a new graphic configuration.
    */
@@ -95,7 +95,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
     this.fullscreen = fullscreen;
   }
-  
+
   /**
    * Sets the graphic quality.
    *

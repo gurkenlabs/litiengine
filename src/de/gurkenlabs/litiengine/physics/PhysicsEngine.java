@@ -100,7 +100,7 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(IMovableEntity entity, float delta) {
+  public boolean move(final IMovableEntity entity, final float delta) {
     return this.move(entity, entity.getFacingAngle(), delta);
   }
 
@@ -200,7 +200,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     if (this.environmentBounds == null) {
       return true;
     }
-    
+
     return this.environmentBounds.contains(collisionBox.getBounds());
   }
 }

@@ -35,6 +35,11 @@ public class Environment implements IEnvironment {
     this.combatEntities = new CopyOnWriteArrayList<>();
   }
 
+  @Override
+  public List<ICombatEntity> getCombatEntities() {
+    return this.combatEntities;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -43,10 +48,5 @@ public class Environment implements IEnvironment {
   @Override
   public IMap getMap() {
     return this.map;
-  }
-
-  @Override
-  public List<ICombatEntity> getCombatEntities() {
-    return this.combatEntities;
   }
 }

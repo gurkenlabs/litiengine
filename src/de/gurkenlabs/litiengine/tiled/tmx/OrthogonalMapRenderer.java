@@ -36,19 +36,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   private int totalTileCount;
   private int tilesRendered;
 
-  public static Image getTile(final IMap map, final ITile tile) {
-    final ITileset tileset = MapUtilities.FindTileSet(map, tile);
-    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
-      return null;
-    }
-
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    final int index = tile.getGridId() - tileset.getFirstGridId();
-    final Image img = new Spritesheet(tileset).getSprite(index);
-    return ImageProcessing.applyAlphaChannel(img, tileset.getImage().getTransparentColor());
-  }
-
   /**
    * Gets the cache key.
    *
@@ -60,8 +47,17 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     return MessageFormat.format("map_{0}_version_{1}", map.getName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
   }
 
-  public float getRenderProgress() {
-    return this.renderProcess;
+  public static Image getTile(final IMap map, final ITile tile) {
+    final ITileset tileset = MapUtilities.FindTileSet(map, tile);
+    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
+      return null;
+    }
+
+    // get the grid id relative to the sprite sheet since we use a 0 based
+    // approach to calculate the position
+    final int index = tile.getGridId() - tileset.getFirstGridId();
+    final Image img = new Spritesheet(tileset).getSprite(index);
+    return ImageProcessing.applyAlphaChannel(img, tileset.getImage().getTransparentColor());
   }
 
   /*
@@ -102,6 +98,11 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     ImageCache.MAPS.putPersistent(getCacheKey(map), img);
     return img;
+  }
+
+  @Override
+  public float getRenderProgress() {
+    return this.renderProcess;
   }
 
   /*

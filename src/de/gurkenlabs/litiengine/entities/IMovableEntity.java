@@ -10,8 +10,6 @@ public interface IMovableEntity extends ICollisionEntity {
   public float getFacingAngle();
 
   public Direction getFacingDirection();
-  
-  public void setFacingDirection(Direction facingDirection);
 
   public IEntityNavigator getNavigator();
 
@@ -28,6 +26,8 @@ public interface IMovableEntity extends ICollisionEntity {
    *          the new facing direction
    */
   public void setFacingAngle(float orientation);
+
+  public void setFacingDirection(Direction facingDirection);
 
   /**
    * Sets the map location.

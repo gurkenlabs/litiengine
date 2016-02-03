@@ -156,6 +156,22 @@ public class RenderEngine implements IRenderEngine {
     g.setClip(oldClip);
   }
 
+  @Override
+  public void renderEntity(final Graphics g, final IEntity entity) {
+    if (entity.getAnimationController() == null) {
+      return;
+    }
+
+    entity.getAnimationController().updateAnimation();
+
+    final BufferedImage img = entity.getAnimationController().getCurrentSprite();
+    RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
+
+    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
+      consumer.accept(new RenderEvent<IEntity>(g, entity));
+    }
+  }
+
   /**
    * Draws the tile layers of the mapcontainer and the animations.
    *
@@ -174,22 +190,6 @@ public class RenderEngine implements IRenderEngine {
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<IMap>(g, map));
-    }
-  }
-
-  @Override
-  public void renderEntity(final Graphics g, final IEntity entity) {
-    if (entity.getAnimationController() == null) {
-      return;
-    }
-
-    entity.getAnimationController().updateAnimation();
-
-    final BufferedImage img = entity.getAnimationController().getCurrentSprite();
-    RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
-
-    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
-      consumer.accept(new RenderEvent<IEntity>(g, entity));
     }
   }
 }

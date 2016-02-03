@@ -24,11 +24,11 @@ public interface IRenderEngine {
 
   public void render(Graphics g, List<? extends IRenderable> renderables);
 
-  public void renderEntity(Graphics g, IEntity entity);
-
   public void renderEntities(Graphics g, List<? extends IEntity> entities);
 
   public void renderEntities(Graphics g, List<? extends IEntity> entities, IVision vision);
+
+  public void renderEntity(Graphics g, IEntity entity);
 
   /**
    * Render map.

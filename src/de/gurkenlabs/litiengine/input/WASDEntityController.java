@@ -19,7 +19,7 @@ public class WASDEntityController implements IKeyObserver {
   }
 
   @Override
-  public void handlePressedKey(int keyCode) {
+  public void handlePressedKey(final int keyCode) {
     Direction dir = Direction.UNDEFINED;
     switch (keyCode) {
     case KeyEvent.VK_W:
@@ -44,12 +44,12 @@ public class WASDEntityController implements IKeyObserver {
   }
 
   @Override
-  public void handleReleasedKey(int keyCode) {
+  public void handleReleasedKey(final int keyCode) {
 
   }
 
   @Override
-  public void handleTypedKey(int keyCode) {
+  public void handleTypedKey(final int keyCode) {
 
   }
 }

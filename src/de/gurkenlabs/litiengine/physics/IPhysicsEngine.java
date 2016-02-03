@@ -35,7 +35,7 @@ public interface IPhysicsEngine {
    *         collision.
    */
   public boolean move(IMovableEntity entity, double angle, float delta);
-  
+
   public boolean move(IMovableEntity entity, float delta);
 
   public void remove(ICollisionEntity entity);

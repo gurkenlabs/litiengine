@@ -15,17 +15,50 @@ public class GameLoop extends Thread implements IGameLoop {
   private long lastUpsTime;
   private long lastUpdateTime;
 
-  private boolean gameIsRunning = true;
+  private final boolean gameIsRunning = true;
 
   /** The next game tick. */
   private long nextGameTick = System.currentTimeMillis();
-  
-  public GameLoop(int updateRate) {
+
+  public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
   }
 
+  @Override
+  public long convertToMs(final long ticks) {
+    return (long) (ticks / (this.updateRate / 1000.0));
+  }
+
+  @Override
+  public long getDeltaTime() {
+    return System.currentTimeMillis() - this.lastUpdateTime;
+  }
+
+  @Override
+  public long getDeltaTime(final long ticks) {
+    return this.convertToMs(this.totalTicks - ticks);
+  }
+
+  @Override
+  public long getTicks() {
+    return this.totalTicks;
+  }
+
+  @Override
+  public void onUpsTracked(final Consumer<Integer> upsConsumer) {
+    if (!this.upsTrackedConsumer.contains(upsConsumer)) {
+      this.upsTrackedConsumer.add(upsConsumer);
+    }
+  }
+
+  @Override
+  public void registerForUpdate(final IUpdateable updatable) {
+    if (!this.updatables.contains(updatable)) {
+      this.updatables.add(updatable);
+    }
+  }
 
   /*
    * (non-Javadoc)
@@ -39,18 +72,18 @@ public class GameLoop extends Thread implements IGameLoop {
 
       if (System.currentTimeMillis() > this.nextGameTick) {
         ++this.totalTicks;
-        updatables.forEach(updatable -> updatable.update());
+        this.updatables.forEach(updatable -> updatable.update());
 
         ++this.updateCount;
 
         final long currentMillis = System.currentTimeMillis();
-        if (currentMillis - lastUpsTime >= 1000) {
-          lastUpsTime = currentMillis;
-          upsTrackedConsumer.forEach(consumer -> consumer.accept(updateCount));
-          updateCount = 0;
+        if (currentMillis - this.lastUpsTime >= 1000) {
+          this.lastUpsTime = currentMillis;
+          this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
+          this.updateCount = 0;
         }
 
-        lastUpdateTime = currentMillis;
+        this.lastUpdateTime = currentMillis;
 
         this.nextGameTick += SKIP_TICKS;
       }
@@ -64,43 +97,9 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
-  public void onUpsTracked(Consumer<Integer> upsConsumer) {
-    if (!this.upsTrackedConsumer.contains(upsConsumer)) {
-      this.upsTrackedConsumer.add(upsConsumer);
-    }
-  }
-
-  @Override
-  public void registerForUpdate(IUpdateable updatable) {
-    if (!this.updatables.contains(updatable)) {
-      this.updatables.add(updatable);
-    }
-  }
-
-  @Override
-  public void unregisterFromUpdate(IUpdateable updatable) {
+  public void unregisterFromUpdate(final IUpdateable updatable) {
     if (this.updatables.contains(updatable)) {
       this.updatables.remove(updatable);
     }
-  }
-
-  @Override
-  public long getTicks() {
-    return this.totalTicks;
-  }
-
-  @Override
-  public long convertToMs(long ticks) {
-    return (long) (ticks / (this.updateRate / 1000.0));
-  }
-
-  @Override
-  public long getDeltaTime() {
-    return System.currentTimeMillis() - lastUpdateTime;
-  }
-
-  @Override
-  public long getDeltaTime(long ticks) {
-    return convertToMs(this.totalTicks - ticks);
   }
 }

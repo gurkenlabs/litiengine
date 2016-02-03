@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  */
 public class PositionLockCamera extends Camera {
   private final IEntity entity;
+
   public PositionLockCamera(final IEntity entity) {
     super();
     this.entity = entity;
@@ -37,6 +38,10 @@ public class PositionLockCamera extends Camera {
   @Override
   public double getCenterY() {
     return Game.getScreenManager().getResolution().height / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() / 2.0;
+  }
+
+  public IEntity getLockedEntity() {
+    return this.entity;
   }
 
   /*
@@ -70,9 +75,5 @@ public class PositionLockCamera extends Camera {
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedEntity().getLocation();
     this.setFocus(this.applyShakeEffect(cameraLocation));
-  }
-  
-  public IEntity getLockedEntity(){
-    return this.entity;
   }
 }

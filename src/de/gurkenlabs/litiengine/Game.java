@@ -59,6 +59,10 @@ public abstract class Game implements IInitializable, ILaunchable {
     return info;
   }
 
+  public static IGameLoop getLoop() {
+    return gameLoop;
+  }
+
   public static IPhysicsEngine getPhysicsEngine() {
     return physicsEngine;
   }
@@ -69,10 +73,6 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   public static IScreenManager getScreenManager() {
     return screenManager;
-  }
-
-  public static IGameLoop getLoop() {
-    return gameLoop;
   }
 
   @Override

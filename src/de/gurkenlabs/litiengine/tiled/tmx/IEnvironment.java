@@ -13,12 +13,12 @@ import de.gurkenlabs.tiled.tmx.IMap;
  */
 public interface IEnvironment {
 
+  public List<ICombatEntity> getCombatEntities();
+
   /**
    * Gets the map.
    *
    * @return the map
    */
   public IMap getMap();
-
-  public List<ICombatEntity> getCombatEntities();
 }
