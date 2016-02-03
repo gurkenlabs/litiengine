@@ -16,9 +16,6 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  */
 public class Force implements IUpdateable {
 
-  /** The Constant ACCEPTABLE_ERROR. */
-  private static final float ACCEPTABLE_ERROR = 1.0f;
-
   /** The affected entity. */
   private final IMovableEntity affectedEntity;
 
@@ -141,7 +138,7 @@ public class Force implements IUpdateable {
       return;
     }
 
-    if (this.cancelOnForceSourceReached && this.getAffectedEntity().getDimensionCenter().distance(this.getLocation()) < ACCEPTABLE_ERROR) {
+    if (this.cancelOnForceSourceReached && this.getAffectedEntity().getCollisionBox().contains(this.getLocation())) {
       this.duration = 0;
       return;
     }
