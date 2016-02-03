@@ -3,9 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.lang.annotation.AnnotationFormatError;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.core.ILaunchable;
@@ -20,25 +17,15 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 
 public abstract class Game implements IInitializable, ILaunchable {
-  private static final List<IUpdateable> updatables = new CopyOnWriteArrayList<>();
-  private static final List<Consumer<Integer>> upsChangedConsumer = new CopyOnWriteArrayList<>();
-
-  private static int updateRate;
-  private static int updateCount;
-  private static long lastUpsTime;
-  private static long lastUpdateTime;
-
-  private static long gameTicks;
   private static GameInfo info;
 
   private static final GameConfiguration configuration = new GameConfiguration();
   private static IScreenManager screenManager;
   private static IRenderEngine graphicsEngine;
   private static IPhysicsEngine physicsEngine;
+  private static IGameLoop gameLoop;
 
   private final RenderLoop renderLoop;
-
-  private final GameLoop gameLoop;
 
   protected Game() {
     final GameInfo inf = this.getClass().getAnnotation(GameInfo.class);
@@ -59,33 +46,13 @@ public abstract class Game implements IInitializable, ILaunchable {
     // init configuration before init method in order to use configured values
     // to initialize components
     getConfiguration().load();
-    updateRate = getConfiguration().CLIENT.getUpdaterate();
 
     this.renderLoop = new RenderLoop();
-    this.gameLoop = new GameLoop();
-  }
-
-  public static long convertToMs(final long ticks) {
-    return (long) (ticks / (updateRate / 1000.0));
+    gameLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
   }
 
   public static GameConfiguration getConfiguration() {
     return configuration;
-  }
-
-  public static long getDeltaTime() {
-    return System.currentTimeMillis() - lastUpdateTime;
-  }
-
-  /**
-   * Calculates the deltatime between the current game time and the specified
-   * ticks in ms.
-   *
-   * @param ticks
-   * @return The delta time in ms.
-   */
-  public static long getDeltaTime(final long ticks) {
-    return convertToMs(gameTicks - ticks);
   }
 
   public static GameInfo getInfo() {
@@ -104,45 +71,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     return screenManager;
   }
 
-  public static long getTicks() {
-    return gameTicks;
-  }
-
-  public static void onUpsChanged(final Consumer<Integer> upsConsumer) {
-    if (!upsChangedConsumer.contains(upsConsumer)) {
-      upsChangedConsumer.add(upsConsumer);
-    }
-  }
-
-  public static void registerForUpdate(final IUpdateable updatable) {
-    if (!updatables.contains(updatable)) {
-      updatables.add(updatable);
-    }
-  }
-
-  public static void unregisterFromUpdate(final IUpdateable updatable) {
-    if (updatables.contains(updatable)) {
-      updatables.remove(updatable);
-    }
-  }
-
-  /**
-   * Update.
-   */
-  private static void update() {
-    ++gameTicks;
-    updatables.forEach(updatable -> updatable.update());
-
-    updateCount++;
-
-    final long currentMillis = System.currentTimeMillis();
-    if (currentMillis - lastUpsTime >= 1000) {
-      lastUpsTime = currentMillis;
-      upsChangedConsumer.forEach(consumer -> consumer.accept(updateCount));
-      updateCount = 0;
-    }
-
-    lastUpdateTime = currentMillis;
+  public static IGameLoop getLoop() {
+    return gameLoop;
   }
 
   @Override
@@ -161,50 +91,14 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void start() {
-    this.gameLoop.start();
+    gameLoop.start();
     this.renderLoop.start();
   }
 
   @Override
   public void terminate() {
-    this.gameLoop.terminate();
+    gameLoop.terminate();
     this.renderLoop.terminate();
-  }
-
-  /**
-   * The Class GameLoop.
-   */
-  private class GameLoop extends Thread {
-
-    /** The game is running. */
-    private boolean gameIsRunning = true;
-
-    /** The next game tick. */
-    private long nextGameTick = System.currentTimeMillis();
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Runnable#run()
-     */
-    @Override
-    public void run() {
-      while (this.gameIsRunning) {
-        final int SKIP_TICKS = 1000 / Game.updateRate;
-
-        if (System.currentTimeMillis() > this.nextGameTick) {
-          Game.update();
-          this.nextGameTick += SKIP_TICKS;
-        }
-      }
-    }
-
-    /**
-     * Terminate.
-     */
-    public void terminate() {
-      this.gameIsRunning = false;
-    }
   }
 
   /**

@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
@@ -15,8 +15,8 @@ public abstract class AnimationController implements IAnimationController {
   private Animation currentAnimation;
 
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
-    this.animations = new ArrayList<>();
-    this.imageEffects = new ArrayList<>();
+    this.animations = new CopyOnWriteArrayList<>();
+    this.imageEffects = new CopyOnWriteArrayList<>();
     this.defaultAnimation = defaultAnimation;
     this.animations.add(this.defaultAnimation);
 

@@ -21,7 +21,7 @@ public class Input {
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
 
-    Game.registerForUpdate(KEYBOARD);
-    Game.registerForUpdate(MOUSE);
+    Game.getLoop().registerForUpdate(KEYBOARD);
+    Game.getLoop().registerForUpdate(MOUSE);
   }
 }

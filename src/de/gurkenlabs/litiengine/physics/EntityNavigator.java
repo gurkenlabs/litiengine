@@ -33,7 +33,7 @@ public class EntityNavigator implements IEntityNavigator {
   public EntityNavigator(final IMovableEntity entity, final IPathFinder pathFinder) {
     this.entity = entity;
     this.pathFinder = pathFinder;
-    Game.registerForUpdate(this);
+    Game.getLoop().registerForUpdate(this);
   }
 
   @Override

@@ -128,7 +128,7 @@ public abstract class Camera implements ICamera {
    */
   @Override
   public void shake(final int intensity, final int shakeDuration) {
-    this.shakeTick = Game.getTicks();
+    this.shakeTick = Game.getLoop().getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
   }
@@ -142,7 +142,7 @@ public abstract class Camera implements ICamera {
    */
   protected Point2D applyShakeEffect(final Point2D cameraLocation) {
     final boolean rnd = Math.random() > 0.5;
-    if (this.getShakeTick() != 0 && Game.getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
+    if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
       return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * (rnd ? -1 : 1), cameraLocation.getY() + this.getShakeOffset() * (rnd ? -1 : 1));
     }
 

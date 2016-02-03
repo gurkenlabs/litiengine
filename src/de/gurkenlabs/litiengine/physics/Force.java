@@ -67,8 +67,8 @@ public class Force implements IUpdateable {
    * Apply.
    */
   public void apply() {
-    this.aliveTick = Game.getTicks();
-    Game.registerForUpdate(this);
+    this.aliveTick = Game.getLoop().getTicks();
+    Game.getLoop().registerForUpdate(this);
   }
 
   /**
@@ -132,8 +132,8 @@ public class Force implements IUpdateable {
    */
   @Override
   public void update() {
-    if (Game.getDeltaTime(this.aliveTick) > this.getDuration()) {
-      Game.unregisterFromUpdate(this);
+    if (Game.getLoop().getDeltaTime(this.aliveTick) > this.getDuration()) {
+      Game.getLoop().unregisterFromUpdate(this);
       this.hasEnded = true;
       return;
     }

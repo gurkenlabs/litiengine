@@ -30,7 +30,7 @@ public class Animation implements IUpdateable, ILaunchable {
       System.out.println("No keyframes defined for animation " + this.getName());
     }
 
-    Game.registerForUpdate(this);
+    Game.getLoop().registerForUpdate(this);
   }
 
   public KeyFrame getCurrentKeyFrame() {
@@ -93,7 +93,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public void update() {
     // do nothing if the animation is not playing of the current keyframe is not
     // finished
-    if (!this.isPlaying() || Game.convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
+    if (!this.isPlaying() || Game.getLoop().convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
       return;
     }
 
