@@ -48,8 +48,6 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
     return this.modifier;
   }
 
-  protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
-
   @Override
   protected void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
@@ -61,4 +59,6 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
     super.cease(affectedEntity);
     this.getAttribute(affectedEntity).removeModifier(this.getModifier());
   }
+
+  protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
 }

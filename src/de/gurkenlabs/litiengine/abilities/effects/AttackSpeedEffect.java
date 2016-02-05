@@ -30,7 +30,7 @@ public class AttackSpeedEffect extends AttributeStateEffect<Float> {
   }
 
   @Override
-  protected Attribute<Float> getAttribute(ICombatEntity entity) {
+  protected Attribute<Float> getAttribute(final ICombatEntity entity) {
     return entity.getAttributes().getAttackSpeed();
   }
 }

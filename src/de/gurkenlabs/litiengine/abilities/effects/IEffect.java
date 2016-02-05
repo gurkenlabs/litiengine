@@ -17,8 +17,8 @@ public interface IEffect {
   public List<IEffect> getFollowUpEffects();
 
   public boolean isActive();
-  
+
   public void onEffectApplied(Consumer<EffectArgument> consumer);
-  
+
   public void onEffectCeased(Consumer<EffectArgument> consumer);
 }

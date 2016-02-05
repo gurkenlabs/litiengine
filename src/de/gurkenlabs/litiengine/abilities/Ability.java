@@ -180,6 +180,13 @@ public abstract class Ability {
     }
   }
 
+  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
+    for (final IEffect effect : this.getEffects()) {
+      // registers to all effects and their follow up effects recursively
+      this.onEffectCeased(effect, consumer);
+    }
+  }
+
   private void onEffectApplied(final IEffect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectApplied(consumer);
 
@@ -188,18 +195,11 @@ public abstract class Ability {
     }
   }
 
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    for (final IEffect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
-      this.onEffectCeased(effect, consumer);
-    }
-  }
-
   private void onEffectCeased(final IEffect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectCeased(consumer);
 
     for (final IEffect followUp : effect.getFollowUpEffects()) {
-      onEffectCeased(followUp, consumer);
+      this.onEffectCeased(followUp, consumer);
     }
   }
 

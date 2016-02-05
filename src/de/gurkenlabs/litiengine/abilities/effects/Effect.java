@@ -96,20 +96,6 @@ public abstract class Effect implements IEffect {
     this.active = false;
   }
 
-  protected void apply(ICombatEntity entity) {
-    EffectArgument arg = new EffectArgument(this, entity);
-    for (Consumer<EffectArgument> consumer : this.appliedConsumer) {
-      consumer.accept(arg);
-    }
-  }
-
-  protected void cease(ICombatEntity entity) {
-    EffectArgument arg = new EffectArgument(this, entity);
-    for (Consumer<EffectArgument> consumer : this.ceasedConsumer) {
-      consumer.accept(arg);
-    }
-  }
-
   /**
    * Gets the ability.
    *
@@ -218,6 +204,20 @@ public abstract class Effect implements IEffect {
    */
   private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  }
+
+  protected void apply(final ICombatEntity entity) {
+    final EffectArgument arg = new EffectArgument(this, entity);
+    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
+      consumer.accept(arg);
+    }
+  }
+
+  protected void cease(final ICombatEntity entity) {
+    final EffectArgument arg = new EffectArgument(this, entity);
+    for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
+      consumer.accept(arg);
+    }
   }
 
   /**

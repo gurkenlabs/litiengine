@@ -35,18 +35,14 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
   }
 
-  private Map<Integer, ICombatEntity> getCombatEntityMap() {
-    return this.combatEntities;
+  @Override
+  public void add(final int mapId, final ICombatEntity entity) {
+    this.getCombatEntityMap().put(mapId, entity);
   }
 
   @Override
   public Collection<ICombatEntity> getCombatEntities() {
     return this.combatEntities.values();
-  }
-
-  @Override
-  public void add(final int mapId, final ICombatEntity entity) {
-    this.getCombatEntityMap().put(mapId, entity);
   }
 
   @Override
@@ -66,5 +62,9 @@ public class Environment implements IEnvironment {
   @Override
   public IMap getMap() {
     return this.map;
+  }
+
+  private Map<Integer, ICombatEntity> getCombatEntityMap() {
+    return this.combatEntities;
   }
 }

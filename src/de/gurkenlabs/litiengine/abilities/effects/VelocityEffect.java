@@ -28,9 +28,9 @@ public class VelocityEffect extends AttributeStateEffect<Float> {
   public VelocityEffect(final IEnvironment environment, final Ability ability, final float velocityDelta, final Modification modification, final EffectTarget... targtes) {
     super(environment, ability, modification, velocityDelta, targtes);
   }
-  
+
   @Override
-  protected Attribute<Float> getAttribute(ICombatEntity entity) {
+  protected Attribute<Float> getAttribute(final ICombatEntity entity) {
     return entity.getAttributes().getVelocity();
   }
 }

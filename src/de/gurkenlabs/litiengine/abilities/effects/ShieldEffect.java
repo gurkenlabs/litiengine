@@ -29,7 +29,7 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
   }
 
   @Override
-  protected Attribute<Short> getAttribute(ICombatEntity entity) {
+  protected Attribute<Short> getAttribute(final ICombatEntity entity) {
     return entity.getAttributes().getShield();
   }
 }

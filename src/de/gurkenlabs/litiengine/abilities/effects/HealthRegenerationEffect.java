@@ -28,9 +28,9 @@ public class HealthRegenerationEffect extends AttributeStateEffect<Byte> {
   public HealthRegenerationEffect(final IEnvironment environment, final Ability ability, final byte healthRegenerationDelta, final Modification modification, final EffectTarget... targtes) {
     super(environment, ability, modification, healthRegenerationDelta, targtes);
   }
-  
+
   @Override
-  protected Attribute<Byte> getAttribute(ICombatEntity entity) {
+  protected Attribute<Byte> getAttribute(final ICombatEntity entity) {
     return entity.getAttributes().getHealthRegeneration();
   }
 }

@@ -132,21 +132,6 @@ public class AbilityExecution implements IUpdateable {
       this.getAppliedEffects().put(effect, this.gameLoop.getTicks());
     }
   }
-  
-  /**
-   * All effects were applied.
-   *
-   * @return true, if successful
-   */
-  protected boolean allEffectsAreFinished() {
-    for (final IEffect effect : this.getAbility().getEffects()) {
-      if (!this.hasFinished(effect)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 
   private boolean hasFinished(final IEffect effect) {
     if (!this.getAppliedEffects().containsKey(effect) || this.gameLoop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
@@ -156,6 +141,21 @@ public class AbilityExecution implements IUpdateable {
     // Recursively called for all follow ups
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       if (!this.hasFinished(followUp)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * All effects were applied.
+   *
+   * @return true, if successful
+   */
+  protected boolean allEffectsAreFinished() {
+    for (final IEffect effect : this.getAbility().getEffects()) {
+      if (!this.hasFinished(effect)) {
         return false;
       }
     }

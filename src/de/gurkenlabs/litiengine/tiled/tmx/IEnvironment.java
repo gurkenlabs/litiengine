@@ -13,9 +13,9 @@ import de.gurkenlabs.tiled.tmx.IMap;
  */
 public interface IEnvironment {
 
-  public Collection<ICombatEntity> getCombatEntities();
-
   public void add(final int mapId, final ICombatEntity entity);
+
+  public Collection<ICombatEntity> getCombatEntities();
 
   public ICombatEntity getEntity(final int mapId);
 
