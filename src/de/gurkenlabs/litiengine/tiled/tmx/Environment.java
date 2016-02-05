@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
@@ -22,6 +23,8 @@ public class Environment implements IEnvironment {
 
   private final Map<Integer, ICombatEntity> combatEntities;
 
+  private final Map<Integer, IMovableEntity> movableEntities;
+
   /**
    * Instantiates a new map container base.
    *
@@ -33,11 +36,12 @@ public class Environment implements IEnvironment {
     this.map = tmxLoader.LoadMap(mapPath);
 
     this.combatEntities = new ConcurrentHashMap<>();
+    this.movableEntities = new ConcurrentHashMap<>();
   }
 
   @Override
   public void add(final int mapId, final ICombatEntity entity) {
-    this.getCombatEntityMap().put(mapId, entity);
+    this.combatEntities.put(mapId, entity);
   }
 
   @Override
@@ -46,7 +50,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public ICombatEntity getEntity(final int mapId) {
+  public ICombatEntity getCombatEntity(final int mapId) {
     if (this.combatEntities.containsKey(mapId)) {
       return this.combatEntities.get(mapId);
     }
@@ -64,7 +68,22 @@ public class Environment implements IEnvironment {
     return this.map;
   }
 
-  private Map<Integer, ICombatEntity> getCombatEntityMap() {
-    return this.combatEntities;
+  @Override
+  public void add(int mapId, IMovableEntity entity) {
+    this.movableEntities.put(mapId, entity);
+  }
+
+  @Override
+  public Collection<IMovableEntity> getMovableEntities() {
+    return this.movableEntities.values();
+  }
+
+  @Override
+  public IMovableEntity getMovableEntity(int mapId) {
+    if (this.movableEntities.containsKey(mapId)) {
+      return this.movableEntities.get(mapId);
+    }
+
+    return null;
   }
 }
