@@ -3,8 +3,9 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.tiled.tmx;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -19,8 +20,7 @@ public class Environment implements IEnvironment {
   /** The map. */
   private final IMap map;
 
-  /** The mobs. */
-  private final CopyOnWriteArrayList<ICombatEntity> combatEntities;
+  private final Map<Integer, ICombatEntity> combatEntities;
 
   /**
    * Instantiates a new map container base.
@@ -32,12 +32,30 @@ public class Environment implements IEnvironment {
     final IMapLoader tmxLoader = new TmxMapLoader();
     this.map = tmxLoader.LoadMap(mapPath);
 
-    this.combatEntities = new CopyOnWriteArrayList<>();
+    this.combatEntities = new ConcurrentHashMap<>();
+  }
+
+  private Map<Integer, ICombatEntity> getCombatEntityMap() {
+    return this.combatEntities;
   }
 
   @Override
-  public List<ICombatEntity> getCombatEntities() {
-    return this.combatEntities;
+  public Collection<ICombatEntity> getCombatEntities() {
+    return this.combatEntities.values();
+  }
+
+  @Override
+  public void add(final int mapId, final ICombatEntity entity) {
+    this.getCombatEntityMap().put(mapId, entity);
+  }
+
+  @Override
+  public ICombatEntity getEntity(final int mapId) {
+    if (this.combatEntities.containsKey(mapId)) {
+      return this.combatEntities.get(mapId);
+    }
+
+    return null;
   }
 
   /*

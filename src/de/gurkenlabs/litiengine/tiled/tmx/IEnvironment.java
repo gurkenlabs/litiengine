@@ -3,7 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.tiled.tmx;
 
-import java.util.List;
+import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -13,7 +13,11 @@ import de.gurkenlabs.tiled.tmx.IMap;
  */
 public interface IEnvironment {
 
-  public List<ICombatEntity> getCombatEntities();
+  public Collection<ICombatEntity> getCombatEntities();
+
+  public void add(final int mapId, final ICombatEntity entity);
+
+  public ICombatEntity getEntity(final int mapId);
 
   /**
    * Gets the map.
