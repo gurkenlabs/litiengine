@@ -11,6 +11,8 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.Game;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Mouse.
@@ -45,6 +47,11 @@ public class Mouse implements IMouse {
     this.setGrabMouse(true);
   }
 
+  @Override
+  public Point2D getMapLocation() {
+    return Game.getScreenManager().getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getInfo().renderScale(), this.getLocation().getY() / Game.getInfo().renderScale()));
+  }
+  
   /*
    * (non-Javadoc)
    *

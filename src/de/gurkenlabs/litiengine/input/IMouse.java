@@ -22,6 +22,8 @@ public interface IMouse extends IUpdateable, MouseListener, MouseMotionListener,
    * @return the render location
    */
   public Point2D getLocation();
+  
+  public Point2D getMapLocation();
 
   /**
    * Checks if is pressed.

@@ -6,14 +6,12 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
-public class WASDEntityController implements IKeyObserver {
-
-  private final IMovableEntity entity;
+public class WASDEntityController extends MovementController implements IKeyObserver {
 
   private final float stepSize;
 
   public WASDEntityController(final IMovableEntity entity, final float stepSize) {
-    this.entity = entity;
+    super(entity);
     this.stepSize = stepSize;
     Input.KEYBOARD.registerForKeyDownEvents(this);
   }
@@ -38,8 +36,8 @@ public class WASDEntityController implements IKeyObserver {
     }
 
     if (dir != Direction.UNDEFINED) {
-      this.entity.setFacingDirection(dir);
-      Game.getPhysicsEngine().move(this.entity, this.stepSize);
+      this.getControlledEntity().setFacingDirection(dir);
+      Game.getPhysicsEngine().move(this.getControlledEntity(), this.stepSize);
     }
   }
 

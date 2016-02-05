@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.input.IMovementController;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -20,8 +21,8 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   /** The last moved. */
   private long lastMoved;
-
-  private IEntityNavigator navigator;
+  
+  private IMovementController movementController;
 
   public MovableCombatEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -61,12 +62,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     System.out.println("unknown facing angle " + this.getFacingAngle());
     return Direction.UNDEFINED;
   }
-
-  @Override
-  public IEntityNavigator getNavigator() {
-    return this.navigator;
-  }
-
+  
   @Override
   public float getVelocityInPixelsPerSecond() {
     return this.pixelsPerSecond * this.getAttributes().getVelocity().getCurrentValue();
@@ -145,7 +141,12 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setNavigator(final IEntityNavigator navigator) {
-    this.navigator = navigator;
+  public IMovementController getMovementController() {
+    return this.movementController;
+  }
+
+  @Override
+  public void setMovementController(IMovementController movementController) {
+    this.movementController = movementController;
   }
 }
