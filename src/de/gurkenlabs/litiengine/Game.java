@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.lang.annotation.AnnotationFormatError;
+import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.core.ILaunchable;
@@ -77,6 +79,19 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void init() {
+    // init logging
+    if (new File("logging.properties").exists()) {
+      System.setProperty("java.util.logging.config.file", "logging.properties");
+
+      try {
+        LogManager.getLogManager().readConfiguration();
+      }
+
+      catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
 
