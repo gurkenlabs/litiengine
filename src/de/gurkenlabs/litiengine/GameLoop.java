@@ -15,7 +15,7 @@ public class GameLoop extends Thread implements IGameLoop {
   private long lastUpsTime;
   private long lastUpdateTime;
 
-  private final boolean gameIsRunning = true;
+  private boolean gameIsRunning = true;
 
   /** The next game tick. */
   private long nextGameTick = System.currentTimeMillis();
@@ -92,8 +92,7 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void terminate() {
-    // TODO Auto-generated method stub
-
+    this.gameIsRunning = false;
   }
 
   @Override

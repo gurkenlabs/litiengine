@@ -129,6 +129,18 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void render(Graphics g, List<? extends IRenderable> renderables, IVision vision) {
+    // set render shape according to the vision
+    final Shape oldClip = g.getClip();
+
+    g.setClip(vision.getRenderVisionShape());
+
+    renderables.forEach(r -> r.render(g));
+
+    g.setClip(oldClip);
+  }
+
+  @Override
   public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
@@ -148,7 +160,6 @@ public class RenderEngine implements IRenderEngine {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    vision.renderFogOfWar(g);
     g.setClip(vision.getRenderVisionShape());
 
     this.renderEntities(g, entities);
@@ -158,14 +169,16 @@ public class RenderEngine implements IRenderEngine {
 
   @Override
   public void renderEntity(final Graphics g, final IEntity entity) {
-    if (entity.getAnimationController() == null) {
+    if (entity.getAnimationController() != null) {
+      entity.getAnimationController().updateAnimation();
+
+      final BufferedImage img = entity.getAnimationController().getCurrentSprite();
+      RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
+    } else if (entity instanceof IRenderable) {
+      ((IRenderable) entity).render(g);
+    } else {
       return;
     }
-
-    entity.getAnimationController().updateAnimation();
-
-    final BufferedImage img = entity.getAnimationController().getCurrentSprite();
-    RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
 
     for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
       consumer.accept(new RenderEvent<IEntity>(g, entity));
