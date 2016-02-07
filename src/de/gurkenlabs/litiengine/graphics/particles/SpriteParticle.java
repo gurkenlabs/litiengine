@@ -11,8 +11,8 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 public class SpriteParticle extends Particle {
   private final Image image;
 
-  public SpriteParticle(final Image sprite, final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final byte width, final byte height, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
+  public SpriteParticle(final Image sprite, final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final int life) {
+    super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, (byte) 0, (byte) 0, life, Color.WHITE);
     this.image = sprite;
   }
 
