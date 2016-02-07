@@ -45,6 +45,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void add(final int mapId, final IMovableEntity entity) {
+    this.movableEntities.put(mapId, entity);
+  }
+
+  @Override
   public Collection<ICombatEntity> getCombatEntities() {
     return this.combatEntities.values();
   }
@@ -69,17 +74,12 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void add(int mapId, IMovableEntity entity) {
-    this.movableEntities.put(mapId, entity);
-  }
-
-  @Override
   public Collection<IMovableEntity> getMovableEntities() {
     return this.movableEntities.values();
   }
 
   @Override
-  public IMovableEntity getMovableEntity(int mapId) {
+  public IMovableEntity getMovableEntity(final int mapId) {
     if (this.movableEntities.containsKey(mapId)) {
       return this.movableEntities.get(mapId);
     }

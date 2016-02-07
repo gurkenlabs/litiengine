@@ -37,6 +37,11 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public IMovableEntity getEntity() {
+    return this.entity;
+  }
+
+  @Override
   public Path getPath() {
     return this.path;
   }
@@ -49,11 +54,6 @@ public class EntityNavigator implements IEntityNavigator {
   @Override
   public void navigate(final Point2D target) {
     this.path = this.getPathFinder().findPath(this.entity, target);
-  }
-
-  @Override
-  public IMovableEntity getEntity() {
-    return this.entity;
   }
 
   /*

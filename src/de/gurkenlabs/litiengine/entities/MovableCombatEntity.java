@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.input.IMovementController;
-import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
@@ -21,7 +20,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   /** The last moved. */
   private long lastMoved;
-  
+
   private IMovementController movementController;
 
   public MovableCombatEntity() {
@@ -62,7 +61,12 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     System.out.println("unknown facing angle " + this.getFacingAngle());
     return Direction.UNDEFINED;
   }
-  
+
+  @Override
+  public IMovementController getMovementController() {
+    return this.movementController;
+  }
+
   @Override
   public float getVelocityInPixelsPerSecond() {
     return this.pixelsPerSecond * this.getAttributes().getVelocity().getCurrentValue();
@@ -141,12 +145,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public IMovementController getMovementController() {
-    return this.movementController;
-  }
-
-  @Override
-  public void setMovementController(IMovementController movementController) {
+  public void setMovementController(final IMovementController movementController) {
     this.movementController = movementController;
   }
 }

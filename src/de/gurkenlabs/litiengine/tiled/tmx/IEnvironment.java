@@ -16,16 +16,11 @@ public interface IEnvironment {
 
   public void add(final int mapId, final ICombatEntity entity);
 
+  public void add(final int mapId, final IMovableEntity entity);
+
   public Collection<ICombatEntity> getCombatEntities();
 
   public ICombatEntity getCombatEntity(final int mapId);
-
-  
-  public void add(final int mapId, final IMovableEntity entity);
-
-  public Collection<IMovableEntity> getMovableEntities();
-
-  public IMovableEntity getMovableEntity(final int mapId);
 
   /**
    * Gets the map.
@@ -33,4 +28,8 @@ public interface IEnvironment {
    * @return the map
    */
   public IMap getMap();
+
+  public Collection<IMovableEntity> getMovableEntities();
+
+  public IMovableEntity getMovableEntity(final int mapId);
 }

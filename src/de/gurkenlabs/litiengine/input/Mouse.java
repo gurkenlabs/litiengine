@@ -47,11 +47,6 @@ public class Mouse implements IMouse {
     this.setGrabMouse(true);
   }
 
-  @Override
-  public Point2D getMapLocation() {
-    return Game.getScreenManager().getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getInfo().renderScale(), this.getLocation().getY() / Game.getInfo().renderScale()));
-  }
-  
   /*
    * (non-Javadoc)
    *
@@ -60,6 +55,11 @@ public class Mouse implements IMouse {
   @Override
   public Point2D getLocation() {
     return this.location;
+  }
+
+  @Override
+  public Point2D getMapLocation() {
+    return Game.getScreenManager().getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getInfo().renderScale(), this.getLocation().getY() / Game.getInfo().renderScale()));
   }
 
   /**

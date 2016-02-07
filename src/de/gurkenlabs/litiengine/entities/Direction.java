@@ -13,17 +13,17 @@ public enum Direction {
     this.flagValue = flagValue;
   }
 
-  public byte getFlagValue() {
-    return this.flagValue;
-  }
-
-  public static Direction fromFlagValue(byte flagValue) {
-    for (Direction dir : Direction.values()) {
+  public static Direction fromFlagValue(final byte flagValue) {
+    for (final Direction dir : Direction.values()) {
       if (dir.getFlagValue() == flagValue) {
         return dir;
       }
     }
 
     return UNDEFINED;
+  }
+
+  public byte getFlagValue() {
+    return this.flagValue;
   }
 }

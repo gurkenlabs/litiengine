@@ -30,29 +30,29 @@ public class MousePathCombatEntityController extends MovementController implemen
   }
 
   @Override
-  public void mouseClicked(MouseEvent e) {
+  public void mouseClicked(final MouseEvent e) {
   }
 
   @Override
-  public void mousePressed(MouseEvent e) {
+  public void mouseEntered(final MouseEvent e) {
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+  }
+
+  @Override
+  public void mousePressed(final MouseEvent e) {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.navigating = true;
     }
   }
 
   @Override
-  public void mouseReleased(MouseEvent e) {
+  public void mouseReleased(final MouseEvent e) {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.navigating = false;
     }
-  }
-
-  @Override
-  public void mouseEntered(MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(MouseEvent e) {
   }
 
   @Override

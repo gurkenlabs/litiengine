@@ -25,7 +25,6 @@ import de.gurkenlabs.tiled.tmx.ITileset;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
-import de.gurkenlabs.tiled.tmx.xml.Tile;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
@@ -157,7 +156,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     layer.getTiles().parallelStream().forEach((tile) -> {
       // get the tile from the tileset image
-      int index = layer.getTiles().indexOf(tile);
+      final int index = layer.getTiles().indexOf(tile);
       if (tile.getGridId() == 0) {
         this.tilesRendered++;
         return;
