@@ -25,6 +25,7 @@ import de.gurkenlabs.tiled.tmx.ITileset;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
+import de.gurkenlabs.tiled.tmx.xml.Tile;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
@@ -137,7 +138,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    *          the map
    * @return the layer image
    */
-  private BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
+  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
     // if we have already retrived the image, use the one from the cache to
     // draw the layer
     final String cacheKey = MessageFormat.format("{0}_{1}", getCacheKey(map), layer.getName());
@@ -153,25 +154,28 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     // set alpha value of the tiles by the layers value
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
-    for (int i = 0; i < layer.getTiles().size(); i++) {
+
+    layer.getTiles().parallelStream().forEach((tile) -> {
       // get the tile from the tileset image
-      final ITile tile = layer.getTiles().get(i);
+      int index = layer.getTiles().indexOf(tile);
       if (tile.getGridId() == 0) {
         this.tilesRendered++;
-        continue;
+        return;
       }
 
       final Image tileTexture = getTile(map, tile);
 
       // draw the tile on the map image
-      final int x = i % layer.getSizeInTiles().width * map.getTileSize().width;
-      final int y = i / layer.getSizeInTiles().width * map.getTileSize().height;
+      final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
+      final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
       imageGraphics.drawImage(tileTexture, x, y, null);
       this.tilesRendered++;
       this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
-    }
+    });
 
-    ImageCache.MAPS.putPersistent(getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+    ImageCache.MAPS.putPersistent(
+
+        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
     return bufferedImage;
   }
 }
