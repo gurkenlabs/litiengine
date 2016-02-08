@@ -49,13 +49,12 @@ public class ShimmerEmitter extends Emitter {
     final float gravityX = 0.0f;
     final float gravityY = 0.0f;
     final byte size = (byte) (rand.nextInt(3) + 2);
-    final short life = (short) 0;
 
     Color color = new Color(255, 255, 255, (int) Math.round(Math.random() * 155) + 100);
     if (rand.nextFloat() > 0.5) {
       color = new Color(170, 255, 255, (int) Math.round(Math.random() * 155) + 100);
     }
-    final Particle p = new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, color);
+    final Particle p = new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, 0, color);
     return p;
   }
 }
