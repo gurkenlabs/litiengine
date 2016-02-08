@@ -38,7 +38,8 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     info = inf;
 
-    final ScreenManager scrMgr = new ScreenManager(getInfo().name() + " " + getInfo().version());
+    String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
+    final ScreenManager scrMgr = new ScreenManager(gameTitle);
 
     // ensures that we terminate the game, when the window is closed
     scrMgr.addWindowListener(new WindowHandler());
