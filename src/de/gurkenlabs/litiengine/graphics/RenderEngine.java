@@ -129,7 +129,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(Graphics g, List<? extends IRenderable> renderables, IVision vision) {
+  public void render(final Graphics g, final List<? extends IRenderable> renderables, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 

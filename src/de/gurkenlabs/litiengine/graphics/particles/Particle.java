@@ -355,7 +355,7 @@ public class Particle implements IUpdateable, ITimeToLive {
     return this.deltaHeight;
   }
 
-  public void setDeltaHeight(float deltaHeight) {
+  public void setDeltaHeight(final float deltaHeight) {
     this.deltaHeight = deltaHeight;
   }
 
@@ -363,7 +363,7 @@ public class Particle implements IUpdateable, ITimeToLive {
     return this.deltaWidth;
   }
 
-  public void setDeltaWidth(float deltaWidth) {
+  public void setDeltaWidth(final float deltaWidth) {
     this.deltaWidth = deltaWidth;
   }
 }

@@ -107,7 +107,7 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
-  public void rotateTowards(Point2D target) {
+  public void rotateTowards(final Point2D target) {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
     this.entity.setFacingAngle((float) angle);
   }

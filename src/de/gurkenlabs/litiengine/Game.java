@@ -93,7 +93,7 @@ public abstract class Game implements IInitializable, ILaunchable {
         LogManager.getLogManager().readConfiguration();
       }
 
-      catch (Exception e) {
+      catch (final Exception e) {
         e.printStackTrace();
       }
     }

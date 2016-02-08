@@ -23,7 +23,7 @@ public interface IRenderEngine {
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
 
   public void render(Graphics g, List<? extends IRenderable> renderables);
-  
+
   public void render(Graphics g, List<? extends IRenderable> renderables, IVision vision);
 
   public void renderEntities(Graphics g, List<? extends IEntity> entities);

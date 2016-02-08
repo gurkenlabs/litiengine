@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 public abstract class SpritesheetEmitter extends Emitter {
   private final Spritesheet spriteSheet;
 
-  public SpritesheetEmitter(Spritesheet spriteSheet, final Point2D origin) {
+  public SpritesheetEmitter(final Spritesheet spriteSheet, final Point2D origin) {
     super(origin);
     this.spriteSheet = spriteSheet;
   }

@@ -19,6 +19,6 @@ public interface IEntityNavigator extends IUpdateable {
   public IPathFinder getPathFinder();
 
   public void navigate(Point2D target);
-  
+
   public void rotateTowards(Point2D target);
 }

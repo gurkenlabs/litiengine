@@ -40,12 +40,12 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
   }
-  
+
   @Override
   public void init() {
     this.loadMapObjects();
   }
-  
+
   @Override
   public void add(final int mapId, final ICombatEntity entity) {
     this.combatEntities.put(mapId, entity);
