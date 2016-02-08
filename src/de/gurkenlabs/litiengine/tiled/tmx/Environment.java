@@ -11,6 +11,8 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
+import de.gurkenlabs.tiled.tmx.IMapObject;
+import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
 
 /**
@@ -38,7 +40,12 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
   }
-
+  
+  @Override
+  public void init() {
+    this.loadMapObjects();
+  }
+  
   @Override
   public void add(final int mapId, final ICombatEntity entity) {
     this.combatEntities.put(mapId, entity);
@@ -85,5 +92,21 @@ public class Environment implements IEnvironment {
     }
 
     return null;
+  }
+
+  protected void addMapObject(final IMapObject mapObject) {
+
+  }
+
+  private void loadMapObjects() {
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+      }
+    }
   }
 }

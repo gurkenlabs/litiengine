@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.tiled.tmx;
 
 import java.util.Collection;
 
+import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -12,7 +13,7 @@ import de.gurkenlabs.tiled.tmx.IMap;
 /**
  * The Interface IMapContainer.
  */
-public interface IEnvironment {
+public interface IEnvironment extends IInitializable {
 
   public void add(final int mapId, final ICombatEntity entity);
 
