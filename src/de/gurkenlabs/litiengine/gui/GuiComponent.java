@@ -86,8 +86,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.setSelected(false);
 
     this.initializeComponents();
-    Input.MOUSE.registerMouseListener(this);
-    Input.MOUSE.registerMouseMotionListener(this);
   }
 
   /**
@@ -367,8 +365,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void prepare() {
-    this.setSuspended(false);
+    for (GuiComponent component : this.getComponents()) {
+      component.prepare();
+    }
 
+    this.setSuspended(false);
+    Input.MOUSE.registerMouseListener(this);
+    Input.MOUSE.registerMouseMotionListener(this);
   }
 
   /**
@@ -480,10 +483,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void suspend() {
-    this.setSuspended(true);
     for (final GuiComponent component : this.getComponents()) {
-      component.setSuspended(true);
+      component.suspend();
     }
+    
+    Input.MOUSE.unregisterMouseListener(this);
+    Input.MOUSE.unregisterMouseMotionListener(this);
+    this.setSuspended(true);
   }
 
   public void toggleSelection() {
