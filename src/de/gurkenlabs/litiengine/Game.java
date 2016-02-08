@@ -18,6 +18,8 @@ import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.util.console.CommandManager;
+import de.gurkenlabs.util.console.ICommandManager;
 
 public abstract class Game implements IInitializable, ILaunchable {
   private static GameInfo info;
@@ -28,6 +30,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static IPhysicsEngine physicsEngine;
   private static IGameLoop gameLoop;
   private static GameMetrics metrics;
+  private static ICommandManager commandManager;
 
   private final RenderLoop renderLoop;
 
@@ -49,6 +52,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
     physicsEngine = new PhysicsEngine();
     metrics = new GameMetrics();
+    commandManager = new CommandManager();
+
     // init configuration before init method in order to use configured values
     // to initialize components
     getConfiguration().load();
@@ -59,7 +64,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
-    
+
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
 
@@ -89,6 +94,10 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   public static IScreenManager getScreenManager() {
     return screenManager;
+  }
+
+  public static ICommandManager getCommandManager() {
+    return commandManager;
   }
 
   @Override
@@ -123,12 +132,14 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void start() {
+    commandManager.start();
     gameLoop.start();
     this.renderLoop.start();
   }
 
   @Override
   public void terminate() {
+    commandManager.terminate();
     gameLoop.terminate();
     this.renderLoop.terminate();
   }
