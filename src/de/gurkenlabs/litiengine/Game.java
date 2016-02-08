@@ -6,6 +6,7 @@ import java.io.File;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.logging.LogManager;
 
+import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
@@ -38,6 +39,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     info = inf;
 
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
     final ScreenManager scrMgr = new ScreenManager(gameTitle);
 
@@ -51,8 +53,13 @@ public abstract class Game implements IInitializable, ILaunchable {
     // to initialize components
     getConfiguration().load();
 
+    // setup default exception handling for render and update loop
     this.renderLoop = new RenderLoop();
-    gameLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    this.renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    gameLoop = updateLoop;
+    
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
 

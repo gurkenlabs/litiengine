@@ -5,7 +5,7 @@ import de.gurkenlabs.litiengine.net.IIncomingPacketObserver;
 import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.util.console.ICommandManager;
 
-public interface IServer extends IIncomingPacketObserver, ILaunchable, ICommandManager {
+public interface IServer extends IIncomingPacketObserver, ILaunchable {
 
   /**
    * Gets the connection manager.
@@ -20,4 +20,6 @@ public interface IServer extends IIncomingPacketObserver, ILaunchable, ICommandM
    * @return the sender
    */
   public IPacketSender getSender();
+  
+  public ICommandManager getCommandManager();
 }

@@ -10,15 +10,14 @@ import de.gurkenlabs.litiengine.net.UdpPacketSender;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
 import de.gurkenlabs.litiengine.net.messages.MessageType;
-import de.gurkenlabs.util.console.ConsoleCommandListener;
+import de.gurkenlabs.util.console.CommandManager;
+import de.gurkenlabs.util.console.ICommandManager;
 import de.gurkenlabs.util.zip.CompressionUtilities;
 
-public abstract class UdpServer implements IServer {
-
+public class UdpServer implements IServer {
+  private static final String SHUTDOWN = "shutdown";
   /** The client connection manager. */
   private final IClientConnectionManager clientConnectionManager;
-
-  private final ConsoleCommandListener commandLineListener;
 
   /** The message handler provider. */
   private final IMessageHandlerProvider messageHandlerProvider;
@@ -29,28 +28,23 @@ public abstract class UdpServer implements IServer {
   /** The sender. */
   private final IPacketSender sender;
 
+  private final ICommandManager commandManager;
+
   public UdpServer(final int listenPort, final IMessageHandlerProvider provider) {
     this.receiver = new UdpPacketReceiver(listenPort);
     this.receiver.registerForIncomingPackets(this);
     this.sender = new UdpPacketSender();
     this.messageHandlerProvider = provider;
-    this.commandLineListener = new ConsoleCommandListener(this);
+    this.commandManager = new CommandManager();
+    this.commandManager.bind(SHUTDOWN, (args) -> this.handleShutdownCommand(args));
+
     this.clientConnectionManager = new ClientConnectionManager();
     provider.register(MessageType.PING, new ClientConnectionPingMessageHandler(this.clientConnectionManager));
   }
 
-  @Override
-  public boolean executeCommand(final String command) {
-    final String SHUTDOWN = "shutdown";
-    if (command == null || command.isEmpty()) {
-      return false;
-    }
-
-    if (command.equalsIgnoreCase(SHUTDOWN)) {
-      System.out.println("Shutting down server...");
-      this.terminate();
-    }
-
+  protected boolean handleShutdownCommand(final String[] command) {
+    System.out.println("Shutting down server...");
+    this.terminate();
     return true;
   }
 
@@ -67,6 +61,11 @@ public abstract class UdpServer implements IServer {
   @Override
   public IPacketSender getSender() {
     return this.sender;
+  }
+
+  @Override
+  public ICommandManager getCommandManager() {
+    return this.commandManager;
   }
 
   @Override
@@ -90,14 +89,13 @@ public abstract class UdpServer implements IServer {
   @Override
   public void start() {
     this.receiver.start();
-    this.commandLineListener.start();
+    this.getCommandManager().start();
   }
 
   @Override
   public void terminate() {
     this.receiver.terminate();
-    this.commandLineListener.terminate();
+    this.getCommandManager().terminate();
     System.exit(-1);
   }
-
 }
