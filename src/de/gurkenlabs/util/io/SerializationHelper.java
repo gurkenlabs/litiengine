@@ -46,6 +46,21 @@ public class SerializationHelper {
     return (byte) encodedAngle;
   }
 
+  public static short encodeAngleToShort(final float angle) {
+    float encodedAngle = angle;
+    if (encodedAngle < 0) {
+      encodedAngle += 360;
+    }
+
+    encodedAngle %= 360;
+
+    return encodeSmallFloatingPointNumber(encodedAngle, 2);
+  }
+
+  public static float decodeAngleFromShort(final short encodedAngle) {
+    return decodeSmallFloatingPointNumber(encodedAngle, 2);
+  }
+
   /**
    * Encodes positive numbers less than Short.MAX_VALUE * 2 / precision (6553.4
    * * for precision = 1).

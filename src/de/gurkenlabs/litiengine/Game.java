@@ -26,6 +26,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static IRenderEngine graphicsEngine;
   private static IPhysicsEngine physicsEngine;
   private static IGameLoop gameLoop;
+  private static GameMetrics metrics;
 
   private final RenderLoop renderLoop;
 
@@ -44,13 +45,14 @@ public abstract class Game implements IInitializable, ILaunchable {
     screenManager = scrMgr;
     graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
     physicsEngine = new PhysicsEngine();
-
+    metrics = new GameMetrics();
     // init configuration before init method in order to use configured values
     // to initialize components
     getConfiguration().load();
 
     this.renderLoop = new RenderLoop();
     gameLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
 
   public static GameConfiguration getConfiguration() {
@@ -59,6 +61,10 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   public static GameInfo getInfo() {
     return info;
+  }
+
+  public static GameMetrics getMetrics() {
+    return metrics;
   }
 
   public static IGameLoop getLoop() {
@@ -91,9 +97,12 @@ public abstract class Game implements IInitializable, ILaunchable {
         e.printStackTrace();
       }
     }
-    
+
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
+    getScreenManager().onFpsChanged(fps -> {
+      getMetrics().setFramesPerSecond(fps);
+    });
 
     // TODO: init sounds
 

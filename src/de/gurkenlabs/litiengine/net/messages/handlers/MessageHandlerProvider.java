@@ -1,11 +1,15 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.net.messages;
+package de.gurkenlabs.litiengine.net.messages.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
+import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
+import de.gurkenlabs.litiengine.net.messages.MessageType;
 
 /**
  * The Class MessageHandlerProvider.

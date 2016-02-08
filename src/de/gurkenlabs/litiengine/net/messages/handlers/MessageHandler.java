@@ -1,10 +1,13 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.net.messages;
+package de.gurkenlabs.litiengine.net.messages.handlers;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+
+import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
+import de.gurkenlabs.litiengine.net.messages.MessagePackage;
 
 // TODO: Auto-generated Javadoc
 /**
