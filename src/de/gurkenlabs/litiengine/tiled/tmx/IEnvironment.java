@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.tiled.tmx;
 
+import java.awt.Shape;
 import java.util.Collection;
 
 import de.gurkenlabs.core.IInitializable;
@@ -22,6 +23,8 @@ public interface IEnvironment extends IInitializable {
   public Collection<ICombatEntity> getCombatEntities();
 
   public ICombatEntity getCombatEntity(final int mapId);
+  
+  public Collection<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
    * Gets the map.

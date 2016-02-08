@@ -3,9 +3,11 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.tiled.tmx;
 
+import java.awt.Shape;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -14,6 +16,7 @@ import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
+import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class MapContainerBase.
@@ -68,6 +71,11 @@ public class Environment implements IEnvironment {
     }
 
     return null;
+  }
+  
+  @Override
+  public Collection<ICombatEntity> findCombatEntities(Shape shape) {
+    return this.getCombatEntities().stream().filter(entity -> GeometricUtilities.shapeIntersects(entity.getHitBox(), shape)).collect(Collectors.toList());
   }
 
   /*

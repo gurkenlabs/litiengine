@@ -108,7 +108,7 @@ public class AbilityExecution implements IUpdateable {
 
         // execute all follow up effects
         effect.getFollowUpEffects().forEach(followUp -> {
-          followUp.apply();
+          followUp.apply(this.getExecutionImpactArea());
           this.getAppliedEffects().put(followUp, this.gameLoop.getTicks());
         });
       }
@@ -128,7 +128,7 @@ public class AbilityExecution implements IUpdateable {
         continue;
       }
 
-      effect.apply();
+      effect.apply(this.getExecutionImpactArea());
       this.getAppliedEffects().put(effect, this.gameLoop.getTicks());
     }
   }

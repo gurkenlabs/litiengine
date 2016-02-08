@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.abilities.effects;
 
+import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -72,8 +73,8 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply() {
-    for (final ICombatEntity affectedEntity : this.lookForAffectedEntities()) {
+  public void apply(final Shape impactArea) {
+    for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
       // cannot affect the entity with the effect while it is still affected
       if (this.affectedEntities.contains(affectedEntity)) {
         return;
@@ -149,6 +150,10 @@ public abstract class Effect implements IEffect {
     return this.followUpEffects;
   }
 
+  public IEnvironment getEnvironment(){
+    return this.environment;
+  }
+  
   @Override
   public boolean isActive() {
     return this.active;
@@ -221,17 +226,6 @@ public abstract class Effect implements IEffect {
   }
 
   /**
-   * Gets the entities in impact area.
-   *
-   * @param attackableEntities
-   *          the attackable entities
-   * @return the entities in impact area
-   */
-  protected List<ICombatEntity> getEntitiesInImpactArea(final Collection<? extends ICombatEntity> attackableEntities) {
-    return this.getAbility().getCurrentExecution() == null ? new ArrayList<>() : attackableEntities.stream().filter(entity -> GeometricUtilities.shapeIntersects(entity.getHitBox(), this.getAbility().getCurrentExecution().getExecutionImpactArea())).collect(Collectors.toList());
-  }
-
-  /**
    * Gets the total duration.
    *
    * @return the total duration
@@ -245,7 +239,7 @@ public abstract class Effect implements IEffect {
    *
    * @return the list
    */
-  protected List<ICombatEntity> lookForAffectedEntities() {
+  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
     List<ICombatEntity> affectedEntities = new ArrayList<>();
 
     for (final EffectTarget target : this.effectTargets) {
@@ -254,11 +248,11 @@ public abstract class Effect implements IEffect {
         affectedEntities.add(this.getAbility().getExecutor());
         break;
       case ENEMY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(this.environment.getCombatEntities()));
+        affectedEntities.addAll(this.environment.findCombatEntities(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
         break;
       case FRIENDLY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(this.environment.getCombatEntities()));
+        affectedEntities.addAll(this.environment.findCombatEntities(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
         break;
       default:
@@ -278,5 +272,9 @@ public abstract class Effect implements IEffect {
     }
 
     return affectedEntities;
+  }
+
+  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
+    return this.environment.findCombatEntities(impactArea);
   }
 }

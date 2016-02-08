@@ -1,10 +1,11 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
+import java.awt.Shape;
 import java.util.List;
 import java.util.function.Consumer;
 
 public interface IEffect {
-  public void apply();
+  public void apply(Shape impactArea);
 
   public void cease();
 
