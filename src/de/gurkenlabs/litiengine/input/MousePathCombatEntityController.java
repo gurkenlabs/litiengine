@@ -31,6 +31,9 @@ public class MousePathCombatEntityController extends MovementController implemen
 
   @Override
   public void mouseClicked(final MouseEvent e) {
+    if (SwingUtilities.isLeftMouseButton(e)) {
+      this.getNavigator().rotateTowards(Input.MOUSE.getMapLocation());
+    }
   }
 
   @Override

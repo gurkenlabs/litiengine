@@ -68,7 +68,7 @@ public class FireEmitter extends Emitter {
     final float dy = (float) (Math.random() * 2 * -1f);
     final float gravityX = 0.0f;
     final float gravityY = 0.0015f * (randBool ? 1f : -1f);
-    final byte size = (byte) (4 + Math.random() * 5);
+    final float size = (float) (4 + Math.random() * 5);
 
     this.addParticle(new Particle(xCoord, 0, dx, dy, gravityX, gravityY, size, size, life, color));
   }

@@ -35,7 +35,7 @@ public class SnowEmitter extends WeatherEmitter {
     final float dy = delta;
     final float gravityX = -0.01f;
     final float gravityY = 0.05f;
-    final byte size = (byte) (Math.random() * 4);
+    final float size = (float) (Math.random() * 4);
     final int life = this.getRandomParticleTTL();
 
     return new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, new Color(255, 255, 255, 180));
@@ -54,7 +54,7 @@ public class SnowEmitter extends WeatherEmitter {
       final double cameraDeltaY = this.lastCameraFocus.getY() - Game.getScreenManager().getCamera().getFocus().getY();
       this.getParticles().forEach(particle -> particle.setxCurrent(particle.getxCurrent() - (float) cameraDeltaX));
       this.getParticles().forEach(particle -> particle.setyCurrent(particle.getyCurrent() - (float) cameraDeltaY));
-      this.getParticles().forEach(particle -> particle.setGravityX(particle.getGravityX() * (Math.random() > 0.5 ? 1 : -1)));
+      this.getParticles().forEach(particle -> particle.setDeltaIncX(particle.getGravityX() * (Math.random() > 0.5 ? 1 : -1)));
     }
 
     this.lastCameraFocus = Game.getScreenManager().getCamera().getFocus();

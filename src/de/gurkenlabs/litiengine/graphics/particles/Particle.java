@@ -31,21 +31,24 @@ public class Particle implements IUpdateable, ITimeToLive {
    * The gravitational pull to the left (negative) and right (positive) acting
    * on this particle.
    */
-  private float gravityX;
+  private float deltaIncX;
 
   /**
    * The gravitational pull to the up (negative) and down (positive) acting on
    * this particle.
    */
-  private float gravityY;
+  private float deltaIncY;
 
   /** The height. */
-  private byte height;
+  private float height;
 
   private final int timeToLife;
 
   /** The width. */
-  private byte width;
+  private float width;
+
+  private float deltaWidth;
+  private float deltaHeight;
 
   /** The currentlocation of the particle on the X-axis. */
   private float xCurrent;
@@ -66,10 +69,10 @@ public class Particle implements IUpdateable, ITimeToLive {
    *          The change in X, per update, of the effect.
    * @param dy
    *          The change in Y, per update, of the effect.
-   * @param gravityX
+   * @param deltaIncX
    *          The gravitational pull to the left (negative) and right (positive)
    *          acting on this effect.
-   * @param gravityY
+   * @param deltaIncY
    *          The gravitational pull to the up (negative) and down (positive)
    *          acting on this effect.
    * @param width
@@ -83,13 +86,13 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @param particleType
    *          the particle type
    */
-  public Particle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final byte width, final byte height, final int life, final Color color) {
+  public Particle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
     this.xCurrent = xCurrent;
     this.yCurrent = yCurrent;
     this.dx = dx;
     this.dy = dy;
-    this.gravityX = gravityX;
-    this.gravityY = gravityY;
+    this.deltaIncX = deltaIncX;
+    this.deltaIncY = deltaIncY;
     this.setWidth(width);
     this.setHeight(height);
     this.timeToLife = life;
@@ -145,7 +148,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @return the gravity x
    */
   public float getGravityX() {
-    return this.gravityX;
+    return this.deltaIncX;
   }
 
   /**
@@ -154,7 +157,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @return the gravity y
    */
   public float getGravityY() {
-    return this.gravityY;
+    return this.deltaIncY;
   }
 
   /**
@@ -162,7 +165,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    *
    * @return the height
    */
-  public byte getHeight() {
+  public float getHeight() {
     return this.height;
   }
 
@@ -187,7 +190,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    *
    * @return the width
    */
-  public byte getWidth() {
+  public float getWidth() {
     return this.width;
   }
 
@@ -266,8 +269,8 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @param gravityX
    *          the new gravity x
    */
-  public void setGravityX(final float gravityX) {
-    this.gravityX = gravityX;
+  public void setDeltaIncX(final float gravityX) {
+    this.deltaIncX = gravityX;
   }
 
   /**
@@ -276,8 +279,8 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @param gravityY
    *          the new gravity y
    */
-  public void setGravityY(final float gravityY) {
-    this.gravityY = gravityY;
+  public void setDeltaIncY(final float gravityY) {
+    this.deltaIncY = gravityY;
   }
 
   /**
@@ -286,7 +289,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @param height
    *          the new height
    */
-  public void setHeight(final byte height) {
+  public void setHeight(final float height) {
     this.height = height;
   }
 
@@ -296,7 +299,7 @@ public class Particle implements IUpdateable, ITimeToLive {
    * @param width
    *          the new width
    */
-  public void setWidth(final byte width) {
+  public void setWidth(final float width) {
     this.width = width;
   }
 
@@ -338,10 +341,29 @@ public class Particle implements IUpdateable, ITimeToLive {
     this.xCurrent += this.dx;
     this.yCurrent += this.dy;
 
-    this.dx += this.gravityX;
-    this.dy += this.gravityY;
+    this.dx += this.deltaIncX;
+    this.dy += this.deltaIncY;
+
+    this.width += this.getDeltaWidth();
+    this.height += this.getDeltaHeight();
 
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+  }
+
+  public float getDeltaHeight() {
+    return this.deltaHeight;
+  }
+
+  public void setDeltaHeight(float deltaHeight) {
+    this.deltaHeight = deltaHeight;
+  }
+
+  public float getDeltaWidth() {
+    return this.deltaWidth;
+  }
+
+  public void setDeltaWidth(float deltaWidth) {
+    this.deltaWidth = deltaWidth;
   }
 }

@@ -89,8 +89,8 @@ public class SelectionEmitter extends Emitter {
     final float dy = (float) (Math.random() * 4 * (randBoolY ? -1f : 1f));
     final float gravityX = 0.0f;
     final float gravityY = 0.0015f * (randBoolY ? 1f : -1f);
-    final byte width = (byte) (4 + Math.random() * this.width / 10);
-    final byte height = (byte) (4 + Math.random() * this.height / 10);
+    final float width = (float) (4 + Math.random() * this.width / 10);
+    final float height = (float) (4 + Math.random() * this.height / 10);
 
     this.addParticle(new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, width, height, life, color));
   }

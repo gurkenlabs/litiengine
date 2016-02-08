@@ -68,7 +68,7 @@ public class DirtEmitter extends EntityEmitter {
     dy = (float) (Math.random() * 2 * (randBoolY ? -1f : 1f));
     final float gravityX = 0.0f;
     final float gravityY = -0.2f;
-    final byte size = (byte) (1 + Math.random() * 2);
+    final float size = (float) (1 + Math.random() * 2);
     final int life = this.getRandomParticleTTL();
 
     final Particle p = new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, REDISH_BROWN);

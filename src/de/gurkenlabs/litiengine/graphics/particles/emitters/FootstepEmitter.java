@@ -25,19 +25,19 @@ public class FootstepEmitter extends Emitter {
 
   @Override
   protected Particle createNewParticle() {
-    byte width;
-    byte height;
+    float width;
+    float height;
     int x;
     int y;
     if (this.dir == Direction.DOWN || this.dir == Direction.UP) {
-      width = (byte) this.stepWidth;
-      height = (byte) this.stepHeight;
+      width = this.stepWidth;
+      height = this.stepHeight;
 
       x = (int) (this.left ? -this.stepWidth * 1.25 : this.stepWidth * 1.25);
       y = 0;
     } else {
-      width = (byte) this.stepHeight;
-      height = (byte) this.stepWidth;
+      width = this.stepHeight;
+      height = this.stepWidth;
 
       x = 0;
       y = (int) (this.left ? -this.stepWidth * 1.25 : this.stepWidth * 1.25);

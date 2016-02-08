@@ -46,7 +46,7 @@ public class HitEmitter extends Emitter {
     final float dy = (float) (1.2 * Math.random() * (Math.random() >= 0.5 ? -1f : 1f));
     final float gravityX = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);
     final float gravityY = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);
-    final byte size = (byte) (3 + Math.random() * 3);
+    final float size = (float) (3 + Math.random() * 3);
     final int life = this.getRandomParticleTTL();
 
     final Particle p = new Particle(0, 0, dx, dy, gravityX, gravityY, size, size, life, this.hitColor);

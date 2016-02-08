@@ -82,8 +82,8 @@ public abstract class WeatherEmitter extends Emitter {
     particle.setyCurrent(particle.getyCurrent() * heightDifference);
     particle.setDx(particle.getDx() * widthDifference);
     particle.setDy(particle.getDy() * heightDifference);
-    particle.setGravityX(particle.getGravityX() * widthDifference);
-    particle.setGravityY(particle.getGravityY() * heightDifference);
+    particle.setDeltaIncX(particle.getGravityX() * widthDifference);
+    particle.setDeltaIncY(particle.getGravityY() * heightDifference);
   }
 
   /*

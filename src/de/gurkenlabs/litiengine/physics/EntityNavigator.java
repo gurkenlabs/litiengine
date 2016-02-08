@@ -16,7 +16,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class EntityNavigator implements IEntityNavigator {
 
   /** The Constant ACCEPTABLE_ERROR. */
-  private static final float ACCEPTABLE_ERROR = 0.1f;
+  private static final float ACCEPTABLE_ERROR = 0.3f;
 
   private final IMovableEntity entity;
   private final IPathFinder pathFinder;
@@ -104,5 +104,11 @@ public class EntityNavigator implements IEntityNavigator {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = this.entity.getVelocityInPixelsPerSecond() / Game.getConfiguration().CLIENT.getUpdaterate();
     Game.getPhysicsEngine().move(this.entity, angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+  }
+
+  @Override
+  public void rotateTowards(Point2D target) {
+    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
+    this.entity.setFacingAngle((float) angle);
   }
 }

@@ -49,7 +49,7 @@ public class BloodEmitter extends EntityEmitter {
     final float dy = (float) (1.5 * Math.random() * (randBoolY ? -1f : 1f));
     final float gravityX = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);
     final float gravityY = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);
-    final byte size = (byte) (2 + Math.random() * 3);
+    final float size = (float) (2 + Math.random() * 3);
     final int life = this.getRandomParticleTTL();
 
     final Particle p = new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, Math.random() >= 0.5 ? Color.RED : new Color(150, 0, 0, 150));

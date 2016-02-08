@@ -49,7 +49,7 @@ public class GlowEmitter extends EntityEmitter {
     final float dy = (float) (Math.random() * (randBoolY ? -1f : 1f));
     final float gravityX = 0.01f * (randBoolY ? -1f : 1f);
     final float gravityY = 0.01f * (randBoolX ? -1f : 1f);
-    final byte size = (byte) (4 + Math.random() * 5);
+    final float size = (float) (4 + Math.random() * 5);
     final int life = this.getRandomParticleTTL();
 
     Color color = DEFAULT_COLOR;
