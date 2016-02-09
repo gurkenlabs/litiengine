@@ -29,14 +29,13 @@ public class ImageProcessing {
    *          the border
    * @return the buffered image
    */
-  public static BufferedImage addShadow(final BufferedImage image, final int xOffset, final int yOffset, final boolean border) {
-    final Color BorderColor = new Color(255, 0, 0, 100);
+  public static BufferedImage addShadow(final BufferedImage image, final int xOffset, final int yOffset) {
     if (image == null) {
       return image;
     }
 
-    final BufferedImage imageWithShadow = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-    final Graphics2D graphics = imageWithShadow.createGraphics();
+    final BufferedImage shadow = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+    final Graphics2D graphics = shadow.createGraphics();
 
     // Transform visible pixels to a semi-transparent black
     final BufferedImage shadowImage = flashVisiblePixels(image, new Color(0, 0, 0, 40));
@@ -55,16 +54,9 @@ public class ImageProcessing {
     // need to draw the shadow with respect to this empty space
     graphics.drawImage(scaledImage, xOffset, yOffset - (scaledImage.getHeight() / 4 + 1), null);
 
-    if (border) {
-      final BufferedImage borderImage = borderAlpha(image, BorderColor);
-      graphics.drawImage(borderImage, 0, 0, null);
-    } else {
-      graphics.drawImage(image, 0, 0, null);
-    }
-
     graphics.dispose();
 
-    return imageWithShadow;
+    return shadow;
   }
 
   /**
