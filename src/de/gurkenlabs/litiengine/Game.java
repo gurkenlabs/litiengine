@@ -18,6 +18,8 @@ import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.litiengine.sound.ISoundEngine;
+import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.util.console.CommandManager;
 import de.gurkenlabs.util.console.ICommandManager;
 
@@ -28,6 +30,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static IScreenManager screenManager;
   private static IRenderEngine graphicsEngine;
   private static IPhysicsEngine physicsEngine;
+  private static ISoundEngine soundEngine;
   private static IGameLoop gameLoop;
   private static GameMetrics metrics;
   private static ICommandManager commandManager;
@@ -51,6 +54,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     screenManager = scrMgr;
     graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
     physicsEngine = new PhysicsEngine();
+    soundEngine = new PaulsSoundEngine();
+
     metrics = new GameMetrics();
     commandManager = new CommandManager();
 
@@ -92,6 +97,10 @@ public abstract class Game implements IInitializable, ILaunchable {
     return graphicsEngine;
   }
 
+  public static ISoundEngine getSoundEngine() {
+    return soundEngine;
+  }
+
   public static IScreenManager getScreenManager() {
     return screenManager;
   }
@@ -121,7 +130,8 @@ public abstract class Game implements IInitializable, ILaunchable {
       getMetrics().setFramesPerSecond(fps);
     });
 
-    // TODO: init sounds
+    // init sounds
+    soundEngine.init(getConfiguration().SOUND.getSoundVolume());
 
     // init inputs
     Input.init();
@@ -134,6 +144,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   public void start() {
     commandManager.start();
     gameLoop.start();
+    soundEngine.start();
     this.renderLoop.start();
   }
 
@@ -141,6 +152,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   public void terminate() {
     commandManager.terminate();
     gameLoop.terminate();
+    soundEngine.terminate();
     this.renderLoop.terminate();
   }
 

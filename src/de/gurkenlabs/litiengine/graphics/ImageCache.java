@@ -158,12 +158,12 @@ public class ImageCache {
    *          the key
    * @return the buffered image
    */
-  private BufferedImage loadImage(final String key) {
+  private synchronized BufferedImage loadImage(final String key) {
     final File file = new File(this.getFileName(key));
     if (!file.exists()) {
       return null;
     }
-
+    
     BufferedImage img;
     try {
       img = ImageIO.read(file);

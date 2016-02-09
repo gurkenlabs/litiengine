@@ -13,9 +13,6 @@ import de.gurkenlabs.configuration.ConfigurationGroup;
 @ConfigurationGroupInfo(prefix = "SOUND_")
 public class SoundConfiguration extends ConfigurationGroup {
 
-  /** The music volume. */
-  private float musicVolume;
-
   /** The sound volume. */
   private float soundVolume;
 
@@ -23,17 +20,7 @@ public class SoundConfiguration extends ConfigurationGroup {
    * Instantiates a new sound configuration.
    */
   public SoundConfiguration() {
-    this.musicVolume = 0.0F;
     this.soundVolume = 0.5F;
-  }
-
-  /**
-   * Gets the music volume.
-   *
-   * @return the music volume
-   */
-  public float getMusicVolume() {
-    return this.musicVolume;
   }
 
   /**
@@ -43,16 +30,6 @@ public class SoundConfiguration extends ConfigurationGroup {
    */
   public float getSoundVolume() {
     return this.soundVolume;
-  }
-
-  /**
-   * Sets the music volume.
-   *
-   * @param musicVolume
-   *          the new music volume
-   */
-  public void setMusicVolume(final float musicVolume) {
-    this.musicVolume = musicVolume;
   }
 
   /**

@@ -73,7 +73,7 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply(final Shape impactArea) {
+  public void apply(final Shape impactArea) {    
     for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
       // cannot affect the entity with the effect while it is still affected
       if (this.affectedEntities.contains(affectedEntity)) {

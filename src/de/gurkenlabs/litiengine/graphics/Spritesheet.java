@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.tiled.tmx.ITileset;
@@ -67,11 +68,16 @@ public class Spritesheet {
   }
 
   public static Spritesheet find(final String path) {
-    if (path == null || path.isEmpty() || !spritesheets.stream().anyMatch(x -> x.getPath().equalsIgnoreCase(path))) {
+    if (path == null || path.isEmpty()) {
       return null;
     }
 
-    return spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst().get();
+    Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst();
+    if (!sheet.isPresent()) {
+      return null;
+    }
+    
+    return sheet.get();
   }
 
   /**
