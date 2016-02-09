@@ -72,9 +72,9 @@ public class Environment implements IEnvironment {
 
     return null;
   }
-  
+
   @Override
-  public Collection<ICombatEntity> findCombatEntities(Shape shape) {
+  public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
     return this.getCombatEntities().stream().filter(entity -> GeometricUtilities.shapeIntersects(entity.getHitBox(), shape)).collect(Collectors.toList());
   }
 

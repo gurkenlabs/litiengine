@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
-import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class Effect.
@@ -73,7 +72,7 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply(final Shape impactArea) {    
+  public void apply(final Shape impactArea) {
     for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
       // cannot affect the entity with the effect while it is still affected
       if (this.affectedEntities.contains(affectedEntity)) {
@@ -150,10 +149,10 @@ public abstract class Effect implements IEffect {
     return this.followUpEffects;
   }
 
-  public IEnvironment getEnvironment(){
+  public IEnvironment getEnvironment() {
     return this.environment;
   }
-  
+
   @Override
   public boolean isActive() {
     return this.active;

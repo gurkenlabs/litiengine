@@ -23,7 +23,7 @@ public interface IEnvironment extends IInitializable {
   public Collection<ICombatEntity> getCombatEntities();
 
   public ICombatEntity getCombatEntity(final int mapId);
-  
+
   public Collection<ICombatEntity> findCombatEntities(Shape shape);
 
   /**

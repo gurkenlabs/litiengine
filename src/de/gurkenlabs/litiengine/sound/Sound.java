@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.Game;
-
 public class Sound {
   private static final List<Sound> sounds = new CopyOnWriteArrayList<>();
 
@@ -21,12 +19,12 @@ public class Sound {
     sounds.add(this);
   }
 
-  public static Sound find(String name) {
+  public static Sound find(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
     }
 
-    Optional<Sound> sound = sounds.stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst();
+    final Optional<Sound> sound = sounds.stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst();
     if (!sound.isPresent()) {
       return null;
     }
@@ -45,7 +43,7 @@ public class Sound {
   public URL getUrl() {
     try {
       return new File(this.getPath()).toURI().toURL();
-    } catch (MalformedURLException e) {
+    } catch (final MalformedURLException e) {
       e.printStackTrace();
     }
 

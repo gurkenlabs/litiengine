@@ -20,6 +20,6 @@ public interface IServer extends IIncomingPacketObserver, ILaunchable {
    * @return the sender
    */
   public IPacketSender getSender();
-  
+
   public ICommandManager getCommandManager();
 }

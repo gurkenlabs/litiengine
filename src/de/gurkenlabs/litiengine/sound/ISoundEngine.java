@@ -24,12 +24,12 @@ public interface ISoundEngine extends ILaunchable {
   public boolean isPlaying(String identifier);
 
   public void updatePosition(String identifier, Point2D location);
-  
+
   public void updateListenerPosition(Point2D location);
 
   public void addEntityPlayCondition(Predicate<IEntity> predicate);
 
   public void addPlayCondition(Predicate<Point2D> predicate);
-  
+
   public void setMaxRadius(float radius);
 }

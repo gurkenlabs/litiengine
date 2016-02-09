@@ -46,7 +46,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     info = inf;
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
+    final String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
     final ScreenManager scrMgr = new ScreenManager(gameTitle);
 
     // ensures that we terminate the game, when the window is closed
@@ -66,7 +66,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     // setup default exception handling for render and update loop
     this.renderLoop = new RenderLoop();
     this.renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
 

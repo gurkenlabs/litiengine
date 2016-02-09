@@ -163,7 +163,7 @@ public class ImageCache {
     if (!file.exists()) {
       return null;
     }
-    
+
     BufferedImage img;
     try {
       img = ImageIO.read(file);

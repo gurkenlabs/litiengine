@@ -14,7 +14,7 @@ public class PaulsSoundEngine extends SoundEngine {
   private SoundSystem soundSystem;
 
   @Override
-  public void init(float soundVolume) {
+  public void init(final float soundVolume) {
     super.init(soundVolume);
 
     try {
@@ -22,7 +22,7 @@ public class PaulsSoundEngine extends SoundEngine {
       SoundSystemConfig.setCodec("wav", CodecWav.class);
       SoundSystemConfig.setCodec("ogg", CodecJOgg.class);
 
-    } catch (SoundSystemException e) {
+    } catch (final SoundSystemException e) {
       System.err.println("error linking with the pluggins");
     }
 
@@ -32,7 +32,7 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void playMusic(Sound sound) {
+  public void playMusic(final Sound sound) {
     if (sound == null) {
       return;
     }
@@ -41,7 +41,7 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void playSound(Sound sound) {
+  public void playSound(final Sound sound) {
     if (sound == null) {
       return;
     }
@@ -54,7 +54,7 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void playSound(IEntity entity, Sound sound) {
+  public void playSound(final IEntity entity, final Sound sound) {
     if (entity == null || sound == null || !this.canPlay(entity)) {
       return;
     }
@@ -63,7 +63,7 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    String uniqueIdentifier = getIdentifier(entity, sound);
+    final String uniqueIdentifier = getIdentifier(entity, sound);
     if (this.isPlaying(uniqueIdentifier)) {
       return;
     }
@@ -80,12 +80,12 @@ public class PaulsSoundEngine extends SoundEngine {
       locationY = (float) entity.getDimensionCenter().getY();
     }
 
-    String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+    final String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
     this.add(new Playback(entity, name));
   }
 
   @Override
-  public void playSound(Point2D location, Sound sound) {
+  public void playSound(final Point2D location, final Sound sound) {
     if (location == null || sound == null || !this.canPlay(location)) {
       return;
     }
@@ -94,7 +94,7 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    String uniqueIdentifier = getIdentifier(location, sound);
+    final String uniqueIdentifier = getIdentifier(location, sound);
     if (this.isPlaying(uniqueIdentifier)) {
       return;
     }
@@ -115,17 +115,17 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public boolean isPlaying(String identifier) {
+  public boolean isPlaying(final String identifier) {
     return this.soundSystem.playing(identifier);
   }
 
   @Override
-  public void updatePosition(String identifier, Point2D location) {
+  public void updatePosition(final String identifier, final Point2D location) {
     this.soundSystem.setPosition(identifier, (float) location.getX(), (float) location.getY(), 0);
   }
 
   @Override
-  public void updateListenerPosition(Point2D location) {
+  public void updateListenerPosition(final Point2D location) {
     this.soundSystem.setListenerPosition((float) location.getX(), (float) location.getY(), 0);
   }
 }

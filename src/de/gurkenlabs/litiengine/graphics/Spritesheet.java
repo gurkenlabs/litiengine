@@ -72,11 +72,11 @@ public class Spritesheet {
       return null;
     }
 
-    Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst();
+    final Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst();
     if (!sheet.isPresent()) {
       return null;
     }
-    
+
     return sheet.get();
   }
 

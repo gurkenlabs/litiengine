@@ -30,7 +30,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
     this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
     this.updateListenerPosition(this.getListenerPosition());
     // update playing sounds position
-    List<Playback> finished = new ArrayList<>();
+    final List<Playback> finished = new ArrayList<>();
     for (final Playback playback : this.playbacks) {
       if (this.isPlaying(playback.getName())) {
         if (this.maxListenerRadius != 0 && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
@@ -54,7 +54,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void init(float gain) {
+  public void init(final float gain) {
     this.setGain(gain);
   }
 
@@ -64,7 +64,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void setGain(float volume) {
+  public void setGain(final float volume) {
     this.gain = volume;
   }
 
@@ -74,7 +74,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void setMaxRadius(float radius) {
+  public void setMaxRadius(final float radius) {
     this.maxListenerRadius = radius;
   }
 
@@ -82,7 +82,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
     return this.listenerPosition;
   }
 
-  protected void add(Playback playBack) {
+  protected void add(final Playback playBack) {
     if (this.playbacks.contains(playBack)) {
       return;
     }
@@ -99,7 +99,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   protected boolean canPlay(final IEntity entity) {
-    for (Predicate<IEntity> condition : this.entityPlayConditions) {
+    for (final Predicate<IEntity> condition : this.entityPlayConditions) {
       if (!condition.test(entity)) {
         return false;
       }
@@ -109,7 +109,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   protected boolean canPlay(final Point2D location) {
-    for (Predicate<Point2D> condition : this.playConditions) {
+    for (final Predicate<Point2D> condition : this.playConditions) {
       if (!condition.test(location)) {
         return false;
       }

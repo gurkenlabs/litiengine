@@ -365,7 +365,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void prepare() {
-    for (GuiComponent component : this.getComponents()) {
+    for (final GuiComponent component : this.getComponents()) {
       component.prepare();
     }
 
@@ -486,7 +486,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (final GuiComponent component : this.getComponents()) {
       component.suspend();
     }
-    
+
     Input.MOUSE.unregisterMouseListener(this);
     Input.MOUSE.unregisterMouseMotionListener(this);
     this.setSuspended(true);

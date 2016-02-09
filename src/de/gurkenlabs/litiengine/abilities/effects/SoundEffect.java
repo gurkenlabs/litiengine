@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 public class SoundEffect extends Effect {
   private final Sound[] sounds;
 
-  public SoundEffect(IEnvironment environment, Ability ability, final Sound...sounds) {
+  public SoundEffect(final IEnvironment environment, final Ability ability, final Sound... sounds) {
     super(environment, ability, EffectTarget.EXECUTINGENTITY);
     this.sounds = sounds;
   }
@@ -17,7 +17,7 @@ public class SoundEffect extends Effect {
   @Override
   protected void apply(final ICombatEntity entity) {
     super.apply(entity);
-    if (sounds.length == 0) {
+    if (this.sounds.length == 0) {
       return;
     }
 
@@ -25,11 +25,11 @@ public class SoundEffect extends Effect {
   }
 
   public Sound getRandomSound() {
-    if (sounds.length == 0) {
+    if (this.sounds.length == 0) {
       return null;
     }
-    
+
     final int randomIndex = (int) (Math.random() * this.sounds.length);
-    return sounds[randomIndex];
+    return this.sounds[randomIndex];
   }
 }

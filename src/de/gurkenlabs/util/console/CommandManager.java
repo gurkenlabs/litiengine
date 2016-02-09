@@ -26,7 +26,7 @@ public class CommandManager implements ICommandManager {
   }
 
   @Override
-  public boolean executeCommand(String command) {
+  public boolean executeCommand(final String command) {
     if (command == null || command.isEmpty()) {
       return false;
     }
@@ -46,7 +46,7 @@ public class CommandManager implements ICommandManager {
   }
 
   @Override
-  public void bind(String command, Function<String[], Boolean> commandConsumer) {
+  public void bind(final String command, final Function<String[], Boolean> commandConsumer) {
     if (this.commandConsumers.containsKey(command)) {
       throw new IllegalArgumentException("Cannot bind command " + command + " because it is already bound.");
     }

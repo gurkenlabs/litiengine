@@ -12,7 +12,7 @@ public class TextParticle extends Particle {
   private final String text;
   private Font font;
 
-  public TextParticle(final String text, float xCurrent, float yCurrent, float dx, float dy, float deltaIncX, float deltaIncY, int life, Color color) {
+  public TextParticle(final String text, final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, 0, 0, life, color);
     this.text = text;
   }
@@ -21,18 +21,18 @@ public class TextParticle extends Particle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(Game.getScreenManager().getCamera().getViewPortLocation(emitterOrigin));
     g.setColor(this.getColor());
-    Font oldFont = g.getFont();
+    final Font oldFont = g.getFont();
     if (this.getFont() != null) {
       g.setFont(this.getFont());
     }
-    FontMetrics fm = g.getFontMetrics();
-    int x = fm.stringWidth(this.getText()) / 2;
-    g.drawString(this.getText(), (int) renderLocation.getX()- x, (int) renderLocation.getY());
+    final FontMetrics fm = g.getFontMetrics();
+    final int x = fm.stringWidth(this.getText()) / 2;
+    g.drawString(this.getText(), (int) renderLocation.getX() - x, (int) renderLocation.getY());
     g.setFont(oldFont);
   }
 
   public String getText() {
-    return text;
+    return this.text;
   }
 
   public Font getFont() {
