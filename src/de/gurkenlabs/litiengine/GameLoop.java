@@ -9,6 +9,8 @@ public class GameLoop extends Thread implements IGameLoop {
   private final List<Consumer<Integer>> upsTrackedConsumer;
 
   private final int updateRate;
+  private final GameTime gameTime;
+  private float timeScale;
   private int totalTicks;
 
   private int updateCount;
@@ -24,6 +26,8 @@ public class GameLoop extends Thread implements IGameLoop {
     this.updatables = new CopyOnWriteArrayList<>();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
+    this.gameTime = new GameTime(this);
+    this.setTimeScale(1.0F);
   }
 
   @Override
@@ -73,9 +77,9 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void run() {
     while (this.gameIsRunning) {
-      final int SKIP_TICKS = 1000 / this.updateRate;
+      final int SKIP_TICKS = (int) (1000 / (this.getUpdateRate() * this.getTimeScale()));
 
-      if (System.currentTimeMillis() > this.nextGameTick) {
+      if (System.currentTimeMillis() >= this.nextGameTick) {
         ++this.totalTicks;
         this.updatables.forEach(updatable -> updatable.update());
 
@@ -105,5 +109,21 @@ public class GameLoop extends Thread implements IGameLoop {
     if (this.updatables.contains(updatable)) {
       this.updatables.remove(updatable);
     }
+  }
+
+  @Override
+  public float getTimeScale() {
+    return this.timeScale;
+  }
+
+  @Override
+  public void setTimeScale(float timeScale) {
+    this.timeScale = timeScale;
+    this.nextGameTick = System.currentTimeMillis();
+  }
+
+  @Override
+  public GameTime getTime() {
+    return this.gameTime;
   }
 }

@@ -7,9 +7,14 @@ import de.gurkenlabs.core.ILaunchable;
 public interface IGameLoop extends ILaunchable {
   public long convertToMs(final long ticks);
 
-  public long getDeltaTime();
-  
   public int getUpdateRate();
+
+  /**
+   * Gets the time passed since the last tick.
+   * 
+   * @return
+   */
+  public long getDeltaTime();
 
   /**
    * Calculates the deltatime between the current game time and the specified
@@ -19,6 +24,12 @@ public interface IGameLoop extends ILaunchable {
    * @return The delta time in ms.
    */
   public long getDeltaTime(final long ticks);
+
+  public GameTime getTime();
+
+  public float getTimeScale();
+
+  public void setTimeScale(float timeScale);
 
   public long getTicks();
 
