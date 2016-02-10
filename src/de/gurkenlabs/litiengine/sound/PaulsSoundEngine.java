@@ -70,8 +70,8 @@ public class PaulsSoundEngine extends SoundEngine {
 
     // center sounds that are roughly played at the same location
 
-    float locationX = (int) this.getListenerPosition().getX();
-    float locationY = (int) this.getListenerPosition().getY();
+    float locationX = (float) this.getListenerPosition().getX();
+    float locationY = (float) this.getListenerPosition().getY();
     if (this.getMaxListenerRadius() != 0 && entity.getDimensionCenter().distance(this.getListenerPosition()) > this.getMaxListenerRadius()) {
       locationX = 10000;
       locationY = 10000;

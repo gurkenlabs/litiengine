@@ -14,6 +14,14 @@ import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 
 public class ImageProcessing {
+  public static final int CROP_ALIGN_CENTER = 0;
+  public static final int CROP_ALIGN_LEFT = 1;
+  public static final int CROP_ALIGN_RIGHT = 2;
+
+  public static final int CROP_VALIGN_CENTER = 0;
+  public static final int CROP_VALIGN_TOP = 1;
+  public static final int CROP_VALIGN_TOPCENTER = 2;
+  public static final int CROP_VALIGN_BOTTOM = 3;
 
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
@@ -123,22 +131,76 @@ public class ImageProcessing {
     return bimage;
   }
 
-  public static BufferedImage zoom(final BufferedImage image, float zoomLevel, boolean crop) {
-    // TODO: implement crop position (top, center ...)
+  public static BufferedImage zoom(final BufferedImage image, float zoomLevel) {
     int newImageWidth = (int) (image.getWidth() * zoomLevel);
     int newImageHeight = (int) (image.getHeight() * zoomLevel);
     BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, image.getType());
     Graphics2D g = resizedImage.createGraphics();
     g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
     g.dispose();
-    if (zoomLevel < 0 || !crop) {
-      return resizedImage;
+
+    return resizedImage;
+  }
+
+  /**
+   * Crops a sub image from the specified image.
+   * @param image
+   * @param cropAlignment
+   *          use the following consts: <br>
+   *          <ul>
+   *          <li>{@link CROP_ALIGN_CENTER}</li>
+   *          <li>{@link CROP_ALIGN_LEFT}</li>
+   *          <li>{@link CROP_ALIGN_RIGHT}</li>
+   *          <ul>
+   * @param cropVerticlaAlignment
+   *          use the following consts: <br>
+   *          <ul>
+   *          <li>{@link CROP_VALIGN_CENTER}</li>
+   *          <li>{@link CROP_VALIGN_TOP}</li>
+   *          <li>{@link CROP_VALIGN_TOPCENTER}</li>
+   *          <li>{@link CROP_VALIGN_BOTTOM}</li>
+   *          <ul>
+   * @param width
+   * @param height
+   * @return
+   */
+  public static BufferedImage crop(final BufferedImage image, int cropAlignment, int cropVerticlaAlignment, int width, int height) {
+    if (width > image.getWidth() || height > image.getHeight()) {
+      return image;
     }
 
-    int x = resizedImage.getWidth() / 2 - image.getWidth() / 2;
-    int y = resizedImage.getHeight() / 2 - image.getHeight() / 2;
-    
-    return resizedImage.getSubimage(x, resizedImage.getHeight() / 4, image.getWidth(), image.getHeight());
+    int x;
+    switch (cropAlignment) {
+    case CROP_ALIGN_CENTER:
+      x = image.getWidth() / 2 - width / 2;
+      break;
+    case CROP_ALIGN_RIGHT:
+      x = image.getWidth() - width;
+      break;
+    case CROP_ALIGN_LEFT:
+    default:
+      x = 0;
+      break;
+    }
+
+    int y;
+    switch (cropVerticlaAlignment) {
+    case CROP_VALIGN_CENTER:
+      y = image.getHeight() / 2 - height / 2;
+      break;
+    case CROP_VALIGN_BOTTOM:
+      y = image.getHeight() - height;
+      break;
+    case CROP_VALIGN_TOPCENTER:
+      y = image.getHeight() / 2 - height;
+      break;
+    case CROP_VALIGN_TOP:
+    default:
+      y = 0;
+      break;
+    }
+
+    return image.getSubimage(x, y, width, height);
   }
 
   /**
