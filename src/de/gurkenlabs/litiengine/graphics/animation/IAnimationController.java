@@ -3,9 +3,10 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
-public interface IAnimationController {
+public interface IAnimationController extends IUpdateable {
   public void add(Animation animation);
 
   public void add(IImageEffect effect);
@@ -19,6 +20,4 @@ public interface IAnimationController {
   public List<IImageEffect> getImageEffects();
 
   public void playAnimation(final String animationName);
-
-  public void updateAnimation();
 }

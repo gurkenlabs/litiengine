@@ -107,26 +107,24 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
     return !this.isDead() && super.hasCollision();
   }
 
-  /**
-   * Hurt.
-   *
-   * @param damage
-   *          the damage
-   */
   @Override
-  public void hit(final int damage) {
-    if (!this.isIndestructible() && !this.isDead()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
+  public boolean hit(final int damage) {
+    if (this.isIndestructible() || this.isDead()) {
+      return false;
+    }
+    
+    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
 
-      if (this.isDead()) {
-        this.die();
-      }
+    if (this.isDead()) {
+      this.die();
     }
 
     final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, damage);
     for (final Consumer<CombatEntityHitArgument> consumer : this.entityHitConsumer) {
       consumer.accept(arg);
     }
+
+    return this.isDead();
   }
 
   /**

@@ -50,7 +50,7 @@ public @interface EmitterInfo {
    *
    * @return
    */
-  int particleUpdateDelay() default 1000 / 30;
+  int particleUpdateRate() default 30;
 
   /**
    * Spawn amount.

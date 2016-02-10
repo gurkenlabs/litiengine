@@ -47,6 +47,11 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
+  public int getUpdateRate() {
+    return this.updateRate;
+  }
+
+  @Override
   public void onUpsTracked(final Consumer<Integer> upsConsumer) {
     if (!this.upsTrackedConsumer.contains(upsConsumer)) {
       this.upsTrackedConsumer.add(upsConsumer);

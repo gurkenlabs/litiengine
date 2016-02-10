@@ -60,9 +60,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /** The time to live. */
   private final int timeToLive;
 
-  /** The last updated. */
-  private long lastUpdated;
-
   /**
    * Basic constructor for an effect.
    *
@@ -85,7 +82,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.timeToLive = info.emitterTTL();
     this.particleMinTTL = info.particleMinTTL();
     this.particleMaxTTL = info.particleMaxTTL();
-    this.particleUpdateDelay = info.particleUpdateDelay();
+    this.particleUpdateDelay = info.particleUpdateRate();
     this.particles = new CopyOnWriteArrayList<Particle>();
     this.setLocation(origin);
     if (info.activateOnInit()) {
@@ -178,7 +175,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.particles;
   }
 
-  public int getParticleUpdateDelay() {
+  public int getParticleUpdateRate() {
     return this.particleUpdateDelay;
   }
 
@@ -253,10 +250,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    */
   @Override
   public void update() {
-    if (Game.getLoop().getDeltaTime(this.lastUpdated) < this.getParticleUpdateDelay()) {
-      if (this.isPaused()) {
-        return;
-      }
+    if (this.isPaused()) {
+      return;
     }
 
     // clear particles if the effect time to life is reached
@@ -264,8 +259,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.deactivate();
       return;
     }
-
-    this.getParticles().forEach(particle -> particle.update());
+    
+    float updateRatio = (float)this.getParticleUpdateRate() / Game.getLoop().getUpdateRate() ;
+    this.getParticles().forEach(particle -> particle.update(updateRatio));
 
     // remove dead particles
     for (final Object p : this.getParticles().stream().filter(particle -> this.particleCanBeRemoved(particle)).toArray()) {
@@ -277,8 +273,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     if (Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
     }
-
-    this.lastUpdated = Game.getLoop().getTicks();
   }
 
   /**

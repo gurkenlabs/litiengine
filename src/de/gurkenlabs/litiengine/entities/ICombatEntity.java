@@ -10,7 +10,12 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public int getTeam();
 
-  public void hit(int damage);
+  /**
+   * 
+   * @param damage
+   * @return Returns if the entity died by the hit.
+   */
+  public boolean hit(int damage);
 
   public boolean isDead();
 

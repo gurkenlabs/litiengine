@@ -55,7 +55,7 @@ public abstract class Camera implements ICamera {
    */
   @Override
   public double getPixelOffsetX() {
-    return this.getCenterX() - this.getFocus().getX();
+    return this.getCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
   }
 
   /*
@@ -65,7 +65,7 @@ public abstract class Camera implements ICamera {
    */
   @Override
   public double getPixelOffsetY() {
-    return this.getCenterY() - this.getFocus().getY();
+    return this.getCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
   }
 
   @Override

@@ -170,7 +170,6 @@ public class RenderEngine implements IRenderEngine {
   @Override
   public void renderEntity(final Graphics g, final IEntity entity) {
     if (entity.getAnimationController() != null) {
-      entity.getAnimationController().updateAnimation();
 
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
       RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));

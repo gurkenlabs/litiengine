@@ -65,8 +65,8 @@ public class ShimmerParticle extends Particle {
    * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
    */
   @Override
-  public void update() {
-    super.update();
+  public void update(float updateRateFactor) {
+    super.update(updateRateFactor);
     final Random rand = new Random();
 
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());

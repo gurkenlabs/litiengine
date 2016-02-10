@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
@@ -120,6 +121,24 @@ public class ImageProcessing {
     }
 
     return bimage;
+  }
+
+  public static BufferedImage zoom(final BufferedImage image, float zoomLevel, boolean crop) {
+    // TODO: implement crop position (top, center ...)
+    int newImageWidth = (int) (image.getWidth() * zoomLevel);
+    int newImageHeight = (int) (image.getHeight() * zoomLevel);
+    BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, image.getType());
+    Graphics2D g = resizedImage.createGraphics();
+    g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
+    g.dispose();
+    if (zoomLevel < 0 || !crop) {
+      return resizedImage;
+    }
+
+    int x = resizedImage.getWidth() / 2 - image.getWidth() / 2;
+    int y = resizedImage.getHeight() / 2 - image.getHeight() / 2;
+    
+    return resizedImage.getSubimage(x, resizedImage.getHeight() / 4, image.getWidth(), image.getHeight());
   }
 
   /**

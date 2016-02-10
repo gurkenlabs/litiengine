@@ -10,12 +10,11 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
-import de.gurkenlabs.litiengine.IUpdateable;
 
 /**
  * Represents a particle in 2D space.
  */
-public class Particle implements IUpdateable, ITimeToLive {
+public class Particle implements ITimeToLive {
   /** The activation tick. */
   private final long aliveTick;
   /** The color of the particle. */
@@ -332,20 +331,19 @@ public class Particle implements IUpdateable, ITimeToLive {
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
    */
-  @Override
-  public void update() {
+  public void update(float updateRatio) {
     if (this.timeToLiveReached()) {
       return;
     }
 
-    this.xCurrent += this.dx;
-    this.yCurrent += this.dy;
+    this.xCurrent += this.dx * updateRatio;
+    this.yCurrent += this.dy * updateRatio;
 
-    this.dx += this.deltaIncX;
-    this.dy += this.deltaIncY;
+    this.dx += this.deltaIncX * updateRatio;
+    this.dy += this.deltaIncY * updateRatio;
 
-    this.width += this.getDeltaWidth();
-    this.height += this.getDeltaHeight();
+    this.width += this.getDeltaWidth() * updateRatio;
+    this.height += this.getDeltaHeight() * updateRatio;
 
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);

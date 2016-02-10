@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
 public abstract class AnimationController implements IAnimationController {
@@ -25,6 +26,8 @@ public abstract class AnimationController implements IAnimationController {
         this.animations.add(anim);
       }
     }
+
+    Game.getLoop().registerForUpdate(this);
   }
 
   @Override
@@ -101,7 +104,7 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void updateAnimation() {
+  public void update() {
     if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
       this.currentAnimation = this.defaultAnimation;
       this.currentAnimation.start();

@@ -8,6 +8,8 @@ public interface IGameLoop extends ILaunchable {
   public long convertToMs(final long ticks);
 
   public long getDeltaTime();
+  
+  public int getUpdateRate();
 
   /**
    * Calculates the deltatime between the current game time and the specified
