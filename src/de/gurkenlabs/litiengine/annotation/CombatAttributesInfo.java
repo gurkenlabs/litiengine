@@ -33,13 +33,6 @@ public @interface CombatAttributesInfo {
   float damageMultiplier() default 1.0f;
 
   /**
-   * Experience.
-   *
-   * @return the int
-   */
-  int experience() default 0;
-
-  /**
    * Health.
    *
    * @return the int
@@ -65,7 +58,7 @@ public @interface CombatAttributesInfo {
    *
    * @return the int
    */
-  int maxExperience() default 200;
+  int maxExperience() default 100;
 
   /**
    * Max level.

@@ -47,19 +47,6 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   }
 
   /**
-   * Adds the xp.
-   *
-   * @param deltaXP
-   *          the delta xp
-   */
-  public void addXP(final int deltaXP) {
-    this.attributes.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.Add, deltaXP));
-    if (this.attributes.getExperience().getCurrentValue() >= this.attributes.getExperience().getMaxValue()) {
-      this.levelUp();
-    }
-  }
-
-  /**
    * Die.
    */
   public void die() {
@@ -197,17 +184,6 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   }
 
   /**
-   * Level up.
-   */
-  private void levelUp() {
-    if (this.attributes.getLevel().getCurrentValue() >= this.attributes.getLevel().getMaxValue()) {
-      return;
-    }
-    this.attributes.getLevel().modifyBaseValue(new AttributeModifier<Byte>(Modification.Add, 1));
-    this.updateAttributes();
-  }
-
-  /**
    * Sets the indestructible.
    *
    * @param ind
@@ -225,27 +201,5 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
    */
   protected void setupAttributes(final CombatAttributes attributes) {
 
-  }
-
-  /**
-   * Update attributes.
-   */
-  protected void updateAttributes() {
-
-    final float levelMultiplier = (float) (Math.log(Math.pow(this.getAttributes().getLevel().getCurrentValue(), 2)) + Math.sqrt(this.getAttributes().getLevel().getCurrentValue()));
-
-    // float xpMultiplier = (float)
-    // (this.getAttributes().getExperience().getInitialMaxValue()
-    // + this.getAttributes().getExperience().getMaxValue()
-    // + this.getAttributes().getExperience().getMaxValue() * 0.1);
-
-    this.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<Short>(Modification.Multiply, levelMultiplier));
-
-    this.getAttributes().getExperience().modifyMaxBaseValue(new AttributeModifier<Integer>(Modification.Multiply, levelMultiplier / 2 * this.getAttributes().getExperience().getMaxValue()));
-
-    this.getAttributes().getShield().modifyMaxBaseValue(new AttributeModifier<Short>(Modification.Multiply, levelMultiplier));
-
-    this.getAttributes().getHealthRegeneration().modifyBaseValue(new AttributeModifier<Byte>(Modification.Multiply, levelMultiplier));
-    this.getAttributes().getDamageMultiplier().modifyBaseValue(new AttributeModifier<Float>(Modification.Multiply, levelMultiplier));
   }
 }

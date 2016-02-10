@@ -5,6 +5,8 @@ package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.Attribute;
+import de.gurkenlabs.litiengine.attributes.AttributeModifier;
+import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
 // TODO: Auto-generated Javadoc
@@ -12,7 +14,7 @@ import de.gurkenlabs.litiengine.attributes.RangeAttribute;
  * The Class Attributes.
  */
 public class CombatAttributes {
-
+  private final CombatAttributesInfo info;
   /** The attack speed. */
   private final Attribute<Float> attackSpeed;
 
@@ -44,11 +46,13 @@ public class CombatAttributes {
    *          the info
    */
   public CombatAttributes(final CombatAttributesInfo info) {
+    this.info = info;
+
     // init range attributes
     this.health = new RangeAttribute<Short>(info.health(), (short) 0, info.health());
     this.shield = new RangeAttribute<Short>(info.maxShield(), (short) 0, info.shield());
     this.level = new RangeAttribute<Byte>(info.maxLevel(), (byte) 0, info.level());
-    this.experience = new RangeAttribute<Integer>(info.maxExperience(), 0, info.experience());
+    this.experience = new RangeAttribute<Integer>(info.maxExperience(), 0, 0);
 
     // init single value attributes
     this.velocity = new Attribute<Float>(info.velocityFactor());
@@ -83,6 +87,13 @@ public class CombatAttributes {
    */
   public RangeAttribute<Integer> getExperience() {
     return this.experience;
+  }
+
+  public void addXP(final int deltaXP) {
+    this.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.Add, deltaXP));
+    if (this.getExperience().getCurrentValue() >= this.getExperience().getMaxValue()) {
+      this.levelUp();
+    }
   }
 
   /**
@@ -128,5 +139,34 @@ public class CombatAttributes {
    */
   public Attribute<Float> getVelocity() {
     return this.velocity;
+  }
+
+  /**
+   * Update attributes.
+   */
+  protected void updateAttributes() {
+
+    // 10% increase per level
+    final float levelMultiplier = 1.1f;
+    float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
+
+    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, maxXp));
+    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+  }
+
+  /**
+   * Level up.
+   */
+  public void levelUp() {
+    if (this.getLevel().getCurrentValue() >= this.getLevel().getMaxValue()) {
+      return;
+    }
+
+    this.getLevel().modifyBaseValue(new AttributeModifier<>(Modification.Add, 1));
+    this.getExperience().modifyBaseValue(new AttributeModifier<>(Modification.Set, 0));
+    this.updateAttributes();
   }
 }

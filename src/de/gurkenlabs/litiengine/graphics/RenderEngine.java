@@ -100,7 +100,15 @@ public class RenderEngine implements IRenderEngine {
   public static void renderImage(final Graphics g, final Image image, final Point2D renderLocation) {
     final AffineTransform t = new AffineTransform();
     t.translate(renderLocation.getX(), renderLocation.getY());
-    t.scale(1, 1);
+    ((Graphics2D) g).drawImage(image, t, null);
+  }
+
+  public static void renderImage(final Graphics g, final Image image, final Point2D renderLocation, float angle) {
+    AffineTransform t = new AffineTransform();
+
+    t.translate(renderLocation.getX(), renderLocation.getY());
+    t.rotate(Math.toRadians(angle));
+
     ((Graphics2D) g).drawImage(image, t, null);
   }
 

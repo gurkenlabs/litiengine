@@ -30,13 +30,13 @@ public class Particle implements ITimeToLive {
    * The gravitational pull to the left (negative) and right (positive) acting
    * on this particle.
    */
-  private float deltaIncX;
+  private float gravityX;
 
   /**
    * The gravitational pull to the up (negative) and down (positive) acting on
    * this particle.
    */
-  private float deltaIncY;
+  private float gravityY;
 
   /** The height. */
   private float height;
@@ -90,8 +90,8 @@ public class Particle implements ITimeToLive {
     this.yCurrent = yCurrent;
     this.dx = dx;
     this.dy = dy;
-    this.deltaIncX = deltaIncX;
-    this.deltaIncY = deltaIncY;
+    this.gravityX = deltaIncX;
+    this.gravityY = deltaIncY;
     this.setWidth(width);
     this.setHeight(height);
     this.timeToLife = life;
@@ -147,7 +147,7 @@ public class Particle implements ITimeToLive {
    * @return the gravity x
    */
   public float getGravityX() {
-    return this.deltaIncX;
+    return this.gravityX;
   }
 
   /**
@@ -156,7 +156,7 @@ public class Particle implements ITimeToLive {
    * @return the gravity y
    */
   public float getGravityY() {
-    return this.deltaIncY;
+    return this.gravityY;
   }
 
   /**
@@ -269,7 +269,7 @@ public class Particle implements ITimeToLive {
    *          the new gravity x
    */
   public void setDeltaIncX(final float gravityX) {
-    this.deltaIncX = gravityX;
+    this.gravityX = gravityX;
   }
 
   /**
@@ -279,7 +279,7 @@ public class Particle implements ITimeToLive {
    *          the new gravity y
    */
   public void setDeltaIncY(final float gravityY) {
-    this.deltaIncY = gravityY;
+    this.gravityY = gravityY;
   }
 
   /**
@@ -339,8 +339,8 @@ public class Particle implements ITimeToLive {
     this.xCurrent += this.dx * updateRatio;
     this.yCurrent += this.dy * updateRatio;
 
-    this.dx += this.deltaIncX * updateRatio;
-    this.dy += this.deltaIncY * updateRatio;
+    this.dx += this.gravityX * updateRatio;
+    this.dy += this.gravityY * updateRatio;
 
     this.width += this.getDeltaWidth() * updateRatio;
     this.height += this.getDeltaHeight() * updateRatio;
