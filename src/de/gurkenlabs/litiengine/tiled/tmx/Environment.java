@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
@@ -48,14 +49,20 @@ public class Environment implements IEnvironment {
   public void init() {
     this.loadMapObjects();
   }
-
+  
   @Override
-  public void add(final int mapId, final ICombatEntity entity) {
+  public void add(int mapId, IMovableCombatEntity entity) {
+    this.addCombatEntity(mapId, entity);
+    this.addMovableEntity(mapId, entity);
+  }
+  
+  @Override
+  public void addCombatEntity(final int mapId, final ICombatEntity entity) {
     this.combatEntities.put(mapId, entity);
   }
 
   @Override
-  public void add(final int mapId, final IMovableEntity entity) {
+  public void addMovableEntity(final int mapId, final IMovableEntity entity) {
     this.movableEntities.put(mapId, entity);
   }
 

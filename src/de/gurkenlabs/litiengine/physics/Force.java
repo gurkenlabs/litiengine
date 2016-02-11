@@ -56,6 +56,7 @@ public class Force implements IUpdateable {
    */
   public Force(final IMovableEntity affectedEntity, final Point2D location, final float strength, final int duration, final boolean cancelOnCollision) {
     this.affectedEntity = affectedEntity;
+    
     this.location = location;
     this.strength = strength;
     this.duration = duration;
@@ -67,6 +68,10 @@ public class Force implements IUpdateable {
    * Apply.
    */
   public void apply() {
+    if(this.affectedEntity.getMovementController() != null){
+      this.affectedEntity.getMovementController().apply(this);
+    }
+    
     this.aliveTick = Game.getLoop().getTicks();
     Game.getLoop().registerForUpdate(this);
   }
@@ -143,7 +148,7 @@ public class Force implements IUpdateable {
       return;
     }
 
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getAffectedEntity().getDimensionCenter(), this.getLocation());
+    final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getAffectedEntity().getCollisionBox().getCenterX(),this.getAffectedEntity().getCollisionBox().getCenterY()), this.getLocation());
     final boolean success = Game.getPhysicsEngine().move(this.getAffectedEntity(), angle, this.getStrength());
     if (this.cancelOnCollision() && !success) {
       this.duration = 0;

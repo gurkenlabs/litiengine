@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.input.IMovementController;
 
 public interface IMovableEntity extends ICollisionEntity {
+  
   public float getFacingAngle();
 
   public Direction getFacingDirection();

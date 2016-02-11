@@ -56,6 +56,11 @@ public class EntityNavigator implements IEntityNavigator {
     this.path = this.getPathFinder().findPath(this.entity, target);
   }
 
+  @Override
+  public void stop() {
+    this.path = null;
+  }
+  
   /*
    * (non-Javadoc)
    *

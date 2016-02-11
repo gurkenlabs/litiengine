@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 
-public class MousePathCombatEntityController extends MovementController implements IUpdateable, MouseListener {
+public class MousePathCombatEntityController extends MovementController implements MouseListener {
   private final IEntityNavigator navigator;
 
   private final IMovableCombatEntity entity;
@@ -22,7 +22,6 @@ public class MousePathCombatEntityController extends MovementController implemen
     this.navigator = navigator;
     this.entity = movableEntity;
     Input.MOUSE.registerMouseListener(this);
-    Game.getLoop().registerForUpdate(this);
   }
 
   public IEntityNavigator getNavigator() {
@@ -60,6 +59,14 @@ public class MousePathCombatEntityController extends MovementController implemen
 
   @Override
   public void update() {
+    super.update();
+
+    // can only walk if no forces are active
+    if (this.getActiceForces().size() > 0) {
+      this.navigator.stop();
+      return;
+    }
+
     if (this.navigating && !this.entity.isDead()) {
       this.navigator.navigate(Input.MOUSE.getMapLocation());
     }
