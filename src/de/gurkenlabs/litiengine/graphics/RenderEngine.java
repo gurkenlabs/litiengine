@@ -168,8 +168,9 @@ public class RenderEngine implements IRenderEngine {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    g.setClip(vision.getRenderVisionShape());
-
+    if (vision != null) {
+      g.setClip(vision.getRenderVisionShape());
+    }
     this.renderEntities(g, entities);
 
     g.setClip(oldClip);
@@ -188,7 +189,7 @@ public class RenderEngine implements IRenderEngine {
       ((IRenderable) entity).render(g);
       rendered = true;
     }
-    
+
     if (rendered) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
         consumer.accept(new RenderEvent<IEntity>(g, entity));
