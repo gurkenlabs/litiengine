@@ -177,18 +177,22 @@ public class RenderEngine implements IRenderEngine {
 
   @Override
   public void renderEntity(final Graphics g, final IEntity entity) {
+    boolean rendered = false;
     if (entity.getAnimationController() != null) {
-
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
       RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
-    } else if (entity instanceof IRenderable) {
-      ((IRenderable) entity).render(g);
-    } else {
-      return;
+      rendered = true;
     }
 
-    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
-      consumer.accept(new RenderEvent<IEntity>(g, entity));
+    if (entity instanceof IRenderable) {
+      ((IRenderable) entity).render(g);
+      rendered = true;
+    }
+    
+    if (rendered) {
+      for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
+        consumer.accept(new RenderEvent<IEntity>(g, entity));
+      }
     }
   }
 

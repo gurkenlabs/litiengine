@@ -50,6 +50,8 @@ public interface IScreenManager {
   public void onFpsChanged(Consumer<Integer> fpsConsumer);
 
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
+  
+  public void onScreenChanged(Consumer<IScreen> screenConsumer);
 
   /**
    * Render the current screen.

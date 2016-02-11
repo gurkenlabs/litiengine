@@ -28,6 +28,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   private final List<Consumer<Integer>> fpsChangedConsumer;
 
+  private final List<Consumer<IScreen>> screenChangedConsumer;
+
   /** The screens. */
   private final List<IScreen> screens;
 
@@ -55,6 +57,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     super(gameTitle);
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
+    this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
 
     // set default jframe stuff
@@ -87,20 +90,25 @@ public class ScreenManager extends JFrame implements IScreenManager {
         || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
       return;
     }
-    if (System.currentTimeMillis() - this.lastScreenChange >= SCREENCHANGETIMEOUT) {
-      final IScreen targetScreen = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst().get();
-      if (targetScreen == null) {
-        return;
-      }
+    if (System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
+      return;
+    }
+    
+    final IScreen targetScreen = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst().get();
+    if (targetScreen == null) {
+      return;
+    }
 
-      if (this.currentScreen != null) {
-        this.currentScreen.suspend();
-      }
+    if (this.currentScreen != null) {
+      this.currentScreen.suspend();
+    }
 
-      this.currentScreen = targetScreen;
-      this.currentScreen.prepare();
-      this.setVisible(true);
-      this.lastScreenChange = System.currentTimeMillis();
+    this.currentScreen = targetScreen;
+    this.currentScreen.prepare();
+    this.setVisible(true);
+    this.lastScreenChange = System.currentTimeMillis();
+    for(final Consumer<IScreen> consumer : this.screenChangedConsumer){
+      consumer.accept(this.currentScreen);
     }
   }
 
@@ -154,6 +162,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
 
     this.resolutionChangedConsumer.add(resolutionConsumer);
+  }
+
+  @Override
+  public void onScreenChanged(Consumer<IScreen> screenConsumer) {
+    // TODO Auto-generated method stub
+
   }
 
   @Override

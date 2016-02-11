@@ -85,7 +85,7 @@ public abstract class Ability {
    * @return true, if successful
    */
   public boolean canCast(final IGameLoop gameLoop) {
-    return this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue();
+    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
 
   /**
