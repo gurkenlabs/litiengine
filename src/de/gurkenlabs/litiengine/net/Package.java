@@ -23,7 +23,7 @@ public abstract class Package {
    * @param packetId
    *          the packet id
    */
-  public Package(final byte packetId) {
+  protected Package(final byte packetId) {
     this.packetId = packetId;
   }
 
@@ -33,8 +33,8 @@ public abstract class Package {
    * @param content
    *          the content
    */
-  public Package(final byte[] content) {
-    this.packetId = content[0];
+  protected Package(final byte[] content) {
+    this(content[0]);
   }
 
   /**
