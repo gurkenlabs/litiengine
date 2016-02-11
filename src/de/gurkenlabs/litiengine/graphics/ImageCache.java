@@ -179,7 +179,7 @@ public class ImageCache {
 
       this.cache.put(key, compatibleImg);
       return compatibleImg;
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       return null;
     }
