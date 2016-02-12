@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.input.IMovementController;
+import de.gurkenlabs.litiengine.input.IEntityMovementController;
 
 public interface IMovableEntity extends ICollisionEntity {
   
@@ -11,7 +11,7 @@ public interface IMovableEntity extends ICollisionEntity {
 
   public Direction getFacingDirection();
 
-  public IMovementController getMovementController();
+  public IEntityMovementController getMovementController();
 
   public float getVelocityInPixelsPerSecond();
 
@@ -37,5 +37,5 @@ public interface IMovableEntity extends ICollisionEntity {
    */
   public void setLocation(Point2D location);
 
-  public void setMovementController(IMovementController movementController);
+  public void setMovementController(IEntityMovementController movementController);
 }

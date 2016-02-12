@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
@@ -249,7 +250,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update() {
+  public void update(final IGameLoop loop) {
     if (this.isPaused()) {
       return;
     }
@@ -260,7 +261,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
     
-    float updateRatio = (float)this.getParticleUpdateRate() / Game.getLoop().getUpdateRate() ;
+    float updateRatio = (float)this.getParticleUpdateRate() / loop.getUpdateRate() ;
     this.getParticles().forEach(particle -> particle.update(updateRatio));
 
     // remove dead particles
@@ -268,9 +269,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.particles.remove(p);
     }
 
-    this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
+    this.aliveTime = loop.getDeltaTime(this.activationTick);
 
-    if (Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
+    if (loop.getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
     }
   }

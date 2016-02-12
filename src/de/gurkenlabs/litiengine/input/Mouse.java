@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -293,7 +294,7 @@ public class Mouse implements IMouse {
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update() {
+  public void update(final IGameLoop gameLoop) {
     if (!this.isGrabMouse()) {
       return;
     }

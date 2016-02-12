@@ -5,12 +5,11 @@ import java.awt.event.MouseListener;
 
 import javax.swing.SwingUtilities;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 
-public class MousePathCombatEntityController extends MovementController implements MouseListener {
+public class MousePathCombatEntityController extends ClientEntityMovementController implements MouseListener {
   private final IEntityNavigator navigator;
 
   private final IMovableCombatEntity entity;
@@ -58,8 +57,8 @@ public class MousePathCombatEntityController extends MovementController implemen
   }
 
   @Override
-  public void update() {
-    super.update();
+  public void update(final IGameLoop gameLoop) {
+    super.update(gameLoop);
 
     // can only walk if no forces are active
     if (this.getActiceForces().size() > 0) {

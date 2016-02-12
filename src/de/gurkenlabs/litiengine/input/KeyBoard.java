@@ -8,6 +8,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.IGameLoop;
+
 /**
  * The listener interface for receiving userKey events. The class that is
  * interested in processing a userKey event implements this interface, and the
@@ -105,7 +107,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update() {
+  public void update(final IGameLoop gameLoop) {
     this.executePressedKeys();
     this.executeReleasedKeys();
     this.executeTypedKeys();

@@ -81,7 +81,7 @@ public class GameLoop extends Thread implements IGameLoop {
 
       if (System.currentTimeMillis() >= this.nextGameTick) {
         ++this.totalTicks;
-        this.updatables.forEach(updatable -> updatable.update());
+        this.updatables.forEach(updatable -> updatable.update(this));
 
         ++this.updateCount;
 

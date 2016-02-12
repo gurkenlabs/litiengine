@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -68,6 +69,11 @@ public abstract class Effect implements IEffect {
     }
   }
 
+  @Override
+  public void update(final IGameLoop loop) {
+
+  }
+  
   /**
    * Apply.
    */
@@ -190,6 +196,10 @@ public abstract class Effect implements IEffect {
    */
   public void setDuration(final int duration) {
     this.duration = duration;
+  }
+
+  protected void setActive(boolean active) {
+    this.active = active;
   }
 
   /**

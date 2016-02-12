@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.graphics.particles.emitters;
 
 import java.awt.Color;
 
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
@@ -60,8 +61,8 @@ public class HitEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#update()
    */
   @Override
-  public void update() {
-    super.update();
+  public void update(final IGameLoop loop) {
+    super.update(loop);
     if (this.getAliveTime() >= MAX_MOVE_TIME) {
       this.getParticles().forEach(particle -> particle.setDx(0));
       this.getParticles().forEach(particle -> particle.setDy(0));

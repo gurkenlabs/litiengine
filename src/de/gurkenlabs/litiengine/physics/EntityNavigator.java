@@ -7,6 +7,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -67,21 +68,11 @@ public class EntityNavigator implements IEntityNavigator {
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update() {
+  public void update(final IGameLoop loop) {
     if (this.path == null) {
       return;
     }
 
-    this.navigateAlongPath();
-  }
-
-  /**
-   * Navigate along path.
-   *
-   * @param entity
-   *          the entity
-   */
-  private void navigateAlongPath() {
     final int currentSegment = this.currentSegment;
 
     final PathIterator pi = this.path.getPath().getPathIterator(null);
@@ -107,7 +98,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    final float pixelsPerTick = this.entity.getVelocityInPixelsPerSecond() / Game.getConfiguration().CLIENT.getUpdaterate();
+    final float pixelsPerTick = loop.getDeltaTime() / 1000.0F * this.entity.getVelocityInPixelsPerSecond();
     Game.getPhysicsEngine().move(this.entity, angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 

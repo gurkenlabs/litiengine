@@ -14,5 +14,5 @@ public interface IUpdateable {
    * their attributes. It is called on every tick, means, it is called
    * Game.GameLoop.TICKS_PER_SECOND times per second.
    */
-  public void update();
+  public void update(final IGameLoop loop);
 }

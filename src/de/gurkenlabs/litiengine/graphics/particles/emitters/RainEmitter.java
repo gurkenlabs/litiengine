@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
@@ -50,8 +51,8 @@ public class RainEmitter extends WeatherEmitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#update()
    */
   @Override
-  public void update() {
-    super.update();
+  public void update(final IGameLoop loop) {
+    super.update(loop);
     if (this.lastCameraFocus != null) {
       final double cameraDeltaX = this.lastCameraFocus.getX() - Game.getScreenManager().getCamera().getFocus().getX();
       final double cameraDeltaY = this.lastCameraFocus.getY() - Game.getScreenManager().getCamera().getFocus().getY();

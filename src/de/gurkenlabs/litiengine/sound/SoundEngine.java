@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
@@ -25,7 +26,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void update() {
+  public void update(final IGameLoop gameLoop) {
     // update listener
     this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
     this.updateListenerPosition(this.getListenerPosition());

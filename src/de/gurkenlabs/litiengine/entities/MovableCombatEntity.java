@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
-import de.gurkenlabs.litiengine.input.IMovementController;
+import de.gurkenlabs.litiengine.input.IEntityMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
@@ -21,7 +21,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   /** The last moved. */
   private long lastMoved;
 
-  private IMovementController movementController;
+  private IEntityMovementController movementController;
 
   public MovableCombatEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -63,7 +63,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public IMovementController getMovementController() {
+  public IEntityMovementController getMovementController() {
     return this.movementController;
   }
 
@@ -145,7 +145,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setMovementController(final IMovementController movementController) {
+  public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
   }
 }

@@ -3,30 +3,20 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Force.
  */
-public class Force implements IUpdateable {
-
-  /** The affected entity. */
-  private final IMovableEntity affectedEntity;
-
+public class Force {
   /** The cancel on collision. */
-  private final boolean cancelOnCollision;
+  private boolean cancelOnCollision;
 
   /** The cancel on force source reached. */
-  private final boolean cancelOnForceSourceReached;
-
-  /** The duration. */
-  private int duration;
+  private boolean cancelOnReached;
 
   /** The has ended. */
   private boolean hasEnded;
@@ -34,11 +24,10 @@ public class Force implements IUpdateable {
   /** The location. */
   private final Point2D location;
 
-  /** The start tick. */
-  private long aliveTick;
-
   /** The strength. */
   private final float strength;
+
+  private final float size;
 
   /**
    * Instantiates a new force.
@@ -48,32 +37,18 @@ public class Force implements IUpdateable {
    * @param location
    *          the location
    * @param strength
-   *          the strength
+   *          the strength in pixels per second
    * @param duration
    *          the duration
    * @param cancelOnCollision
    *          the cancel on collision
    */
-  public Force(final IMovableEntity affectedEntity, final Point2D location, final float strength, final int duration, final boolean cancelOnCollision) {
-    this.affectedEntity = affectedEntity;
-    
+  public Force(final Point2D location, final float strength, final float size) {
     this.location = location;
     this.strength = strength;
-    this.duration = duration;
-    this.cancelOnCollision = cancelOnCollision;
-    this.cancelOnForceSourceReached = true;
-  }
-
-  /**
-   * Apply.
-   */
-  public void apply() {
-    if(this.affectedEntity.getMovementController() != null){
-      this.affectedEntity.getMovementController().apply(this);
-    }
-    
-    this.aliveTick = Game.getLoop().getTicks();
-    Game.getLoop().registerForUpdate(this);
+    this.size = size;
+    this.cancelOnCollision = true;
+    this.cancelOnReached = true;
   }
 
   /**
@@ -85,22 +60,12 @@ public class Force implements IUpdateable {
     return this.cancelOnCollision;
   }
 
-  /**
-   * Gets the affected entity.
-   *
-   * @return the affected entity
-   */
-  public IMovableEntity getAffectedEntity() {
-    return this.affectedEntity;
+  public boolean cancelOnReached() {
+    return this.cancelOnReached;
   }
 
-  /**
-   * Gets the duration.
-   *
-   * @return the duration
-   */
-  public int getDuration() {
-    return this.duration;
+  public boolean hasReached(ICollisionEntity entity) {
+    return new Ellipse2D.Double(this.getLocation().getX() - this.size / 2, this.getLocation().getY() - this.size / 2, size, size).intersects(entity.getCollisionBox());
   }
 
   /**
@@ -113,9 +78,9 @@ public class Force implements IUpdateable {
   }
 
   /**
-   * Gets the strength.
+   * Gets the strength in pixels per second.
    *
-   * @return the strength
+   * @return the strength in pixels per seconds
    */
   public float getStrength() {
     return this.strength;
@@ -130,28 +95,15 @@ public class Force implements IUpdateable {
     return this.hasEnded;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
-  @Override
-  public void update() {
-    if (Game.getLoop().getDeltaTime(this.aliveTick) > this.getDuration()) {
-      Game.getLoop().unregisterFromUpdate(this);
-      this.hasEnded = true;
-      return;
-    }
+  public void end() {
+    this.hasEnded = true;
+  }
 
-    if (this.cancelOnForceSourceReached && this.getAffectedEntity().getCollisionBox().contains(this.getLocation())) {
-      this.duration = 0;
-      return;
-    }
+  public void setCancelOnCollision(boolean cancelOnCollision) {
+    this.cancelOnCollision = cancelOnCollision;
+  }
 
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getAffectedEntity().getCollisionBox().getCenterX(),this.getAffectedEntity().getCollisionBox().getCenterY()), this.getLocation());
-    final boolean success = Game.getPhysicsEngine().move(this.getAffectedEntity(), angle, this.getStrength());
-    if (this.cancelOnCollision() && !success) {
-      this.duration = 0;
-    }
+  public void setCancelOnReached(boolean cancelOnReached) {
+    this.cancelOnReached = cancelOnReached;
   }
 }

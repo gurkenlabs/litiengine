@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
 /**
  * The Force implementation sticks to an entity in terms of its location.
@@ -24,14 +23,14 @@ public class StickyForce extends Force {
    * @param forceEntity
    *          the force entity
    * @param strength
-   *          the strength
+   *          the strength in pixels per second
    * @param duration
    *          the duration
    * @param cancelOnCollision
    *          the cancel on collision
    */
-  public StickyForce(final IMovableEntity affectedEntity, final IEntity forceEntity, final float strength, final int duration, final boolean cancelOnCollision) {
-    super(affectedEntity, forceEntity.getDimensionCenter(), strength, duration, cancelOnCollision);
+  public StickyForce(final IEntity forceEntity, final float strength, final float size) {
+    super(forceEntity.getDimensionCenter(), strength, size);
     this.forceEntiy = forceEntity;
   }
 

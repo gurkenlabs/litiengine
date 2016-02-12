@@ -6,7 +6,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
-public class WASDEntityController extends MovementController implements IKeyObserver {
+public class WASDEntityController extends ClientEntityMovementController implements IKeyObserver {
 
   private final float stepSize;
 

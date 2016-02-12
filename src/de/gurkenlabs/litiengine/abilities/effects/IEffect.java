@@ -4,7 +4,10 @@ import java.awt.Shape;
 import java.util.List;
 import java.util.function.Consumer;
 
-public interface IEffect {
+import de.gurkenlabs.litiengine.IUpdateable;
+
+public interface IEffect extends IUpdateable {
+  public static final int NO_DURATION = -1;
   public void apply(Shape impactArea);
 
   public void cease();

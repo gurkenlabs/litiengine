@@ -158,7 +158,7 @@ public class GameMetrics implements IUpdateable {
   }
 
   @Override
-  public void update() {
+  public void update(final IGameLoop loop) {
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;
