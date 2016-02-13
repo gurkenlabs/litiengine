@@ -96,9 +96,10 @@ public class AbilityExecution implements IUpdateable {
 
     // handle already applied effects
     for (final IEffect effect : this.getAppliedEffects().keySet()) {
-      // while the duration + delay of an effect is not reached or an effect without duration is still active 
+      // while the duration + delay of an effect is not reached or an effect
+      // without duration is still active
       // effects without a duration are cancelled after the abiltity duration
-      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && loop.getDeltaTime(this.getAppliedEffects().get(effect)) <this.getAbility().getAttributes().getDuration().getCurrentValue()
+      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && loop.getDeltaTime(this.getAppliedEffects().get(effect)) < this.getAbility().getAttributes().getDuration().getCurrentValue()
           || effect.getDuration() != IEffect.NO_DURATION && loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDuration() + effect.getDelay()) {
         continue;
       }
@@ -136,8 +137,14 @@ public class AbilityExecution implements IUpdateable {
   }
 
   private boolean hasFinished(final IGameLoop loop, final IEffect effect) {
-    if (!this.getAppliedEffects().containsKey(effect) || loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
-      return false;
+    if(effect.getDuration() == IEffect.NO_DURATION ){
+      if(!this.getAppliedEffects().containsKey(effect) || effect.isActive()){
+        return false;
+      }
+    }else{
+      if(!this.getAppliedEffects().containsKey(effect) || loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
+        return false;
+      }
     }
 
     // Recursively called for all follow ups
