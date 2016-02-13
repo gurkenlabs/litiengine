@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -34,10 +35,19 @@ public interface IPhysicsEngine {
    * @return true, if successful, false if the physics engine detected a
    *         collision.
    */
-  public boolean move(IMovableEntity entity, double angle, float delta);
+  public boolean move(IMovableEntity entity, float angle, float delta);
 
+  /**
+   * Moves the specified entity towards target by the delta.
+   * @param entity
+   * @param target
+   * @param delta
+   * @return
+   */
+  public boolean move(IMovableEntity entity, Point2D target, float delta);
+  
   public boolean move(IMovableEntity entity, float delta);
-
+ 
   public void remove(ICollisionEntity entity);
 
   public void remove(Rectangle2D staticCollisionBox);

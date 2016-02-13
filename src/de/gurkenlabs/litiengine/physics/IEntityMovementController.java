@@ -1,9 +1,8 @@
-package de.gurkenlabs.litiengine.input;
+package de.gurkenlabs.litiengine.physics;
 
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.litiengine.physics.Force;
 
 public interface IEntityMovementController {
   public IMovableEntity getControlledEntity();

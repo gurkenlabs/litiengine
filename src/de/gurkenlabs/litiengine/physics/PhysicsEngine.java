@@ -62,24 +62,19 @@ public class PhysicsEngine implements IPhysicsEngine {
     return allCollisionBoxes;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.physics.IPhysicsEngine#move(de.gurkenlabs.liti.entities.
-   * Entity, int, float)
-   */
-  /*
-   * Moves the given entity in the specified angle by the specified delta.
-   *
-   * @see
-   * de.gurkenlabs.liti.physics.IPhysicsEngine#move(de.gurkenlabs.liti.entities
-   * * .Entity, int, double)
-   */
   @Override
-  public boolean move(final IMovableEntity entity, final double angle, final float delta) {
+  public boolean move(IMovableEntity entity, Point2D target, float delta) {
+    Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
+    return this.move(entity, newPosition);
+  }
 
+  @Override
+  public boolean move(final IMovableEntity entity, final float angle, final float delta) {
     Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
+    return this.move(entity, newPosition);
+  }
+
+  private boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
 
     if (entity.hasCollision() && this.collidesWithAnyEntity(entity, newPosition) || this.collidesWithAnyStaticCollisionBox(entity, newPosition)) {
@@ -93,8 +88,8 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     // set new map location
+    entity.setFacingAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     entity.setLocation(newPosition);
-    entity.setFacingAngle(Math.round(angle));
 
     return success;
   }

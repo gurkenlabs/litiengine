@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
-import de.gurkenlabs.litiengine.input.IEntityMovementController;
+import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo

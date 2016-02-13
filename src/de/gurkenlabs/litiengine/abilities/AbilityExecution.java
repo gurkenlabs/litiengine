@@ -91,6 +91,7 @@ public class AbilityExecution implements IUpdateable {
       }
 
       loop.unregisterFromUpdate(this);
+      this.getAppliedEffects().clear();
       return;
     }
 
@@ -99,8 +100,9 @@ public class AbilityExecution implements IUpdateable {
       // while the duration + delay of an effect is not reached or an effect
       // without duration is still active
       // effects without a duration are cancelled after the abiltity duration
-      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && loop.getDeltaTime(this.getAppliedEffects().get(effect)) < this.getAbility().getAttributes().getDuration().getCurrentValue()
-          || effect.getDuration() != IEffect.NO_DURATION && loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDuration() + effect.getDelay()) {
+      long effectDuration = loop.getDeltaTime(this.getAppliedEffects().get(effect));
+      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && effectDuration < this.getAbility().getAttributes().getDuration().getCurrentValue() + effect.getDelay()
+          || effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay()) {
         continue;
       }
 
@@ -110,6 +112,10 @@ public class AbilityExecution implements IUpdateable {
 
       // execute all follow up effects
       effect.getFollowUpEffects().forEach(followUp -> {
+        if(this.getAppliedEffects().containsKey(followUp)){
+          return;
+        }
+        
         followUp.apply(this.getExecutionImpactArea());
         loop.registerForUpdate(followUp);
         this.getAppliedEffects().put(followUp, loop.getTicks());
@@ -137,12 +143,12 @@ public class AbilityExecution implements IUpdateable {
   }
 
   private boolean hasFinished(final IGameLoop loop, final IEffect effect) {
-    if(effect.getDuration() == IEffect.NO_DURATION ){
-      if(!this.getAppliedEffects().containsKey(effect) || effect.isActive()){
+    if (effect.getDuration() == IEffect.NO_DURATION) {
+      if (!this.getAppliedEffects().containsKey(effect) || effect.isActive()) {
         return false;
       }
-    }else{
-      if(!this.getAppliedEffects().containsKey(effect) || loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
+    } else {
+      if (!this.getAppliedEffects().containsKey(effect) || loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
         return false;
       }
     }
