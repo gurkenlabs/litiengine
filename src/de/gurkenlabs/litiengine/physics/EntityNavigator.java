@@ -91,7 +91,7 @@ public class EntityNavigator implements IEntityNavigator {
 
     pi.currentSegment(coordinates);
 
-    final double distance = GeometricUtilities.calcDistance(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
+    final double distance = GeometricUtilities.distance(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     if (distance < ACCEPTABLE_ERROR) {
       ++this.currentSegment;
       return;

@@ -3,10 +3,12 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics.particles;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,6 +27,8 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
  */
 @CollisionInfo(collision = false)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
+  private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  private final List<Color> colors;
   /** The activated. */
   private boolean activated;
 
@@ -75,6 +79,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public Emitter(final Point2D origin) {
     super();
+    this.colors = new ArrayList<>();
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
 
     this.maxParticles = info.maxParticles();
@@ -260,8 +265,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.deactivate();
       return;
     }
-    
-    float updateRatio = (float)this.getParticleUpdateRate() / loop.getUpdateRate() ;
+
+    float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
     this.getParticles().forEach(particle -> particle.update(updateRatio));
 
     // remove dead particles
@@ -273,6 +278,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     if (loop.getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
+    }
+  }
+
+  protected void addParticleColor(Color... colors) {
+    for (Color color : colors) {
+      if (!this.colors.contains(color)) {
+        this.colors.add(color);
+      }
     }
   }
 
@@ -291,6 +304,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * @return the particle
    */
   protected abstract Particle createNewParticle();
+
+  protected Color getRandomParticleColor() {
+    if (this.colors.size() == 0) {
+      return DEFAULT_PARTICLE_COLOR;
+    }
+
+    return this.colors.get(new Random().nextInt(this.colors.size()));
+  }
 
   protected int getRandomParticleTTL() {
     final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();

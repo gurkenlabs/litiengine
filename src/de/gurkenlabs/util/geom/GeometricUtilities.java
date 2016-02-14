@@ -11,7 +11,7 @@ import java.util.List;
 
 public class GeometricUtilities {
 
-  public static double calcDistance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
+  public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
     return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
   }
 
@@ -294,14 +294,6 @@ public class GeometricUtilities {
     return line;
   }
 
-  public static double getXDelta(final double angle, final double delta) {
-    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
-  }
-
-  public static double getYDelta(final double angle, final double delta) {
-    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
-  }
-
   /**
    * Intersects.
    *
@@ -321,12 +313,15 @@ public class GeometricUtilities {
     return null;
   }
 
-  public static boolean isEqual(final double d0, final double d1, final double epsilon) {
-    return d0 == d1 ? true : Math.abs(d0 - d1) < epsilon;
+  public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
+    return point1.distance(point2) < epsilon;
   }
 
-  public static boolean isEqual(final Point2D point1, final Point2D point2, final double epsilon) {
-    return isEqual(point1.getX(), point2.getX(), epsilon) && isEqual(point1.getY(), point2.getY(), epsilon);
+  public static Point2D getPointOnCircle(final Point2D center, final double radius, final double angle) {
+    double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
+    double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
+
+    return new Point2D.Double(x, y);
   }
 
   /**
@@ -399,7 +394,7 @@ public class GeometricUtilities {
       // raycast needs to pass the rectangle first.
       // Thus, the rectangle point at index i will not be added to the result.
       if (intersectionPoints.stream()
-          .anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> isEqual(rectPoint, intersectionPoint, EPSILON)))) {
+          .anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, EPSILON)))) {
         continue;
       }
 
@@ -424,5 +419,13 @@ public class GeometricUtilities {
     final Area areaA = new Area(shapeA);
     areaA.intersect(new Area(shapeB));
     return !areaA.isEmpty();
+  }
+
+  private static double getXDelta(final double angle, final double delta) {
+    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
+  private static double getYDelta(final double angle, final double delta) {
+    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }

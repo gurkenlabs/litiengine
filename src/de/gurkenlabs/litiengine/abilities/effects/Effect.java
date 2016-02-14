@@ -73,7 +73,7 @@ public abstract class Effect implements IEffect {
   public void update(final IGameLoop loop) {
 
   }
-  
+
   /**
    * Apply.
    */
@@ -257,11 +257,11 @@ public abstract class Effect implements IEffect {
         affectedEntities.add(this.getAbility().getExecutor());
         break;
       case ENEMY:
-        affectedEntities.addAll(this.environment.findCombatEntities(impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
         break;
       case FRIENDLY:
-        affectedEntities.addAll(this.environment.findCombatEntities(impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
         break;
       default:
