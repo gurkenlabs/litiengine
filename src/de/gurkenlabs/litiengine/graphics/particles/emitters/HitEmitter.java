@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 /**
  * The Class HitBloodEmitter.
@@ -42,7 +42,7 @@ public class HitEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  public Particle createNewParticle() {
+  public RectangleFillParticle createNewParticle() {
     final float dx = (float) (1.2 * Math.random() * (Math.random() >= 0.5 ? -1f : 1f));
     final float dy = (float) (1.2 * Math.random() * (Math.random() >= 0.5 ? -1f : 1f));
     final float gravityX = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);
@@ -50,7 +50,7 @@ public class HitEmitter extends Emitter {
     final float size = (float) (3 + Math.random() * 3);
     final int life = this.getRandomParticleTTL();
 
-    final Particle p = new Particle(0, 0, dx, dy, gravityX, gravityY, size, size, life, this.hitColor);
+    final RectangleFillParticle p = new RectangleFillParticle(0, 0, dx, dy, gravityX, gravityY, size, size, life, this.hitColor);
     p.setColorAlpha(50);
     return p;
   }

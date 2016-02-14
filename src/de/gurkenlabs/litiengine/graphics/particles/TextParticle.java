@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 
-public class TextParticle extends Particle {
+public class TextParticle extends RectangleFillParticle {
   private final String text;
   private Font font;
 

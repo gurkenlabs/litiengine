@@ -49,7 +49,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private final int particleMinTTL;
 
   /** A collection of particles that make up the snow. */
-  private final CopyOnWriteArrayList<Particle> particles;
+  private final CopyOnWriteArrayList<RectangleFillParticle> particles;
 
   private final int particleUpdateDelay;
 
@@ -89,7 +89,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.particleMinTTL = info.particleMinTTL();
     this.particleMaxTTL = info.particleMaxTTL();
     this.particleUpdateDelay = info.particleUpdateRate();
-    this.particles = new CopyOnWriteArrayList<Particle>();
+    this.particles = new CopyOnWriteArrayList<RectangleFillParticle>();
     this.setLocation(origin);
     if (info.activateOnInit()) {
       this.activate();
@@ -115,7 +115,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * @param particle
    *          the particle
    */
-  public void addParticle(final Particle particle) {
+  public void addParticle(final RectangleFillParticle particle) {
     this.particles.add(particle);
   }
 
@@ -177,7 +177,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *
    * @return the particles
    */
-  public List<Particle> getParticles() {
+  public List<RectangleFillParticle> getParticles() {
     return this.particles;
   }
 
@@ -303,7 +303,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *
    * @return the particle
    */
-  protected abstract Particle createNewParticle();
+  protected abstract RectangleFillParticle createNewParticle();
 
   protected Color getRandomParticleColor() {
     if (this.colors.size() == 0) {
@@ -329,7 +329,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *          the particle
    * @return true, if successful
    */
-  protected boolean particleCanBeRemoved(final Particle particle) {
+  protected boolean particleCanBeRemoved(final RectangleFillParticle particle) {
     return particle.timeToLiveReached();
   }
 

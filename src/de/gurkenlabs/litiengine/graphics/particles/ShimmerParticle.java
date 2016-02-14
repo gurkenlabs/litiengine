@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * The Class ShimmerParticle.
  */
-public class ShimmerParticle extends Particle {
+public class ShimmerParticle extends RectangleFillParticle {
 
   /** The bounding box. */
   private final Rectangle2D boundingBox;

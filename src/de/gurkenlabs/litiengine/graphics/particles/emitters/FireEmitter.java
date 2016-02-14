@@ -9,7 +9,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -70,7 +70,7 @@ public class FireEmitter extends Emitter {
     final float gravityY = 0.0015f * (randBool ? 1f : -1f);
     final float size = (float) (4 + Math.random() * 5);
 
-    this.addParticle(new Particle(xCoord, 0, dx, dy, gravityX, gravityY, size, size, life, color));
+    this.addParticle(new RectangleFillParticle(xCoord, 0, dx, dy, gravityX, gravityY, size, size, life, color));
   }
 
   /*
@@ -79,7 +79,7 @@ public class FireEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  protected Particle createNewParticle() {
+  protected RectangleFillParticle createNewParticle() {
     return null;
   }
 

@@ -8,7 +8,7 @@ import java.awt.Color;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -39,7 +39,7 @@ public class DirtEmitter extends EntityEmitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  public Particle createNewParticle() {
+  public RectangleFillParticle createNewParticle() {
     final boolean randBoolX = Math.random() >= 0.5;
     final boolean randBoolY = Math.random() >= 0.1;
     float xCoord = 0, yCoord = 0, dx = 0, dy = 0;
@@ -71,7 +71,7 @@ public class DirtEmitter extends EntityEmitter {
     final float size = (float) (1 + Math.random() * 2);
     final int life = this.getRandomParticleTTL();
 
-    final Particle p = new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, REDISH_BROWN);
+    final RectangleFillParticle p = new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, REDISH_BROWN);
     p.setColorAlpha(50);
     return p;
   }

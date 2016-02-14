@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -31,7 +31,7 @@ public class RainEmitter extends WeatherEmitter {
    * @return the particle
    */
   @Override
-  public Particle createNewParticle() {
+  public RectangleFillParticle createNewParticle() {
     final float xCoord = (float) (Math.random() * (this.getScreenDimensions().width * 2 + Game.getScreenManager().getCamera().getFocus().getX()) + this.getScreenDimensions().width);
     final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + WeatherEmitter.WeatherEffectStartingY;
     final float delta = (float) (Math.random() * 2);

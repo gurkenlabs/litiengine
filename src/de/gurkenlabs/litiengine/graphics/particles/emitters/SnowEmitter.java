@@ -9,7 +9,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -28,7 +28,7 @@ public class SnowEmitter extends WeatherEmitter {
    * @return the particle
    */
   @Override
-  public Particle createNewParticle() {
+  public RectangleFillParticle createNewParticle() {
     final float xCoord = (float) (Math.random() * (this.getScreenDimensions().width * 2 + Game.getScreenManager().getCamera().getFocus().getX()) + (this.getScreenDimensions().width * Math.random() > 0.5 ? 1 : -1));
     final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + WeatherEmitter.WeatherEffectStartingY;
     final float delta = (float) (Math.random() * 0.5);
@@ -39,7 +39,7 @@ public class SnowEmitter extends WeatherEmitter {
     final float size = (float) (Math.random() * 4);
     final int life = this.getRandomParticleTTL();
 
-    return new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, new Color(255, 255, 255, 180));
+    return new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, new Color(255, 255, 255, 180));
   }
 
   /*

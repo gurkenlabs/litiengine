@@ -9,7 +9,7 @@ import java.util.Random;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 
 // TODO: Auto-generated Javadoc
@@ -38,7 +38,7 @@ public class ShimmerEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  public Particle createNewParticle() {
+  public RectangleFillParticle createNewParticle() {
     final Random rand = new Random();
 
     final float xCoord = rand.nextInt((int) this.getWidth());
@@ -54,7 +54,7 @@ public class ShimmerEmitter extends Emitter {
     if (rand.nextFloat() > 0.5) {
       color = new Color(170, 255, 255, (int) Math.round(Math.random() * 155) + 100);
     }
-    final Particle p = new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, 0, color);
+    final RectangleFillParticle p = new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, 0, color);
     return p;
   }
 }

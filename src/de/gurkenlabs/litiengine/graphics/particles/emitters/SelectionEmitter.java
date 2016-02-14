@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -92,7 +92,7 @@ public class SelectionEmitter extends Emitter {
     final float width = (float) (4 + Math.random() * this.width / 10);
     final float height = (float) (4 + Math.random() * this.height / 10);
 
-    this.addParticle(new Particle(xCoord, yCoord, dx, dy, gravityX, gravityY, width, height, life, color));
+    this.addParticle(new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, width, height, life, color));
   }
 
   @Override
@@ -116,7 +116,7 @@ public class SelectionEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  protected Particle createNewParticle() {
+  protected RectangleFillParticle createNewParticle() {
     return null;
   }
 

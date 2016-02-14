@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
-public class SpriteParticle extends Particle {
+public class SpriteParticle extends RectangleFillParticle {
   private final Image image;
   private float angle;
 

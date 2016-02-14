@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 
-public class RectangleOutlineParticle extends Particle {
+public class RectangleOutlineParticle extends RectangleFillParticle {
 
   public RectangleOutlineParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);

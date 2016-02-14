@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.ITimeToLive;
 /**
  * Represents a particle in 2D space.
  */
-public class Particle implements ITimeToLive {
+public class RectangleFillParticle implements ITimeToLive {
   /** The activation tick. */
   private final long aliveTick;
   /** The color of the particle. */
@@ -41,7 +41,7 @@ public class Particle implements ITimeToLive {
   /** The height. */
   private float height;
 
-  private final int timeToLife;
+  private final int timeToLive;
 
   /** The width. */
   private float width;
@@ -85,7 +85,7 @@ public class Particle implements ITimeToLive {
    * @param particleType
    *          the particle type
    */
-  public Particle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
+  public RectangleFillParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
     this.xCurrent = xCurrent;
     this.yCurrent = yCurrent;
     this.dx = dx;
@@ -94,7 +94,7 @@ public class Particle implements ITimeToLive {
     this.gravityY = deltaIncY;
     this.setWidth(width);
     this.setHeight(height);
-    this.timeToLife = life;
+    this.timeToLive = life;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
     this.aliveTick = Game.getLoop().getTicks();
@@ -181,7 +181,7 @@ public class Particle implements ITimeToLive {
 
   @Override
   public int getTimeToLive() {
-    return this.timeToLife;
+    return this.timeToLive;
   }
 
   /**

@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 
-public class OvalParticle extends Particle {
+public class OvalParticle extends RectangleFillParticle {
 
   public OvalParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
