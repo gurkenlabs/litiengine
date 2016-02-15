@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferStrategy;
@@ -93,7 +94,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     if (System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
       return;
     }
-    
+
     final IScreen targetScreen = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst().get();
     if (targetScreen == null) {
       return;
@@ -107,7 +108,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.currentScreen.prepare();
     this.setVisible(true);
     this.lastScreenChange = System.currentTimeMillis();
-    for(final Consumer<IScreen> consumer : this.screenChangedConsumer){
+    for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.currentScreen);
     }
   }
@@ -229,5 +230,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
     public void componentResized(final ComponentEvent evt) {
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
     }
+  }
+
+  @Override
+  public Point getScreenLocation() {
+    return this.getLocation();
   }
 }

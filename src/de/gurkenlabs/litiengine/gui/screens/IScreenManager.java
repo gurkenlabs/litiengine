@@ -6,6 +6,8 @@ package de.gurkenlabs.litiengine.gui.screens;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.ICamera;
@@ -44,6 +46,8 @@ public interface IScreenManager {
    * @return the frame size
    */
   public Dimension getResolution();
+  
+  public Point getScreenLocation();
 
   public void init(int width, int height, boolean fullscreen);
 

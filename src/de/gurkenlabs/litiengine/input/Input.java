@@ -22,6 +22,5 @@ public class Input {
     MOUSE = new Mouse();
 
     Game.getLoop().registerForUpdate(KEYBOARD);
-    Game.getLoop().registerForUpdate(MOUSE);
   }
 }

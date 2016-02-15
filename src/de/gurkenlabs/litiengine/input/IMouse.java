@@ -8,13 +8,11 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.IUpdateable;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Interface IMouse.
  */
-public interface IMouse extends IUpdateable, MouseListener, MouseMotionListener, MouseWheelListener {
+public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelListener {
 
   /**
    * Gets the render location.

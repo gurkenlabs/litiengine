@@ -12,16 +12,12 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Mouse.
  */
 public class Mouse implements IMouse {
-
-  /** The grab mouse. */
-  private boolean grabMouse;
 
   /** The mouse listeners. */
   private final CopyOnWriteArrayList<MouseListener> mouseListeners;
@@ -37,6 +33,8 @@ public class Mouse implements IMouse {
 
   /** The pressed. */
   private boolean pressed;
+  /** The grab mouse. */
+  private boolean grabMouse;
 
   /**
    * Instantiates a new mouse.
@@ -45,6 +43,7 @@ public class Mouse implements IMouse {
     this.mouseListeners = new CopyOnWriteArrayList<>();
     this.mouseMotionListeners = new CopyOnWriteArrayList<>();
     this.mouseWheelListeners = new CopyOnWriteArrayList<>();
+
     this.setGrabMouse(true);
   }
 
@@ -136,6 +135,7 @@ public class Mouse implements IMouse {
   @Override
   public void mouseMoved(final MouseEvent e) {
     this.location = e.getPoint();
+
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
   }
 
@@ -288,17 +288,4 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.remove(listener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
-  @Override
-  public void update(final IGameLoop gameLoop) {
-    if (!this.isGrabMouse()) {
-      return;
-    }
-
-    // TODO: Lock mouse to window
-  }
 }
