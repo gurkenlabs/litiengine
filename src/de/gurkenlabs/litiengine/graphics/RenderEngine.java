@@ -152,10 +152,6 @@ public class RenderEngine implements IRenderEngine {
     Collections.sort(entities, new EntityYComparator());
 
     for (final IEntity entity : entities) {
-      if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
-        continue;
-      }
-
       this.renderEntity(g, entity);
     }
   }
@@ -188,10 +184,14 @@ public class RenderEngine implements IRenderEngine {
       return;
     }
 
+    if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
+      return;
+    }
+
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
-      RenderEngine.renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
+      renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
       rendered = true;
     }
 

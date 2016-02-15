@@ -100,7 +100,7 @@ public class CombatEntityVision implements IVision {
   public Shape getRenderVisionShape() {
     final Area renderVisionShape = new Area(this.getRenderVisionCircle(this.combatEntity));
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
-      if (!entity.equals(this.combatEntity) && entity.isFriendly(this.combatEntity)) {
+      if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
         renderVisionShape.add(new Area(this.getRenderVisionCircle(entity)));
       }
     }
@@ -171,7 +171,6 @@ public class CombatEntityVision implements IVision {
     final Area rectangleArea = new Area(rect);
 
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
-
       if (entity.isFriendly(this.combatEntity)) {
         final Ellipse2D visionEllipse = this.getMapVisionCircle(entity);
         final Ellipse2D scaledEllipse = new Ellipse2D.Double(x + visionEllipse.getX() * minimapScale, y + visionEllipse.getY() * minimapScale, visionEllipse.getWidth() * minimapScale, visionEllipse.getHeight() * minimapScale);

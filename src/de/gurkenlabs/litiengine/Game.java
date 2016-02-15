@@ -42,7 +42,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     if (inf == null) {
       throw new AnnotationFormatError("No GameInfo annotation found on game implementation " + this.getClass());
     }
-
     info = inf;
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
