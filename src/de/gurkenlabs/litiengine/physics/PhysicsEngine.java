@@ -76,6 +76,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
+    entity.setFacingAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
 
     if (entity.hasCollision() && this.collidesWithAnyEntity(entity, newPosition) || this.collidesWithAnyStaticCollisionBox(entity, newPosition)) {
       newPosition = this.findLocationWithoutCollision(entity, newPosition);
@@ -88,9 +89,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     // set new map location
-    entity.setFacingAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     entity.setLocation(newPosition);
-
     return success;
   }
 
@@ -129,11 +128,18 @@ public class PhysicsEngine implements IPhysicsEngine {
    */
   private boolean collidesWithAnyEntity(final ICollisionEntity entity, final Point2D newPosition) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
+      if (!otherEntity.hasCollision()) {
+        continue;
+      }
+      
       if (otherEntity.equals(entity)) {
         continue;
       }
 
-      if (!otherEntity.hasCollision()) {
+      // the entity is too far away for collision
+      // calculate distace first because it only takes half the time, the
+      // intersects method would take
+      if (otherEntity.getLocation().distance(newPosition) > Math.max(entity.getHeight(), entity.getWidth()) * 2) {
         continue;
       }
 
