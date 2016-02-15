@@ -46,7 +46,7 @@ public interface IScreenManager {
    * @return the frame size
    */
   public Dimension getResolution();
-  
+
   public Point getScreenLocation();
 
   public void init(int width, int height, boolean fullscreen);
@@ -54,7 +54,7 @@ public interface IScreenManager {
   public void onFpsChanged(Consumer<Integer> fpsConsumer);
 
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
-  
+
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
 
   /**
@@ -71,4 +71,6 @@ public interface IScreenManager {
   public void setCamera(ICamera camera);
 
   public void setIconImage(Image image);
+
+  public void setCursor(Image image);
 }

@@ -3,11 +3,14 @@ package de.gurkenlabs.litiengine.gui.screens;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferStrategy;
@@ -235,5 +238,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public Point getScreenLocation() {
     return this.getLocation();
+  }
+
+  @Override
+  public void setCursor(Image image) {
+    Cursor c = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(this.getContentPane().getX(), this.getContentPane().getY()), "img");
+    this.getContentPane().setCursor(c);
   }
 }
