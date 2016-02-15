@@ -52,7 +52,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     // ensures that we terminate the game, when the window is closed
     scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
-    graphicsEngine = new RenderEngine(getConfiguration().GRAPHICS, getInfo().orientation());
+    graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
 

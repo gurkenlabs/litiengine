@@ -18,14 +18,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.tiled.tmx.OrthogonalMapRenderer;
@@ -42,7 +43,7 @@ public class RenderEngine implements IRenderEngine {
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
 
   /** The map renderer. */
-  private final IMapRenderer mapRenderer;
+  private final Map<MapOrientation, IMapRenderer> mapRenderer;
 
   /**
    * Instantiates a new graphics engine.
@@ -50,20 +51,12 @@ public class RenderEngine implements IRenderEngine {
    * @param mapRenderer
    *          the map renderer
    */
-  public RenderEngine(final GraphicConfiguration config, final MapOrientation mapOrientation) {
+  public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.mapRenderer = new HashMap<>();
 
-    IMapRenderer renderer;
-    switch (mapOrientation) {
-    case orthogonal:
-      renderer = new OrthogonalMapRenderer();
-      break;
-    default:
-      throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
-    }
-
-    this.mapRenderer = renderer;
+    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
   }
 
   /**
@@ -113,8 +106,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public IMapRenderer getMapRenderer() {
-    return this.mapRenderer;
+  public IMapRenderer getMapRenderer(MapOrientation mapOrientation) {
+    if (!this.mapRenderer.containsKey(mapOrientation)) {
+      throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
+    }
+
+    return this.mapRenderer.get(mapOrientation);
   }
 
   @Override
@@ -133,7 +130,7 @@ public class RenderEngine implements IRenderEngine {
 
   @Override
   public void render(final Graphics g, final List<? extends IRenderable> renderables) {
-    renderables.forEach(r -> r.render(g));
+    renderables.forEach(r -> this.render(g, r));
   }
 
   @Override
@@ -177,7 +174,20 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void render(Graphics g, IRenderable renderable) {
+    if (renderable == null) {
+      return;
+    }
+
+    renderable.render(g);
+  }
+
+  @Override
   public void renderEntity(final Graphics g, final IEntity entity) {
+    if (entity == null) {
+      return;
+    }
+
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
@@ -211,7 +221,7 @@ public class RenderEngine implements IRenderEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.render(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map);
+    this.mapRenderer.get(map.getOrientation()).render(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map);
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<IMap>(g, map));

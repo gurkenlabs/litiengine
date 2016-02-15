@@ -29,6 +29,9 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   private final List<Color> colors;
+
+  private IGameLoop gameLoop;
+
   /** The activated. */
   private boolean activated;
 
@@ -49,7 +52,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private final int particleMinTTL;
 
   /** A collection of particles that make up the snow. */
-  private final CopyOnWriteArrayList<RectangleFillParticle> particles;
+  private final CopyOnWriteArrayList<Particle> particles;
 
   private final int particleUpdateDelay;
 
@@ -89,24 +92,25 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.particleMinTTL = info.particleMinTTL();
     this.particleMaxTTL = info.particleMaxTTL();
     this.particleUpdateDelay = info.particleUpdateRate();
-    this.particles = new CopyOnWriteArrayList<RectangleFillParticle>();
+    this.particles = new CopyOnWriteArrayList<>();
     this.setLocation(origin);
     if (info.activateOnInit()) {
-      this.activate();
+      this.activate(Game.getLoop());
     }
   }
 
   /**
    * Activate.
    */
-  public void activate() {
-    if (this.activated) {
+  public void activate(IGameLoop gameLoop) {
+    if (gameLoop == null || this.activated) {
       return;
     }
 
+    this.gameLoop = gameLoop;
     this.activated = true;
-    this.activationTick = Game.getLoop().getTicks();
-    Game.getLoop().registerForUpdate(this);
+    this.activationTick = this.gameLoop.getTicks();
+    this.gameLoop.registerForUpdate(this);
   }
 
   /**
@@ -115,7 +119,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * @param particle
    *          the particle
    */
-  public void addParticle(final RectangleFillParticle particle) {
+  public void addParticle(final Particle particle) {
     this.particles.add(particle);
   }
 
@@ -123,12 +127,18 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * Deactivate.
    */
   public void deactivate() {
+    if (!this.activated) {
+      return;
+    }
+    
+    this.activated = false;
     this.getParticles().clear();
-
     this.aliveTime = 0;
     this.activationTick = 0;
     this.lastSpawn = 0;
-    Game.getLoop().unregisterFromUpdate(this);
+    if (this.gameLoop != null) {
+      this.gameLoop.unregisterFromUpdate(this);
+    }
   }
 
   /**
@@ -177,7 +187,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *
    * @return the particles
    */
-  public List<RectangleFillParticle> getParticles() {
+  public List<Particle> getParticles() {
     return this.particles;
   }
 
@@ -267,7 +277,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
-    this.getParticles().forEach(particle -> particle.update(updateRatio));
+    this.getParticles().forEach(particle -> particle.update(loop, updateRatio));
 
     // remove dead particles
     for (final Object p : this.getParticles().stream().filter(particle -> this.particleCanBeRemoved(particle)).toArray()) {
@@ -303,7 +313,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *
    * @return the particle
    */
-  protected abstract RectangleFillParticle createNewParticle();
+  protected abstract Particle createNewParticle();
 
   protected Color getRandomParticleColor() {
     if (this.colors.size() == 0) {
@@ -329,7 +339,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *          the particle
    * @return true, if successful
    */
-  protected boolean particleCanBeRemoved(final RectangleFillParticle particle) {
+  protected boolean particleCanBeRemoved(final Particle particle) {
     return particle.timeToLiveReached();
   }
 

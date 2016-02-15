@@ -8,6 +8,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
+import de.gurkenlabs.litiengine.IGameLoop;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ShimmerParticle.
@@ -65,12 +67,12 @@ public class ShimmerParticle extends RectangleFillParticle {
    * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
    */
   @Override
-  public void update(float updateRateFactor) {
-    super.update(updateRateFactor);
+  public void update(final IGameLoop loop, float updateRateFactor) {
+    super.update(loop, updateRateFactor);
     final Random rand = new Random();
 
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());
-    final Point2D relativeParticleLocation = this.getLocation(emitterLocation);
+    final Point2D relativeParticleLocation = this.getRelativeLocation(emitterLocation);
     if (relativeParticleLocation.getX() < this.getBoundingBox().getX()) {
       this.setDx(rand.nextFloat());
     }

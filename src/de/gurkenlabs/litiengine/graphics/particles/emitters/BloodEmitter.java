@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
@@ -40,7 +41,7 @@ public class BloodEmitter extends EntityEmitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  public RectangleFillParticle createNewParticle() {
+  public Particle createNewParticle() {
     final boolean randBoolX = Math.random() >= 0.5;
     final boolean randBoolY = Math.random() >= 0.5;
 
@@ -53,7 +54,7 @@ public class BloodEmitter extends EntityEmitter {
     final float size = (float) (2 + Math.random() * 3);
     final int life = this.getRandomParticleTTL();
 
-    final RectangleFillParticle p = new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, Math.random() >= 0.5 ? Color.RED : new Color(150, 0, 0, 150));
+    final Particle p = new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, Math.random() >= 0.5 ? Color.RED : new Color(150, 0, 0, 150));
     p.setColorAlpha(50);
     return p;
   }

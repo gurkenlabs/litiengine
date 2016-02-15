@@ -8,6 +8,7 @@ import java.awt.Color;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 // TODO: Auto-generated Javadoc
@@ -39,7 +40,7 @@ public class GlowEmitter extends EntityEmitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  public RectangleFillParticle createNewParticle() {
+  public Particle createNewParticle() {
     final boolean randBoolX = Math.random() >= 0.5;
     final boolean randBoolY = Math.random() >= 0.5;
 
@@ -58,7 +59,7 @@ public class GlowEmitter extends EntityEmitter {
       color = this.colors[randomColorIndex];
     }
 
-    final RectangleFillParticle p = new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, color);
+    final Particle p = new RectangleFillParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, color);
     p.setColorAlpha(50);
     return p;
   }

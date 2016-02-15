@@ -5,10 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
-public class SpriteParticle extends RectangleFillParticle {
+public class SpriteParticle extends Particle {
   private final Image image;
   private float angle;
 
@@ -19,7 +18,7 @@ public class SpriteParticle extends RectangleFillParticle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(Game.getScreenManager().getCamera().getViewPortLocation(emitterOrigin));
+    final Point2D renderLocation = this.getLocation(emitterOrigin);
 
     if (this.getAngle() != 0) {
       RenderEngine.renderImage(g, this.image, renderLocation, this.getAngle());

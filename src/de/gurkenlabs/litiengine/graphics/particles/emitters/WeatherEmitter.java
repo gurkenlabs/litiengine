@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
 /**
  * The Class WeatherEmitter.
@@ -51,7 +51,7 @@ public abstract class WeatherEmitter extends Emitter {
     // Update all particles to work properly with the new screen dimensions.
     final Dimension oldDimension = this.screenDimensions;
     this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale()));
-    for (final RectangleFillParticle p : this.getParticles()) {
+    for (final Particle p : this.getParticles()) {
       this.updateForNewScreenDimensions(p, oldDimension);
     }
   }
@@ -66,7 +66,7 @@ public abstract class WeatherEmitter extends Emitter {
    *          The current screen dimensions for the screen on which the particle
    *          is to be drawn.
    */
-  private void updateForNewScreenDimensions(final RectangleFillParticle particle, final Dimension oldScreenDimension) {
+  private void updateForNewScreenDimensions(final Particle particle, final Dimension oldScreenDimension) {
     final short widthCurrent = (short) oldScreenDimension.width;
     final short heightCurrent = (short) oldScreenDimension.height;
     final short widthNew = (short) this.getScreenDimensions().width;
@@ -93,10 +93,10 @@ public abstract class WeatherEmitter extends Emitter {
    * gurkenlabs.liti.graphics.particles.Particle)
    */
   @Override
-  protected boolean particleCanBeRemoved(final RectangleFillParticle particle) {
+  protected boolean particleCanBeRemoved(final Particle particle) {
     // since our weather effects are top-right-to-bottom-left, we need to remove
     // particles that have reached the bottom left end
-    final Point2D renderLocation = particle.getLocation(Game.getScreenManager().getCamera().getViewPortLocation(this));
+    final Point2D renderLocation = particle.getLocation(this.getOrigin());
     if (renderLocation.getX() < 0 || renderLocation.getY() > this.getScreenDimensions().height) {
       return true;
     }

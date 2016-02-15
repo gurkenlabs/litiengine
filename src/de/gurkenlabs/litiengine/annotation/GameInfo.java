@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.tiled.tmx.MapOrientation;
-
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GameInfo {
@@ -21,8 +19,6 @@ public @interface GameInfo {
   public String logo() default "";
 
   public String name();
-
-  public MapOrientation orientation() default MapOrientation.orthogonal;
 
   public float renderScale() default 3.0f;
 

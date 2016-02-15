@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.OvalParticle;
-import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -69,7 +69,7 @@ public class WaterSplashEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
-  protected RectangleFillParticle createNewParticle() {
+  protected Particle createNewParticle() {
     return null;
   }
 

@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
+import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 
 /**
@@ -16,7 +17,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
  */
 public interface IRenderEngine {
 
-  public IMapRenderer getMapRenderer();
+  public IMapRenderer getMapRenderer(MapOrientation orientation);
 
   public void onEntityRendered(Consumer<RenderEvent<IEntity>> entity);
 
@@ -29,6 +30,8 @@ public interface IRenderEngine {
   public void renderEntities(Graphics g, List<? extends IEntity> entities);
 
   public void renderEntities(Graphics g, List<? extends IEntity> entities, IVision vision);
+
+  public void render(Graphics g, IRenderable renderable);
 
   public void renderEntity(Graphics g, IEntity entity);
 

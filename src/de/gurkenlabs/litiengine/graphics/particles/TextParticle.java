@@ -6,9 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
-
-public class TextParticle extends RectangleFillParticle {
+public class TextParticle extends Particle {
   private final String text;
   private Font font;
 
@@ -19,7 +17,7 @@ public class TextParticle extends RectangleFillParticle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(Game.getScreenManager().getCamera().getViewPortLocation(emitterOrigin));
+    final Point2D renderLocation = this.getLocation(emitterOrigin);
     g.setColor(this.getColor());
     final Font oldFont = g.getFont();
     if (this.getFont() != null) {

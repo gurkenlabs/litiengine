@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 @EmitterInfo(maxParticles = 1, spawnAmount = 1, emitterTTL = 5000, particleMinTTL = 5000, particleMaxTTL = 5000)
@@ -24,7 +25,7 @@ public class FootstepEmitter extends Emitter {
   }
 
   @Override
-  protected RectangleFillParticle createNewParticle() {
+  protected Particle createNewParticle() {
     float width;
     float height;
     int x;
@@ -45,7 +46,7 @@ public class FootstepEmitter extends Emitter {
 
     final int life = this.getRandomParticleTTL();
 
-    final RectangleFillParticle p = new RectangleFillParticle(x, y, 0, 0, 0, 0, width, height, life, new Color(0, 0, 0, 80));
+    final Particle p = new RectangleFillParticle(x, y, 0, 0, 0, 0, width, height, life, new Color(0, 0, 0, 80));
     p.setColorAlpha(50);
 
     return p;
