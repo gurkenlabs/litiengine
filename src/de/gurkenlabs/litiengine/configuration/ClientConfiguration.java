@@ -26,8 +26,8 @@ public class ClientConfiguration extends ConfigurationGroup {
    */
   public ClientConfiguration() {
     super();
-    this.setUpdaterate(100);
-    this.setMaxFps(500);
+    this.setUpdaterate(23);
+    this.setMaxFps(60);
   }
 
   /**

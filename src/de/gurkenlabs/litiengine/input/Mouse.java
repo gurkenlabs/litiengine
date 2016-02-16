@@ -3,38 +3,47 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.AWTException;
+import java.awt.Point;
+import java.awt.Robot;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Mouse.
  */
 public class Mouse implements IMouse {
 
   /** The mouse listeners. */
-  private final CopyOnWriteArrayList<MouseListener> mouseListeners;
+  private final List<MouseListener> mouseListeners;
 
   /** The mouse motion listeners. */
-  private final CopyOnWriteArrayList<MouseMotionListener> mouseMotionListeners;
+  private final List<MouseMotionListener> mouseMotionListeners;
 
   /** The mouse wheel listeners. */
-  private final CopyOnWriteArrayList<MouseWheelListener> mouseWheelListeners;
+  private final List<MouseWheelListener> mouseWheelListeners;
+
+  private final float sensitivity;
+
+  private Robot robot;
 
   /** The position. */
-  private Point2D location;
+  private Point location;
 
   /** The pressed. */
   private boolean pressed;
   /** The grab mouse. */
   private boolean grabMouse;
+
+  private boolean isGrabbing;
 
   /**
    * Instantiates a new mouse.
@@ -44,7 +53,15 @@ public class Mouse implements IMouse {
     this.mouseMotionListeners = new CopyOnWriteArrayList<>();
     this.mouseWheelListeners = new CopyOnWriteArrayList<>();
 
+    try {
+      this.robot = new Robot();
+    } catch (AWTException e) {
+      e.printStackTrace();
+    }
+
     this.setGrabMouse(true);
+    this.location = new Point((int) Game.getScreenManager().getCamera().getCenterX(), (int) Game.getScreenManager().getCamera().getCenterY());
+    this.sensitivity = Game.getConfiguration().INPUT.getMouseSensitivity();
   }
 
   /*
@@ -53,7 +70,7 @@ public class Mouse implements IMouse {
    * @see de.gurkenlabs.liti.input.IMouse#getRenderLocation()
    */
   @Override
-  public Point2D getLocation() {
+  public Point getLocation() {
     return this.location;
   }
 
@@ -88,8 +105,8 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseClicked(final MouseEvent e) {
-    this.location = e.getPoint();
-    this.mouseListeners.forEach(listener -> listener.mouseClicked(e));
+    this.setLocation(e.getPoint());
+    this.mouseListeners.forEach(listener -> listener.mouseClicked(this.createEvent(e)));
   }
 
   /*
@@ -100,8 +117,8 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseDragged(final MouseEvent e) {
-    this.location = e.getPoint();
-    this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(e));
+    this.setLocation(e.getPoint());
+    this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(this.createEvent(e)));
   }
 
   /*
@@ -111,8 +128,8 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
-    this.location = e.getPoint();
-    this.mouseListeners.forEach(listener -> listener.mouseEntered(e));
+    this.setLocation(e.getPoint());
+    this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
   }
 
   /*
@@ -122,8 +139,8 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseExited(final MouseEvent e) {
-    this.location = e.getPoint();
-    this.mouseListeners.forEach(listener -> listener.mouseExited(e));
+    this.setLocation(e.getPoint());
+    this.mouseListeners.forEach(listener -> listener.mouseExited(this.createEvent(e)));
   }
 
   /*
@@ -134,9 +151,8 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseMoved(final MouseEvent e) {
-    this.location = e.getPoint();
-
-    this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
+    this.setLocation(e.getPoint());
+    this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(this.createEvent(e)));
   }
 
   /*
@@ -146,9 +162,9 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mousePressed(final MouseEvent e) {
-    this.location = e.getPoint();
+    this.setLocation(e.getPoint());
     this.setPressed(true);
-    this.mouseListeners.forEach(listener -> listener.mousePressed(e));
+    this.mouseListeners.forEach(listener -> listener.mousePressed(this.createEvent(e)));
   }
 
   /*
@@ -158,8 +174,9 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseReleased(final MouseEvent e) {
+    this.setLocation(e.getPoint());
     this.setPressed(false);
-    this.mouseListeners.forEach(listener -> listener.mouseReleased(e));
+    this.mouseListeners.forEach(listener -> listener.mouseReleased(this.createEvent(e)));
   }
 
   /*
@@ -288,4 +305,38 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.remove(listener);
   }
 
+  private void setLocation(Point mouseLocation) {
+    if (this.isGrabbing) {
+      return;
+    }
+    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() / 2;
+    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
+
+    double diffX = mouseLocation.x - screenCenterX;
+    double diffY = mouseLocation.y - screenCenterY;
+    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
+    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
+
+    if (newX < 0) {
+      newX = 0;
+    } else if (newX > Game.getScreenManager().getResolution().getWidth()) {
+      newX = (int) Game.getScreenManager().getResolution().getWidth();
+    }
+
+    if (newY < 0) {
+      newY = 0;
+    } else if (newY > Game.getScreenManager().getResolution().getHeight()) {
+      newY = (int) Game.getScreenManager().getResolution().getHeight();
+    }
+
+    this.location = new Point(newX, newY);
+    this.isGrabbing = true;
+    this.robot.mouseMove((int) (Game.getScreenManager().getScreenLocation().getX() + screenCenterX), (int) (Game.getScreenManager().getScreenLocation().getY() + screenCenterY));
+    this.isGrabbing = false;
+  }
+
+  private MouseEvent createEvent(MouseEvent original) {
+    MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(), original.getButton());
+    return event;
+  }
 }

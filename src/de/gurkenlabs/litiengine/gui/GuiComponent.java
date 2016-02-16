@@ -213,7 +213,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the boolean
    */
-  public Boolean isHovered() {
+  public boolean isHovered() {
     return this.isHovered;
   }
 
@@ -222,7 +222,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the boolean
    */
-  public Boolean isPressed() {
+  public boolean isPressed() {
     return this.isPressed;
   }
 

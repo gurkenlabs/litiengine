@@ -6,14 +6,13 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -22,6 +21,8 @@ import javax.swing.JFrame;
 
 import de.gurkenlabs.litiengine.graphics.DefaultCamera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.input.Input;
 
 public class ScreenManager extends JFrame implements IScreenManager {
   private static final long serialVersionUID = 7958549828482285935L;
@@ -37,16 +38,16 @@ public class ScreenManager extends JFrame implements IScreenManager {
   /** The screens. */
   private final List<IScreen> screens;
 
-  private final GraphicsDevice device;
+  /** The Render canvas. */
+  private final Canvas renderCanvas;
 
   /** The camera. */
   private ICamera camera;
 
-  /** The Render canvas. */
-  private final Canvas renderCanvas;
-
   /** The current screen. */
   private IScreen currentScreen;
+
+  private Image cursorImage;
 
   /** The last screen change. */
   private long lastScreenChange = 0;
@@ -70,11 +71,15 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.addComponentListener(new ResizedEventListener());
 
-    this.device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     this.renderCanvas = new Canvas();
 
     // canvas will scale when the size of this jframe gets changed
     this.renderCanvas.setPreferredSize(this.getResolution());
+
+    // hide default cursor
+    BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+    this.renderCanvas.setCursor(blankCursor);
 
     this.add(this.renderCanvas);
   }
@@ -141,7 +146,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.setCamera(new DefaultCamera());
     if (fullscreen) {
       this.setUndecorated(true);
-      this.device.setFullScreenWindow(this);
+      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+      // this.device.setFullScreenWindow(this);
     } else {
       this.setSize(new Dimension(width, height));
     }
@@ -170,8 +176,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void onScreenChanged(Consumer<IScreen> screenConsumer) {
-    // TODO Auto-generated method stub
-
+    if (!this.screenChangedConsumer.contains(screenConsumer)) {
+      this.screenChangedConsumer.add(screenConsumer);
+    }
   }
 
   @Override
@@ -194,7 +201,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     this.getCamera().updateFocus();
     this.getCurrentScreen().render(g);
-
+    RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
     g.dispose();
     bs.show();
 
@@ -237,12 +244,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public Point getScreenLocation() {
-    return this.getLocation();
+    return this.getRenderComponent().getLocationOnScreen();
   }
 
   @Override
   public void setCursor(Image image) {
-    Cursor c = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(this.getContentPane().getX(), this.getContentPane().getY()), "img");
-    this.getContentPane().setCursor(c);
+    this.cursorImage = image;
   }
 }

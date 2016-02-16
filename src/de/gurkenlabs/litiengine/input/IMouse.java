@@ -3,12 +3,12 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.Point;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IMouse.
  */
@@ -19,7 +19,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    *
    * @return the render location
    */
-  public Point2D getLocation();
+  public Point getLocation();
 
   public Point2D getMapLocation();
 

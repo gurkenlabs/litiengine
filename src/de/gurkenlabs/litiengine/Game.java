@@ -26,7 +26,7 @@ import de.gurkenlabs.util.console.ICommandManager;
 public abstract class Game implements IInitializable, ILaunchable {
   private static GameInfo info;
 
-  private static final GameConfiguration configuration = new GameConfiguration();
+  private static GameConfiguration configuration;
   private static IScreenManager screenManager;
   private static IRenderEngine graphicsEngine;
   private static IPhysicsEngine physicsEngine;
@@ -60,6 +60,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     // init configuration before init method in order to use configured values
     // to initialize components
+    configuration = this.createGameConfiguration();
     getConfiguration().load();
 
     // setup default exception handling for render and update loop
@@ -155,6 +156,10 @@ public abstract class Game implements IInitializable, ILaunchable {
     this.renderLoop.terminate();
   }
 
+  protected GameConfiguration createGameConfiguration(){
+    return new GameConfiguration();
+  }
+  
   /**
    * The Class RenderLoop.
    */
