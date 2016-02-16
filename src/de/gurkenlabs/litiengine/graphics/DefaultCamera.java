@@ -12,6 +12,13 @@ import de.gurkenlabs.litiengine.Game;
  * The Class DefaultCamera.
  */
 public class DefaultCamera extends Camera {
+  private double centerX;
+  private double centerY;
+
+  public DefaultCamera() {
+    this.centerX = Game.getScreenManager().getResolution().width / 2.0;
+    this.centerY = Game.getScreenManager().getResolution().height / 2.0;
+  }
 
   /*
    * (non-Javadoc)
@@ -20,7 +27,7 @@ public class DefaultCamera extends Camera {
    */
   @Override
   public double getCenterX() {
-    return Game.getScreenManager().getResolution().width / 2.0;
+    return this.centerX;
   }
 
   /*
@@ -30,7 +37,7 @@ public class DefaultCamera extends Camera {
    */
   @Override
   public double getCenterY() {
-    return Game.getScreenManager().getResolution().height / 2.0;
+    return this.centerY;
   }
 
   /*
@@ -46,5 +53,13 @@ public class DefaultCamera extends Camera {
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(new Point2D.Double(this.getCenterX(), this.getCenterY())));
+  }
+
+  public void setCenterX(double centerX) {
+    this.centerX = centerX;
+  }
+
+  public void setCenterY(double centerY) {
+    this.centerY = centerY;
   }
 }

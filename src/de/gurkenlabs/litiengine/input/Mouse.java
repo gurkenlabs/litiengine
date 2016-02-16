@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.Game;
 
 /**
- * The Class Mouse.
+ * This implementation provides information about the mouse input in the litiengine.
  */
 public class Mouse implements IMouse {
 
@@ -305,6 +305,13 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.remove(listener);
   }
 
+  /**
+   * Calculates the location of the ingame mouse by the position diff and locks
+   * the original mouse to the center of the screen.
+   * 
+   * @param mouseLocation
+   *          The location of the original mouse.
+   */
   private void setLocation(Point mouseLocation) {
     if (this.isGrabbing) {
       return;
@@ -312,17 +319,20 @@ public class Mouse implements IMouse {
     final double screenCenterX = Game.getScreenManager().getResolution().getWidth() / 2;
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
 
+    // calculate diffs and new location for the ingame mouse
     double diffX = mouseLocation.x - screenCenterX;
     double diffY = mouseLocation.y - screenCenterY;
     int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
 
+    // ensure that x coordinates are within the screen
     if (newX < 0) {
       newX = 0;
     } else if (newX > Game.getScreenManager().getResolution().getWidth()) {
       newX = (int) Game.getScreenManager().getResolution().getWidth();
     }
 
+    // ensure that y coordinates are within the screen
     if (newY < 0) {
       newY = 0;
     } else if (newY > Game.getScreenManager().getResolution().getHeight()) {
@@ -330,6 +340,8 @@ public class Mouse implements IMouse {
     }
 
     this.location = new Point(newX, newY);
+
+    // lock original mouse back to the center of the screen
     this.isGrabbing = true;
     this.robot.mouseMove((int) (Game.getScreenManager().getScreenLocation().getX() + screenCenterX), (int) (Game.getScreenManager().getScreenLocation().getY() + screenCenterY));
     this.isGrabbing = false;

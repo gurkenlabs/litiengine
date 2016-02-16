@@ -10,7 +10,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 
 /**
- * The Interface IMouse.
+ * The Interface IMouse provides methods to mange mouse input in the litiengine.
  */
 public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelListener {
 
