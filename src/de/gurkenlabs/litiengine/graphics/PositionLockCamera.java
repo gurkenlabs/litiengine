@@ -18,6 +18,7 @@ public class PositionLockCamera extends Camera {
   public PositionLockCamera(final IEntity entity) {
     super();
     this.entity = entity;
+    this.updateFocus();
   }
 
   /*
@@ -51,7 +52,8 @@ public class PositionLockCamera extends Camera {
    */
   @Override
   public Rectangle2D getViewPort() {
-    return new Rectangle2D.Double(this.getFocus().getX() - this.getCenterX(), this.getFocus().getY() - this.getCenterY(), Game.getScreenManager().getResolution().width / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().height / Game.getInfo().renderScale());
+    Point2D focus = this.getFocus();
+    return new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().width / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().height / Game.getInfo().renderScale());
   }
 
   @Override
