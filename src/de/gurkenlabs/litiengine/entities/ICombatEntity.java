@@ -28,22 +28,4 @@ public interface ICombatEntity extends ICollisionEntity {
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 
   public void setTeam(int team);
-
-  public class CombatEntityHitArgument {
-    private final ICombatEntity entity;
-    private final float damage;
-
-    public CombatEntityHitArgument(final ICombatEntity entity, final float damage) {
-      this.entity = entity;
-      this.damage = damage;
-    }
-
-    public float getDamage() {
-      return this.damage;
-    }
-
-    public ICombatEntity getEntity() {
-      return this.entity;
-    }
-  }
 }
