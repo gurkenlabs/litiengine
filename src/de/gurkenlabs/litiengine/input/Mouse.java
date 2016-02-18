@@ -313,9 +313,10 @@ public class Mouse implements IMouse {
    *          The location of the original mouse.
    */
   private void setLocation(Point mouseLocation) {
-    if (this.isGrabbing) {
+    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
       return;
     }
+    
     final double screenCenterX = Game.getScreenManager().getResolution().getWidth() / 2;
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
 

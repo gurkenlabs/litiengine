@@ -251,4 +251,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void setCursor(Image image) {
     this.cursorImage = image;
   }
+
+  public boolean isFocusOwner() {
+    return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
+  }
 }

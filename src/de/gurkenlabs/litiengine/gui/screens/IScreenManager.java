@@ -72,4 +72,6 @@ public interface IScreenManager {
   public void setIconImage(Image image);
 
   public void setCursor(Image image);
+  
+  public boolean isFocusOwner();
 }
