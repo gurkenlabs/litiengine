@@ -131,19 +131,22 @@ public class PhysicsEngine implements IPhysicsEngine {
       if (!otherEntity.hasCollision()) {
         continue;
       }
-      
+
       if (otherEntity.equals(entity)) {
         continue;
       }
 
-      // the entity is too far away for collision
-      // calculate distace first because it only takes half the time, the
-      // intersects method would take
-      if (otherEntity.getLocation().distance(newPosition) > Math.max(entity.getHeight(), entity.getWidth()) * 2) {
-        continue;
+      if (collides(otherEntity.getCollisionBox(), entity.getCollisionBox(newPosition))) {
+        return true;
       }
+    }
 
-      if (otherEntity.getCollisionBox().intersects(entity.getCollisionBox(newPosition))) {
+    return false;
+  }
+
+  private static boolean collides(Rectangle2D a, Rectangle2D b) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() / 2 + b.getWidth() / 2) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() / 2 + b.getHeight() / 2) {
         return true;
       }
     }
@@ -161,8 +164,8 @@ public class PhysicsEngine implements IPhysicsEngine {
    * @return true, if successful
    */
   private boolean collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Point2D newPosition) {
-    for (final Rectangle2D shape : this.staticCollisionBoxes) {
-      if (shape.intersects(entity.getCollisionBox(newPosition))) {
+    for (final Rectangle2D collisionBox : this.staticCollisionBoxes) {
+      if (collides(collisionBox, entity.getCollisionBox(newPosition))) {
         return true;
       }
     }

@@ -122,7 +122,19 @@ public class GeometricPathFinder implements IPathFinder {
       // apply a margin for the path calculation in order to take the entities
       // collision box into consideration
       final Rectangle2D rectangleWithMargin = this.applyPathMargin(entity, collisionBox);
-      final Point2D intersection = GeometricUtilities.intersects(line, rectangleWithMargin);
+
+      // if the start is in the margin, the margin is not considered when
+      // checking for collision because this will always return true
+      Point2D intersection = null;
+      if (rectangleWithMargin.contains(start)) {
+        intersection = GeometricUtilities.intersects(line, collisionBox);
+        if (intersection != null) {
+          intersectedShapes.put(rectangleWithMargin, intersection);
+        }
+      } else {
+        intersection = GeometricUtilities.intersects(line, rectangleWithMargin);
+      }
+
       if (intersection != null) {
         intersectedShapes.put(rectangleWithMargin, intersection);
       }
@@ -131,7 +143,7 @@ public class GeometricPathFinder implements IPathFinder {
     Rectangle2D min = null;
     double minDist = 0;
     for (final Rectangle2D shape : intersectedShapes.keySet()) {
-      final double dist = intersectedShapes.get(shape).distance(start);
+      final double dist = intersectedShapes.get(shape).distance(target);
       if (min == null) {
         min = shape;
         minDist = dist;
@@ -149,7 +161,7 @@ public class GeometricPathFinder implements IPathFinder {
   private Point2D getNextPoint(final IMovableEntity entity, final Point2D currentPoint, final Point2D target) {
     // 1. get first intersected collision box
     final Rectangle2D currentCollisionBox = this.getFirstIntersectedCollisionBox(entity, currentPoint, target);
-    if (currentCollisionBox == null) {
+    if (currentCollisionBox == null || currentCollisionBox.contains(target)) {
       // if no collision box is found, we can directly go to the target
       return target;
     }
