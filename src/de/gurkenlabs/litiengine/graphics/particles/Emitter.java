@@ -45,28 +45,25 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private long lastSpawn;
 
   /** The max particles. */
-  private final int maxParticles;
+  private int maxParticles;
 
-  private final int particleMaxTTL;
+  private int particleMaxTTL, particleMinTTL;
 
-  private final int particleMinTTL;
-
-  /** A collection of particles that make up the snow. */
   private final CopyOnWriteArrayList<Particle> particles;
 
-  private final int particleUpdateDelay;
+  private int particleUpdateDelay;
 
   /** The paused. */
   private boolean paused;
 
   /** The spawn amount. */
-  private final int spawnAmount;
+  private int spawnAmount;
 
   /** The spawn rate. */
-  private final int spawnRate;
+  private int spawnRate;
 
   /** The time to live. */
-  private final int timeToLive;
+  private int timeToLive;
 
   /**
    * Basic constructor for an effect.
@@ -130,7 +127,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     if (!this.activated) {
       return;
     }
-    
+
     this.activated = false;
     this.getParticles().clear();
     this.aliveTime = 0;
@@ -204,6 +201,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.spawnRate;
   }
 
+  public int getSpawnAmount() {
+    return this.spawnAmount;
+  }
+
   /**
    * Gets the time to live.
    *
@@ -232,6 +233,42 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    */
   public boolean isPaused() {
     return this.paused;
+  }
+
+  public void togglePaused() {
+    this.paused = !this.paused;
+  }
+
+  public void setMaxParticles(int maxPart) {
+    this.maxParticles = maxPart;
+  }
+
+  public void setOrigin(Point2D location) {
+    this.setLocation(location);
+  }
+
+  public void setParticleMaxTTL(int maxTTL) {
+    this.particleMaxTTL = maxTTL;
+  }
+
+  public void getParticleMinTTL(int minTTL) {
+    this.particleMinTTL = minTTL;
+  }
+
+  public void setParticleUpdateRate(int delay) {
+    this.particleUpdateDelay = delay;
+  }
+
+  public void setSpawnRate(int spawnRate) {
+    this.spawnRate = spawnRate;
+  }
+
+  public void setSpawnAmount(int spawnAmount) {
+    this.spawnAmount = spawnAmount;
+  }
+
+  public void setTimeToLive(int ttl) {
+    this.timeToLive = ttl;
   }
 
   @Override
@@ -332,6 +369,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return new Random().nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
   }
 
+  protected int getRandomParticleX() {
+    return new Random().nextInt((int) this.getWidth());
+  }
+
+  protected int getRandomParticleY() {
+    return new Random().nextInt((int) this.getHeight());
+  }
+
   /**
    * Particle can be removed.
    *
@@ -357,7 +402,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * Spawn particle.
    */
   protected void spawnParticle() {
-    for (short i = 0; i < this.spawnAmount; i++) {
+    for (short i = 0; i < this.getSpawnAmount(); i++) {
       if (!this.canTakeNewParticles()) {
         return;
       }
