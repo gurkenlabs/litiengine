@@ -13,7 +13,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public abstract class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
-  private final short pixelsPerSecond;
+  private final short velocity;
 
   /** The direction. */
   private float facingAngle;
@@ -26,7 +26,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   public MovableCombatEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
-    this.pixelsPerSecond = info.pixelsPerSecond();
+    this.velocity = info.pixelsPerSecond();
   }
 
   /**
@@ -35,31 +35,13 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
    * @return the facing direction
    */
   @Override
-  public float getFacingAngle() {
+  public float getAngle() {
     return this.facingAngle;
   }
 
   @Override
   public Direction getFacingDirection() {
-    if (this.getFacingAngle() >= 0 && this.getFacingAngle() < 45) {
-      return Direction.DOWN;
-    }
-    if (this.getFacingAngle() >= 45 && this.getFacingAngle() < 135) {
-      return Direction.RIGHT;
-    }
-    if (this.getFacingAngle() >= 135 && this.getFacingAngle() < 225) {
-      return Direction.UP;
-    }
-    if (this.getFacingAngle() >= 225 && this.getFacingAngle() < 315) {
-      return Direction.LEFT;
-    }
-
-    if (this.getFacingAngle() >= 315 && this.getFacingAngle() <= 360) {
-      return Direction.DOWN;
-    }
-
-    System.out.println("unknown facing angle " + this.getFacingAngle());
-    return Direction.UNDEFINED;
+    return Direction.fromAngle(this.getAngle());
   }
 
   @Override
@@ -68,8 +50,8 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public float getVelocityInPixelsPerSecond() {
-    return this.pixelsPerSecond * this.getAttributes().getVelocity().getCurrentValue();
+  public float getVelocity() {
+    return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
   }
 
   /**
@@ -99,7 +81,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
    *          the new facing direction
    */
   @Override
-  public void setFacingAngle(final float angle) {
+  public void setAngle(final float angle) {
     this.facingAngle = angle;
   }
 
@@ -107,16 +89,16 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   public void setFacingDirection(final Direction facingDirection) {
     switch (facingDirection) {
     case DOWN:
-      this.setFacingAngle(0);
+      this.setAngle(0);
       break;
     case RIGHT:
-      this.setFacingAngle(90);
+      this.setAngle(90);
       break;
     case UP:
-      this.setFacingAngle(180);
+      this.setAngle(180);
       break;
     case LEFT:
-      this.setFacingAngle(270);
+      this.setAngle(270);
       break;
 
     default:

@@ -23,7 +23,29 @@ public enum Direction {
     return UNDEFINED;
   }
 
+  public static Direction fromAngle(final float angle) {
+    if (angle >= 0 && angle < 45) {
+      return Direction.DOWN;
+    }
+    if (angle >= 45 && angle < 135) {
+      return Direction.RIGHT;
+    }
+    if (angle >= 135 && angle < 225) {
+      return Direction.UP;
+    }
+    if (angle >= 225 && angle < 315) {
+      return Direction.LEFT;
+    }
+
+    if (angle >= 315 && angle <= 360) {
+      return Direction.DOWN;
+    }
+    
+    return Direction.UNDEFINED;
+  }
+
   public byte getFlagValue() {
     return this.flagValue;
   }
+
 }

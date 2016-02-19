@@ -76,7 +76,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
-    entity.setFacingAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
+    entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
 
     if (entity.hasCollision() && this.collidesWithAnyEntity(entity, newPosition) || this.collidesWithAnyStaticCollisionBox(entity, newPosition)) {
       newPosition = this.findLocationWithoutCollision(entity, newPosition);
@@ -95,7 +95,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean move(final IMovableEntity entity, final float delta) {
-    return this.move(entity, entity.getFacingAngle(), delta);
+    return this.move(entity, entity.getAngle(), delta);
   }
 
   @Override

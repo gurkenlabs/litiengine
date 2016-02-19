@@ -6,16 +6,19 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 
 public interface IMovableEntity extends ICollisionEntity {
-  
-  public float getFacingAngle();
+
+  public float getAngle();
+
+  /**
+   * Gets the entitie's velocity in PIXEL / Second
+   * 
+   * @return
+   */
+  public float getVelocity();
 
   public Direction getFacingDirection();
 
   public IEntityMovementController getMovementController();
-
-  public float getVelocityInPixelsPerSecond();
-
-  public boolean isIdle();
 
   public void onMoved(Consumer<IMovableEntity> consumer);
 
@@ -25,9 +28,7 @@ public interface IMovableEntity extends ICollisionEntity {
    * @param orientation
    *          the new facing direction
    */
-  public void setFacingAngle(float orientation);
-
-  public void setFacingDirection(Direction facingDirection);
+  public void setAngle(float angle);
 
   /**
    * Sets the map location.

@@ -74,7 +74,7 @@ public abstract class Ability {
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
-    final double start = this.getExecutor().getFacingAngle() - impactAngle / 2 - 90;
+    final double start = this.getExecutor().getAngle() - impactAngle / 2 - 90;
 
     return new Arc2D.Double(arcX, arcY, impact, impact, start, impactAngle, Arc2D.PIE);
   }
