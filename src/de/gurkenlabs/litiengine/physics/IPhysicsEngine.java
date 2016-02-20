@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -55,14 +54,14 @@ public interface IPhysicsEngine {
    * @param rect
    * @return true if there is any collision; otherwise false.
    */
-  public boolean check(Point2D point);
+  public boolean collides(Point2D point);
 
   /**
    * 
    * @param rect
    * @return true if there is any collision; otherwise false.
    */
-  public boolean check(Rectangle2D rect);
+  public boolean collides(Rectangle2D rect);
 
   public void remove(ICollisionEntity entity);
 

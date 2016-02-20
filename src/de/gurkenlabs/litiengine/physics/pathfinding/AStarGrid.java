@@ -29,7 +29,7 @@ public class AStarGrid {
         Rectangle nodeBounds = new Rectangle(x * nodeSize, y * nodeSize, nodeSize, nodeSize);
         
         // TODO: add terrain dependent penalty
-        this.getGrid()[x][y] = new AStarNode(!physicsEngine.check(nodeBounds), nodeBounds, x, y, 0);
+        this.getGrid()[x][y] = new AStarNode(!physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
       }
     }
   }

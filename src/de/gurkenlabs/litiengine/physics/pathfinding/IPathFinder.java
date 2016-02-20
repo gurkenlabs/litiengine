@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.physics.pathfinding;
 
 import java.awt.geom.Point2D;
+
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.Path;
 

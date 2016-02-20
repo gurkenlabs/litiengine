@@ -4,17 +4,13 @@
 package de.gurkenlabs.litiengine.physics.pathfinding;
 
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.Path;
 import de.gurkenlabs.util.geom.GeometricUtilities;

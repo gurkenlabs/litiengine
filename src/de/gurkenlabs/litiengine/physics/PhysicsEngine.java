@@ -9,7 +9,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -75,25 +74,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     return this.move(entity, newPosition);
   }
 
-  private boolean move(final IMovableEntity entity, Point2D newPosition) {
-    boolean success = true;
-    entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
-
-    if (entity.hasCollision() && this.collidesWithAnyEntity(entity, newPosition) || this.collidesWithAnyStaticCollisionBox(entity, newPosition)) {
-      newPosition = this.findLocationWithoutCollision(entity, newPosition);
-      success = false;
-    }
-
-    // don't set new location if it is outside the boundaries of the map
-    if (!this.isInMap(entity.getCollisionBox(newPosition))) {
-      return false;
-    }
-
-    // set new map location
-    entity.setLocation(newPosition);
-    return success;
-  }
-
   @Override
   public boolean move(final IMovableEntity entity, final float delta) {
     return this.move(entity, entity.getAngle(), delta);
@@ -118,6 +98,28 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.environmentBounds = environmentBounds;
   }
 
+  @Override
+  public boolean collides(Point2D point) {
+    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collisionBox.contains(point)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean collides(Rectangle2D rect) {
+    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collides(rect, collisionBox)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * Collides with any entity.
    *
@@ -127,7 +129,7 @@ public class PhysicsEngine implements IPhysicsEngine {
    *          the new position
    * @return true, if successful
    */
-  private boolean collidesWithAnyEntity(final ICollisionEntity entity, final Point2D newPosition) {
+  private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Point2D newPosition) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
       if (!otherEntity.hasCollision()) {
         continue;
@@ -138,11 +140,11 @@ public class PhysicsEngine implements IPhysicsEngine {
       }
 
       if (collides(otherEntity.getCollisionBox(), entity.getCollisionBox(newPosition))) {
-        return true;
+        return otherEntity.getCollisionBox().createIntersection(entity.getCollisionBox(newPosition));
       }
     }
 
-    return false;
+    return null;
   }
 
   private static boolean collides(Rectangle2D a, Rectangle2D b) {
@@ -164,14 +166,14 @@ public class PhysicsEngine implements IPhysicsEngine {
    *          the new position
    * @return true, if successful
    */
-  private boolean collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Point2D newPosition) {
+  private Rectangle2D collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Point2D newPosition) {
     for (final Rectangle2D collisionBox : this.staticCollisionBoxes) {
       if (collides(collisionBox, entity.getCollisionBox(newPosition))) {
-        return true;
+        return collisionBox.createIntersection(entity.getCollisionBox(newPosition));
       }
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -186,7 +188,7 @@ public class PhysicsEngine implements IPhysicsEngine {
   private Point2D findLocationWithoutCollision(final ICollisionEntity mob, final Point2D newPosition) {
 
     for (final Point2D pointBetween : GeometricUtilities.getPointsBetweenPoints(newPosition, mob.getLocation())) {
-      if (!this.collidesWithAnyEntity(mob, pointBetween) && !this.collidesWithAnyStaticCollisionBox(mob, pointBetween)) {
+      if (this.collidesWithAnyEntity(mob, pointBetween) == null && this.collidesWithAnyStaticCollisionBox(mob, pointBetween) == null) {
         return pointBetween;
       }
     }
@@ -209,25 +211,62 @@ public class PhysicsEngine implements IPhysicsEngine {
     return this.environmentBounds.contains(collisionBox.getBounds());
   }
 
-  @Override
-  public boolean check(Point2D point) {
-    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
-      if (collisionBox.contains(point)) {
-        return true;
+  private boolean move(final IMovableEntity entity, Point2D newPosition) {
+    boolean success = true;
+    entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
+
+    if (entity.hasCollision()) {
+      Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
+      if (staticIntersection != null) {
+        newPosition = resolveCollision(entity, newPosition, staticIntersection);
+        success = false;
+      }
+
+      Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, newPosition);
+      if (entityIntersection != null) {
+        newPosition = resolveCollision(entity, newPosition, entityIntersection);
+        success = false;
       }
     }
 
-    return false;
+    // don't set new location if it is outside the boundaries of the map
+    if (!this.isInMap(entity.getCollisionBox(newPosition))) {
+      return false;
+    }
+
+    // set new map location
+    entity.setLocation(newPosition);
+    return success;
   }
 
-  @Override
-  public boolean check(Rectangle2D rect) {
-    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
-      if (collides(rect, collisionBox)) {
-        return true;
+  private Point2D resolveCollision(final IMovableEntity entity, Point2D newPosition, Rectangle2D intersection) {
+    Point2D resolvedPosition = newPosition;
+    double smallerDistance = Math.min(intersection.getWidth(), intersection.getHeight());
+    if (smallerDistance == intersection.getWidth()) {
+      // x axis resolving
+      if (Math.abs(newPosition.getX() - intersection.getMinX()) < Math.abs(newPosition.getX() - intersection.getMaxX())) {
+        // new position is closer to the left side, so push out to the left
+        resolvedPosition.setLocation(resolvedPosition.getX() - intersection.getWidth(), resolvedPosition.getY());
+      } else {
+        // push it out to the right
+        resolvedPosition.setLocation(resolvedPosition.getX() + intersection.getWidth(), resolvedPosition.getY());
+      }
+    } else {
+      // y axis resolving
+      if (Math.abs(newPosition.getY() - intersection.getMinY()) < Math.abs(newPosition.getY() - intersection.getMaxY())) {
+        // new position is closer to the top
+        resolvedPosition.setLocation(resolvedPosition.getX(), resolvedPosition.getY() - intersection.getHeight());
+      } else {
+        resolvedPosition.setLocation(resolvedPosition.getX(), resolvedPosition.getY() + intersection.getHeight());
       }
     }
 
-    return false;
+    // if the resolved location still collides with something
+    if (this.collides(entity.getCollisionBox(resolvedPosition))) {
+      // fallback
+      return this.findLocationWithoutCollision(entity, newPosition);
+    }
+
+    return resolvedPosition;
   }
 }
