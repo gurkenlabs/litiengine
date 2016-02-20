@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -39,15 +40,30 @@ public interface IPhysicsEngine {
 
   /**
    * Moves the specified entity towards target by the delta.
+   * 
    * @param entity
    * @param target
    * @param delta
    * @return
    */
   public boolean move(IMovableEntity entity, Point2D target, float delta);
-  
+
   public boolean move(IMovableEntity entity, float delta);
- 
+
+  /**
+   * 
+   * @param rect
+   * @return true if there is any collision; otherwise false.
+   */
+  public boolean check(Point2D point);
+
+  /**
+   * 
+   * @param rect
+   * @return true if there is any collision; otherwise false.
+   */
+  public boolean check(Rectangle2D rect);
+
   public void remove(ICollisionEntity entity);
 
   public void remove(Rectangle2D staticCollisionBox);

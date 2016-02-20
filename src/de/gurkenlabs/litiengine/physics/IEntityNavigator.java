@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 
 /**
  * The Interface IEntityNavigator.

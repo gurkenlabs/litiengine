@@ -1,29 +1,16 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.physics;
+package de.gurkenlabs.litiengine.physics.pathfinding;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
-import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.physics.Path;
 
 /**
  * The Interface IPathFinder.
  */
 public interface IPathFinder {
-
-  /**
-   * Apply path margin.
-   *
-   * @param entity
-   *          the entity
-   * @param rectangle
-   *          the rectangle
-   * @return the rectangle2 d
-   */
-  public Rectangle2D applyPathMargin(ICollisionEntity entity, Rectangle2D rectangle);
 
   /**
    * Gets the path.

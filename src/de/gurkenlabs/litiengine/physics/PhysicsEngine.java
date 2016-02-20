@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -206,5 +207,27 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return this.environmentBounds.contains(collisionBox.getBounds());
+  }
+
+  @Override
+  public boolean check(Point2D point) {
+    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collisionBox.contains(point)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean check(Rectangle2D rect) {
+    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collides(rect, collisionBox)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

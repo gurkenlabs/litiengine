@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
@@ -54,7 +55,9 @@ public class EntityNavigator implements IEntityNavigator {
 
   @Override
   public void navigate(final Point2D target) {
+    long current = System.nanoTime();
     this.path = this.getPathFinder().findPath(this.entity, target);
+    System.out.println("pathfinding took " + (System.nanoTime() - current) / 1000000.0 + "ms");
   }
 
   @Override
