@@ -24,17 +24,14 @@ public class AStarGrid {
   }
 
   private void populateGrid(final IPhysicsEngine physicsEngine, final int gridSizeX, final int gridSizeY) {
-    long current = System.nanoTime();
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
         Rectangle nodeBounds = new Rectangle(x * nodeSize, y * nodeSize, nodeSize, nodeSize);
-
+        
         // TODO: add terrain dependent penalty
-        this.getGrid()[x][y] = new AStarNode(physicsEngine, nodeBounds, x, y, 0);
+        this.getGrid()[x][y] = new AStarNode(!physicsEngine.check(nodeBounds), nodeBounds, x, y, 0);
       }
     }
-
-    System.out.println("grid populated in" + ((System.nanoTime() - current) / 1000000.0) + "ms");
   }
 
   public List<AStarNode> getNeighbours(AStarNode node) {

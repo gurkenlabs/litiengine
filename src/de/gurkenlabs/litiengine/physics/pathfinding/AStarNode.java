@@ -3,27 +3,23 @@ package de.gurkenlabs.litiengine.physics.pathfinding;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
-
 public class AStarNode {
-  private final IPhysicsEngine physicsEngine;
   private final Rectangle bound;
   private final int gridX;
   private final int gridY;
-  private final boolean walkable;
+  private boolean walkable;
   private final int penalty;
 
   private int gCost;
   private int hCost;
   private AStarNode predecessor;
 
-  public AStarNode(final IPhysicsEngine physicsEngine, final Rectangle bound, final int gridX, final int gridY, final int penalty) {
-    this.physicsEngine = physicsEngine;
+  public AStarNode(final boolean walkable, final Rectangle bound, final int gridX, final int gridY, final int penalty) {
     this.bound = bound;
     this.gridX = gridX;
     this.gridY = gridY;
     this.penalty = penalty;
-    this.walkable = !this.physicsEngine.check(this.getBounds());
+    this.walkable = walkable;
   }
 
   public int getgCost() {
@@ -58,6 +54,10 @@ public class AStarNode {
     return this.walkable;
   }
 
+  public void setWalkable(boolean walkable) {
+    this.walkable = walkable;
+  }
+
   public Rectangle getBounds() {
     return this.bound;
   }
@@ -73,9 +73,9 @@ public class AStarNode {
   public int getGridY() {
     return this.gridY;
   }
-  
-  public int getPenalty(){
-    return this.getPenalty();
+
+  public int getPenalty() {
+    return this.penalty;
   }
 
   public int getCosts(final AStarNode target) {
