@@ -75,8 +75,13 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     final int currentSegment = this.currentSegment;
-
     final PathIterator pi = this.path.getPath().getPathIterator(null);
+    if (pi.isDone()) {
+      this.currentSegment = 0;
+      this.path = null;
+      return;
+    }
+    
     final double[] startCoordinates = new double[6];
     final double[] coordinates = new double[6];
     for (int i = 0; i <= currentSegment; i++) {

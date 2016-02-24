@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.tiled.tmx.IMap;
 
 public class AStarGrid {
+  private boolean allowDiagonalMovementOnCorners;
   private final Dimension size;
   private final int nodeSize;
   private final AStarNode[][] grid;
@@ -27,7 +28,7 @@ public class AStarGrid {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
         Rectangle nodeBounds = new Rectangle(x * nodeSize, y * nodeSize, nodeSize, nodeSize);
-        
+
         // TODO: add terrain dependent penalty
         this.getGrid()[x][y] = new AStarNode(!physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
       }
@@ -36,23 +37,62 @@ public class AStarGrid {
 
   public List<AStarNode> getNeighbours(AStarNode node) {
 
-    List<AStarNode> neighbours = new ArrayList<AStarNode>();
+    List<AStarNode> neighbors = new ArrayList<AStarNode>();
+    int x = node.getGridX();
+    int y = node.getGridY();
+    AStarNode top = this.getNode(x, y - 1);
+    AStarNode bottom = this.getNode(x, y + 1);
+    AStarNode left = this.getNode(x - 1, y);
+    AStarNode right = this.getNode(x + 1, y);
 
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        if (x == 0 && y == 0)
-          continue;
+    // diagonal
+    AStarNode topLeft = this.getNode(x - 1, y - 1);
+    AStarNode topRight = this.getNode(x + 1, y - 1);
+    AStarNode bottomLeft = this.getNode(x - 1, y + 1);
+    AStarNode bottomRight = this.getNode(x + 1, y + 1);
 
-        int checkX = node.getGridX() + x;
-        int checkY = node.getGridY() + y;
-
-        if (checkX >= 0 && checkX < this.getGrid().length && checkY >= 0 && checkY < this.getGrid()[0].length) {
-          neighbours.add(this.getGrid()[checkX][checkY]);
-        }
-      }
+    if (top != null && top.isWalkable()) {
+      neighbors.add(top);
     }
 
-    return neighbours;
+    if (bottom != null && bottom.isWalkable()) {
+      neighbors.add(bottom);
+    }
+
+    if (right != null && right.isWalkable()) {
+      neighbors.add(right);
+    }
+
+    if (left != null && left.isWalkable()) {
+      neighbors.add(left);
+    }
+
+    // only add diogonal neighbours when they are not on a cornor
+    if ((topLeft != null && this.diagonalMovementOnCorners()) || (topLeft != null && top.isWalkable() && left.isWalkable())) {
+      neighbors.add(topLeft);
+    }
+
+    if ((topRight != null && this.diagonalMovementOnCorners()) || (topRight != null && top.isWalkable() && right.isWalkable())) {
+      neighbors.add(topRight);
+    }
+
+    if ((bottomLeft != null && this.diagonalMovementOnCorners()) || (bottomLeft != null && bottom.isWalkable() && left.isWalkable())) {
+      neighbors.add(bottomLeft);
+    }
+
+    if ((bottomRight != null && this.diagonalMovementOnCorners()) || (bottomRight != null && bottom.isWalkable() && right.isWalkable())) {
+      neighbors.add(bottomRight);
+    }
+
+    return neighbors;
+  }
+
+  private AStarNode getNode(int x, int y) {
+    if (x >= 0 && x < this.getGrid().length && y >= 0 && y < this.getGrid()[0].length) {
+      return this.getGrid()[x][y];
+    }
+
+    return null;
   }
 
   public AStarNode getNodeFromMapLocation(Point2D point) {
@@ -76,5 +116,13 @@ public class AStarGrid {
 
   public Dimension getSize() {
     return this.size;
+  }
+
+  public boolean diagonalMovementOnCorners() {
+    return this.allowDiagonalMovementOnCorners;
+  }
+
+  public void setAllowDiagonalMovementOnCorners(boolean allowDiagonalMovementOnCorners) {
+    this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
   }
 }

@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.physics.pathfinding;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,11 +15,14 @@ import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class AStarPathFinder extends PathFinder {
-  private static final int GRID_SIZE = 16;
   private final AStarGrid grid;
 
+  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, int gridNodeSize) {
+    this.grid = new AStarGrid(physicsEngine, map, gridNodeSize);
+  }
+
   public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map) {
-    this.grid = new AStarGrid(physicsEngine, map, GRID_SIZE);
+    this.grid = new AStarGrid(physicsEngine, map, map.getTileSize().width);
   }
 
   @Override
@@ -26,12 +30,20 @@ public class AStarPathFinder extends PathFinder {
     // if there is no collision between the start and the target return a direct
     // path
     Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
+    Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
+    if (collisionBox == null) {
+      return this.findDirectPath(startLocation, target);
+    }
 
-    AStarNode startNode = this.grid.getNodeFromMapLocation(startLocation);
-    AStarNode targetNode = this.grid.getNodeFromMapLocation(target);
-
-    if (startNode.equals(targetNode) || !targetNode.isWalkable()) {
+    AStarNode startNode = this.getGrid().getNodeFromMapLocation(startLocation);
+    AStarNode targetNode = this.getGrid().getNodeFromMapLocation(target);
+    if (startNode.equals(targetNode)) {
       return null;
+    }
+
+    // simple fallback if the target tile is not walkable.
+    if (!targetNode.isWalkable()) {
+      return this.findDirectPath(startLocation, target);
     }
 
     List<AStarNode> opened = new ArrayList<>();
@@ -43,7 +55,7 @@ public class AStarPathFinder extends PathFinder {
 
       // find node with lowest cost
       for (int i = 1; i < opened.size(); i++) {
-        if (opened.get(i).getfCost() < currentNode.getfCost() 
+        if (opened.get(i).getfCost() < currentNode.getfCost()
             || (opened.get(i).getfCost() == currentNode.getfCost() && opened.get(i).gethCost() < currentNode.gethCost())) {
           currentNode = opened.get(i);
         }
