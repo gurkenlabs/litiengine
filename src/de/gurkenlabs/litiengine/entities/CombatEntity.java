@@ -28,6 +28,8 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   /** The team. */
   private int team;
 
+  private ICombatEntity target;
+
   /** The is indestructible. */
   private boolean isIndestructible;
 
@@ -99,7 +101,7 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
     if (this.isIndestructible() || this.isDead()) {
       return false;
     }
-    
+
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
 
     if (this.isDead()) {
@@ -200,6 +202,18 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
    *          the new up attributes
    */
   protected void setupAttributes(final CombatAttributes attributes) {
+
+  }
+
+  @Override
+  public ICombatEntity getTarget() {
+    // TODO Auto-generated method stub
+    return this.target;
+  }
+
+  @Override
+  public void setTarget(ICombatEntity target) {
+    this.target = target;
 
   }
 }

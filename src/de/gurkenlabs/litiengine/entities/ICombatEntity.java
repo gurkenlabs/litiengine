@@ -10,6 +10,10 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public int getTeam();
 
+  public ICombatEntity getTarget();
+
+  public void setTarget(final ICombatEntity target);
+
   /**
    * 
    * @param damage

@@ -80,6 +80,7 @@ public abstract class Effect implements IEffect {
   @Override
   public void apply(final Shape impactArea) {
     for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
+
       // cannot affect the entity with the effect while it is still affected
       if (this.affectedEntities.contains(affectedEntity)) {
         return;
@@ -272,11 +273,16 @@ public abstract class Effect implements IEffect {
     affectedEntities.removeAll(Collections.singleton(null));
 
     if (!this.getAbility().isMultiTarget()) {
-      affectedEntities.sort(new EntityDistanceComparator(this.getAbility().getExecutor()));
-      if (affectedEntities.size() > 0) {
-        final ICombatEntity closest = affectedEntities.get(0);
+      if (this.getAbility().getExecutor().getTarget() != null) {
         affectedEntities = new ArrayList<>();
-        affectedEntities.add(closest);
+        affectedEntities.add(this.getAbility().getExecutor().getTarget());
+      } else {
+        affectedEntities.sort(new EntityDistanceComparator(this.getAbility().getExecutor()));
+        if (affectedEntities.size() > 0) {
+          final ICombatEntity closest = affectedEntities.get(0);
+          affectedEntities = new ArrayList<>();
+          affectedEntities.add(closest);
+        }
       }
     }
 
