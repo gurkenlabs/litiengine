@@ -272,18 +272,17 @@ public abstract class Effect implements IEffect {
 
     affectedEntities.removeAll(Collections.singleton(null));
 
-    if (!this.getAbility().isMultiTarget()) {
+    if (!this.getAbility().isMultiTarget() && affectedEntities.size() > 0) {
+      affectedEntities.sort(new EntityDistanceComparator(this.getAbility().getExecutor()));
+      final ICombatEntity target;
       if (this.getAbility().getExecutor().getTarget() != null) {
-        affectedEntities = new ArrayList<>();
-        affectedEntities.add(this.getAbility().getExecutor().getTarget());
+        target = this.getAbility().getExecutor().getTarget();
       } else {
-        affectedEntities.sort(new EntityDistanceComparator(this.getAbility().getExecutor()));
-        if (affectedEntities.size() > 0) {
-          final ICombatEntity closest = affectedEntities.get(0);
-          affectedEntities = new ArrayList<>();
-          affectedEntities.add(closest);
-        }
+        target = affectedEntities.get(0);
       }
+      affectedEntities = new ArrayList<>();
+      affectedEntities.add(target);
+
     }
 
     return affectedEntities;
