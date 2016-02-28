@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.Game;
@@ -19,7 +20,16 @@ public class Animation implements IUpdateable, ILaunchable {
   private int frameDuration = this.DEFAULT_FRAME_DURATION;
   private boolean playing;
   private KeyFrame currentFrame;
+  private KeyFrame firstFrame;
   private long elapsedTicks;
+
+  public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
+    this(name, spritesheet, loop, keyFrameDurations);
+
+    if (randomizeStart && this.keyframes.size() > 0) {
+      this.firstFrame = this.getKeyframes().get(new Random().nextInt(this.getKeyframes().size()));
+    }
+  }
 
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this.name = name;
@@ -76,7 +86,7 @@ public class Animation implements IUpdateable, ILaunchable {
       return;
     }
 
-    this.currentFrame = this.getKeyframes().get(0);
+    this.currentFrame = this.firstFrame;
   }
 
   @Override
@@ -120,12 +130,14 @@ public class Animation implements IUpdateable, ILaunchable {
       for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
         this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
       }
-
-      return;
+    } else {
+      for (int i = 0; i < keyFrames.length; i++) {
+        this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
+      }
     }
 
-    for (int i = 0; i < keyFrames.length; i++) {
-      this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
+    if (this.keyframes.size() != 0) {
+      this.firstFrame = this.getKeyframes().get(0);
     }
   }
 
