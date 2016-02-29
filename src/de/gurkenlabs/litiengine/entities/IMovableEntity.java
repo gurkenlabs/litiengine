@@ -16,8 +16,6 @@ public interface IMovableEntity extends ICollisionEntity {
    */
   public float getVelocity();
 
-  public Direction getFacingDirection();
-
   public IEntityMovementController getMovementController();
 
   public void onMoved(Consumer<IMovableEntity> consumer);

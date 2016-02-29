@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Direction;
+import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
@@ -16,7 +17,7 @@ public class FootstepEmitter extends Emitter {
   private final Direction dir;
   private final boolean left;
 
-  public FootstepEmitter(final IMovableEntity entity, final boolean left) {
+  public FootstepEmitter(final IMovableCombatEntity entity, final boolean left) {
     super(entity.getCollisionBox().getX() + entity.getCollisionBox().getWidth() / 2, entity.getCollisionBox().getY() + entity.getCollisionBox().getHeight() / 2);
     this.stepWidth = entity.getWidth() / 8;
     this.stepHeight = entity.getHeight() / 6;

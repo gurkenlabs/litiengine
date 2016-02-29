@@ -19,9 +19,9 @@ import java.lang.annotation.Target;
 public @interface MovementInfo {
 
   /**
-   * Pixels per second.
+   * The velocity in pixels per second.
    *
-   * @return the int
+   * @return the velocity
    */
-  short pixelsPerSecond() default 100;
+  short velocity() default 100;
 }

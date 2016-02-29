@@ -10,59 +10,34 @@ import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
-public abstract class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
-
+public class MovableEntity extends CollisionEntity implements IMovableEntity {
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
 
   /** The direction. */
   private float facingAngle;
 
-  /** The last moved. */
-  private long lastMoved;
-
   private IEntityMovementController movementController;
 
-  public MovableCombatEntity() {
+  public MovableEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
   }
 
-  /**
-   * Gets the facing direction.
-   *
-   * @return the facing direction
-   */
   @Override
   public float getAngle() {
     return this.facingAngle;
   }
 
   @Override
-  public Direction getFacingDirection() {
-    return Direction.fromAngle(this.getAngle());
+  public float getVelocity() {
+    return this.velocity;
   }
 
   @Override
   public IEntityMovementController getMovementController() {
     return this.movementController;
-  }
-
-  @Override
-  public float getVelocity() {
-    return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
-  }
-
-  /**
-   * Checks if is idle.
-   *
-   * @return true, if is idle
-   */
-  @Override
-  public boolean isIdle() {
-    final int IDLE_DELAY = 100;
-    return System.currentTimeMillis() - this.lastMoved > IDLE_DELAY;
   }
 
   @Override
@@ -72,38 +47,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     }
 
     this.entityMovedConsumer.add(consumer);
-  }
-
-  /**
-   * Sets the facing direction.
-   *
-   * @param angle
-   *          the new facing direction
-   */
-  @Override
-  public void setAngle(final float angle) {
-    this.facingAngle = angle;
-  }
-
-  @Override
-  public void setFacingDirection(final Direction facingDirection) {
-    switch (facingDirection) {
-    case DOWN:
-      this.setAngle(0);
-      break;
-    case RIGHT:
-      this.setAngle(90);
-      break;
-    case UP:
-      this.setAngle(180);
-      break;
-    case LEFT:
-      this.setAngle(270);
-      break;
-
-    default:
-      return;
-    }
   }
 
   /*
@@ -119,7 +62,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     }
 
     super.setLocation(position);
-    this.lastMoved = System.currentTimeMillis();
 
     for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
@@ -129,5 +71,10 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
+  }
+
+  @Override
+  public void setAngle(float angle) {
+    this.facingAngle = angle;
   }
 }

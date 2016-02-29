@@ -5,4 +5,6 @@ public interface IMovableCombatEntity extends ICombatEntity, IMovableEntity {
 
   public void setFacingDirection(Direction facingDirection);
 
+  public Direction getFacingDirection();
+
 }
