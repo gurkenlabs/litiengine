@@ -154,6 +154,10 @@ public abstract class Ability {
    * @return the remaining cooldown in seconds
    */
   public float getRemainingCooldownInSeconds(final IGameLoop loop) {
+    if(this.getCurrentExecution() == null){
+      return 0;
+    }
+    
     // calculate cooldown in seconds
     return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) / 1000.0 : 0);
   }
