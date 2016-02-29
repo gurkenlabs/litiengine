@@ -14,20 +14,12 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
 
-  /** The direction. */
-  private float facingAngle;
-
   private IEntityMovementController movementController;
 
   public MovableEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
-  }
-
-  @Override
-  public float getAngle() {
-    return this.facingAngle;
   }
 
   @Override
@@ -72,9 +64,9 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
   }
-
+  
   @Override
-  public void setAngle(float angle) {
-    this.facingAngle = angle;
+  public void setAngle(final float angle) {
+    super.setAngle(angle);
   }
 }

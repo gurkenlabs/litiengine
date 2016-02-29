@@ -22,6 +22,9 @@ public abstract class Entity implements IEntity {
   /** The map location. */
   private Point2D mapLocation;
 
+  /** The direction. */
+  private float angle;
+
   private float width;
 
   private IAnimationController animationController;
@@ -70,6 +73,11 @@ public abstract class Entity implements IEntity {
   public Point2D getLocation() {
     return this.mapLocation;
   }
+  
+  @Override
+  public float getAngle() {
+    return this.angle;
+  }
 
   @Override
   public int getMapId() {
@@ -111,5 +119,9 @@ public abstract class Entity implements IEntity {
    */
   protected void setLocation(final Point2D location) {
     this.mapLocation = location;
+  }
+
+  protected void setAngle(float angle) {
+    this.angle = angle;
   }
 }

@@ -6,9 +6,6 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 
 public interface IMovableEntity extends ICollisionEntity {
-
-  public float getAngle();
-
   /**
    * Gets the entitie's velocity in PIXEL / Second
    * 

@@ -23,7 +23,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-
+  private static int tmpId = 0;
   /** The map. */
   private final IMap map;
 
@@ -49,13 +49,13 @@ public class Environment implements IEnvironment {
   public void init() {
     this.loadMapObjects();
   }
-  
+
   @Override
   public void add(int mapId, IMovableCombatEntity entity) {
     this.addCombatEntity(mapId, entity);
     this.addMovableEntity(mapId, entity);
   }
-  
+
   @Override
   public void addCombatEntity(final int mapId, final ICombatEntity entity) {
     this.combatEntities.put(mapId, entity);
@@ -122,6 +122,25 @@ public class Environment implements IEnvironment {
 
         this.addMapObject(mapObject);
       }
+    }
+  }
+
+  /**
+   * Negative map ids are only used locally.
+   */
+  @Override
+  public int getLocalMapId() {
+    return --tmpId;
+  }
+
+  @Override
+  public void remove(int mapId) {
+    if (this.movableEntities.containsKey(mapId)) {
+      this.movableEntities.remove(mapId);
+    }
+
+    if (this.combatEntities.containsKey(mapId)) {
+      this.combatEntities.remove(mapId);
     }
   }
 }

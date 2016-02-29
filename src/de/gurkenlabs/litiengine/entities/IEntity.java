@@ -19,6 +19,8 @@ public interface IEntity {
   public int getMapId();
 
   public float getWidth();
+  
+  public float getAngle();
 
   public void setAnimationController(IAnimationController animationController);
 

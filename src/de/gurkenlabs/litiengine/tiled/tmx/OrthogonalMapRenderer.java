@@ -6,11 +6,7 @@ package de.gurkenlabs.litiengine.tiled.tmx;
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.Transparency;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
@@ -73,11 +69,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       return ImageCache.MAPS.get(getCacheKey(map));
     }
 
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage img = config.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight(),
-        Transparency.TRANSLUCENT);
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
     final Graphics g = img.createGraphics();
 
     this.renderProcess = 0;

@@ -101,8 +101,9 @@ public class AbilityExecution implements IUpdateable {
       // without duration is still active
       // effects without a duration are cancelled after the abiltity duration
       long effectDuration = loop.getDeltaTime(this.getAppliedEffects().get(effect));
-      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && effectDuration < this.getAbility().getAttributes().getDuration().getCurrentValue() + effect.getDelay()
-          || effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay()) {
+      int abilityDuration = this.getAbility().getAttributes().getDuration().getCurrentValue();
+      if ((effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && (abilityDuration == 0 || effectDuration < abilityDuration + effect.getDelay()))
+          || (effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay())) {
         continue;
       }
 

@@ -15,9 +15,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
 
-  /** The direction. */
-  private float facingAngle;
-
   /** The last moved. */
   private long lastMoved;
 
@@ -27,16 +24,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
-  }
-
-  /**
-   * Gets the facing direction.
-   *
-   * @return the facing direction
-   */
-  @Override
-  public float getAngle() {
-    return this.facingAngle;
   }
 
   @Override
@@ -82,7 +69,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
    */
   @Override
   public void setAngle(final float angle) {
-    this.facingAngle = angle;
+    super.setAngle(angle);
   }
 
   @Override

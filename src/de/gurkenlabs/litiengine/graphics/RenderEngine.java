@@ -100,9 +100,18 @@ public class RenderEngine implements IRenderEngine {
     AffineTransform t = new AffineTransform();
 
     t.translate(renderLocation.getX(), renderLocation.getY());
-    t.rotate(Math.toRadians(angle));
+    t.rotate(Math.toRadians(angle), image.getWidth(null) / 2, image.getHeight(null) / 2);
 
     ((Graphics2D) g).drawImage(image, t, null);
+  }
+
+  public static BufferedImage createCompatibleImage(int width, int height) {
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsDevice device = env.getDefaultScreenDevice();
+    final GraphicsConfiguration config = device.getDefaultConfiguration();
+    final BufferedImage img = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+
+    return img;
   }
 
   @Override
