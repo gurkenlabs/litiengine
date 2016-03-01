@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * The Class UdpPacketReceiver.
  */
 public class UdpPacketReceiver extends Thread implements IPacketReceiver {
-
+  private final int updateRate;
   /** The is terminated. */
   private boolean isTerminated;
 
@@ -30,7 +30,8 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
    * @param socket
    *          the socket
    */
-  public UdpPacketReceiver(final DatagramSocket socket) {
+  public UdpPacketReceiver(final DatagramSocket socket, final int updateRate) {
+    this.updateRate = updateRate;
     this.incomingPacketObservers = new ArrayList<IIncomingPacketObserver>();
     this.socket = socket;
   }
@@ -41,7 +42,8 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
    * @param port
    *          the port
    */
-  public UdpPacketReceiver(final int port) {
+  public UdpPacketReceiver(final int port, final int updateRate) {
+    this.updateRate = updateRate;
     this.incomingPacketObservers = new ArrayList<IIncomingPacketObserver>();
     try {
       this.socket = new DatagramSocket(port);
@@ -68,6 +70,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
    */
   @Override
   public void run() {
+    final int SKIP_TICKS = 1000 / this.updateRate;
     while (!this.isTerminated) {
       final byte[] data = new byte[10000];
       final DatagramPacket packet = new DatagramPacket(data, data.length);
@@ -79,6 +82,12 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
 
       for (final IIncomingPacketObserver packetObserver : this.incomingPacketObservers) {
         packetObserver.packetReceived(packet.getData(), packet.getAddress(), packet.getPort());
+      }
+      
+      try {
+        Thread.sleep(SKIP_TICKS);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
 

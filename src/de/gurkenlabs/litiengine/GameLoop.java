@@ -19,9 +19,6 @@ public class GameLoop extends Thread implements IGameLoop {
 
   private boolean gameIsRunning = true;
 
-  /** The next game tick. */
-  private long nextGameTick = System.currentTimeMillis();
-
   public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
@@ -79,22 +76,24 @@ public class GameLoop extends Thread implements IGameLoop {
     while (this.gameIsRunning) {
       final int SKIP_TICKS = (int) (1000 / (this.getUpdateRate() * this.getTimeScale()));
 
-      if (System.currentTimeMillis() >= this.nextGameTick) {
-        ++this.totalTicks;
-        this.updatables.forEach(updatable -> updatable.update(this));
+      ++this.totalTicks;
+      this.updatables.parallelStream().forEach(updatable -> updatable.update(this));
 
-        ++this.updateCount;
+      ++this.updateCount;
 
-        final long currentMillis = System.currentTimeMillis();
-        if (currentMillis - this.lastUpsTime >= 1000) {
-          this.lastUpsTime = currentMillis;
-          this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
-          this.updateCount = 0;
-        }
+      final long currentMillis = System.currentTimeMillis();
+      if (currentMillis - this.lastUpsTime >= 1000) {
+        this.lastUpsTime = currentMillis;
+        this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
+        this.updateCount = 0;
+      }
 
-        this.lastUpdateTime = currentMillis;
+      this.lastUpdateTime = currentMillis;
 
-        this.nextGameTick += SKIP_TICKS;
+      try {
+        Thread.sleep(SKIP_TICKS);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
   }
@@ -119,7 +118,6 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void setTimeScale(float timeScale) {
     this.timeScale = timeScale;
-    this.nextGameTick = System.currentTimeMillis();
   }
 
   @Override

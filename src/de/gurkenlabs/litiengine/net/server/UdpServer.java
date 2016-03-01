@@ -30,8 +30,8 @@ public class UdpServer implements IServer {
 
   private final ICommandManager commandManager;
 
-  public UdpServer(final int listenPort, final IMessageHandlerProvider provider) {
-    this.receiver = new UdpPacketReceiver(listenPort);
+  public UdpServer(final int listenPort, final IMessageHandlerProvider provider, int updateRate) {
+    this.receiver = new UdpPacketReceiver(listenPort, updateRate);
     this.receiver.registerForIncomingPackets(this);
     this.sender = new UdpPacketSender();
     this.messageHandlerProvider = provider;

@@ -156,10 +156,10 @@ public abstract class Game implements IInitializable, ILaunchable {
     this.renderLoop.terminate();
   }
 
-  protected GameConfiguration createGameConfiguration(){
+  protected GameConfiguration createGameConfiguration() {
     return new GameConfiguration();
   }
-  
+
   /**
    * The Class RenderLoop.
    */
@@ -168,9 +168,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     /** The game is running. */
     private boolean gameIsRunning = true;
 
-    /** The next render tick. */
-    private long nextRenderTick = System.currentTimeMillis();
-
     /*
      * (non-Javadoc)
      *
@@ -178,12 +175,14 @@ public abstract class Game implements IInitializable, ILaunchable {
      */
     @Override
     public void run() {
+      final int SKIP_FRAMES = 1000 / Game.getConfiguration().CLIENT.getMaxFps();
       while (this.gameIsRunning) {
-        final int SKIP_FRAMES = 1000 / Game.getConfiguration().CLIENT.getMaxFps();
-
-        if (System.currentTimeMillis() > this.nextRenderTick) {
-          Game.getScreenManager().renderCurrentScreen();
-          this.nextRenderTick += SKIP_FRAMES;
+        Game.getScreenManager().renderCurrentScreen();
+        
+        try {
+          Thread.sleep(SKIP_FRAMES);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
       }
     }
