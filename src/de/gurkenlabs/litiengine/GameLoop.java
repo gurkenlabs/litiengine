@@ -77,7 +77,7 @@ public class GameLoop extends Thread implements IGameLoop {
       final int SKIP_TICKS = (int) (1000 / (this.getUpdateRate() * this.getTimeScale()));
 
       ++this.totalTicks;
-      this.updatables.parallelStream().forEach(updatable -> updatable.update(this));
+      this.updatables.forEach(updatable -> updatable.update(this));
 
       ++this.updateCount;
 

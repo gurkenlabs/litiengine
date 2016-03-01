@@ -80,7 +80,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     /** The Constant TimeBetweenPings. */
     private final static int TimeBetweenPings = 1000;
 
-    private boolean answered;
+    private boolean pingRecorded;
 
     /** The is terminated. */
     private boolean isTerminated;
@@ -90,12 +90,22 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
 
     private final IPacketSender sender;
 
+    private long lastPing;
+
     private PingThread(final IPacketSender sender, final String serverIpAdress, final int port) {
       this.sender = sender;
+      this.pingRecorded = true;
     }
 
     public void pingAnswerReceived() {
-      this.answered = true;
+      this.pingRecorded = true;
+
+      final long after = System.currentTimeMillis();
+      this.ping = after - this.lastPing;
+
+      for (final Consumer<Long> consumer : PingLoop.this.pingRecordConsumer) {
+        consumer.accept(this.ping);
+      }
     }
 
     /*
@@ -106,22 +116,10 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     @Override
     public void run() {
       while (!this.isTerminated) {
-        this.answered = false;
-        final long before = System.currentTimeMillis();
+        this.pingRecorded = false;
+        this.lastPing = System.currentTimeMillis();
         final MessagePackage<ClientMessage> packet = new MessagePackage<ClientMessage>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
         this.sender.sendData(packet, PingLoop.this.serverIpAdress, PingLoop.this.port);
-        while (!this.answered) {
-          if (System.currentTimeMillis() - before > TimeBetweenPings) {
-            break;
-          }
-        }
-
-        final long after = System.currentTimeMillis();
-        this.ping = after - before;
-
-        for (final Consumer<Long> consumer : PingLoop.this.pingRecordConsumer) {
-          consumer.accept(this.ping);
-        }
 
         try {
           Thread.sleep(TimeBetweenPings);
