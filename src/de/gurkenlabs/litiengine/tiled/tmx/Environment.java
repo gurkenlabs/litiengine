@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.tiled.tmx;
 
 import java.awt.Shape;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,7 +83,16 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
-    return this.getCombatEntities().stream().filter(entity -> GeometricUtilities.shapeIntersects(entity.getHitBox(), shape)).collect(Collectors.toList());
+    ArrayList<ICombatEntity> entities = new ArrayList<>();
+    for (ICombatEntity combatEntity : this.getCombatEntities()) {
+      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
+        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
+          entities.add(combatEntity);
+        }
+      }
+    }
+
+    return entities;
   }
 
   /*
