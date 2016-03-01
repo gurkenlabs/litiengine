@@ -33,7 +33,6 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static ISoundEngine soundEngine;
   private static IGameLoop gameLoop;
   private static GameMetrics metrics;
-  private static ICommandManager commandManager;
 
   private final RenderLoop renderLoop;
 
@@ -56,7 +55,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     soundEngine = new PaulsSoundEngine();
 
     metrics = new GameMetrics();
-    commandManager = new CommandManager();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -105,10 +103,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     return screenManager;
   }
 
-  public static ICommandManager getCommandManager() {
-    return commandManager;
-  }
-
   @Override
   public void init() {
     // init logging
@@ -142,7 +136,6 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void start() {
-    commandManager.start();
     gameLoop.start();
     soundEngine.start();
     this.renderLoop.start();
@@ -150,7 +143,6 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void terminate() {
-    commandManager.terminate();
     gameLoop.terminate();
     soundEngine.terminate();
     this.renderLoop.terminate();
