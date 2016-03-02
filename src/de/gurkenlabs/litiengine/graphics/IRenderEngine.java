@@ -19,6 +19,7 @@ public interface IRenderEngine {
 
   public IMapRenderer getMapRenderer(MapOrientation orientation);
 
+  public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
   public void onEntityRendered(Consumer<RenderEvent<IEntity>> entity);
 
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);

@@ -38,6 +38,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
  * The Class GraphicsEngine.
  */
 public class RenderEngine implements IRenderEngine {
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
 
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
@@ -53,6 +54,7 @@ public class RenderEngine implements IRenderEngine {
    */
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderer = new HashMap<>();
 
@@ -131,6 +133,13 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity) {
+    if (!this.entityRenderingConsumer.contains(entity)) {
+      this.entityRenderingConsumer.add(entity);
+    }
+  }
+
+  @Override
   public void onMapRendered(final Consumer<RenderEvent<IMap>> map) {
     if (!this.mapRenderedConsumer.contains(map)) {
       this.mapRenderedConsumer.add(map);
@@ -196,7 +205,11 @@ public class RenderEngine implements IRenderEngine {
     if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
       return;
     }
-
+    
+    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
+      consumer.accept(new RenderEvent<IEntity>(g, entity));
+    }
+    
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
