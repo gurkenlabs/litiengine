@@ -154,7 +154,7 @@ public abstract class Ability {
    * @return the remaining cooldown in seconds
    */
   public float getRemainingCooldownInSeconds(final IGameLoop loop) {
-    if(this.getCurrentExecution() == null){
+    if(this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()){
       return 0;
     }
     
