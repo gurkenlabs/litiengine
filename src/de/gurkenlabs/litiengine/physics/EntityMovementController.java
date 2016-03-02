@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -10,12 +11,14 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class EntityMovementController implements IUpdateable, IEntityMovementController {
+  private final List<Predicate<IEntityMovementController>> movementPredicates;
   private final List<Force> activeForces;
   private final IMovableEntity movableEntity;
   private final IPhysicsEngine engine;
 
-  public EntityMovementController(final IGameLoop gameLoop, IPhysicsEngine engine, final IMovableEntity movableEntity) {
+  public EntityMovementController(final IGameLoop gameLoop,final IPhysicsEngine engine, final IMovableEntity movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
+    this.movementPredicates = new CopyOnWriteArrayList<>();
     this.movableEntity = movableEntity;
     this.engine = engine;
     gameLoop.registerForUpdate(this);
@@ -37,7 +40,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
   public void update(final IGameLoop gameLoop) {
     this.handleForces(gameLoop);
   }
-  
+
   @Override
   public List<Force> getActiceForces() {
     return this.activeForces;
@@ -45,6 +48,23 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
 
   protected IPhysicsEngine getPhysicsEngine() {
     return this.engine;
+  }
+
+  @Override
+  public void onMovementCheck(Predicate<IEntityMovementController> predicate) {
+    if (!this.movementPredicates.contains(predicate)) {
+      this.movementPredicates.add(predicate);
+    }
+  }
+
+  protected boolean isMovementAllowed() {
+    for (Predicate<IEntityMovementController> predicate : this.movementPredicates) {
+      if (!predicate.test(this)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private void handleForces(IGameLoop gameLoop) {
@@ -56,7 +76,8 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
     });
 
     // apply all forces
-    // TODO: calculate the diff of all forces combined and only move the entity once
+    // TODO: calculate the diff of all forces combined and only move the entity
+    // once
     for (final Force force : this.activeForces) {
       if (force.cancelOnReached() && force.hasReached(this.getControlledEntity())) {
         force.end();
@@ -64,7 +85,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
       }
 
       final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY()), force.getLocation());
-      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float)angle, (gameLoop.getDeltaTime() / 1000.0F) * force.getStrength());
+      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, (gameLoop.getDeltaTime() / 1000.0F) * force.getStrength());
       if (force.cancelOnCollision() && !success) {
         force.end();
       }
