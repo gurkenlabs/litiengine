@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.entities.EntityComparator;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
@@ -35,6 +36,8 @@ public abstract class Effect implements IEffect {
 
   /** The effect targets. */
   private final EffectTarget[] effectTargets;
+
+  private EntityComparator targetPriorityComparator;
 
   /** The delay. */
   private int delay;
@@ -60,6 +63,7 @@ public abstract class Effect implements IEffect {
 
     this.environment = environment;
     this.ability = ability;
+    this.targetPriorityComparator = new EntityDistanceComparator(this.getAbility().getExecutor());
 
     this.duration = ability.getAttributes().getDuration().getCurrentValue();
     if (targets == null || targets.length == 0) {
@@ -199,6 +203,14 @@ public abstract class Effect implements IEffect {
     this.duration = duration;
   }
 
+  public EntityComparator getTargetPriorityComparator() {
+    return this.targetPriorityComparator;
+  }
+
+  public void setTargetPriorityComparator(EntityComparator targetPriorityComparator) {
+    this.targetPriorityComparator = targetPriorityComparator;
+  }
+
   protected void setActive(boolean active) {
     this.active = active;
   }
@@ -273,7 +285,7 @@ public abstract class Effect implements IEffect {
     affectedEntities.removeAll(Collections.singleton(null));
 
     if (!this.getAbility().isMultiTarget() && affectedEntities.size() > 0) {
-      affectedEntities.sort(new EntityDistanceComparator(this.getAbility().getExecutor()));
+      affectedEntities.sort(this.targetPriorityComparator);
       final ICombatEntity target;
       if (this.getAbility().getExecutor().getTarget() != null) {
         target = this.getAbility().getExecutor().getTarget();
