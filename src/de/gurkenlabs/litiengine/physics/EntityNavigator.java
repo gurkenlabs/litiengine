@@ -116,4 +116,9 @@ public class EntityNavigator implements IEntityNavigator {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
     this.entity.setAngle((float) angle);
   }
+
+  @Override
+  public boolean isNavigating() {
+    return this.path != null;
+  }
 }

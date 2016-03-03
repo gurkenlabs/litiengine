@@ -3,6 +3,10 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.entities;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -14,6 +18,7 @@ import de.gurkenlabs.litiengine.attributes.RangeAttribute;
  * The Class Attributes.
  */
 public class CombatAttributes {
+  private final List<Consumer<CombatAttributes>> levelUpConsumer;
   private final CombatAttributesInfo info;
   /** The attack speed. */
   private final Attribute<Float> attackSpeed;
@@ -46,6 +51,7 @@ public class CombatAttributes {
    *          the info
    */
   public CombatAttributes(final CombatAttributesInfo info) {
+    this.levelUpConsumer = new CopyOnWriteArrayList<>();
     this.info = info;
 
     // init range attributes
@@ -168,5 +174,15 @@ public class CombatAttributes {
     this.getLevel().modifyBaseValue(new AttributeModifier<>(Modification.Add, 1));
     this.getExperience().modifyBaseValue(new AttributeModifier<>(Modification.Set, 0));
     this.updateAttributes();
+
+    for (Consumer<CombatAttributes> consumer : this.levelUpConsumer) {
+      consumer.accept(this);
+    }
+  }
+
+  public void onLevelUp(Consumer<CombatAttributes> consumer) {
+    if (!this.levelUpConsumer.contains(consumer)) {
+      this.levelUpConsumer.add(consumer);
+    }
   }
 }

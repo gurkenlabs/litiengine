@@ -24,4 +24,6 @@ public interface IEntityNavigator extends IUpdateable {
   public void stop();
 
   public void rotateTowards(Point2D target);
+  
+  public boolean isNavigating();
 }
