@@ -5,6 +5,9 @@ package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -20,6 +23,7 @@ public class EntityNavigator implements IEntityNavigator {
   /** The Constant ACCEPTABLE_ERROR. */
   private static final float ACCEPTABLE_ERROR = 0.3f;
 
+  private final List<Predicate<IMovableEntity>> cancelNavigationConditions;
   private final IMovableEntity entity;
   private final IPathFinder pathFinder;
 
@@ -33,6 +37,7 @@ public class EntityNavigator implements IEntityNavigator {
    * Instantiates a new entity navigator.
    */
   public EntityNavigator(final IMovableEntity entity, final IPathFinder pathFinder) {
+    this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
     this.entity = entity;
     this.pathFinder = pathFinder;
     Game.getLoop().registerForUpdate(this);
@@ -60,6 +65,7 @@ public class EntityNavigator implements IEntityNavigator {
 
   @Override
   public void stop() {
+    this.currentSegment = 0;
     this.path = null;
   }
 
@@ -74,11 +80,17 @@ public class EntityNavigator implements IEntityNavigator {
       return;
     }
 
+    for (Predicate<IMovableEntity> pred : this.cancelNavigationConditions) {
+      if (pred.test(this.getEntity())) {
+        this.stop();
+        return;
+      }
+    }
+
     final int currentSegment = this.currentSegment;
     final PathIterator pi = this.path.getPath().getPathIterator(null);
     if (pi.isDone()) {
-      this.currentSegment = 0;
-      this.path = null;
+      this.stop();
       return;
     }
 
@@ -93,8 +105,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     if (pi.isDone()) {
-      this.currentSegment = 0;
-      this.path = null;
+      this.stop();
       return;
     }
 
@@ -120,5 +131,12 @@ public class EntityNavigator implements IEntityNavigator {
   @Override
   public boolean isNavigating() {
     return this.path != null;
+  }
+
+  @Override
+  public void cancelNavigation(final Predicate<IMovableEntity> predicate) {
+    if (!this.cancelNavigationConditions.contains(predicate)) {
+      this.cancelNavigationConditions.add(predicate);
+    }
   }
 }

@@ -4,6 +4,8 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -26,4 +28,6 @@ public interface IEntityNavigator extends IUpdateable {
   public void rotateTowards(Point2D target);
   
   public boolean isNavigating();
+  
+  public void cancelNavigation(Predicate<IMovableEntity> predicate);
 }
