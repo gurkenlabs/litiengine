@@ -15,6 +15,8 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.SwingUtilities;
+
 import de.gurkenlabs.litiengine.Game;
 
 /**
@@ -40,6 +42,10 @@ public class Mouse implements IMouse {
 
   /** The pressed. */
   private boolean pressed;
+  
+  private boolean isLeftMouseButtonDown;
+  private boolean isRightMouseButtonDown;
+  
   /** The grab mouse. */
   private boolean grabMouse;
 
@@ -165,6 +171,14 @@ public class Mouse implements IMouse {
     this.setLocation(e.getPoint());
     this.setPressed(true);
     this.mouseListeners.forEach(listener -> listener.mousePressed(this.createEvent(e)));
+    
+    if(SwingUtilities.isLeftMouseButton(e)){
+      this.isLeftMouseButtonDown = true;
+    }
+    
+    if(SwingUtilities.isRightMouseButton(e)){
+      this.isRightMouseButtonDown = true;
+    }
   }
 
   /*
@@ -177,6 +191,14 @@ public class Mouse implements IMouse {
     this.setLocation(e.getPoint());
     this.setPressed(false);
     this.mouseListeners.forEach(listener -> listener.mouseReleased(this.createEvent(e)));
+    
+    if(SwingUtilities.isLeftMouseButton(e)){
+      this.isLeftMouseButtonDown = false;
+    }
+    
+    if(SwingUtilities.isRightMouseButton(e)){
+      this.isRightMouseButtonDown = false;
+    }
   }
 
   /*
@@ -351,5 +373,13 @@ public class Mouse implements IMouse {
   private MouseEvent createEvent(MouseEvent original) {
     MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(), original.getButton());
     return event;
+  }
+
+  public boolean isLeftMouseButtonDown() {
+    return this.isLeftMouseButtonDown;
+  }
+
+  public boolean isRightMouseButtonDown() {
+    return this.isRightMouseButtonDown;
   }
 }

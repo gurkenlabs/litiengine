@@ -30,6 +30,10 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    */
   public boolean isPressed();
 
+  public boolean isLeftMouseButtonDown();
+
+  public boolean isRightMouseButtonDown();
+
   /**
    * Register mouse listener.
    *
