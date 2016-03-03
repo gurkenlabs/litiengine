@@ -28,6 +28,8 @@ public interface ICombatEntity extends ICollisionEntity {
   public boolean isIndestructible();
 
   public void onDeath(Consumer<ICombatEntity> consumer);
+  
+  public void onResurrect(Consumer<ICombatEntity> consumer);
 
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 

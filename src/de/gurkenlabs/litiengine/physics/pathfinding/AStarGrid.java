@@ -3,34 +3,39 @@ package de.gurkenlabs.litiengine.physics.pathfinding;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.tiled.tmx.IMap;
 
 public class AStarGrid {
-  private boolean allowDiagonalMovementOnCorners;
+  private final IPhysicsEngine physicsEngine;
   private final Dimension size;
   private final int nodeSize;
   private final AStarNode[][] grid;
 
+  private boolean allowDiagonalMovementOnCorners;
+
   public AStarGrid(final IPhysicsEngine physicsEngine, final IMap map, final int nodeSize) {
+    this.physicsEngine = physicsEngine;
     this.size = map.getSizeInPixles();
     this.nodeSize = nodeSize;
     int gridSizeX = this.size.width / nodeSize;
     int gridSizeY = this.size.height / nodeSize;
     this.grid = new AStarNode[gridSizeX][gridSizeY];
-    this.populateGrid(physicsEngine, gridSizeX, gridSizeY);
+    this.populateGrid(gridSizeX, gridSizeY);
   }
 
-  private void populateGrid(final IPhysicsEngine physicsEngine, final int gridSizeX, final int gridSizeY) {
+  private void populateGrid(final int gridSizeX, final int gridSizeY) {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
         Rectangle nodeBounds = new Rectangle(x * nodeSize, y * nodeSize, nodeSize, nodeSize);
 
         // TODO: add terrain dependent penalty
-        this.getGrid()[x][y] = new AStarNode(!physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
+        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
       }
     }
   }
@@ -104,6 +109,39 @@ public class AStarGrid {
     int x = (int) ((this.getGrid().length - 1) * percentX);
     int y = (int) ((this.getGrid()[0].length) * percentY);
     return this.getGrid()[x][y];
+  }
+
+  /**
+   * Updates the walkable attribute of nodes intersected by the specified
+   * rectangle.
+   * 
+   * @param rectangle
+   */
+  public void updateWalkable(Rectangle2D rectangle) {
+    for (AStarNode node : this.getIntersectedNodes(rectangle)) {
+      node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
+    }
+  }
+
+  public List<AStarNode> getIntersectedNodes(Rectangle2D rectangle) {
+    final Point2D start = new Point2D.Double(rectangle.getMinX(), rectangle.getMinY());
+    final Point2D end = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
+
+    final AStarNode startNode = this.getNodeFromMapLocation(start);
+    final AStarNode endNode = this.getNodeFromMapLocation(end);
+
+    List<AStarNode> nodes = new ArrayList<>();
+    if (startNode == null || endNode == null) {
+      return nodes;
+    }
+
+    for (int x = startNode.getGridX(); x <= endNode.getGridX(); x++) {
+      for (int y = startNode.getGridY(); y <= endNode.getGridY(); y++) {
+        nodes.add(this.getGrid()[x][y]);
+      }
+    }
+
+    return nodes;
   }
 
   public int getNodeSize() {

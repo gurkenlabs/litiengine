@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.util.List;
 
 /**
  * The Class Path.
@@ -17,6 +18,8 @@ public class Path {
   private final Point2D start;
   /** The target. */
   private final Point2D target;
+  
+  private final List<Point2D> points;
 
   /**
    * Instantiates a new path.
@@ -28,10 +31,11 @@ public class Path {
    * @param path
    *          the path
    */
-  public Path(final Point2D start, final Point2D target, final Path2D path) {
+  public Path(final Point2D start, final Point2D target, final Path2D path, final List<Point2D> points) {
     this.start = start;
     this.target = target;
     this.path = path;
+    this.points = points;
   }
 
   /**
@@ -54,5 +58,9 @@ public class Path {
    */
   public Point2D getTarget() {
     return this.target;
+  }
+
+  public List<Point2D> getPoints() {
+    return this.points;
   }
 }

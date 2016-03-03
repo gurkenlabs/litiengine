@@ -20,8 +20,6 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
-import de.gurkenlabs.util.console.CommandManager;
-import de.gurkenlabs.util.console.ICommandManager;
 
 public abstract class Game implements IInitializable, ILaunchable {
   private static GameInfo info;

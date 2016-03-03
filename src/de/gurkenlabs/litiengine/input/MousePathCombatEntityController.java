@@ -31,6 +31,7 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
   public void mouseClicked(final MouseEvent e) {
     if (SwingUtilities.isLeftMouseButton(e)) {
       this.getNavigator().rotateTowards(Input.MOUSE.getMapLocation());
+      this.navigator.stop();
     }
   }
 
@@ -46,6 +47,11 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
   public void mousePressed(final MouseEvent e) {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.navigating = true;
+    }
+    
+    if (SwingUtilities.isLeftMouseButton(e)) {
+      this.getNavigator().rotateTowards(Input.MOUSE.getMapLocation());
+      this.navigator.stop();
     }
   }
 

@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 @CollisionInfo(collision = true)
 public abstract class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
+  private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
 
   /** The attributes. */
@@ -39,6 +40,7 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   public CombatEntity() {
     super();
     this.entityDeathConsumer = new CopyOnWriteArrayList<>();
+    this.entityResurrectConsumer = new CopyOnWriteArrayList<>();
     this.entityHitConsumer = new CopyOnWriteArrayList<>();
 
     final CombatAttributesInfo info = this.getClass().getAnnotation(CombatAttributesInfo.class);
@@ -158,6 +160,15 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   }
 
   @Override
+  public void onResurrect(Consumer<ICombatEntity> consumer) {
+    if (this.entityResurrectConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.entityResurrectConsumer.add(consumer);
+  }
+
+  @Override
   public void onHit(final Consumer<CombatEntityHitArgument> consumer) {
     if (this.entityHitConsumer.contains(consumer)) {
       return;
@@ -171,6 +182,10 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
    */
   public void resurrect() {
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, this.getAttributes().getHealth().getMaxValue()));
+    for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
+      consumer.accept(this);
+    }
+    
     this.setCollision(true);
   }
 

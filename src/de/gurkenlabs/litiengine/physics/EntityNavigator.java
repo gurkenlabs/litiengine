@@ -62,7 +62,7 @@ public class EntityNavigator implements IEntityNavigator {
   public void stop() {
     this.path = null;
   }
-  
+
   /*
    * (non-Javadoc)
    *
@@ -81,9 +81,12 @@ public class EntityNavigator implements IEntityNavigator {
       this.path = null;
       return;
     }
-    
-    final double[] startCoordinates = new double[6];
-    final double[] coordinates = new double[6];
+
+    // although at max 6 elements are returned, sometimes the path
+    // implementation tries to access index 20 ... don't know why, but this
+    // prevents it
+    final double[] startCoordinates = new double[21];
+    final double[] coordinates = new double[21];
     for (int i = 0; i <= currentSegment; i++) {
       pi.currentSegment(startCoordinates);
       pi.next();
@@ -105,7 +108,7 @@ public class EntityNavigator implements IEntityNavigator {
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = loop.getDeltaTime() / 1000.0F * this.entity.getVelocity();
-    Game.getPhysicsEngine().move(this.entity, (float)angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+    Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 
   @Override

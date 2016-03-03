@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.physics.pathfinding;
 
+import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -55,8 +56,7 @@ public class AStarPathFinder extends PathFinder {
 
       // find node with lowest cost
       for (int i = 1; i < opened.size(); i++) {
-        if (opened.get(i).getfCost() < currentNode.getfCost()
-            || (opened.get(i).getfCost() == currentNode.getfCost() && opened.get(i).gethCost() < currentNode.gethCost())) {
+        if (opened.get(i).getfCost() < currentNode.getfCost() || (opened.get(i).getfCost() == currentNode.getfCost() && opened.get(i).gethCost() < currentNode.gethCost())) {
           currentNode = opened.get(i);
         }
       }
@@ -113,25 +113,34 @@ public class AStarPathFinder extends PathFinder {
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(startNode.getLocation().x, startNode.getLocation().y);
 
+    final List<Point2D> pointsOfPath = new ArrayList<>();
     for (int i = 0; i < path.size(); i++) {
       AStarNode current = path.get(i);
-      path2D.lineTo(current.getLocation().x, current.getLocation().y);
+      Point currentPoint = new Point(current.getLocation().x, current.getLocation().y);
+      pointsOfPath.add(currentPoint);
+      path2D.lineTo(currentPoint.x, currentPoint.y);
     }
 
     path2D.lineTo(targetNode.getLocation().x, targetNode.getLocation().y);
 
-    return new Path(startNode.getLocation(), targetNode.getLocation(), path2D);
+    return new Path(startNode.getLocation(), targetNode.getLocation(), path2D, pointsOfPath);
   }
 
+  /**
+   * TODO: Improve this optimization.
+   * @param path
+   * @return
+   */
   private static List<AStarNode> optimizePath(final List<AStarNode> path) {
     List<AStarNode> optPath = new ArrayList<>();
     double oldAngle = 0;
     for (int i = 1; i < path.size(); i++) {
+
       double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
       if (angle != oldAngle) {
         optPath.add(path.get(i));
       }
-
+      
       oldAngle = angle;
     }
     return optPath;

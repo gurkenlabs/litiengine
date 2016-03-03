@@ -5,6 +5,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,7 +19,11 @@ public abstract class PathFinder implements IPathFinder {
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(start.getX(), start.getY());
     path2D.lineTo(target.getX(), target.getY());
-    return new Path(start, target, path2D);
+
+    List<Point2D> points = new ArrayList<Point2D>();
+    points.add(start);
+    points.add(target);
+    return new Path(start, target, path2D, points);
   }
 
   /*

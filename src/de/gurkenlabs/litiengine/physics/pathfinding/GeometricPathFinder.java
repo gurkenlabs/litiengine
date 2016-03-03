@@ -85,7 +85,7 @@ public class GeometricPathFinder extends PathFinder {
       pointsOfPath.add(target);
     }
 
-    return new Path(start, target, path);
+    return new Path(start, target, path, pointsOfPath);
   }
 
   private Point2D getNextPoint(final IMovableEntity entity, final Point2D currentPoint, final Point2D target) {
