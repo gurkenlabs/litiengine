@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.tiled.tmx;
 
 import java.awt.Shape;
 import java.util.Collection;
+import java.util.List;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -29,7 +30,7 @@ public interface IEnvironment extends IInitializable {
 
   public ICombatEntity getCombatEntity(final int mapId);
 
-  public Collection<ICombatEntity> findCombatEntities(Shape shape);
+  public List<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
    * Gets the map.

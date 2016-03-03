@@ -29,10 +29,6 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (SwingUtilities.isLeftMouseButton(e)) {
-      this.getNavigator().rotateTowards(Input.MOUSE.getMapLocation());
-      this.navigator.stop();
-    }
   }
 
   @Override
@@ -48,11 +44,6 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
     if (SwingUtilities.isRightMouseButton(e)) {
       this.navigating = true;
     }
-    
-    if (SwingUtilities.isLeftMouseButton(e)) {
-      this.getNavigator().rotateTowards(Input.MOUSE.getMapLocation());
-      this.navigator.stop();
-    }
   }
 
   @Override
@@ -65,7 +56,6 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
   @Override
   public void update(final IGameLoop gameLoop) {
     super.update(gameLoop);
-
     // can only walk if no forces are active
     if (!this.isMovementAllowed() || this.getActiceForces().size() > 0) {
       this.navigator.stop();
