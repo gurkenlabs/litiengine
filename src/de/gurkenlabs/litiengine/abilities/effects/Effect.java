@@ -268,7 +268,7 @@ public abstract class Effect implements IEffect {
       switch (target) {
       case EXECUTINGENTITY:
         affectedEntities.add(this.getAbility().getExecutor());
-        break;
+        return affectedEntities;
       case ENEMY:
         affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
