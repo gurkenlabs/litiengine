@@ -43,7 +43,7 @@ public abstract class Ability {
   private final boolean multiTarget;
 
   private final CastType castType;
-
+  
   /**
    * Instantiates a new ability.
    *
