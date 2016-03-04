@@ -101,7 +101,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
    */
   @Override
   public void setLocation(final Point2D position) {
-    if (position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {
+    if (this.isDead() || position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {
       return;
     }
 

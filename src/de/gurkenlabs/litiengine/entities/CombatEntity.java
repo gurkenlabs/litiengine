@@ -99,9 +99,19 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   }
 
   @Override
-  public boolean hit(final int damage) {
+  public boolean hit(int damage) {
     if (this.isIndestructible() || this.isDead()) {
       return false;
+    }
+
+    if (this.getAttributes().getShield().getCurrentValue() > 0) {
+      int shieldDmg = damage;
+      if (shieldDmg > this.getAttributes().getShield().getCurrentValue()) {
+        shieldDmg = this.getAttributes().getShield().getCurrentValue();
+      }
+      
+      this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, shieldDmg));
+      damage = damage - shieldDmg;
     }
 
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
@@ -185,7 +195,7 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
     for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
       consumer.accept(this);
     }
-    
+
     this.setCollision(true);
   }
 
