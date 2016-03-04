@@ -109,11 +109,11 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
       if (shieldDmg > this.getAttributes().getShield().getCurrentValue()) {
         shieldDmg = this.getAttributes().getShield().getCurrentValue();
       }
-      
+
       this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, shieldDmg));
       damage = damage - shieldDmg;
     }
-
+    
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
 
     if (this.isDead()) {
