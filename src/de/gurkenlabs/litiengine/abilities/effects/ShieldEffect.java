@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.Attribute;
+import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
@@ -31,5 +32,16 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
   @Override
   protected Attribute<Short> getAttribute(final ICombatEntity entity) {
     return entity.getAttributes().getShield();
+  }
+
+  @Override
+  protected void apply(final ICombatEntity affectedEntity) {
+    this.getAttribute(affectedEntity).modifyBaseValue(this.getModifier());
+  }
+
+  @Override
+  protected void cease(final ICombatEntity affectedEntity) {
+    AttributeModifier<Short> revert = new AttributeModifier<>(this.getModifier().getModification(), -this.getModifier().getModifyValue());
+    this.getAttribute(affectedEntity).modifyBaseValue(revert);
   }
 }

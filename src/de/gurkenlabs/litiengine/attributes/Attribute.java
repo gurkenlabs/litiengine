@@ -112,7 +112,7 @@ public class Attribute<T extends Number> {
    *
    * @return the modifiers
    */
-  protected List<AttributeModifier<T>> getModifiers() {
+  public List<AttributeModifier<T>> getModifiers() {
     return this.modifiers;
   }
 
