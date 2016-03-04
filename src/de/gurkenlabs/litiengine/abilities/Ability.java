@@ -42,6 +42,8 @@ public abstract class Ability {
   /** The multi target. */
   private final boolean multiTarget;
 
+  private final CastType castType;
+
   /**
    * Instantiates a new ability.
    *
@@ -58,6 +60,7 @@ public abstract class Ability {
     this.name = info.name();
     this.multiTarget = info.multiTarget();
     this.description = info.description();
+    this.castType = info.castType();
   }
 
   public void addEffect(final IEffect effect) {
@@ -70,15 +73,19 @@ public abstract class Ability {
    * @return the shape
    */
   public Shape calculateImpactArea() {
+    return this.internalCalculateImpactArea(this.getExecutor().getAngle());
+  }
+
+  protected Shape internalCalculateImpactArea(float angle) {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
-    final double start = this.getExecutor().getAngle() - impactAngle / 2 - 90;
+    final double start = angle - impactAngle / 2 - 90;
 
     return new Arc2D.Double(arcX, arcY, impact, impact, start, impactAngle, Arc2D.PIE);
   }
-  
+
   public Shape calculatePotentialImpactRange() {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
@@ -164,10 +171,10 @@ public abstract class Ability {
    * @return the remaining cooldown in seconds
    */
   public float getRemainingCooldownInSeconds(final IGameLoop loop) {
-    if(this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()){
+    if (this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()) {
       return 0;
     }
-    
+
     // calculate cooldown in seconds
     return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) / 1000.0 : 0);
   }
@@ -199,6 +206,10 @@ public abstract class Ability {
       // registers to all effects and their follow up effects recursively
       this.onEffectCeased(effect, consumer);
     }
+  }
+
+  public CastType getCastType() {
+    return this.castType;
   }
 
   private void onEffectApplied(final IEffect effect, final Consumer<EffectArgument> consumer) {
