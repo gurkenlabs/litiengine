@@ -21,7 +21,7 @@ public interface IEnvironment extends IInitializable {
   public void addCombatEntity(final int mapId, final ICombatEntity entity);
 
   public void addMovableEntity(final int mapId, final IMovableEntity entity);
-  
+
   public void remove(final int mapId);
 
   public void add(final int mapId, final IMovableCombatEntity entity);
@@ -42,6 +42,12 @@ public interface IEnvironment extends IInitializable {
   public Collection<IMovableEntity> getMovableEntities();
 
   public IMovableEntity getMovableEntity(final int mapId);
-  
+
+  /**
+   * Gets the next unique local map id. 
+   * (All local map ids are negative).
+   */
   public int getLocalMapId();
+  
+  public int getMapId();
 }

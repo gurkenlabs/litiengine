@@ -18,13 +18,15 @@ import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
+import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-  private static int tmpId = 0;
+  private static int localIdSequence = 0;
+  private static int mapIdSequence;
   /** The map. */
   private final IMap map;
 
@@ -41,7 +43,8 @@ public class Environment implements IEnvironment {
   public Environment(final String mapPath) {
     final IMapLoader tmxLoader = new TmxMapLoader();
     this.map = tmxLoader.LoadMap(mapPath);
-
+    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
+    
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
   }
@@ -140,7 +143,7 @@ public class Environment implements IEnvironment {
    */
   @Override
   public int getLocalMapId() {
-    return --tmpId;
+    return --localIdSequence;
   }
 
   @Override
@@ -152,5 +155,10 @@ public class Environment implements IEnvironment {
     if (this.combatEntities.containsKey(mapId)) {
       this.combatEntities.remove(mapId);
     }
+  }
+
+  @Override
+  public int getMapId() {
+    return ++mapIdSequence;
   }
 }
