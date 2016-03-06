@@ -12,6 +12,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
@@ -37,6 +38,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer;
+
+  private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
+
+  private final List<Consumer<ComponentMouseEvent>> mouseLeaveConsumer;
 
   /** The components. */
   private final List<GuiComponent> components;
@@ -73,7 +78,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   protected GuiComponent(final int x, final int y) {
     this.components = new ArrayList<>();
-    this.clickConsumer = new ArrayList<Consumer<ComponentMouseEvent>>();
+    this.clickConsumer = new CopyOnWriteArrayList<>();
+    this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
+    this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
     this.setBackGroundColor(DEFAULT_BG_COLOR);
@@ -128,8 +135,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the click consumer
    */
-  public List<Consumer<ComponentMouseEvent>> getClickConsumer() {
+  protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
     return this.clickConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
+    return this.mouseEnterConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
+    return this.mouseLeaveConsumer;
   }
 
   /**
@@ -288,6 +303,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
 
     this.isHovered = true;
+    this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /*
@@ -299,6 +315,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void mouseExited(final MouseEvent e) {
     this.isHovered = false;
     this.isPressed = false;
+    this.getMouseLeaveConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /*
@@ -309,7 +326,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if (!this.mouseEventShouldBeForwarded(e)) {
+    if (!this.mouseEventShouldBeForwarded(e) && this.isHovered()) {
       this.mouseExited(e);
       return;
     }
@@ -356,7 +373,21 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the callback
    */
   public void onClicked(final Consumer<ComponentMouseEvent> callback) {
-    this.getClickConsumer().add(callback);
+    if (!this.getClickConsumer().contains(callback)) {
+      this.getClickConsumer().add(callback);
+    }
+  }
+
+  public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMouseEnterConsumer().contains(callback)) {
+      this.getMouseEnterConsumer().add(callback);
+    }
+  }
+
+  public void onMouseLeave(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMouseLeaveConsumer().contains(callback)) {
+      this.getMouseLeaveConsumer().add(callback);
+    }
   }
 
   /**

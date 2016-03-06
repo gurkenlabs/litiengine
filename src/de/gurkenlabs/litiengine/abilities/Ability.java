@@ -5,6 +5,8 @@ package de.gurkenlabs.litiengine.abilities;
 
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -14,6 +16,7 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class Ability.
@@ -43,7 +46,7 @@ public abstract class Ability {
   private final boolean multiTarget;
 
   private final CastType castType;
-  
+
   /**
    * Instantiates a new ability.
    *
@@ -81,19 +84,23 @@ public abstract class Ability {
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
-    final double start = angle - impactAngle / 2 - 90;
 
-    return new Arc2D.Double(arcX, arcY, impact, impact, start, impactAngle, Arc2D.PIE);
+    // project
+    Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, (this.getAttributes().getRange().getCurrentValue() / 2) - impact / 2);
+    final double start = angle - impactAngle / 2 - 90;
+    if (impactAngle % 360 == 0) {
+      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
+    }
+    
+    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
-  public Shape calculatePotentialImpactRange() {
-    final int impact = this.getAttributes().getImpact().getCurrentValue();
-    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
-    final double start = this.getExecutor().getAngle() - impactAngle / 2 - 90;
+  public Ellipse2D calculateRangeArea() {
+    final int range = this.getAttributes().getRange().getCurrentValue();
+    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range / 2;
+    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range / 2;
 
-    return new Arc2D.Double(arcX, arcY, impact, impact, start, 360, Arc2D.PIE);
+    return new Ellipse2D.Double(arcX, arcY, range, range);
   }
 
   /**

@@ -4,7 +4,6 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.Point2D;
-import java.util.List;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IUpdateable;
