@@ -40,6 +40,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   /** The Render canvas. */
   private final Canvas renderCanvas;
+  
+  private BufferStrategy bufferStrategy; 
 
   /** The camera. */
   private ICamera camera;
@@ -153,6 +155,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
 
     this.setVisible(true);
+    this.renderCanvas.createBufferStrategy(2);
+    this.bufferStrategy = this.renderCanvas.getBufferStrategy();
     this.requestFocus();
   }
 
@@ -187,24 +191,20 @@ public class ScreenManager extends JFrame implements IScreenManager {
       return;
     }
 
-    final long currentMillis = System.currentTimeMillis();
-    final BufferStrategy bs = this.renderCanvas.getBufferStrategy();
-    if (bs == null) {
-      this.renderCanvas.createBufferStrategy(3);
-      return;
-    }
 
-    final Graphics g = bs.getDrawGraphics();
+    final long currentMillis = System.currentTimeMillis();
+    final Graphics g = this.bufferStrategy.getDrawGraphics();
 
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
     this.getCamera().updateFocus();
+
     this.getCurrentScreen().render(g);
     RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
     g.dispose();
-    bs.show();
-
+    this.bufferStrategy.show();
+    Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
 
     if (currentMillis - this.lastFpsTime >= 1000) {
@@ -212,6 +212,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
       this.frameCount = 0;
     }
+
   }
 
   @Override

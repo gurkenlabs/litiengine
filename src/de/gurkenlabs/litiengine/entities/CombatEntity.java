@@ -232,7 +232,6 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
 
   @Override
   public ICombatEntity getTarget() {
-    // TODO Auto-generated method stub
     return this.target;
   }
 

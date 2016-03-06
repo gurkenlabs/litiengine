@@ -74,8 +74,9 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void run() {
     while (this.gameIsRunning) {
-      final int SKIP_TICKS = (int) (1000 / (this.getUpdateRate() * this.getTimeScale()));
-
+      long TICK_WAIT = (long) (1.0 / (this.getUpdateRate() * this.getTimeScale()) * 1000);
+      
+      long updateStart = System.nanoTime();
       ++this.totalTicks;
       this.updatables.forEach(updatable -> updatable.update(this));
 
@@ -90,10 +91,12 @@ public class GameLoop extends Thread implements IGameLoop {
 
       this.lastUpdateTime = currentMillis;
 
+      long updateTime = (System.nanoTime() - updateStart) / 1000000;
       try {
-        Thread.sleep(SKIP_TICKS);
+        Thread.sleep(Math.max(0, TICK_WAIT - updateTime));
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        Thread.interrupted();
+        break;
       }
     }
   }

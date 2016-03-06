@@ -165,14 +165,17 @@ public abstract class Game implements IInitializable, ILaunchable {
      */
     @Override
     public void run() {
-      final int SKIP_FRAMES = 1000 / Game.getConfiguration().CLIENT.getMaxFps();
+      long FPS_WAIT = (long) (1.0 / Game.getConfiguration().CLIENT.getMaxFps() * 1000);
       while (this.gameIsRunning) {
+        long renderStart = System.nanoTime();
         Game.getScreenManager().renderCurrentScreen();
-        
+
+        long renderTime = (System.nanoTime() - renderStart) / 1000000;
         try {
-          Thread.sleep(SKIP_FRAMES);
+          Thread.sleep(Math.max(0, FPS_WAIT - renderTime));
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          Thread.interrupted();
+          break;
         }
       }
     }

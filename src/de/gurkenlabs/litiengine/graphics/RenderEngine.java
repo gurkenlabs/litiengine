@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -106,6 +107,21 @@ public class RenderEngine implements IRenderEngine {
 
     ((Graphics2D) g).drawImage(image, t, null);
   }
+  
+  public static void drawShape(final Graphics g, final Shape shape){
+    Graphics2D g2 = (Graphics2D)g;
+    g2.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    g2.draw(shape); 
+    g2.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+  }
+  
+  public static void fillShape(final Graphics g, final Shape shape){
+    Graphics2D g2 = (Graphics2D)g;
+    g2.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    g2.fill(shape);
+    
+    g2.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+  }
 
   public static BufferedImage createCompatibleImage(int width, int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -167,7 +183,7 @@ public class RenderEngine implements IRenderEngine {
   public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
-    Collections.sort(entities, new EntityYComparator());
+    // Collections.sort(entities, new EntityYComparator());
 
     for (final IEntity entity : entities) {
       this.renderEntity(g, entity);
