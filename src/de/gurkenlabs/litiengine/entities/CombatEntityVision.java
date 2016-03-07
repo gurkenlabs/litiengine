@@ -40,6 +40,8 @@ public class CombatEntityVision implements IVision {
   /** The vision radius. */
   private final int visionRadius;
 
+  private Area renderVisionShape;
+
   /**
    * Instantiates a new liti vision.
    *
@@ -97,15 +99,12 @@ public class CombatEntityVision implements IVision {
    * @see de.gurkenlabs.liti.graphics.IVision#getRenderVisionShape()
    */
   @Override
-  public Shape getRenderVisionShape() {
-    final Area renderVisionShape = new Area(this.getRenderVisionCircle(this.combatEntity));
-    for (final ICombatEntity entity : this.environment.getCombatEntities()) {
-      if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
-        renderVisionShape.add(new Area(this.getRenderVisionCircle(entity)));
-      }
+  public Area getRenderVisionShape() {
+    if (this.renderVisionShape == null) {
+      this.updateVisionShape();
     }
 
-    return renderVisionShape;
+    return this.renderVisionShape;
   }
 
   /*
@@ -138,7 +137,7 @@ public class CombatEntityVision implements IVision {
 
     final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
     final Area rectangleArea = new Area(rect);
-    rectangleArea.subtract(new Area(this.getRenderVisionShape()));
+    rectangleArea.subtract(this.getRenderVisionShape());
 
     /*
      * Maybe we will add a more sophisticated vision algorithm in the future
@@ -191,5 +190,17 @@ public class CombatEntityVision implements IVision {
    */
   private Ellipse2D getMapVisionCircle(final ICombatEntity entity) {
     return new Ellipse2D.Double(entity.getDimensionCenter().getX() - this.visionRadius, entity.getDimensionCenter().getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
+  }
+
+  @Override
+  public void updateVisionShape() {
+    final Area renderVisionShape = new Area(this.getRenderVisionCircle(this.combatEntity));
+    for (final ICombatEntity entity : this.environment.getCombatEntities()) {
+      if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
+        renderVisionShape.add(new Area(this.getRenderVisionCircle(entity)));
+      }
+    }
+
+    this.renderVisionShape = renderVisionShape;
   }
 }

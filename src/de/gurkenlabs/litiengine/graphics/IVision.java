@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics;
 import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -39,8 +40,10 @@ public interface IVision {
    *
    * @return the render vision shape
    */
-  public Shape getRenderVisionShape();
-
+  public Area getRenderVisionShape();
+  
+  public void updateVisionShape();
+  
   /**
    * Intersects.
    *

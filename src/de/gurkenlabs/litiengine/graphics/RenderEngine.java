@@ -183,7 +183,10 @@ public class RenderEngine implements IRenderEngine {
   public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
-    // Collections.sort(entities, new EntityYComparator());
+    
+    // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A BETTER DATASTRUCTURE FOR THE (HEAP)
+    // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
+    Collections.sort(entities, new EntityYComparator());
 
     for (final IEntity entity : entities) {
       this.renderEntity(g, entity);
@@ -198,6 +201,7 @@ public class RenderEngine implements IRenderEngine {
     if (vision != null) {
       g.setClip(vision.getRenderVisionShape());
     }
+    
     this.renderEntities(g, entities);
 
     g.setClip(oldClip);
