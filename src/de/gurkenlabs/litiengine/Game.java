@@ -11,6 +11,7 @@ import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.entities.ai.EntityManager;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
@@ -31,6 +32,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static ISoundEngine soundEngine;
   private static IGameLoop gameLoop;
   private static GameMetrics metrics;
+  private static EntityManager entityManager;
 
   private final RenderLoop renderLoop;
 
@@ -53,6 +55,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     soundEngine = new PaulsSoundEngine();
 
     metrics = new GameMetrics();
+    entityManager = new EntityManager();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -148,6 +151,10 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   protected GameConfiguration createGameConfiguration() {
     return new GameConfiguration();
+  }
+
+  public static EntityManager getEntityManager() {
+    return entityManager;
   }
 
   /**
