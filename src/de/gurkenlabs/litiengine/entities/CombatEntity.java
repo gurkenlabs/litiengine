@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
  */
 @CombatAttributesInfo
 @CollisionInfo(collision = true)
-public abstract class CombatEntity extends CollisionEntity implements ICombatEntity {
+public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
   private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
@@ -239,5 +239,10 @@ public abstract class CombatEntity extends CollisionEntity implements ICombatEnt
   public void setTarget(ICombatEntity target) {
     this.target = target;
 
+  }
+
+  @Override
+  public boolean isNeutral() {
+    return this.getTeam() == 0;
   }
 }

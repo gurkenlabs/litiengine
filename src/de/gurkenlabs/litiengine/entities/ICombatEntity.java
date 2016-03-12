@@ -24,6 +24,8 @@ public interface ICombatEntity extends ICollisionEntity {
   public boolean isDead();
 
   public boolean isFriendly(final ICombatEntity entity);
+  
+  public boolean isNeutral();
 
   public boolean isIndestructible();
 
