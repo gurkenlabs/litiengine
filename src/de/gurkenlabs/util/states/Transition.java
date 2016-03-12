@@ -1,24 +1,19 @@
 package de.gurkenlabs.util.states;
 
+import de.gurkenlabs.litiengine.IGameLoop;
+
 public abstract class Transition implements ITransition {
-  private final IState state;
   private final int priority;
 
-  protected Transition(final IState state, final int priority) {
-    this.state = state;
+  protected Transition(final int priority) {
     this.priority = priority;
   }
 
   @Override
-  public abstract boolean conditionsFullfilled();
+  public abstract boolean conditionsFullfilled(IGameLoop loop);
 
   @Override
   public abstract IState getNextState();
-
-  @Override
-  public IState getState() {
-    return this.state;
-  }
 
   @Override
   public int getPriority() {

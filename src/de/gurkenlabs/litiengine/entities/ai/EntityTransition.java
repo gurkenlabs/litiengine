@@ -7,8 +7,8 @@ import de.gurkenlabs.util.states.Transition;
 public abstract class EntityTransition<T extends Entity> extends Transition {
   private final T entity;
 
-  protected EntityTransition(final IState state, final T entity, int priority) {
-    super(state, priority);
+  protected EntityTransition(final T entity, int priority) {
+    super(priority);
     this.entity = entity;
   }
 

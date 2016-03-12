@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class EntityManager {
-  public final Map<IEntity, IEntityController<? extends IEntity>> entityControllers;
+  private final Map<IEntity, IEntityController<? extends IEntity>> entityControllers;
 
   public EntityManager() {
     this.entityControllers = new ConcurrentHashMap<>();

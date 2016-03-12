@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
@@ -44,7 +47,7 @@ public class Environment implements IEnvironment {
     final IMapLoader tmxLoader = new TmxMapLoader();
     this.map = tmxLoader.LoadMap(mapPath);
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
-    
+
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
   }
@@ -86,8 +89,13 @@ public class Environment implements IEnvironment {
 
   @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape) {
+    return this.findCombatEntities(shape, (entity) -> true);
+  }
+
+  @Override
+  public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition) {
     ArrayList<ICombatEntity> entities = new ArrayList<>();
-    for (ICombatEntity combatEntity : this.getCombatEntities()) {
+    for (ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
       if (combatEntity.getHitBox().intersects(shape.getBounds())) {
         if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
           entities.add(combatEntity);

@@ -23,7 +23,7 @@ public class StateMachine implements IStateMachine {
     Collections.sort(transitions);
 
     for (ITransition transition : transitions) {
-      if (!transition.conditionsFullfilled()) {
+      if (!transition.conditionsFullfilled(loop)) {
         continue;
       }
 
