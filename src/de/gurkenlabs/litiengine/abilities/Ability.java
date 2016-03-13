@@ -86,7 +86,7 @@ public abstract class Ability {
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
 
     // project
-    Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, (this.getAttributes().getRange().getCurrentValue() / 2) - impact / 2);
+    Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, (this.getAttributes().getRange().getCurrentValue() / 2));
     final double start = angle - impactAngle / 2 - 90;
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
@@ -95,8 +95,8 @@ public abstract class Ability {
     return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
-  public Ellipse2D calculateRangeArea() {
-    final int range = this.getAttributes().getRange().getCurrentValue();
+  public Ellipse2D calculatePotentialImpactArea() {
+    final int range = this.getAttributes().getImpact().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range / 2;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range / 2;
 
