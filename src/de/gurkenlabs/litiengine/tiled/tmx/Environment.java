@@ -150,7 +150,7 @@ public class Environment implements IEnvironment {
    * Negative map ids are only used locally.
    */
   @Override
-  public int getLocalMapId() {
+  public synchronized int getLocalMapId() {
     return --localIdSequence;
   }
 
@@ -166,7 +166,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public int getMapId() {
+  public synchronized int getMapId() {
     return ++mapIdSequence;
   }
 }

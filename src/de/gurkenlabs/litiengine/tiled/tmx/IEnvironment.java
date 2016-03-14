@@ -52,5 +52,9 @@ public interface IEnvironment extends IInitializable {
    */
   public int getLocalMapId();
   
+  /**
+   * Gets the next unique global map id.
+   * @return
+   */
   public int getMapId();
 }

@@ -73,7 +73,7 @@ public abstract class Entity implements IEntity {
   public Point2D getLocation() {
     return this.mapLocation;
   }
-  
+
   @Override
   public float getAngle() {
     return this.angle;
@@ -117,7 +117,8 @@ public abstract class Entity implements IEntity {
    * @param location
    *          the new map location
    */
-  protected void setLocation(final Point2D location) {
+  @Override
+  public void setLocation(final Point2D location) {
     this.mapLocation = location;
   }
 

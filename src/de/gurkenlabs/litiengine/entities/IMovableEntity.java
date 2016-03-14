@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.physics.IEntityMovementController;
@@ -24,14 +23,6 @@ public interface IMovableEntity extends ICollisionEntity {
    *          the new facing direction
    */
   public void setAngle(float angle);
-
-  /**
-   * Sets the map location.
-   *
-   * @param location
-   *          the new map location
-   */
-  public void setLocation(Point2D location);
 
   public void setMovementController(IEntityMovementController movementController);
 }

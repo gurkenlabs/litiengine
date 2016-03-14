@@ -15,6 +15,14 @@ public interface IEntity {
   public float getHeight();
 
   public Point2D getLocation();
+  
+  /**
+   * Sets the map location.
+   *
+   * @param location
+   *          the new map location
+   */
+  public void setLocation(Point2D location);
 
   public int getMapId();
 
