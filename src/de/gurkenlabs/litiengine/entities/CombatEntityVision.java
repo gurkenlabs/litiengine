@@ -7,8 +7,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -39,7 +41,7 @@ public class CombatEntityVision implements IVision {
   /** The vision radius. */
   private final int visionRadius;
 
-  private Area renderVisionShape;
+  private Shape renderVisionShape;
 
   /**
    * Instantiates a new liti vision.
@@ -98,7 +100,7 @@ public class CombatEntityVision implements IVision {
    * @see de.gurkenlabs.liti.graphics.IVision#getRenderVisionShape()
    */
   @Override
-  public Area getRenderVisionShape() {
+  public Shape getRenderVisionShape() {
     if (this.renderVisionShape == null) {
       this.updateVisionShape();
     }
@@ -133,11 +135,11 @@ public class CombatEntityVision implements IVision {
     // otherwise we create a mask for the whole map
     final float width = Game.getScreenManager().getResolution().width / Game.getInfo().renderScale();
     final float height = Game.getScreenManager().getResolution().height / Game.getInfo().renderScale();
-
     final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
-    final Area rectangleArea = new Area(rect);
-    rectangleArea.subtract(this.getRenderVisionShape());
 
+    final Area rectangleArea = new Area(rect);
+    rectangleArea.subtract(new Area(this.getRenderVisionShape()));
+    
     /*
      * Maybe we will add a more sophisticated vision algorithm in the future
      * that takes obstructed vision into consideration for(Destructable dest :
@@ -193,13 +195,15 @@ public class CombatEntityVision implements IVision {
 
   @Override
   public void updateVisionShape() {
-    final Area renderVisionShape = new Area(this.getRenderVisionCircle(this.combatEntity));
+    Path2D path = new Path2D.Float();
+    path.append(this.getRenderVisionCircle(this.combatEntity), false);
+
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
       if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
-        renderVisionShape.add(new Area(this.getRenderVisionCircle(entity)));
+        path.append(this.getRenderVisionCircle(entity), false);
       }
     }
 
-    this.renderVisionShape = renderVisionShape;
+    this.renderVisionShape = path;
   }
 }

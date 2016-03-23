@@ -20,7 +20,8 @@ import javax.swing.SwingUtilities;
 import de.gurkenlabs.litiengine.Game;
 
 /**
- * This implementation provides information about the mouse input in the litiengine.
+ * This implementation provides information about the mouse input in the
+ * litiengine.
  */
 public class Mouse implements IMouse {
 
@@ -42,10 +43,10 @@ public class Mouse implements IMouse {
 
   /** The pressed. */
   private boolean pressed;
-  
+
   private boolean isLeftMouseButtonDown;
   private boolean isRightMouseButtonDown;
-  
+
   /** The grab mouse. */
   private boolean grabMouse;
 
@@ -171,12 +172,12 @@ public class Mouse implements IMouse {
     this.setLocation(e.getPoint());
     this.setPressed(true);
     this.mouseListeners.forEach(listener -> listener.mousePressed(this.createEvent(e)));
-    
-    if(SwingUtilities.isLeftMouseButton(e)){
+
+    if (SwingUtilities.isLeftMouseButton(e)) {
       this.isLeftMouseButtonDown = true;
     }
-    
-    if(SwingUtilities.isRightMouseButton(e)){
+
+    if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = true;
     }
   }
@@ -191,12 +192,12 @@ public class Mouse implements IMouse {
     this.setLocation(e.getPoint());
     this.setPressed(false);
     this.mouseListeners.forEach(listener -> listener.mouseReleased(this.createEvent(e)));
-    
-    if(SwingUtilities.isLeftMouseButton(e)){
+
+    if (SwingUtilities.isLeftMouseButton(e)) {
       this.isLeftMouseButtonDown = false;
     }
-    
-    if(SwingUtilities.isRightMouseButton(e)){
+
+    if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = false;
     }
   }
@@ -338,7 +339,7 @@ public class Mouse implements IMouse {
     if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
       return;
     }
-    
+
     final double screenCenterX = Game.getScreenManager().getResolution().getWidth() / 2;
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
 
@@ -366,7 +367,8 @@ public class Mouse implements IMouse {
 
     // lock original mouse back to the center of the screen
     this.isGrabbing = true;
-    this.robot.mouseMove((int) (Game.getScreenManager().getScreenLocation().getX() + screenCenterX), (int) (Game.getScreenManager().getScreenLocation().getY() + screenCenterY));
+    Point screenLocation = Game.getScreenManager().getScreenLocation();
+    this.robot.mouseMove((int) (screenLocation.getX() + screenCenterX), (int) (screenLocation.getY() + screenCenterY));
     this.isGrabbing = false;
   }
 
