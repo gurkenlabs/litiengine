@@ -62,6 +62,7 @@ public class Mouse implements IMouse {
 
     try {
       this.robot = new Robot();
+      this.robot.setAutoDelay(0);
     } catch (AWTException e) {
       e.printStackTrace();
     }
