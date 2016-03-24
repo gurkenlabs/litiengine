@@ -8,11 +8,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.peer.LightweightPeer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IVision;
@@ -42,6 +44,8 @@ public class CombatEntityVision implements IVision {
   private final int visionRadius;
 
   private Shape renderVisionShape;
+
+  private Shape fogOfWar;
 
   /**
    * Instantiates a new liti vision.
@@ -82,18 +86,6 @@ public class CombatEntityVision implements IVision {
     return false;
   }
 
-  /**
-   * Gets the render vision circle.
-   *
-   * @param entity
-   *          the mob
-   * @return the render vision circle
-   */
-  public Ellipse2D getRenderVisionCircle(final IEntity entity) {
-    final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
-    return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
-  }
-
   /*
    * (non-Javadoc)
    *
@@ -131,26 +123,18 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderFogOfWar(final Graphics g) {
-    // if we create a relative vision mask, we only need the screen size
-    // otherwise we create a mask for the whole map
-    final float width = Game.getScreenManager().getResolution().width / Game.getInfo().renderScale();
-    final float height = Game.getScreenManager().getResolution().height / Game.getInfo().renderScale();
-    final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
-
-    final Area rectangleArea = new Area(rect);
-    rectangleArea.subtract(new Area(this.getRenderVisionShape()));
+    Graphics2D g2D = (Graphics2D) g;
     
-    /*
-     * Maybe we will add a more sophisticated vision algorithm in the future
-     * that takes obstructed vision into consideration for(Destructable dest :
-     * Game.instance().getScreenManager().getIngameScreen().getData().getMatch()
-     * .getMapContainer().getDestructables()){ rectangleArea
-     * .add(dest.getObstructedVisionArea(this.liti.getRenderDimensionCenter()));
-     * }
-     */
+    AffineTransform oldTransform = g2D.getTransform();
+    
+    AffineTransform at = new AffineTransform();
+    at.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    at.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
+    g2D.setTransform(at);
     g.setColor(FogOfWarColor);
-    ((Graphics2D) g).fill(rectangleArea);
+    ((Graphics2D) g).fill(this.fogOfWar);
+    g2D.setTransform(oldTransform);
   }
 
   /*
@@ -161,25 +145,43 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderMinimapFogOfWar(final Graphics g, final float minimapScale, final int x, final int y) {
+    Graphics2D g2D = (Graphics2D) g;
+   
+    AffineTransform oldTransform = g2D.getTransform();
+    
+    AffineTransform at = new AffineTransform();
+    at.translate(x, y);
+    at.scale(minimapScale, minimapScale);
 
-    // if we create a relative vision mask, we only need the screen size
-    // otherwise we create a mask for the whole map
-    final float width = (float) (minimapScale * this.environment.getMap().getSizeInPixles().getWidth());
-    final float height = (float) (minimapScale * this.environment.getMap().getSizeInPixles().getHeight());
+    g2D.setTransform(at);
+    g.setColor(FogOfWarColor);
+    ((Graphics2D) g).fill(this.fogOfWar);
+    g2D.setTransform(oldTransform);
+  }
 
-    final Rectangle2D rect = new Rectangle2D.Float(x, y, width, height);
-    final Area rectangleArea = new Area(rect);
-
+  @Override
+  public void updateVisionShape() {
+    Path2D path = new Path2D.Float();
+    Path2D renderPath = new Path2D.Float();
+    path.append(this.getMapVisionCircle(this.combatEntity), false);
+    renderPath.append(this.getRenderVisionCircle(this.combatEntity), false);
+    
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
-      if (entity.isFriendly(this.combatEntity)) {
-        final Ellipse2D visionEllipse = this.getMapVisionCircle(entity);
-        final Ellipse2D scaledEllipse = new Ellipse2D.Double(x + visionEllipse.getX() * minimapScale, y + visionEllipse.getY() * minimapScale, visionEllipse.getWidth() * minimapScale, visionEllipse.getHeight() * minimapScale);
-        rectangleArea.subtract(new Area(scaledEllipse));
+      if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
+        path.append(this.getMapVisionCircle(entity), false);
+        renderPath.append(this.getRenderVisionCircle(entity), false);
       }
     }
+    
+    this.renderVisionShape = renderPath;
+    
+    final float width = (float) (this.environment.getMap().getSizeInPixles().getWidth());
+    final float height = (float) (this.environment.getMap().getSizeInPixles().getHeight());
+    final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
+    final Area rectangleArea = new Area(rect);
+    rectangleArea.subtract(new Area(path));
 
-    g.setColor(FogOfWarColor);
-    ((Graphics2D) g).fill(rectangleArea);
+    this.fogOfWar = rectangleArea;
   }
 
   /**
@@ -192,18 +194,18 @@ public class CombatEntityVision implements IVision {
   private Ellipse2D getMapVisionCircle(final ICombatEntity entity) {
     return new Ellipse2D.Double(entity.getDimensionCenter().getX() - this.visionRadius, entity.getDimensionCenter().getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
+  
 
-  @Override
-  public void updateVisionShape() {
-    Path2D path = new Path2D.Float();
-    path.append(this.getRenderVisionCircle(this.combatEntity), false);
-
-    for (final ICombatEntity entity : this.environment.getCombatEntities()) {
-      if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
-        path.append(this.getRenderVisionCircle(entity), false);
-      }
-    }
-
-    this.renderVisionShape = path;
+  /**
+   * Gets the render vision circle.
+   *
+   * @param entity
+   *          the mob
+   * @return the render vision circle
+   */
+  private Ellipse2D getRenderVisionCircle(final IEntity entity) {
+    final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
+    return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
+
 }

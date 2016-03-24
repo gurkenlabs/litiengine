@@ -1,6 +1,7 @@
 package de.gurkenlabs.util.geom;
 
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -10,6 +11,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class GeometricUtilities {
+
+  public static Shape scaleShape(final Shape shape, double scale) {
+    final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
+    return transform.createTransformedShape(shape);
+  }
 
   public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
     return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
@@ -70,8 +76,7 @@ public class GeometricUtilities {
    * @return true, if successful
    */
   public static boolean contains(final Rectangle2D rectangle, final Point2D p) {
-    return rectangle.getX() <= p.getX() && rectangle.getY() <= p.getY() && rectangle.getX() + rectangle.getWidth() >= p.getX()
-        && rectangle.getY() + rectangle.getHeight() >= p.getY();
+    return rectangle.getX() <= p.getX() && rectangle.getY() <= p.getY() && rectangle.getX() + rectangle.getWidth() >= p.getX() && rectangle.getY() + rectangle.getHeight() >= p.getY();
   }
 
   /**
@@ -136,8 +141,7 @@ public class GeometricUtilities {
       final double xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
       final double yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
 
-      if (xi >= Math.min(lineA.getX1(), lineA.getX2()) && xi <= Math.max(lineA.getX1(), lineA.getX2()) && yi >= Math.min(lineA.getY1(), lineA.getY2())
-          && yi <= Math.max(lineA.getY1(), lineA.getY2())) {
+      if (xi >= Math.min(lineA.getX1(), lineA.getX2()) && xi <= Math.max(lineA.getX1(), lineA.getX2()) && yi >= Math.min(lineA.getY1(), lineA.getY2()) && yi <= Math.max(lineA.getY1(), lineA.getY2())) {
         p = new Point2D.Double(xi, yi);
       }
     }
@@ -393,8 +397,7 @@ public class GeometricUtilities {
       // rectangle the rectangle point at index i is not visible because the
       // raycast needs to pass the rectangle first.
       // Thus, the rectangle point at index i will not be added to the result.
-      if (intersectionPoints.stream()
-          .anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, EPSILON)))) {
+      if (intersectionPoints.stream().anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, EPSILON)))) {
         continue;
       }
 
