@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.input.Input;
 /**
  * The Class GuiComponent.
  */
-public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, IUpdateable {
+public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener {
 
   /** The component id. */
   private static int componentId = 0;
