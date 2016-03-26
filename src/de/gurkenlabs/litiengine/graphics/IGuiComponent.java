@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.geom.Point2D;
+
 public interface IGuiComponent extends IRenderable {
 
   /**
@@ -43,4 +45,9 @@ public interface IGuiComponent extends IRenderable {
    * Suspend.
    */
   public void suspend();
+
+  void setPosition(int x, int y);
+  void setPosition(Point2D newPosition);
+
+  void setDimension(int width, int height);
 }

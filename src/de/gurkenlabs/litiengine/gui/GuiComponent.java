@@ -9,12 +9,14 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -22,7 +24,7 @@ import de.gurkenlabs.litiengine.input.Input;
 /**
  * The Class GuiComponent.
  */
-public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener {
+public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, IUpdateable {
 
   /** The component id. */
   private static int componentId = 0;
@@ -211,6 +213,24 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public int getX() {
     return this.x;
+  }
+
+  @Override
+  public void setPosition(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  @Override
+  public void setPosition(Point2D newPosition) {
+    this.x = (int) newPosition.getX();
+    this.y = (int) newPosition.getY();
+  }
+
+  @Override
+  public void setDimension(int width, int height) {
+    this.width = width;
+    this.height = height;
   }
 
   /**
@@ -411,10 +431,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @param newY
    *          the new y
    */
-  public void relocate(final int newX, final int newY) {
-    this.x = newX;
-    this.y = newY;
-  }
 
   /**
    * Render.

@@ -20,7 +20,7 @@ public @interface GameInfo {
 
   public String name();
 
-  public float renderScale() default 3.0f;
+  public float renderScale() default 4.0f;
 
   public String subTitle() default "";
 
