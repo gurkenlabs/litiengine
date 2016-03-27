@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
+import de.gurkenlabs.util.image.ImageProcessing;
 
 public abstract class AnimationController implements IAnimationController {
   private final List<Animation> animations;
@@ -62,7 +63,7 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
-  public BufferedImage getCurrentSprite() {
+  public BufferedImage getCurrentScaledSprite(int width, int height) {
     if (this.getCurrentAnimation() == null) {
       return null;
     }
@@ -71,7 +72,7 @@ public abstract class AnimationController implements IAnimationController {
     for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
-
+    ImageProcessing.scaleImage(sprite, width, height);
     return sprite;
   }
 
@@ -85,8 +86,7 @@ public abstract class AnimationController implements IAnimationController {
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do
     // nothing
-    if (!this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName))
-        || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
+    if (!this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName)) || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       return;
     }
 

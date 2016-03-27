@@ -143,6 +143,7 @@ public class ImageProcessing {
 
   /**
    * Crops a sub image from the specified image.
+   * 
    * @param image
    * @param cropAlignment
    *          use the following consts: <br>
@@ -270,7 +271,6 @@ public class ImageProcessing {
     final double scaleY = (double) height / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-
     return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
   }
 
