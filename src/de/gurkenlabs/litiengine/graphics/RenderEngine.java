@@ -3,7 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -92,34 +91,32 @@ public class RenderEngine implements IRenderEngine {
     return null;
   }
 
-  public static void renderImage(final Graphics g, final Image image, final Point2D renderLocation) {
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
     final AffineTransform t = new AffineTransform();
     t.translate(renderLocation.getX(), renderLocation.getY());
-    ((Graphics2D) g).drawImage(image, t, null);
+    g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics g, final Image image, final Point2D renderLocation, float angle) {
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, float angle) {
     AffineTransform t = new AffineTransform();
 
     t.translate(renderLocation.getX(), renderLocation.getY());
     t.rotate(Math.toRadians(angle), image.getWidth(null) / 2, image.getHeight(null) / 2);
 
-    ((Graphics2D) g).drawImage(image, t, null);
+    g.drawImage(image, t, null);
   }
   
-  public static void drawShape(final Graphics g, final Shape shape){
-    Graphics2D g2 = (Graphics2D)g;
-    g2.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
-    g2.draw(shape); 
-    g2.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+  public static void drawShape(final Graphics2D g, final Shape shape){
+    g.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    g.draw(shape); 
+    g.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
   }
   
-  public static void fillShape(final Graphics g, final Shape shape){
-    Graphics2D g2 = (Graphics2D)g;
-    g2.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
-    g2.fill(shape);
+  public static void fillShape(final Graphics2D g, final Shape shape){
+    g.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    g.fill(shape);
     
-    g2.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+    g.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
   }
 
   public static BufferedImage createCompatibleImage(int width, int height) {
@@ -162,12 +159,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics g, final List<? extends IRenderable> renderables) {
+  public void render(final Graphics2D g, final List<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
 
   @Override
-  public void render(final Graphics g, final List<? extends IRenderable> renderables, final IVision vision) {
+  public void render(final Graphics2D g, final List<? extends IRenderable> renderables, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -179,7 +176,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics g, final List<? extends IEntity> entities) {
+  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
     
@@ -193,7 +190,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics g, final List<? extends IEntity> entities, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -207,7 +204,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(Graphics g, IRenderable renderable) {
+  public void render(Graphics2D g, IRenderable renderable) {
     if (renderable == null) {
       return;
     }
@@ -216,7 +213,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntity(final Graphics g, final IEntity entity) {
+  public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
       return;
     }
@@ -256,7 +253,7 @@ public class RenderEngine implements IRenderEngine {
    * @see de.gurkenlabs.litiengine.graphics.IRenderEngine#renderMap(java.awt.Graphics)
    */
   @Override
-  public void renderMap(final Graphics g, final IMap map) {
+  public void renderMap(final Graphics2D g, final IMap map) {
     if (map == null) {
       return;
     }

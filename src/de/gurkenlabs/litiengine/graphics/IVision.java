@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
@@ -59,7 +60,7 @@ public interface IVision {
    * @param g
    *          the g
    */
-  public void renderFogOfWar(Graphics g);
+  public void renderFogOfWar(Graphics2D g);
 
   /**
    * Render minimap fog of war.
@@ -73,5 +74,6 @@ public interface IVision {
    * @param y
    *          the y
    */
-  public void renderMinimapFogOfWar(Graphics g, float minimapScale, int x, int y);
+  public void renderMinimapFogOfWar(Graphics2D g, float minimapScale, int x, int y);
+
 }

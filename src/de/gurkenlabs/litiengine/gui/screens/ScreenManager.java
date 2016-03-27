@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -193,7 +193,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
 
     final long currentMillis = System.currentTimeMillis();
-    final Graphics g = this.bufferStrategy.getDrawGraphics();
+    final Graphics2D g = (Graphics2D) this.bufferStrategy.getDrawGraphics();
 
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, this.getWidth(), this.getHeight());

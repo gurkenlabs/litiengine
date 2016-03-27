@@ -3,7 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -24,17 +24,19 @@ public interface IRenderEngine {
 
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
 
-  public void render(Graphics g, List<? extends IRenderable> renderables);
+  public void render(Graphics2D g, List<? extends IRenderable> renderables);
 
-  public void render(Graphics g, List<? extends IRenderable> renderables, IVision vision);
+  public void render(Graphics2D g, List<? extends IRenderable> renderables, IVision vision);
 
-  public void renderEntities(Graphics g, List<? extends IEntity> entities);
+  
+  
+  public void renderEntities(Graphics2D g, List<? extends IEntity> entities);
 
-  public void renderEntities(Graphics g, List<? extends IEntity> entities, IVision vision);
+  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, IVision vision);
 
-  public void render(Graphics g, IRenderable renderable);
+  public void render(Graphics2D g, IRenderable renderable);
 
-  public void renderEntity(Graphics g, IEntity entity);
+  public void renderEntity(Graphics2D g, IEntity entity);
 
   /**
    * Render map.
@@ -42,5 +44,5 @@ public interface IRenderEngine {
    * @param g
    *          the g
    */
-  public void renderMap(Graphics g, final IMap map);
+  public void renderMap(Graphics2D g, final IMap map);
 }

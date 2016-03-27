@@ -4,8 +4,7 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -67,18 +65,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private boolean visible;
 
   /** The width. */
-  private int width;
+  private double width, height, x, y;
 
-  /** The height. */
-  private int height;
-
-  /** The x. */
-  private int x;
-
-  /** The y. */
-  private int y;
-
-  protected GuiComponent(final int x, final int y) {
+  protected GuiComponent(final double x, final double y) {
     this.components = new ArrayList<>();
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
@@ -108,7 +97,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @param height
    *          the height
    */
-  protected GuiComponent(final int x, final int y, final int width, final int height) {
+  protected GuiComponent(final double x, final double y, final double width, final double height) {
     this(x, y);
     this.width = width;
     this.height = height;
@@ -129,7 +118,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the bounding box
    */
   public Rectangle2D getBoundingBox() {
-    return new Rectangle(this.x, this.y, this.width, this.height);
+    return new Rectangle2D.Double(this.x, this.y, this.width, this.height);
   }
 
   /**
@@ -164,7 +153,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the height
    */
   @Override
-  public int getHeight() {
+  public double getHeight() {
     return this.height;
   }
 
@@ -201,7 +190,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the width
    */
   @Override
-  public int getWidth() {
+  public double getWidth() {
     return this.width;
   }
 
@@ -211,12 +200,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the x
    */
   @Override
-  public int getX() {
+  public double getX() {
     return this.x;
   }
 
+  public Point2D getPosition(){
+    return new Point2D.Double(this.getX(),this.getY());
+  }
+  
   @Override
-  public void setPosition(int x, int y) {
+  public void setPosition(double x, double y) {
     this.x = x;
     this.y = y;
   }
@@ -228,7 +221,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   @Override
-  public void setDimension(int width, int height) {
+  public void setDimension(double width, double height) {
     this.width = width;
     this.height = height;
   }
@@ -239,7 +232,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    * @return the y
    */
   @Override
-  public int getY() {
+  public double getY() {
     return this.y;
   }
 
@@ -439,7 +432,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the g
    */
   @Override
-  public void render(final Graphics g) {
+  public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
       return;
     }

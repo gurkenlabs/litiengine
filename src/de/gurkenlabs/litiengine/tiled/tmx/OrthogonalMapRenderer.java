@@ -4,7 +4,6 @@
 package de.gurkenlabs.litiengine.tiled.tmx;
 
 import java.awt.AlphaComposite;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
@@ -70,7 +69,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
 
     final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
-    final Graphics g = img.createGraphics();
+    final Graphics2D g = img.createGraphics();
 
     this.renderProcess = 0;
     this.totalTileCount = 0;
@@ -114,7 +113,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * de.gurkenlabs.tiled.tmx.IMap)
    */
   @Override
-  public void render(final Graphics g, final Point2D offset, final IMap map) {
+  public void render(final Graphics2D g, final Point2D offset, final IMap map) {
     // draw all tile layers to the graphics object
     final BufferedImage mapImage = this.getMapImage(map);
     RenderEngine.renderImage(g, mapImage, offset);

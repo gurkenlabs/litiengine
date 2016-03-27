@@ -4,7 +4,6 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
@@ -122,19 +121,16 @@ public class CombatEntityVision implements IVision {
    * @see de.gurkenlabs.liti.graphics.IVision#renderFogOfWar(java.awt.Graphics)
    */
   @Override
-  public void renderFogOfWar(final Graphics g) {
-    Graphics2D g2D = (Graphics2D) g;
-    
-    AffineTransform oldTransform = g2D.getTransform();
-    
+  public void renderFogOfWar(final Graphics2D g) {
+    AffineTransform oldTransform = g.getTransform();
     AffineTransform at = new AffineTransform();
     at.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
     at.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
-    g2D.setTransform(at);
+    g.setTransform(at);
     g.setColor(FogOfWarColor);
-    ((Graphics2D) g).fill(this.fogOfWar);
-    g2D.setTransform(oldTransform);
+    g.fill(this.fogOfWar);
+    g.setTransform(oldTransform);
   }
 
   /*
@@ -144,19 +140,17 @@ public class CombatEntityVision implements IVision {
    * Graphics, float, int, int)
    */
   @Override
-  public void renderMinimapFogOfWar(final Graphics g, final float minimapScale, final int x, final int y) {
-    Graphics2D g2D = (Graphics2D) g;
-   
-    AffineTransform oldTransform = g2D.getTransform();
-    
+  public void renderMinimapFogOfWar(final Graphics2D g, final float minimapScale, final int x, final int y) {
+    AffineTransform oldTransform = g.getTransform();
+
     AffineTransform at = new AffineTransform();
     at.translate(x, y);
     at.scale(minimapScale, minimapScale);
 
-    g2D.setTransform(at);
+    g.setTransform(at);
     g.setColor(FogOfWarColor);
-    ((Graphics2D) g).fill(this.fogOfWar);
-    g2D.setTransform(oldTransform);
+    g.fill(this.fogOfWar);
+    g.setTransform(oldTransform);
   }
 
   @Override
@@ -165,16 +159,16 @@ public class CombatEntityVision implements IVision {
     Path2D renderPath = new Path2D.Float();
     path.append(this.getMapVisionCircle(this.combatEntity), false);
     renderPath.append(this.getRenderVisionCircle(this.combatEntity), false);
-    
+
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
       if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
         path.append(this.getMapVisionCircle(entity), false);
         renderPath.append(this.getRenderVisionCircle(entity), false);
       }
     }
-    
+
     this.renderVisionShape = renderPath;
-    
+
     final float width = (float) (this.environment.getMap().getSizeInPixles().getWidth());
     final float height = (float) (this.environment.getMap().getSizeInPixles().getHeight());
     final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
@@ -194,7 +188,6 @@ public class CombatEntityVision implements IVision {
   private Ellipse2D getMapVisionCircle(final ICombatEntity entity) {
     return new Ellipse2D.Double(entity.getDimensionCenter().getX() - this.visionRadius, entity.getDimensionCenter().getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
-  
 
   /**
    * Gets the render vision circle.

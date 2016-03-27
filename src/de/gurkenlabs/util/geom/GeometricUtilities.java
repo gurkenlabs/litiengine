@@ -1,5 +1,6 @@
 package de.gurkenlabs.util.geom;
 
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -15,6 +16,13 @@ public class GeometricUtilities {
   public static Shape scaleShape(final Shape shape, double scale) {
     final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
+  }
+  
+  public static Shape translateShape (final Shape shape,Point2D renderLocation){
+    final AffineTransform t = new AffineTransform();
+    t.translate(renderLocation.getX(), renderLocation.getY());
+    return shape;
+    
   }
 
   public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {

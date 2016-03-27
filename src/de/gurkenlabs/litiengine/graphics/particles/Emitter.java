@@ -272,7 +272,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   @Override
-  public void render(final Graphics g) {
+  public void render(final Graphics2D g) {
     this.particles.forEach(particle -> particle.render((Graphics2D) g, this.getOrigin()));
   }
 

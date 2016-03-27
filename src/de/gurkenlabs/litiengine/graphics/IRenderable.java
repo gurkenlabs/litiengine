@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 public interface IRenderable {
 
@@ -10,5 +10,5 @@ public interface IRenderable {
    * @param g
    *          the g
    */
-  public void render(Graphics g);
+  public void render(Graphics2D g);
 }
