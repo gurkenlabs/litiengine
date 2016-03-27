@@ -17,6 +17,7 @@ import java.awt.peer.LightweightPeer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IVision;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 
 // TODO: Auto-generated Javadoc
@@ -129,7 +130,7 @@ public class CombatEntityVision implements IVision {
 
     g.setTransform(at);
     g.setColor(FogOfWarColor);
-    g.fill(this.fogOfWar);
+    RenderEngine.fillShape(g, this.fogOfWar);
     g.setTransform(oldTransform);
   }
 
@@ -149,7 +150,7 @@ public class CombatEntityVision implements IVision {
 
     g.setTransform(at);
     g.setColor(FogOfWarColor);
-    g.fill(this.fogOfWar);
+    RenderEngine.fillShape(g, this.fogOfWar);
     g.setTransform(oldTransform);
   }
 

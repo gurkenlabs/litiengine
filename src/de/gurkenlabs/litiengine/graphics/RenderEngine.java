@@ -8,6 +8,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
@@ -105,18 +106,25 @@ public class RenderEngine implements IRenderEngine {
 
     g.drawImage(image, t, null);
   }
-  
-  public static void drawShape(final Graphics2D g, final Shape shape){
-    g.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
-    g.draw(shape); 
-    g.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+
+  public static void drawShape(final Graphics2D g, final Shape shape) {
+    final AffineTransform t = new AffineTransform();
+    t.translate(shape.getBounds2D().getX(), shape.getBounds2D().getY());
+    g.draw(shape);
   }
-  
-  public static void fillShape(final Graphics2D g, final Shape shape){
-    g.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+
+  public static void fillShape(final Graphics2D g, final Shape shape) {
+    final AffineTransform t = new AffineTransform();
+    t.translate(shape.getBounds2D().getX(), shape.getBounds2D().getY());
     g.fill(shape);
-    
-    g.translate(-Game.getScreenManager().getCamera().getPixelOffsetX(), -Game.getScreenManager().getCamera().getPixelOffsetY());
+  }
+
+  public static void drawText(final Graphics2D g, final String text, float x, float y) {
+    final AffineTransform t = new AffineTransform();
+    t.translate(x, y);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+    g.drawString(text, x, y);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
   public static BufferedImage createCompatibleImage(int width, int height) {
@@ -179,8 +187,9 @@ public class RenderEngine implements IRenderEngine {
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
-    
-    // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A BETTER DATASTRUCTURE FOR THE (HEAP)
+
+    // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
+    // BETTER DATASTRUCTURE FOR THE (HEAP)
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
     Collections.sort(entities, new EntityYComparator());
 
@@ -197,7 +206,7 @@ public class RenderEngine implements IRenderEngine {
     if (vision != null) {
       g.setClip(vision.getRenderVisionShape());
     }
-    
+
     this.renderEntities(g, entities);
 
     g.setClip(oldClip);
@@ -221,11 +230,11 @@ public class RenderEngine implements IRenderEngine {
     if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
       return;
     }
-    
+
     for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
       consumer.accept(new RenderEvent<IEntity>(g, entity));
     }
-    
+
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
