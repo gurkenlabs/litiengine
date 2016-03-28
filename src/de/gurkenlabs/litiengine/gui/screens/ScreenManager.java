@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.DefaultCamera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -35,13 +36,15 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   private final List<Consumer<IScreen>> screenChangedConsumer;
 
+  private final List<Consumer<Graphics2D>> renderedConsumer;
+
   /** The screens. */
   private final List<IScreen> screens;
 
   /** The Render canvas. */
   private final Canvas renderCanvas;
-  
-  private BufferStrategy bufferStrategy; 
+
+  private BufferStrategy bufferStrategy;
 
   /** The camera. */
   private ICamera camera;
@@ -66,6 +69,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
+    this.renderedConsumer = new CopyOnWriteArrayList<>();
 
     // set default jframe stuff
     this.setResizable(false);
@@ -97,8 +101,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void changeScreen(final String screen) {
     // if the scren is already displayed or there is no screen with the
     // specified name
-    if (this.currentScreen != null && this.currentScreen.getName().equalsIgnoreCase(screen)
-        || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
+    if (this.currentScreen != null && this.currentScreen.getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
       return;
     }
     if (System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
@@ -186,11 +189,17 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
+  public void onRendered(Consumer<Graphics2D> renderedConsumer) {
+    if (!this.renderedConsumer.contains(renderedConsumer)) {
+      this.renderedConsumer.add(renderedConsumer);
+    }
+  }
+
+  @Override
   public void renderCurrentScreen() {
     if (this.getCurrentScreen() == null) {
       return;
     }
-
 
     final long currentMillis = System.currentTimeMillis();
     final Graphics2D g = (Graphics2D) this.bufferStrategy.getDrawGraphics();
@@ -202,6 +211,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     this.getCurrentScreen().render(g);
     RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
+
+    for (Consumer<Graphics2D> consumer : this.renderedConsumer) {
+      consumer.accept(g);
+    }
+
     g.dispose();
     this.bufferStrategy.show();
     Toolkit.getDefaultToolkit().sync();
@@ -233,7 +247,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private class ResizedEventListener extends ComponentAdapter {
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
      * ComponentEvent)
      */

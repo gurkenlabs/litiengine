@@ -17,9 +17,9 @@ public class ClientConfiguration extends ConfigurationGroup {
   private int maxFps;
 
   /** The updaterate. */
-  // this highly depends on the executing machine... if the machine can only
-  // render less than 100 frames, this value should be lowered...
   private int updaterate;
+  
+  private boolean showGameMetrics;
 
   /**
    * Instantiates a new client configuration.
@@ -28,6 +28,7 @@ public class ClientConfiguration extends ConfigurationGroup {
     super();
     this.setUpdaterate(23);
     this.setMaxFps(60);
+    this.setShowGameMetrics(false);
   }
 
   /**
@@ -75,5 +76,13 @@ public class ClientConfiguration extends ConfigurationGroup {
     }
 
     this.updaterate = updaterate;
+  }
+
+  public boolean showGameMetrics() {
+    return this.showGameMetrics;
+  }
+
+  public void setShowGameMetrics(boolean showGameMetrics) {
+    this.showGameMetrics = showGameMetrics;
   }
 }

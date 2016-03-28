@@ -54,7 +54,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
 
-    metrics = new GameMetrics();
     entityManager = new EntityManager();
 
     // init configuration before init method in order to use configured values
@@ -119,6 +118,8 @@ public abstract class Game implements IInitializable, ILaunchable {
       }
     }
 
+    metrics = new GameMetrics();
+    
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
     getScreenManager().onFpsChanged(fps -> {
@@ -167,7 +168,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Runnable#run()
      */
     @Override
@@ -176,7 +177,7 @@ public abstract class Game implements IInitializable, ILaunchable {
       while (this.gameIsRunning) {
         long renderStart = System.nanoTime();
         Game.getScreenManager().renderCurrentScreen();
-
+        
         long renderTime = (System.nanoTime() - renderStart) / 1000000;
         try {
           Thread.sleep(Math.max(0, FPS_WAIT - renderTime));
@@ -202,7 +203,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
      */
@@ -212,7 +213,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
      */
@@ -222,7 +223,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
      */
@@ -234,7 +235,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.
      * WindowEvent)
      */
@@ -244,7 +245,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.
      * WindowEvent)
      */
@@ -254,7 +255,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
      */
@@ -264,7 +265,7 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
      */

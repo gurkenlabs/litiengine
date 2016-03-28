@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.gui.screens;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.function.Consumer;
@@ -55,6 +56,8 @@ public interface IScreenManager {
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
+  
+  public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   /**
    * Render the current screen.
