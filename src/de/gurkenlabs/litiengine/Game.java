@@ -53,7 +53,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
-
+    metrics = new GameMetrics();
+    
     entityManager = new EntityManager();
 
     // init configuration before init method in order to use configured values
@@ -118,8 +119,10 @@ public abstract class Game implements IInitializable, ILaunchable {
       }
     }
 
-    metrics = new GameMetrics();
-    
+    if (Game.getConfiguration().CLIENT.showGameMetrics()) {
+      Game.getScreenManager().onRendered((g) -> getMetrics().render(g));
+    }
+
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
     getScreenManager().onFpsChanged(fps -> {
@@ -177,7 +180,7 @@ public abstract class Game implements IInitializable, ILaunchable {
       while (this.gameIsRunning) {
         long renderStart = System.nanoTime();
         Game.getScreenManager().renderCurrentScreen();
-        
+
         long renderTime = (System.nanoTime() - renderStart) / 1000000;
         try {
           Thread.sleep(Math.max(0, FPS_WAIT - renderTime));

@@ -53,9 +53,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
     this.ups = new CopyOnWriteArrayList<>();
     this.bytesSent = new CopyOnWriteArrayList<>();
     this.bytesReceived = new CopyOnWriteArrayList<>();
-    if (Game.getConfiguration().CLIENT.showGameMetrics()) {
-      Game.getScreenManager().onRendered((g) -> this.render(g));
-    }
   }
 
   public void recordNetworkTraffic() {
