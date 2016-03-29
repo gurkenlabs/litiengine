@@ -43,7 +43,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   public static Image getTile(final IMap map, final ITile tile) {
-    final ITileset tileset = MapUtilities.FindTileSet(map, tile);
+    final ITileset tileset = MapUtilities.findTileSet(map, tile);
     if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
       return null;
     }

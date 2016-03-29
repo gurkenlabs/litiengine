@@ -129,22 +129,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  protected void addMapObject(final IMapObject mapObject) {
-
-  }
-
-  private void loadMapObjects() {
-    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-          continue;
-        }
-
-        this.addMapObject(mapObject);
-      }
-    }
-  }
-
   /**
    * Negative map ids are only used locally.
    */
@@ -167,5 +151,21 @@ public class Environment implements IEnvironment {
   @Override
   public synchronized int getMapId() {
     return ++mapIdSequence;
+  }
+  
+  protected void addMapObject(final IMapObject mapObject) {
+
+  }
+
+  private void loadMapObjects() {
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+      }
+    }
   }
 }
