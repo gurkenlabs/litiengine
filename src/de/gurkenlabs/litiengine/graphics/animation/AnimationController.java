@@ -72,8 +72,8 @@ public abstract class AnimationController implements IAnimationController {
     for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
-    ImageProcessing.scaleImage(sprite, width, height);
-    return sprite;
+    
+    return ImageProcessing.scaleImage(sprite, width, height);
   }
 
   @Override
