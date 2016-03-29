@@ -31,7 +31,7 @@ public class SpriteParticle extends Particle {
     return this.angle;
   }
 
-  public void setAngle(float angle) {
+  public void setAngle(final float angle) {
     this.angle = angle;
   }
 }

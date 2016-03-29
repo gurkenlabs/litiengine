@@ -63,7 +63,7 @@ public class Mouse implements IMouse {
     try {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);
-    } catch (AWTException e) {
+    } catch (final AWTException e) {
       e.printStackTrace();
     }
 
@@ -332,11 +332,11 @@ public class Mouse implements IMouse {
   /**
    * Calculates the location of the ingame mouse by the position diff and locks
    * the original mouse to the center of the screen.
-   * 
+   *
    * @param mouseLocation
    *          The location of the original mouse.
    */
-  private void setLocation(Point mouseLocation) {
+  private void setLocation(final Point mouseLocation) {
     if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
       return;
     }
@@ -345,8 +345,8 @@ public class Mouse implements IMouse {
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
 
     // calculate diffs and new location for the ingame mouse
-    double diffX = mouseLocation.x - screenCenterX;
-    double diffY = mouseLocation.y - screenCenterY;
+    final double diffX = mouseLocation.x - screenCenterX;
+    final double diffY = mouseLocation.y - screenCenterY;
     int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
 
@@ -368,20 +368,23 @@ public class Mouse implements IMouse {
 
     // lock original mouse back to the center of the screen
     this.isGrabbing = true;
-    Point screenLocation = Game.getScreenManager().getScreenLocation();
+    final Point screenLocation = Game.getScreenManager().getScreenLocation();
     this.robot.mouseMove((int) (screenLocation.getX() + screenCenterX), (int) (screenLocation.getY() + screenCenterY));
     this.isGrabbing = false;
   }
 
-  private MouseEvent createEvent(MouseEvent original) {
-    MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(), original.getButton());
+  private MouseEvent createEvent(final MouseEvent original) {
+    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+        original.getButton());
     return event;
   }
 
+  @Override
   public boolean isLeftMouseButtonDown() {
     return this.isLeftMouseButtonDown;
   }
 
+  @Override
   public boolean isRightMouseButtonDown() {
     return this.isRightMouseButtonDown;
   }

@@ -56,7 +56,7 @@ public interface IScreenManager {
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
-  
+
   public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   /**
@@ -75,6 +75,6 @@ public interface IScreenManager {
   public void setIconImage(Image image);
 
   public void setCursor(Image image);
-  
+
   public boolean isFocusOwner();
 }

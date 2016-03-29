@@ -13,16 +13,16 @@ public class StateMachine implements IStateMachine {
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update(final IGameLoop loop) {
     if (this.currentState == null) {
       return;
     }
 
     this.currentState.executeBehaviour(loop);
-    List<ITransition> transitions = this.currentState.getTransitions();
+    final List<ITransition> transitions = this.currentState.getTransitions();
     Collections.sort(transitions);
 
-    for (ITransition transition : transitions) {
+    for (final ITransition transition : transitions) {
       if (!transition.conditionsFullfilled(loop)) {
         continue;
       }

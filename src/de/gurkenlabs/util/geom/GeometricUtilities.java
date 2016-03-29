@@ -1,6 +1,5 @@
 package de.gurkenlabs.util.geom;
 
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -13,16 +12,16 @@ import java.util.List;
 
 public class GeometricUtilities {
 
-  public static Shape scaleShape(final Shape shape, double scale) {
+  public static Shape scaleShape(final Shape shape, final double scale) {
     final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
   }
-  
-  public static Shape translateShape (final Shape shape,Point2D renderLocation){
+
+  public static Shape translateShape(final Shape shape, final Point2D renderLocation) {
     final AffineTransform t = new AffineTransform();
     t.translate(renderLocation.getX(), renderLocation.getY());
     return shape;
-    
+
   }
 
   public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
@@ -330,8 +329,8 @@ public class GeometricUtilities {
   }
 
   public static Point2D getPointOnCircle(final Point2D center, final double radius, final double angle) {
-    double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
-    double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
+    final double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
+    final double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
 
     return new Point2D.Double(x, y);
   }

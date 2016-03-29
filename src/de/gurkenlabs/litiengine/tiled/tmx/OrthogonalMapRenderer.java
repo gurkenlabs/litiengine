@@ -135,8 +135,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     if (ImageCache.MAPS.containsKey(cacheKey)) {
       return ImageCache.MAPS.get(cacheKey);
     }
-    final BufferedImage bufferedImage = new BufferedImage(layer.getSizeInTiles().width * map.getTileSize().width,
-        layer.getSizeInTiles().height * map.getTileSize().height, BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage bufferedImage = new BufferedImage(layer.getSizeInTiles().width * map.getTileSize().width, layer.getSizeInTiles().height * map.getTileSize().height, BufferedImage.TYPE_INT_ARGB);
 
     // we need a graphics 2D object to work with transparency
     final Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();

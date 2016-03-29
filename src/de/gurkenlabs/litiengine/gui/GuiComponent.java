@@ -204,24 +204,24 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.x;
   }
 
-  public Point2D getPosition(){
-    return new Point2D.Double(this.getX(),this.getY());
+  public Point2D getPosition() {
+    return new Point2D.Double(this.getX(), this.getY());
   }
-  
+
   @Override
-  public void setPosition(double x, double y) {
+  public void setPosition(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
   @Override
-  public void setPosition(Point2D newPosition) {
-    this.x = (int) newPosition.getX();
-    this.y = (int) newPosition.getY();
+  public void setPosition(final Point2D newPosition) {
+    this.x = newPosition.getX();
+    this.y = newPosition.getY();
   }
 
   @Override
-  public void setDimension(double width, double height) {
+  public void setDimension(final double width, final double height) {
     this.width = width;
     this.height = height;
   }

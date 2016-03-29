@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -19,7 +20,6 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.DefaultCamera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -83,8 +83,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.renderCanvas.setPreferredSize(this.getResolution());
 
     // hide default cursor
-    BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-    Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+    final BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
     this.renderCanvas.setCursor(blankCursor);
 
     this.add(this.renderCanvas);
@@ -151,7 +151,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.setCamera(new DefaultCamera());
     if (fullscreen) {
       this.setUndecorated(true);
-      this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+      this.setExtendedState(Frame.MAXIMIZED_BOTH);
       // this.device.setFullScreenWindow(this);
     } else {
       this.setSize(new Dimension(width, height));
@@ -182,14 +182,14 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void onScreenChanged(Consumer<IScreen> screenConsumer) {
+  public void onScreenChanged(final Consumer<IScreen> screenConsumer) {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
     }
   }
 
   @Override
-  public void onRendered(Consumer<Graphics2D> renderedConsumer) {
+  public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
     if (!this.renderedConsumer.contains(renderedConsumer)) {
       this.renderedConsumer.add(renderedConsumer);
     }
@@ -212,7 +212,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.getCurrentScreen().render(g);
     RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
 
-    for (Consumer<Graphics2D> consumer : this.renderedConsumer) {
+    for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
       consumer.accept(g);
     }
 
@@ -247,7 +247,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private class ResizedEventListener extends ComponentAdapter {
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
      * ComponentEvent)
      */
@@ -263,10 +263,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void setCursor(Image image) {
+  public void setCursor(final Image image) {
     this.cursorImage = image;
   }
 
+  @Override
   public boolean isFocusOwner() {
     return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
   }

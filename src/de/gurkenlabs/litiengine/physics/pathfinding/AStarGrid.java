@@ -22,8 +22,8 @@ public class AStarGrid {
     this.physicsEngine = physicsEngine;
     this.size = map.getSizeInPixles();
     this.nodeSize = nodeSize;
-    int gridSizeX = this.size.width / nodeSize;
-    int gridSizeY = this.size.height / nodeSize;
+    final int gridSizeX = this.size.width / nodeSize;
+    final int gridSizeY = this.size.height / nodeSize;
     this.grid = new AStarNode[gridSizeX][gridSizeY];
     this.populateGrid(gridSizeX, gridSizeY);
   }
@@ -31,7 +31,7 @@ public class AStarGrid {
   private void populateGrid(final int gridSizeX, final int gridSizeY) {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
-        Rectangle nodeBounds = new Rectangle(x * nodeSize, y * nodeSize, nodeSize, nodeSize);
+        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
 
         // TODO: add terrain dependent penalty
         this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
@@ -39,21 +39,21 @@ public class AStarGrid {
     }
   }
 
-  public List<AStarNode> getNeighbours(AStarNode node) {
+  public List<AStarNode> getNeighbours(final AStarNode node) {
 
-    List<AStarNode> neighbors = new ArrayList<AStarNode>();
-    int x = node.getGridX();
-    int y = node.getGridY();
-    AStarNode top = this.getNode(x, y - 1);
-    AStarNode bottom = this.getNode(x, y + 1);
-    AStarNode left = this.getNode(x - 1, y);
-    AStarNode right = this.getNode(x + 1, y);
+    final List<AStarNode> neighbors = new ArrayList<AStarNode>();
+    final int x = node.getGridX();
+    final int y = node.getGridY();
+    final AStarNode top = this.getNode(x, y - 1);
+    final AStarNode bottom = this.getNode(x, y + 1);
+    final AStarNode left = this.getNode(x - 1, y);
+    final AStarNode right = this.getNode(x + 1, y);
 
     // diagonal
-    AStarNode topLeft = this.getNode(x - 1, y - 1);
-    AStarNode topRight = this.getNode(x + 1, y - 1);
-    AStarNode bottomLeft = this.getNode(x - 1, y + 1);
-    AStarNode bottomRight = this.getNode(x + 1, y + 1);
+    final AStarNode topLeft = this.getNode(x - 1, y - 1);
+    final AStarNode topRight = this.getNode(x + 1, y - 1);
+    final AStarNode bottomLeft = this.getNode(x - 1, y + 1);
+    final AStarNode bottomRight = this.getNode(x + 1, y + 1);
 
     if (top != null && top.isWalkable()) {
       neighbors.add(top);
@@ -72,26 +72,26 @@ public class AStarGrid {
     }
 
     // only add diogonal neighbours when they are not on a cornor
-    if ((topLeft != null && this.diagonalMovementOnCorners()) || (topLeft != null && top.isWalkable() && left.isWalkable())) {
+    if (topLeft != null && this.diagonalMovementOnCorners() || topLeft != null && top.isWalkable() && left.isWalkable()) {
       neighbors.add(topLeft);
     }
 
-    if ((topRight != null && this.diagonalMovementOnCorners()) || (topRight != null && top.isWalkable() && right.isWalkable())) {
+    if (topRight != null && this.diagonalMovementOnCorners() || topRight != null && top.isWalkable() && right.isWalkable()) {
       neighbors.add(topRight);
     }
 
-    if ((bottomLeft != null && this.diagonalMovementOnCorners()) || (bottomLeft != null && bottom.isWalkable() && left.isWalkable())) {
+    if (bottomLeft != null && this.diagonalMovementOnCorners() || bottomLeft != null && bottom.isWalkable() && left.isWalkable()) {
       neighbors.add(bottomLeft);
     }
 
-    if ((bottomRight != null && this.diagonalMovementOnCorners()) || (bottomRight != null && bottom.isWalkable() && right.isWalkable())) {
+    if (bottomRight != null && this.diagonalMovementOnCorners() || bottomRight != null && bottom.isWalkable() && right.isWalkable()) {
       neighbors.add(bottomRight);
     }
 
     return neighbors;
   }
 
-  private AStarNode getNode(int x, int y) {
+  private AStarNode getNode(final int x, final int y) {
     if (x >= 0 && x < this.getGrid().length && y >= 0 && y < this.getGrid()[0].length) {
       return this.getGrid()[x][y];
     }
@@ -99,37 +99,37 @@ public class AStarGrid {
     return null;
   }
 
-  public AStarNode getNodeFromMapLocation(Point2D point) {
+  public AStarNode getNodeFromMapLocation(final Point2D point) {
     float percentX = (float) (point.getX() / this.getSize().getWidth());
     float percentY = (float) (point.getY() / this.getSize().getHeight());
     percentX = Math.max(0, Math.min(1, percentX));
     percentY = Math.max(0, Math.min(1, percentY));
 
-    int x = (int) ((this.getGrid().length - 1) * percentX);
-    int y = (int) ((this.getGrid()[0].length) * percentY);
+    final int x = (int) ((this.getGrid().length - 1) * percentX);
+    final int y = (int) (this.getGrid()[0].length * percentY);
     return this.getGrid()[x][y];
   }
 
   /**
    * Updates the walkable attribute of nodes intersected by the specified
    * rectangle.
-   * 
+   *
    * @param rectangle
    */
-  public void updateWalkable(Rectangle2D rectangle) {
-    for (AStarNode node : this.getIntersectedNodes(rectangle)) {
+  public void updateWalkable(final Rectangle2D rectangle) {
+    for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
       node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
     }
   }
 
-  public List<AStarNode> getIntersectedNodes(Rectangle2D rectangle) {
+  public List<AStarNode> getIntersectedNodes(final Rectangle2D rectangle) {
     final Point2D start = new Point2D.Double(rectangle.getMinX(), rectangle.getMinY());
     final Point2D end = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
 
     final AStarNode startNode = this.getNodeFromMapLocation(start);
     final AStarNode endNode = this.getNodeFromMapLocation(end);
 
-    List<AStarNode> nodes = new ArrayList<>();
+    final List<AStarNode> nodes = new ArrayList<>();
     if (startNode == null || endNode == null) {
       return nodes;
     }
@@ -159,7 +159,7 @@ public class AStarGrid {
     return this.allowDiagonalMovementOnCorners;
   }
 
-  public void setAllowDiagonalMovementOnCorners(boolean allowDiagonalMovementOnCorners) {
+  public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
     this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
   }
 }

@@ -13,6 +13,5 @@ public interface IState {
 
   public void executeBehaviour(IGameLoop loop);
 
-
   public List<ITransition> getTransitions();
 }

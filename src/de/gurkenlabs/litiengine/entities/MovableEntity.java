@@ -64,7 +64,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
   }
-  
+
   @Override
   public void setAngle(final float angle) {
     super.setAngle(angle);

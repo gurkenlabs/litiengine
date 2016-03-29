@@ -113,14 +113,13 @@ public class Spritesheet {
       return ImageCache.SPRITES.get(imageCacheKey);
     }
 
-    
     final BufferedImage bigImg = RenderEngine.getImage(this.getPath());
     if (bigImg == null) {
       return null;
     }
 
     final Point position = this.getLocation(index);
-    final BufferedImage smallImage = bigImg.getSubimage((int) position.getX(), (int) position.getY(), this.spriteWidth, this.spriteHeight);
+    final BufferedImage smallImage = bigImg.getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
     ImageCache.SPRITES.putPersistent(imageCacheKey, smallImage);
     return smallImage;
   }

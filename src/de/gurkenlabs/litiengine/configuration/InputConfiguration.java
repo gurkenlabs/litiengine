@@ -12,10 +12,10 @@ public class InputConfiguration extends ConfigurationGroup {
   }
 
   public float getMouseSensitivity() {
-    return mouseSensitivity;
+    return this.mouseSensitivity;
   }
 
-  public void setMouseSensitivity(float mouseSensitivity) {
+  public void setMouseSensitivity(final float mouseSensitivity) {
     this.mouseSensitivity = mouseSensitivity;
   }
 }

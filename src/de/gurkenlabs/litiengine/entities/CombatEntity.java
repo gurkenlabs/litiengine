@@ -113,7 +113,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, shieldDmg));
       damage = damage - shieldDmg;
     }
-    
+
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
 
     if (this.isDead()) {
@@ -170,7 +170,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void onResurrect(Consumer<ICombatEntity> consumer) {
+  public void onResurrect(final Consumer<ICombatEntity> consumer) {
     if (this.entityResurrectConsumer.contains(consumer)) {
       return;
     }
@@ -236,7 +236,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void setTarget(ICombatEntity target) {
+  public void setTarget(final ICombatEntity target) {
     this.target = target;
 
   }

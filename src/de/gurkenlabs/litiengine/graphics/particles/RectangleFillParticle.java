@@ -8,21 +8,19 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-
 /**
  * Represents a particle in 2D space.
  */
 public class RectangleFillParticle extends Particle {
 
-  public RectangleFillParticle(float xCurrent, float yCurrent, float dx, float dy, float deltaIncX, float deltaIncY, float width, float height, int life, Color color) {
+  public RectangleFillParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, width, height, life, color);
   }
 
   @Override
-  public void render(Graphics2D g, Point2D emitterOrigin) {
+  public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
     g.setColor(this.getColor());
-    RenderEngine.fillShape(g,new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), this.getWidth(), this.getHeight()));
+    g.fill(new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), this.getWidth(), this.getHeight()));
   }
 }

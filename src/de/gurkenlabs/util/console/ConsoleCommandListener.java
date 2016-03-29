@@ -44,10 +44,10 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
       } catch (final IOException e) {
         e.printStackTrace();
       }
-      
+
       try {
         Thread.sleep(500);
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         e.printStackTrace();
       }
     }

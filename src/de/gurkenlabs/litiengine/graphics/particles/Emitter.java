@@ -4,7 +4,6 @@
 package de.gurkenlabs.litiengine.graphics.particles;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -99,7 +98,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /**
    * Activate.
    */
-  public void activate(IGameLoop gameLoop) {
+  public void activate(final IGameLoop gameLoop) {
     if (gameLoop == null || this.activated) {
       return;
     }
@@ -239,41 +238,41 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.paused = !this.paused;
   }
 
-  public void setMaxParticles(int maxPart) {
+  public void setMaxParticles(final int maxPart) {
     this.maxParticles = maxPart;
   }
 
-  public void setOrigin(Point2D location) {
+  public void setOrigin(final Point2D location) {
     this.setLocation(location);
   }
 
-  public void setParticleMaxTTL(int maxTTL) {
+  public void setParticleMaxTTL(final int maxTTL) {
     this.particleMaxTTL = maxTTL;
   }
 
-  public void getParticleMinTTL(int minTTL) {
+  public void getParticleMinTTL(final int minTTL) {
     this.particleMinTTL = minTTL;
   }
 
-  public void setParticleUpdateRate(int delay) {
+  public void setParticleUpdateRate(final int delay) {
     this.particleUpdateDelay = delay;
   }
 
-  public void setSpawnRate(int spawnRate) {
+  public void setSpawnRate(final int spawnRate) {
     this.spawnRate = spawnRate;
   }
 
-  public void setSpawnAmount(int spawnAmount) {
+  public void setSpawnAmount(final int spawnAmount) {
     this.spawnAmount = spawnAmount;
   }
 
-  public void setTimeToLive(int ttl) {
+  public void setTimeToLive(final int ttl) {
     this.timeToLive = ttl;
   }
 
   @Override
   public void render(final Graphics2D g) {
-    this.particles.forEach(particle -> particle.render((Graphics2D) g, this.getOrigin()));
+    this.particles.forEach(particle -> particle.render(g, this.getOrigin()));
   }
 
   /**
@@ -313,7 +312,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
+    final float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
     this.getParticles().forEach(particle -> particle.update(loop, updateRatio));
 
     // remove dead particles
@@ -328,8 +327,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
-  protected void addParticleColor(Color... colors) {
-    for (Color color : colors) {
+  protected void addParticleColor(final Color... colors) {
+    for (final Color color : colors) {
       if (!this.colors.contains(color)) {
         this.colors.add(color);
       }

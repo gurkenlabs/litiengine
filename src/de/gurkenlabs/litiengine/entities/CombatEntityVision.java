@@ -13,11 +13,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.peer.LightweightPeer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IVision;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 
 // TODO: Auto-generated Javadoc
@@ -123,14 +121,14 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderFogOfWar(final Graphics2D g) {
-    AffineTransform oldTransform = g.getTransform();
-    AffineTransform at = new AffineTransform();
+    final AffineTransform oldTransform = g.getTransform();
+    final AffineTransform at = new AffineTransform();
     at.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
     at.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
     g.setTransform(at);
     g.setColor(FogOfWarColor);
-    RenderEngine.fillShape(g, this.fogOfWar);
+    g.fill(this.fogOfWar);
     g.setTransform(oldTransform);
   }
 
@@ -142,22 +140,22 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderMinimapFogOfWar(final Graphics2D g, final float minimapScale, final int x, final int y) {
-    AffineTransform oldTransform = g.getTransform();
+    final AffineTransform oldTransform = g.getTransform();
 
-    AffineTransform at = new AffineTransform();
+    final AffineTransform at = new AffineTransform();
     at.translate(x, y);
     at.scale(minimapScale, minimapScale);
 
     g.setTransform(at);
     g.setColor(FogOfWarColor);
-    RenderEngine.fillShape(g, this.fogOfWar);
+    g.fill(this.fogOfWar);
     g.setTransform(oldTransform);
   }
 
   @Override
   public void updateVisionShape() {
-    Path2D path = new Path2D.Float();
-    Path2D renderPath = new Path2D.Float();
+    final Path2D path = new Path2D.Float();
+    final Path2D renderPath = new Path2D.Float();
     path.append(this.getMapVisionCircle(this.combatEntity), false);
     renderPath.append(this.getRenderVisionCircle(this.combatEntity), false);
 
@@ -170,8 +168,8 @@ public class CombatEntityVision implements IVision {
 
     this.renderVisionShape = renderPath;
 
-    final float width = (float) (this.environment.getMap().getSizeInPixles().getWidth());
-    final float height = (float) (this.environment.getMap().getSizeInPixles().getHeight());
+    final float width = (float) this.environment.getMap().getSizeInPixles().getWidth();
+    final float height = (float) this.environment.getMap().getSizeInPixles().getHeight();
     final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
     final Area rectangleArea = new Area(rect);
     rectangleArea.subtract(new Area(path));

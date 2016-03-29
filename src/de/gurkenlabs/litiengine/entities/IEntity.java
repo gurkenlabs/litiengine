@@ -15,7 +15,7 @@ public interface IEntity {
   public float getHeight();
 
   public Point2D getLocation();
-  
+
   /**
    * Sets the map location.
    *
@@ -27,7 +27,7 @@ public interface IEntity {
   public int getMapId();
 
   public float getWidth();
-  
+
   public float getAngle();
 
   public void setAnimationController(IAnimationController animationController);

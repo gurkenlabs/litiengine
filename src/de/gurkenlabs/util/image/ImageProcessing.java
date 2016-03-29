@@ -130,11 +130,11 @@ public class ImageProcessing {
     return bimage;
   }
 
-  public static BufferedImage zoom(final BufferedImage image, float zoomLevel) {
-    int newImageWidth = (int) (image.getWidth() * zoomLevel);
-    int newImageHeight = (int) (image.getHeight() * zoomLevel);
-    BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, image.getType());
-    Graphics2D g = resizedImage.createGraphics();
+  public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
+    final int newImageWidth = (int) (image.getWidth() * zoomLevel);
+    final int newImageHeight = (int) (image.getHeight() * zoomLevel);
+    final BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, image.getType());
+    final Graphics2D g = resizedImage.createGraphics();
     g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
     g.dispose();
 
@@ -143,7 +143,7 @@ public class ImageProcessing {
 
   /**
    * Crops a sub image from the specified image.
-   * 
+   *
    * @param image
    * @param cropAlignment
    *          use the following consts: <br>
@@ -164,7 +164,7 @@ public class ImageProcessing {
    * @param height
    * @return
    */
-  public static BufferedImage crop(final BufferedImage image, int cropAlignment, int cropVerticlaAlignment, int width, int height) {
+  public static BufferedImage crop(final BufferedImage image, final int cropAlignment, final int cropVerticlaAlignment, final int width, final int height) {
     if (width > image.getWidth() || height > image.getHeight()) {
       return image;
     }

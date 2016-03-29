@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 public interface IMovableEntity extends ICollisionEntity {
   /**
    * Gets the entitie's velocity in PIXEL / Second
-   * 
+   *
    * @return
    */
   public float getVelocity();

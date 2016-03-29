@@ -12,7 +12,7 @@ public class EntityManager {
     this.entityControllers = new ConcurrentHashMap<>();
   }
 
-  public IEntityController<? extends IEntity> getController(IEntity entity) {
+  public IEntityController<? extends IEntity> getController(final IEntity entity) {
     if (this.entityControllers.containsKey(entity)) {
       return this.entityControllers.get(entity);
     }
@@ -20,7 +20,7 @@ public class EntityManager {
     return null;
   }
 
-  public <T extends IEntity> void addController(T entity, IEntityController<T> controller) {
+  public <T extends IEntity> void addController(final T entity, final IEntityController<T> controller) {
     this.entityControllers.put(entity, controller);
   }
 }

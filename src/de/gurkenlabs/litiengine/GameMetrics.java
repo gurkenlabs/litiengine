@@ -181,7 +181,7 @@ public class GameMetrics implements IUpdateable, IRenderable {
   }
 
   @Override
-  public void render(Graphics2D g) {
+  public void render(final Graphics2D g) {
     final int OffsetX = 5;
     final int OffsetY = 12;
     int currentOffsetY = OffsetY;

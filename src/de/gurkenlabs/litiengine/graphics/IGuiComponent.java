@@ -31,8 +31,6 @@ public interface IGuiComponent extends IRenderable {
    * @return the y
    */
   public double getY();
-  
- 
 
   /**
    * Prepare.
@@ -49,6 +47,7 @@ public interface IGuiComponent extends IRenderable {
   public void suspend();
 
   void setPosition(double x, double y);
+
   void setPosition(Point2D newPosition);
 
   void setDimension(double width, double height);

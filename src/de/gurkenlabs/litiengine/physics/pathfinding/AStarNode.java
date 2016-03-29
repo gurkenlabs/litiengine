@@ -26,7 +26,7 @@ public class AStarNode {
     return this.gCost;
   }
 
-  public void setgCost(int gCost) {
+  public void setgCost(final int gCost) {
     this.gCost = gCost;
   }
 
@@ -34,7 +34,7 @@ public class AStarNode {
     return this.hCost;
   }
 
-  public void sethCost(int hCost) {
+  public void sethCost(final int hCost) {
     this.hCost = hCost;
   }
 
@@ -46,7 +46,7 @@ public class AStarNode {
     return this.predecessor;
   }
 
-  public void setPredecessor(AStarNode predecessor) {
+  public void setPredecessor(final AStarNode predecessor) {
     this.predecessor = predecessor;
   }
 
@@ -54,7 +54,7 @@ public class AStarNode {
     return this.walkable;
   }
 
-  public void setWalkable(boolean walkable) {
+  public void setWalkable(final boolean walkable) {
     this.walkable = walkable;
   }
 
@@ -81,8 +81,8 @@ public class AStarNode {
   public int getCosts(final AStarNode target) {
     final int DIAGONAL_COST = 14;
     final int STRAIGHT_COST = 10;
-    int dstX = Math.abs(this.getGridX() - target.getGridX());
-    int dstY = Math.abs(this.getGridY() - target.getGridY());
+    final int dstX = Math.abs(this.getGridX() - target.getGridX());
+    final int dstY = Math.abs(this.getGridY() - target.getGridY());
 
     if (dstX > dstY) {
       return DIAGONAL_COST * dstY + STRAIGHT_COST * (dstX - dstY);

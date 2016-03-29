@@ -176,7 +176,7 @@ public abstract class Particle implements ITimeToLive {
     return this.getRelativeLocation(effectLocation);
   }
 
-  protected Point2D getRelativeLocation(Point2D effectLocation) {
+  protected Point2D getRelativeLocation(final Point2D effectLocation) {
     return new Point2D.Double(effectLocation.getX() + (int) this.getxCurrent() - this.getWidth() / 2, effectLocation.getY() + (int) this.getyCurrent() - this.getHeight() / 2);
   }
 
@@ -328,11 +328,11 @@ public abstract class Particle implements ITimeToLive {
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
    */
-  public void update(final IGameLoop loop, float updateRatio) {
-    if(this.aliveTick == 0){
+  public void update(final IGameLoop loop, final float updateRatio) {
+    if (this.aliveTick == 0) {
       this.aliveTick = loop.getTicks();
     }
-    
+
     this.aliveTime = loop.getDeltaTime(this.aliveTick);
     if (this.timeToLiveReached()) {
       return;

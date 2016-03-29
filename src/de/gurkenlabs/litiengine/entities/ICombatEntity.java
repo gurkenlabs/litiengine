@@ -15,7 +15,7 @@ public interface ICombatEntity extends ICollisionEntity {
   public void setTarget(final ICombatEntity target);
 
   /**
-   * 
+   *
    * @param damage
    * @return Returns if the entity died by the hit.
    */
@@ -24,13 +24,13 @@ public interface ICombatEntity extends ICollisionEntity {
   public boolean isDead();
 
   public boolean isFriendly(final ICombatEntity entity);
-  
+
   public boolean isNeutral();
 
   public boolean isIndestructible();
 
   public void onDeath(Consumer<ICombatEntity> consumer);
-  
+
   public void onResurrect(Consumer<ICombatEntity> consumer);
 
   public void onHit(Consumer<CombatEntityHitArgument> consumer);

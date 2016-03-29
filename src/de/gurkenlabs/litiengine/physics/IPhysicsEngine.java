@@ -39,7 +39,7 @@ public interface IPhysicsEngine {
 
   /**
    * Moves the specified entity towards target by the delta.
-   * 
+   *
    * @param entity
    * @param target
    * @param delta
@@ -50,14 +50,14 @@ public interface IPhysicsEngine {
   public boolean move(IMovableEntity entity, float delta);
 
   /**
-   * 
+   *
    * @param rect
    * @return true if there is any collision; otherwise false.
    */
   public boolean collides(Point2D point);
 
   /**
-   * 
+   *
    * @param rect
    * @return true if there is any collision; otherwise false.
    */

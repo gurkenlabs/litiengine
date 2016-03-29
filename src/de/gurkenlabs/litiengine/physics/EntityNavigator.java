@@ -80,7 +80,7 @@ public class EntityNavigator implements IEntityNavigator {
       return;
     }
 
-    for (Predicate<IMovableEntity> pred : this.cancelNavigationConditions) {
+    for (final Predicate<IMovableEntity> pred : this.cancelNavigationConditions) {
       if (pred.test(this.getEntity())) {
         this.stop();
         return;

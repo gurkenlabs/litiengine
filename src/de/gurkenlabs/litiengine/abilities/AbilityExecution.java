@@ -100,10 +100,9 @@ public class AbilityExecution implements IUpdateable {
       // while the duration + delay of an effect is not reached or an effect
       // without duration is still active
       // effects without a duration are cancelled after the abiltity duration
-      long effectDuration = loop.getDeltaTime(this.getAppliedEffects().get(effect));
-      int abilityDuration = this.getAbility().getAttributes().getDuration().getCurrentValue();
-      if ((effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && (abilityDuration == 0 || effectDuration < abilityDuration + effect.getDelay()))
-          || (effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay())) {
+      final long effectDuration = loop.getDeltaTime(this.getAppliedEffects().get(effect));
+      final int abilityDuration = this.getAbility().getAttributes().getDuration().getCurrentValue();
+      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && (abilityDuration == 0 || effectDuration < abilityDuration + effect.getDelay()) || effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay()) {
         continue;
       }
 
@@ -113,10 +112,10 @@ public class AbilityExecution implements IUpdateable {
 
       // execute all follow up effects
       effect.getFollowUpEffects().forEach(followUp -> {
-        if(this.getAppliedEffects().containsKey(followUp)){
+        if (this.getAppliedEffects().containsKey(followUp)) {
           return;
         }
-        
+
         followUp.apply(this.getExecutionImpactArea());
         loop.registerForUpdate(followUp);
         this.getAppliedEffects().put(followUp, loop.getTicks());

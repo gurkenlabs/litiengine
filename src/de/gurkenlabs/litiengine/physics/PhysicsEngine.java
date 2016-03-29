@@ -63,14 +63,14 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(IMovableEntity entity, Point2D target, float delta) {
-    Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
+  public boolean move(final IMovableEntity entity, final Point2D target, final float delta) {
+    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
     return this.move(entity, newPosition);
   }
 
   @Override
   public boolean move(final IMovableEntity entity, final float angle, final float delta) {
-    Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
+    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
   }
 
@@ -99,8 +99,8 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean collides(Point2D point) {
-    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+  public boolean collides(final Point2D point) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (collisionBox.contains(point)) {
         return true;
       }
@@ -110,8 +110,8 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean collides(Rectangle2D rect) {
-    for (Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+  public boolean collides(final Rectangle2D rect) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (collides(rect, collisionBox)) {
         return true;
       }
@@ -147,7 +147,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     return null;
   }
 
-  private static boolean collides(Rectangle2D a, Rectangle2D b) {
+  private static boolean collides(final Rectangle2D a, final Rectangle2D b) {
     if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() / 2 + b.getWidth() / 2) {
       if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() / 2 + b.getHeight() / 2) {
         return true;
@@ -216,15 +216,15 @@ public class PhysicsEngine implements IPhysicsEngine {
     entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
 
     if (entity.hasCollision()) {
-      Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
+      final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
       if (staticIntersection != null) {
-        newPosition = resolveCollision(entity, newPosition, staticIntersection);
+        newPosition = this.resolveCollision(entity, newPosition, staticIntersection);
         success = false;
       }
 
-      Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, newPosition);
+      final Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, newPosition);
       if (entityIntersection != null) {
-        newPosition = resolveCollision(entity, newPosition, entityIntersection);
+        newPosition = this.resolveCollision(entity, newPosition, entityIntersection);
         success = false;
       }
     }
@@ -239,9 +239,9 @@ public class PhysicsEngine implements IPhysicsEngine {
     return success;
   }
 
-  private Point2D resolveCollision(final IMovableEntity entity, Point2D newPosition, Rectangle2D intersection) {
-    Point2D resolvedPosition = newPosition;
-    double smallerDistance = Math.min(intersection.getWidth(), intersection.getHeight());
+  private Point2D resolveCollision(final IMovableEntity entity, final Point2D newPosition, final Rectangle2D intersection) {
+    final Point2D resolvedPosition = newPosition;
+    final double smallerDistance = Math.min(intersection.getWidth(), intersection.getHeight());
     if (smallerDistance == intersection.getWidth()) {
       // x axis resolving
       if (Math.abs(newPosition.getX() - intersection.getMinX()) < Math.abs(newPosition.getX() - intersection.getMaxX())) {

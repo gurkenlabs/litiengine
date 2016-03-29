@@ -154,7 +154,7 @@ public class CombatAttributes {
 
     // 10% increase per level
     final float levelMultiplier = 1.1f;
-    float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
+    final float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
 
     this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
     this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, maxXp));
@@ -175,12 +175,12 @@ public class CombatAttributes {
     this.getExperience().modifyBaseValue(new AttributeModifier<>(Modification.Set, 0));
     this.updateAttributes();
 
-    for (Consumer<CombatAttributes> consumer : this.levelUpConsumer) {
+    for (final Consumer<CombatAttributes> consumer : this.levelUpConsumer) {
       consumer.accept(this);
     }
   }
 
-  public void onLevelUp(Consumer<CombatAttributes> consumer) {
+  public void onLevelUp(final Consumer<CombatAttributes> consumer) {
     if (!this.levelUpConsumer.contains(consumer)) {
       this.levelUpConsumer.add(consumer);
     }

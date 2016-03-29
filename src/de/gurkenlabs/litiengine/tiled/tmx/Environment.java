@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -58,7 +57,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void add(int mapId, IMovableCombatEntity entity) {
+  public void add(final int mapId, final IMovableCombatEntity entity) {
     this.addCombatEntity(mapId, entity);
     this.addMovableEntity(mapId, entity);
   }
@@ -93,9 +92,9 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition) {
-    ArrayList<ICombatEntity> entities = new ArrayList<>();
-    for (ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
+    final ArrayList<ICombatEntity> entities = new ArrayList<>();
+    for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
       if (combatEntity.getHitBox().intersects(shape.getBounds())) {
         if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
           entities.add(combatEntity);
@@ -155,7 +154,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void remove(int mapId) {
+  public void remove(final int mapId) {
     if (this.movableEntities.containsKey(mapId)) {
       this.movableEntities.remove(mapId);
     }

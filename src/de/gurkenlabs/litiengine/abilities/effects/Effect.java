@@ -207,11 +207,11 @@ public abstract class Effect implements IEffect {
     return this.targetPriorityComparator;
   }
 
-  public void setTargetPriorityComparator(EntityComparator targetPriorityComparator) {
+  public void setTargetPriorityComparator(final EntityComparator targetPriorityComparator) {
     this.targetPriorityComparator = targetPriorityComparator;
   }
 
-  protected void setActive(boolean active) {
+  protected void setActive(final boolean active) {
     this.active = active;
   }
 

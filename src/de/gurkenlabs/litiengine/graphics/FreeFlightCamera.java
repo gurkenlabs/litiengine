@@ -12,16 +12,6 @@ public class FreeFlightCamera extends Camera {
     this.location = location;
   }
 
-  @Override
-  public double getCenterX() {
-    return Game.getScreenManager().getResolution().width / 2.0 / Game.getInfo().renderScale();
-  }
-
-  @Override
-  public double getCenterY() {
-    return Game.getScreenManager().getResolution().height / 2.0 / Game.getInfo().renderScale();
-  }
-
   /*
    * (non-Javadoc)
    *
@@ -29,15 +19,17 @@ public class FreeFlightCamera extends Camera {
    */
   @Override
   public Rectangle2D getViewPort() {
-    return new Rectangle2D.Double(this.getFocus().getX() - this.getCenterX(), this.getFocus().getY() - this.getCenterY(), Game.getScreenManager().getResolution().width / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().height / Game.getInfo().renderScale());
+    return new Rectangle2D.Double(this.getFocus().getX() - this.getCenterX(), this.getFocus().getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
   }
 
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.location));
+    this.setCenterX(Game.getScreenManager().getResolution().getWidth() / 2.0 / Game.getInfo().renderScale());
+    this.setCenterY(Game.getScreenManager().getResolution().getHeight() / 2.0 / Game.getInfo().renderScale());
   }
 
-  public void setLocation(Point2D location) {
+  public void setLocation(final Point2D location) {
     this.location = location;
   }
 

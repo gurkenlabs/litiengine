@@ -1,11 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
 public enum Direction {
-  DOWN((byte) 1),
-  LEFT((byte) 2),
-  RIGHT((byte) 4),
-  UNDEFINED((byte) 8),
-  UP((byte) 16);
+  DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);
 
   private final byte flagValue;
 
@@ -40,7 +36,7 @@ public enum Direction {
     if (angle >= 315 && angle <= 360) {
       return Direction.DOWN;
     }
-    
+
     return Direction.UNDEFINED;
   }
 

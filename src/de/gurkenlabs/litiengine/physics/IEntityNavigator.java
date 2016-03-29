@@ -21,12 +21,12 @@ public interface IEntityNavigator extends IUpdateable {
   public IPathFinder getPathFinder();
 
   public void navigate(Point2D target);
-  
+
   public void stop();
 
   public void rotateTowards(Point2D target);
-  
+
   public boolean isNavigating();
-  
+
   public void cancelNavigation(Predicate<IMovableEntity> predicate);
 }

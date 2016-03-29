@@ -16,7 +16,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
   private final IMovableEntity movableEntity;
   private final IPhysicsEngine engine;
 
-  public EntityMovementController(final IGameLoop gameLoop,final IPhysicsEngine engine, final IMovableEntity movableEntity) {
+  public EntityMovementController(final IGameLoop gameLoop, final IPhysicsEngine engine, final IMovableEntity movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
     this.movableEntity = movableEntity;
@@ -30,7 +30,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
   }
 
   @Override
-  public void apply(Force force) {
+  public void apply(final Force force) {
     if (!this.activeForces.contains(force)) {
       this.activeForces.add(force);
     }
@@ -51,14 +51,14 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
   }
 
   @Override
-  public void onMovementCheck(Predicate<IEntityMovementController> predicate) {
+  public void onMovementCheck(final Predicate<IEntityMovementController> predicate) {
     if (!this.movementPredicates.contains(predicate)) {
       this.movementPredicates.add(predicate);
     }
   }
 
   protected boolean isMovementAllowed() {
-    for (Predicate<IEntityMovementController> predicate : this.movementPredicates) {
+    for (final Predicate<IEntityMovementController> predicate : this.movementPredicates) {
       if (!predicate.test(this)) {
         return false;
       }
@@ -67,7 +67,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
     return true;
   }
 
-  private void handleForces(IGameLoop gameLoop) {
+  private void handleForces(final IGameLoop gameLoop) {
     // clean up forces
     this.activeForces.forEach(x -> {
       if (x.hasEnded()) {
@@ -85,7 +85,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
       }
 
       final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY()), force.getLocation());
-      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, (gameLoop.getDeltaTime() / 1000.0F) * force.getStrength());
+      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() / 1000.0F * force.getStrength());
       if (force.cancelOnCollision() && !success) {
         force.end();
       }

@@ -40,9 +40,9 @@ public interface IVision {
    * @return the render vision shape
    */
   public Shape getRenderVisionShape();
-  
+
   public void updateVisionShape();
-  
+
   /**
    * Intersects.
    *

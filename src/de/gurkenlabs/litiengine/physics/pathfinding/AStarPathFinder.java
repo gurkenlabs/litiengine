@@ -18,7 +18,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class AStarPathFinder extends PathFinder {
   private final AStarGrid grid;
 
-  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, int gridNodeSize) {
+  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, final int gridNodeSize) {
     this.grid = new AStarGrid(physicsEngine, map, gridNodeSize);
   }
 
@@ -27,17 +27,17 @@ public class AStarPathFinder extends PathFinder {
   }
 
   @Override
-  public Path findPath(IMovableEntity entity, Point2D target) {
+  public Path findPath(final IMovableEntity entity, final Point2D target) {
     // if there is no collision between the start and the target return a direct
     // path
-    Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
-    Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
+    final Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
+    final Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
     if (collisionBox == null) {
       return this.findDirectPath(startLocation, target);
     }
 
-    AStarNode startNode = this.getGrid().getNodeFromMapLocation(startLocation);
-    AStarNode targetNode = this.getGrid().getNodeFromMapLocation(target);
+    final AStarNode startNode = this.getGrid().getNodeFromMapLocation(startLocation);
+    final AStarNode targetNode = this.getGrid().getNodeFromMapLocation(target);
     if (startNode.equals(targetNode)) {
       return null;
     }
@@ -47,8 +47,8 @@ public class AStarPathFinder extends PathFinder {
       return this.findDirectPath(startLocation, target);
     }
 
-    List<AStarNode> opened = new ArrayList<>();
-    List<AStarNode> closed = new ArrayList<>();
+    final List<AStarNode> opened = new ArrayList<>();
+    final List<AStarNode> closed = new ArrayList<>();
     opened.add(startNode);
 
     while (opened.size() > 0) {
@@ -56,7 +56,7 @@ public class AStarPathFinder extends PathFinder {
 
       // find node with lowest cost
       for (int i = 1; i < opened.size(); i++) {
-        if (opened.get(i).getfCost() < currentNode.getfCost() || (opened.get(i).getfCost() == currentNode.getfCost() && opened.get(i).gethCost() < currentNode.gethCost())) {
+        if (opened.get(i).getfCost() < currentNode.getfCost() || opened.get(i).getfCost() == currentNode.getfCost() && opened.get(i).gethCost() < currentNode.gethCost()) {
           currentNode = opened.get(i);
         }
       }
@@ -79,7 +79,7 @@ public class AStarPathFinder extends PathFinder {
           continue;
         }
 
-        int newgCostOfNeighbour = currentNode.getgCost() + currentNode.getCosts(neighbour);
+        final int newgCostOfNeighbour = currentNode.getgCost() + currentNode.getCosts(neighbour);
         if (newgCostOfNeighbour < neighbour.getgCost() || !opened.contains(neighbour)) {
           neighbour.setgCost(newgCostOfNeighbour);
           neighbour.sethCost(neighbour.getCosts(targetNode));
@@ -99,8 +99,8 @@ public class AStarPathFinder extends PathFinder {
     return this.grid;
   }
 
-  private Path retracePath(AStarNode startNode, AStarNode targetNode) {
-    List<AStarNode> path = new ArrayList<>();
+  private Path retracePath(final AStarNode startNode, final AStarNode targetNode) {
+    final List<AStarNode> path = new ArrayList<>();
     AStarNode currentNode = targetNode.getPredecessor();
 
     while (currentNode != startNode) {
@@ -115,8 +115,8 @@ public class AStarPathFinder extends PathFinder {
 
     final List<Point2D> pointsOfPath = new ArrayList<>();
     for (int i = 0; i < path.size(); i++) {
-      AStarNode current = path.get(i);
-      Point currentPoint = new Point(current.getLocation().x, current.getLocation().y);
+      final AStarNode current = path.get(i);
+      final Point currentPoint = new Point(current.getLocation().x, current.getLocation().y);
       pointsOfPath.add(currentPoint);
       path2D.lineTo(currentPoint.x, currentPoint.y);
     }
@@ -128,19 +128,20 @@ public class AStarPathFinder extends PathFinder {
 
   /**
    * TODO: Improve this optimization.
+   * 
    * @param path
    * @return
    */
   private static List<AStarNode> optimizePath(final List<AStarNode> path) {
-    List<AStarNode> optPath = new ArrayList<>();
+    final List<AStarNode> optPath = new ArrayList<>();
     double oldAngle = 0;
     for (int i = 1; i < path.size(); i++) {
 
-      double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
+      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
       if (angle != oldAngle) {
         optPath.add(path.get(i));
       }
-      
+
       oldAngle = angle;
     }
     return optPath;

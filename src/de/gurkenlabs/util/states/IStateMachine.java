@@ -7,5 +7,5 @@ public interface IStateMachine extends IUpdateable {
   public void setState(final IState newState);
 
   public IState getCurrentState();
-  
+
 }

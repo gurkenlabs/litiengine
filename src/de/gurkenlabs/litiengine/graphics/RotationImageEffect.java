@@ -7,14 +7,14 @@ import java.awt.image.BufferedImage;
 public class RotationImageEffect extends ImageEffect {
   private final float angle;
 
-  public RotationImageEffect(int ttl, float angle) {
+  public RotationImageEffect(final int ttl, final float angle) {
     super(ttl);
     this.angle = angle;
   }
 
   @Override
-  public BufferedImage apply(BufferedImage image) {
-    int size = Math.max(image.getWidth(), image.getHeight()) * 2;
+  public BufferedImage apply(final BufferedImage image) {
+    final int size = Math.max(image.getWidth(), image.getHeight()) * 2;
     final BufferedImage img = RenderEngine.createCompatibleImage(size, size);
     final Graphics2D g = img.createGraphics();
     RenderEngine.renderImage(g, image, new Point2D.Double(0, 0), this.getAngle());

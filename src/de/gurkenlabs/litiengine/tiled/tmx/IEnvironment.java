@@ -32,7 +32,7 @@ public interface IEnvironment extends IInitializable {
   public ICombatEntity getCombatEntity(final int mapId);
 
   public List<ICombatEntity> findCombatEntities(Shape shape);
-  
+
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
   /**
@@ -47,13 +47,13 @@ public interface IEnvironment extends IInitializable {
   public IMovableEntity getMovableEntity(final int mapId);
 
   /**
-   * Gets the next unique local map id. 
-   * (All local map ids are negative).
+   * Gets the next unique local map id. (All local map ids are negative).
    */
   public int getLocalMapId();
-  
+
   /**
    * Gets the next unique global map id.
+   * 
    * @return
    */
   public int getMapId();

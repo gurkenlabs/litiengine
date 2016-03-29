@@ -11,7 +11,7 @@ public interface IGameLoop extends ILaunchable {
 
   /**
    * Gets the time passed since the last tick.
-   * 
+   *
    * @return
    */
   public long getDeltaTime();

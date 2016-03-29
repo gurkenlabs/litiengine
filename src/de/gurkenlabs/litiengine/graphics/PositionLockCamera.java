@@ -21,26 +21,6 @@ public class PositionLockCamera extends Camera {
     this.updateFocus();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getCenterX()
-   */
-  @Override
-  public double getCenterX() {
-    return Game.getScreenManager().getResolution().width / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() / 2.0;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getCenterY()
-   */
-  @Override
-  public double getCenterY() {
-    return Game.getScreenManager().getResolution().height / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() / 2.0;
-  }
-
   public IEntity getLockedEntity() {
     return this.entity;
   }
@@ -52,8 +32,8 @@ public class PositionLockCamera extends Camera {
    */
   @Override
   public Rectangle2D getViewPort() {
-    Point2D focus = this.getFocus();
-    return new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().width / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().height / Game.getInfo().renderScale());
+    final Point2D focus = this.getFocus();
+    return new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
   }
 
   @Override
@@ -77,5 +57,7 @@ public class PositionLockCamera extends Camera {
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedEntity().getLocation();
     this.setFocus(this.applyShakeEffect(cameraLocation));
+    this.setCenterX(Game.getScreenManager().getResolution().getWidth() / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() / 2.0);
+    this.setCenterY(Game.getScreenManager().getResolution().getHeight() / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() / 2.0);
   }
 }

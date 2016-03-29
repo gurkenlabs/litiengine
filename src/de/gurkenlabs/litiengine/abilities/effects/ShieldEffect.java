@@ -41,7 +41,7 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
 
   @Override
   protected void cease(final ICombatEntity affectedEntity) {
-    AttributeModifier<Short> revert = new AttributeModifier<>(this.getModifier().getModification(), -this.getModifier().getModifyValue());
+    final AttributeModifier<Short> revert = new AttributeModifier<>(this.getModifier().getModification(), -this.getModifier().getModifyValue());
     this.getAttribute(affectedEntity).modifyBaseValue(revert);
   }
 }

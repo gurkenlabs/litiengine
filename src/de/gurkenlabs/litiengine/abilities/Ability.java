@@ -79,19 +79,19 @@ public abstract class Ability {
     return this.internalCalculateImpactArea(this.getExecutor().getAngle());
   }
 
-  protected Shape internalCalculateImpactArea(float angle) {
+  protected Shape internalCalculateImpactArea(final float angle) {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
     final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
 
     // project
-    Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, (this.getAttributes().getRange().getCurrentValue() / 2));
+    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() / 2);
     final double start = angle - impactAngle / 2 - 90;
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
     }
-    
+
     return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 

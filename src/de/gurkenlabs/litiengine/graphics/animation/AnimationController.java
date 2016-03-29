@@ -63,7 +63,7 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
-  public BufferedImage getCurrentScaledSprite(int width, int height) {
+  public BufferedImage getCurrentScaledSprite(final int width, final int height) {
     if (this.getCurrentAnimation() == null) {
       return null;
     }

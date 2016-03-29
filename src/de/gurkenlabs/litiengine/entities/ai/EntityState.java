@@ -8,7 +8,7 @@ public abstract class EntityState<T extends Entity> extends State implements IEn
   private final T entity;
   private final IEnvironment environment;
 
-  protected EntityState(String name, T entity, IEnvironment env) {
+  protected EntityState(final String name, final T entity, final IEnvironment env) {
     super(name);
     this.entity = entity;
     this.environment = env;

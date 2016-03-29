@@ -24,6 +24,9 @@ public abstract class Camera implements ICamera {
   /** The shake tick. */
   private long shakeTick;
 
+  private double centerX;
+  private double centerY;
+
   /**
    * Instantiates a new camera.
    */
@@ -72,11 +75,11 @@ public abstract class Camera implements ICamera {
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
     if (entity.getAnimationController() == null || entity.getAnimationController().getCurrentAnimation() == null) {
-      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() / 2, viewPortLocation.getY() + entity.getHeight() / 2);
+      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() / 2.0, viewPortLocation.getY() + entity.getHeight() / 2.0);
     }
 
     final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() / 2, viewPortLocation.getY() + spriteSheet.getSpriteHeight() / 2);
+    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() / 2.0, viewPortLocation.getY() + spriteSheet.getSpriteHeight() / 2.0);
   }
 
   /*
@@ -133,6 +136,16 @@ public abstract class Camera implements ICamera {
     this.shakeDuration = shakeDuration;
   }
 
+  @Override
+  public double getCenterX() {
+    return this.centerX;
+  }
+
+  @Override
+  public double getCenterY() {
+    return this.centerY;
+  }
+
   /**
    * Apply shake effect.
    *
@@ -141,9 +154,9 @@ public abstract class Camera implements ICamera {
    * @return the point2 d
    */
   protected Point2D applyShakeEffect(final Point2D cameraLocation) {
-    final boolean rnd = Math.random() > 0.5;
     if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
-      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * (rnd ? -1 : 1), cameraLocation.getY() + this.getShakeOffset() * (rnd ? -1 : 1));
+      final boolean rnd = Math.random() > 0.5;
+      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * (rnd ? -1.0 : 1.0), cameraLocation.getY() + this.getShakeOffset() * (rnd ? -1.0 : 1.0));
     }
 
     return cameraLocation;
@@ -178,5 +191,13 @@ public abstract class Camera implements ICamera {
 
   protected void setFocus(final Point2D focus) {
     this.focus = focus;
+  }
+
+  protected void setCenterX(final double centerX) {
+    this.centerX = centerX;
+  }
+
+  protected void setCenterY(final double centerY) {
+    this.centerY = centerY;
   }
 }

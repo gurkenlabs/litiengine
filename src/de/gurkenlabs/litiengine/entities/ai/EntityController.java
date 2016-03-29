@@ -6,13 +6,14 @@ import de.gurkenlabs.util.states.StateMachine;
 
 public class EntityController<T extends Entity> extends StateMachine implements IEntityController<T> {
   private final T entity;
-  protected EntityController(final IGameLoop loop, T entity) {
+
+  protected EntityController(final IGameLoop loop, final T entity) {
     super(loop);
     this.entity = entity;
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update(final IGameLoop loop) {
     super.update(loop);
   }
 

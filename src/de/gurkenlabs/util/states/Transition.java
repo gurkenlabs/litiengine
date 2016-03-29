@@ -21,7 +21,7 @@ public abstract class Transition implements ITransition {
   }
 
   @Override
-  public int compareTo(ITransition other) {
+  public int compareTo(final ITransition other) {
     return Integer.compare(this.getPriority(), other.getPriority());
   }
 }

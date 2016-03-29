@@ -67,7 +67,7 @@ public class ShimmerParticle extends RectangleFillParticle {
    * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
    */
   @Override
-  public void update(final IGameLoop loop, float updateRateFactor) {
+  public void update(final IGameLoop loop, final float updateRateFactor) {
     super.update(loop, updateRateFactor);
     final Random rand = new Random();
 

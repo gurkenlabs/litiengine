@@ -18,7 +18,7 @@ public class Path {
   private final Point2D start;
   /** The target. */
   private final Point2D target;
-  
+
   private final List<Point2D> points;
 
   /**

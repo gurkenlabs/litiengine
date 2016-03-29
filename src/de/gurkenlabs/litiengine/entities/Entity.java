@@ -122,7 +122,7 @@ public abstract class Entity implements IEntity {
     this.mapLocation = location;
   }
 
-  protected void setAngle(float angle) {
+  protected void setAngle(final float angle) {
     this.angle = angle;
   }
 }

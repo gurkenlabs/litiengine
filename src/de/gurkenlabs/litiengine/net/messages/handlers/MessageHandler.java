@@ -46,7 +46,7 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
    * This method can be overwritten by concrete implementations to provide a
    * validation mechanism for the messages sent. E.g. one could test if a
    * certain field of the message is not null.
-   * 
+   *
    * @param message
    * @return True if the message is valid for the message handler; otherwise
    *         false.

@@ -18,7 +18,7 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   /** The updaterate. */
   private int updaterate;
-  
+
   private boolean showGameMetrics;
 
   /**
@@ -82,7 +82,7 @@ public class ClientConfiguration extends ConfigurationGroup {
     return this.showGameMetrics;
   }
 
-  public void setShowGameMetrics(boolean showGameMetrics) {
+  public void setShowGameMetrics(final boolean showGameMetrics) {
     this.showGameMetrics = showGameMetrics;
   }
 }

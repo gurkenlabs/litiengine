@@ -20,6 +20,7 @@ public interface IRenderEngine {
   public IMapRenderer getMapRenderer(MapOrientation orientation);
 
   public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
+
   public void onEntityRendered(Consumer<RenderEvent<IEntity>> entity);
 
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
@@ -28,8 +29,6 @@ public interface IRenderEngine {
 
   public void render(Graphics2D g, List<? extends IRenderable> renderables, IVision vision);
 
-  
-  
   public void renderEntities(Graphics2D g, List<? extends IEntity> entities);
 
   public void renderEntities(Graphics2D g, List<? extends IEntity> entities, IVision vision);

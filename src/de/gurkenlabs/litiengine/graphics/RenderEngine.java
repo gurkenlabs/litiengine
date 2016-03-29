@@ -98,8 +98,8 @@ public class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, float angle) {
-    AffineTransform t = new AffineTransform();
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
+    final AffineTransform t = new AffineTransform();
 
     t.translate(renderLocation.getX(), renderLocation.getY());
     t.rotate(Math.toRadians(angle), image.getWidth(null) / 2, image.getHeight(null) / 2);
@@ -107,27 +107,18 @@ public class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape) {
-    final AffineTransform t = new AffineTransform();
-    t.translate(shape.getBounds2D().getX(), shape.getBounds2D().getY());
-    g.draw(shape);
-  }
-
-  public static void fillShape(final Graphics2D g, final Shape shape) {
-    final AffineTransform t = new AffineTransform();
-    t.translate(shape.getBounds2D().getX(), shape.getBounds2D().getY());
-    g.fill(shape);
-  }
-
-  public static void drawText(final Graphics2D g, final String text, float x, float y) {
+  public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
     final AffineTransform t = new AffineTransform();
     t.translate(x, y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    g.drawString(text, x, y);
+    final AffineTransform old = g.getTransform();
+    g.setTransform(t);
+    g.drawString(text, 0, 0);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    g.setTransform(old);
   }
 
-  public static BufferedImage createCompatibleImage(int width, int height) {
+  public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();
@@ -137,7 +128,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public IMapRenderer getMapRenderer(MapOrientation mapOrientation) {
+  public IMapRenderer getMapRenderer(final MapOrientation mapOrientation) {
     if (!this.mapRenderer.containsKey(mapOrientation)) {
       throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
     }
@@ -153,7 +144,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity) {
+  public void onEntityRendering(final Consumer<RenderEvent<IEntity>> entity) {
     if (!this.entityRenderingConsumer.contains(entity)) {
       this.entityRenderingConsumer.add(entity);
     }
@@ -213,7 +204,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(Graphics2D g, IRenderable renderable) {
+  public void render(final Graphics2D g, final IRenderable renderable) {
     if (renderable == null) {
       return;
     }
@@ -237,7 +228,7 @@ public class RenderEngine implements IRenderEngine {
 
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
-      final BufferedImage img = entity.getAnimationController().getCurrentScaledSprite(entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteWidth(),entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteHeight());
+      final BufferedImage img = entity.getAnimationController().getCurrentScaledSprite(entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteWidth(), entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteHeight());
       renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
       rendered = true;
     }

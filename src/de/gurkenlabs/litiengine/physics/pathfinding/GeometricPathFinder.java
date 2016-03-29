@@ -34,7 +34,7 @@ public class GeometricPathFinder extends PathFinder {
   private static boolean isInRectangle(final Point2D point, final Rectangle2D rect) {
     return point.getX() >= rect.getMinX() && point.getX() <= rect.getMaxX() && point.getY() >= rect.getMinY() && point.getY() <= rect.getMaxY();
   }
-  
+
   /*
    * (non-Javadoc)
    *
@@ -46,8 +46,8 @@ public class GeometricPathFinder extends PathFinder {
   public Path findPath(final IMovableEntity entity, final Point2D target) {
     // if there is no collision between the start and the target return a direct
     // path
-    Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
-    Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
+    final Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
+    final Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
     if (collisionBox == null) {
       return this.findDirectPath(startLocation, target);
     }
