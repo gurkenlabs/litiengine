@@ -6,8 +6,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-
 public class TextParticle extends Particle {
   private final String text;
   private Font font;
@@ -27,7 +25,7 @@ public class TextParticle extends Particle {
     }
     final FontMetrics fm = g.getFontMetrics();
     final int x = fm.stringWidth(this.getText()) / 2;
-    RenderEngine.drawText(g, this.getText(), (int) renderLocation.getX() - x, (int) renderLocation.getY());
+    g.drawString(this.getText(), (int) renderLocation.getX() - x, (int) renderLocation.getY());
     g.setFont(oldFont);
   }
 

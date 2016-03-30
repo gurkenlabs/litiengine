@@ -108,14 +108,10 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
-    final AffineTransform t = new AffineTransform();
-    t.translate(x, y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    final AffineTransform old = g.getTransform();
-    g.setTransform(t);
-    g.drawString(text, 0, 0);
+
+    g.drawString(text, (int)x, (int)y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-    g.setTransform(old);
   }
 
   public static BufferedImage createCompatibleImage(final int width, final int height) {
