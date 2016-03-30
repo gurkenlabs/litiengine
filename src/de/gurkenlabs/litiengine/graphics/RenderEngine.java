@@ -228,7 +228,7 @@ public class RenderEngine implements IRenderEngine {
 
     boolean rendered = false;
     if (entity.getAnimationController() != null) {
-      final BufferedImage img = entity.getAnimationController().getCurrentScaledSprite(entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteWidth(), entity.getAnimationController().getCurrentAnimation().getSpritesheet().getSpriteHeight());
+      final BufferedImage img = entity.getAnimationController().getCurrentSprite();
       renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
       rendered = true;
     }

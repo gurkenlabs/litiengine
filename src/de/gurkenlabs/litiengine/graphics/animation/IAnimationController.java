@@ -19,5 +19,7 @@ public interface IAnimationController extends IUpdateable {
 
   public void playAnimation(final String animationName);
 
-  public BufferedImage getCurrentScaledSprite(int width, int height);
+  public BufferedImage getCurrentSprite(int width, int height);
+
+  public BufferedImage getCurrentSprite();
 }

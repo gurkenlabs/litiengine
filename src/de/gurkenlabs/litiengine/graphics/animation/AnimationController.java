@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,7 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
-  public BufferedImage getCurrentScaledSprite(final int width, final int height) {
+  public BufferedImage getCurrentSprite() {
     if (this.getCurrentAnimation() == null) {
       return null;
     }
@@ -72,8 +73,13 @@ public abstract class AnimationController implements IAnimationController {
     for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
-    
-    return ImageProcessing.scaleImage(sprite, width, height);
+
+    return sprite;
+  }
+
+  @Override
+  public BufferedImage getCurrentSprite(final int width, final int height) {
+    return ImageProcessing.scaleImage(this.getCurrentSprite(), width, height);
   }
 
   @Override
@@ -112,6 +118,14 @@ public abstract class AnimationController implements IAnimationController {
     }
   }
 
+  protected String buildCurrentCacheKey() {
+    final StringBuilder effects = new StringBuilder();
+    this.getImageEffects().forEach(x -> effects.append(x.getClass().getSimpleName()));
+
+    final String cacheKey = MessageFormat.format("{0}_{1}_{2}", this.getCurrentAnimation().getSpritesheet().getPath().hashCode(), this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex(), effects.toString());
+    return cacheKey;
+  }
+
   private void removeFinishedImageEffects() {
     for (int i = 0; i < this.imageEffects.size(); i++) {
       final IImageEffect effect = this.imageEffects.get(i);
@@ -126,4 +140,5 @@ public abstract class AnimationController implements IAnimationController {
 
     this.imageEffects.removeAll(Collections.singleton(null));
   }
+
 }
