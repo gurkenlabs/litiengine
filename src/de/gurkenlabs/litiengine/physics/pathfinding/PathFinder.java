@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -84,8 +85,10 @@ public abstract class PathFinder implements IPathFinder {
 
     Rectangle2D min = null;
     double minDist = 0;
-    for (final Rectangle2D shape : intersectedShapes.keySet()) {
-      final double dist = intersectedShapes.get(shape).distance(target);
+    for (final Entry<Rectangle2D, Point2D> entry : intersectedShapes.entrySet()) {
+      Rectangle2D shape = entry.getKey();
+      Point2D intersection = entry.getValue();
+      final double dist = intersection.distance(target);
       if (min == null) {
         min = shape;
         minDist = dist;

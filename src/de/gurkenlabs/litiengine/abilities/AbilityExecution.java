@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.abilities;
 
 import java.awt.Shape;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -96,11 +97,14 @@ public class AbilityExecution implements IUpdateable {
     }
 
     // handle already applied effects
-    for (final IEffect effect : this.getAppliedEffects().keySet()) {
+    for (final Entry<IEffect, Long> entry : this.getAppliedEffects().entrySet()) {
+      IEffect effect = entry.getKey();
+      long time = entry.getValue();
+      
       // while the duration + delay of an effect is not reached or an effect
       // without duration is still active
       // effects without a duration are cancelled after the abiltity duration
-      final long effectDuration = loop.getDeltaTime(this.getAppliedEffects().get(effect));
+      final long effectDuration = loop.getDeltaTime(time);
       final int abilityDuration = this.getAbility().getAttributes().getDuration().getCurrentValue();
       if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && (abilityDuration == 0 || effectDuration < abilityDuration + effect.getDelay()) || effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay()) {
         continue;

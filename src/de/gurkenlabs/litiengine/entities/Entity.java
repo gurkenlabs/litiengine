@@ -125,4 +125,9 @@ public abstract class Entity implements IEntity {
   protected void setAngle(final float angle) {
     this.angle = angle;
   }
+  
+  @Override
+  public int hashCode() {
+    return this.mapId;
+  }
 }
