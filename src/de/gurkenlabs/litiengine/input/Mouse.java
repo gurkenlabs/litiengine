@@ -341,8 +341,8 @@ public class Mouse implements IMouse {
       return;
     }
 
-    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() / 2;
-    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() / 2;
+    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
+    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
 
     // calculate diffs and new location for the ingame mouse
     final double diffX = mouseLocation.x - screenCenterX;

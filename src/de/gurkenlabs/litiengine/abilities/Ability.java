@@ -82,12 +82,12 @@ public abstract class Ability {
   protected Shape internalCalculateImpactArea(final float angle) {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact / 2;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact / 2;
+    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact * 0.5;
+    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact * 0.5;
 
     // project
-    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() / 2);
-    final double start = angle - impactAngle / 2 - 90;
+    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
+    final double start = angle - impactAngle * 0.5 - 90;
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
     }
@@ -97,8 +97,8 @@ public abstract class Ability {
 
   public Ellipse2D calculatePotentialImpactArea() {
     final int range = this.getAttributes().getImpact().getCurrentValue();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range / 2;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range / 2;
+    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range * 0.5;
+    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - range * 0.5;
 
     return new Ellipse2D.Double(arcX, arcY, range, range);
   }
@@ -143,7 +143,7 @@ public abstract class Ability {
    * @return the cooldown in seconds
    */
   public float getCooldownInSeconds() {
-    return (float) (this.getAttributes().getCooldown().getCurrentValue() / 1000.0);
+    return (float) (this.getAttributes().getCooldown().getCurrentValue() * 0.001);
   }
 
   /**
@@ -183,7 +183,7 @@ public abstract class Ability {
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) / 1000.0 : 0);
+    return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
   /**

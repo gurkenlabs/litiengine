@@ -118,7 +118,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    final float pixelsPerTick = loop.getDeltaTime() / 1000.0F * this.entity.getVelocity();
+    final float pixelsPerTick = loop.getDeltaTime() * 0.001f * this.entity.getVelocity();
     Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 

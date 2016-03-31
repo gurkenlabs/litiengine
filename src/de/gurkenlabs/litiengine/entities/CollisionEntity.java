@@ -41,7 +41,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public Rectangle2D getCollisionBox(final Point2D location) {
     final float collisionBoxWidth = this.getWidth() * this.collisionBoxWidthFactor;
     final float collisionBoxHeight = this.getHeight() * this.collisionBoxHeightFactor;
-    return new Rectangle2D.Double(location.getX() + this.getWidth() / 2 - collisionBoxWidth / 2, location.getY() + this.getHeight() - collisionBoxHeight, collisionBoxWidth, collisionBoxHeight);
+    return new Rectangle2D.Double(location.getX() + this.getWidth() * 0.5 - collisionBoxWidth * 0.5, location.getY() + this.getHeight() - collisionBoxHeight, collisionBoxWidth, collisionBoxHeight);
   }
 
   /**

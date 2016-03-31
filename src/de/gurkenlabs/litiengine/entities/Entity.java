@@ -56,7 +56,7 @@ public abstract class Entity implements IEntity {
    */
   @Override
   public Point2D getDimensionCenter() {
-    return new Point2D.Double(this.getLocation().getX() + this.getWidth() / 2, this.getLocation().getY() + this.getHeight() / 2);
+    return new Point2D.Double(this.getLocation().getX() + this.getWidth() * 0.5, this.getLocation().getY() + this.getHeight() * 0.5);
   }
 
   @Override

@@ -65,7 +65,7 @@ public class Force {
   }
 
   public boolean hasReached(final ICollisionEntity entity) {
-    return new Ellipse2D.Double(this.getLocation().getX() - this.size / 2, this.getLocation().getY() - this.size / 2, this.size, this.size).intersects(entity.getCollisionBox());
+    return new Ellipse2D.Double(this.getLocation().getX() - this.size * 0.5, this.getLocation().getY() - this.size * 0.5, this.size, this.size).intersects(entity.getCollisionBox());
   }
 
   /**

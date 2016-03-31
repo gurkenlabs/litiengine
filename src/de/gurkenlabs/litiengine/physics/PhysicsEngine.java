@@ -148,8 +148,8 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   private static boolean collides(final Rectangle2D a, final Rectangle2D b) {
-    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() / 2 + b.getWidth() / 2) {
-      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() / 2 + b.getHeight() / 2) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
         return true;
       }
     }

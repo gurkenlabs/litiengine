@@ -85,7 +85,7 @@ public class EntityMovementController implements IUpdateable, IEntityMovementCon
       }
 
       final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY()), force.getLocation());
-      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() / 1000.0F * force.getStrength());
+      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
       if (force.cancelOnCollision() && !success) {
         force.end();
       }

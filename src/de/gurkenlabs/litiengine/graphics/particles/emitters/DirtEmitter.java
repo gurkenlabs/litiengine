@@ -47,19 +47,19 @@ public class DirtEmitter extends EntityEmitter {
     switch (this.mob.getFacingDirection()) {
     case UP:
       xCoord = (float) (1 + Math.random()) * 4 * (randBoolX ? -1f : 1f);
-      yCoord = (float) (2 * Math.random() + this.getEntity().getHeight() / 2);
+      yCoord = (float) (2 * Math.random() + this.getEntity().getHeight() * 0.5);
       break;
     case DOWN:
       xCoord = (float) (1 + Math.random()) * 4 * (randBoolX ? -1f : 1f);
-      yCoord = (float) (-2 * Math.random() + this.getEntity().getHeight() / 2);
+      yCoord = (float) (-2 * Math.random() + this.getEntity().getHeight() * 0.5);
       break;
     case LEFT:
       xCoord = (float) Math.random() * 8;
-      yCoord = (float) (Math.random() * -4 + this.getEntity().getHeight() / 2);
+      yCoord = (float) (Math.random() * -4 + this.getEntity().getHeight() * 0.5);
       break;
     case RIGHT:
       xCoord = (float) Math.random() * -8;
-      yCoord = (float) (Math.random() * -4 + this.getEntity().getHeight() / 2);
+      yCoord = (float) (Math.random() * -4 + this.getEntity().getHeight() * 0.5);
       break;
     default:
       break;

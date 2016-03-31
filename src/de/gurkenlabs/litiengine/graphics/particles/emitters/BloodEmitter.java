@@ -45,8 +45,8 @@ public class BloodEmitter extends EntityEmitter {
     final boolean randBoolX = Math.random() >= 0.5;
     final boolean randBoolY = Math.random() >= 0.5;
 
-    final float xCoord = (float) (Math.random() * (this.getEntity().getWidth() / 4) * (randBoolX ? -1f : 1f));
-    final float yCoord = (float) (Math.random() * (this.getEntity().getHeight() / 4) * (randBoolY ? -1f : 1f));
+    final float xCoord = (float) (Math.random() * (this.getEntity().getWidth() * 0.25) * (randBoolX ? -1f : 1f));
+    final float yCoord = (float) (Math.random() * (this.getEntity().getHeight() * 0.25) * (randBoolY ? -1f : 1f));
     final float dx = (float) (1.5 * Math.random() * (randBoolX ? -1f : 1f));
     final float dy = (float) (1.5 * Math.random() * (randBoolY ? -1f : 1f));
     final float gravityX = 0.05f * (Math.random() >= 0.5 ? -1f : 1f);

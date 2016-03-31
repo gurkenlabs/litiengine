@@ -15,8 +15,8 @@ public class DefaultCamera extends Camera {
 
   public DefaultCamera() {
     this.updateFocus();
-    this.setCenterX(Game.getScreenManager().getResolution().getWidth() / 2.0);
-    this.setCenterY(Game.getScreenManager().getResolution().getHeight() / 2.0);
+    this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5);
+    this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5);
   }
 
   /*

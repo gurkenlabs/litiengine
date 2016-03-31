@@ -75,11 +75,11 @@ public abstract class Camera implements ICamera {
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
     if (entity.getAnimationController() == null || entity.getAnimationController().getCurrentAnimation() == null) {
-      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() / 2.0, viewPortLocation.getY() + entity.getHeight() / 2.0);
+      return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
     final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() / 2.0, viewPortLocation.getY() + spriteSheet.getSpriteHeight() / 2.0);
+    return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
   /*
@@ -104,7 +104,7 @@ public abstract class Camera implements ICamera {
     // localplayer camera causes flickering and bouncing of the sprite
     if (entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null) {
       final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-      final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) / 2.0, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) / 2.0);
+      final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
       return this.getViewPortLocation(location);
     }
 

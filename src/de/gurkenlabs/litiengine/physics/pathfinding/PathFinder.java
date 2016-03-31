@@ -36,8 +36,8 @@ public abstract class PathFinder implements IPathFinder {
   protected Rectangle2D applyPathMargin(final ICollisionEntity entity, final Rectangle2D rectangle) {
     final float Margin = 2.0f;
     // calculate offset in order to prevent collision
-    final double newX = rectangle.getX() - (entity.getCollisionBox().getWidth() / 2 + Margin);
-    final double newY = rectangle.getY() - (entity.getCollisionBox().getHeight() / 2 + Margin);
+    final double newX = rectangle.getX() - (entity.getCollisionBox().getWidth() * 0.5 + Margin);
+    final double newY = rectangle.getY() - (entity.getCollisionBox().getHeight() * 0.5 + Margin);
     final double newWidth = rectangle.getWidth() + entity.getCollisionBox().getWidth() + Margin * 2;
     final double newHeight = rectangle.getHeight() + entity.getCollisionBox().getHeight() + Margin * 2;
     return new Rectangle2D.Double(newX, newY, newWidth, newHeight);

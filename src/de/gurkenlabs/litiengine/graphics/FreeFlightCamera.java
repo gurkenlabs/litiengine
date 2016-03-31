@@ -25,8 +25,8 @@ public class FreeFlightCamera extends Camera {
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.location));
-    this.setCenterX(Game.getScreenManager().getResolution().getWidth() / 2.0 / Game.getInfo().renderScale());
-    this.setCenterY(Game.getScreenManager().getResolution().getHeight() / 2.0 / Game.getInfo().renderScale());
+    this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale());
+    this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale());
   }
 
   public void setLocation(final Point2D location) {

@@ -46,7 +46,7 @@ public class PositionLockCamera extends Camera {
     // localplayer camera causes flickering and bouncing of the sprite
     if (entity.equals(this.getLockedEntity()) && entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null) {
       final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-      final Point2D location = new Point2D.Double(this.getFocus().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) / 2.0, this.getFocus().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) / 2.0);
+      final Point2D location = new Point2D.Double(this.getFocus().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, this.getFocus().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
       return this.getViewPortLocation(location);
     }
 
@@ -57,7 +57,7 @@ public class PositionLockCamera extends Camera {
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedEntity().getLocation();
     this.setFocus(this.applyShakeEffect(cameraLocation));
-    this.setCenterX(Game.getScreenManager().getResolution().getWidth() / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() / 2.0);
-    this.setCenterY(Game.getScreenManager().getResolution().getHeight() / 2.0 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() / 2.0);
+    this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() * 0.5);
+    this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() * 0.5);
   }
 }

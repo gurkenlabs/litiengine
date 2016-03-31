@@ -192,8 +192,8 @@ public class GameMetrics implements IUpdateable, IRenderable {
     g.drawString(ping, OffsetX, currentOffsetY);
     currentOffsetY += OffsetY;
 
-    final float upStream = Float.valueOf(Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) / 100.0f);
-    final float downStream = Float.valueOf(Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) / 100.0f);
+    final float upStream = Float.valueOf(Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f);
+    final float downStream = Float.valueOf(Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f);
     final String in = "in: " + this.getPackagesReceived() + " - " + downStream + "kb/s";
     g.drawString(in, OffsetX, currentOffsetY);
     currentOffsetY += OffsetY;

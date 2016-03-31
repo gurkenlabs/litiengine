@@ -48,7 +48,7 @@ public class FireEmitter extends Emitter {
    */
   @Override
   public Point2D getOrigin() {
-    return new Point2D.Double(this.getLocation().getX() + this.getWidth() / 2, this.getLocation().getY() + this.getHeight());
+    return new Point2D.Double(this.getLocation().getX() + this.getWidth() * 0.5, this.getLocation().getY() + this.getHeight());
   }
 
   /**
@@ -64,8 +64,8 @@ public class FireEmitter extends Emitter {
   public void newParticle(final Color color, final int life, final short maxAxisMovement) {
     final boolean randBool = Math.random() >= 0.5;
 
-    final float xCoord = (float) (this.getWidth() / 2 + Math.random() * maxAxisMovement * (randBool ? -1f : 1f));
-    final float dx = (float) (Math.random() / 4);
+    final float xCoord = (float) (this.getWidth() * 0.5 + Math.random() * maxAxisMovement * (randBool ? -1f : 1f));
+    final float dx = (float) (Math.random() * 0.2);
     final float dy = (float) (Math.random() * 2 * -1f);
     final float gravityX = 0.0f;
     final float gravityY = 0.0015f * (randBool ? 1f : -1f);

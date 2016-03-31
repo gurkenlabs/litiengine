@@ -102,7 +102,7 @@ public class RenderEngine implements IRenderEngine {
     final AffineTransform t = new AffineTransform();
 
     t.translate(renderLocation.getX(), renderLocation.getY());
-    t.rotate(Math.toRadians(angle), image.getWidth(null) / 2, image.getHeight(null) / 2);
+    t.rotate(Math.toRadians(angle), image.getWidth(null) * 0.5, image.getHeight(null) * 0.5);
 
     g.drawImage(image, t, null);
   }
