@@ -201,11 +201,12 @@ public class ImageCache {
       final ImageWriteParam iwp = writer.getDefaultWriteParam();
 
       file.getParentFile().mkdirs();
-      final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile());
-      writer.setOutput(output);
-      final IIOImage outimage = new IIOImage(value, null, null);
-      writer.write(null, outimage, iwp);
-      writer.dispose();
+      try (final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile())) {
+        writer.setOutput(output);
+        final IIOImage outimage = new IIOImage(value, null, null);
+        writer.write(null, outimage, iwp);
+        writer.dispose();
+      }
     } catch (final IOException e) {
       e.printStackTrace();
     }

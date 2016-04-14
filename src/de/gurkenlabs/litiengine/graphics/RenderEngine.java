@@ -63,7 +63,7 @@ public class RenderEngine implements IRenderEngine {
 
   /**
    * Gets the image by the specified relative path.
-   *
+   * This method supports both, loading images from a folder and loading them from the resources.
    * @param absolutPath
    *          the image
    * @return the image
@@ -74,22 +74,31 @@ public class RenderEngine implements IRenderEngine {
       return ImageCache.IMAGES.get(cacheKey);
     }
 
+    // try to get image from resource folder first and as a fallback get it from
+    // a normal folder
+    BufferedImage img;
     try {
-      final InputStream imageFile = new FileInputStream(absolutPath);
-      final BufferedImage img = ImageIO.read(imageFile);
-      final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      final GraphicsDevice device = env.getDefaultScreenDevice();
-      final GraphicsConfiguration config = device.getDefaultConfiguration();
-      final BufferedImage compatibleImg = config.createCompatibleImage(img.getWidth(), img.getHeight(), Transparency.TRANSLUCENT);
-      compatibleImg.getGraphics().drawImage(img, 0, 0, null);
-
-      ImageCache.IMAGES.putPersistent(cacheKey, compatibleImg);
-      return compatibleImg;
-    } catch (final IOException e) {
+      InputStream imageFromResource = ClassLoader.getSystemResourceAsStream(absolutPath);
+      if (imageFromResource != null) {
+        img = ImageIO.read(imageFromResource);
+      } else {
+        try (final InputStream imageFile = new FileInputStream(absolutPath)) {
+          img = ImageIO.read(imageFile);
+        }
+      }
+    } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
 
-    return null;
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsDevice device = env.getDefaultScreenDevice();
+    final GraphicsConfiguration config = device.getDefaultConfiguration();
+    final BufferedImage compatibleImg = config.createCompatibleImage(img.getWidth(), img.getHeight(), Transparency.TRANSLUCENT);
+    compatibleImg.getGraphics().drawImage(img, 0, 0, null);
+
+    ImageCache.IMAGES.putPersistent(cacheKey, compatibleImg);
+    return compatibleImg;
   }
 
   public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
@@ -110,7 +119,7 @@ public class RenderEngine implements IRenderEngine {
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-    g.drawString(text, (int)x, (int)y);
+    g.drawString(text, (int) x, (int) y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
