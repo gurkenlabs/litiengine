@@ -149,8 +149,10 @@ public abstract class Game implements IInitializable, ILaunchable {
   @Override
   public void terminate() {
     gameLoop.terminate();
+    
     soundEngine.terminate();
     this.renderLoop.terminate();
+    System.exit(0);
   }
 
   protected GameConfiguration createGameConfiguration() {

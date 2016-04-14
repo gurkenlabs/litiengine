@@ -65,6 +65,11 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
+  public void terminate() {
+    Game.getLoop().unregisterFromUpdate(this);
+  }
+
+  @Override
   public void setGain(final float volume) {
     this.gain = volume;
   }

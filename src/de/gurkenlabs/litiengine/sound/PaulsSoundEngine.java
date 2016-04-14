@@ -111,6 +111,7 @@ public class PaulsSoundEngine extends SoundEngine {
 
   @Override
   public void terminate() {
+    super.terminate();
     this.soundSystem.cleanup();
   }
 
