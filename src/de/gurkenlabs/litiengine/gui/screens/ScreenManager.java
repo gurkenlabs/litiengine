@@ -12,12 +12,18 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import de.gurkenlabs.litiengine.graphics.DefaultCamera;
@@ -62,6 +68,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   /** The frame count. */
   private int frameCount = 0;
+
+  private boolean takeScreenShot;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -157,6 +165,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.setSize(new Dimension(width, height));
     }
 
+    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> this.takeScreenShot = true);
     this.setVisible(true);
     this.renderCanvas.createBufferStrategy(2);
     this.bufferStrategy = this.renderCanvas.getBufferStrategy();
@@ -216,7 +225,17 @@ public class ScreenManager extends JFrame implements IScreenManager {
       consumer.accept(g);
     }
 
+    if (this.takeScreenShot) {
+      BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+      Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+      this.getCurrentScreen().render(imgGraphics);
+      RenderEngine.renderImage(imgGraphics, this.cursorImage, Input.MOUSE.getLocation());
+      imgGraphics.dispose();
+      this.saveScreenShot(img);
+    }
+
     g.dispose();
+
     this.bufferStrategy.show();
     Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
@@ -270,5 +289,23 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public boolean isFocusOwner() {
     return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
+  }
+
+  private void saveScreenShot(BufferedImage img) {
+    try {
+      try {
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+        File folder =new File("./screenshots/");
+        if(!folder.exists()){
+          folder.mkdirs();
+        }
+        
+        ImageIO.write(img, "png", new File("./screenshots/" + timeStamp + ".png"));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } finally {
+      this.takeScreenShot = false;
+    }
   }
 }

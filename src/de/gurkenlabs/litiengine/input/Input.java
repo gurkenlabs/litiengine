@@ -12,13 +12,12 @@ import de.gurkenlabs.litiengine.Game;
 public class Input {
 
   /** The keyboard. */
-  public static IKeyboard KEYBOARD;
+  public static IKeyboard KEYBOARD = new KeyBoard();;
 
   /** The mouse. */
   public static IMouse MOUSE;
 
   public static void init() {
-    KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
 
     Game.getLoop().registerForUpdate(KEYBOARD);
