@@ -36,7 +36,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
     }
 
     if (dir != Direction.UNDEFINED) {
-      Game.getPhysicsEngine().move(this.getControlledEntity(), this.stepSize);
+      Game.getPhysicsEngine().move(this.getControlledEntity(), Direction.toAngle(dir), this.stepSize);
     }
   }
 

@@ -19,6 +19,21 @@ public enum Direction {
     return UNDEFINED;
   }
 
+  public static float toAngle(final Direction dir) {
+    switch (dir) {
+
+    case RIGHT:
+      return 90;
+    case UP:
+      return 180;
+    case LEFT:
+      return 270;
+    case DOWN:
+    default:
+      return 0;
+    }
+  }
+
   public static Direction fromAngle(final float angle) {
     if (angle >= 0 && angle < 45) {
       return Direction.DOWN;

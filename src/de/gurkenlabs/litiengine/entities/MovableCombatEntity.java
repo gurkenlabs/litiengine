@@ -74,23 +74,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   @Override
   public void setFacingDirection(final Direction facingDirection) {
-    switch (facingDirection) {
-    case DOWN:
-      this.setAngle(0);
-      break;
-    case RIGHT:
-      this.setAngle(90);
-      break;
-    case UP:
-      this.setAngle(180);
-      break;
-    case LEFT:
-      this.setAngle(270);
-      break;
-
-    default:
-      return;
-    }
+    this.setAngle(Direction.toAngle(facingDirection));
   }
 
   /*
