@@ -14,6 +14,10 @@ public class RotationImageEffect extends ImageEffect {
 
   @Override
   public BufferedImage apply(final BufferedImage image) {
+    if (image == null) {
+      return null;
+    }
+    
     final int size = Math.max(image.getWidth(), image.getHeight()) * 2;
     final BufferedImage img = RenderEngine.createCompatibleImage(size, size);
     final Graphics2D g = img.createGraphics();
