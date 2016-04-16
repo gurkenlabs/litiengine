@@ -56,6 +56,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void init(final float gain) {
+    this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
     this.setGain(gain);
   }
 

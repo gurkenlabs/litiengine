@@ -36,8 +36,17 @@ public class PaulsSoundEngine extends SoundEngine {
     if (sound == null) {
       return;
     }
+    
+    if (this.isPlaying(sound.getPath())) {
+      return;
+    }
 
-    this.soundSystem.backgroundMusic(sound.getName(), sound.getUrl(), sound.getPath(), true);
+    this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true);
+  }
+  
+  @Override
+  public void rewind(Sound sound) {
+    this.soundSystem.rewind(sound.getPath());
   }
 
   @Override
