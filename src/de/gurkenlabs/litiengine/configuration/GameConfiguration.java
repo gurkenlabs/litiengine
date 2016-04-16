@@ -8,6 +8,7 @@ public class GameConfiguration extends Configuration {
   public final SoundConfiguration SOUND;
   public final GraphicConfiguration GRAPHICS;
   public final InputConfiguration INPUT;
+  public final DebugConfiguration DEBUG;
 
   public GameConfiguration(final ConfigurationGroup... groups) {
     super(groups);
@@ -15,9 +16,11 @@ public class GameConfiguration extends Configuration {
     this.SOUND = new SoundConfiguration();
     this.GRAPHICS = new GraphicConfiguration();
     this.INPUT = new InputConfiguration();
+    this.DEBUG = new DebugConfiguration();
     this.getConfigurationGroups().add(this.CLIENT);
     this.getConfigurationGroups().add(this.SOUND);
     this.getConfigurationGroups().add(this.GRAPHICS);
     this.getConfigurationGroups().add(this.INPUT);
+    this.getConfigurationGroups().add(this.DEBUG);
   }
 }
