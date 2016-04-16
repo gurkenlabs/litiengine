@@ -157,12 +157,12 @@ public class CombatEntityVision implements IVision {
     final Path2D path = new Path2D.Float();
     final Path2D renderPath = new Path2D.Float();
     path.append(this.getMapVisionCircle(this.combatEntity), false);
-    renderPath.append(this.getRenderVisionCircle(this.combatEntity), false);
+    renderPath.append(this.getRenderVisionArc(this.combatEntity), false);
 
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
       if (entity.isFriendly(this.combatEntity) && !entity.equals(this.combatEntity)) {
         path.append(this.getMapVisionCircle(entity), false);
-        renderPath.append(this.getRenderVisionCircle(entity), false);
+        renderPath.append(this.getRenderVisionArc(entity), false);
       }
     }
 
@@ -175,6 +175,26 @@ public class CombatEntityVision implements IVision {
     rectangleArea.subtract(new Area(path));
 
     this.fogOfWar = rectangleArea;
+  }
+
+  protected ICombatEntity getCombatEntity() {
+    return this.combatEntity;
+  }
+
+  protected Shape getFogOfWar() {
+    return this.fogOfWar;
+  }
+
+  protected void setFogOfWar(Shape fogOfWar) {
+    this.fogOfWar = fogOfWar;
+  }
+
+  protected IEnvironment getEnvironment() {
+    return this.environment;
+  }
+
+  protected void setRenderVisionShape(Shape renderVisionShape) {
+    this.renderVisionShape = renderVisionShape;
   }
 
   /**
@@ -195,7 +215,7 @@ public class CombatEntityVision implements IVision {
    *          the mob
    * @return the render vision circle
    */
-  private Ellipse2D getRenderVisionCircle(final IEntity entity) {
+  private Ellipse2D getRenderVisionArc(final IEntity entity) {
     final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
     return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
