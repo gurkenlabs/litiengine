@@ -62,6 +62,14 @@ public class PhysicsEngine implements IPhysicsEngine {
     return allCollisionBoxes;
   }
 
+  public List<Rectangle2D> getAllCollisionBoxes(ICollisionEntity entity) {
+    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
+      allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.staticCollisionBoxes);
+
+    return allCollisionBoxes;
+  }
+
   @Override
   public boolean move(final IMovableEntity entity, final Point2D target, final float delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
@@ -112,6 +120,16 @@ public class PhysicsEngine implements IPhysicsEngine {
   @Override
   public boolean collides(final Rectangle2D rect) {
     for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collides(rect, collisionBox)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public boolean collides(ICollisionEntity entity, final Rectangle2D rect) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes(entity)) {
       if (collides(rect, collisionBox)) {
         return true;
       }

@@ -54,6 +54,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * Die.
    */
   public void die() {
+    if(this.isDead()){
+      return;
+    }
+    
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, 0));
     for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
       consumer.accept(this);
@@ -191,6 +195,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * Resurrect.
    */
   public void resurrect() {
+    if(!this.isDead()){
+      return;
+    }
+    
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, this.getAttributes().getHealth().getMaxValue()));
     for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
       consumer.accept(this);
