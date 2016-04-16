@@ -301,6 +301,6 @@ public abstract class Effect implements IEffect {
   }
 
   protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return this.environment.findCombatEntities(impactArea);
+    return this.getEnvironment().findCombatEntities(impactArea);
   }
 }
