@@ -13,6 +13,7 @@ import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -59,6 +60,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private IScreen currentScreen;
 
   private Image cursorImage;
+
+  private int cursorOffsetX;
+  private int cursorOffsetY;
 
   /** The last screen change. */
   private long lastScreenChange = 0;
@@ -229,7 +233,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
       BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
       Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
       this.getCurrentScreen().render(imgGraphics);
-      RenderEngine.renderImage(imgGraphics, this.cursorImage, Input.MOUSE.getLocation());
+
+      Point2D cursorlocation = new Point2D.Double(Input.MOUSE.getLocation().getX() + this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() + this.getCursorOffsetY());
+      RenderEngine.renderImage(imgGraphics, this.cursorImage, cursorlocation);
       imgGraphics.dispose();
       this.saveScreenShot(img);
     }
@@ -291,15 +297,35 @@ public class ScreenManager extends JFrame implements IScreenManager {
     return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
   }
 
+  @Override
+  public int getCursorOffsetX() {
+    return this.cursorOffsetX;
+  }
+
+  @Override
+  public void setCursorOffsetX(int cursorOffsetX) {
+    this.cursorOffsetX = cursorOffsetX;
+  }
+
+  @Override
+  public int getCursorOffsetY() {
+    return this.cursorOffsetY;
+  }
+
+  @Override
+  public void setCursorOffsetY(int cursorOffsetY) {
+    this.cursorOffsetY = cursorOffsetY;
+  }
+
   private void saveScreenShot(BufferedImage img) {
     try {
       try {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-        File folder =new File("./screenshots/");
-        if(!folder.exists()){
+        File folder = new File("./screenshots/");
+        if (!folder.exists()) {
           folder.mkdirs();
         }
-        
+
         ImageIO.write(img, "png", new File("./screenshots/" + timeStamp + ".png"));
       } catch (IOException e) {
         e.printStackTrace();

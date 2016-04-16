@@ -76,5 +76,13 @@ public interface IScreenManager {
 
   public void setCursor(Image image);
 
+  public int getCursorOffsetX();
+
+  public void setCursorOffsetX(int cursorOffsetX);
+
+  public int getCursorOffsetY();
+
+  public void setCursorOffsetY(int cursorOffsetY);
+
   public boolean isFocusOwner();
 }
