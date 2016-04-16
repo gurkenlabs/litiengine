@@ -53,6 +53,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   /**
    * Die.
    */
+  @Override
   public void die() {
     if(this.isDead()){
       return;
@@ -194,6 +195,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   /**
    * Resurrect.
    */
+  @Override
   public void resurrect() {
     if(!this.isDead()){
       return;

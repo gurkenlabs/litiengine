@@ -8,9 +8,9 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
   private boolean collision;
-  private final float collisionBoxHeightFactor;
+  private float collisionBoxHeightFactor;
 
-  private final float collisionBoxWidthFactor;
+  private float collisionBoxWidthFactor;
 
   protected CollisionEntity() {
     super();
@@ -64,9 +64,25 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public void setCollision(final boolean collision) {
     this.collision = collision;
   }
-  
+
   @Override
   public boolean collidesWith(ICollisionEntity otherEntity) {
     return true;
+  }
+
+  public float getCollisionBoxHeightFactor() {
+    return this.collisionBoxHeightFactor;
+  }
+
+  public void setCollisionBoxHeightFactor(float collisionBoxHeightFactor) {
+    this.collisionBoxHeightFactor = collisionBoxHeightFactor;
+  }
+
+  public float getCollisionBoxWidthFactor() {
+    return this.collisionBoxWidthFactor;
+  }
+
+  public void setCollisionBoxWidthFactor(float collisionBoxWidthFactor) {
+    this.collisionBoxWidthFactor = collisionBoxWidthFactor;
   }
 }

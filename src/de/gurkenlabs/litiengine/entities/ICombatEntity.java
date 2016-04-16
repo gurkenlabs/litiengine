@@ -21,6 +21,10 @@ public interface ICombatEntity extends ICollisionEntity {
    */
   public boolean hit(int damage);
 
+  public void die();
+
+  public void resurrect();
+
   public boolean isDead();
 
   public boolean isFriendly(final ICombatEntity entity);
