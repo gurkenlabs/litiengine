@@ -76,6 +76,10 @@ public class EntityNavigator implements IEntityNavigator {
    */
   @Override
   public void update(final IGameLoop loop) {
+    if(!this.isNavigating()){
+      return;
+    }
+    
     if (this.path == null) {
       return;
     }
@@ -97,9 +101,14 @@ public class EntityNavigator implements IEntityNavigator {
     // although at max 6 elements are returned, sometimes the path
     // implementation tries to access index 20 ... don't know why, but this
     // prevents it
-    final double[] startCoordinates = new double[21];
-    final double[] coordinates = new double[21];
+    final double[] startCoordinates = new double[22];
+    final double[] coordinates = new double[22];
     for (int i = 0; i <= currentSegment; i++) {
+      if(pi.isDone()){
+        this.stop();
+        return;
+      }
+      
       pi.currentSegment(startCoordinates);
       pi.next();
     }

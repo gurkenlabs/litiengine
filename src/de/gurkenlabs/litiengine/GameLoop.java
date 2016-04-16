@@ -1,10 +1,14 @@
 package de.gurkenlabs.litiengine;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class GameLoop extends Thread implements IGameLoop {
+  private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private final List<IUpdateable> updatables;
   private final List<Consumer<Integer>> upsTrackedConsumer;
 
@@ -78,7 +82,16 @@ public class GameLoop extends Thread implements IGameLoop {
 
       final long updateStart = System.nanoTime();
       ++this.totalTicks;
-      this.updatables.forEach(updatable -> updatable.update(this));
+      this.updatables.forEach(updatable -> {
+        try {
+          updatable.update(this);
+        } catch (final Exception e) {
+          final StringWriter sw = new StringWriter();
+          e.printStackTrace(new PrintWriter(sw));
+          final String stacktrace = sw.toString();
+          log.severe(stacktrace);
+        }
+      });
 
       ++this.updateCount;
 
