@@ -6,7 +6,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 
 public class SoundController {
-  private static final int LOCK_TIME = 100;
+  private static final int LOCK_TIME = 50;
   private static long lastPlay;
 
   public static boolean canPlay() {
@@ -27,7 +27,7 @@ public class SoundController {
 
   public static void callIgnoreTimeout(Consumer<ISoundEngine> engine) {
     Thread t = new SoundPlayThread(engine);
-    t.run();
+    t.start();
   }
 
   public static class SoundPlayThread extends Thread {

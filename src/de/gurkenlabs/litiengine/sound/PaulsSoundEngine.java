@@ -37,12 +37,12 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true);
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true));
   }
-  
+
   @Override
   public void rewind(Sound sound) {
-    this.soundSystem.rewind(sound.getPath());
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()));
   }
 
   @Override
@@ -51,7 +51,7 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff()));
   }
 
   @Override
@@ -59,26 +59,25 @@ public class PaulsSoundEngine extends SoundEngine {
     if (entity == null || sound == null || !this.canPlay(entity)) {
       return;
     }
-    
-    if (this.soundSystem.getMasterVolume() == 0) {
-      return;
-    }
 
-    final String uniqueIdentifier = getIdentifier(entity, sound);
-    // center sounds that are roughly played at the same location
+    SoundController.callIgnoreTimeout(engine -> {
+      final String uniqueIdentifier = getIdentifier(entity, sound);
+      // center sounds that are roughly played at the same location
 
-    float locationX = (float) this.getListenerPosition().getX();
-    float locationY = (float) this.getListenerPosition().getY();
-    if (this.getMaxListenerRadius() != 0 && entity.getDimensionCenter().distance(this.getListenerPosition()) > this.getMaxListenerRadius()) {
-      locationX = 10000;
-      locationY = 10000;
-    } else if (entity.getLocation().distance(this.getListenerPosition()) > 5) {
-      locationX = (float) entity.getDimensionCenter().getX();
-      locationY = (float) entity.getDimensionCenter().getY();
-    }
+      float locationX = (float) this.getListenerPosition().getX();
+      float locationY = (float) this.getListenerPosition().getY();
+      if (this.getMaxListenerRadius() != 0 && entity.getDimensionCenter().distance(this.getListenerPosition()) > this.getMaxListenerRadius()) {
+        locationX = 10000;
+        locationY = 10000;
+      } else if (entity.getLocation().distance(this.getListenerPosition()) > 5) {
+        locationX = (float) entity.getDimensionCenter().getX();
+        locationY = (float) entity.getDimensionCenter().getY();
+      }
 
-    final String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-    this.add(new Playback(entity, name));
+      final String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+      this.add(new Playback(entity, name));
+    });
+
   }
 
   @Override
@@ -87,25 +86,25 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    if (this.soundSystem.getMasterVolume() == 0) {
-      return;
-    }
+    SoundController.callIgnoreTimeout(engine -> {
+      final String uniqueIdentifier = getIdentifier(location, sound);
+      float locationX = (int) this.getListenerPosition().getX();
+      float locationY = (int) this.getListenerPosition().getY();
+      if (location.distance(this.getListenerPosition()) > 50) {
+        locationX = (float) location.getX();
+        locationY = (float) location.getY();
+      }
 
-    final String uniqueIdentifier = getIdentifier(location, sound);
-    float locationX = (int) this.getListenerPosition().getX();
-    float locationY = (int) this.getListenerPosition().getY();
-    if (location.distance(this.getListenerPosition()) > 50) {
-      locationX = (float) location.getX();
-      locationY = (float) location.getY();
-    }
-
-    this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+      this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+    });
   }
 
   @Override
   public void terminate() {
     super.terminate();
-    this.soundSystem.cleanup();
+    SoundController.callIgnoreTimeout(engine -> {
+      this.soundSystem.cleanup();
+    });
   }
 
   @Override
@@ -120,6 +119,6 @@ public class PaulsSoundEngine extends SoundEngine {
 
   @Override
   public void updateListenerPosition(final Point2D location) {
-    SoundController.callIgnoreTimeout(engine ->  this.soundSystem.setListenerPosition((float) location.getX(), (float) location.getY(), 0));
+    this.soundSystem.setListenerPosition((float) location.getX(), (float) location.getY(), 0);
   }
 }

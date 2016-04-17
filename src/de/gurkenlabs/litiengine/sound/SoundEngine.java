@@ -27,27 +27,29 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void update(final IGameLoop gameLoop) {
-    // update listener
-    this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
-    this.updateListenerPosition(this.getListenerPosition());
-    // update playing sounds position
-    final List<Playback> finished = new ArrayList<>();
-    for (final Playback playback : this.playbacks) {
-      if (this.isPlaying(playback.getName())) {
-        if (this.maxListenerRadius != 0 && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
-          this.updatePosition(playback.getName(), new Point2D.Double(10000, 10000));
-        } else if (playback.getEntity().getLocation().distance(this.getListenerPosition()) > 5) {
-          this.updatePosition(playback.getName(), playback.getEntity().getDimensionCenter());
+    SoundController.callIgnoreTimeout(engine -> {
+      // update listener
+      this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
+      this.updateListenerPosition(this.getListenerPosition());
+      // update playing sounds position
+      final List<Playback> finished = new ArrayList<>();
+      for (final Playback playback : this.playbacks) {
+        if (this.isPlaying(playback.getName())) {
+          if (this.maxListenerRadius != 0 && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
+            this.updatePosition(playback.getName(), new Point2D.Double(10000, 10000));
+          } else if (playback.getEntity().getLocation().distance(this.getListenerPosition()) > 5) {
+            this.updatePosition(playback.getName(), playback.getEntity().getDimensionCenter());
+          } else {
+            this.updatePosition(playback.getName(), this.getListenerPosition());
+          }
         } else {
-          this.updatePosition(playback.getName(), this.getListenerPosition());
+          finished.add(playback);
         }
-      } else {
-        finished.add(playback);
       }
-    }
 
-    // clean up finished playbacks
-    finished.forEach(x -> this.playbacks.remove(x));
+      // clean up finished playbacks
+      finished.forEach(x -> this.playbacks.remove(x));
+    });
   }
 
   public float getMaxListenerRadius() {
