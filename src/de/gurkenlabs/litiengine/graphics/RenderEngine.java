@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.imageio.ImageIO;
 
@@ -39,6 +40,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
  */
 public class RenderEngine implements IRenderEngine {
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+  private final List<Predicate<RenderEvent<IEntity>>> entityRenderingConditions;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
 
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
@@ -55,6 +57,7 @@ public class RenderEngine implements IRenderEngine {
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderer = new HashMap<>();
 
@@ -62,8 +65,9 @@ public class RenderEngine implements IRenderEngine {
   }
 
   /**
-   * Gets the image by the specified relative path.
-   * This method supports both, loading images from a folder and loading them from the resources.
+   * Gets the image by the specified relative path. This method supports both,
+   * loading images from a folder and loading them from the resources.
+   * 
    * @param absolutPath
    *          the image
    * @return the image
@@ -163,6 +167,13 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void entityRenderingCondition(Predicate<RenderEvent<IEntity>> predicate) {
+    if (!this.entityRenderingConditions.contains(predicate)) {
+      this.entityRenderingConditions.add(predicate);
+    }
+  }
+
+  @Override
   public void render(final Graphics2D g, final List<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
@@ -225,6 +236,12 @@ public class RenderEngine implements IRenderEngine {
 
     if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
       return;
+    }
+
+    for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
+      if (!consumer.test(new RenderEvent<IEntity>(g, entity))) {
+        return;
+      }
     }
 
     for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {

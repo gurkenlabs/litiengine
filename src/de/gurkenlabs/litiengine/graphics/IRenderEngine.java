@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Graphics2D;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -18,6 +19,8 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 public interface IRenderEngine {
 
   public IMapRenderer getMapRenderer(MapOrientation orientation);
+  
+  public void entityRenderingCondition(Predicate<RenderEvent<IEntity>> predicate);
 
   public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
 
