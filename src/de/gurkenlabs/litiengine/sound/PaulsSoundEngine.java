@@ -36,10 +36,6 @@ public class PaulsSoundEngine extends SoundEngine {
     if (sound == null) {
       return;
     }
-    
-    if (this.isPlaying(sound.getPath())) {
-      return;
-    }
 
     this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true);
   }
@@ -55,10 +51,6 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    if (this.isPlaying(sound.getName())) {
-      return;
-    }
-
     this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
   }
 
@@ -67,16 +59,12 @@ public class PaulsSoundEngine extends SoundEngine {
     if (entity == null || sound == null || !this.canPlay(entity)) {
       return;
     }
-
+    
     if (this.soundSystem.getMasterVolume() == 0) {
       return;
     }
 
     final String uniqueIdentifier = getIdentifier(entity, sound);
-    if (this.isPlaying(uniqueIdentifier)) {
-      return;
-    }
-
     // center sounds that are roughly played at the same location
 
     float locationX = (float) this.getListenerPosition().getX();
@@ -104,10 +92,6 @@ public class PaulsSoundEngine extends SoundEngine {
     }
 
     final String uniqueIdentifier = getIdentifier(location, sound);
-    if (this.isPlaying(uniqueIdentifier)) {
-      return;
-    }
-
     float locationX = (int) this.getListenerPosition().getX();
     float locationY = (int) this.getListenerPosition().getY();
     if (location.distance(this.getListenerPosition()) > 50) {
