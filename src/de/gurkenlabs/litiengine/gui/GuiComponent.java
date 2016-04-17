@@ -38,6 +38,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer;
+  
+  private final List<Consumer<ComponentMouseEvent>> mousePressedConsumer;
 
   private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
 
@@ -70,6 +72,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   protected GuiComponent(final double x, final double y) {
     this.components = new ArrayList<>();
     this.clickConsumer = new CopyOnWriteArrayList<>();
+    this.mousePressedConsumer = new CopyOnWriteArrayList<>();
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
 
@@ -128,6 +131,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
     return this.clickConsumer;
+  }
+  
+  protected List<Consumer<ComponentMouseEvent>> getMousePressedConsumer(){
+    return this.mousePressedConsumer;
   }
 
   protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
@@ -363,6 +370,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
 
     this.isPressed = true;
+    this.getMousePressedConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /*
@@ -391,6 +399,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
+  public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMousePressedConsumer().contains(callback)) {
+      this.getMousePressedConsumer().add(callback);
+    }
+  }
+  
   public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseEnterConsumer().contains(callback)) {
       this.getMouseEnterConsumer().add(callback);

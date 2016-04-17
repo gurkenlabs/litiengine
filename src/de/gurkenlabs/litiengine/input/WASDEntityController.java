@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
 public class WASDEntityController extends ClientEntityMovementController implements IKeyObserver {
 
-  private final float stepSize;
+  private float stepSize;
 
   public WASDEntityController(final IMovableEntity entity, final float stepSize) {
     super(entity);
@@ -49,4 +49,14 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   public void handleTypedKey(final int keyCode) {
 
   }
+
+  public float getStepSize() {
+    return this.stepSize;
+  }
+
+  public void setStepSize(float stepSize) {
+    this.stepSize = stepSize;
+  }
+  
+  
 }

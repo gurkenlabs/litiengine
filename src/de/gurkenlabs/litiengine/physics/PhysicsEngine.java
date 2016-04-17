@@ -25,6 +25,8 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private Rectangle2D environmentBounds;
 
+  private boolean turnEntityOnMove = true;
+
   /**
    * Instantiates a new physics engine.
    */
@@ -64,7 +66,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   public List<Rectangle2D> getAllCollisionBoxes(ICollisionEntity entity) {
     final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
-      allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
     allCollisionBoxes.addAll(this.staticCollisionBoxes);
 
     return allCollisionBoxes;
@@ -231,8 +233,10 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
-    entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
-
+    if (this.turnEntityOnMove) {
+      entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
+    }
+    
     if (entity.hasCollision()) {
       final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
       if (staticIntersection != null) {
@@ -291,5 +295,14 @@ public class PhysicsEngine implements IPhysicsEngine {
   @Override
   public List<Rectangle2D> getStaticCollisionBoxes() {
     return this.staticCollisionBoxes;
+  }
+
+  @Override
+  public boolean setTurnEntityOnMove(boolean turn) {
+    return this.turnEntityOnMove = turn;
+  }
+
+  public boolean isTurnEntityOnMove() {
+    return turnEntityOnMove;
   }
 }

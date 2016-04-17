@@ -51,6 +51,8 @@ public interface IPhysicsEngine {
 
   public boolean move(IMovableEntity entity, float delta);
 
+  public boolean setTurnEntityOnMove(boolean turn);
+  
   /**
    *
    * @param rect
