@@ -15,11 +15,5 @@ public class Input {
   public static IKeyboard KEYBOARD = new KeyBoard();;
 
   /** The mouse. */
-  public static IMouse MOUSE;
-
-  public static void init() {
-    MOUSE = new Mouse();
-
-    Game.getLoop().registerForUpdate(KEYBOARD);
-  }
+  public static IMouse MOUSE =  new Mouse();
 }

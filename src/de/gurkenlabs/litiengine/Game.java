@@ -132,8 +132,6 @@ public abstract class Game implements IInitializable, ILaunchable {
     // init sounds
     soundEngine.init(getConfiguration().SOUND.getSoundVolume());
 
-    // init inputs
-    Input.init();
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);

@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
 /**
@@ -29,7 +30,8 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   private final List<Map.Entry<Integer, Consumer<Integer>>> keyTypedConsumer;
   private final List<Map.Entry<Integer, Consumer<Integer>>> keyPressedConsumer;
   private final List<Map.Entry<Integer, Consumer<Integer>>> keyReleasedConsumer;
-
+  private final IGameLoop inputLoop;
+  
   /** The key observers. */
   private final List<IKeyObserver> keyObservers;
 
@@ -53,6 +55,10 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.releasedKeys = new CopyOnWriteArrayList<>();
     this.typedKeys = new CopyOnWriteArrayList<>();
     this.keyObservers = new CopyOnWriteArrayList<>();
+    
+    this.inputLoop = new GameLoop(30);
+    this.inputLoop.registerForUpdate(this);
+    this.inputLoop.start();
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }
