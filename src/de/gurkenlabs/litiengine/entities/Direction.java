@@ -29,6 +29,7 @@ public enum Direction {
     case LEFT:
       return 270;
     case DOWN:
+      return 360;
     default:
       return 0;
     }
