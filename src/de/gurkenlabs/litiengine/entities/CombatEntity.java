@@ -122,7 +122,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
 
     if (this.isDead()) {
-      this.die();
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, 0));
+      for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
+        consumer.accept(this);
+      }
+
+      this.setCollision(false);
     }
 
     final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, damage);
