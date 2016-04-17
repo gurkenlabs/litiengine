@@ -22,6 +22,8 @@ public interface IPhysicsEngine {
   public void clear();
 
   public List<Rectangle2D> getAllCollisionBoxes();
+  
+  public List<Rectangle2D> getStaticCollisionBoxes();
 
   /**
    * Moves the specified entity by the delta in the direction of the angle.

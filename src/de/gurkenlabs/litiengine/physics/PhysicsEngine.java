@@ -287,4 +287,9 @@ public class PhysicsEngine implements IPhysicsEngine {
 
     return resolvedPosition;
   }
+
+  @Override
+  public List<Rectangle2D> getStaticCollisionBoxes() {
+    return this.staticCollisionBoxes;
+  }
 }
