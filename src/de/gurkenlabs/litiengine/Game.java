@@ -3,6 +3,9 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.logging.LogManager;
 
@@ -21,6 +24,7 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
+import de.gurkenlabs.util.io.StreamUtilities;
 
 public abstract class Game implements IInitializable, ILaunchable {
   private static GameInfo info;
@@ -106,15 +110,27 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   @Override
   public void init() {
+    final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
-    if (new File("logging.properties").exists()) {
-      System.setProperty("java.util.logging.config.file", "logging.properties");
+    InputStream defaultLoggingConfig = ClassLoader.getSystemResourceAsStream(LOGGING_CONFIG_FILE);
+
+    // if a specific file exists, load it
+    // otherwise try to find a default logging configuration in any resource
+    // folder.
+    if (!new File(LOGGING_CONFIG_FILE).exists() && defaultLoggingConfig != null) {
+      try {
+        StreamUtilities.copy(defaultLoggingConfig, new File(LOGGING_CONFIG_FILE));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (new File(LOGGING_CONFIG_FILE).exists()) {
+      System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
 
       try {
         LogManager.getLogManager().readConfiguration();
-      }
-
-      catch (final Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -147,7 +163,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   @Override
   public void terminate() {
     gameLoop.terminate();
-    
+
     soundEngine.terminate();
     this.renderLoop.terminate();
     System.exit(0);

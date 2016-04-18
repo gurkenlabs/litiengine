@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,25 +84,41 @@ public class Configuration {
     }
   }
 
+  /**
+   *  Tries to load configuration from file in the application folder.
+   *  If none exists, it tires to load the file from any resource folder.
+   *  If none exists, it creates a new configuration file in the application folder.
+   */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
-    if (!settingsFile.exists() || !settingsFile.isFile()) {
+    InputStream settingsStream = ClassLoader.getSystemResourceAsStream(this.getFileName());
+    if (!settingsFile.exists() && settingsStream == null) {
+      if (!settingsFile.exists() || !settingsFile.isFile()) {
+        try {
+          final OutputStream out = new FileOutputStream(settingsFile);
+          this.createDefaultSettingsFile(out);
+          out.close();
+        } catch (final IOException e) {
+          e.printStackTrace();
+        }
+
+        System.out.printf("Default configuration %s created \n", this.getFileName());
+        return;
+      }
+    }
+
+    if (settingsFile.exists()) {
       try {
-        final OutputStream out = new FileOutputStream(settingsFile);
-        this.createDefaultSettingsFile(out);
-        out.close();
-      } catch (final IOException e) {
+        settingsStream = new FileInputStream(settingsFile);
+      } catch (FileNotFoundException e) {
         e.printStackTrace();
       }
-
-      System.out.printf("Default configuration %s created \n", this.getFileName());
-      return;
     }
 
     final Properties properties = new Properties();
     BufferedInputStream stream;
     try {
-      stream = new BufferedInputStream(new FileInputStream(settingsFile));
+      stream = new BufferedInputStream(settingsStream);
       properties.load(stream);
       stream.close();
     } catch (final FileNotFoundException e1) {
