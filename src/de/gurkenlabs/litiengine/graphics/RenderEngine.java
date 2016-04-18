@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -123,6 +124,19 @@ public class RenderEngine implements IRenderEngine {
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
+    g.drawString(text, (int) x, (int) y);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, Color shadow) {
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+    Color old = g.getColor();
+    g.setColor(shadow);
+    g.drawString(text, (int) x + 1, (int) y + 1);
+    g.drawString(text, (int) x + 1, (int) y - 1);
+    g.drawString(text, (int) x - 1, (int) y - 1);
+    g.drawString(text, (int) x - 1, (int) y + 1);
+    g.setColor(old);
     g.drawString(text, (int) x, (int) y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }

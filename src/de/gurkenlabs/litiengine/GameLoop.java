@@ -81,9 +81,9 @@ public class GameLoop extends Thread implements IGameLoop {
       final float timeScale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
       final long TICK_WAIT = (long) (1.0 / (this.getUpdateRate() * timeScale) * 1000);
       final long updateStart = System.nanoTime();
-      ++this.totalTicks;
 
       if (this.getTimeScale() > 0) {
+        ++this.totalTicks;
         this.updatables.forEach(updatable -> {
           try {
             updatable.update(this);
@@ -95,7 +95,7 @@ public class GameLoop extends Thread implements IGameLoop {
           }
         });
       }
-      
+
       ++this.updateCount;
 
       final long currentMillis = System.currentTimeMillis();
