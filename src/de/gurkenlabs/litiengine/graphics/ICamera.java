@@ -107,7 +107,7 @@ public interface ICamera {
    * @param duration
    *          the duration in update calls.
    */
-  public void shake(int intensity, int duration);
+  public void shake(double intensity, int duration);
 
   public void updateFocus();
 }

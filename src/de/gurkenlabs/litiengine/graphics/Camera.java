@@ -19,7 +19,7 @@ public abstract class Camera implements ICamera {
   private int shakeDuration = 2;
 
   /** The shake intensity. */
-  private int shakeIntensity = 1;
+  private double shakeIntensity = 1;
 
   /** The shake tick. */
   private long shakeTick;
@@ -130,7 +130,7 @@ public abstract class Camera implements ICamera {
    * @see de.gurkenlabs.liti.graphics.ICamera#shake(int, int)
    */
   @Override
-  public void shake(final int intensity, final int shakeDuration) {
+  public void shake(final double intensity, final int shakeDuration) {
     this.shakeTick = Game.getLoop().getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
@@ -176,7 +176,7 @@ public abstract class Camera implements ICamera {
    *
    * @return the shake offset
    */
-  protected int getShakeOffset() {
+  protected double getShakeOffset() {
     return this.shakeIntensity;
   }
 
