@@ -121,4 +121,9 @@ public class PaulsSoundEngine extends SoundEngine {
   public void updateListenerPosition(final Point2D location) {
     this.soundSystem.setListenerPosition((float) location.getX(), (float) location.getY(), 0);
   }
+
+  @Override
+  public void stopMusic(Sound s) {
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()));
+  }
 }

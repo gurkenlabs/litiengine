@@ -18,6 +18,8 @@ public interface ISoundEngine extends ILaunchable {
   public void playSound(Sound s);
 
   public void rewind(Sound s);
+  
+  public void stopMusic(Sound s);
 
   public void playSound(IEntity entity, Sound s);
 
