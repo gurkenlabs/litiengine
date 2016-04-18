@@ -51,6 +51,11 @@ public class Environment implements IEnvironment {
     this.movableEntities = new ConcurrentHashMap<>();
   }
 
+  public void clear() {
+    this.combatEntities.clear();
+    this.movableEntities.clear();
+  }
+
   @Override
   public void init() {
     this.loadMapObjects();
@@ -152,7 +157,7 @@ public class Environment implements IEnvironment {
   public synchronized int getMapId() {
     return ++mapIdSequence;
   }
-  
+
   protected void addMapObject(final IMapObject mapObject) {
 
   }

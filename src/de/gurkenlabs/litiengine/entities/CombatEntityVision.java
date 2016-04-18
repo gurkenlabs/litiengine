@@ -121,6 +121,10 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderFogOfWar(final Graphics2D g) {
+    if(this.fogOfWar == null){
+      return;
+    }
+    
     final AffineTransform oldTransform = g.getTransform();
     final AffineTransform at = new AffineTransform();
     at.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
