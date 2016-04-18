@@ -114,7 +114,10 @@ public abstract class AnimationController implements IAnimationController {
   public void update(final IGameLoop loop) {
     if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
       this.currentAnimation = this.defaultAnimation;
-      this.currentAnimation.start();
+
+      if (this.currentAnimation != null) {
+        this.currentAnimation.start();
+      }
     }
   }
 
