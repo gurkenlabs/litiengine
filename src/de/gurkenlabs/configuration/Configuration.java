@@ -85,9 +85,9 @@ public class Configuration {
   }
 
   /**
-   *  Tries to load configuration from file in the application folder.
-   *  If none exists, it tires to load the file from any resource folder.
-   *  If none exists, it creates a new configuration file in the application folder.
+   * Tries to load configuration from file in the application folder. If none
+   * exists, it tires to load the file from any resource folder. If none exists,
+   * it creates a new configuration file in the application folder.
    */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
@@ -110,7 +110,7 @@ public class Configuration {
     if (settingsFile.exists()) {
       try {
         settingsStream = new FileInputStream(settingsFile);
-      } catch (FileNotFoundException e) {
+      } catch (final FileNotFoundException e) {
         e.printStackTrace();
       }
     }

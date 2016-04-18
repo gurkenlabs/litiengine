@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 
@@ -57,7 +56,7 @@ public class DebugRenderer {
    *          the entity
    */
   private static void drawHitEllipse(final Graphics2D g, final ICombatEntity combatEntity) {
-    g.setColor(Color.RED);    
+    g.setColor(Color.RED);
     g.draw(combatEntity.getHitBox());
   }
 

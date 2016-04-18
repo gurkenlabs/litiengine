@@ -128,7 +128,7 @@ public class AStarPathFinder extends PathFinder {
 
   /**
    * TODO: Improve this optimization.
-   * 
+   *
    * @param path
    * @return
    */

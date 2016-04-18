@@ -64,7 +64,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     return allCollisionBoxes;
   }
 
-  public List<Rectangle2D> getAllCollisionBoxes(ICollisionEntity entity) {
+  public List<Rectangle2D> getAllCollisionBoxes(final ICollisionEntity entity) {
     final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
     allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
     allCollisionBoxes.addAll(this.staticCollisionBoxes);
@@ -130,7 +130,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  public boolean collides(ICollisionEntity entity, final Rectangle2D rect) {
+  public boolean collides(final ICollisionEntity entity, final Rectangle2D rect) {
     for (final Rectangle2D collisionBox : this.getAllCollisionBoxes(entity)) {
       if (collides(rect, collisionBox)) {
         return true;
@@ -236,7 +236,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     if (this.turnEntityOnMove) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
-    
+
     if (entity.hasCollision()) {
       final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
       if (staticIntersection != null) {
@@ -298,11 +298,11 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean setTurnEntityOnMove(boolean turn) {
+  public boolean setTurnEntityOnMove(final boolean turn) {
     return this.turnEntityOnMove = turn;
   }
 
   public boolean isTurnEntityOnMove() {
-    return turnEntityOnMove;
+    return this.turnEntityOnMove;
   }
 }

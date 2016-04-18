@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -31,7 +30,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   private final List<Map.Entry<Integer, Consumer<Integer>>> keyPressedConsumer;
   private final List<Map.Entry<Integer, Consumer<Integer>>> keyReleasedConsumer;
   private final IGameLoop inputLoop;
-  
+
   /** The key observers. */
   private final List<IKeyObserver> keyObservers;
 
@@ -55,7 +54,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.releasedKeys = new CopyOnWriteArrayList<>();
     this.typedKeys = new CopyOnWriteArrayList<>();
     this.keyObservers = new CopyOnWriteArrayList<>();
-    
+
     this.inputLoop = new GameLoop(30);
     this.inputLoop.registerForUpdate(this);
     this.inputLoop.start();
@@ -237,17 +236,17 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
-  public void onKeyTyped(int keyCode, Consumer<Integer> consumer) {
+  public void onKeyTyped(final int keyCode, final Consumer<Integer> consumer) {
     this.keyTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
   @Override
-  public void onKeyReleased(int keyCode, Consumer<Integer> consumer) {
+  public void onKeyReleased(final int keyCode, final Consumer<Integer> consumer) {
     this.keyReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
   @Override
-  public void onKeyPressed(int keyCode, Consumer<Integer> consumer) {
+  public void onKeyPressed(final int keyCode, final Consumer<Integer> consumer) {
     this.keyPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 }

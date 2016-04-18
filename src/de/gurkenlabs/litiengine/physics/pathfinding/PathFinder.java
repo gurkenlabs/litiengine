@@ -86,8 +86,8 @@ public abstract class PathFinder implements IPathFinder {
     Rectangle2D min = null;
     double minDist = 0;
     for (final Entry<Rectangle2D, Point2D> entry : intersectedShapes.entrySet()) {
-      Rectangle2D shape = entry.getKey();
-      Point2D intersection = entry.getValue();
+      final Rectangle2D shape = entry.getKey();
+      final Point2D intersection = entry.getValue();
       final double dist = intersection.distance(target);
       if (min == null) {
         min = shape;

@@ -68,7 +68,7 @@ public class RenderEngine implements IRenderEngine {
   /**
    * Gets the image by the specified relative path. This method supports both,
    * loading images from a folder and loading them from the resources.
-   * 
+   *
    * @param absolutPath
    *          the image
    * @return the image
@@ -83,7 +83,7 @@ public class RenderEngine implements IRenderEngine {
     // a normal folder
     BufferedImage img;
     try {
-      InputStream imageFromResource = ClassLoader.getSystemResourceAsStream(absolutPath);
+      final InputStream imageFromResource = ClassLoader.getSystemResourceAsStream(absolutPath);
       if (imageFromResource != null) {
         img = ImageIO.read(imageFromResource);
       } else {
@@ -91,7 +91,7 @@ public class RenderEngine implements IRenderEngine {
           img = ImageIO.read(imageFile);
         }
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
       return null;
     }
@@ -128,9 +128,9 @@ public class RenderEngine implements IRenderEngine {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
-  public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, Color shadow) {
+  public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    Color old = g.getColor();
+    final Color old = g.getColor();
     g.setColor(shadow);
     g.drawString(text, (int) x + 1, (int) y + 1);
     g.drawString(text, (int) x + 1, (int) y - 1);
@@ -181,7 +181,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void entityRenderingCondition(Predicate<RenderEvent<IEntity>> predicate) {
+  public void entityRenderingCondition(final Predicate<RenderEvent<IEntity>> predicate) {
     if (!this.entityRenderingConditions.contains(predicate)) {
       this.entityRenderingConditions.add(predicate);
     }

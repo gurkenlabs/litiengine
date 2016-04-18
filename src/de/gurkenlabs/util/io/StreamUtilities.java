@@ -9,10 +9,10 @@ import java.io.OutputStream;
 
 public class StreamUtilities {
 
-  public static void copy(InputStream in, OutputStream out) throws IOException {
-    byte[] buffer = new byte[1024];
+  public static void copy(final InputStream in, final OutputStream out) throws IOException {
+    final byte[] buffer = new byte[1024];
     while (true) {
-      int readCount = in.read(buffer);
+      final int readCount = in.read(buffer);
       if (readCount < 0) {
         break;
       }
@@ -20,8 +20,8 @@ public class StreamUtilities {
     }
   }
 
-  public static void copy(File file, OutputStream out) throws IOException {
-    InputStream in = new FileInputStream(file);
+  public static void copy(final File file, final OutputStream out) throws IOException {
+    final InputStream in = new FileInputStream(file);
     try {
       copy(in, out);
     } finally {
@@ -29,8 +29,8 @@ public class StreamUtilities {
     }
   }
 
-  public static void copy(InputStream in, File file) throws IOException {
-    OutputStream out = new FileOutputStream(file);
+  public static void copy(final InputStream in, final File file) throws IOException {
+    final OutputStream out = new FileOutputStream(file);
     try {
       copy(in, out);
     } finally {

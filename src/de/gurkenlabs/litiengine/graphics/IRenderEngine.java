@@ -19,7 +19,7 @@ import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 public interface IRenderEngine {
 
   public IMapRenderer getMapRenderer(MapOrientation orientation);
-  
+
   public void entityRenderingCondition(Predicate<RenderEvent<IEntity>> predicate);
 
   public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);

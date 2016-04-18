@@ -41,7 +41,7 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void rewind(Sound sound) {
+  public void rewind(final Sound sound) {
     SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()));
   }
 
@@ -123,7 +123,7 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void stopMusic(Sound s) {
+  public void stopMusic(final Sound s) {
     SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()));
   }
 }

@@ -3,8 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
-import de.gurkenlabs.litiengine.Game;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Input.
@@ -15,5 +13,5 @@ public class Input {
   public static IKeyboard KEYBOARD = new KeyBoard();;
 
   /** The mouse. */
-  public static IMouse MOUSE =  new Mouse();
+  public static IMouse MOUSE = new Mouse();
 }

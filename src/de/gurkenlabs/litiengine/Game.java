@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.AnnotationFormatError;
@@ -112,7 +111,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   public void init() {
     final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
-    InputStream defaultLoggingConfig = ClassLoader.getSystemResourceAsStream(LOGGING_CONFIG_FILE);
+    final InputStream defaultLoggingConfig = ClassLoader.getSystemResourceAsStream(LOGGING_CONFIG_FILE);
 
     // if a specific file exists, load it
     // otherwise try to find a default logging configuration in any resource
@@ -120,7 +119,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     if (!new File(LOGGING_CONFIG_FILE).exists() && defaultLoggingConfig != null) {
       try {
         StreamUtilities.copy(defaultLoggingConfig, new File(LOGGING_CONFIG_FILE));
-      } catch (IOException e) {
+      } catch (final IOException e) {
         e.printStackTrace();
       }
     }

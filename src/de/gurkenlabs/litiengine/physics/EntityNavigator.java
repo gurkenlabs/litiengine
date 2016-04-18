@@ -76,10 +76,10 @@ public class EntityNavigator implements IEntityNavigator {
    */
   @Override
   public void update(final IGameLoop loop) {
-    if(!this.isNavigating()){
+    if (!this.isNavigating()) {
       return;
     }
-    
+
     if (this.path == null) {
       return;
     }
@@ -104,11 +104,11 @@ public class EntityNavigator implements IEntityNavigator {
     final double[] startCoordinates = new double[22];
     final double[] coordinates = new double[22];
     for (int i = 0; i <= currentSegment; i++) {
-      if(pi.isDone()){
+      if (pi.isDone()) {
         this.stop();
         return;
       }
-      
+
       pi.currentSegment(startCoordinates);
       pi.next();
     }

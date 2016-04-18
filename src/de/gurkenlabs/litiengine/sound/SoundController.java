@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.sound;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.sound.ISoundEngine;
 
 public class SoundController {
   private static final int LOCK_TIME = 50;
@@ -17,23 +16,23 @@ public class SoundController {
     return false;
   }
 
-  public static void call(Consumer<ISoundEngine> engine) {
+  public static void call(final Consumer<ISoundEngine> engine) {
     if (canPlay()) {
-      Thread t = new SoundPlayThread(engine);
+      final Thread t = new SoundPlayThread(engine);
       t.run();
       lastPlay = Game.getLoop().getTicks();
     }
   }
 
-  public static void callIgnoreTimeout(Consumer<ISoundEngine> engine) {
-    Thread t = new SoundPlayThread(engine);
+  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine) {
+    final Thread t = new SoundPlayThread(engine);
     t.start();
   }
 
   public static class SoundPlayThread extends Thread {
-    private Consumer<ISoundEngine> engine;
+    private final Consumer<ISoundEngine> engine;
 
-    public SoundPlayThread(Consumer<ISoundEngine> engine) {
+    public SoundPlayThread(final Consumer<ISoundEngine> engine) {
       this.engine = engine;
     }
 

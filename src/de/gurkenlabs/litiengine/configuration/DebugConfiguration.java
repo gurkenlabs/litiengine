@@ -64,7 +64,7 @@ public class DebugConfiguration extends ConfigurationGroup {
     return this.isDebugEnabled() && this.renderHitBoxes;
   }
 
-  public void setDebugEnabled(boolean debugEnabled) {
+  public void setDebugEnabled(final boolean debugEnabled) {
     this.debugEnabled = debugEnabled;
   }
 

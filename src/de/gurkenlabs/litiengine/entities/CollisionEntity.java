@@ -66,7 +66,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public boolean collidesWith(ICollisionEntity otherEntity) {
+  public boolean collidesWith(final ICollisionEntity otherEntity) {
     return true;
   }
 
@@ -74,7 +74,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return this.collisionBoxHeightFactor;
   }
 
-  public void setCollisionBoxHeightFactor(float collisionBoxHeightFactor) {
+  public void setCollisionBoxHeightFactor(final float collisionBoxHeightFactor) {
     this.collisionBoxHeightFactor = collisionBoxHeightFactor;
   }
 
@@ -82,7 +82,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return this.collisionBoxWidthFactor;
   }
 
-  public void setCollisionBoxWidthFactor(float collisionBoxWidthFactor) {
+  public void setCollisionBoxWidthFactor(final float collisionBoxWidthFactor) {
     this.collisionBoxWidthFactor = collisionBoxWidthFactor;
   }
 }

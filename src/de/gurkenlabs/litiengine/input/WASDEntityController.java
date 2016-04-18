@@ -11,7 +11,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   private float stepSize;
 
   // UP, LEFT, DOWN, RIGHT
-  private boolean[] pressed = new boolean[] { false, false, false, false };
+  private final boolean[] pressed = new boolean[] { false, false, false, false };
   private boolean moved;
 
   public WASDEntityController(final IMovableEntity entity, final float stepSize) {
@@ -21,7 +21,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update(final IGameLoop loop) {
     super.update(loop);
 
     if (this.moved) {
@@ -65,12 +65,12 @@ public class WASDEntityController extends ClientEntityMovementController impleme
         this.pressed[3] = false;
       }
 
-      for (int i = 0; i < pressed.length; i++) {
-        if (!pressed[i]) {
+      for (int i = 0; i < this.pressed.length; i++) {
+        if (!this.pressed[i]) {
           continue;
         }
 
-        pressed[i] = false;
+        this.pressed[i] = false;
 
         switch (i) {
         case 0:
@@ -96,16 +96,16 @@ public class WASDEntityController extends ClientEntityMovementController impleme
 
     switch (keyCode) {
     case KeyEvent.VK_W:
-      pressed[0] = true;
+      this.pressed[0] = true;
       break;
     case KeyEvent.VK_A:
-      pressed[1] = true;
+      this.pressed[1] = true;
       break;
     case KeyEvent.VK_S:
-      pressed[2] = true;
+      this.pressed[2] = true;
       break;
     case KeyEvent.VK_D:
-      pressed[3] = true;
+      this.pressed[3] = true;
       break;
     }
 
@@ -126,7 +126,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
     return this.stepSize;
   }
 
-  public void setStepSize(float stepSize) {
+  public void setStepSize(final float stepSize) {
     this.stepSize = stepSize;
   }
 

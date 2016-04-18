@@ -98,9 +98,9 @@ public class AbilityExecution implements IUpdateable {
 
     // handle already applied effects
     for (final Entry<IEffect, Long> entry : this.getAppliedEffects().entrySet()) {
-      IEffect effect = entry.getKey();
-      long time = entry.getValue();
-      
+      final IEffect effect = entry.getKey();
+      final long time = entry.getValue();
+
       // while the duration + delay of an effect is not reached or an effect
       // without duration is still active
       // effects without a duration are cancelled after the abiltity duration

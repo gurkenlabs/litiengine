@@ -121,10 +121,10 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public void renderFogOfWar(final Graphics2D g) {
-    if(this.fogOfWar == null){
+    if (this.fogOfWar == null) {
       return;
     }
-    
+
     final AffineTransform oldTransform = g.getTransform();
     final AffineTransform at = new AffineTransform();
     at.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
@@ -189,7 +189,7 @@ public class CombatEntityVision implements IVision {
     return this.fogOfWar;
   }
 
-  protected void setFogOfWar(Shape fogOfWar) {
+  protected void setFogOfWar(final Shape fogOfWar) {
     this.fogOfWar = fogOfWar;
   }
 
@@ -197,7 +197,7 @@ public class CombatEntityVision implements IVision {
     return this.environment;
   }
 
-  protected void setRenderVisionShape(Shape renderVisionShape) {
+  protected void setRenderVisionShape(final Shape renderVisionShape) {
     this.renderVisionShape = renderVisionShape;
   }
 

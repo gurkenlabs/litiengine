@@ -22,7 +22,7 @@ public interface IPhysicsEngine {
   public void clear();
 
   public List<Rectangle2D> getAllCollisionBoxes();
-  
+
   public List<Rectangle2D> getStaticCollisionBoxes();
 
   /**
@@ -52,7 +52,7 @@ public interface IPhysicsEngine {
   public boolean move(IMovableEntity entity, float delta);
 
   public boolean setTurnEntityOnMove(boolean turn);
-  
+
   /**
    *
    * @param rect

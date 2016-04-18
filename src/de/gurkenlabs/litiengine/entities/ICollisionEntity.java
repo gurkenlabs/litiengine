@@ -26,7 +26,7 @@ public interface ICollisionEntity extends IEntity {
    * @return true, if successful
    */
   public boolean hasCollision();
-  
+
   /**
    * Sets the collision.
    *

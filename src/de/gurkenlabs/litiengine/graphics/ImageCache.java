@@ -63,23 +63,23 @@ public class ImageCache {
     this.subFolder = subfolder;
   }
 
-  public static void saveCache(String path) {
-    File cacheFile = new File(path, CACHE_DUMP_NAME);
+  public static void saveCache(final String path) {
+    final File cacheFile = new File(path, CACHE_DUMP_NAME);
     try {
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
       System.out.println("cache dumped to " + cacheFile.toPath());
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
   }
 
-  public static void loadCache(String path) {
+  public static void loadCache(final String path) {
     InputStream in = null;
-    File cacheFile = new File(path, CACHE_DUMP_NAME);
+    final File cacheFile = new File(path, CACHE_DUMP_NAME);
     if (cacheFile.exists()) {
       try {
         in = new FileInputStream(cacheFile);
-      } catch (FileNotFoundException e) {
+      } catch (final FileNotFoundException e) {
         e.printStackTrace();
       }
     } else {
@@ -94,7 +94,7 @@ public class ImageCache {
     try {
       CompressionUtilities.unzip(in, new File(CACHE_DIRECTORY));
       System.out.println("cache loaded from " + cacheFile.toPath());
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
   }

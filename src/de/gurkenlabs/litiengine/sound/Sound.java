@@ -42,12 +42,12 @@ public class Sound {
 
   public URL getUrl() {
     try {
-      File file = new File(this.getPath());
+      final File file = new File(this.getPath());
       if (file.exists()) {
         return file.toURI().toURL();
       }
 
-      return getClass().getClassLoader().getResource(this.getPath());
+      return this.getClass().getClassLoader().getResource(this.getPath());
     } catch (final MalformedURLException e) {
       e.printStackTrace();
     }
