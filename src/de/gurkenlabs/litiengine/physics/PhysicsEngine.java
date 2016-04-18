@@ -4,9 +4,11 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.Shape;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -128,6 +130,50 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return false;
+  }
+
+  @Override
+  public Point2D collides(Line2D rayCast) {
+    Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
+    List<Rectangle2D> collBoxes = this.getAllCollisionBoxes();
+    collBoxes.sort(new Comparator<Rectangle2D>() {
+
+      @Override
+      public int compare(Rectangle2D rect1, Rectangle2D rect2) {
+        Point2D rect1Center = new Point2D.Double(rect1.getCenterX(), rect1.getCenterY());
+        Point2D rect2Center = new Point2D.Double(rect2.getCenterX(), rect2.getCenterY());
+        double dist1 = rect1Center.distance(rayCastSource);
+        double dist2 = rect2Center.distance(rayCastSource);
+
+        if (dist1 < dist2) {
+          return -1;
+        }
+
+        if (dist1 > dist2) {
+          return 1;
+        }
+
+        return 0;
+      }
+    });
+
+    for (final Rectangle2D collisionBox : collBoxes) {
+      if (collisionBox.intersectsLine(rayCast)) {
+        double closestDist = -1;
+        Point2D closestPoint = null;
+        for (Point2D intersection : GeometricUtilities.getIntersectionPoints(rayCast, collisionBox)) {
+          double dist = intersection.distance(rayCastSource);
+          if (closestPoint == null || dist < closestDist) {
+            closestPoint = intersection;
+            closestDist = dist;
+          }
+        }
+
+        return closestPoint;
+      }
+    }
+
+    return null;
   }
 
   public boolean collides(final ICollisionEntity entity, final Rectangle2D rect) {

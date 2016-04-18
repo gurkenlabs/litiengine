@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -59,6 +60,8 @@ public interface IPhysicsEngine {
    * @return true if there is any collision; otherwise false.
    */
   public boolean collides(Point2D point);
+  
+  public Point2D collides(Line2D rayCast);
 
   /**
    *
