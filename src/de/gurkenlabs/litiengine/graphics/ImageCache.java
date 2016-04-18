@@ -9,7 +9,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,12 +22,20 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
+import de.gurkenlabs.util.zip.CompressionUtilities;
+
 /**
  * The Class ImageCache.
  */
 public class ImageCache {
+  public static final String CACHE_DUMP_NAME = "imagecache.dump";
+
   /** The Constant CACHE_DIRECTORY. */
   public static final String CACHE_DIRECTORY = "cache/";
+
+  public static final String MAP_DIRECTORY = "map";
+  public static final String SPRITES_DIRECTORY = "sprites";
+  public static final String IMAGES_DIRECTORY = "images";
 
   /** The Constant MAP_CACHE. */
   public static final ImageCache MAPS = new ImageCache("map");
@@ -50,6 +61,42 @@ public class ImageCache {
   private ImageCache(final String subfolder) {
     this.cache = new ConcurrentHashMap<>();
     this.subFolder = subfolder;
+  }
+
+  public static void saveCache(String path) {
+    File cacheFile = new File(path, CACHE_DUMP_NAME);
+    try {
+      CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
+      System.out.println("cache dumped to " + cacheFile.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void loadCache(String path) {
+    InputStream in = null;
+    File cacheFile = new File(path, CACHE_DUMP_NAME);
+    if (cacheFile.exists()) {
+      try {
+        in = new FileInputStream(cacheFile);
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    } else {
+      in = ClassLoader.getSystemResourceAsStream(CACHE_DUMP_NAME);
+    }
+
+    if (in == null) {
+      System.out.println("loading stream from " + cacheFile.toPath() + " failed!");
+      return;
+    }
+
+    try {
+      CompressionUtilities.unzip(in, new File(CACHE_DIRECTORY));
+      System.out.println("cache loaded from " + cacheFile.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
