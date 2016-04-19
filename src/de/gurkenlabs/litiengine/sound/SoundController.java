@@ -30,8 +30,8 @@ public class SoundController {
     }
   }
 
-  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine) {
-    soundPlayThread.enqueue(engine, true);
+  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, boolean force) {
+    soundPlayThread.enqueue(engine, force);
   }
 
   public static void start() {
@@ -53,7 +53,7 @@ public class SoundController {
         if (this.queue.peek() != null) {
           Consumer<ISoundEngine> consumer = this.queue.poll();
           if (this.reqTime.containsKey(consumer)) {
-            if (Game.getLoop().getDeltaTime(this.reqTime.get(consumer)) < 100) {
+            if (Game.getLoop().getDeltaTime(this.reqTime.get(consumer)) < 500) {
               consumer.accept(Game.getSoundEngine());
             }
 
