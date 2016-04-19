@@ -16,6 +16,7 @@ public class PaulsSoundEngine extends SoundEngine {
   @Override
   public void init(final float soundVolume) {
     super.init(soundVolume);
+    SoundController.start();
 
     try {
       SoundSystemConfig.addLibrary(LibraryJavaSound.class);
@@ -37,12 +38,12 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true));
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true), true);
   }
 
   @Override
   public void rewind(final Sound sound) {
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()));
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()), true);
   }
 
   @Override
@@ -51,7 +52,7 @@ public class PaulsSoundEngine extends SoundEngine {
       return;
     }
 
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff()));
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff()), false);
   }
 
   @Override
@@ -76,7 +77,7 @@ public class PaulsSoundEngine extends SoundEngine {
 
       final String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
       this.add(new Playback(entity, name));
-    });
+    }, false);
 
   }
 
@@ -96,7 +97,7 @@ public class PaulsSoundEngine extends SoundEngine {
       }
 
       this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-    });
+    }, false);
   }
 
   @Override
@@ -104,7 +105,9 @@ public class PaulsSoundEngine extends SoundEngine {
     super.terminate();
     SoundController.callIgnoreTimeout(engine -> {
       this.soundSystem.cleanup();
-    });
+    }, true);
+
+    SoundController.terminate();
   }
 
   @Override
@@ -124,6 +127,6 @@ public class PaulsSoundEngine extends SoundEngine {
 
   @Override
   public void stopMusic(final Sound s) {
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()));
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()), true);
   }
 }

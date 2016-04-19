@@ -49,7 +49,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
       // clean up finished playbacks
       finished.forEach(x -> this.playbacks.remove(x));
-    });
+    } , true);
   }
 
   public float getMaxListenerRadius() {
