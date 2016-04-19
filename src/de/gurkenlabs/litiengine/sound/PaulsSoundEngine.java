@@ -16,6 +16,7 @@ public class PaulsSoundEngine extends SoundEngine {
   @Override
   public void init(final float soundVolume) {
     super.init(soundVolume);
+    SoundController.start();
 
     try {
       SoundSystemConfig.addLibrary(LibraryJavaSound.class);
@@ -105,6 +106,8 @@ public class PaulsSoundEngine extends SoundEngine {
     SoundController.callIgnoreTimeout(engine -> {
       this.soundSystem.cleanup();
     });
+
+    SoundController.terminate();
   }
 
   @Override
