@@ -284,7 +284,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public Point getScreenLocation() {
-    return this.getRenderComponent().getLocationOnScreen();
+    return this.getLocationOnScreen();
   }
 
   @Override

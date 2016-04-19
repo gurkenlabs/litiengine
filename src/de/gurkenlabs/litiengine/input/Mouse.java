@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.AWTException;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.MouseEvent;
@@ -15,6 +16,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
@@ -343,10 +345,13 @@ public class Mouse implements IMouse {
 
     final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
+    final Point screenLocation = Game.getScreenManager().getScreenLocation();
+    int grabX = (int) (screenLocation.x + screenCenterX);
+    int grabY = (int) (screenLocation.y + screenCenterY);
 
     // calculate diffs and new location for the ingame mouse
-    final double diffX = mouseLocation.x - screenCenterX;
-    final double diffY = mouseLocation.y - screenCenterY;
+    final double diffX =  MouseInfo.getPointerInfo().getLocation().x - grabX;
+    final double diffY =  MouseInfo.getPointerInfo().getLocation().y - grabY;
     int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
 
@@ -368,8 +373,7 @@ public class Mouse implements IMouse {
 
     // lock original mouse back to the center of the screen
     this.isGrabbing = true;
-    final Point screenLocation = Game.getScreenManager().getScreenLocation();
-    this.robot.mouseMove((int) (screenLocation.getX() + screenCenterX), (int) (screenLocation.getY() + screenCenterY));
+    this.robot.mouseMove(grabX, grabY);
     this.isGrabbing = false;
   }
 
