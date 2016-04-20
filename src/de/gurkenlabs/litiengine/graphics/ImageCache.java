@@ -66,6 +66,10 @@ public class ImageCache {
   public static void saveCache(final String path) {
     final File cacheFile = new File(path, CACHE_DUMP_NAME);
     try {
+      if (cacheFile.exists()) {
+        cacheFile.delete();
+      }
+      
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
       System.out.println("cache dumped to " + cacheFile.toPath());
     } catch (final IOException e) {
