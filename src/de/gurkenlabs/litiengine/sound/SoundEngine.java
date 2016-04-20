@@ -35,9 +35,9 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
       final List<Playback> finished = new ArrayList<>();
       for (final Playback playback : this.playbacks) {
         if (this.isPlaying(playback.getName())) {
-          if (this.maxListenerRadius != 0 && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
+          if (this.maxListenerRadius != 0 && playback.getEntity() != null && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
             this.updatePosition(playback.getName(), new Point2D.Double(10000, 10000));
-          } else if (playback.getEntity().getLocation().distance(this.getListenerPosition()) > 5) {
+          } else if (playback.getEntity() != null && playback.getEntity().getLocation().distance(this.getListenerPosition()) > 5) {
             this.updatePosition(playback.getName(), playback.getEntity().getDimensionCenter());
           } else {
             this.updatePosition(playback.getName(), this.getListenerPosition());

@@ -36,4 +36,6 @@ public interface ISoundEngine extends ILaunchable {
   public void addPlayCondition(Predicate<Point2D> predicate);
 
   public void setMaxRadius(float radius);
+  
+  public void load(Sound sound);
 }

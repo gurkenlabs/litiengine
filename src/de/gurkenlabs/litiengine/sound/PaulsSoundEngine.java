@@ -47,12 +47,21 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
+  public void load(Sound sound) {
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.loadSound(sound.getUrl(), sound.getPath()), true);
+  }
+
+  @Override
   public void playSound(final Sound sound) {
     if (sound == null) {
       return;
     }
 
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff()), false);
+    SoundController.callIgnoreTimeout(engine -> {
+      String identifier = this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+      this.add(new Playback(null, identifier));
+    } , false);
+
   }
 
   @Override
@@ -77,7 +86,7 @@ public class PaulsSoundEngine extends SoundEngine {
 
       final String name = this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
       this.add(new Playback(entity, name));
-    }, false);
+    } , false);
 
   }
 
@@ -97,7 +106,7 @@ public class PaulsSoundEngine extends SoundEngine {
       }
 
       this.soundSystem.quickPlay(false, sound.getUrl(), uniqueIdentifier, false, locationX, locationY, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-    }, false);
+    } , false);
   }
 
   @Override
@@ -105,7 +114,7 @@ public class PaulsSoundEngine extends SoundEngine {
     super.terminate();
     SoundController.callIgnoreTimeout(engine -> {
       this.soundSystem.cleanup();
-    }, true);
+    } , true);
 
     SoundController.terminate();
   }
@@ -129,4 +138,5 @@ public class PaulsSoundEngine extends SoundEngine {
   public void stopMusic(final Sound s) {
     SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()), true);
   }
+
 }
