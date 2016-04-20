@@ -9,6 +9,7 @@ import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -222,6 +223,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     this.getCamera().updateFocus();
 
+    g.setClip(new Rectangle(0, 0, (int) this.getResolution().getWidth(), (int) this.getResolution().getHeight()));
     this.getCurrentScreen().render(g);
     RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
 
@@ -272,7 +274,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private class ResizedEventListener extends ComponentAdapter {
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
      * ComponentEvent)
      */
