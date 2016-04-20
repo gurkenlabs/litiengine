@@ -28,7 +28,7 @@ public class CombatEntityVision implements IVision {
   public static final int VISION_RADIUS = 200;
 
   /** The Constant FogOfWarColor. */
-  private static final Color FogOfWarColor = new Color(0, 0, 0, 127);
+  protected static final Color FogOfWarColor = new Color(0, 0, 0, 127);
 
   private final IEnvironment environment;
 
@@ -36,10 +36,10 @@ public class CombatEntityVision implements IVision {
   private final ICombatEntity combatEntity;
 
   /** The vision diameter. */
-  private final int visionDiameter;
+  private int visionDiameter;
 
   /** The vision radius. */
-  private final int visionRadius;
+  private int visionRadius;
 
   private Shape renderVisionShape;
 
@@ -179,6 +179,11 @@ public class CombatEntityVision implements IVision {
     rectangleArea.subtract(new Area(path));
 
     this.fogOfWar = rectangleArea;
+  }
+  
+  public void setVisionRadius(int radius){
+    this.visionRadius = radius;
+    this.visionDiameter = radius* 2;
   }
 
   protected ICombatEntity getCombatEntity() {
