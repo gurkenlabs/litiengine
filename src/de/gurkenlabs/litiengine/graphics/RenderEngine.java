@@ -48,6 +48,8 @@ public class RenderEngine implements IRenderEngine {
 
   /** The map renderer. */
   private final Map<MapOrientation, IMapRenderer> mapRenderer;
+  
+  private final EntityYComparator entityComparator;
 
   /**
    * Instantiates a new graphics engine.
@@ -61,6 +63,7 @@ public class RenderEngine implements IRenderEngine {
     this.entityRenderingConditions = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderer = new HashMap<>();
+    this.entityComparator = new EntityYComparator();
 
     this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
   }
@@ -212,7 +215,7 @@ public class RenderEngine implements IRenderEngine {
     // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
     // BETTER DATASTRUCTURE FOR THE (HEAP)
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
-    Collections.sort(entities, new EntityYComparator());
+    Collections.sort(entities, this.entityComparator);
 
     for (final IEntity entity : entities) {
       this.renderEntity(g, entity);

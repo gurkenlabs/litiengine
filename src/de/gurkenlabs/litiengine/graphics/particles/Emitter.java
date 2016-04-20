@@ -64,6 +64,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /** The time to live. */
   private int timeToLive;
 
+  private Rectangle2D boundingBox;
+
   /**
    * Basic constructor for an effect.
    *
@@ -149,7 +151,11 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public Rectangle2D getBoundingBox() {
-    return new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    if (this.boundingBox == null) {
+      this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    }
+
+    return boundingBox;
   }
 
   /**
@@ -244,6 +250,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void setOrigin(final Point2D location) {
     this.setLocation(location);
+    this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
   }
 
   public void setParticleMaxTTL(final int maxTTL) {

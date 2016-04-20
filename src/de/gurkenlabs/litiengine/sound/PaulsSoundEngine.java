@@ -60,7 +60,7 @@ public class PaulsSoundEngine extends SoundEngine {
     SoundController.callIgnoreTimeout(engine -> {
       String identifier = this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
       this.add(new Playback(null, identifier));
-    } , false);
+    } , true);
 
   }
 

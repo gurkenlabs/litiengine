@@ -122,11 +122,13 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   protected String buildCurrentCacheKey() {
-    final StringBuilder effects = new StringBuilder();
-    this.getImageEffects().forEach(x -> effects.append(x.getClass().getSimpleName()));
-
-    final String cacheKey = MessageFormat.format("{0}_{1}_{2}", this.getCurrentAnimation().getSpritesheet().getPath().hashCode(), this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex(), effects.toString());
-    return cacheKey;
+    final StringBuilder cacheKey = new StringBuilder();
+    cacheKey.append(this.getCurrentAnimation().getSpritesheet().getPath().hashCode());
+    cacheKey.append('_');
+    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
+    cacheKey.append('_');
+    this.getImageEffects().forEach(x -> cacheKey.append(x.getName()));
+    return cacheKey.toString();
   }
 
   private void removeFinishedImageEffects() {

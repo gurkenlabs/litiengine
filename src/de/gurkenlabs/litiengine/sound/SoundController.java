@@ -32,6 +32,7 @@ public class SoundController {
 
   public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, boolean force) {
     soundPlayThread.enqueue(engine, force);
+    lastPlay = Game.getLoop().getTicks();
   }
 
   public static void start() {

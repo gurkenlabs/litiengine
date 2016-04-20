@@ -19,6 +19,9 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   private Point2D listenerPosition;
   private float maxListenerRadius;
 
+  private static final int UPDATE_RATE = 200;
+  private long lastUpdate;
+
   public SoundEngine() {
     this.playbacks = new CopyOnWriteArrayList<>();
     this.entityPlayConditions = new CopyOnWriteArrayList<>();
@@ -27,6 +30,10 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void update(final IGameLoop gameLoop) {
+    if (gameLoop.getDeltaTime(this.lastUpdate) < UPDATE_RATE) {
+      return;
+    }
+
     SoundController.callIgnoreTimeout(engine -> {
       // update listener
       this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
@@ -50,6 +57,8 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
       // clean up finished playbacks
       finished.forEach(x -> this.playbacks.remove(x));
     } , true);
+
+    this.lastUpdate = gameLoop.getTicks();
   }
 
   public float getMaxListenerRadius() {

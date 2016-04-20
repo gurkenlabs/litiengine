@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  */
 public class PositionLockCamera extends Camera {
   private final IEntity entity;
+  private Rectangle2D viewPort;
 
   public PositionLockCamera(final IEntity entity) {
     super();
@@ -32,8 +33,7 @@ public class PositionLockCamera extends Camera {
    */
   @Override
   public Rectangle2D getViewPort() {
-    final Point2D focus = this.getFocus();
-    return new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
+    return this.viewPort;
   }
 
   @Override
@@ -59,5 +59,8 @@ public class PositionLockCamera extends Camera {
     this.setFocus(this.applyShakeEffect(cameraLocation));
     this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() * 0.5);
     this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() * 0.5);
+    final Point2D focus = this.getFocus();
+    this.viewPort =  new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
+
   }
 }

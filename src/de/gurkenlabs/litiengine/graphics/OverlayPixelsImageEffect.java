@@ -10,7 +10,7 @@ public class OverlayPixelsImageEffect extends ImageEffect {
   private final Color color;
 
   public OverlayPixelsImageEffect(final int ttl, final Color color) {
-    super(ttl);
+    super(ttl, "OverlayPixelsImageEffect");
     this.color = color;
   }
 

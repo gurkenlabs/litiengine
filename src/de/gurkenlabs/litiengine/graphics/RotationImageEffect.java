@@ -8,7 +8,7 @@ public class RotationImageEffect extends ImageEffect {
   private final float angle;
 
   public RotationImageEffect(final int ttl, final float angle) {
-    super(ttl);
+    super(ttl, "RotationImageEffect");
     this.angle = angle;
   }
 

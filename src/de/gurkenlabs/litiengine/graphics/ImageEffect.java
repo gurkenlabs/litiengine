@@ -6,9 +6,11 @@ public abstract class ImageEffect implements IImageEffect {
   private final int ttl;
 
   private final long aliveTick;
+  private final String name;
 
-  protected ImageEffect(final int ttl) {
+  protected ImageEffect(final int ttl, final String name) {
     this.ttl = ttl;
+    this.name = name;
     this.aliveTick = Game.getLoop().getTicks();
   }
 
@@ -25,5 +27,10 @@ public abstract class ImageEffect implements IImageEffect {
   @Override
   public boolean timeToLiveReached() {
     return this.getTimeToLive() > 0 && this.getAliveTime() > this.getTimeToLive();
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 }
