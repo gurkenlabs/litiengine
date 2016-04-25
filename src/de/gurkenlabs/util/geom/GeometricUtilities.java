@@ -34,7 +34,7 @@ public class GeometricUtilities {
     // 0 currently points EAST.
     // NOTE: By preserving Y and X param order to atan2, we are expecting
     // a CLOCKWISE angle direction.
-    final double theta = Math.atan2(targetY - centerY, targetX - centerX);
+    final double theta = Trigonometry.atan2((float)(targetY - centerY), (float)(targetX - centerX));
 
     // convert from radians to degrees
     // this will give you an angle from [0->270],[-180,0]
@@ -430,12 +430,12 @@ public class GeometricUtilities {
     areaA.intersect(new Area(shapeB));
     return !areaA.isEmpty();
   }
-
+  
   private static double getXDelta(final double angle, final double delta) {
-    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
+    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 
   private static double getYDelta(final double angle, final double delta) {
-    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
+    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }

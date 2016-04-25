@@ -225,7 +225,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     g.setClip(new Rectangle(0, 0, (int) this.getResolution().getWidth(), (int) this.getResolution().getHeight()));
     this.getCurrentScreen().render(g);
-    RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
+
+    if (this.cursorImage != null) {
+      RenderEngine.renderImage(g, this.cursorImage, Input.MOUSE.getLocation());
+    }
 
     for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
       consumer.accept(g);
