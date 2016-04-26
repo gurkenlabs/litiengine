@@ -222,7 +222,7 @@ public class ImageCache {
       final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
       compatibleImg.getGraphics().drawImage(img, 0, 0, null);
       compatibleImg.getGraphics().dispose();
-      
+
       this.cache.put(key, compatibleImg);
       return compatibleImg;
     } catch (final Exception e) {

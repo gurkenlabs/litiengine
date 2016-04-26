@@ -29,7 +29,7 @@ public class SoundController {
     }
   }
 
-  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, boolean force) {
+  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, final boolean force) {
     soundPlayThread.enqueue(engine, force);
     lastPlay = Game.getLoop().getTicks();
   }
@@ -51,7 +51,7 @@ public class SoundController {
     public void run() {
       while (this.isRunning) {
         while (this.queue.peek() != null) {
-          Consumer<ISoundEngine> consumer = this.queue.poll();
+          final Consumer<ISoundEngine> consumer = this.queue.poll();
           if (this.reqTime.containsKey(consumer)) {
             if (Game.getLoop().getDeltaTime(this.reqTime.get(consumer)) < 500) {
               consumer.accept(Game.getSoundEngine());
@@ -64,21 +64,21 @@ public class SoundController {
         }
         try {
           Thread.sleep(20);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
           e.printStackTrace();
         }
       }
     }
 
     public boolean isRunning() {
-      return isRunning;
+      return this.isRunning;
     }
 
-    public void setRunning(boolean isRunning) {
+    public void setRunning(final boolean isRunning) {
       this.isRunning = isRunning;
     }
 
-    public void enqueue(Consumer<ISoundEngine> consumer, boolean force) {
+    public void enqueue(final Consumer<ISoundEngine> consumer, final boolean force) {
       this.queue.add(consumer);
       if (!force) {
         this.reqTime.put(consumer, Game.getLoop().getTicks());

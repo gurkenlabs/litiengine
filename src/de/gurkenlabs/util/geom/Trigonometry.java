@@ -20,7 +20,7 @@ public class Trigonometry {
   private static final int SIN_COUNT = SIN_MASK + 1;
 
   private static final float radFull = (float) (Math.PI * 2.0);
-  private static final float degFull = (float) (360.0);
+  private static final float degFull = (float) 360.0;
   private static final float radToIndex = SIN_COUNT / radFull;
   private static final float degToIndex = SIN_COUNT / degFull;
 
@@ -30,27 +30,27 @@ public class Trigonometry {
   static {
     for (int i = 0; i < ATAN2_DIM; i++) {
       for (int j = 0; j < ATAN2_DIM; j++) {
-        float x0 = (float) i / ATAN2_DIM;
-        float y0 = (float) j / ATAN2_DIM;
+        final float x0 = (float) i / ATAN2_DIM;
+        final float y0 = (float) j / ATAN2_DIM;
 
         atan2[j * ATAN2_DIM + i] = (float) Math.atan2(y0, x0);
       }
     }
 
     for (int i = 0; i < SIN_COUNT; i++) {
-      sin[i] = (float) Math.sin((float) (i + 0.5f) / SIN_COUNT * radFull);
-      cos[i] = (float) Math.cos((float) (i + 0.5f) / SIN_COUNT * radFull);
+      sin[i] = (float) Math.sin((i + 0.5f) / SIN_COUNT * radFull);
+      cos[i] = (float) Math.cos((i + 0.5f) / SIN_COUNT * radFull);
     }
   }
 
   /**
    * ATAN2
    */
-  public static final float atan2Deg(float y, float x) {
+  public static final float atan2Deg(final float y, final float x) {
     return atan2(y, x) * DEG;
   }
 
-  public static final float atan2DegStrict(float y, float x) {
+  public static final float atan2DegStrict(final float y, final float x) {
     return (float) Math.atan2(y, x) * DEG;
   }
 
@@ -80,10 +80,10 @@ public class Trigonometry {
       add = 0.0f;
     }
 
-    float invDiv = 1.0f / (((x < y) ? y : x) * INV_ATAN2_DIM_MINUS_1);
+    final float invDiv = 1.0f / ((x < y ? y : x) * INV_ATAN2_DIM_MINUS_1);
 
-    int xi = (int) (x * invDiv);
-    int yi = (int) (y * invDiv);
+    final int xi = (int) (x * invDiv);
+    final int yi = (int) (y * invDiv);
 
     return (atan2[yi * ATAN2_DIM + xi] + add) * mul;
   }
@@ -91,22 +91,22 @@ public class Trigonometry {
   /**
    * SIN / COS (RAD)
    */
-  public static final float sin(float rad) {
+  public static final float sin(final float rad) {
     return sin[(int) (rad * radToIndex) & SIN_MASK];
   }
 
-  public static final float cos(float rad) {
+  public static final float cos(final float rad) {
     return cos[(int) (rad * radToIndex) & SIN_MASK];
   }
 
   /**
    * SIN / COS (DEG)
    */
-  public static final float sinDeg(float deg) {
+  public static final float sinDeg(final float deg) {
     return sin[(int) (deg * degToIndex) & SIN_MASK];
   }
 
-  public static final float cosDeg(float deg) {
+  public static final float cosDeg(final float deg) {
     return cos[(int) (deg * degToIndex) & SIN_MASK];
   }
 }

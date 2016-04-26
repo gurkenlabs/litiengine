@@ -13,10 +13,10 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class DebugRenderer {
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
-    if(!Game.getConfiguration().DEBUG.isDebugEnabled()){
+    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
       return;
     }
-    
+
     if (Game.getConfiguration().DEBUG.renderEntityNames()) {
       drawMapId(g, entity);
     }

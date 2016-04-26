@@ -155,7 +155,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
     }
 
-    return boundingBox;
+    return this.boundingBox;
   }
 
   /**
@@ -279,11 +279,11 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public void render(final Graphics2D g) {
-    if(!Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())){
+    if (!Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())) {
       return;
     }
-    
-    Point2D origin = this.getOrigin();
+
+    final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> particle.render(g, origin));
   }
 

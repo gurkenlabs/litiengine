@@ -345,12 +345,12 @@ public class Mouse implements IMouse {
     final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
     final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
     final Point screenLocation = Game.getScreenManager().getScreenLocation();
-    int grabX = (int) (screenLocation.x + screenCenterX);
-    int grabY = (int) (screenLocation.y + screenCenterY);
+    final int grabX = (int) (screenLocation.x + screenCenterX);
+    final int grabY = (int) (screenLocation.y + screenCenterY);
 
     // calculate diffs and new location for the ingame mouse
-    final double diffX =  MouseInfo.getPointerInfo().getLocation().x - grabX;
-    final double diffY =  MouseInfo.getPointerInfo().getLocation().y - grabY;
+    final double diffX = MouseInfo.getPointerInfo().getLocation().x - grabX;
+    final double diffY = MouseInfo.getPointerInfo().getLocation().y - grabY;
     int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
 

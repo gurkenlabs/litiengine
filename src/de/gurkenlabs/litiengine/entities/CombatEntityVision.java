@@ -180,10 +180,10 @@ public class CombatEntityVision implements IVision {
 
     this.fogOfWar = rectangleArea;
   }
-  
-  public void setVisionRadius(int radius){
+
+  public void setVisionRadius(final int radius) {
     this.visionRadius = radius;
-    this.visionDiameter = radius* 2;
+    this.visionDiameter = radius * 2;
   }
 
   protected ICombatEntity getCombatEntity() {

@@ -60,7 +60,7 @@ public interface IPhysicsEngine {
    * @return true if there is any collision; otherwise false.
    */
   public boolean collides(Point2D point);
-  
+
   public Point2D collides(Line2D rayCast);
 
   /**

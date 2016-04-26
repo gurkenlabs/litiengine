@@ -54,10 +54,10 @@ public abstract class EntityEmitter extends Emitter {
    */
   @Override
   public Point2D getLocation() {
-    if(this.getEntity() == null){
+    if (this.getEntity() == null) {
       return null;
     }
-    
+
     return this.getEntity().getDimensionCenter();
   }
 

@@ -89,10 +89,10 @@ public class Attribute<T extends Number> {
    * @return the t
    */
   protected T applyModifiers(final T baseValue) {
-    if(this.getModifiers().size() == 0){
+    if (this.getModifiers().size() == 0) {
       return baseValue;
     }
-    
+
     T currentValue = baseValue;
     for (final AttributeModifier<T> modifier : this.getModifiers()) {
       currentValue = modifier.modify(currentValue);

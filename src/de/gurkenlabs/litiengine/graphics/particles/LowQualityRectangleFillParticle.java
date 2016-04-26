@@ -14,6 +14,6 @@ public class LowQualityRectangleFillParticle extends Particle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
     g.setColor(this.getColor());
-    g.fillRect((int)renderLocation.getX(), (int)renderLocation.getY(), (int)this.getWidth(), (int) this.getHeight());
+    g.fillRect((int) renderLocation.getX(), (int) renderLocation.getY(), (int) this.getWidth(), (int) this.getHeight());
   }
 }

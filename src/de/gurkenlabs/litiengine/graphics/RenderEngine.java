@@ -137,7 +137,7 @@ public class RenderEngine implements IRenderEngine {
   /**
    * PERFORMANCE HINT: The larger the text is, the more time it needs to render
    * especially with antialiasing turned on.
-   * 
+   *
    * @param g
    * @param text
    * @param x
@@ -262,7 +262,7 @@ public class RenderEngine implements IRenderEngine {
       return;
     }
 
-    RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
+    final RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
     if (this.entityRenderingConditions.size() > 0) {
       for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
         if (!consumer.test(renderEvent)) {

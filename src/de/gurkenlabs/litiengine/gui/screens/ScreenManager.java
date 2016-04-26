@@ -277,7 +277,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private class ResizedEventListener extends ComponentAdapter {
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
      * ComponentEvent)
      */

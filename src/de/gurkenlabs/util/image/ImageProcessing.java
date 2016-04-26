@@ -277,15 +277,15 @@ public class ImageProcessing {
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
   }
-  
-  public static BufferedImage getCompatibleImage(int width, int height){
+
+  public static BufferedImage getCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();
     final BufferedImage compatibleImg = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
     return compatibleImg;
   }
-  
+
   /**
    * Needs border.
    *
