@@ -22,7 +22,7 @@ public class Force {
   private boolean hasEnded;
 
   /** The location. */
-  private final Point2D location;
+  private Point2D location;
 
   /** The strength. */
   private final float strength;
@@ -105,5 +105,9 @@ public class Force {
 
   public void setCancelOnReached(final boolean cancelOnReached) {
     this.cancelOnReached = cancelOnReached;
+  }
+  
+  public void setLocation(Point2D location){
+    this.location = location;
   }
 }
