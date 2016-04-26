@@ -279,6 +279,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public void render(final Graphics2D g) {
+    if(!Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())){
+      return;
+    }
+    
     Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> particle.render(g, origin));
   }

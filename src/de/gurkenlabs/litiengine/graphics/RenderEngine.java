@@ -50,7 +50,7 @@ public class RenderEngine implements IRenderEngine {
 
   /** The map renderer. */
   private final Map<MapOrientation, IMapRenderer> mapRenderer;
-  
+
   private final EntityYComparator entityComparator;
 
   /**
@@ -109,10 +109,10 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
-    if(image == null){
+    if (image == null) {
       return;
     }
-    
+
     final AffineTransform t = new AffineTransform();
     t.translate(renderLocation.getX(), renderLocation.getY());
     g.drawImage(image, t, null);
@@ -135,8 +135,9 @@ public class RenderEngine implements IRenderEngine {
   }
 
   /**
-   * PERFORMANCE HINT: 
-   * The larger the text is, the more time it needs to render especially with antialiasing turned on.
+   * PERFORMANCE HINT: The larger the text is, the more time it needs to render
+   * especially with antialiasing turned on.
+   * 
    * @param g
    * @param text
    * @param x
@@ -261,14 +262,19 @@ public class RenderEngine implements IRenderEngine {
       return;
     }
 
-    for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
-      if (!consumer.test(new RenderEvent<IEntity>(g, entity))) {
-        return;
+    RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
+    if (this.entityRenderingConditions.size() > 0) {
+      for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
+        if (!consumer.test(renderEvent)) {
+          return;
+        }
       }
     }
 
-    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
-      consumer.accept(new RenderEvent<IEntity>(g, entity));
+    if (this.entityRenderingConsumer.size() > 0) {
+      for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
+        consumer.accept(renderEvent);
+      }
     }
 
     boolean rendered = false;
@@ -283,9 +289,9 @@ public class RenderEngine implements IRenderEngine {
       rendered = true;
     }
 
-    if (rendered) {
+    if (rendered && this.entityRenderedConsumer.size() > 0) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
-        consumer.accept(new RenderEvent<IEntity>(g, entity));
+        consumer.accept(renderEvent);
       }
     }
   }
