@@ -16,7 +16,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;

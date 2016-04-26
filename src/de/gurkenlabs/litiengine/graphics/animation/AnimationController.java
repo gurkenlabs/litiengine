@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
