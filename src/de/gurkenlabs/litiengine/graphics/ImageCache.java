@@ -3,10 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +18,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
+import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.zip.CompressionUtilities;
 
 /**
@@ -69,7 +66,7 @@ public class ImageCache {
       if (cacheFile.exists()) {
         cacheFile.delete();
       }
-      
+
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
       System.out.println("cache dumped to " + cacheFile.toPath());
     } catch (final IOException e) {
@@ -222,12 +219,10 @@ public class ImageCache {
         return null;
       }
 
-      final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      final GraphicsDevice device = env.getDefaultScreenDevice();
-      final GraphicsConfiguration config = device.getDefaultConfiguration();
-      final BufferedImage compatibleImg = config.createCompatibleImage(img.getWidth(), img.getHeight(), Transparency.TRANSLUCENT);
+      final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
       compatibleImg.getGraphics().drawImage(img, 0, 0, null);
-
+      compatibleImg.getGraphics().dispose();
+      
       this.cache.put(key, compatibleImg);
       return compatibleImg;
     } catch (final Exception e) {

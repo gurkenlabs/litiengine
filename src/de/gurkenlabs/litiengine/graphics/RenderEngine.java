@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -35,6 +36,7 @@ import de.gurkenlabs.litiengine.tiled.tmx.OrthogonalMapRenderer;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
+import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
  * The Class GraphicsEngine.
@@ -99,10 +101,7 @@ public class RenderEngine implements IRenderEngine {
       return null;
     }
 
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage compatibleImg = config.createCompatibleImage(img.getWidth(), img.getHeight(), Transparency.TRANSLUCENT);
+    final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
     compatibleImg.getGraphics().drawImage(img, 0, 0, null);
 
     ImageCache.IMAGES.putPersistent(cacheKey, compatibleImg);
@@ -135,8 +134,16 @@ public class RenderEngine implements IRenderEngine {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
+  /**
+   * PERFORMANCE HINT: 
+   * The larger the text is, the more time it needs to render especially with antialiasing turned on.
+   * @param g
+   * @param text
+   * @param x
+   * @param y
+   * @param shadow
+   */
   public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     final Color old = g.getColor();
     g.setColor(shadow);
     g.drawString(text, (int) x + 1, (int) y + 1);
@@ -145,7 +152,6 @@ public class RenderEngine implements IRenderEngine {
     g.drawString(text, (int) x - 1, (int) y + 1);
     g.setColor(old);
     g.drawString(text, (int) x, (int) y);
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
   public static BufferedImage createCompatibleImage(final int width, final int height) {
@@ -219,7 +225,7 @@ public class RenderEngine implements IRenderEngine {
     // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
     // BETTER DATASTRUCTURE FOR THE (HEAP)
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
-    Collections.sort(entities, this.entityComparator);
+    Collections.sort(entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList()), this.entityComparator);
 
     for (final IEntity entity : entities) {
       this.renderEntity(g, entity);
@@ -252,10 +258,6 @@ public class RenderEngine implements IRenderEngine {
   @Override
   public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
-      return;
-    }
-
-    if (!Game.getScreenManager().getCamera().getViewPort().intersects(entity.getBoundingBox())) {
       return;
     }
 

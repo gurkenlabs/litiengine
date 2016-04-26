@@ -35,6 +35,8 @@ public class Spritesheet {
   /** The sprite width. */
   private final int spriteWidth;
 
+  private final int hashCode;
+
   public Spritesheet(final ITileset tileset) {
     this.path = tileset.getImage().getAbsoluteSourcePath();
     this.spriteWidth = tileset.getTileDimension().width;
@@ -42,6 +44,7 @@ public class Spritesheet {
     this.columns = tileset.getImage().getDimension().width / tileset.getTileDimension().width;
     this.rows = tileset.getImage().getDimension().height / tileset.getTileDimension().height;
     spritesheets.add(this);
+    this.hashCode = this.getPath().hashCode();
   }
 
   /**
@@ -65,6 +68,7 @@ public class Spritesheet {
     this.columns = columns;
     this.rows = rows;
     spritesheets.add(this);
+    this.hashCode = this.getPath().hashCode();
   }
 
   public static Spritesheet find(final String path) {
@@ -78,6 +82,11 @@ public class Spritesheet {
     }
 
     return sheet.get();
+  }
+
+  @Override
+  public int hashCode() {
+    return this.hashCode;
   }
 
   /**

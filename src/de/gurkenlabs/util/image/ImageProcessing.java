@@ -2,8 +2,12 @@ package de.gurkenlabs.util.image;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -214,7 +218,7 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage flashVisiblePixels(final Image playerImage, final Color flashColor) {
-    final BufferedImage bimage = new BufferedImage(playerImage.getWidth(null), playerImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage bimage = getCompatibleImage(playerImage.getWidth(null), playerImage.getHeight(null));
 
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
@@ -273,7 +277,15 @@ public class ImageProcessing {
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
   }
-
+  
+  public static BufferedImage getCompatibleImage(int width, int height){
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsDevice device = env.getDefaultScreenDevice();
+    final GraphicsConfiguration config = device.getDefaultConfiguration();
+    final BufferedImage compatibleImg = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+    return compatibleImg;
+  }
+  
   /**
    * Needs border.
    *

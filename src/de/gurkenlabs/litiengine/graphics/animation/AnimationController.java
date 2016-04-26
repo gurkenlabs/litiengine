@@ -123,7 +123,7 @@ public abstract class AnimationController implements IAnimationController {
 
   protected String buildCurrentCacheKey() {
     final StringBuilder cacheKey = new StringBuilder();
-    cacheKey.append(this.getCurrentAnimation().getSpritesheet().getPath().hashCode());
+    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
     cacheKey.append('_');
     cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
     cacheKey.append('_');

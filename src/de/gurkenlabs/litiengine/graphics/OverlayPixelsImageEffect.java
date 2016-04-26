@@ -10,13 +10,13 @@ public class OverlayPixelsImageEffect extends ImageEffect {
   private final Color color;
 
   public OverlayPixelsImageEffect(final int ttl, final Color color) {
-    super(ttl, "OverlayPixelsImageEffect");
+    super(ttl, "OverlayPixels");
     this.color = color;
   }
 
   @Override
   public BufferedImage apply(final BufferedImage image) {
-    final BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
 
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();

@@ -172,7 +172,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> this.takeScreenShot = true);
     this.setVisible(true);
-    this.renderCanvas.createBufferStrategy(2);
+    this.renderCanvas.createBufferStrategy(3);
     this.bufferStrategy = this.renderCanvas.getBufferStrategy();
     this.requestFocus();
   }

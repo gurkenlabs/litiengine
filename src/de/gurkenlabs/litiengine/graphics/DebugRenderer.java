@@ -13,6 +13,10 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class DebugRenderer {
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
+    if(!Game.getConfiguration().DEBUG.isDebugEnabled()){
+      return;
+    }
+    
     if (Game.getConfiguration().DEBUG.renderEntityNames()) {
       drawMapId(g, entity);
     }
@@ -21,9 +25,9 @@ public class DebugRenderer {
       drawHitEllipse(g, (ICombatEntity) entity);
     }
 
-    if (entity instanceof ICollisionEntity) {
+    if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
-      if (collisionEntity.hasCollision() && Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
+      if (collisionEntity.hasCollision()) {
         drawCollisionBox(g, collisionEntity.getCollisionBox());
       }
     }
