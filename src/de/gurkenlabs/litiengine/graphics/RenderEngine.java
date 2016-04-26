@@ -227,7 +227,15 @@ public class RenderEngine implements IRenderEngine {
     // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
     // BETTER DATASTRUCTURE FOR THE (HEAP)
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
-    Collections.sort(entitiesToRender, this.entityComparator);
+    try {
+      Collections.sort(entitiesToRender, this.entityComparator);
+    } catch (IllegalArgumentException e) {
+      for (final IEntity entity : entities) {
+        this.renderEntity(g, entity);
+      }
+      
+      return;
+    }
 
     for (final IEntity entity : entitiesToRender) {
       this.renderEntity(g, entity);
