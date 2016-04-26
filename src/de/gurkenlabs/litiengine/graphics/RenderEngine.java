@@ -223,12 +223,13 @@ public class RenderEngine implements IRenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
     // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
     // BETTER DATASTRUCTURE FOR THE (HEAP)
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
-    Collections.sort(entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList()), this.entityComparator);
+    Collections.sort(entitiesToRender, this.entityComparator);
 
-    for (final IEntity entity : entities) {
+    for (final IEntity entity : entitiesToRender) {
       this.renderEntity(g, entity);
     }
   }

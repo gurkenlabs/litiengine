@@ -211,7 +211,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void renderCurrentScreen() {
-    if (this.getCurrentScreen() == null) {
+    if (this.getState() == Frame.ICONIFIED || this.getCurrentScreen() == null) {
       return;
     }
 
