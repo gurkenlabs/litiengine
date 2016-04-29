@@ -116,7 +116,7 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor) {
-    final BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage bimage = getCompatibleImage(image.getWidth(null), image.getHeight(null));
 
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
@@ -137,7 +137,7 @@ public class ImageProcessing {
   public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
     final int newImageWidth = (int) (image.getWidth() * zoomLevel);
     final int newImageHeight = (int) (image.getHeight() * zoomLevel);
-    final BufferedImage resizedImage = new BufferedImage(newImageWidth, newImageHeight, image.getType());
+    final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
     final Graphics2D g = resizedImage.createGraphics();
     g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
     g.dispose();

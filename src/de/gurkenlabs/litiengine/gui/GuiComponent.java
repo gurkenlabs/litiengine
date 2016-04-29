@@ -393,6 +393,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
 
     this.isPressed = false;
+    this.mouseClicked(e);
   }
 
   /**
