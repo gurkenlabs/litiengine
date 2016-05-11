@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.tiled.tmx;
 
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -99,6 +100,23 @@ public class Environment implements IEnvironment {
   @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
     final ArrayList<ICombatEntity> entities = new ArrayList<>();
+    if (shape == null) {
+      return entities;
+    }
+    
+    // for rectangle we can jsut use the intersects method
+    if (shape instanceof Rectangle2D) {
+      Rectangle2D rect = (Rectangle2D) shape;
+      for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+        if (combatEntity.getHitBox().intersects(rect)) {
+          entities.add(combatEntity);
+        }
+      }
+
+      return entities;
+    }
+
+    // for other shapes, we check if the shape's bounds intersect the hitbox and if so, we then check if the actual shape intersects the hitbox
     for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
       if (combatEntity.getHitBox().intersects(shape.getBounds())) {
         if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {

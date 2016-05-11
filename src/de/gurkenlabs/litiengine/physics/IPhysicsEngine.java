@@ -50,6 +50,8 @@ public interface IPhysicsEngine {
    */
   public boolean move(IMovableEntity entity, Point2D target, float delta);
 
+  public boolean move(IMovableEntity entity, double x, double y, float delta);
+  
   public boolean move(IMovableEntity entity, float delta);
 
   public boolean setTurnEntityOnMove(boolean turn);

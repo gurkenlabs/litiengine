@@ -78,6 +78,12 @@ public class PhysicsEngine implements IPhysicsEngine {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
     return this.move(entity, newPosition);
   }
+  
+
+  @Override
+  public boolean move(IMovableEntity entity, double x, double y, float delta) {
+    return this.move(entity, new Point2D.Double(x, y), delta);
+  }
 
   @Override
   public boolean move(final IMovableEntity entity, final float angle, final float delta) {
