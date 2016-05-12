@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -325,11 +326,13 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     final float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
-    this.getParticles().forEach(particle -> particle.update(loop, updateRatio));
-
-    // remove dead particles
-    for (final Object p : this.getParticles().stream().filter(particle -> this.particleCanBeRemoved(particle)).toArray()) {
-      this.particles.remove(p);
+    for (final Particle p : this.getParticles().stream().collect(Collectors.toList())) {
+      if (this.particleCanBeRemoved(p)) {
+        // remove dead particles
+        this.particles.remove(p);
+      }
+      
+      p.update(loop, updateRatio);
     }
 
     this.aliveTime = loop.getDeltaTime(this.activationTick);

@@ -65,9 +65,7 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void registerForUpdate(final IUpdateable updatable) {
-    if (!this.updatables.contains(updatable)) {
-      this.updatables.add(updatable);
-    }
+    this.updatables.add(updatable);
   }
 
   /*
@@ -124,9 +122,7 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void unregisterFromUpdate(final IUpdateable updatable) {
-    if (this.updatables.contains(updatable)) {
-      this.updatables.remove(updatable);
-    }
+    this.updatables.remove(updatable);
   }
 
   @Override
