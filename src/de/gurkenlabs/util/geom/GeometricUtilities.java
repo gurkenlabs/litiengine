@@ -54,6 +54,28 @@ public class GeometricUtilities {
     return 360 - angle;
   }
 
+  public static float getDeltaX(double angle) {
+    angle = angle - 90;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    angle = 360 - angle;
+    return Trigonometry.cosDeg((float) angle);
+  }
+
+  public static float getDeltaY(double angle) {
+    angle = angle - 90;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    angle = 360 - angle;
+    return Trigonometry.sinDeg((float) angle);
+  }
+
   /**
    * Calculates the angle from centerPt to targetPt in degrees. The return
    * should range from [0,360), rotating CLOCKWISE, 0 and 360 degrees represents
