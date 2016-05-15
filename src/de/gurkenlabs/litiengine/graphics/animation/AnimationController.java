@@ -138,7 +138,7 @@ public abstract class AnimationController implements IAnimationController {
       }
 
       if (effect.timeToLiveReached()) {
-        this.imageEffects.remove(i);
+        this.imageEffects.remove(effect);
       }
     }
 
