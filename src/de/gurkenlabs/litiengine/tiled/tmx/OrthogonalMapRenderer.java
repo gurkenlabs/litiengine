@@ -7,9 +7,14 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -20,7 +25,9 @@ import de.gurkenlabs.tiled.tmx.ITileset;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
+import de.gurkenlabs.util.TimeUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class OrthogonalMapRenderer.
@@ -30,6 +37,15 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   private float renderProcess;
   private int totalTileCount;
   private int tilesRendered;
+  private int partitionsX;
+  private int partitionsY;
+  private Map<IMap, BufferedImage[][]> imageGrids;
+
+  public OrthogonalMapRenderer() {
+    this.partitionsX = 1;
+    this.partitionsY = 1;
+    this.imageGrids = new ConcurrentHashMap<>();
+  }
 
   /**
    * Gets the cache key.
@@ -57,7 +73,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see
    * de.gurkenlabs.liti.graphics.IMapRenderer#getMapImage(de.gurkenlabs.tiled.
    * tmx.IMap)
@@ -98,7 +114,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see de.gurkenlabs.liti.graphics.IMapRenderer#getSupportedOrientation()
    */
   @Override
@@ -108,15 +124,31 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see de.gurkenlabs.liti.graphics.IMapRenderer#render(java.awt.Graphics,
    * de.gurkenlabs.tiled.tmx.IMap)
    */
   @Override
   public void render(final Graphics2D g, final Point2D offset, final IMap map) {
     // draw all tile layers to the graphics object
-    final BufferedImage mapImage = this.getMapImage(map);
-    RenderEngine.renderImage(g, mapImage, offset);
+    if (!this.imageGrids.containsKey(map)) {
+      final BufferedImage mapImage = this.getMapImage(map);
+      this.imageGrids.put(map, ImageProcessing.getSubImages(mapImage, this.getPartitionsY(), this.getPartitionsX()));
+    }
+
+    Rectangle2D viewPort = Game.getScreenManager().getCamera().getViewPort();
+    final BufferedImage[][] imageGrid = this.imageGrids.get(map);
+    double cellWidth = map.getSizeInPixles().getWidth() / this.getPartitionsX();
+    double cellHeight = map.getSizeInPixles().getHeight() / this.getPartitionsY();
+    for (int y = 0; y < this.getPartitionsY(); y++) {
+      for (int x = 0; x < this.getPartitionsX(); x++) {
+        double cellX = x * cellWidth;
+        double cellY = y * cellHeight;
+        if (viewPort.intersects(new Rectangle2D.Double(cellX, cellY, cellWidth, cellHeight))) {
+          RenderEngine.renderImage(g, imageGrid[y][x], Game.getScreenManager().getCamera().getViewPortLocation(new Point2D.Double(cellX, cellY)));
+        }
+      }
+    }
   }
 
   /**
@@ -146,25 +178,43 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     layer.getTiles().parallelStream().forEach((tile) -> {
       // get the tile from the tileset image
-      final int index = layer.getTiles().indexOf(tile);
-      if (tile.getGridId() == 0) {
+        final int index = layer.getTiles().indexOf(tile);
+        if (tile.getGridId() == 0) {
+          this.tilesRendered++;
+          return;
+        }
+
+        final Image tileTexture = getTile(map, tile);
+
+        // draw the tile on the map image
+        final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
+        final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
+        imageGraphics.drawImage(tileTexture, x, y, null);
         this.tilesRendered++;
-        return;
-      }
-
-      final Image tileTexture = getTile(map, tile);
-
-      // draw the tile on the map image
-      final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
-      final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
-      imageGraphics.drawImage(tileTexture, x, y, null);
-      this.tilesRendered++;
-      this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
-    });
+        this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
+      });
 
     ImageCache.MAPS.putPersistent(
 
-        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+    getCacheKey(map) + "_" + layer.getName(), bufferedImage);
     return bufferedImage;
+  }
+
+  @Override
+  public void setPartitionsX(int partitions) {
+    this.partitionsX = partitions;
+  }
+
+  public int getPartitionsX() {
+    return this.partitionsX;
+  }
+
+  @Override
+  public void setPartitionsY(int partitions) {
+    this.partitionsY = partitions;
+  }
+
+  public int getPartitionsY() {
+    return this.partitionsY;
   }
 }

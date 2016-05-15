@@ -145,6 +145,22 @@ public class ImageProcessing {
     return resizedImage;
   }
 
+  public static BufferedImage[][] getSubImages(final BufferedImage image, int rows, int columns) {
+    BufferedImage[][] smallImages = new BufferedImage[rows][columns];
+    int smallWidth = image.getWidth() / columns;
+    int smallHeight = image.getHeight() / rows;
+
+    for (int y = 0; y < rows; y++) {
+      for (int x = 0; x < columns; x++) {
+        int cellX = x * smallWidth;
+        int cellY = y * smallHeight;
+        smallImages[y][x] = image.getSubimage(cellX, cellY, smallWidth, smallHeight);
+      }
+    }
+
+    return smallImages;
+  }
+
   /**
    * Crops a sub image from the specified image.
    *
