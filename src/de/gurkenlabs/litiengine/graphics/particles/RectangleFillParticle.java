@@ -21,10 +21,8 @@ public class RectangleFillParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    Stopwatch.trackInConsole("lowres", l -> {
-      final Point2D renderLocation = this.getLocation(emitterOrigin);
-      g.setColor(this.getColor());
-      g.fill(new Rectangle2D.Float((float) renderLocation.getX(), (float) renderLocation.getY(), this.getWidth(), this.getHeight()));
-    });
+    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    g.setColor(this.getColor());
+    g.fill(new Rectangle2D.Float((float) renderLocation.getX(), (float) renderLocation.getY(), this.getWidth(), this.getHeight()));
   }
 }
