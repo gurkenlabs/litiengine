@@ -330,6 +330,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       if (this.particleCanBeRemoved(p)) {
         // remove dead particles
         this.particles.remove(p);
+        continue;
       }
       
       p.update(loop, updateRatio);
