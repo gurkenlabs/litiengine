@@ -280,7 +280,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public void render(final Graphics2D g) {
-    if (!Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())) {
+    if (Game.getScreenManager() != null && Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())) {
       return;
     }
 
@@ -332,7 +332,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         this.particles.remove(p);
         continue;
       }
-      
+
       p.update(loop, updateRatio);
     }
 
