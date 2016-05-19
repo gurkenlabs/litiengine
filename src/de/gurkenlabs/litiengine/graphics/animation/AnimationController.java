@@ -1,7 +1,9 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -131,18 +133,18 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   private void removeFinishedImageEffects() {
-    for (int i = 0; i < this.imageEffects.size(); i++) {
-      final IImageEffect effect = this.imageEffects.get(i);
+    List<IImageEffect> effectsToRemove = new ArrayList<>();
+    for (IImageEffect effect : this.imageEffects) {
       if (effect == null) {
         continue;
       }
 
       if (effect.timeToLiveReached()) {
-        this.imageEffects.remove(effect);
+        effectsToRemove.add(effect);
       }
     }
 
+    this.imageEffects.removeAll(effectsToRemove);
     this.imageEffects.removeAll(Collections.singleton(null));
   }
-
 }
