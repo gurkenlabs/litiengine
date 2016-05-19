@@ -22,4 +22,6 @@ public interface IAnimationController extends IUpdateable {
   public BufferedImage getCurrentSprite(int width, int height);
 
   public BufferedImage getCurrentSprite();
+  
+  public void dispose();
 }

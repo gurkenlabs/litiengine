@@ -300,8 +300,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     if (!this.mouseEventShouldBeForwarded(e)) {
       return;
     }
-
-    this.getClickConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
+    
+    if (this.isPressed) {
+      this.getClickConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
+      this.isPressed = false;
+    }
   }
 
   /*
@@ -393,7 +396,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
 
     this.isPressed = false;
-    this.mouseClicked(e);
+
+    this.getClickConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /**

@@ -139,4 +139,9 @@ public class GameLoop extends Thread implements IGameLoop {
   public GameTime getTime() {
     return this.gameTime;
   }
+
+  @Override
+  public int getUpdatablesCount() {
+    return this.updatables.size();
+  }
 }

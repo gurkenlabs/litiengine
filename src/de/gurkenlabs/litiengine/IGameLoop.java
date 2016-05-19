@@ -38,4 +38,6 @@ public interface IGameLoop extends ILaunchable {
   public void registerForUpdate(final IUpdateable updatable);
 
   public void unregisterFromUpdate(final IUpdateable updatable);
+  
+  public int getUpdatablesCount();
 }

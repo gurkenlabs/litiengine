@@ -122,6 +122,14 @@ public abstract class AnimationController implements IAnimationController {
     }
   }
 
+  @Override
+  public void dispose() {
+    Game.getLoop().unregisterFromUpdate(this);
+    for (Animation animation : this.getAnimations()) {
+      Game.getLoop().unregisterFromUpdate(animation);
+    }
+  }
+
   protected String buildCurrentCacheKey() {
     final StringBuilder cacheKey = new StringBuilder();
     cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());

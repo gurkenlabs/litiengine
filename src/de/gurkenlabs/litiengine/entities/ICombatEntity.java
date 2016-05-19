@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Ellipse2D;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.abilities.Ability;
+
 public interface ICombatEntity extends ICollisionEntity {
   public CombatAttributes getAttributes();
 
@@ -19,7 +21,7 @@ public interface ICombatEntity extends ICollisionEntity {
    * @param damage
    * @return Returns if the entity died by the hit.
    */
-  public boolean hit(int damage);
+  public boolean hit(int damage, Ability ability);
 
   public void die();
 

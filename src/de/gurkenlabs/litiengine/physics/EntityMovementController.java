@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-public class EntityMovementController implements IUpdateable, IEntityMovementController {
+public class EntityMovementController implements IEntityMovementController {
   private final List<Predicate<IEntityMovementController>> movementPredicates;
   private final List<Force> activeForces;
   private final IMovableEntity movableEntity;

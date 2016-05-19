@@ -12,8 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -53,6 +55,13 @@ public class Environment implements IEnvironment {
   }
 
   public void clear() {
+    List<IEntity> allEntities = Stream.concat(this.combatEntities.values().stream(), this.movableEntities.values().stream()).collect(Collectors.toList());
+    for (IEntity e : allEntities) {
+      if (e.getAnimationController() != null) {
+        e.getAnimationController().dispose();
+      }
+    }
+    
     this.combatEntities.clear();
     this.movableEntities.clear();
   }
@@ -103,7 +112,7 @@ public class Environment implements IEnvironment {
     if (shape == null) {
       return entities;
     }
-    
+
     // for rectangle we can jsut use the intersects method
     if (shape instanceof Rectangle2D) {
       Rectangle2D rect = (Rectangle2D) shape;
@@ -116,7 +125,8 @@ public class Environment implements IEnvironment {
       return entities;
     }
 
-    // for other shapes, we check if the shape's bounds intersect the hitbox and if so, we then check if the actual shape intersects the hitbox
+    // for other shapes, we check if the shape's bounds intersect the hitbox and
+    // if so, we then check if the actual shape intersects the hitbox
     for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
       if (combatEntity.getHitBox().intersects(shape.getBounds())) {
         if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {

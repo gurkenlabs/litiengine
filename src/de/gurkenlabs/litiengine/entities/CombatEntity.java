@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -104,7 +105,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public boolean hit(int damage) {
+  public boolean hit(int damage, Ability ability) {
     if (this.isIndestructible() || this.isDead()) {
       return false;
     }
@@ -130,7 +131,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.setCollision(false);
     }
 
-    final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, damage);
+    final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, damage, ability);
     for (final Consumer<CombatEntityHitArgument> consumer : this.entityHitConsumer) {
       consumer.accept(arg);
     }
