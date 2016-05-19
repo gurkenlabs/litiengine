@@ -75,7 +75,9 @@ public abstract class Effect implements IEffect {
 
   @Override
   public void update(final IGameLoop loop) {
-
+    if (!this.isActive()) {
+      return;
+    }
   }
 
   /**
