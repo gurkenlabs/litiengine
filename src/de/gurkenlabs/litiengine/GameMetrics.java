@@ -188,6 +188,12 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
     g.setColor(Color.RED);
     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+    Runtime runtime = Runtime.getRuntime();
+    final float usedMemory = Float.valueOf(Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f);
+    final String memory = "memory: " + usedMemory + "MB";
+    g.drawString(memory, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
     final String ping = "ping: " + this.getPing() + "ms";
     g.drawString(ping, OffsetX, currentOffsetY);
     currentOffsetY += OffsetY;
