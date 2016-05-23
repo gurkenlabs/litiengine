@@ -261,6 +261,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public void getParticleMinTTL(final int minTTL) {
     this.particleMinTTL = minTTL;
   }
+  
+  public void setParticleMinTTL(final int minTTL) {
+    this.particleMinTTL = minTTL;
+  }
 
   public void setParticleUpdateRate(final int delay) {
     this.particleUpdateDelay = delay;

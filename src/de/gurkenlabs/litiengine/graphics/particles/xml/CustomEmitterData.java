@@ -79,6 +79,9 @@ public class CustomEmitterData {
   @XmlElement
   private ParticleParameter deltaHeight;
 
+  @XmlElement
+  private String particleText;
+
   @XmlElementWrapper(name = "colors")
   @XmlElement(name = "color")
   private List<ParticleColor> colors;
@@ -295,4 +298,14 @@ public class CustomEmitterData {
   public void setParticleType(ParticleType particleType) {
     this.particleType = particleType;
   }
+
+  @XmlTransient
+  public String getParticleText() {
+    return this.particleText;
+  }
+
+  public void setParticleText(String particleText) {
+    this.particleText = particleText;
+  }
+
 }

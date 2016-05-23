@@ -73,6 +73,18 @@ public class ParticleParameter {
     return (float) (this.getMinValue() + (Math.random() * (this.getMaxValue() - this.getMinValue() + 1)));
   }
 
+  /**
+   * Gets either the acutal value or a random value, depending on the random number flag being set.
+   * @return
+   */
+  public float get() {
+    if (this.isRandomValue()) {
+      return this.getRandomNumber();
+    } else {
+      return this.getValue();
+    }
+  }
+
   public static int randomInRange(int min, int max) {
     return min + (int) (Math.random() * (max - min + 1));
   }
