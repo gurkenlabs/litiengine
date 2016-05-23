@@ -28,8 +28,8 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 @CollisionInfo(collision = false)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  private static final Random RANDOM = new Random();
   private final List<Color> colors;
-
   private IGameLoop gameLoop;
 
   /** The activated. */
@@ -372,7 +372,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return DEFAULT_PARTICLE_COLOR;
     }
 
-    return this.colors.get(new Random().nextInt(this.colors.size()));
+    return this.colors.get(RANDOM.nextInt(this.colors.size()));
   }
 
   protected int getRandomParticleTTL() {
@@ -381,15 +381,15 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return this.getParticleMaxTTL();
     }
 
-    return new Random().nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    return RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
   }
 
   protected int getRandomParticleX() {
-    return new Random().nextInt((int) this.getWidth());
+    return RANDOM.nextInt((int) this.getWidth());
   }
 
   protected int getRandomParticleY() {
-    return new Random().nextInt((int) this.getHeight());
+    return RANDOM.nextInt((int) this.getHeight());
   }
 
   /**
