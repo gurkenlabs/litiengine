@@ -71,7 +71,8 @@ public abstract class Game implements IInitializable, ILaunchable {
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
-
+    
+    getLoop().registerForUpdate(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
 

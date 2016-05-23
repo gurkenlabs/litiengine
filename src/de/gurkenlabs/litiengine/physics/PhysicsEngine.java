@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class PhysicsEngine.
@@ -23,6 +25,8 @@ public class PhysicsEngine implements IPhysicsEngine {
   private final List<ICollisionEntity> collisionEntities;
 
   private final List<Rectangle2D> staticCollisionBoxes;
+  
+  private final List<Rectangle2D> allCollisionBoxes;
 
   private Rectangle2D environmentBounds;
 
@@ -34,8 +38,16 @@ public class PhysicsEngine implements IPhysicsEngine {
   public PhysicsEngine() {
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
+    this.allCollisionBoxes = new CopyOnWriteArrayList<>();
   }
 
+  @Override
+  public void update(IGameLoop loop) {
+    this.allCollisionBoxes.clear();
+    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
+  }
+  
   @Override
   public void add(final ICollisionEntity entity) {
     if (!this.collisionEntities.contains(entity)) {
@@ -58,11 +70,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public List<Rectangle2D> getAllCollisionBoxes() {
-    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
-    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
-    allCollisionBoxes.addAll(this.staticCollisionBoxes);
-
-    return allCollisionBoxes;
+    return this.allCollisionBoxes;
   }
 
   public List<Rectangle2D> getAllCollisionBoxes(final ICollisionEntity entity) {
@@ -196,7 +204,7 @@ public class PhysicsEngine implements IPhysicsEngine {
    *          the new position
    * @return true, if successful
    */
-  private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Point2D newPosition) {
+  private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Rectangle2D collisionBox) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
       if (!otherEntity.hasCollision()) {
         continue;
@@ -206,8 +214,8 @@ public class PhysicsEngine implements IPhysicsEngine {
         continue;
       }
 
-      if (collides(otherEntity.getCollisionBox(), entity.getCollisionBox(newPosition))) {
-        return otherEntity.getCollisionBox().createIntersection(entity.getCollisionBox(newPosition));
+      if (collides(otherEntity.getCollisionBox(), collisionBox)) {
+        return otherEntity.getCollisionBox().createIntersection(collisionBox);
       }
     }
 
@@ -233,10 +241,10 @@ public class PhysicsEngine implements IPhysicsEngine {
    *          the new position
    * @return true, if successful
    */
-  private Rectangle2D collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Point2D newPosition) {
+  private Rectangle2D collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
     for (final Rectangle2D collisionBox : this.staticCollisionBoxes) {
-      if (collides(collisionBox, entity.getCollisionBox(newPosition))) {
-        return collisionBox.createIntersection(entity.getCollisionBox(newPosition));
+      if (collides(collisionBox, entityCollisionBox)) {
+        return collisionBox.createIntersection(entityCollisionBox);
       }
     }
 
@@ -253,9 +261,9 @@ public class PhysicsEngine implements IPhysicsEngine {
    * @return the point2 d
    */
   private Point2D findLocationWithoutCollision(final ICollisionEntity mob, final Point2D newPosition) {
-
     for (final Point2D pointBetween : GeometricUtilities.getPointsBetweenPoints(newPosition, mob.getLocation())) {
-      if (this.collidesWithAnyEntity(mob, pointBetween) == null && this.collidesWithAnyStaticCollisionBox(mob, pointBetween) == null) {
+      Rectangle2D newCollisionBox = mob.getCollisionBox(pointBetween);
+      if (this.collidesWithAnyEntity(mob, newCollisionBox) == null && this.collidesWithAnyStaticCollisionBox(mob, newCollisionBox) == null) {
         return pointBetween;
       }
     }
@@ -283,15 +291,16 @@ public class PhysicsEngine implements IPhysicsEngine {
     if (this.turnEntityOnMove) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
-
+    
+    Rectangle2D entityCollisionBox = entity.getCollisionBox(newPosition);
     if (entity.hasCollision()) {
-      final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, newPosition);
+      final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, entityCollisionBox);
       if (staticIntersection != null) {
         newPosition = this.resolveCollision(entity, newPosition, staticIntersection);
         success = false;
       }
 
-      final Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, newPosition);
+      final Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, entityCollisionBox);
       if (entityIntersection != null) {
         newPosition = this.resolveCollision(entity, newPosition, entityIntersection);
         success = false;

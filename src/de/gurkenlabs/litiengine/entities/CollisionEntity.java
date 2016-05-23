@@ -12,12 +12,15 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private float collisionBoxWidthFactor;
 
+  private Rectangle2D collisionBox;
+
   protected CollisionEntity() {
     super();
     final CollisionInfo info = this.getClass().getAnnotation(CollisionInfo.class);
     this.collisionBoxWidthFactor = info.collisionBoxWidthFactor();
     this.collisionBoxHeightFactor = info.collisionBoxHeightFactor();
     this.collision = info.collision();
+    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   /**
@@ -27,7 +30,13 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    */
   @Override
   public Rectangle2D getCollisionBox() {
-    return this.getCollisionBox(this.getLocation());
+    return this.collisionBox;
+  }
+
+  @Override
+  public void setLocation(final Point2D location) {
+    super.setLocation(location);
+    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   /**
@@ -76,6 +85,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   public void setCollisionBoxHeightFactor(final float collisionBoxHeightFactor) {
     this.collisionBoxHeightFactor = collisionBoxHeightFactor;
+    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   public float getCollisionBoxWidthFactor() {
@@ -84,5 +94,6 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   public void setCollisionBoxWidthFactor(final float collisionBoxWidthFactor) {
     this.collisionBoxWidthFactor = collisionBoxWidthFactor;
+    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 }
