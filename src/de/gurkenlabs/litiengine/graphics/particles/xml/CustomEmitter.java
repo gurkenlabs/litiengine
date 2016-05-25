@@ -24,9 +24,8 @@ public class CustomEmitter extends Emitter {
 
   public CustomEmitter(double originX, double originY, URL emitterXml) {
     super(originX, originY);
-    JAXBContext jaxbContext;
     try {
-      jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
+      JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       this.emitterData = (CustomEmitterData) jaxbUnmarshaller.unmarshal(emitterXml);
     } catch (JAXBException e) {
