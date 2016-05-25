@@ -81,6 +81,9 @@ public class CustomEmitterData {
 
   @XmlElement
   private String particleText;
+  
+  @XmlElement
+  private boolean applyStaticPhysics;
 
   @XmlElementWrapper(name = "colors")
   @XmlElement(name = "color")
@@ -307,5 +310,16 @@ public class CustomEmitterData {
   public void setParticleText(String particleText) {
     this.particleText = particleText;
   }
+
+  @XmlTransient
+  public boolean isApplyingStaticPhysics() {
+    return this.applyStaticPhysics;
+  }
+
+  public void setApplyStaticPhysics(boolean applyStaticPhysics) {
+    this.applyStaticPhysics = applyStaticPhysics;
+  }
+  
+  
 
 }

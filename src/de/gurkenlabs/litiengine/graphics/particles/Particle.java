@@ -3,10 +3,12 @@ package de.gurkenlabs.litiengine.graphics.particles;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
+import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 public abstract class Particle implements ITimeToLive {
   /** The activation tick. */
@@ -49,6 +51,8 @@ public abstract class Particle implements ITimeToLive {
 
   /** The current location of the particle on the Y-axis. */
   private float yCurrent;
+  
+  private boolean applyStaticPhysics;
 
   /**
    * Constructs a new particle.
@@ -328,7 +332,7 @@ public abstract class Particle implements ITimeToLive {
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
    */
-  public void update(final IGameLoop loop, final float updateRatio) {
+  public void update(final IGameLoop loop, Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
       this.aliveTick = loop.getTicks();
     }
@@ -337,9 +341,13 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-
     this.xCurrent += this.dx * updateRatio;
     this.yCurrent += this.dy * updateRatio;
+
+    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), IPhysicsEngine.COLLTYPE_STATIC)) {
+      this.xCurrent -= this.dx * updateRatio;
+      this.yCurrent -= this.dy * updateRatio;
+    }
 
     this.dx += this.gravityX * updateRatio;
     this.dy += this.gravityY * updateRatio;
@@ -365,5 +373,17 @@ public abstract class Particle implements ITimeToLive {
 
   public void setDeltaWidth(final float deltaWidth) {
     this.deltaWidth = deltaWidth;
+  }
+
+  public Rectangle2D getBoundingBox(Point2D origin) {
+    return new Rectangle2D.Double(origin.getX() + this.getxCurrent(), origin.getY() + this.getyCurrent(), this.getWidth(), this.getHeight());
+  }
+
+  public boolean isApplyingStaticPhysics() {
+    return applyStaticPhysics;
+  }
+
+  public void setApplyStaticPhysics(boolean applyStaticPhysics) {
+    this.applyStaticPhysics = applyStaticPhysics;
   }
 }

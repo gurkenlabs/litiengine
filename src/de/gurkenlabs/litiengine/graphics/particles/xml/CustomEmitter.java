@@ -92,6 +92,7 @@ public class CustomEmitter extends Emitter {
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
+    particle.setApplyStaticPhysics(this.emitterData.isApplyingStaticPhysics());
     return particle;
   }
 

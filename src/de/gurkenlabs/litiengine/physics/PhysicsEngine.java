@@ -25,7 +25,7 @@ public class PhysicsEngine implements IPhysicsEngine {
   private final List<ICollisionEntity> collisionEntities;
 
   private final List<Rectangle2D> staticCollisionBoxes;
-  
+
   private final List<Rectangle2D> allCollisionBoxes;
 
   private Rectangle2D environmentBounds;
@@ -47,7 +47,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
     this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
   }
-  
+
   @Override
   public void add(final ICollisionEntity entity) {
     if (!this.collisionEntities.contains(entity)) {
@@ -86,7 +86,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
     return this.move(entity, newPosition);
   }
-  
 
   @Override
   public boolean move(IMovableEntity entity, double x, double y, float delta) {
@@ -140,6 +139,23 @@ public class PhysicsEngine implements IPhysicsEngine {
       if (collides(rect, collisionBox)) {
         return true;
       }
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean collides(Rectangle2D rect, int collisionType) {
+    if ((collisionType & COLLTYPE_ALL) == COLLTYPE_ALL) {
+      return collides(rect);
+    }
+
+    if ((collisionType & COLLTYPE_ENTITY) == COLLTYPE_ENTITY) {
+      return this.collidesWithAnyEntity(null, rect) != null;
+    }
+
+    if ((collisionType & COLLTYPE_STATIC) == COLLTYPE_STATIC) {
+      return this.collidesWithAnyStaticCollisionBox(null, rect) != null;
     }
 
     return false;
@@ -291,7 +307,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     if (this.turnEntityOnMove) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
-    
+
     Rectangle2D entityCollisionBox = entity.getCollisionBox(newPosition);
     if (entity.hasCollision()) {
       final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, entityCollisionBox);

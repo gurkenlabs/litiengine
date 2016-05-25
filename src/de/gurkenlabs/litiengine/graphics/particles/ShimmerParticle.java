@@ -67,8 +67,8 @@ public class ShimmerParticle extends RectangleFillParticle {
    * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
    */
   @Override
-  public void update(final IGameLoop loop, final float updateRateFactor) {
-    super.update(loop, updateRateFactor);
+  public void update(final IGameLoop loop, Point2D emitterOrigin, final float updateRateFactor) {
+    super.update(loop, emitterOrigin, updateRateFactor);
     final Random rand = new Random();
 
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());

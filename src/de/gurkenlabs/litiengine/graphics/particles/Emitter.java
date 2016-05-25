@@ -337,7 +337,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         continue;
       }
 
-      p.update(loop, updateRatio);
+      p.update(loop, this.getOrigin(), updateRatio);
     }
 
     this.aliveTime = loop.getDeltaTime(this.activationTick);
