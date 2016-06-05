@@ -45,7 +45,7 @@ public abstract class Effect implements IEffect {
 
   /** The duration. */
   private int duration;
-
+  
   /**
    * Instantiates a new effect.
    *
@@ -268,7 +268,7 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  protected void cease(final ICombatEntity entity) {
+  public void cease(final ICombatEntity entity) {
     final EffectArgument arg = new EffectArgument(this, entity);
     for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
       consumer.accept(arg);
@@ -331,4 +331,5 @@ public abstract class Effect implements IEffect {
   protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
     return this.getEnvironment().findCombatEntities(impactArea);
   }
+
 }

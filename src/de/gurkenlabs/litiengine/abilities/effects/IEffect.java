@@ -12,7 +12,7 @@ public interface IEffect extends IUpdateable {
   public static final int NO_DURATION = -1;
 
   public void apply(IGameLoop loop, Shape impactArea);
-
+  public void cease(final ICombatEntity affectedEntity);
   public int getDelay();
 
   public int getDuration();

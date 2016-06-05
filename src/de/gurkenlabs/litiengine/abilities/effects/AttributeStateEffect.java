@@ -55,7 +55,7 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   }
 
   @Override
-  protected void cease(final ICombatEntity affectedEntity) {
+  public void cease(final ICombatEntity affectedEntity) {
     super.cease(affectedEntity);
     this.getAttribute(affectedEntity).removeModifier(this.getModifier());
   }
