@@ -19,18 +19,6 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
-    if (this.getAppliedForce() == null) {
-      return;
-    }
-
-    if (this.getAppliedForce().hasEnded()) {
-      this.setActive(false);
-    }
-  }
-
-  @Override
   public void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
     // only apply one force per effect
@@ -45,13 +33,17 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  public void cease() {
-    super.cease();
-    this.setActive(false);
+  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
+    super.cease(loop, appliance);
     if (this.getAppliedForce() != null) {
       this.getAppliedForce().end();
       this.appliedForce = null;
     }
+  }
+
+  @Override
+  protected boolean hasEnded(final IGameLoop loop, EffectAppliance appliance) {
+    return super.hasEnded(loop, appliance) || this.getAppliedForce().hasEnded();
   }
 
   public float getStrength() {

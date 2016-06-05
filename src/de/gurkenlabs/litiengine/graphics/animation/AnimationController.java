@@ -46,12 +46,11 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void add(final IImageEffect effect) {
-    final List<IImageEffect> effects = this.getImageEffects();
-    if (effects.contains(effect)) {
-      effects.remove(effect);
+    if (this.getImageEffects().contains(effect)) {
+      this.getImageEffects().remove(effect);
     }
 
-    effects.add(effect);
+    this.getImageEffects().add(effect);
   }
 
   @Override
@@ -113,6 +112,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void update(final IGameLoop loop) {
+    if(this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()){
+      return;
+    }
+    
     if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
       this.currentAnimation = this.defaultAnimation;
 

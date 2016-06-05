@@ -47,6 +47,10 @@ public class Attribute<T extends Number> {
     Collections.sort(this.getModifiers());
   }
 
+  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
+    return this.getModifiers().contains(modifier);
+  }
+
   /**
    * Gets the current value.
    *

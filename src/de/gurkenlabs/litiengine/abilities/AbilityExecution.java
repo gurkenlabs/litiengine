@@ -4,9 +4,8 @@
 package de.gurkenlabs.litiengine.abilities;
 
 import java.awt.Shape;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -16,7 +15,7 @@ import de.gurkenlabs.litiengine.abilities.effects.IEffect;
  * The Class AbilityExecution.
  */
 public class AbilityExecution implements IUpdateable {
-  private final Map<IEffect, Long> appliedEffects;
+  private final List<IEffect> appliedEffects;
   /** The executed ability. */
   private final Ability ability;
 
@@ -33,7 +32,7 @@ public class AbilityExecution implements IUpdateable {
    *          the ability
    */
   public AbilityExecution(final IGameLoop gameLoop, final Ability ability) {
-    this.appliedEffects = new ConcurrentHashMap<>();
+    this.appliedEffects = new CopyOnWriteArrayList<>();
 
     this.ability = ability;
     this.executionTicks = gameLoop.getTicks();
@@ -50,7 +49,7 @@ public class AbilityExecution implements IUpdateable {
     return this.ability;
   }
 
-  public Map<IEffect, Long> getAppliedEffects() {
+  public List<IEffect> getAppliedEffects() {
     return this.appliedEffects;
   }
 
@@ -72,65 +71,24 @@ public class AbilityExecution implements IUpdateable {
     return this.executionTicks;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * 1. Apply all ability effects after their delay. 2. Unregister this instance
+   * after all effects were applied. 3. Effects will apply their follow up
+   * effects on their own. (non-Javadoc)
    *
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
   public void update(final IGameLoop loop) {
-    if (this.getAbility().getEffects().size() == 0) {
+    // if there a no effects to apply -> unregister this instance and we're done
+    if (this.getAbility().getEffects().size() == 0 || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
       loop.unregisterFromUpdate(this);
       return;
     }
 
-    // only execute effects once and during the duration
-    if (this.allEffectsAreFinished(loop)) {
-      for (final IEffect effect : this.getAppliedEffects().keySet()) {
-        loop.unregisterFromUpdate(effect);
-        effect.cease();
-      }
-
-      loop.unregisterFromUpdate(this);
-      this.getAppliedEffects().clear();
-      return;
-    }
-
-    // handle already applied effects
-    for (final Entry<IEffect, Long> entry : this.getAppliedEffects().entrySet()) {
-      final IEffect effect = entry.getKey();
-      final long time = entry.getValue();
-
-      // while the duration + delay of an effect is not reached or an effect
-      // without duration is still active
-      // effects without a duration are cancelled after the abiltity duration
-      final long effectDuration = loop.getDeltaTime(time);
-      final int abilityDuration = this.getAbility().getAttributes().getDuration().getCurrentValue();
-      if (effect.getDuration() == IEffect.NO_DURATION && effect.isActive() && (abilityDuration == 0 || effectDuration < abilityDuration + effect.getDelay()) || effect.getDuration() != IEffect.NO_DURATION && effectDuration < effect.getDuration() + effect.getDelay()) {
-        continue;
-      }
-
-      // cease the effect when the total duration is reached
-      loop.unregisterFromUpdate(effect);
-      effect.cease();
-
-      // execute all follow up effects
-      effect.getFollowUpEffects().forEach(followUp -> {
-        if (this.getAppliedEffects().containsKey(followUp)) {
-          return;
-        }
-
-        followUp.apply(this.getExecutionImpactArea());
-        loop.registerForUpdate(followUp);
-        this.getAppliedEffects().put(followUp, loop.getTicks());
-      });
-    }
-
-    // TODO: Take effect appliance type into consideration...
-    // ONCAST, ONPROJECTILEHIT, ONTICK
     // handle all effects from the ability that were not applied yet
     for (final IEffect effect : this.getAbility().getEffects()) {
-      if (this.getAppliedEffects().containsKey(effect)) {
+      if (this.getAppliedEffects().contains(effect)) {
         continue;
       }
 
@@ -140,45 +98,8 @@ public class AbilityExecution implements IUpdateable {
         continue;
       }
 
-      effect.apply(this.getExecutionImpactArea());
-      loop.registerForUpdate(effect);
-      this.getAppliedEffects().put(effect, loop.getTicks());
+      effect.apply(loop, this.getExecutionImpactArea());
+      this.getAppliedEffects().add(effect);
     }
-  }
-
-  private boolean hasFinished(final IGameLoop loop, final IEffect effect) {
-    if (effect.getDuration() == IEffect.NO_DURATION) {
-      if (!this.getAppliedEffects().containsKey(effect) || effect.isActive()) {
-        return false;
-      }
-    } else {
-      if (!this.getAppliedEffects().containsKey(effect) || loop.getDeltaTime(this.getAppliedEffects().get(effect)) < effect.getDelay() + effect.getDuration()) {
-        return false;
-      }
-    }
-
-    // Recursively called for all follow ups
-    for (final IEffect followUp : effect.getFollowUpEffects()) {
-      if (!this.hasFinished(loop, followUp)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * All effects were applied.
-   *
-   * @return true, if successful
-   */
-  protected boolean allEffectsAreFinished(final IGameLoop loop) {
-    for (final IEffect effect : this.getAbility().getEffects()) {
-      if (!this.hasFinished(loop, effect)) {
-        return false;
-      }
-    }
-
-    return true;
   }
 }

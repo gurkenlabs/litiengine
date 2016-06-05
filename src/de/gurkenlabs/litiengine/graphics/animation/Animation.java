@@ -22,6 +22,8 @@ public class Animation implements IUpdateable, ILaunchable {
   private KeyFrame currentFrame;
   private KeyFrame firstFrame;
   private long elapsedTicks;
+  private boolean paused;
+  
 
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(name, spritesheet, loop, keyFrameDurations);
@@ -69,7 +71,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   public boolean isPlaying() {
-    return this.keyframes.size() > 0 && this.playing;
+    return !this.paused && this.keyframes.size() > 0 && this.playing;
   }
 
   public void setFrameDuration(final int frameDuration) {
@@ -98,6 +100,18 @@ public class Animation implements IUpdateable, ILaunchable {
     }
 
     this.currentFrame = this.getKeyframes().get(0);
+  }
+  
+  public void pause(){
+    this.paused = true;
+  }
+  
+  public void unpause(){
+    this.paused = false;
+  }
+  
+  public boolean isPaused(){
+    return paused;
   }
 
   @Override

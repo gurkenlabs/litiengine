@@ -4,14 +4,14 @@ import java.awt.Shape;
 import java.util.List;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 public interface IEffect extends IUpdateable {
   public static final int NO_DURATION = -1;
 
-  public void apply(Shape impactArea);
-
-  public void cease();
+  public void apply(IGameLoop loop, Shape impactArea);
 
   public int getDelay();
 
@@ -20,8 +20,10 @@ public interface IEffect extends IUpdateable {
   public EffectTarget[] getEffectTargets();
 
   public List<IEffect> getFollowUpEffects();
-
-  public boolean isActive();
+  
+  public List<EffectAppliance> getActiveAppliances();
+  
+  public boolean isActive(ICombatEntity entity);
 
   public void onEffectApplied(Consumer<EffectArgument> consumer);
 
