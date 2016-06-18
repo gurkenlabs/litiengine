@@ -385,7 +385,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return this.getParticleMaxTTL();
     }
 
-    return RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    return ttl;
   }
 
   protected int getRandomParticleX() {

@@ -12,6 +12,7 @@ import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.tiled.tmx.IMap;
 
 /**
@@ -28,6 +29,8 @@ public interface IEnvironment extends IInitializable {
   public void add(final int mapId, final IMovableCombatEntity entity);
 
   public Collection<ICombatEntity> getCombatEntities();
+  
+  public List<LightSource> getLightSources();
 
   public ICombatEntity getCombatEntity(final int mapId);
 

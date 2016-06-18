@@ -3,6 +3,8 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.tiled.tmx;
 
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +21,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
@@ -30,6 +34,11 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
+  private static final String MAP_OBJECT_LIGHTSOURCE = "LIGHTSOURCE";
+  private static final String CUSTOM_PROP_LIGHTSOURCE_RADIUS = "LIGHTSOURCE_RADIUS";
+  private static final String CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS = "LIGHTSOURCE_BRIGHTNESS";
+  private static final String CUSTOM_PROP_LIGHTSOURCE_COLOR = "LIGHTSOURCE_COLOR";
+  
   private static int localIdSequence = 0;
   private static int mapIdSequence;
   /** The map. */
@@ -38,6 +47,8 @@ public class Environment implements IEnvironment {
   private final Map<Integer, ICombatEntity> combatEntities;
 
   private final Map<Integer, IMovableEntity> movableEntities;
+  
+  private final List<LightSource> lightSources;
 
   /**
    * Instantiates a new map container base.
@@ -52,6 +63,7 @@ public class Environment implements IEnvironment {
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
+    this.lightSources = new CopyOnWriteArrayList<>();
   }
 
   public void clear() {
@@ -99,6 +111,11 @@ public class Environment implements IEnvironment {
     }
 
     return null;
+  }
+  
+  @Override
+  public List<LightSource> getLightSources() {
+    return this.lightSources;
   }
 
   @Override
@@ -187,7 +204,20 @@ public class Environment implements IEnvironment {
   }
 
   protected void addMapObject(final IMapObject mapObject) {
-
+    if (mapObject.getType().equals(MAP_OBJECT_LIGHTSOURCE)) {
+      final String propRadius = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_RADIUS);
+      final String propBrightness = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS);
+      final String propColor = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_COLOR);
+      if (propRadius == null || propRadius.isEmpty() || propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
+        return;
+      }
+      
+      final int radius = Integer.parseInt(propRadius);
+      final int brightness = Integer.parseInt(propBrightness);
+      final Color color = Color.decode(propColor);
+      
+      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), radius, brightness, color));
+    }
   }
 
   private void loadMapObjects() {
