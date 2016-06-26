@@ -68,6 +68,7 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   private void handleForces(final IGameLoop gameLoop) {
+    final double ACCEPTABLE_DIST = 5;
     // clean up forces
     this.activeForces.forEach(x -> {
       if (x.hasEnded()) {
@@ -84,10 +85,17 @@ public class EntityMovementController implements IEntityMovementController {
         continue;
       }
 
-      final double angle = GeometricUtilities.calcRotationAngleInDegrees(new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY()), force.getLocation());
-      final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
-      if (force.cancelOnCollision() && !success) {
-        force.end();
+      final Point2D collisionBoxCenter = new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY());
+      if (collisionBoxCenter.distance(force.getLocation()) < ACCEPTABLE_DIST) {
+        final double yDelta = this.getControlledEntity().getHeight() - this.getControlledEntity().getCollisionBox().getHeight() + this.getControlledEntity().getCollisionBox().getHeight() / 2;
+        final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getControlledEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
+        this.getControlledEntity().setLocation(entityLocation);
+      } else {
+        final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
+        final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
+        if (force.cancelOnCollision() && !success) {
+          force.end();
+        }
       }
     }
   }

@@ -21,11 +21,32 @@ public class MathUtilities {
     if (min == max) {
       return min;
     }
-    
-    if(min > max){
+
+    if (min > max) {
       throw new IllegalArgumentException("min value is > than max value");
     }
-    
+
     return min + RANDOM.nextDouble() * (max - min);
+  }
+
+  /**
+   * The index probabilities must sum up to 1;
+   * 
+   * @param indexProbabilities
+   * @return
+   */
+  public static int getRandomIndex(double[] indexProbabilities) {
+    double rnd = RANDOM.nextDouble();
+    double probSum = 0;
+    for (int i = 0; i < indexProbabilities.length; i++) {
+      double newProbSum = probSum + indexProbabilities[i];
+      if (rnd >= probSum && rnd < newProbSum) {
+        return i;
+      }
+
+      probSum = newProbSum;
+    }
+
+    return 0;
   }
 }
