@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.util.MathUtilities;
 
 /**
  * The Class Camera.
@@ -155,8 +156,7 @@ public abstract class Camera implements ICamera {
    */
   protected Point2D applyShakeEffect(final Point2D cameraLocation) {
     if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
-      final boolean rnd = Math.random() > 0.5;
-      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * (rnd ? -1.0 : 1.0), cameraLocation.getY() + this.getShakeOffset() * (rnd ? -1.0 : 1.0));
+      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * MathUtilities.randomSign(), cameraLocation.getY() + this.getShakeOffset() * MathUtilities.randomSign());
     }
 
     return cameraLocation;
