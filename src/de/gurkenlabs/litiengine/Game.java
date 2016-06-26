@@ -14,6 +14,7 @@ import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
+import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
@@ -137,6 +138,10 @@ public abstract class Game implements IInitializable, ILaunchable {
 
     if (Game.getConfiguration().CLIENT.showGameMetrics()) {
       Game.getScreenManager().onRendered((g) -> getMetrics().render(g));
+    }
+    
+    if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
+      Game.getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
 
     // init screens

@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -155,6 +156,18 @@ public class RenderEngine implements IRenderEngine {
     g.drawString(text, (int) x, (int) y);
   }
 
+  public static void drawShape(final Graphics2D g, final Shape shape) {
+    AffineTransform oldTransForm = g.getTransform();
+    AffineTransform t = new AffineTransform();
+    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+
+    g.setTransform(t);
+    g.setStroke(new BasicStroke(1 / Game.getInfo().renderScale()));
+    g.draw(shape);
+    g.setTransform(oldTransForm);
+  }
+
   public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
@@ -233,7 +246,7 @@ public class RenderEngine implements IRenderEngine {
       for (final IEntity entity : entities) {
         this.renderEntity(g, entity);
       }
-      
+
       return;
     }
 
