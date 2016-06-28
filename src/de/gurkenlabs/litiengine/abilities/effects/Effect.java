@@ -260,6 +260,10 @@ public abstract class Effect implements IEffect {
   private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
+  
+  private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
+  }
 
   protected void apply(final ICombatEntity entity) {
     final EffectArgument arg = new EffectArgument(this, entity);
@@ -304,6 +308,10 @@ public abstract class Effect implements IEffect {
       case FRIENDLY:
         affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
+        break;
+      case FRIENDLYDEAD:
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
         break;
       default:
         break;
