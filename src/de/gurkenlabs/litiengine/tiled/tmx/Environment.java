@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
@@ -34,10 +35,12 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
+  public static final String COLLISIONBOX = "COLLISIONBOX";
   private static final String MAP_OBJECT_LIGHTSOURCE = "LIGHTSOURCE";
   private static final String CUSTOM_PROP_LIGHTSOURCE_RADIUS = "LIGHTSOURCE_RADIUS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS = "LIGHTSOURCE_BRIGHTNESS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_COLOR = "LIGHTSOURCE_COLOR";
+  public static final String STATIC_SHADOW = "SHADOW";
   
   private static int localIdSequence = 0;
   private static int mapIdSequence;
@@ -97,6 +100,12 @@ public class Environment implements IEnvironment {
   @Override
   public void addMovableEntity(final int mapId, final IMovableEntity entity) {
     this.movableEntities.put(mapId, entity);
+  }
+  
+  public void addCollisionBoxes(final IMapObject mapObject) {
+    if (mapObject.getType().equals(COLLISIONBOX)) {
+      Game.getPhysicsEngine().add(mapObject.getCollisionBox());
+    }
   }
 
   @Override
@@ -218,6 +227,8 @@ public class Environment implements IEnvironment {
       
       this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), radius, brightness, color));
     }
+    
+    this.addCollisionBoxes(mapObject);
   }
 
   private void loadMapObjects() {

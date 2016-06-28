@@ -85,9 +85,9 @@ public class LightSource extends Emitter {
    *          the center
    * @return the obstructed vision area
    */
-  private static Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
+  private Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
     /** The gradient radius for our shadow. */
-    final float OBSTRUCTED_VISION_SIZE = 200f;
+    final float OBSTRUCTED_VISION_RADIUS = 200f;
     final Polygon SHADOW_POLYGON = new Polygon();
 
     final Ellipse2D shadowEllipse = getShadowEllipse(mob);
@@ -128,8 +128,8 @@ public class LightSource extends Emitter {
     final Point2D.Double B = new Point2D.Double(cx + px * r, cy + py * ry);
 
     // project the points by our SHADOW_EXTRUDE amount
-    final Point2D C = GeometricUtilities.project(center, A, OBSTRUCTED_VISION_SIZE);
-    final Point2D D = GeometricUtilities.project(center, B, OBSTRUCTED_VISION_SIZE);
+    final Point2D C = GeometricUtilities.project(center, A, OBSTRUCTED_VISION_RADIUS);
+    final Point2D D = GeometricUtilities.project(center, B, OBSTRUCTED_VISION_RADIUS);
 
     // construct a polygon from our points
     SHADOW_POLYGON.reset();
@@ -275,7 +275,7 @@ public class LightSource extends Emitter {
 
     // for each entity
     for (final ICombatEntity mob : this.environment.getCombatEntities()) {
-      if (!isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
+      if (mob.isDead() || !isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
         continue;
       }
 
