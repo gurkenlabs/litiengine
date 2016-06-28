@@ -40,8 +40,17 @@ public class Environment implements IEnvironment {
   private static final String CUSTOM_PROP_LIGHTSOURCE_RADIUS = "LIGHTSOURCE_RADIUS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS = "LIGHTSOURCE_BRIGHTNESS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_COLOR = "LIGHTSOURCE_COLOR";
-  public static final String STATIC_SHADOW = "SHADOW";
-  
+  public static final String SHADOW_DOWN = "SHADOW_DOWN";
+  public static final String SHADOW_LEFT = "SHADOW_LEFT";
+  public static final String SHADOW_RIGHT = "SHADOW_RIGHT";
+  public static final String SHADOW_DOWNLEFT = "SHADOW_DOWNLEFT";
+  public static final String SHADOW_DOWNRIGHT = "SHADOW_DOWNRIGHT";
+  public static final String SHADOW_LEFTDOWN = "SHADOW_LEFTDOWN";
+  public static final String SHADOW_LEFTRIGHT = "SHADOW_LEFTRIGHT";
+  public static final String SHADOW_RIGHTDOWN = "SHADOW_RIGHTDOWN";
+  public static final String SHADOW_RIGHTLEFT = "SHADOW_RIGHTLEFT";
+  public static final String SHADOW_NOOFFSET = "SHADOW_NOOFFSET";
+
   private static int localIdSequence = 0;
   private static int mapIdSequence;
   /** The map. */
@@ -50,7 +59,7 @@ public class Environment implements IEnvironment {
   private final Map<Integer, ICombatEntity> combatEntities;
 
   private final Map<Integer, IMovableEntity> movableEntities;
-  
+
   private final List<LightSource> lightSources;
 
   /**
@@ -76,7 +85,7 @@ public class Environment implements IEnvironment {
         e.getAnimationController().dispose();
       }
     }
-    
+
     this.combatEntities.clear();
     this.movableEntities.clear();
   }
@@ -101,7 +110,7 @@ public class Environment implements IEnvironment {
   public void addMovableEntity(final int mapId, final IMovableEntity entity) {
     this.movableEntities.put(mapId, entity);
   }
-  
+
   public void addCollisionBoxes(final IMapObject mapObject) {
     if (mapObject.getType().equals(COLLISIONBOX)) {
       Game.getPhysicsEngine().add(mapObject.getCollisionBox());
@@ -121,7 +130,7 @@ public class Environment implements IEnvironment {
 
     return null;
   }
-  
+
   @Override
   public List<LightSource> getLightSources() {
     return this.lightSources;
@@ -220,14 +229,14 @@ public class Environment implements IEnvironment {
       if (propRadius == null || propRadius.isEmpty() || propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
         return;
       }
-      
+
       final int radius = Integer.parseInt(propRadius);
       final int brightness = Integer.parseInt(propBrightness);
       final Color color = Color.decode(propColor);
-      
+
       this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), radius, brightness, color));
     }
-    
+
     this.addCollisionBoxes(mapObject);
   }
 
