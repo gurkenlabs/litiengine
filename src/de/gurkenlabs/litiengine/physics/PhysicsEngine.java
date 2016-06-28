@@ -30,8 +30,6 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private Rectangle2D environmentBounds;
 
-  private boolean turnEntityOnMove = true;
-
   /**
    * Instantiates a new physics engine.
    */
@@ -304,7 +302,7 @@ public class PhysicsEngine implements IPhysicsEngine {
 
   private boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
-    if (this.turnEntityOnMove) {
+    if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
 
@@ -367,14 +365,5 @@ public class PhysicsEngine implements IPhysicsEngine {
   @Override
   public List<Rectangle2D> getStaticCollisionBoxes() {
     return this.staticCollisionBoxes;
-  }
-
-  @Override
-  public boolean setTurnEntityOnMove(final boolean turn) {
-    return this.turnEntityOnMove = turn;
-  }
-
-  public boolean isTurnEntityOnMove() {
-    return this.turnEntityOnMove;
   }
 }

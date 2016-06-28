@@ -58,8 +58,6 @@ public interface IPhysicsEngine extends IUpdateable{
   
   public boolean move(IMovableEntity entity, float delta);
 
-  public boolean setTurnEntityOnMove(boolean turn);
-
   /**
    *
    * @param rect

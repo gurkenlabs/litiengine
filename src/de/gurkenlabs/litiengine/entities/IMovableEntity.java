@@ -12,6 +12,10 @@ public interface IMovableEntity extends ICollisionEntity {
    */
   public float getVelocity();
 
+  public boolean turnOnMove();
+
+  public void setTurnOnMove(boolean turn);
+
   public IEntityMovementController getMovementController();
 
   public void onMoved(Consumer<IMovableEntity> consumer);

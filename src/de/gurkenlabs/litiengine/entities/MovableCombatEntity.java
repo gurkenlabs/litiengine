@@ -14,7 +14,8 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
-
+  private boolean turnOnMove;
+  
   /** The last moved. */
   private long lastMoved;
 
@@ -101,5 +102,15 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
+  }
+  
+  @Override
+  public boolean turnOnMove() {
+    return this.turnOnMove;
+  }
+
+  @Override
+  public void setTurnOnMove(boolean turn) {
+    this.turnOnMove = turn;
   }
 }

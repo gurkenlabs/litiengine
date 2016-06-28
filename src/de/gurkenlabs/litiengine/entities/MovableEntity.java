@@ -14,12 +14,15 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
 
+  private boolean turnOnMove;
+
   private IEntityMovementController movementController;
 
   public MovableEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
+    this.turnOnMove = info.turnOnMove();
   }
 
   @Override
@@ -68,5 +71,15 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   @Override
   public void setAngle(final float angle) {
     super.setAngle(angle);
+  }
+
+  @Override
+  public boolean turnOnMove() {
+    return this.turnOnMove;
+  }
+
+  @Override
+  public void setTurnOnMove(boolean turn) {
+    this.turnOnMove = turn;
   }
 }
