@@ -22,7 +22,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
-    this.turnOnMove = info.turnOnMove();
+    this.setTurnOnMove(info.turnOnMove());
   }
 
   @Override
