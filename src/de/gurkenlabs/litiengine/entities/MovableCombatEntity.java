@@ -26,6 +26,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
+    this.setTurnOnMove(info.turnOnMove());
   }
 
   @Override
