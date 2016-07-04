@@ -1,11 +1,8 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 
 import de.gurkenlabs.litiengine.Game;
@@ -24,13 +21,20 @@ public class DebugRenderer {
     }
 
     if (Game.getConfiguration().DEBUG.renderHitBoxes() && entity instanceof ICombatEntity) {
-      drawHitEllipse(g, (ICombatEntity) entity);
+      g.setColor(Color.RED);
+      RenderEngine.drawShape(g, ((ICombatEntity)entity).getHitBox());
+    }
+    
+    if (Game.getConfiguration().DEBUG.renderBoundingBoxes()) {
+      g.setColor(Color.RED);
+      RenderEngine.drawShape(g, entity.getBoundingBox());
     }
 
     if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
       if (collisionEntity.hasCollision()) {
-        drawCollisionBox(g, collisionEntity.getCollisionBox());
+        g.setColor(Color.RED);
+        RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
       }
     }
   }
@@ -51,31 +55,5 @@ public class DebugRenderer {
     RenderEngine.drawText(g, entity.getMapId() + "", x, y);
     final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
     RenderEngine.drawText(g, locationString, x, y + 5);
-  }
-
-  /**
-   * Draw hit ellipse.
-   *
-   * @param g
-   *          the g
-   * @param entity
-   *          the entity
-   */
-  private static void drawHitEllipse(final Graphics2D g, final ICombatEntity combatEntity) {
-    g.setColor(Color.RED);
-    RenderEngine.drawShape(g, combatEntity.getHitBox());
-  }
-
-  /**
-   * Draw collision box. drawing given rectangles.
-   *
-   * @param g
-   *          the g
-   * @param collisionBox
-   *          the shape
-   */
-  private static void drawCollisionBox(final Graphics2D g, final Rectangle2D collisionBox) {
-    g.setColor(Color.RED);
-    RenderEngine.drawShape(g, collisionBox);
   }
 }

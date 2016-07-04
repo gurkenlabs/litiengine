@@ -20,7 +20,9 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 /**
  * An abstract implementation for emitters that provide a particle effect.
@@ -153,7 +155,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   @Override
   public Rectangle2D getBoundingBox() {
     if (this.boundingBox == null) {
-      this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+      this.boundingBox = new Rectangle2D.Double(this.getOrigin().getX() - this.getWidth() / 2, this.getOrigin().getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
     }
 
     return this.boundingBox;
@@ -290,6 +292,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> particle.render(g, origin));
+    if(Game.getConfiguration().DEBUG.renderHitBoxes()){
+      DebugRenderer.renderEntityDebugInfo(g, this);
+    }
   }
 
   /**
