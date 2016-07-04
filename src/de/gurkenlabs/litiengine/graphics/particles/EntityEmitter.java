@@ -28,16 +28,6 @@ public abstract class EntityEmitter extends Emitter {
     this.entity = entity;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.entities.Entity#getCollisionBox()
-   */
-  @Override
-  public Rectangle2D getBoundingBox() {
-    return this.getEntity().getBoundingBox();
-  }
-
   /**
    * Gets the entity.
    *
