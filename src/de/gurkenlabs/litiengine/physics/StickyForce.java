@@ -34,6 +34,11 @@ public class StickyForce extends Force {
     this.forceEntiy = forceEntity;
   }
 
+  public StickyForce(final Point2D center, final float strength, final float size) {
+    super(center, strength, size);
+    this.forceEntiy = null;
+  }
+
   /**
    * Gets the force entiy.
    *
@@ -50,6 +55,9 @@ public class StickyForce extends Force {
    */
   @Override
   public Point2D getLocation() {
-    return this.getForceEntiy().getDimensionCenter();
+    if (this.getForceEntiy() != null) {
+      return this.getForceEntiy().getDimensionCenter();
+    }
+    return super.getLocation();
   }
 }

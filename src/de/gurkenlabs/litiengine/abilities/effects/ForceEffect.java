@@ -43,7 +43,7 @@ public abstract class ForceEffect extends Effect {
 
   @Override
   protected boolean hasEnded(final IGameLoop loop, EffectAppliance appliance) {
-    return super.hasEnded(loop, appliance) || this.getAppliedForce().hasEnded();
+    return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
   }
 
   public float getStrength() {

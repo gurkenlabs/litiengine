@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.abilities;
 
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -25,6 +26,8 @@ public class AbilityExecution implements IUpdateable {
   /** The impact area. */
   private final Shape impactArea;
 
+  private final Point2D castLocation;
+
   /**
    * Instantiates a new ability execution.
    *
@@ -33,10 +36,10 @@ public class AbilityExecution implements IUpdateable {
    */
   public AbilityExecution(final IGameLoop gameLoop, final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
-
     this.ability = ability;
     this.executionTicks = gameLoop.getTicks();
     this.impactArea = ability.calculateImpactArea();
+    this.castLocation = ability.getExecutor().getDimensionCenter();
     gameLoop.registerForUpdate(this);
   }
 
@@ -60,6 +63,10 @@ public class AbilityExecution implements IUpdateable {
    */
   public Shape getExecutionImpactArea() {
     return this.impactArea;
+  }
+
+  public Point2D getCastLocation() {
+    return this.castLocation;
   }
 
   /**
