@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -23,7 +24,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
   private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
-
+  
+  private final List<IEffect> appliedEffects;
+  
   /** The attributes. */
   private final CombatAttributes attributes;
 
@@ -43,6 +46,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.entityDeathConsumer = new CopyOnWriteArrayList<>();
     this.entityResurrectConsumer = new CopyOnWriteArrayList<>();
     this.entityHitConsumer = new CopyOnWriteArrayList<>();
+    this.appliedEffects = new CopyOnWriteArrayList<>();
 
     final CombatAttributesInfo info = this.getClass().getAnnotation(CombatAttributesInfo.class);
 
@@ -260,5 +264,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public boolean isNeutral() {
     return this.getTeam() == 0;
+  }
+
+  @Override
+  public List<IEffect> getAppliedEffects() {
+    return this.appliedEffects;
   }
 }

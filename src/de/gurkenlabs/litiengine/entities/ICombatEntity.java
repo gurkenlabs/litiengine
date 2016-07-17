@@ -1,9 +1,11 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Ellipse2D;
+import java.util.List;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
+import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 
 public interface ICombatEntity extends ICollisionEntity {
   public CombatAttributes getAttributes();
@@ -42,4 +44,6 @@ public interface ICombatEntity extends ICollisionEntity {
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 
   public void setTeam(int team);
+  
+  public List<IEffect> getAppliedEffects();
 }
