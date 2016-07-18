@@ -24,6 +24,7 @@ import de.gurkenlabs.tiled.tmx.ITileLayer;
 import de.gurkenlabs.tiled.tmx.ITileset;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
+import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 import de.gurkenlabs.util.TimeUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -33,7 +34,7 @@ import de.gurkenlabs.util.logging.Stopwatch;
  * The Class OrthogonalMapRenderer.
  */
 public class OrthogonalMapRenderer implements IMapRenderer {
-
+  private static final String LAYER_RENDER_TYPE = "RENDERTYPE";
   private float renderProcess;
   private int totalTileCount;
   private int tilesRendered;
@@ -98,12 +99,61 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
+      String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
+        LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
+        if (renderType == LayerRenderType.OVERLAY) {
+          continue;
+        }
+      }
+
       RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
     }
 
     g.dispose();
 
     ImageCache.MAPS.putPersistent(getCacheKey(map), img);
+    return img;
+  }
+
+  @Override
+  public BufferedImage getLayerImage(IMap map, LayerRenderType type) {
+    if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
+      return ImageCache.MAPS.get(getCacheKey(map) + type);
+    }
+
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
+    final Graphics2D g = img.createGraphics();
+
+    this.renderProcess = 0;
+    this.totalTileCount = 0;
+    this.tilesRendered = 0;
+    for (final ITileLayer layer : map.getTileLayers()) {
+      this.totalTileCount += layer.getTiles().size();
+    }
+
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+
+      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
+        continue;
+      }
+      
+      LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
+      if (renderType != type) {
+        continue;
+      }
+
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+    }
+
+    g.dispose();
+
+    ImageCache.MAPS.putPersistent(getCacheKey(map) + type, img);
     return img;
   }
 
@@ -151,6 +201,12 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
   }
 
+  @Override
+  public void renderLayers(Graphics2D g, Point2D offset, IMap map, LayerRenderType type) {
+    final BufferedImage mapImage = this.getLayerImage(map, type);
+    RenderEngine.renderImage(g, mapImage, offset);
+  }
+
   /**
    * Gets the layer image.
    *
@@ -178,25 +234,25 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     layer.getTiles().parallelStream().forEach((tile) -> {
       // get the tile from the tileset image
-        final int index = layer.getTiles().indexOf(tile);
-        if (tile.getGridId() == 0) {
-          this.tilesRendered++;
-          return;
-        }
-
-        final Image tileTexture = getTile(map, tile);
-
-        // draw the tile on the map image
-        final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
-        final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
-        imageGraphics.drawImage(tileTexture, x, y, null);
+      final int index = layer.getTiles().indexOf(tile);
+      if (tile.getGridId() == 0) {
         this.tilesRendered++;
-        this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
-      });
+        return;
+      }
+
+      final Image tileTexture = getTile(map, tile);
+
+      // draw the tile on the map image
+      final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
+      final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
+      imageGraphics.drawImage(tileTexture, x, y, null);
+      this.tilesRendered++;
+      this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
+    });
 
     ImageCache.MAPS.putPersistent(
 
-    getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
     return bufferedImage;
   }
 

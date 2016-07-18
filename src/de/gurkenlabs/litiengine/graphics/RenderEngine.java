@@ -37,6 +37,7 @@ import de.gurkenlabs.litiengine.tiled.tmx.OrthogonalMapRenderer;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
+import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
@@ -349,5 +350,16 @@ public class RenderEngine implements IRenderEngine {
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<IMap>(g, map));
     }
+  }
+
+  @Override
+  public void renderLayers(Graphics2D g, IMap map, LayerRenderType type) {
+    if (map == null) {
+      return;
+    }
+
+    // draw tile layers
+    this.mapRenderer.get(map.getOrientation()).renderLayers(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map, type);
+
   }
 }

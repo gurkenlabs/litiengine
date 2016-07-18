@@ -87,6 +87,7 @@ public class Environment implements IEnvironment {
 
     this.combatEntities.clear();
     this.movableEntities.clear();
+    this.lightSources.clear();
   }
 
   @Override

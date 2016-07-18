@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
+import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 
 /**
  * The Interface IGraphicsEngine.
@@ -47,4 +48,12 @@ public interface IRenderEngine {
    *          the g
    */
   public void renderMap(Graphics2D g, final IMap map);
+  
+  /**
+   * Render map.
+   *
+   * @param g
+   *          the g
+   */
+  public void renderLayers(Graphics2D g, final IMap map, LayerRenderType type);
 }
