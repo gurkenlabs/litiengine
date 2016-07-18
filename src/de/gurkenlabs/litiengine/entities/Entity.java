@@ -130,4 +130,9 @@ public abstract class Entity implements IEntity {
   public int hashCode() {
     return this.mapId;
   }
+
+  @Override
+  public String sendMessage(String message) {
+    return null;
+  }
 }
