@@ -143,6 +143,10 @@ public abstract class Game implements IInitializable, ILaunchable {
     if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
       Game.getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
+    
+    Game.getRenderEngine().onMapRendered(e -> {
+      DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject());
+    });
 
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());

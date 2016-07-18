@@ -1,6 +1,8 @@
 package de.gurkenlabs.util.image;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -253,6 +255,18 @@ public class ImageProcessing {
     return bimage;
   }
 
+  public static BufferedImage setOpacity(final Image img, final float opacity) {
+    final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
+
+    // Draw the image on to the buffered image
+    final Graphics2D g2d = (Graphics2D)bimage.getGraphics();
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+    g2d.drawImage(img, 0, 0, null);
+    g2d.dispose();
+
+    return bimage;
+  }
+
   /**
    * Horizontalflip.
    *
@@ -266,6 +280,16 @@ public class ImageProcessing {
     final BufferedImage dimg = new BufferedImage(w, h, img.getType());
     final Graphics2D g = dimg.createGraphics();
     g.drawImage(img, 0, 0, w, h, w, 0, 0, h, null);
+    g.dispose();
+    return dimg;
+  }
+
+  public static BufferedImage verticalFlip(final BufferedImage img) {
+    final int w = img.getWidth();
+    final int h = img.getHeight();
+    final BufferedImage dimg = new BufferedImage(w, h, img.getType());
+    final Graphics2D g = dimg.createGraphics();
+    g.drawImage(img, 0, 0 + h, w, -h, null);
     g.dispose();
     return dimg;
   }
