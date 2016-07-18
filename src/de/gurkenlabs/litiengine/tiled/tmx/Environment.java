@@ -37,7 +37,6 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class Environment implements IEnvironment {
   public static final String COLLISIONBOX = "COLLISIONBOX";
   private static final String MAP_OBJECT_LIGHTSOURCE = "LIGHTSOURCE";
-  private static final String CUSTOM_PROP_LIGHTSOURCE_RADIUS = "LIGHTSOURCE_RADIUS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS = "LIGHTSOURCE_BRIGHTNESS";
   private static final String CUSTOM_PROP_LIGHTSOURCE_COLOR = "LIGHTSOURCE_COLOR";
   public static final String SHADOW_DOWN = "SHADOW_DOWN";
@@ -223,18 +222,16 @@ public class Environment implements IEnvironment {
 
   protected void addMapObject(final IMapObject mapObject) {
     if (mapObject.getType().equals(MAP_OBJECT_LIGHTSOURCE)) {
-      final String propRadius = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_RADIUS);
       final String propBrightness = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS);
       final String propColor = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_COLOR);
-      if (propRadius == null || propRadius.isEmpty() || propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
+      if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
         return;
       }
 
-      final int radius = Integer.parseInt(propRadius);
       final int brightness = Integer.parseInt(propBrightness);
       final Color color = Color.decode(propColor);
 
-      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), radius, brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
+      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int)(mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
     }
 
     this.addCollisionBoxes(mapObject);
