@@ -69,24 +69,22 @@ public class ShimmerParticle extends RectangleFillParticle {
   @Override
   public void update(final IGameLoop loop, Point2D emitterOrigin, final float updateRateFactor) {
     super.update(loop, emitterOrigin, updateRateFactor);
-    final Random rand = new Random();
-
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());
     final Point2D relativeParticleLocation = this.getRelativeLocation(emitterLocation);
     if (relativeParticleLocation.getX() < this.getBoundingBox().getX()) {
-      this.setDx(rand.nextFloat());
+      this.setDx(-this.getDx());
     }
 
     if (relativeParticleLocation.getX() > this.getBoundingBox().getX() + this.getBoundingBox().getWidth()) {
-      this.setDx(-rand.nextFloat());
+      this.setDx(-this.getDx());
     }
 
     if (relativeParticleLocation.getY() < this.getBoundingBox().getY()) {
-      this.setDy(rand.nextFloat());
+      this.setDy(-this.getDy());
     }
 
     if (relativeParticleLocation.getY() > this.getBoundingBox().getY() + this.getBoundingBox().getHeight()) {
-      this.setDy(-rand.nextFloat());
+      this.setDy(-this.getDy());
     }
   }
 

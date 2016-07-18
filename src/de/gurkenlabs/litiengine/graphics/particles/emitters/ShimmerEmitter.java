@@ -28,7 +28,7 @@ public class ShimmerEmitter extends Emitter {
    * @param originY
    *          the origin y
    */
-  public ShimmerEmitter(final int originX, final int originY) {
+  public ShimmerEmitter(final double originX, final double originY) {
     super(originX, originY);
   }
 
