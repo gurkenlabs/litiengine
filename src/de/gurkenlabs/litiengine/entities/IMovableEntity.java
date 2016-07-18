@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.physics.IEntityMovementController;
@@ -11,6 +12,10 @@ public interface IMovableEntity extends ICollisionEntity {
    * @return
    */
   public float getVelocity();
+
+  public Point2D getMoveDestination();
+
+  public void setMoveDestination(Point2D dest);
 
   public boolean turnOnMove();
 

@@ -13,6 +13,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class MovableEntity extends CollisionEntity implements IMovableEntity {
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
+  private Point2D moveDestination;
 
   private boolean turnOnMove;
 
@@ -29,6 +30,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   public float getVelocity() {
     return this.velocity;
   }
+  
 
   @Override
   public IEntityMovementController getMovementController() {
@@ -81,5 +83,15 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   @Override
   public void setTurnOnMove(boolean turn) {
     this.turnOnMove = turn;
+  }
+
+  @Override
+  public Point2D getMoveDestination() {
+    return this.moveDestination;
+  }
+
+  @Override
+  public void setMoveDestination(Point2D dest) {
+    this.moveDestination = dest;
   }
 }

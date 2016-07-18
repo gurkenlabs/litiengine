@@ -15,7 +15,8 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private final short velocity;
   private boolean turnOnMove;
-  
+  private Point2D moveDestination;
+
   /** The last moved. */
   private long lastMoved;
 
@@ -104,7 +105,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
   }
-  
+
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
@@ -113,5 +114,15 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public void setTurnOnMove(boolean turn) {
     this.turnOnMove = turn;
+  }
+
+  @Override
+  public Point2D getMoveDestination() {
+    return this.moveDestination;
+  }
+
+  @Override
+  public void setMoveDestination(Point2D dest) {
+    this.moveDestination = dest;
   }
 }
