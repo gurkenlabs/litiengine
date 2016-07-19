@@ -53,6 +53,12 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Rectangle2D.Double(location.getX() + this.getWidth() * 0.5 - collisionBoxWidth * 0.5, location.getY() + this.getHeight() - collisionBoxHeight, collisionBoxWidth, collisionBoxHeight);
   }
 
+  @Override
+  public void setSize(float width, float height) {
+    super.setSize(width, height);
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
   /**
    * Checks for collision.
    *
