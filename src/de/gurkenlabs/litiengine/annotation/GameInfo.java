@@ -25,4 +25,15 @@ public @interface GameInfo {
   public String subTitle() default "";
 
   public float version();
+
+  /** The Constant FONT_DIRECTORY. */
+  public String fontDirectory() default "fonts/";
+
+  /** The Constant MAP_DIRECTORY. */
+  public String mapDirectory() default "maps/";
+
+  /** The Constant SPRITESHEET_DIRECTORY. */
+  public String spritesDirectory() default "sprites/";
+
+  public String abilityIconDirectory() default "abilities/";
 }

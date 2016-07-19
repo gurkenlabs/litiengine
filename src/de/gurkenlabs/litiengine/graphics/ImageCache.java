@@ -32,6 +32,7 @@ public class ImageCache {
 
   public static final String MAP_DIRECTORY = "map";
   public static final String SPRITES_DIRECTORY = "sprites";
+
   public static final String IMAGES_DIRECTORY = "images";
 
   /** The Constant MAP_CACHE. */
