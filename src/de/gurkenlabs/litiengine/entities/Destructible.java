@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.entities;
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.CombatEntity;
@@ -12,20 +13,28 @@ import de.gurkenlabs.litiengine.graphics.animation.DestructibleAnimationControll
 /**
  * The Class Destructable.
  */
-public abstract class Destructible extends CombatEntity {
+public class Destructible extends CombatEntity {
   private Material material;
+  private String spritePath;
 
   /**
    * Instantiates a new destructible.
    */
-  protected Destructible(Point2D location) {
+  public Destructible(Point2D location, String spritesheetName, Dimension dimension, Material mat) {
     super();
+    this.spritePath = spritesheetName;
+    this.material = mat;
+    this.setSize(dimension.width, dimension.height);
     this.setLocation(location);
     this.setAnimationController(new DestructibleAnimationController(this));
   }
 
   public Material getMaterial() {
     return this.material;
+  }
+
+  public String getSpritePath() {
+    return this.spritePath;
   }
 
   /**
