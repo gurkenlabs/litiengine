@@ -24,9 +24,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
   private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
-  
+
   private final List<IEffect> appliedEffects;
-  
+
   /** The attributes. */
   private final CombatAttributes attributes;
 
@@ -110,7 +110,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @Override
   public boolean hit(int damage, Ability ability) {
-    if (this.isIndestructible() || this.isDead()) {
+    if (this.isDead()) {
       return false;
     }
 
@@ -124,7 +124,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       damage = damage - shieldDmg;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
+    if (!this.isIndestructible()) {
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
+    }
 
     if (this.isDead()) {
       this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, 0));
@@ -236,7 +238,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * @param ind
    *          the new indestructible
    */
-  protected void setIndestructible(final boolean ind) {
+  public void setIndestructible(final boolean ind) {
     this.isIndestructible = ind;
   }
 

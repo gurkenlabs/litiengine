@@ -45,7 +45,7 @@ public abstract class Effect implements IEffect {
 
   /** The duration. */
   private int duration;
-  
+
   /**
    * Instantiates a new effect.
    *
@@ -249,7 +249,7 @@ public abstract class Effect implements IEffect {
    * @return the predicate<? super attackable entity>
    */
   private Predicate<? super ICombatEntity> canAttackEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isIndestructible() && !entity.isDead();
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
 
   /**
@@ -260,7 +260,7 @@ public abstract class Effect implements IEffect {
   private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
-  
+
   private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
   }
