@@ -7,7 +7,7 @@ package de.gurkenlabs.litiengine.entities;
 /**
  * The Enum DestructableState.
  */
-public enum DestructibleState {
+public enum PropState {
   /** The Damaged. */
   Damaged,
   /** The Destroyed. */

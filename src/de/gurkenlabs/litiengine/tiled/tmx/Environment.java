@@ -17,12 +17,19 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.attributes.AttributeModifier;
+import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Material;
+import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.LightSource;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
@@ -56,7 +63,7 @@ public class Environment implements IEnvironment {
   private final IMap map;
 
   private final Map<Integer, ICombatEntity> combatEntities;
-
+  private final List<Prop> props;
   private final Map<Integer, IMovableEntity> movableEntities;
 
   private final List<LightSource> lightSources;
@@ -75,6 +82,7 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
     this.lightSources = new CopyOnWriteArrayList<>();
+    this.props = new CopyOnWriteArrayList<>();
   }
 
   public void clear() {
@@ -93,6 +101,11 @@ public class Environment implements IEnvironment {
   @Override
   public void init() {
     this.loadMapObjects();
+  }
+
+  @Override
+  public List<Prop> getProps() {
+    return this.props;
   }
 
   @Override
@@ -232,7 +245,7 @@ public class Environment implements IEnvironment {
       final int brightness = Integer.parseInt(propBrightness);
       final Color color = Color.decode(propColor);
 
-      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int)(mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
+      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) (mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
     }
 
     this.addCollisionBoxes(mapObject);
@@ -247,6 +260,70 @@ public class Environment implements IEnvironment {
 
         this.addMapObject(mapObject);
       }
+    }
+  }
+
+  @Override
+  public void addProp(IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
+      return;
+    }
+    Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL)));
+    if (!mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    }
+    if (!prop.isIndestructible()) {
+      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.Damaged));
+      prop.getAnimationController().add(PropAnimationController.createAnimation((Prop) prop, PropState.Destroyed));
+    }
+    prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+    prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
+      prop.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
+      prop.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    }
+    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    this.getProps().add(prop);
+    this.addCombatEntity(mapObject.getId(), prop);
+    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
+      prop.setTeam(Integer.parseInt((mapObject.getCustomProperty(MapObjectProperties.TEAM))));
+    }
+    if (prop.hasCollision()) {
+      Game.getPhysicsEngine().add(prop);
+    }
+  }
+
+  @Override
+  public void addEffect(IMapObject mapObject) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addMob(IMapObject mapObject) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addDecorMob(final IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.DECORMOB)) {
+      return;
+    }
+    DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.MOBTYPE));
+    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
+      mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
+      mob.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    }
+    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    this.addMovableEntity(mapObject.getId(), mob);
+    if (mob.hasCollision()) {
+      Game.getPhysicsEngine().add(mob);
     }
   }
 }

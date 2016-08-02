@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
 public interface IAnimationController extends IUpdateable {
@@ -24,4 +26,5 @@ public interface IAnimationController extends IUpdateable {
   public BufferedImage getCurrentSprite();
   
   public void dispose();
+
 }

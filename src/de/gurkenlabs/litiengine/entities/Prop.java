@@ -1,20 +1,55 @@
+/***************************************************************
+ * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
+ ***************************************************************/
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
-public class Prop extends CollisionEntity {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Destructable.
+ */
+public class Prop extends CombatEntity {
+  private Material material;
   private String spritePath;
 
-  public Prop(Point2D location, String spritesheetName) {
+  /**
+   * Instantiates a new destructible.
+   */
+  public Prop(Point2D location, String spritesheetName, Material mat) {
     super();
     this.spritePath = spritesheetName;
+    this.material = mat;
     this.setLocation(location);
     this.setAnimationController(new PropAnimationController(this));
   }
 
+  public Material getMaterial() {
+    return this.material;
+  }
+
   public String getSpritePath() {
     return this.spritePath;
+  }
+
+  /**
+   * Gets the state.
+   *
+   * @return the state
+   */
+  public PropState getState() {
+    if (this.getAttributes().getHealth().getCurrentValue() <= 0) {
+      return PropState.Destroyed;
+    } else if (this.getAttributes().getHealth().getCurrentValue() <= this.getAttributes().getHealth().getMaxValue() * 0.5) {
+      return PropState.Damaged;
+    } else {
+      return PropState.Intact;
+    }
+  }
+
+  protected void setMaterial(Material material) {
+    this.material = material;
   }
 }

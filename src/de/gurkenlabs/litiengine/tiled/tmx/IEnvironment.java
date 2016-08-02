@@ -12,8 +12,10 @@ import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.tiled.tmx.IMap;
+import de.gurkenlabs.tiled.tmx.IMapObject;
 
 /**
  * The Interface IMapContainer.
@@ -29,7 +31,7 @@ public interface IEnvironment extends IInitializable {
   public void add(final int mapId, final IMovableCombatEntity entity);
 
   public Collection<ICombatEntity> getCombatEntities();
-  
+
   public List<LightSource> getLightSources();
 
   public ICombatEntity getCombatEntity(final int mapId);
@@ -60,4 +62,15 @@ public interface IEnvironment extends IInitializable {
    * @return
    */
   public int getMapId();
+
+  public List<Prop> getProps();
+
+  public void addProp(IMapObject mapObject);
+
+  public void addEffect(final IMapObject mapObject);
+
+  public void addMob(final IMapObject mapObject);
+
+  public void addDecorMob(final IMapObject mapObject);
+
 }
