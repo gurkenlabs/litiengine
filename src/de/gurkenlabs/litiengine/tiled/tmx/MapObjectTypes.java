@@ -8,5 +8,8 @@ public class MapObjectTypes {
   public static final String PROP = "PROP";
   public static final String MOB = "MOB";
   public static final String DECORMOB = "DECORMOB";
+  public static final String COLLISIONBOX = "COLLISIONBOX";
+  public static final String SHADOWBOX = "SHADOWBOX";
+  public static final String LIGHTSOURCE = "LIGHTSOURCE";
 
 }
