@@ -44,18 +44,8 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class Environment implements IEnvironment {
   public static final String COLLISIONBOX = "COLLISIONBOX";
   private static final String MAP_OBJECT_LIGHTSOURCE = "LIGHTSOURCE";
-  private static final String CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS = "LIGHTSOURCE_BRIGHTNESS";
-  private static final String CUSTOM_PROP_LIGHTSOURCE_COLOR = "LIGHTSOURCE_COLOR";
-  public static final String SHADOW_DOWN = "SHADOW_DOWN";
-  public static final String SHADOW_LEFT = "SHADOW_LEFT";
-  public static final String SHADOW_RIGHT = "SHADOW_RIGHT";
-  public static final String SHADOW_DOWNLEFT = "SHADOW_DOWNLEFT";
-  public static final String SHADOW_DOWNRIGHT = "SHADOW_DOWNRIGHT";
-  public static final String SHADOW_LEFTDOWN = "SHADOW_LEFTDOWN";
-  public static final String SHADOW_LEFTRIGHT = "SHADOW_LEFTRIGHT";
-  public static final String SHADOW_RIGHTDOWN = "SHADOW_RIGHTDOWN";
-  public static final String SHADOW_RIGHTLEFT = "SHADOW_RIGHTLEFT";
-  public static final String SHADOW_NOOFFSET = "SHADOW_NOOFFSET";
+
+
 
   private static int localIdSequence = 0;
   private static int mapIdSequence;
@@ -236,8 +226,8 @@ public class Environment implements IEnvironment {
 
   protected void addMapObject(final IMapObject mapObject) {
     if (mapObject.getType().equals(MAP_OBJECT_LIGHTSOURCE)) {
-      final String propBrightness = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_BRIGHTNESS);
-      final String propColor = mapObject.getCustomProperty(CUSTOM_PROP_LIGHTSOURCE_COLOR);
+      final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+      final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
       if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
         return;
       }
@@ -263,6 +253,8 @@ public class Environment implements IEnvironment {
     }
   }
 
+  
+  
   @Override
   public void addProp(IMapObject mapObject) {
     if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
