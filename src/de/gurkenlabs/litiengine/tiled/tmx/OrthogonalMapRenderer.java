@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,9 +25,7 @@ import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
 import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
-import de.gurkenlabs.util.TimeUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
-import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class OrthogonalMapRenderer.

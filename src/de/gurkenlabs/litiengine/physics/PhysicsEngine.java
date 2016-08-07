@@ -16,7 +16,6 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class PhysicsEngine.

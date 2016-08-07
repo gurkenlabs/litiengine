@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
+import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.util.io.StreamUtilities;
 
 public abstract class Game implements IInitializable, ILaunchable {
@@ -35,6 +37,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   private static IPhysicsEngine physicsEngine;
   private static ISoundEngine soundEngine;
   private static IGameLoop gameLoop;
+  private static IEnvironment environment;
   private static GameMetrics metrics;
   private static EntityManager entityManager;
 
@@ -107,6 +110,16 @@ public abstract class Game implements IInitializable, ILaunchable {
 
   public static IScreenManager getScreenManager() {
     return screenManager;
+  }
+  
+  public static IEnvironment getEnvironment(){
+    return environment;
+  }
+  
+  public static void loadEnvironment(final IEnvironment env){
+    environment = env;
+    environment.init();
+    getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixles().getWidth(), environment.getMap().getSizeInPixles().getHeight()));
   }
 
   @Override

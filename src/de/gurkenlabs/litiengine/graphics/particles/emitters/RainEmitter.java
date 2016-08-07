@@ -11,13 +11,18 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class RainEmitter.
  */
 @EmitterInfo(maxParticles = 3000, spawnAmount = 50, particleMinTTL = 20000, particleMaxTTL = 30000)
-public class RainEmitter extends WeatherEmitter {
+public class RainEmitter extends Weather {
+
+  public RainEmitter() {
+    super(WeatherType.Rain);
+  }
 
   /** The Constant LIGHT_BLUE. */
   private static final Color LIGHT_BLUE = new Color(45, 166, 189, 100);
@@ -33,7 +38,7 @@ public class RainEmitter extends WeatherEmitter {
   @Override
   public Particle createNewParticle() {
     final float xCoord = (float) (Math.random() * (this.getScreenDimensions().width * 2 + Game.getScreenManager().getCamera().getFocus().getX()) + this.getScreenDimensions().width);
-    final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + WeatherEmitter.WeatherEffectStartingY;
+    final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + Weather.WeatherEffectStartingY;
     final float delta = (float) (Math.random() * 2);
     final float dx = -delta;
     final float dy = delta;

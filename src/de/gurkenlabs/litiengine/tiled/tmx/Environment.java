@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.DecorMob;
@@ -34,14 +35,21 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
+import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.SnowEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.Weather;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
+import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -53,18 +61,25 @@ public class Environment implements IEnvironment {
 
   private static int localIdSequence = 0;
   private static int mapIdSequence;
-  /** The map. */
+
+  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
+  private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
+  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+
   private final IMap map;
 
   private final Map<Integer, ICombatEntity> combatEntities;
   private final List<Prop> props;
   private final Map<Integer, IMovableEntity> movableEntities;
+  private final List<Emitter> groundEmitters;
+  private final List<Emitter> emitters;
+  private final List<Emitter> overlayEmitters;
 
   private final List<LightSource> lightSources;
   private Image staticShadowImage;
-  private Image ambientImage;
-  private Color ambientColor;
-  private int ambientAlpha;
+  private AmbientLight ambientLight;
+
+  private Weather weather;
 
   /**
    * Instantiates a new map container base.
@@ -81,6 +96,68 @@ public class Environment implements IEnvironment {
     this.movableEntities = new ConcurrentHashMap<>();
     this.lightSources = new CopyOnWriteArrayList<>();
     this.props = new CopyOnWriteArrayList<>();
+    this.emitters = new CopyOnWriteArrayList<>();
+    this.groundEmitters = new CopyOnWriteArrayList<>();
+    this.overlayEmitters = new CopyOnWriteArrayList<>();
+    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
+  }
+
+  @Override
+  public void render(Graphics2D g) {
+    g.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+
+    Game.getRenderEngine().renderMap(g, this.getMap());
+    this.informConsumers(g, this.mapRenderedConsumer);
+
+    Game.getRenderEngine().renderEntities(g, this.getGroundEmitters());
+
+    Game.getRenderEngine().renderEntities(g, this.getAllEntities());
+    this.informConsumers(g, this.entitiesRenderedConsumer);
+
+    Game.getRenderEngine().renderEntities(g, this.getOverlayEmitters());
+
+    Game.getRenderEngine().renderLayers(g, this.getMap(), LayerRenderType.OVERLAY);
+
+    // render static shadows
+    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+
+    if (this.getAmbientLight().getAlpha() != 0) {
+      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+    }
+
+    if (this.weather != null) {
+      this.weather.render(g);
+    }
+
+    this.informConsumers(g, this.overlayRenderedConsumer);
+
+    g.scale(1.0 / Game.getInfo().renderScale(), 1.0 / Game.getInfo().renderScale());
+  }
+
+  private List<IEntity> getAllEntities() {
+    final List<IEntity> entities = new ArrayList<>();
+    entities.addAll(this.getCombatEntities());
+    entities.addAll(this.getMovableEntities());
+    entities.addAll(this.getEmitters());
+    entities.addAll(this.getProps());
+    return entities;
+  }
+
+  @Override
+  public void onMapRendered(Consumer<Graphics2D> consumer) {
+    this.mapRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onEntitiesRendered(Consumer<Graphics2D> consumer) {
+    this.entitiesRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onOverlayRendered(Consumer<Graphics2D> consumer) {
+    this.overlayRenderedConsumer.add(consumer);
   }
 
   @Override
@@ -92,10 +169,15 @@ public class Environment implements IEnvironment {
   private void addAmbientLight() {
     final String alphaProp = this.getMap().getCustomProperty("AMBIENTALPHA");
     final String colorProp = this.getMap().getCustomProperty("AMBIENTLIGHT");
-    this.ambientAlpha = Integer.parseInt(alphaProp);
-    this.ambientColor = Color.decode(colorProp);
+    int ambientAlpha = 0;
+    Color ambientColor = Color.WHITE;
+    try {
+      ambientAlpha = Integer.parseInt(alphaProp);
+      ambientColor = Color.decode(colorProp);
+    } catch (NumberFormatException e) {
+    }
 
-    this.createAmbientImage();
+    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   public void addCollisionBoxes(final IMapObject mapObject) {
@@ -133,23 +215,6 @@ public class Environment implements IEnvironment {
   public void addEffect(final IMapObject mapObject) {
     // TODO Auto-generated method stub
 
-  }
-
-  protected void addMapObject(final IMapObject mapObject) {
-    if (mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
-      final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-      final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-      if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
-        return;
-      }
-
-      final int brightness = Integer.parseInt(propBrightness);
-      final Color color = Color.decode(propColor);
-
-      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) (mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
-    }
-
-    this.addCollisionBoxes(mapObject);
   }
 
   @Override
@@ -336,68 +401,21 @@ public class Environment implements IEnvironment {
   }
 
   public void clear() {
-    final List<IEntity> allEntities = Stream.concat(this.combatEntities.values().stream(), this.movableEntities.values().stream()).collect(Collectors.toList());
-    for (final IEntity e : allEntities) {
-      if (e.getAnimationController() != null) {
-        e.getAnimationController().dispose();
-      }
-    }
+    this.dispose(this.combatEntities.values());
+    this.dispose(this.movableEntities.values());
+    this.dispose(this.getLightSources());
+    this.dispose(this.getGroundEmitters());
+    this.dispose(this.getEmitters());
+    this.dispose(this.getOverlayEmitters());
+    this.dispose(this.getProps());
 
     this.combatEntities.clear();
     this.movableEntities.clear();
     this.lightSources.clear();
-  }
-
-  public void createAmbientImage() {
-    final Color col = new Color(this.getAmbientColor().getRed(), this.getAmbientColor().getGreen(), this.getAmbientColor().getBlue(), this.getAmbientAlpha());
-    final StringBuilder sb = new StringBuilder();
-    for (final LightSource light : this.getLightSources()) {
-      light.deactivate();
-      sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" + light.getLocation().getY());
-    }
-
-    // build map specific cache key, respecting the lights and color
-    final String cacheKey = "AMBIENT_" + this.getMap().getName().replaceAll("[\\/]", "-") + "_" + sb.toString().hashCode() + "_" + this.getAmbientColor().getRed() + "_" + this.getAmbientColor().getGreen() + "_" + this.getAmbientColor().getBlue() + "_" + this.getAmbientAlpha();
-    final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
-    if (cachedImg != null) {
-      this.ambientImage = cachedImg;
-      return;
-    }
-
-    // create large rectangle and crop lights from it
-    final Area ar = new Area(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixles().getWidth(), this.getMap().getSizeInPixles().getHeight()));
-    for (final LightSource light : this.getLightSources()) {
-      final Ellipse2D lightCircle = new Ellipse2D.Double(light.getLocation().getX(), light.getLocation().getY(), light.getRadius() * 2, light.getRadius() * 2);
-      ar.subtract(new Area(lightCircle));
-    }
-
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixles().getWidth(), (int) this.getMap().getSizeInPixles().getHeight());
-    final Graphics2D g = (Graphics2D) img.getGraphics();
-    g.setColor(col);
-    g.fill(ar);
-
-    // apply 2 step gradient for all lights
-    for (final LightSource light : this.getLightSources()) {
-      // set gradient step size, relative to the light radius
-      final double LIGHT_GRADIENT_STEP = light.getRadius() * 0.15;
-      final Ellipse2D lightCircle = new Ellipse2D.Double(light.getLocation().getX(), light.getLocation().getY(), light.getRadius() * 2, light.getRadius() * 2);
-      final Ellipse2D midLightCircle = new Ellipse2D.Double(light.getLocation().getX() + LIGHT_GRADIENT_STEP, light.getLocation().getY() + LIGHT_GRADIENT_STEP, (light.getRadius() - LIGHT_GRADIENT_STEP) * 2, (light.getRadius() - LIGHT_GRADIENT_STEP) * 2);
-      final Ellipse2D smallLightCircle = new Ellipse2D.Double(light.getLocation().getX() + LIGHT_GRADIENT_STEP * 2, light.getLocation().getY() + LIGHT_GRADIENT_STEP * 2, (light.getRadius() - LIGHT_GRADIENT_STEP * 2) * 2, (light.getRadius() - LIGHT_GRADIENT_STEP * 2) * 2);
-
-      final Area mid = new Area(lightCircle);
-      mid.subtract(new Area(midLightCircle));
-      g.setColor(new Color(this.getAmbientColor().getRed(), this.getAmbientColor().getGreen(), this.getAmbientColor().getBlue(), (int) (this.getAmbientAlpha() * 0.5)));
-      g.fill(mid);
-
-      final Area small = new Area(midLightCircle);
-      small.subtract(new Area(smallLightCircle));
-      g.setColor(new Color(this.getAmbientColor().getRed(), this.getAmbientColor().getGreen(), this.getAmbientColor().getBlue(), (int) (this.getAmbientAlpha() * 0.25)));
-      g.fill(small);
-    }
-
-    g.dispose();
-    this.ambientImage = img;
-    ImageCache.IMAGES.putPersistent(cacheKey, img);
+    this.getGroundEmitters().clear();
+    this.getEmitters().clear();
+    this.getOverlayEmitters().clear();
+    this.getProps().clear();
   }
 
   @Override
@@ -435,18 +453,6 @@ public class Environment implements IEnvironment {
     }
 
     return entities;
-  }
-
-  public int getAmbientAlpha() {
-    return this.ambientAlpha;
-  }
-
-  public Color getAmbientColor() {
-    return this.ambientColor;
-  }
-
-  public Image getAmbientShape() {
-    return this.ambientImage;
   }
 
   public List<IMapObject> getCollisionBoxes() {
@@ -527,6 +533,18 @@ public class Environment implements IEnvironment {
     return this.props;
   }
 
+  public List<Emitter> getEmitters() {
+    return this.emitters;
+  }
+
+  public List<Emitter> getGroundEmitters() {
+    return this.groundEmitters;
+  }
+
+  public List<Emitter> getOverlayEmitters() {
+    return this.overlayEmitters;
+  }
+
   public List<IMapObject> getShadowBoxes() {
     final List<IMapObject> shadowBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
@@ -546,6 +564,10 @@ public class Environment implements IEnvironment {
 
   public Image getStaticShadowImage() {
     return this.staticShadowImage;
+  }
+
+  public AmbientLight getAmbientLight() {
+    return this.ambientLight;
   }
 
   @Override
@@ -578,17 +600,73 @@ public class Environment implements IEnvironment {
     }
   }
 
-  public void setAmbientAlpha(int ambientAlpha) {
-    if (ambientAlpha < 0) {
-      ambientAlpha = 0;
+  protected void addMapObject(final IMapObject mapObject) {
+    if (mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
+      final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+      final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+      if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
+        return;
+      }
+
+      final int brightness = Integer.parseInt(propBrightness);
+      final Color color = Color.decode(propColor);
+
+      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) (mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
     }
 
-    this.ambientAlpha = Math.min(ambientAlpha, 255);
-    this.createAmbientImage();
+    this.addCollisionBoxes(mapObject);
   }
 
-  public void setAmbientColor(final Color color) {
-    this.ambientColor = color;
-    this.createAmbientImage();
+  protected Weather getWeatherEmitter() {
+    return this.weather;
+  }
+
+  private void informConsumers(final Graphics2D g, List<Consumer<Graphics2D>> consumers) {
+    for (Consumer<Graphics2D> consumer : consumers) {
+      consumer.accept(g);
+    }
+  }
+
+  private void dispose(Collection<? extends IEntity> entities) {
+    for (final IEntity entity : entities) {
+      if (entity instanceof IUpdateable) {
+        Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+      }
+
+      if (entity.getAnimationController() != null) {
+        entity.getAnimationController().dispose();
+      }
+
+      if (entity instanceof IMovableEntity) {
+        if (((IMovableEntity) entity).getMovementController() != null) {
+          Game.getLoop().unregisterFromUpdate(((IMovableEntity) entity).getMovementController());
+        }
+      }
+    }
+  }
+
+  @Override
+  public WeatherType getWeather() {
+    return this.weather == null ? WeatherType.Clear : this.weather.getType();
+  }
+
+  @Override
+  public void setWeather(WeatherType weather) {
+    switch (weather) {
+    case Rain:
+      this.weather = new RainEmitter();
+      break;
+    case Snow:
+      this.weather = new SnowEmitter();
+      break;
+    case Clear:
+    default:
+      this.weather = null;
+      break;
+    }
+    
+    if (weather != null) {
+      this.weather.activate(Game.getLoop());
+    }
   }
 }

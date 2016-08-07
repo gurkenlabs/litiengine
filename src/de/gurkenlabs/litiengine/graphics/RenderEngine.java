@@ -12,6 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -130,6 +131,10 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
     g.drawString(text, (int) x, (int) y);
@@ -147,6 +152,10 @@ public class RenderEngine implements IRenderEngine {
    * @param shadow
    */
   public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
     final Color old = g.getColor();
     g.setColor(shadow);
     g.drawString(text, (int) x + 1, (int) y + 1);
@@ -157,18 +166,22 @@ public class RenderEngine implements IRenderEngine {
     g.drawString(text, (int) x, (int) y);
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape) {
+  public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
     AffineTransform oldTransForm = g.getTransform();
     AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
     g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getInfo().renderScale()));
+    g.setStroke(stroke);
     g.draw(shape);
     g.setTransform(oldTransForm);
   }
-  
+
+  public static void drawShape(final Graphics2D g, final Shape shape) {
+    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().renderScale()));
+  }
+
   public static void fillShape(final Graphics2D g, final Shape shape) {
     AffineTransform oldTransForm = g.getTransform();
     AffineTransform t = new AffineTransform();

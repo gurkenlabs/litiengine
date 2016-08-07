@@ -5,15 +5,17 @@ package de.gurkenlabs.litiengine.graphics.particles.emitters;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 
 /**
  * The Class WeatherEmitter.
  */
-public abstract class WeatherEmitter extends Emitter {
+public abstract class Weather extends Emitter {
 
   /** The Constant WeatherEffectStartingX. */
   public static final int WeatherEffectStartingX = 0;
@@ -21,14 +23,17 @@ public abstract class WeatherEmitter extends Emitter {
   /** The Constant WeatherEffectStartingY. */
   public static final int WeatherEffectStartingY = -50;
 
+  private final WeatherType type;
+  
   /** The screen dimensions. */
   private Dimension screenDimensions;
 
   /**
    * Instantiates a new weather emitter.
    */
-  public WeatherEmitter() {
+  public Weather(final WeatherType type) {
     super((int) -Game.getScreenManager().getCamera().getCenterX(), (int) -Game.getScreenManager().getCamera().getCenterY() + WeatherEffectStartingY);
+    this.type = type;
     this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale()));
     Game.getScreenManager().onResolutionChanged(resolution -> this.resolutionChanged());
   }
@@ -40,6 +45,11 @@ public abstract class WeatherEmitter extends Emitter {
    */
   public Dimension getScreenDimensions() {
     return this.screenDimensions;
+  }
+  
+  @Override
+  public Rectangle2D getBoundingBox() {
+    return Game.getScreenManager().getCamera().getViewPort();
   }
 
   /*
@@ -102,5 +112,9 @@ public abstract class WeatherEmitter extends Emitter {
     }
 
     return super.particleCanBeRemoved(particle);
+  }
+
+  public WeatherType getType() {
+    return type;
   }
 }

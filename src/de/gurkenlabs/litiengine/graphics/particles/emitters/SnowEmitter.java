@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -18,7 +19,11 @@ import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
  *
  */
 @EmitterInfo(maxParticles = 5000, spawnAmount = 50, particleMinTTL = 5000, particleMaxTTL = 10000, activateOnInit = false)
-public class SnowEmitter extends WeatherEmitter {
+public class SnowEmitter extends Weather {
+
+  public SnowEmitter() {
+    super(WeatherType.Snow);
+  }
 
   /** The last camera focus. */
   private Point2D lastCameraFocus;
@@ -31,7 +36,7 @@ public class SnowEmitter extends WeatherEmitter {
   @Override
   public Particle createNewParticle() {
     final float xCoord = (float) (Math.random() * (this.getScreenDimensions().width * 2 + Game.getScreenManager().getCamera().getFocus().getX()) + (this.getScreenDimensions().width * Math.random() > 0.5 ? 1 : -1));
-    final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + WeatherEmitter.WeatherEffectStartingY;
+    final float yCoord = (float) Game.getScreenManager().getCamera().getFocus().getY() + Weather.WeatherEffectStartingY;
     final float delta = (float) (Math.random() * 0.5);
     final float dx = -delta;
     final float dy = delta;
