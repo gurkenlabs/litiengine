@@ -55,16 +55,16 @@ public class CombatAttributes {
     this.info = info;
 
     // init range attributes
-    this.health = new RangeAttribute<Short>(info.health(), (short) 0, info.health());
-    this.shield = new RangeAttribute<Short>(info.maxShield(), (short) 0, info.shield());
-    this.level = new RangeAttribute<Byte>(info.maxLevel(), (byte) 0, info.level());
-    this.experience = new RangeAttribute<Integer>(info.maxExperience(), 0, 0);
+    this.health = new RangeAttribute<>(info.health(), (short) 0, info.health());
+    this.shield = new RangeAttribute<>(info.maxShield(), (short) 0, info.shield());
+    this.level = new RangeAttribute<>(info.maxLevel(), (byte) 0, info.level());
+    this.experience = new RangeAttribute<>(info.maxExperience(), 0, 0);
 
     // init single value attributes
-    this.velocity = new Attribute<Float>(info.velocityFactor());
-    this.attackSpeed = new Attribute<Float>(info.attackSpeed());
-    this.damageMultiplier = new Attribute<Float>(info.damageMultiplier());
-    this.healthRegeneration = new Attribute<Byte>(info.healthRegenerationPerSecond());
+    this.velocity = new Attribute<>(info.velocityFactor());
+    this.attackSpeed = new Attribute<>(info.attackSpeed());
+    this.damageMultiplier = new Attribute<>(info.damageMultiplier());
+    this.healthRegeneration = new Attribute<>(info.healthRegenerationPerSecond());
 
   }
 

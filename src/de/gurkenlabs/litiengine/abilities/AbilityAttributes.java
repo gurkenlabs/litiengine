@@ -36,12 +36,12 @@ public class AbilityAttributes {
    *          the info
    */
   public AbilityAttributes(final AbilityInfo info) {
-    this.cooldown = new Attribute<Integer>(info.cooldown());
-    this.range = new Attribute<Integer>(info.range());
-    this.impact = new Attribute<Integer>(info.impact());
-    this.duration = new Attribute<Integer>(info.duration());
-    this.value = new Attribute<Integer>(info.value());
-    this.impactAngle = new Attribute<Integer>(info.impactAngle());
+    this.cooldown = new Attribute<>(info.cooldown());
+    this.range = new Attribute<>(info.range());
+    this.impact = new Attribute<>(info.impact());
+    this.duration = new Attribute<>(info.duration());
+    this.value = new Attribute<>(info.value());
+    this.impactAngle = new Attribute<>(info.impactAngle());
   }
 
   /**

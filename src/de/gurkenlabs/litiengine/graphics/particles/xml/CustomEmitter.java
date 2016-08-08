@@ -22,13 +22,13 @@ import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
 public class CustomEmitter extends Emitter {
   private CustomEmitterData emitterData;
 
-  public CustomEmitter(double originX, double originY, URL emitterXml) {
+  public CustomEmitter(final double originX, final double originY, final URL emitterXml) {
     super(originX, originY);
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
+      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       this.emitterData = (CustomEmitterData) jaxbUnmarshaller.unmarshal(emitterXml);
-    } catch (JAXBException e) {
+    } catch (final JAXBException e) {
       e.printStackTrace();
     }
 
@@ -42,7 +42,7 @@ public class CustomEmitter extends Emitter {
     this.setParticleUpdateRate(this.emitterData.getUpdateRate());
     this.setSize(this.emitterData.getWidth(), this.emitterData.getHeight());
 
-    for (ParticleColor color : this.emitterData.getColors()) {
+    for (final ParticleColor color : this.emitterData.getColors()) {
       this.addParticleColor(color.toColor());
     }
   }
@@ -65,28 +65,28 @@ public class CustomEmitter extends Emitter {
     Particle particle;
     switch (this.emitterData.getParticleType()) {
     case LeftLineParticle:
-      particle = new LeftLineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new LeftLineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case OvalParticle:
-      particle = new OvalParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new OvalParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case RectangleFillParticle:
-      particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case RectangleOutlineParticle:
-      particle = new RectangleOutlineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new RectangleOutlineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case RightLineParticle:
-      particle = new RightLineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new RightLineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case ShimmerParticle:
-      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, this.getWidth(), this.getHeight()), x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new ShimmerParticle(new Rectangle2D.Float(x, y, this.getWidth(), this.getHeight()), x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case TextParticle:
-      particle = new TextParticle(this.emitterData.getParticleText(), x, y, deltaX, deltaY, gravityX, gravityY, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new TextParticle(this.emitterData.getParticleText(), x, y, deltaX, deltaY, gravityX, gravityY, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     default:
-      particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, getRandomParticleTTL(), getRandomParticleColor());
+      particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     }
 

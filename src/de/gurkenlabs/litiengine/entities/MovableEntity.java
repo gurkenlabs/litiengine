@@ -30,7 +30,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   public float getVelocity() {
     return this.velocity;
   }
-  
 
   @Override
   public IEntityMovementController getMovementController() {
@@ -81,7 +80,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public void setTurnOnMove(boolean turn) {
+  public void setTurnOnMove(final boolean turn) {
     this.turnOnMove = turn;
   }
 
@@ -91,7 +90,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public void setMoveDestination(Point2D dest) {
+  public void setMoveDestination(final Point2D dest) {
     this.moveDestination = dest;
   }
 }

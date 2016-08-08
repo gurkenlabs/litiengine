@@ -167,8 +167,8 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
-    AffineTransform oldTransForm = g.getTransform();
-    AffineTransform t = new AffineTransform();
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
@@ -183,8 +183,8 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void fillShape(final Graphics2D g, final Shape shape) {
-    AffineTransform oldTransForm = g.getTransform();
-    AffineTransform t = new AffineTransform();
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
@@ -268,7 +268,7 @@ public class RenderEngine implements IRenderEngine {
     // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
     try {
       Collections.sort(entitiesToRender, this.entityComparator);
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       for (final IEntity entity : entities) {
         this.renderEntity(g, entity);
       }
@@ -310,7 +310,7 @@ public class RenderEngine implements IRenderEngine {
       return;
     }
 
-    final RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
+    final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
     if (this.entityRenderingConditions.size() > 0) {
       for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
         if (!consumer.test(renderEvent)) {
@@ -361,12 +361,12 @@ public class RenderEngine implements IRenderEngine {
     this.mapRenderer.get(map.getOrientation()).render(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map);
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
-      consumer.accept(new RenderEvent<IMap>(g, map));
+      consumer.accept(new RenderEvent<>(g, map));
     }
   }
 
   @Override
-  public void renderLayers(Graphics2D g, IMap map, LayerRenderType type) {
+  public void renderLayers(final Graphics2D g, final IMap map, final LayerRenderType type) {
     if (map == null) {
       return;
     }

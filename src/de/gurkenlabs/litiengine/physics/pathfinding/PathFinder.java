@@ -21,7 +21,7 @@ public abstract class PathFinder implements IPathFinder {
     path2D.moveTo(start.getX(), start.getY());
     path2D.lineTo(target.getX(), target.getY());
 
-    final List<Point2D> points = new ArrayList<Point2D>();
+    final List<Point2D> points = new ArrayList<>();
     points.add(start);
     points.add(target);
     return new Path(start, target, path2D, points);

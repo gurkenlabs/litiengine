@@ -51,7 +51,7 @@ public abstract class Particle implements ITimeToLive {
 
   /** The current location of the particle on the Y-axis. */
   private float yCurrent;
-  
+
   private boolean applyStaticPhysics;
 
   /**
@@ -332,7 +332,7 @@ public abstract class Particle implements ITimeToLive {
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
    */
-  public void update(final IGameLoop loop, Point2D emitterOrigin, final float updateRatio) {
+  public void update(final IGameLoop loop, final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
       this.aliveTick = loop.getTicks();
     }
@@ -375,15 +375,15 @@ public abstract class Particle implements ITimeToLive {
     this.deltaWidth = deltaWidth;
   }
 
-  public Rectangle2D getBoundingBox(Point2D origin) {
+  public Rectangle2D getBoundingBox(final Point2D origin) {
     return new Rectangle2D.Double(origin.getX() + this.getxCurrent(), origin.getY() + this.getyCurrent(), this.getWidth(), this.getHeight());
   }
 
   public boolean isApplyingStaticPhysics() {
-    return applyStaticPhysics;
+    return this.applyStaticPhysics;
   }
 
-  public void setApplyStaticPhysics(boolean applyStaticPhysics) {
+  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
   }
 }

@@ -105,7 +105,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void render(Graphics2D g) {
+  public void render(final Graphics2D g) {
     g.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
 
     Game.getRenderEngine().renderMap(g, this.getMap());
@@ -146,17 +146,17 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void onMapRendered(Consumer<Graphics2D> consumer) {
+  public void onMapRendered(final Consumer<Graphics2D> consumer) {
     this.mapRenderedConsumer.add(consumer);
   }
 
   @Override
-  public void onEntitiesRendered(Consumer<Graphics2D> consumer) {
+  public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
     this.entitiesRenderedConsumer.add(consumer);
   }
 
   @Override
-  public void onOverlayRendered(Consumer<Graphics2D> consumer) {
+  public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
     this.overlayRenderedConsumer.add(consumer);
   }
 
@@ -166,7 +166,8 @@ public class Environment implements IEnvironment {
     this.addMovableEntity(mapId, entity);
   }
 
-  private void addAmbientLight() {
+  @Override
+  public void addAmbientLight() {
     final String alphaProp = this.getMap().getCustomProperty("AMBIENTALPHA");
     final String colorProp = this.getMap().getCustomProperty("AMBIENTLIGHT");
     int ambientAlpha = 0;
@@ -174,14 +175,22 @@ public class Environment implements IEnvironment {
     try {
       ambientAlpha = Integer.parseInt(alphaProp);
       ambientColor = Color.decode(colorProp);
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
     }
 
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
+  @Override
   public void addCollisionBoxes(final IMapObject mapObject) {
     if (mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+      Game.getPhysicsEngine().add(mapObject.getCollisionBox());
+    }
+  }
+
+  @Override
+  public void addShadowBoxes(final IMapObject mapObject) {
+    if (mapObject.getType().equals(MapObjectTypes.SHADOWBOX)) {
       Game.getPhysicsEngine().add(mapObject.getCollisionBox());
     }
   }
@@ -400,6 +409,7 @@ public class Environment implements IEnvironment {
     ImageCache.IMAGES.putPersistent(cacheKey, img);
   }
 
+  @Override
   public void clear() {
     this.dispose(this.combatEntities.values());
     this.dispose(this.movableEntities.values());
@@ -455,6 +465,7 @@ public class Environment implements IEnvironment {
     return entities;
   }
 
+  @Override
   public List<IMapObject> getCollisionBoxes() {
     final List<IMapObject> collisionBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
@@ -533,18 +544,22 @@ public class Environment implements IEnvironment {
     return this.props;
   }
 
+  @Override
   public List<Emitter> getEmitters() {
     return this.emitters;
   }
 
+  @Override
   public List<Emitter> getGroundEmitters() {
     return this.groundEmitters;
   }
 
+  @Override
   public List<Emitter> getOverlayEmitters() {
     return this.overlayEmitters;
   }
 
+  @Override
   public List<IMapObject> getShadowBoxes() {
     final List<IMapObject> shadowBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
@@ -621,13 +636,13 @@ public class Environment implements IEnvironment {
     return this.weather;
   }
 
-  private void informConsumers(final Graphics2D g, List<Consumer<Graphics2D>> consumers) {
-    for (Consumer<Graphics2D> consumer : consumers) {
+  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
+    for (final Consumer<Graphics2D> consumer : consumers) {
       consumer.accept(g);
     }
   }
 
-  private void dispose(Collection<? extends IEntity> entities) {
+  private void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
         Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
@@ -651,7 +666,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void setWeather(WeatherType weather) {
+  public void setWeather(final WeatherType weather) {
     switch (weather) {
     case Rain:
       this.weather = new RainEmitter();
@@ -664,7 +679,7 @@ public class Environment implements IEnvironment {
       this.weather = null;
       break;
     }
-    
+
     if (weather != null) {
       this.weather.activate(Game.getLoop());
     }

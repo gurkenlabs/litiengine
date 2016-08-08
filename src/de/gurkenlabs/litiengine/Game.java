@@ -75,7 +75,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
-    
+
     getLoop().registerForUpdate(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
@@ -111,12 +111,12 @@ public abstract class Game implements IInitializable, ILaunchable {
   public static IScreenManager getScreenManager() {
     return screenManager;
   }
-  
-  public static IEnvironment getEnvironment(){
+
+  public static IEnvironment getEnvironment() {
     return environment;
   }
-  
-  public static void loadEnvironment(final IEnvironment env){
+
+  public static void loadEnvironment(final IEnvironment env) {
     environment = env;
     environment.init();
     getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixles().getWidth(), environment.getMap().getSizeInPixles().getHeight()));
@@ -152,11 +152,11 @@ public abstract class Game implements IInitializable, ILaunchable {
     if (Game.getConfiguration().CLIENT.showGameMetrics()) {
       Game.getScreenManager().onRendered((g) -> getMetrics().render(g));
     }
-    
+
     if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
       Game.getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
-    
+
     Game.getRenderEngine().onMapRendered(e -> {
       DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject());
     });

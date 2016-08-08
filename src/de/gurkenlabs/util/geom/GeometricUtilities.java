@@ -4,6 +4,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -26,6 +27,10 @@ public class GeometricUtilities {
 
   public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
     return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
+  }
+
+  public static double distance(final Point2D p1, final Point2D p2) {
+    return Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
   }
 
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
@@ -273,7 +278,7 @@ public class GeometricUtilities {
    */
   public static ArrayList<Point2D> getPoints(final Rectangle2D rectangle) {
 
-    final ArrayList<Point2D> points = new ArrayList<Point2D>();
+    final ArrayList<Point2D> points = new ArrayList<>();
     points.add(new Point2D.Double(rectangle.getMinX(), rectangle.getMinY()));
     points.add(new Point2D.Double(rectangle.getMaxX(), rectangle.getMinY()));
     points.add(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY()));
@@ -295,7 +300,7 @@ public class GeometricUtilities {
     double y0 = point1.getY();
     final double x1 = point2.getX();
     final double y1 = point2.getY();
-    final List<Point2D> line = new ArrayList<Point2D>();
+    final List<Point2D> line = new ArrayList<>();
 
     final int dx = (int) Math.abs(x1 - x0);
     final int dy = (int) Math.abs(y1 - y0);
@@ -355,6 +360,48 @@ public class GeometricUtilities {
     final double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
 
     return new Point2D.Double(x, y);
+  }
+
+  public static ArrayList<Line2D.Double> getConstrainingLines(Area area) {
+    ArrayList<double[]> areaPoints = new ArrayList<double[]>();
+    ArrayList<Line2D.Double> areaSegments = new ArrayList<Line2D.Double>();
+    double[] coords = new double[6];
+
+    for (PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
+      // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
+      // Because the Area is composed of straight lines
+      int type = pi.currentSegment(coords);
+      // We record a double array of {segment type, x coord, y coord}
+      double[] pathIteratorCoords = { type, coords[0], coords[1] };
+      areaPoints.add(pathIteratorCoords);
+    }
+
+    double[] start = new double[3]; // To record where each polygon starts
+
+    for (int i = 0; i < areaPoints.size(); i++) {
+      // If we're not on the last point, return a line from this point to the
+      // next
+      double[] currentElement = areaPoints.get(i);
+
+      // We need a default value in case we've reached the end of the ArrayList
+      double[] nextElement = { -1, -1, -1 };
+      if (i < areaPoints.size() - 1) {
+        nextElement = areaPoints.get(i + 1);
+      }
+
+      // Make the lines
+      if (currentElement[0] == PathIterator.SEG_MOVETO) {
+        start = currentElement; // Record where the polygon started to close it
+                                // later
+      }
+
+      if (nextElement[0] == PathIterator.SEG_LINETO) {
+        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], nextElement[1], nextElement[2]));
+      } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
+        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], start[1], start[2]));
+      }
+    }
+    return areaSegments;
   }
 
   /**
@@ -418,7 +465,7 @@ public class GeometricUtilities {
 
     // 2. connect point with all rectangle points
     final Line2D[] connectingLines = getConnectingLines(point, rectPoints.toArray(new Point2D[rectPoints.size()]));
-    final ArrayList<Point2D> resutPoints = new ArrayList<>();
+    final ArrayList<Point2D> resultPoints = new ArrayList<>();
 
     for (int i = 0; i < rectPoints.size(); i++) {
       final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(connectingLines[i], rectangle);
@@ -430,11 +477,11 @@ public class GeometricUtilities {
         continue;
       }
 
-      resutPoints.add(rectPoints.get(i));
+      resultPoints.add(rectPoints.get(i));
     }
 
-    resutPoints.removeAll(Collections.singleton(null));
-    return resutPoints.toArray(new Point2D[resutPoints.size()]);
+    resultPoints.removeAll(Collections.singleton(null));
+    return resultPoints.toArray(new Point2D[resultPoints.size()]);
   }
 
   /**

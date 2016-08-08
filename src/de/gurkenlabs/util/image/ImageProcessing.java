@@ -146,15 +146,15 @@ public class ImageProcessing {
     return resizedImage;
   }
 
-  public static BufferedImage[][] getSubImages(final BufferedImage image, int rows, int columns) {
-    BufferedImage[][] smallImages = new BufferedImage[rows][columns];
-    int smallWidth = image.getWidth() / columns;
-    int smallHeight = image.getHeight() / rows;
+  public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
+    final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
+    final int smallWidth = image.getWidth() / columns;
+    final int smallHeight = image.getHeight() / rows;
 
     for (int y = 0; y < rows; y++) {
       for (int x = 0; x < columns; x++) {
-        int cellX = x * smallWidth;
-        int cellY = y * smallHeight;
+        final int cellX = x * smallWidth;
+        final int cellY = y * smallHeight;
         smallImages[y][x] = image.getSubimage(cellX, cellY, smallWidth, smallHeight);
       }
     }
@@ -258,7 +258,7 @@ public class ImageProcessing {
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
 
     // Draw the image on to the buffered image
-    final Graphics2D g2d = (Graphics2D)bimage.getGraphics();
+    final Graphics2D g2d = (Graphics2D) bimage.getGraphics();
     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
     g2d.drawImage(img, 0, 0, null);
     g2d.dispose();

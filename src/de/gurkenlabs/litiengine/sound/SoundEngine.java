@@ -56,7 +56,7 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
       // clean up finished playbacks
       finished.forEach(x -> this.playbacks.remove(x));
-    } , true);
+    }, true);
 
     this.lastUpdate = gameLoop.getTicks();
   }

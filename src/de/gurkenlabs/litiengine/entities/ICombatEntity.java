@@ -44,6 +44,6 @@ public interface ICombatEntity extends ICollisionEntity {
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 
   public void setTeam(int team);
-  
+
   public List<IEffect> getAppliedEffects();
 }

@@ -24,13 +24,13 @@ public class DecorMobAnimationController extends AnimationController {
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update(final IGameLoop loop) {
     super.update(loop);
     this.playAnimation(this.mob.getMobType());
   }
 
   private static Spritesheet findSpriteSheet(final DecorMob mob) {
-    final String path = Game.getInfo().spritesDirectory() + "decormob-" + mob.getMobType().toLowerCase() +  ".png";
+    final String path = Game.getInfo().spritesDirectory() + "decormob-" + mob.getMobType().toLowerCase() + ".png";
     final Spritesheet sheet = Spritesheet.find(path);
     return sheet;
   }

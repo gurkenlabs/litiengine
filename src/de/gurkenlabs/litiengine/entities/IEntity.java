@@ -41,6 +41,6 @@ public interface IEntity {
   public void setMapId(int mapId);
 
   public void setSize(float width, float height);
-  
+
   public String sendMessage(String message);
 }

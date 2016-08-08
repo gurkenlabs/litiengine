@@ -262,7 +262,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public void getParticleMinTTL(final int minTTL) {
     this.particleMinTTL = minTTL;
   }
-  
+
   public void setParticleMinTTL(final int minTTL) {
     this.particleMinTTL = minTTL;
   }
@@ -291,7 +291,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> particle.render(g, origin));
-    if(Game.getConfiguration().DEBUG.renderHitBoxes()){
+    if (Game.getConfiguration().DEBUG.renderHitBoxes()) {
       DebugRenderer.renderEntityDebugInfo(g, this);
     }
   }
@@ -389,7 +389,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return this.getParticleMaxTTL();
     }
 
-    int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
     return ttl;
   }
 

@@ -399,7 +399,7 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void onWheelMoved(int keyCode, Consumer<Integer> consumer) {
+  public void onWheelMoved(final int keyCode, final Consumer<Integer> consumer) {
     this.wheelMovedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 }

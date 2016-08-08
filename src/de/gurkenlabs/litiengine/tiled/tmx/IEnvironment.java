@@ -82,16 +82,27 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void addMob(final IMapObject mapObject);
 
   public void addDecorMob(final IMapObject mapObject);
-  
+
   public WeatherType getWeather();
-  
+
   public void setWeather(WeatherType weather);
-  
+
   public void onMapRendered(final Consumer<Graphics2D> consumer);
 
   public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
 
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
-  
+
   public void clear();
+
+  public List<IMapObject> getShadowBoxes();
+
+  public List<IMapObject> getCollisionBoxes();
+
+  public void addCollisionBoxes(IMapObject mapObject);
+
+  public void addShadowBoxes(IMapObject mapObject);
+
+  public void addAmbientLight();
+
 }

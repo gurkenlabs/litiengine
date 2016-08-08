@@ -17,7 +17,7 @@ public enum EffectTarget {
 
   /** The friendly. */
   FRIENDLY,
-  
+
   FRIENDLYDEAD,
 
   /** The none. */

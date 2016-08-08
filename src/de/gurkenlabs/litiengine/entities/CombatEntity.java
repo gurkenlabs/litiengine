@@ -109,7 +109,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public boolean hit(int damage, Ability ability) {
+  public boolean hit(int damage, final Ability ability) {
     if (this.isDead()) {
       return false;
     }

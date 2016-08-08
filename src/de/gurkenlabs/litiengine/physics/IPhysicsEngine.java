@@ -15,11 +15,11 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 /**
  * The Interface IPhysicsEngine.
  */
-public interface IPhysicsEngine extends IUpdateable{
+public interface IPhysicsEngine extends IUpdateable {
   public static final int COLLTYPE_ENTITY = 1;
   public static final int COLLTYPE_STATIC = 2;
   public static final int COLLTYPE_ALL = COLLTYPE_ENTITY | COLLTYPE_STATIC;
-  
+
   public void add(ICollisionEntity entity);
 
   public void add(Rectangle2D staticCollisionBox);
@@ -55,7 +55,7 @@ public interface IPhysicsEngine extends IUpdateable{
   public boolean move(IMovableEntity entity, Point2D target, float delta);
 
   public boolean move(IMovableEntity entity, double x, double y, float delta);
-  
+
   public boolean move(IMovableEntity entity, float delta);
 
   /**
@@ -73,12 +73,12 @@ public interface IPhysicsEngine extends IUpdateable{
    * @return true if there is any collision; otherwise false.
    */
   public boolean collides(Rectangle2D rect);
-  
+
   /**
-   * 
+   *
    * @param rect
    * @param collisionType
-   *        use the following flags
+   *          use the following flags
    *          <ul>
    *          <li>{@link COLLTYPE_ENTITY}</li>
    *          <li>{@link COLLTYPE_STATIC}</li>

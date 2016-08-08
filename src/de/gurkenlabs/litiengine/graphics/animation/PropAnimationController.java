@@ -18,7 +18,7 @@ public class PropAnimationController extends AnimationController {
     this.prop = (Prop) prop;
   }
 
-  public static Animation createAnimation(final Prop prop, PropState state) {
+  public static Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = findSpriteSheet(prop, state);
     if (spritesheet == null) {
       return null;
@@ -28,7 +28,7 @@ public class PropAnimationController extends AnimationController {
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update(final IGameLoop loop) {
     super.update(loop);
     switch (this.prop.getState()) {
     case Intact:
@@ -47,9 +47,9 @@ public class PropAnimationController extends AnimationController {
 
   }
 
-  private static Spritesheet findSpriteSheet(final Prop prop, PropState state) {
+  private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
     String propState = "";
-    if(!prop.isIndestructible()){
+    if (!prop.isIndestructible()) {
       propState = state.name().toLowerCase();
     }
     final String path = Game.getInfo().spritesDirectory() + "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";

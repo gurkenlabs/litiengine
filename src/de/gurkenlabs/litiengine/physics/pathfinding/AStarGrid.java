@@ -41,7 +41,7 @@ public class AStarGrid {
 
   public List<AStarNode> getNeighbours(final AStarNode node) {
 
-    final List<AStarNode> neighbors = new ArrayList<AStarNode>();
+    final List<AStarNode> neighbors = new ArrayList<>();
     final int x = node.getGridX();
     final int y = node.getGridY();
     final AStarNode top = this.getNode(x, y - 1);

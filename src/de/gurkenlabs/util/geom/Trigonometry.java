@@ -84,7 +84,7 @@ public class Trigonometry {
 
     final int xi = (int) (x * invDiv);
     final int yi = (int) (y * invDiv);
-    
+
     return (atan2[yi * ATAN2_DIM + xi] + add) * mul;
   }
 

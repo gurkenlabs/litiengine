@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 
 public class RectangleOutlineParticle extends Particle {
   private float stroke = 0.5f;
+
   public RectangleOutlineParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
   }
@@ -16,7 +17,7 @@ public class RectangleOutlineParticle extends Particle {
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
-    Stroke oldStroke = g.getStroke();
+    final Stroke oldStroke = g.getStroke();
     g.setColor(this.getColor());
     g.setStroke(new BasicStroke(this.stroke));
     g.draw(new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), this.getWidth(), this.getHeight()));
@@ -27,7 +28,7 @@ public class RectangleOutlineParticle extends Particle {
     return this.stroke;
   }
 
-  public void setStroke(float stroke) {
+  public void setStroke(final float stroke) {
     this.stroke = stroke;
   }
 }

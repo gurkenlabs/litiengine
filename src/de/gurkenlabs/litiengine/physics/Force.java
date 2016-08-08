@@ -106,8 +106,8 @@ public class Force {
   public void setCancelOnReached(final boolean cancelOnReached) {
     this.cancelOnReached = cancelOnReached;
   }
-  
-  public void setLocation(Point2D location){
+
+  public void setLocation(final Point2D location) {
     this.location = location;
   }
 }

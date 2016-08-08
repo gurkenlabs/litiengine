@@ -112,7 +112,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setTurnOnMove(boolean turn) {
+  public void setTurnOnMove(final boolean turn) {
     this.turnOnMove = turn;
   }
 
@@ -122,7 +122,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setMoveDestination(Point2D dest) {
+  public void setMoveDestination(final Point2D dest) {
     this.moveDestination = dest;
   }
 }

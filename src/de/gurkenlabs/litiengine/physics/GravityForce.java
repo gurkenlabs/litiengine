@@ -31,7 +31,7 @@ public class GravityForce extends Force {
 
   @Override
   public Point2D getLocation() {
-    Point2D gravityLocation = GeometricUtilities.project(this.getForceEntiy().getDimensionCenter(), Direction.toAngle(this.direction), Math.max(this.forceEntiy.getHeight(),this.forceEntiy.getWidth() * 2 + this.getStrength())); 
+    final Point2D gravityLocation = GeometricUtilities.project(this.getForceEntiy().getDimensionCenter(), Direction.toAngle(this.direction), Math.max(this.forceEntiy.getHeight(), this.forceEntiy.getWidth() * 2 + this.getStrength()));
     return gravityLocation;
   }
 }

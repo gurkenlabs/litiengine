@@ -37,7 +37,7 @@ public class LightSource extends Emitter {
 
   /** The color. */
   private final Color color;
-  
+
   private final IEnvironment environment;
 
   /** The radius. */
@@ -279,7 +279,7 @@ public class LightSource extends Emitter {
         continue;
       }
 
-      final Shape obstructedVision = getObstructedVisionArea(mob, Game.getScreenManager().getCamera().getViewPortDimensionCenter(this));
+      final Shape obstructedVision = this.getObstructedVisionArea(mob, Game.getScreenManager().getCamera().getViewPortDimensionCenter(this));
       // fill the polygon with the gradient paint
 
       g.fill(obstructedVision);

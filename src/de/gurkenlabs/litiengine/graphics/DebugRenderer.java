@@ -47,20 +47,19 @@ public class DebugRenderer {
     final Point tileLocation = MapUtilities.getTileLocation(map, location);
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
-    FontMetrics fm = g.getFontMetrics();
+    final FontMetrics fm = g.getFontMetrics();
     final Point2D relative = Game.getScreenManager().getCamera().getViewPortLocation(playerTile.getX(), playerTile.getY());
     RenderEngine.drawText(g, locationText, (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight()));
-    
+
     final List<ITile> tiles = MapUtilities.getTilesByPixelLocation(map, location);
-    StringBuilder sb = new StringBuilder();
-    for(ITile tile : tiles){
+    final StringBuilder sb = new StringBuilder();
+    for (final ITile tile : tiles) {
       sb.append("[gid: " + tile.getGridId() + "] ");
     }
-    
+
     RenderEngine.drawText(g, sb.toString(), (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight() * 2 + 2));
   }
 
-  
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
     if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
       return;
@@ -72,9 +71,9 @@ public class DebugRenderer {
 
     if (Game.getConfiguration().DEBUG.renderHitBoxes() && entity instanceof ICombatEntity) {
       g.setColor(Color.RED);
-      RenderEngine.drawShape(g, ((ICombatEntity)entity).getHitBox());
+      RenderEngine.drawShape(g, ((ICombatEntity) entity).getHitBox());
     }
-    
+
     if (Game.getConfiguration().DEBUG.renderBoundingBoxes()) {
       g.setColor(Color.RED);
       RenderEngine.drawShape(g, entity.getBoundingBox());

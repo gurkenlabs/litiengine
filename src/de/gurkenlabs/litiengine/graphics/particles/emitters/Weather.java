@@ -24,7 +24,7 @@ public abstract class Weather extends Emitter {
   public static final int WeatherEffectStartingY = -50;
 
   private final WeatherType type;
-  
+
   /** The screen dimensions. */
   private Dimension screenDimensions;
 
@@ -46,7 +46,7 @@ public abstract class Weather extends Emitter {
   public Dimension getScreenDimensions() {
     return this.screenDimensions;
   }
-  
+
   @Override
   public Rectangle2D getBoundingBox() {
     return Game.getScreenManager().getCamera().getViewPort();
@@ -115,6 +115,6 @@ public abstract class Weather extends Emitter {
   }
 
   public WeatherType getType() {
-    return type;
+    return this.type;
   }
 }

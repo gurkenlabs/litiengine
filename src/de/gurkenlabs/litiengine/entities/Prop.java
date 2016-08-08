@@ -13,12 +13,12 @@ import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
  */
 public class Prop extends CombatEntity {
   private Material material;
-  private String spritePath;
+  private final String spritePath;
 
   /**
    * Instantiates a new destructible.
    */
-  public Prop(Point2D location, String spritesheetName, Material mat) {
+  public Prop(final Point2D location, final String spritesheetName, final Material mat) {
     super();
     this.spritePath = spritesheetName;
     this.material = mat;
@@ -49,7 +49,7 @@ public class Prop extends CombatEntity {
     }
   }
 
-  protected void setMaterial(Material material) {
+  protected void setMaterial(final Material material) {
     this.material = material;
   }
 }

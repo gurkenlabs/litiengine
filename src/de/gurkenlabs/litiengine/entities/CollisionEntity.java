@@ -54,7 +54,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void setSize(float width, float height) {
+  public void setSize(final float width, final float height) {
     super.setSize(width, height);
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }

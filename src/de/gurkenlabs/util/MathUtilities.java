@@ -13,11 +13,11 @@ public class MathUtilities {
     return randomBoolean() ? 1 : -1;
   }
 
-  public static boolean probabilityIsTrue(double probability) {
+  public static boolean probabilityIsTrue(final double probability) {
     return RANDOM.nextDouble() < probability;
   }
 
-  public static double randomInRange(double min, double max) {
+  public static double randomInRange(final double min, final double max) {
     if (min == max) {
       return min;
     }
@@ -31,15 +31,15 @@ public class MathUtilities {
 
   /**
    * The index probabilities must sum up to 1;
-   * 
+   *
    * @param indexProbabilities
    * @return
    */
-  public static int getRandomIndex(double[] indexProbabilities) {
-    double rnd = RANDOM.nextDouble();
+  public static int getRandomIndex(final double[] indexProbabilities) {
+    final double rnd = RANDOM.nextDouble();
     double probSum = 0;
     for (int i = 0; i < indexProbabilities.length; i++) {
-      double newProbSum = probSum + indexProbabilities[i];
+      final double newProbSum = probSum + indexProbabilities[i];
       if (rnd >= probSum && rnd < newProbSum) {
         return i;
       }

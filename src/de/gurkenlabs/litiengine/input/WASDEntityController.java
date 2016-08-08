@@ -25,7 +25,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
     super.update(loop);
 
     if (this.moved) {
-      Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.dx, this.getControlledEntity().getLocation().getY() + this.dy);
+      final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.dx, this.getControlledEntity().getLocation().getY() + this.dy);
       Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation, this.stepSize * this.getControlledEntity().getVelocity() / 100.0f);
 
       this.dx = 0;

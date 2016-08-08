@@ -118,7 +118,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
       while (!this.isTerminated) {
         this.pingRecorded = false;
         this.lastPing = System.currentTimeMillis();
-        final MessagePackage<ClientMessage> packet = new MessagePackage<ClientMessage>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
+        final MessagePackage<ClientMessage> packet = new MessagePackage<>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
         this.sender.sendData(packet, PingLoop.this.serverIpAdress, PingLoop.this.port);
 
         try {

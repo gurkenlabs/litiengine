@@ -111,8 +111,8 @@ public abstract class Ability {
   public boolean canCast(final IGameLoop gameLoop) {
     return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
-  
-  public boolean isCasting(final IGameLoop gameLoop){
+
+  public boolean isCasting(final IGameLoop gameLoop) {
     return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 

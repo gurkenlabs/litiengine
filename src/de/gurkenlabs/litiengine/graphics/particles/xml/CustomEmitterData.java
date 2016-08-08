@@ -79,7 +79,7 @@ public class CustomEmitterData {
 
   @XmlElement
   private String particleText;
-  
+
   @XmlElement
   private boolean applyStaticPhysics;
 
@@ -107,7 +107,7 @@ public class CustomEmitterData {
     return this.name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -116,7 +116,7 @@ public class CustomEmitterData {
     return this.particleMinTTL;
   }
 
-  public void setParticleMinTTL(int particleMinTTL) {
+  public void setParticleMinTTL(final int particleMinTTL) {
     this.particleMinTTL = particleMinTTL;
   }
 
@@ -125,7 +125,7 @@ public class CustomEmitterData {
     return this.particleMaxTTL;
   }
 
-  public void setParticleMaxTTL(int particleMaxTTL) {
+  public void setParticleMaxTTL(final int particleMaxTTL) {
     this.particleMaxTTL = particleMaxTTL;
   }
 
@@ -134,7 +134,7 @@ public class CustomEmitterData {
     return this.spawnAmount;
   }
 
-  public void setSpawnAmount(int spawnAmount) {
+  public void setSpawnAmount(final int spawnAmount) {
     this.spawnAmount = spawnAmount;
   }
 
@@ -143,7 +143,7 @@ public class CustomEmitterData {
     return this.spawnRate;
   }
 
-  public void setSpawnRate(int spawnRate) {
+  public void setSpawnRate(final int spawnRate) {
     this.spawnRate = spawnRate;
   }
 
@@ -152,7 +152,7 @@ public class CustomEmitterData {
     return this.maxParticles;
   }
 
-  public void setMaxParticles(int maxParticles) {
+  public void setMaxParticles(final int maxParticles) {
     this.maxParticles = maxParticles;
   }
 
@@ -161,7 +161,7 @@ public class CustomEmitterData {
     return this.emitterTTL;
   }
 
-  public void setEmitterTTL(int emitterTTL) {
+  public void setEmitterTTL(final int emitterTTL) {
     this.emitterTTL = emitterTTL;
   }
 
@@ -170,7 +170,7 @@ public class CustomEmitterData {
     return this.width;
   }
 
-  public void setWidth(int width) {
+  public void setWidth(final int width) {
     this.width = width;
   }
 
@@ -179,7 +179,7 @@ public class CustomEmitterData {
     return this.height;
   }
 
-  public void setHeight(int height) {
+  public void setHeight(final int height) {
     this.height = height;
   }
 
@@ -188,7 +188,7 @@ public class CustomEmitterData {
     return this.x;
   }
 
-  public void setX(ParticleParameter x) {
+  public void setX(final ParticleParameter x) {
     this.x = x;
   }
 
@@ -197,7 +197,7 @@ public class CustomEmitterData {
     return this.y;
   }
 
-  public void setY(ParticleParameter y) {
+  public void setY(final ParticleParameter y) {
     this.y = y;
   }
 
@@ -206,7 +206,7 @@ public class CustomEmitterData {
     return this.deltaX;
   }
 
-  public void setDeltaX(ParticleParameter deltaX) {
+  public void setDeltaX(final ParticleParameter deltaX) {
     this.deltaX = deltaX;
   }
 
@@ -215,7 +215,7 @@ public class CustomEmitterData {
     return this.deltaY;
   }
 
-  public void setDeltaY(ParticleParameter deltaY) {
+  public void setDeltaY(final ParticleParameter deltaY) {
     this.deltaY = deltaY;
   }
 
@@ -224,7 +224,7 @@ public class CustomEmitterData {
     return this.gravityX;
   }
 
-  public void setGravityX(ParticleParameter gravityX) {
+  public void setGravityX(final ParticleParameter gravityX) {
     this.gravityX = gravityX;
   }
 
@@ -233,7 +233,7 @@ public class CustomEmitterData {
     return this.gravityY;
   }
 
-  public void setGravityY(ParticleParameter gravityY) {
+  public void setGravityY(final ParticleParameter gravityY) {
     this.gravityY = gravityY;
   }
 
@@ -242,7 +242,7 @@ public class CustomEmitterData {
     return this.particleWidth;
   }
 
-  public void setParticleWidth(ParticleParameter particleWidth) {
+  public void setParticleWidth(final ParticleParameter particleWidth) {
     this.particleWidth = particleWidth;
   }
 
@@ -251,7 +251,7 @@ public class CustomEmitterData {
     return this.particleHeight;
   }
 
-  public void setParticleHeight(ParticleParameter particleHeight) {
+  public void setParticleHeight(final ParticleParameter particleHeight) {
     this.particleHeight = particleHeight;
   }
 
@@ -260,7 +260,7 @@ public class CustomEmitterData {
     return this.deltaWidth;
   }
 
-  public void setDeltaWidth(ParticleParameter deltaWidth) {
+  public void setDeltaWidth(final ParticleParameter deltaWidth) {
     this.deltaWidth = deltaWidth;
   }
 
@@ -269,7 +269,7 @@ public class CustomEmitterData {
     return this.deltaHeight;
   }
 
-  public void setDeltaHeight(ParticleParameter deltaHeight) {
+  public void setDeltaHeight(final ParticleParameter deltaHeight) {
     this.deltaHeight = deltaHeight;
   }
 
@@ -278,7 +278,7 @@ public class CustomEmitterData {
     return this.colors;
   }
 
-  public void setColors(List<ParticleColor> colors) {
+  public void setColors(final List<ParticleColor> colors) {
     this.colors = colors;
   }
 
@@ -287,7 +287,7 @@ public class CustomEmitterData {
     return this.updateRate;
   }
 
-  public void setUpdateRate(int updateRate) {
+  public void setUpdateRate(final int updateRate) {
     this.updateRate = updateRate;
   }
 
@@ -296,7 +296,7 @@ public class CustomEmitterData {
     return this.particleType;
   }
 
-  public void setParticleType(ParticleType particleType) {
+  public void setParticleType(final ParticleType particleType) {
     this.particleType = particleType;
   }
 
@@ -305,7 +305,7 @@ public class CustomEmitterData {
     return this.particleText;
   }
 
-  public void setParticleText(String particleText) {
+  public void setParticleText(final String particleText) {
     this.particleText = particleText;
   }
 
@@ -314,10 +314,8 @@ public class CustomEmitterData {
     return this.applyStaticPhysics;
   }
 
-  public void setApplyStaticPhysics(boolean applyStaticPhysics) {
+  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
   }
-  
-  
 
 }

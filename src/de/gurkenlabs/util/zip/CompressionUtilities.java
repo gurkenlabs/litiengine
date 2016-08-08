@@ -69,7 +69,7 @@ public class CompressionUtilities {
 
   public static void zip(File directory, final File zipfile) throws IOException {
     final URI base = directory.toURI();
-    final Deque<File> queue = new LinkedList<File>();
+    final Deque<File> queue = new LinkedList<>();
     queue.push(directory);
     final OutputStream out = new FileOutputStream(zipfile);
     Closeable res = out;

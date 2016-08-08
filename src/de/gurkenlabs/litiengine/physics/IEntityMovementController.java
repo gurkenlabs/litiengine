@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
-public interface IEntityMovementController extends IUpdateable{
+public interface IEntityMovementController extends IUpdateable {
   public IMovableEntity getControlledEntity();
 
   public void apply(Force force);

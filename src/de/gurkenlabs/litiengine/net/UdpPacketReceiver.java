@@ -31,7 +31,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
    *          the socket
    */
   public UdpPacketReceiver(final DatagramSocket socket) {
-    this.incomingPacketObservers = new ArrayList<IIncomingPacketObserver>();
+    this.incomingPacketObservers = new ArrayList<>();
     this.socket = socket;
   }
 
@@ -42,7 +42,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
    *          the port
    */
   public UdpPacketReceiver(final int port) {
-    this.incomingPacketObservers = new ArrayList<IIncomingPacketObserver>();
+    this.incomingPacketObservers = new ArrayList<>();
     try {
       this.socket = new DatagramSocket(port);
     } catch (final SocketException e) {

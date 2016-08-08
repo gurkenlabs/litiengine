@@ -37,7 +37,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   private int tilesRendered;
   private int partitionsX;
   private int partitionsY;
-  private Map<IMap, BufferedImage[][]> imageGrids;
+  private final Map<IMap, BufferedImage[][]> imageGrids;
 
   public OrthogonalMapRenderer() {
     this.partitionsX = 1;
@@ -71,7 +71,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * de.gurkenlabs.liti.graphics.IMapRenderer#getMapImage(de.gurkenlabs.tiled.
    * tmx.IMap)
@@ -96,9 +96,9 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
       if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-        LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
+        final LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
         if (renderType == LayerRenderType.OVERLAY) {
           continue;
         }
@@ -114,7 +114,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public BufferedImage getLayerImage(IMap map, LayerRenderType type) {
+  public BufferedImage getLayerImage(final IMap map, final LayerRenderType type) {
     if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
       return ImageCache.MAPS.get(getCacheKey(map) + type);
     }
@@ -134,13 +134,13 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
 
       if (renderTypeProp == null || renderTypeProp.isEmpty()) {
         continue;
       }
-      
-      LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
+
+      final LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
       if (renderType != type) {
         continue;
       }
@@ -161,7 +161,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.gurkenlabs.liti.graphics.IMapRenderer#getSupportedOrientation()
    */
   @Override
@@ -171,7 +171,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.gurkenlabs.liti.graphics.IMapRenderer#render(java.awt.Graphics,
    * de.gurkenlabs.tiled.tmx.IMap)
    */
@@ -183,14 +183,14 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       this.imageGrids.put(map, ImageProcessing.getSubImages(mapImage, this.getPartitionsY(), this.getPartitionsX()));
     }
 
-    Rectangle2D viewPort = Game.getScreenManager().getCamera().getViewPort();
+    final Rectangle2D viewPort = Game.getScreenManager().getCamera().getViewPort();
     final BufferedImage[][] imageGrid = this.imageGrids.get(map);
-    double cellWidth = map.getSizeInPixles().getWidth() / this.getPartitionsX();
-    double cellHeight = map.getSizeInPixles().getHeight() / this.getPartitionsY();
+    final double cellWidth = map.getSizeInPixles().getWidth() / this.getPartitionsX();
+    final double cellHeight = map.getSizeInPixles().getHeight() / this.getPartitionsY();
     for (int y = 0; y < this.getPartitionsY(); y++) {
       for (int x = 0; x < this.getPartitionsX(); x++) {
-        double cellX = x * cellWidth;
-        double cellY = y * cellHeight;
+        final double cellX = x * cellWidth;
+        final double cellY = y * cellHeight;
         if (viewPort.intersects(new Rectangle2D.Double(cellX, cellY, cellWidth, cellHeight))) {
           RenderEngine.renderImage(g, imageGrid[y][x], Game.getScreenManager().getCamera().getViewPortLocation(new Point2D.Double(cellX, cellY)));
         }
@@ -199,7 +199,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void renderLayers(Graphics2D g, Point2D offset, IMap map, LayerRenderType type) {
+  public void renderLayers(final Graphics2D g, final Point2D offset, final IMap map, final LayerRenderType type) {
     final BufferedImage mapImage = this.getLayerImage(map, type);
     RenderEngine.renderImage(g, mapImage, offset);
   }
@@ -254,7 +254,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void setPartitionsX(int partitions) {
+  public void setPartitionsX(final int partitions) {
     this.partitionsX = partitions;
   }
 
@@ -263,7 +263,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void setPartitionsY(int partitions) {
+  public void setPartitionsY(final int partitions) {
     this.partitionsY = partitions;
   }
 

@@ -48,7 +48,7 @@ public interface IRenderEngine {
    *          the g
    */
   public void renderMap(Graphics2D g, final IMap map);
-  
+
   /**
    * Render map.
    *

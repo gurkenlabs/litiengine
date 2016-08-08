@@ -5,12 +5,11 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 
-
 @CombatAttributesInfo(velocityFactor = 0.1f)
 public class DecorMob extends MovableEntity {
-  private String mobType;
+  private final String mobType;
 
-  public DecorMob(final Point2D location, String mobType) {
+  public DecorMob(final Point2D location, final String mobType) {
     super();
     this.mobType = mobType;
     this.setLocation(location);

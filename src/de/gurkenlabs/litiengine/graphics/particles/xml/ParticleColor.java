@@ -21,7 +21,7 @@ public class ParticleColor {
   public ParticleColor() {
   }
 
-  public ParticleColor(Color color) {
+  public ParticleColor(final Color color) {
     this.red = color.getRed();
     this.green = color.getGreen();
     this.blue = color.getBlue();
@@ -33,7 +33,7 @@ public class ParticleColor {
     return this.red;
   }
 
-  public void setRed(int red) {
+  public void setRed(final int red) {
     this.red = red;
   }
 
@@ -42,7 +42,7 @@ public class ParticleColor {
     return this.green;
   }
 
-  public void setGreen(int green) {
+  public void setGreen(final int green) {
     this.green = green;
   }
 
@@ -51,7 +51,7 @@ public class ParticleColor {
     return this.blue;
   }
 
-  public void setBlue(int blue) {
+  public void setBlue(final int blue) {
     this.blue = blue;
   }
 
@@ -60,7 +60,7 @@ public class ParticleColor {
     return this.alpha;
   }
 
-  public void setAlpha(int alpha) {
+  public void setAlpha(final int alpha) {
     this.alpha = alpha;
   }
 

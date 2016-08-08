@@ -15,7 +15,7 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   /** The render hit boxes. */
   private boolean renderHitBoxes = false;
-  
+
   private boolean renderBoundingBoxes = false;
 
   /** The render paths. */
@@ -69,7 +69,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   public boolean renderBoundingBoxes() {
     return this.isDebugEnabled() && this.renderBoundingBoxes;
   }
-  
+
   public void setDebugEnabled(final boolean debugEnabled) {
     this.debugEnabled = debugEnabled;
   }
@@ -134,7 +134,7 @@ public class DebugConfiguration extends ConfigurationGroup {
     this.renderAStarInfo = renderAStarInfo;
   }
 
-  public void setRenderBoundingBoxes(boolean renderBoundingBoxes) {
+  public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {
     this.renderBoundingBoxes = renderBoundingBoxes;
   }
 }

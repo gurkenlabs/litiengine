@@ -52,29 +52,31 @@ public class ParticleParameter {
     return this.maxValue;
   }
 
-  public void setValue(float value) {
+  public void setValue(final float value) {
     this.value = value;
   }
 
-  public void setRandomValue(boolean randomValue) {
+  public void setRandomValue(final boolean randomValue) {
     this.randomValue = randomValue;
   }
 
-  public void setMinValue(float minValue) {
+  public void setMinValue(final float minValue) {
     this.minValue = minValue;
   }
 
-  public void setMaxValue(float maxValue) {
+  public void setMaxValue(final float maxValue) {
     this.maxValue = maxValue;
   }
 
   @XmlTransient
   public float getRandomNumber() {
-    return (float) (this.getMinValue() + (Math.random() * (this.getMaxValue() - this.getMinValue() + 1)));
+    return (float) (this.getMinValue() + Math.random() * (this.getMaxValue() - this.getMinValue() + 1));
   }
 
   /**
-   * Gets either the acutal value or a random value, depending on the random number flag being set.
+   * Gets either the acutal value or a random value, depending on the random
+   * number flag being set.
+   * 
    * @return
    */
   public float get() {
@@ -85,7 +87,7 @@ public class ParticleParameter {
     }
   }
 
-  public static int randomInRange(int min, int max) {
+  public static int randomInRange(final int min, final int max) {
     return min + (int) (Math.random() * (max - min + 1));
   }
 }

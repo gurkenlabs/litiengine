@@ -42,7 +42,7 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  protected boolean hasEnded(final IGameLoop loop, EffectAppliance appliance) {
+  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
     return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
   }
 

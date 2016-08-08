@@ -12,7 +12,9 @@ public interface IEffect extends IUpdateable {
   public static final int NO_DURATION = -1;
 
   public void apply(IGameLoop loop, Shape impactArea);
+
   public void cease(final ICombatEntity affectedEntity);
+
   public int getDelay();
 
   public int getDuration();
@@ -20,9 +22,9 @@ public interface IEffect extends IUpdateable {
   public EffectTarget[] getEffectTargets();
 
   public List<IEffect> getFollowUpEffects();
-  
+
   public List<EffectAppliance> getActiveAppliances();
-  
+
   public boolean isActive(ICombatEntity entity);
 
   public void onEffectApplied(Consumer<EffectArgument> consumer);

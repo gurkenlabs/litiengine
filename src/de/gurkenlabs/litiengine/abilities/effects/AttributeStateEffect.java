@@ -36,7 +36,7 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
    */
   protected AttributeStateEffect(final IEnvironment environment, final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
     super(environment, ability, targtes);
-    this.modifier = new AttributeModifier<T>(modification, delta);
+    this.modifier = new AttributeModifier<>(modification, delta);
   }
 
   /**

@@ -91,7 +91,7 @@ public abstract class AnimationController implements IAnimationController {
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do
     // nothing
-    if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName)) || (this.getCurrentAnimation() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName))) {
+    if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName)) || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       return;
     }
 
@@ -111,10 +111,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void update(final IGameLoop loop) {
-    if(this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()){
+    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
       return;
     }
-    
+
     if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
       this.currentAnimation = this.defaultAnimation;
 
@@ -127,7 +127,7 @@ public abstract class AnimationController implements IAnimationController {
   @Override
   public void dispose() {
     Game.getLoop().unregisterFromUpdate(this);
-    for (Animation animation : this.getAnimations()) {
+    for (final Animation animation : this.getAnimations()) {
       Game.getLoop().unregisterFromUpdate(animation);
     }
   }
@@ -143,8 +143,8 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   private void removeFinishedImageEffects() {
-    List<IImageEffect> effectsToRemove = new ArrayList<>();
-    for (IImageEffect effect : this.imageEffects) {
+    final List<IImageEffect> effectsToRemove = new ArrayList<>();
+    for (final IImageEffect effect : this.imageEffects) {
       if (effect == null) {
         continue;
       }

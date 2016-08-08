@@ -79,8 +79,8 @@ public abstract class Effect implements IEffect {
   @Override
   public void update(final IGameLoop loop) {
 
-    for (Iterator<EffectAppliance> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
-      EffectAppliance appliance = iterator.next();
+    for (final Iterator<EffectAppliance> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
+      final EffectAppliance appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(loop, appliance)) {
 
@@ -99,8 +99,8 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply(IGameLoop loop, final Shape impactArea) {
-    List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
+  public void apply(final IGameLoop loop, final Shape impactArea) {
+    final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
     for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
       this.apply(affectedEntity);
     }
@@ -114,9 +114,9 @@ public abstract class Effect implements IEffect {
   }
 
   @Override
-  public boolean isActive(ICombatEntity entity) {
-    for (EffectAppliance app : this.getActiveAppliances()) {
-      for (ICombatEntity affected : app.getAffectedEntities()) {
+  public boolean isActive(final ICombatEntity entity) {
+    for (final EffectAppliance app : this.getActiveAppliances()) {
+      for (final ICombatEntity affected : app.getAffectedEntities()) {
         if (affected.equals(entity)) {
           return true;
         }
@@ -228,7 +228,7 @@ public abstract class Effect implements IEffect {
 
   protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
     // 1. cease the effect for all affected entities
-    for (ICombatEntity entity : appliance.getAffectedEntities()) {
+    for (final ICombatEntity entity : appliance.getAffectedEntities()) {
       this.cease(entity);
     }
 
@@ -238,7 +238,7 @@ public abstract class Effect implements IEffect {
     });
   }
 
-  protected boolean hasEnded(final IGameLoop loop, EffectAppliance appliance) {
+  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
     final long effectDuration = loop.getDeltaTime(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }
@@ -273,6 +273,7 @@ public abstract class Effect implements IEffect {
     }
   }
 
+  @Override
   public void cease(final ICombatEntity entity) {
     entity.getAppliedEffects().remove(this);
     final EffectArgument arg = new EffectArgument(this, entity);
