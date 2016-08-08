@@ -22,8 +22,6 @@ import de.gurkenlabs.tiled.tmx.ITile;
 import de.gurkenlabs.tiled.tmx.ITileLayer;
 import de.gurkenlabs.tiled.tmx.ITileset;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
-import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
-import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 
@@ -98,8 +96,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
       final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
       if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-        final LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
-        if (renderType == LayerRenderType.OVERLAY) {
+        final RenderType renderType = RenderType.valueOf(renderTypeProp);
+        if (renderType == RenderType.OVERLAY) {
           continue;
         }
       }
@@ -114,7 +112,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public BufferedImage getLayerImage(final IMap map, final LayerRenderType type) {
+  public BufferedImage getLayerImage(final IMap map, final RenderType type) {
     if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
       return ImageCache.MAPS.get(getCacheKey(map) + type);
     }
@@ -140,7 +138,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      final LayerRenderType renderType = LayerRenderType.valueOf(renderTypeProp);
+      final RenderType renderType = RenderType.valueOf(renderTypeProp);
       if (renderType != type) {
         continue;
       }
@@ -199,7 +197,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void renderLayers(final Graphics2D g, final Point2D offset, final IMap map, final LayerRenderType type) {
+  public void renderLayers(final Graphics2D g, final Point2D offset, final IMap map, final RenderType type) {
     final BufferedImage mapImage = this.getLayerImage(map, type);
     RenderEngine.renderImage(g, mapImage, offset);
   }

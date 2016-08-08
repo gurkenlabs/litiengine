@@ -34,11 +34,11 @@ import javax.imageio.ImageIO;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.tiled.tmx.IMapRenderer;
 import de.gurkenlabs.litiengine.tiled.tmx.OrthogonalMapRenderer;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
-import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
-import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
@@ -366,7 +366,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderLayers(final Graphics2D g, final IMap map, final LayerRenderType type) {
+  public void renderLayers(final Graphics2D g, final IMap map, final RenderType type) {
     if (map == null) {
       return;
     }

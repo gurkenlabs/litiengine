@@ -63,7 +63,6 @@ public class AmbientLight {
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixles().getWidth(), (int) this.environment.getMap().getSizeInPixles().getHeight());
     final Graphics2D g = (Graphics2D) img.getGraphics();
     for (final LightSource light : this.environment.getLightSources()) {
-      light.deactivate();
       sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" + light.getLocation().getY());
     }
 

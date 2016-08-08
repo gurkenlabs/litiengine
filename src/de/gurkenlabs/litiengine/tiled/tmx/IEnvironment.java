@@ -50,6 +50,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<Emitter> getOverlayEmitters();
 
+  public List<IRenderable> getGroundRenderable();
+
+  public List<IRenderable> getOverlayRenderable();
+
   /**
    * Gets the map.
    *
@@ -83,6 +87,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void addDecorMob(final IMapObject mapObject);
 
+  public void add(IRenderable renderable, RenderType type);
+
+  public void remove(IRenderable renderable);
+  
   public WeatherType getWeather();
 
   public void setWeather(WeatherType weather);

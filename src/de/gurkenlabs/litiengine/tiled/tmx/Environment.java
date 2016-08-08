@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -49,7 +50,6 @@ import de.gurkenlabs.tiled.tmx.IMapLoader;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
 import de.gurkenlabs.tiled.tmx.TmxMapLoader;
-import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -65,6 +65,9 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+  
+  private final List<IRenderable> groundRenderable;
+  private final List<IRenderable> overlayRenderable;
 
   private final IMap map;
 
@@ -102,6 +105,9 @@ public class Environment implements IEnvironment {
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
+    
+    this.groundRenderable = new CopyOnWriteArrayList<>();
+    this.overlayRenderable = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -110,6 +116,10 @@ public class Environment implements IEnvironment {
 
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
+    
+    for(IRenderable rend : this.getGroundRenderable()){
+      rend.render(g);
+    }
 
     Game.getRenderEngine().renderEntities(g, this.getGroundEmitters());
 
@@ -118,7 +128,7 @@ public class Environment implements IEnvironment {
 
     Game.getRenderEngine().renderEntities(g, this.getOverlayEmitters());
 
-    Game.getRenderEngine().renderLayers(g, this.getMap(), LayerRenderType.OVERLAY);
+    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
 
     // render static shadows
     RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
@@ -129,6 +139,10 @@ public class Environment implements IEnvironment {
 
     if (this.weather != null) {
       this.weather.render(g);
+    }
+    
+    for(IRenderable rend : this.getOverlayRenderable()){
+      rend.render(g);
     }
 
     this.informConsumers(g, this.overlayRenderedConsumer);
@@ -159,7 +173,32 @@ public class Environment implements IEnvironment {
   public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
     this.overlayRenderedConsumer.add(consumer);
   }
+  @Override
+  public void add(IRenderable renderable, RenderType type) {
+    switch (type) {
+    case GROUND:
+      this.getGroundRenderable().add(renderable);
+      break;
+    case OVERLAY:
+      this.getOverlayRenderable().add(renderable);
+      break;
 
+    default:
+      break;
+    }
+  }
+
+  @Override
+  public void remove(IRenderable renderable) {
+    if(this.getGroundRenderable().contains(renderable)){
+      this.getGroundRenderable().remove(renderable);
+    }
+    
+    if(this.getOverlayRenderable().contains(renderable)){
+      this.getOverlayRenderable().remove(renderable);
+    }
+  }
+  
   @Override
   public void add(final int mapId, final IMovableCombatEntity entity) {
     this.addCombatEntity(mapId, entity);
@@ -684,4 +723,13 @@ public class Environment implements IEnvironment {
       this.weather.activate(Game.getLoop());
     }
   }
+
+  public List<IRenderable> getGroundRenderable() {
+    return this.groundRenderable;
+  }
+
+  public List<IRenderable> getOverlayRenderable() {
+    return this.overlayRenderable;
+  }
+
 }

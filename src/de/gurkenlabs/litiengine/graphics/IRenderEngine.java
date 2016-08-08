@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.tiled.tmx.IMapRenderer;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
-import de.gurkenlabs.tiled.tmx.utilities.IMapRenderer;
-import de.gurkenlabs.tiled.tmx.utilities.LayerRenderType;
 
 /**
  * The Interface IGraphicsEngine.
@@ -55,5 +55,5 @@ public interface IRenderEngine {
    * @param g
    *          the g
    */
-  public void renderLayers(Graphics2D g, final IMap map, LayerRenderType type);
+  public void renderLayers(Graphics2D g, final IMap map, RenderType type);
 }
