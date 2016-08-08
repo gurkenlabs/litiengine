@@ -626,7 +626,7 @@ public class Environment implements IEnvironment {
       final int brightness = Integer.parseInt(propBrightness);
       final Color color = Color.decode(propColor);
 
-      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) (mapObject.getDimension().getWidth() / 2.0), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
+      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
     }
 
     this.addCollisionBoxes(mapObject);

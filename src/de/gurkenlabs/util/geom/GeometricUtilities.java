@@ -237,10 +237,10 @@ public class GeometricUtilities {
    */
   public static Line2D[] getLines(final Rectangle2D rectangle) {
     final Line2D[] lines = new Line2D[4];
-    lines[0] = new Line2D.Double(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMinY());
+    lines[0] = new Line2D.Double(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMaxY());
     lines[1] = new Line2D.Double(rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMaxY());
-    lines[2] = new Line2D.Double(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMaxY());
-    lines[3] = new Line2D.Double(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY());
+    lines[2] = new Line2D.Double(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMaxX(), rectangle.getMinY());
+    lines[3] = new Line2D.Double(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMinX(), rectangle.getMinY());
     return lines;
   }
 

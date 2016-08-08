@@ -17,11 +17,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -29,8 +27,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 /**
  * The Class LightSource.
  */
-@EmitterInfo(maxParticles = 1, spawnAmount = 1, spawnRate = 1000)
-public class LightSource extends Emitter {
+public class LightSource extends Entity implements IRenderable {
 
   /** The brightness. */
   private int brightness;
@@ -48,7 +45,7 @@ public class LightSource extends Emitter {
    *
    * @param location
    *          the location
-   * @param radius
+   * @param diameter
    *          the light inner radius
    * @param lightOuterRadius
    *          the light outer radius
@@ -57,23 +54,15 @@ public class LightSource extends Emitter {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final Point2D location, final int radius, final int brightness, final Color lightColor) {
-    super(location);
+  public LightSource(final IEnvironment environment, final Point2D location, final int diameter, final int brightness, final Color lightColor) {
+    super();
+    this.setLocation(location);
     this.color = lightColor;
     this.environment = environment;
-    this.setRadius(radius);
+    this.setSize(diameter, diameter);
+    this.setRadius(diameter / 2);
     this.setBrightness(brightness);
     this.setLocation(location);
-  }
-
-  @Override
-  protected Particle createNewParticle() {
-    final Particle part = new LightParticle(this.radius * 2, this.radius * 2, this.radius / 2, 0, 0, 0, 0, 0, this.radius, this.radius, 0, new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), 50));
-    // in the end the particle should have a size of 10
-    final float delta = this.radius / (float) this.getParticleUpdateRate();
-    part.setDeltaWidth(delta);
-    part.setDeltaHeight(delta);
-    return part;
   }
 
   /**
@@ -206,7 +195,6 @@ public class LightSource extends Emitter {
 
   @Override
   public void render(final Graphics2D g) {
-    super.render(g);
     this.renderShadows(g);
   }
 
