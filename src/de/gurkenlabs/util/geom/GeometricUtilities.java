@@ -244,6 +244,15 @@ public class GeometricUtilities {
     return lines;
   }
 
+  public static Point2D getMidPoint(Point2D p1, Point2D p2) {
+    Point2D mid = new Point2D.Double();
+    double x = (p1.getX() + p2.getX()) / 2;
+    double y = (p1.getY() + p2.getY()) / 2;
+    mid.setLocation(x, y);
+    return mid;
+
+  }
+
   /**
    * Gets the perpendicular intersection.
    *

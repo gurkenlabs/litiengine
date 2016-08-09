@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.util.geom.Vector2D;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class AmbientLight {
@@ -75,12 +76,18 @@ public class AmbientLight {
     final String cacheKey = "AMBIENT_" + this.environment.getMap().getName().replaceAll("[\\/]", "-") + "_" + sb.toString().hashCode() + "_" + this.getColor().getRed() + "_" + this.getColor().getGreen() + "_" + this.getColor().getBlue() + "_" + this.getAlpha();
     final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
     if (cachedImg != null) {
-      this.image = cachedImg;
-      return;
+      // this.image = cachedImg;
+      // return;
     }
 
     // create large rectangle and crop lights from it
-    final Area ar = new Area(new Rectangle2D.Double(0, 0, this.environment.getMap().getSizeInPixles().getWidth(), this.environment.getMap().getSizeInPixles().getHeight()));
+    double mapWidth = this.environment.getMap().getSizeInPixles().getWidth();
+    double mapHeight = this.environment.getMap().getSizeInPixles().getHeight();
+    double longerDimension = mapWidth;
+    if (mapWidth < mapHeight) {
+      longerDimension = mapWidth;
+    }
+    final Area ar = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
     for (final LightSource light : this.environment.getLightSources()) {
       final double LIGHT_GRADIENT_STEP = light.getRadius() * 0.15;
       Point2D lightCenter = light.getDimensionCenter();
@@ -106,10 +113,16 @@ public class AmbientLight {
 
         /** The gradient radius for our shadow. */
         for (Line2D line : bounds) {
-          Path2D shadowParallelogram = new Path2D.Double();
+          Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
+          Vector2D lightVector = new Vector2D(lightCenter, line.getP1());
 
-          final Point2D S1 = GeometricUtilities.project(lightCenter, line.getP1(), light.getRadius() * 2);
-          final Point2D S2 = GeometricUtilities.project(lightCenter, line.getP2(), light.getRadius() * 2);
+          if (lineVector.normalVector().dotProduct(lightVector) >= 0) {
+            continue;
+          }
+
+          Path2D shadowParallelogram = new Path2D.Double();
+          final Point2D S1 = GeometricUtilities.project(lightCenter, line.getP1(), longerDimension);
+          final Point2D S2 = GeometricUtilities.project(lightCenter, line.getP2(), longerDimension);
 
           // construct a shape from our points
           shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
@@ -119,12 +132,11 @@ public class AmbientLight {
           shadowParallelogram.closePath();
 
           Area shadowArea = new Area(shadowParallelogram);
-
-          shadowArea.add(boxInLight);
+          if (light.getDimensionCenter().getY() < obj.getCollisionBox().getMaxY() && !obj.getCollisionBox().contains(light.getDimensionCenter())) {
+            shadowArea.add(boxInLight);
+          }
           shadowArea.intersect(large);
-
           large.subtract(shadowArea);
-
           mid.subtract(shadowArea);
 
           small.subtract(shadowArea);
