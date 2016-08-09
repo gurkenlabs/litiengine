@@ -661,6 +661,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addMapObject(final IMapObject mapObject) {
+    this.addCollisionBoxes(mapObject);
     if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
       return;
     }
@@ -687,8 +688,6 @@ public class Environment implements IEnvironment {
     LightSource light = new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), (int) mapObject.getDimension().getHeight(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType,
         Double.parseDouble(mapObject.getCustomProperty(MapObjectProperties.LIGHTSTEPFACTOR)));
     this.getLightSources().add(light);
-
-    this.addCollisionBoxes(mapObject);
   }
 
   protected Weather getWeatherEmitter() {
