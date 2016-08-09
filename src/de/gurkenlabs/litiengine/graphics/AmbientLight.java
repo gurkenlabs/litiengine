@@ -68,8 +68,8 @@ public class AmbientLight {
     final String cacheKey = "AMBIENT_" + this.environment.getMap().getName().replaceAll("[\\/]", "-") + "_" + sb.toString().hashCode() + "_" + this.getColor().getRed() + "_" + this.getColor().getGreen() + "_" + this.getColor().getBlue() + "_" + this.getAlpha();
     final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
     if (cachedImg != null) {
-      // this.image = cachedImg;
-      // return;
+      this.image = cachedImg;
+      return;
     }
 
     // create large rectangle and crop lights from it
