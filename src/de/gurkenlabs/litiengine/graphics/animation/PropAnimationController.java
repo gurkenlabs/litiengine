@@ -14,7 +14,7 @@ public class PropAnimationController extends AnimationController {
   private final Prop prop;
 
   public PropAnimationController(final IEntity prop) {
-    super(createAnimation((Prop) prop, PropState.Intact));
+    super(createAnimation((Prop) prop, PropState.INTACT));
     this.prop = (Prop) prop;
   }
 
@@ -31,13 +31,13 @@ public class PropAnimationController extends AnimationController {
   public void update(final IGameLoop loop) {
     super.update(loop);
     switch (this.prop.getState()) {
-    case Intact:
+    case INTACT:
       this.playAnimation(INTACT);
       break;
-    case Damaged:
+    case DAMAGED:
       this.playAnimation(DAMAGED);
       break;
-    case Destroyed:
+    case DESTROYED:
       this.playAnimation(DESTROYED);
       break;
     default:

@@ -39,6 +39,14 @@ public class LightSource extends Entity implements IRenderable {
 
   /** The radius. */
   private int radius;
+  public static final String RECTANGLE = "rectangle";
+  public static final String ELLIPSE = "ellipse";
+  private String lightShapeType;
+
+  private Shape largeLightShape;
+  private Shape midLightShape;
+  private Shape smallLightShape;
+  private final double gradientStepSize;
 
   /**
    * Instantiates a new light source.
@@ -54,15 +62,38 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final Point2D location, final int diameter, final int brightness, final Color lightColor) {
+  public LightSource(final IEnvironment environment, final Point2D location, final int width, final int height, final int brightness, final Color lightColor, final String shapeType, final double gradientStepFactor) {
     super();
     this.setLocation(location);
     this.color = lightColor;
     this.environment = environment;
-    this.setSize(diameter, diameter);
-    this.setRadius(diameter / 2);
+    this.setSize(width, height);
+    int shorterDimension = width;
+    if (width > height) {
+      shorterDimension = height;
+    }
+    this.setRadius(shorterDimension / 2);
+    this.gradientStepSize = this.getRadius() * gradientStepFactor;
     this.setBrightness(brightness);
     this.setLocation(location);
+    this.lightShapeType = shapeType;
+    switch (this.getLightShapeType()) {
+    case LightSource.ELLIPSE:
+      largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      break;
+    case LightSource.RECTANGLE:
+      largeLightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      midLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      smallLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      break;
+    default:
+      largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      break;
+    }
   }
 
   /**
@@ -175,6 +206,10 @@ public class LightSource extends Entity implements IRenderable {
     return this.brightness;
   }
 
+  public String getLightShapeType() {
+    return this.lightShapeType;
+  }
+
   /**
    * Gets the color.
    *
@@ -191,6 +226,22 @@ public class LightSource extends Entity implements IRenderable {
    */
   public int getRadius() {
     return this.radius;
+  }
+
+  public Shape getLargeLightShape() {
+    return largeLightShape;
+  }
+
+  public Shape getMidLightShape() {
+    return midLightShape;
+  }
+
+  public Shape getSmallLightShape() {
+    return smallLightShape;
+  }
+
+  public double getGradientStepSize() {
+    return gradientStepSize;
   }
 
   @Override

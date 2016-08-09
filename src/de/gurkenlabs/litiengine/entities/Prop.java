@@ -41,11 +41,11 @@ public class Prop extends CombatEntity {
    */
   public PropState getState() {
     if (this.getAttributes().getHealth().getCurrentValue() <= 0) {
-      return PropState.Destroyed;
+      return PropState.DESTROYED;
     } else if (this.getAttributes().getHealth().getCurrentValue() <= this.getAttributes().getHealth().getMaxValue() * 0.5) {
-      return PropState.Damaged;
+      return PropState.DAMAGED;
     } else {
-      return PropState.Intact;
+      return PropState.INTACT;
     }
   }
 

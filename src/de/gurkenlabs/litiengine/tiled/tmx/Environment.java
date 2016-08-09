@@ -9,7 +9,6 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -66,7 +65,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
-  
+
   private final List<IRenderable> groundRenderable;
   private final List<IRenderable> overlayRenderable;
 
@@ -106,7 +105,7 @@ public class Environment implements IEnvironment {
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
-    
+
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
   }
@@ -117,8 +116,8 @@ public class Environment implements IEnvironment {
 
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
-    
-    for(IRenderable rend : this.getGroundRenderable()){
+
+    for (IRenderable rend : this.getGroundRenderable()) {
       rend.render(g);
     }
 
@@ -144,8 +143,8 @@ public class Environment implements IEnvironment {
     if (this.weather != null) {
       this.weather.render(g);
     }
-    
-    for(IRenderable rend : this.getOverlayRenderable()){
+
+    for (IRenderable rend : this.getOverlayRenderable()) {
       rend.render(g);
     }
 
@@ -177,6 +176,7 @@ public class Environment implements IEnvironment {
   public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
     this.overlayRenderedConsumer.add(consumer);
   }
+
   @Override
   public void add(IRenderable renderable, RenderType type) {
     switch (type) {
@@ -194,15 +194,15 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(IRenderable renderable) {
-    if(this.getGroundRenderable().contains(renderable)){
+    if (this.getGroundRenderable().contains(renderable)) {
       this.getGroundRenderable().remove(renderable);
     }
-    
-    if(this.getOverlayRenderable().contains(renderable)){
+
+    if (this.getOverlayRenderable().contains(renderable)) {
       this.getOverlayRenderable().remove(renderable);
     }
   }
-  
+
   @Override
   public void add(final int mapId, final IMovableCombatEntity entity) {
     this.addCombatEntity(mapId, entity);
@@ -290,8 +290,8 @@ public class Environment implements IEnvironment {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
     if (!prop.isIndestructible()) {
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.Damaged));
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.Destroyed));
+      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DAMAGED));
+      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DESTROYED));
     }
     prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
     prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
@@ -439,10 +439,8 @@ public class Environment implements IEnvironment {
     for (final Path2D staticShadow : staticShadows) {
       Area staticShadowArea = new Area(staticShadow);
       for (final LightSource light : this.getLightSources()) {
-        final Ellipse2D lightCircle = new Ellipse2D.Double(light.getLocation().getX(), light.getLocation().getY(), light.getRadius() * 2, light.getRadius() * 2);
         if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
-
-          staticShadowArea.subtract(new Area(lightCircle));
+          staticShadowArea.subtract(new Area(light.getLargeLightShape()));
         }
       }
       ar.add(staticShadowArea);
@@ -663,18 +661,32 @@ public class Environment implements IEnvironment {
   }
 
   protected void addMapObject(final IMapObject mapObject) {
-    if (mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
-      final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-      final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-      if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
-        return;
-      }
-
-      final int brightness = Integer.parseInt(propBrightness);
-      final Color color = Color.decode(propColor);
-
-      this.getLightSources().add(new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness)));
+    if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
+      return;
     }
+    final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+    final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+    if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
+      return;
+    }
+
+    final int brightness = Integer.parseInt(propBrightness);
+    final Color color = Color.decode(propColor);
+
+    String lightType;
+    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
+    case LightSource.ELLIPSE:
+      lightType = LightSource.ELLIPSE;
+      break;
+    case LightSource.RECTANGLE:
+      lightType = LightSource.RECTANGLE;
+      break;
+    default:
+      lightType = LightSource.ELLIPSE;
+    }
+    LightSource light = new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), (int) mapObject.getDimension().getHeight(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType,
+        Double.parseDouble(mapObject.getCustomProperty(MapObjectProperties.LIGHTSTEPFACTOR)));
+    this.getLightSources().add(light);
 
     this.addCollisionBoxes(mapObject);
   }

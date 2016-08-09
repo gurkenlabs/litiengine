@@ -1,23 +1,15 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -85,25 +77,20 @@ public class AmbientLight {
     double mapHeight = this.environment.getMap().getSizeInPixles().getHeight();
     double longerDimension = mapWidth;
     if (mapWidth < mapHeight) {
-      longerDimension = mapWidth;
+      longerDimension = mapHeight;
     }
     final Area ar = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
     for (final LightSource light : this.environment.getLightSources()) {
-      final double LIGHT_GRADIENT_STEP = light.getRadius() * 0.15;
       Point2D lightCenter = light.getDimensionCenter();
-      Point2D lightLocation = light.getLocation();
-      final Ellipse2D lightCircle = new Ellipse2D.Double(lightLocation.getX(), lightLocation.getY(), light.getRadius() * 2, light.getRadius() * 2);
-      final Ellipse2D midLightCircle = new Ellipse2D.Double(lightLocation.getX() + LIGHT_GRADIENT_STEP, lightLocation.getY() + LIGHT_GRADIENT_STEP, (light.getRadius() - LIGHT_GRADIENT_STEP) * 2, (light.getRadius() - LIGHT_GRADIENT_STEP) * 2);
-      final Ellipse2D smallLightCircle = new Ellipse2D.Double(lightLocation.getX() + LIGHT_GRADIENT_STEP * 2, lightLocation.getY() + LIGHT_GRADIENT_STEP * 2, (light.getRadius() - LIGHT_GRADIENT_STEP * 2) * 2, (light.getRadius() - LIGHT_GRADIENT_STEP * 2) * 2);
 
-      Area large = new Area(lightCircle);
-      Area mid = new Area(midLightCircle);
-      Area small = new Area(smallLightCircle);
+      Area large = new Area(light.getLargeLightShape());
+      Area mid = new Area(light.getMidLightShape());
+      Area small = new Area(light.getSmallLightShape());
 
       // cut the light area where shadow Boxes are (this simulates light falling
       // into and out of rooms)
       for (IMapObject obj : this.environment.getShadowBoxes()) {
-        if (!GeometricUtilities.shapeIntersects(lightCircle, obj.getCollisionBox())) {
+        if (!GeometricUtilities.shapeIntersects(light.getLargeLightShape(), obj.getCollisionBox())) {
           continue;
         }
         Area boxInLight = new Area(obj.getCollisionBox());
@@ -138,7 +125,6 @@ public class AmbientLight {
           shadowArea.intersect(large);
           large.subtract(shadowArea);
           mid.subtract(shadowArea);
-
           small.subtract(shadowArea);
 
         }

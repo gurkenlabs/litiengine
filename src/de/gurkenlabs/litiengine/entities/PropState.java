@@ -9,9 +9,9 @@ package de.gurkenlabs.litiengine.entities;
  */
 public enum PropState {
   /** The Damaged. */
-  Damaged,
+  DAMAGED,
   /** The Destroyed. */
-  Destroyed,
+  DESTROYED,
   /** The Intact. */
-  Intact
+  INTACT
 }
