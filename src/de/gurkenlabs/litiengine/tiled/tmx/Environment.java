@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.configuration.Quality;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -122,6 +123,9 @@ public class Environment implements IEnvironment {
     }
 
     Game.getRenderEngine().renderEntities(g, this.getGroundEmitters());
+    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
+      Game.getRenderEngine().renderEntities(g, this.getLightSources());
+    }
 
     Game.getRenderEngine().renderEntities(g, this.getAllEntities());
     this.informConsumers(g, this.entitiesRenderedConsumer);
@@ -433,12 +437,16 @@ public class Environment implements IEnvironment {
 
     final Area ar = new Area();
     for (final Path2D staticShadow : staticShadows) {
-      ar.add(new Area(staticShadow));
-    }
+      Area staticShadowArea = new Area(staticShadow);
+      for (final LightSource light : this.getLightSources()) {
+        final Ellipse2D lightCircle = new Ellipse2D.Double(light.getLocation().getX(), light.getLocation().getY(), light.getRadius() * 2, light.getRadius() * 2);
+        if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
 
-    for (final LightSource light : this.getLightSources()) {
-      final Ellipse2D lightCircle = new Ellipse2D.Double(light.getLocation().getX(), light.getLocation().getY(), light.getRadius() * 2, light.getRadius() * 2);
-      ar.subtract(new Area(lightCircle));
+          staticShadowArea.subtract(new Area(lightCircle));
+        }
+      }
+      ar.add(staticShadowArea);
+
     }
 
     g.fill(ar);
