@@ -45,32 +45,77 @@ import de.gurkenlabs.util.image.ImageProcessing;
  * The Class GraphicsEngine.
  */
 public class RenderEngine implements IRenderEngine {
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-  private final List<Predicate<RenderEvent<IEntity>>> entityRenderingConditions;
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
+  public static BufferedImage createCompatibleImage(final int width, final int height) {
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsDevice device = env.getDefaultScreenDevice();
+    final GraphicsConfiguration config = device.getDefaultConfiguration();
+    final BufferedImage img = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
-  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
+    return img;
+  }
 
-  /** The map renderer. */
-  private final Map<MapOrientation, IMapRenderer> mapRenderer;
+  public static void drawShape(final Graphics2D g, final Shape shape) {
+    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().renderScale()));
+  }
 
-  private final EntityYComparator entityComparator;
+  public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
+    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+
+    g.setTransform(t);
+    g.setStroke(stroke);
+    g.draw(shape);
+    g.setTransform(oldTransForm);
+  }
+
+  public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+    g.drawString(text, (int) x, (int) y);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
 
   /**
-   * Instantiates a new graphics engine.
+   * PERFORMANCE HINT: The larger the text is, the more time it needs to render
+   * especially with antialiasing turned on.
    *
-   * @param mapRenderer
-   *          the map renderer
+   * @param g
+   * @param text
+   * @param x
+   * @param y
+   * @param shadow
    */
-  public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new HashMap<>();
-    this.entityComparator = new EntityYComparator();
+  public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
 
-    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+    final Color old = g.getColor();
+    g.setColor(shadow);
+    g.drawString(text, (int) x + 1, (int) y + 1);
+    g.drawString(text, (int) x + 1, (int) y - 1);
+    g.drawString(text, (int) x - 1, (int) y - 1);
+    g.drawString(text, (int) x - 1, (int) y + 1);
+    g.setColor(old);
+    g.drawString(text, (int) x, (int) y);
+  }
+
+  public static void fillShape(final Graphics2D g, final Shape shape) {
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
+    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+
+    g.setTransform(t);
+    g.setStroke(new BasicStroke(1 / Game.getInfo().renderScale()));
+    g.fill(shape);
+    g.setTransform(oldTransForm);
   }
 
   /**
@@ -130,77 +175,41 @@ public class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
-  public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
-    if (text == null || text.isEmpty()) {
-      return;
-    }
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
 
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+  private final List<Predicate<RenderEvent<IEntity>>> entityRenderingConditions;
 
-    g.drawString(text, (int) x, (int) y);
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-  }
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
+
+  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
+
+  /** The map renderer. */
+  private final Map<MapOrientation, IMapRenderer> mapRenderer;
+
+  private final EntityYComparator entityComparator;
 
   /**
-   * PERFORMANCE HINT: The larger the text is, the more time it needs to render
-   * especially with antialiasing turned on.
+   * Instantiates a new graphics engine.
    *
-   * @param g
-   * @param text
-   * @param x
-   * @param y
-   * @param shadow
+   * @param mapRenderer
+   *          the map renderer
    */
-  public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
-    if (text == null || text.isEmpty()) {
-      return;
+  public RenderEngine() {
+    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
+    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.mapRenderer = new HashMap<>();
+    this.entityComparator = new EntityYComparator();
+
+    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+  }
+
+  @Override
+  public void entityRenderingCondition(final Predicate<RenderEvent<IEntity>> predicate) {
+    if (!this.entityRenderingConditions.contains(predicate)) {
+      this.entityRenderingConditions.add(predicate);
     }
-
-    final Color old = g.getColor();
-    g.setColor(shadow);
-    g.drawString(text, (int) x + 1, (int) y + 1);
-    g.drawString(text, (int) x + 1, (int) y - 1);
-    g.drawString(text, (int) x - 1, (int) y - 1);
-    g.drawString(text, (int) x - 1, (int) y + 1);
-    g.setColor(old);
-    g.drawString(text, (int) x, (int) y);
-  }
-
-  public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
-    final AffineTransform oldTransForm = g.getTransform();
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
-    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
-
-    g.setTransform(t);
-    g.setStroke(stroke);
-    g.draw(shape);
-    g.setTransform(oldTransForm);
-  }
-
-  public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().renderScale()));
-  }
-
-  public static void fillShape(final Graphics2D g, final Shape shape) {
-    final AffineTransform oldTransForm = g.getTransform();
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
-    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
-
-    g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getInfo().renderScale()));
-    g.fill(shape);
-    g.setTransform(oldTransForm);
-  }
-
-  public static BufferedImage createCompatibleImage(final int width, final int height) {
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage img = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-
-    return img;
   }
 
   @Override
@@ -234,10 +243,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void entityRenderingCondition(final Predicate<RenderEvent<IEntity>> predicate) {
-    if (!this.entityRenderingConditions.contains(predicate)) {
-      this.entityRenderingConditions.add(predicate);
+  public void render(final Graphics2D g, final IRenderable renderable) {
+    if (renderable == null) {
+      return;
     }
+
+    renderable.render(g);
   }
 
   @Override
@@ -296,15 +307,6 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics2D g, final IRenderable renderable) {
-    if (renderable == null) {
-      return;
-    }
-
-    renderable.render(g);
-  }
-
-  @Override
   public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
       return;
@@ -344,6 +346,17 @@ public class RenderEngine implements IRenderEngine {
     }
   }
 
+  @Override
+  public void renderLayers(final Graphics2D g, final IMap map, final RenderType type) {
+    if (map == null) {
+      return;
+    }
+
+    // draw tile layers
+    this.mapRenderer.get(map.getOrientation()).renderLayers(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map, type);
+
+  }
+
   /**
    * Draws the tile layers of the mapcontainer and the animations.
    *
@@ -363,16 +376,5 @@ public class RenderEngine implements IRenderEngine {
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));
     }
-  }
-
-  @Override
-  public void renderLayers(final Graphics2D g, final IMap map, final RenderType type) {
-    if (map == null) {
-      return;
-    }
-
-    // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).renderLayers(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map, type);
-
   }
 }

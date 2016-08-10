@@ -16,6 +16,10 @@ public class SpriteParticle extends Particle {
     this.image = sprite;
   }
 
+  public float getAngle() {
+    return this.angle;
+  }
+
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
@@ -25,10 +29,6 @@ public class SpriteParticle extends Particle {
     } else {
       RenderEngine.renderImage(g, this.image, renderLocation);
     }
-  }
-
-  public float getAngle() {
-    return this.angle;
   }
 
   public void setAngle(final float angle) {

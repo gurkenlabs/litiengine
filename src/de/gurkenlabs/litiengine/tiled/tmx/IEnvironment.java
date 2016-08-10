@@ -26,33 +26,56 @@ import de.gurkenlabs.tiled.tmx.IMapObject;
  */
 public interface IEnvironment extends IInitializable, IRenderable {
 
+  public void add(final int mapId, final IMovableCombatEntity entity);
+
+  public void add(IRenderable renderable, RenderType type);
+
+  public void addAmbientLight();
+
+  public void addCollisionBox(IMapObject mapObject);
+
   public void addCombatEntity(final int mapId, final ICombatEntity entity);
+
+  public void addDecorMob(final IMapObject mapObject);
+
+  public void addEffect(final IMapObject mapObject);
+
+  public void addLightSource(IMapObject mapObject);
+
+  public void addMapObject(final IMapObject mapObject);
+
+  public void addMob(final IMapObject mapObject);
 
   public void addMovableEntity(final int mapId, final IMovableEntity entity);
 
-  public void remove(final int mapId);
+  public void addProp(IMapObject mapObject);
 
-  public void add(final int mapId, final IMovableCombatEntity entity);
+  public void addSpawnpoint(IMapObject mapObject);
 
-  public Collection<ICombatEntity> getCombatEntities();
-
-  public List<LightSource> getLightSources();
-
-  public ICombatEntity getCombatEntity(final int mapId);
+  public void clear();
 
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
+  public List<IMapObject> getCollisionBoxes();
+
+  public Collection<ICombatEntity> getCombatEntities();
+
+  public ICombatEntity getCombatEntity(final int mapId);
+
   public List<Emitter> getEmitters();
 
   public List<Emitter> getGroundEmitters();
 
-  public List<Emitter> getOverlayEmitters();
-
   public List<IRenderable> getGroundRenderable();
 
-  public List<IRenderable> getOverlayRenderable();
+  public List<LightSource> getLightSources();
+
+  /**
+   * Gets the next unique local map id. (All local map ids are negative).
+   */
+  public int getLocalMapId();
 
   /**
    * Gets the map.
@@ -61,15 +84,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public IMap getMap();
 
-  public Collection<IMovableEntity> getMovableEntities();
-
-  public IMovableEntity getMovableEntity(final int mapId);
-
-  /**
-   * Gets the next unique local map id. (All local map ids are negative).
-   */
-  public int getLocalMapId();
-
   /**
    * Gets the next unique global map id.
    *
@@ -77,40 +91,32 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public int getMapId();
 
+  public Collection<IMovableEntity> getMovableEntities();
+
+  public IMovableEntity getMovableEntity(final int mapId);
+
+  public List<Emitter> getOverlayEmitters();
+
+  public List<IRenderable> getOverlayRenderable();
+
   public List<Prop> getProps();
-
-  public void addProp(IMapObject mapObject);
-
-  public void addEffect(final IMapObject mapObject);
-
-  public void addMob(final IMapObject mapObject);
-
-  public void addDecorMob(final IMapObject mapObject);
-
-  public void add(IRenderable renderable, RenderType type);
-
-  public void remove(IRenderable renderable);
-  
-  public WeatherType getWeather();
-
-  public void setWeather(WeatherType weather);
-
-  public void onMapRendered(final Consumer<Graphics2D> consumer);
-
-  public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
-
-  public void onOverlayRendered(final Consumer<Graphics2D> consumer);
-
-  public void clear();
 
   public List<IMapObject> getShadowBoxes();
 
-  public List<IMapObject> getCollisionBoxes();
+  public List<MapLocation> getSpawnPoints();
 
-  public void addCollisionBoxes(IMapObject mapObject);
+  public WeatherType getWeather();
 
-  public void addShadowBoxes(IMapObject mapObject);
+  public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
 
-  public void addAmbientLight();
+  public void onMapRendered(final Consumer<Graphics2D> consumer);
+
+  public void onOverlayRendered(final Consumer<Graphics2D> consumer);
+
+  public void remove(final int mapId);
+
+  public void remove(IRenderable renderable);
+
+  public void setWeather(WeatherType weather);
 
 }

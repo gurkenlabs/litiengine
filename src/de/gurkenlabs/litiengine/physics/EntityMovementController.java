@@ -24,11 +24,6 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   @Override
-  public IMovableEntity getControlledEntity() {
-    return this.movableEntity;
-  }
-
-  @Override
   public void apply(final Force force) {
     if (!this.activeForces.contains(force)) {
       this.activeForces.add(force);
@@ -36,34 +31,17 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   @Override
-  public void update(final IGameLoop gameLoop) {
-    this.handleForces(gameLoop);
-  }
-
-  @Override
   public List<Force> getActiceForces() {
     return this.activeForces;
   }
 
+  @Override
+  public IMovableEntity getControlledEntity() {
+    return this.movableEntity;
+  }
+
   protected IPhysicsEngine getPhysicsEngine() {
     return this.engine;
-  }
-
-  @Override
-  public void onMovementCheck(final Predicate<IEntityMovementController> predicate) {
-    if (!this.movementPredicates.contains(predicate)) {
-      this.movementPredicates.add(predicate);
-    }
-  }
-
-  protected boolean isMovementAllowed() {
-    for (final Predicate<IEntityMovementController> predicate : this.movementPredicates) {
-      if (!predicate.test(this)) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   private void handleForces(final IGameLoop gameLoop) {
@@ -97,5 +75,27 @@ public class EntityMovementController implements IEntityMovementController {
         }
       }
     }
+  }
+
+  protected boolean isMovementAllowed() {
+    for (final Predicate<IEntityMovementController> predicate : this.movementPredicates) {
+      if (!predicate.test(this)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @Override
+  public void onMovementCheck(final Predicate<IEntityMovementController> predicate) {
+    if (!this.movementPredicates.contains(predicate)) {
+      this.movementPredicates.add(predicate);
+    }
+  }
+
+  @Override
+  public void update(final IGameLoop gameLoop) {
+    this.handleForces(gameLoop);
   }
 }

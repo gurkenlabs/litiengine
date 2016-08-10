@@ -135,33 +135,6 @@ public class ImageProcessing {
     return bimage;
   }
 
-  public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
-    final int newImageWidth = (int) (image.getWidth() * zoomLevel);
-    final int newImageHeight = (int) (image.getHeight() * zoomLevel);
-    final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
-    final Graphics2D g = resizedImage.createGraphics();
-    g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
-    g.dispose();
-
-    return resizedImage;
-  }
-
-  public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
-    final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
-    final int smallWidth = image.getWidth() / columns;
-    final int smallHeight = image.getHeight() / rows;
-
-    for (int y = 0; y < rows; y++) {
-      for (int x = 0; x < columns; x++) {
-        final int cellX = x * smallWidth;
-        final int cellY = y * smallHeight;
-        smallImages[y][x] = image.getSubimage(cellX, cellY, smallWidth, smallHeight);
-      }
-    }
-
-    return smallImages;
-  }
-
   /**
    * Crops a sub image from the specified image.
    *
@@ -254,16 +227,28 @@ public class ImageProcessing {
     return bimage;
   }
 
-  public static BufferedImage setOpacity(final Image img, final float opacity) {
-    final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
+  public static BufferedImage getCompatibleImage(final int width, final int height) {
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    final GraphicsDevice device = env.getDefaultScreenDevice();
+    final GraphicsConfiguration config = device.getDefaultConfiguration();
+    final BufferedImage compatibleImg = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+    return compatibleImg;
+  }
 
-    // Draw the image on to the buffered image
-    final Graphics2D g2d = (Graphics2D) bimage.getGraphics();
-    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-    g2d.drawImage(img, 0, 0, null);
-    g2d.dispose();
+  public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
+    final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
+    final int smallWidth = image.getWidth() / columns;
+    final int smallHeight = image.getHeight() / rows;
 
-    return bimage;
+    for (int y = 0; y < rows; y++) {
+      for (int x = 0; x < columns; x++) {
+        final int cellX = x * smallWidth;
+        final int cellY = y * smallHeight;
+        smallImages[y][x] = image.getSubimage(cellX, cellY, smallWidth, smallHeight);
+      }
+    }
+
+    return smallImages;
   }
 
   /**
@@ -281,48 +266,6 @@ public class ImageProcessing {
     g.drawImage(img, 0, 0, w, h, w, 0, 0, h, null);
     g.dispose();
     return dimg;
-  }
-
-  public static BufferedImage verticalFlip(final BufferedImage img) {
-    final int w = img.getWidth();
-    final int h = img.getHeight();
-    final BufferedImage dimg = new BufferedImage(w, h, img.getType());
-    final Graphics2D g = dimg.createGraphics();
-    g.drawImage(img, 0, 0 + h, w, -h, null);
-    g.dispose();
-    return dimg;
-  }
-
-  /**
-   * The specified image is scaled to a new dimension with the specified width
-   * and height. This method doesn't use anti aliasing for this process to keep
-   * the indy look.
-   *
-   * @param image
-   *          the image
-   * @param width
-   *          the width
-   * @param height
-   *          the height
-   * @return the buffered image
-   */
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
-    final int imageWidth = image.getWidth();
-    final int imageHeight = image.getHeight();
-
-    final double scaleX = (double) width / imageWidth;
-    final double scaleY = (double) height / imageHeight;
-    final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
-    final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
-  }
-
-  public static BufferedImage getCompatibleImage(final int width, final int height) {
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage compatibleImg = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-    return compatibleImg;
   }
 
   /**
@@ -379,5 +322,62 @@ public class ImageProcessing {
     }
 
     return false;
+  }
+
+  /**
+   * The specified image is scaled to a new dimension with the specified width
+   * and height. This method doesn't use anti aliasing for this process to keep
+   * the indy look.
+   *
+   * @param image
+   *          the image
+   * @param width
+   *          the width
+   * @param height
+   *          the height
+   * @return the buffered image
+   */
+  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
+    final int imageWidth = image.getWidth();
+    final int imageHeight = image.getHeight();
+
+    final double scaleX = (double) width / imageWidth;
+    final double scaleY = (double) height / imageHeight;
+    final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
+    final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
+  }
+
+  public static BufferedImage setOpacity(final Image img, final float opacity) {
+    final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
+
+    // Draw the image on to the buffered image
+    final Graphics2D g2d = (Graphics2D) bimage.getGraphics();
+    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+    g2d.drawImage(img, 0, 0, null);
+    g2d.dispose();
+
+    return bimage;
+  }
+
+  public static BufferedImage verticalFlip(final BufferedImage img) {
+    final int w = img.getWidth();
+    final int h = img.getHeight();
+    final BufferedImage dimg = new BufferedImage(w, h, img.getType());
+    final Graphics2D g = dimg.createGraphics();
+    g.drawImage(img, 0, 0 + h, w, -h, null);
+    g.dispose();
+    return dimg;
+  }
+
+  public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
+    final int newImageWidth = (int) (image.getWidth() * zoomLevel);
+    final int newImageHeight = (int) (image.getHeight() * zoomLevel);
+    final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
+    final Graphics2D g = resizedImage.createGraphics();
+    g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
+    g.dispose();
+
+    return resizedImage;
   }
 }

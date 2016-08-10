@@ -16,6 +16,17 @@ public class Configuration {
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
+  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
+    try {
+      final Properties groupProperties = new Properties();
+      group.storeProperties(groupProperties);
+      groupProperties.store(out, group.getPrefix() + "SETTINGS");
+      out.flush();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   private final List<ConfigurationGroup> configurationGroups;
 
   private final String fileName;
@@ -34,14 +45,9 @@ public class Configuration {
     }
   }
 
-  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
-    try {
-      final Properties groupProperties = new Properties();
-      group.storeProperties(groupProperties);
-      groupProperties.store(out, group.getPrefix() + "SETTINGS");
-      out.flush();
-    } catch (final IOException e) {
-      e.printStackTrace();
+  private void createDefaultSettingsFile(final OutputStream out) {
+    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+      storeConfigurationGroup(out, group);
     }
   }
 
@@ -64,16 +70,6 @@ public class Configuration {
     return this.fileName;
   }
 
-  public void load() {
-    this.loadFromFile();
-  }
-
-  private void createDefaultSettingsFile(final OutputStream out) {
-    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
-      storeConfigurationGroup(out, group);
-    }
-  }
-
   private void initializeSettingsByProperties(final Properties properties) {
     for (final String key : properties.stringPropertyNames()) {
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
@@ -82,6 +78,10 @@ public class Configuration {
         }
       }
     }
+  }
+
+  public void load() {
+    this.loadFromFile();
   }
 
   /**

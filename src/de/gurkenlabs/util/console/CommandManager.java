@@ -16,13 +16,12 @@ public class CommandManager implements ICommandManager {
   }
 
   @Override
-  public void start() {
-    this.commandListener.start();
-  }
+  public void bind(final String command, final Function<String[], Boolean> commandConsumer) {
+    if (this.commandConsumers.containsKey(command)) {
+      throw new IllegalArgumentException("Cannot bind command " + command + " because it is already bound.");
+    }
 
-  @Override
-  public void terminate() {
-    this.commandListener.terminate();
+    this.commandConsumers.put(command, commandConsumer);
   }
 
   @Override
@@ -46,11 +45,12 @@ public class CommandManager implements ICommandManager {
   }
 
   @Override
-  public void bind(final String command, final Function<String[], Boolean> commandConsumer) {
-    if (this.commandConsumers.containsKey(command)) {
-      throw new IllegalArgumentException("Cannot bind command " + command + " because it is already bound.");
-    }
+  public void start() {
+    this.commandListener.start();
+  }
 
-    this.commandConsumers.put(command, commandConsumer);
+  @Override
+  public void terminate() {
+    this.commandListener.terminate();
   }
 }

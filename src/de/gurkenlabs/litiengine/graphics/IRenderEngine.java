@@ -19,15 +19,17 @@ import de.gurkenlabs.tiled.tmx.MapOrientation;
  */
 public interface IRenderEngine {
 
-  public IMapRenderer getMapRenderer(MapOrientation orientation);
-
   public void entityRenderingCondition(Predicate<RenderEvent<IEntity>> predicate);
 
-  public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
+  public IMapRenderer getMapRenderer(MapOrientation orientation);
 
   public void onEntityRendered(Consumer<RenderEvent<IEntity>> entity);
 
+  public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
+
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
+
+  public void render(Graphics2D g, IRenderable renderable);
 
   public void render(Graphics2D g, List<? extends IRenderable> renderables);
 
@@ -37,8 +39,6 @@ public interface IRenderEngine {
 
   public void renderEntities(Graphics2D g, List<? extends IEntity> entities, IVision vision);
 
-  public void render(Graphics2D g, IRenderable renderable);
-
   public void renderEntity(Graphics2D g, IEntity entity);
 
   /**
@@ -47,7 +47,7 @@ public interface IRenderEngine {
    * @param g
    *          the g
    */
-  public void renderMap(Graphics2D g, final IMap map);
+  public void renderLayers(Graphics2D g, final IMap map, RenderType type);
 
   /**
    * Render map.
@@ -55,5 +55,5 @@ public interface IRenderEngine {
    * @param g
    *          the g
    */
-  public void renderLayers(Graphics2D g, final IMap map, RenderType type);
+  public void renderMap(Graphics2D g, final IMap map);
 }

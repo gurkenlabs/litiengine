@@ -36,6 +36,11 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
+  public Point2D getMoveDestination() {
+    return this.moveDestination;
+  }
+
+  @Override
   public IEntityMovementController getMovementController() {
     return this.movementController;
   }
@@ -102,13 +107,13 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public void setMovementController(final IEntityMovementController movementController) {
-    this.movementController = movementController;
+  public void setMoveDestination(final Point2D dest) {
+    this.moveDestination = dest;
   }
 
   @Override
-  public boolean turnOnMove() {
-    return this.turnOnMove;
+  public void setMovementController(final IEntityMovementController movementController) {
+    this.movementController = movementController;
   }
 
   @Override
@@ -117,12 +122,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public Point2D getMoveDestination() {
-    return this.moveDestination;
-  }
-
-  @Override
-  public void setMoveDestination(final Point2D dest) {
-    this.moveDestination = dest;
+  public boolean turnOnMove() {
+    return this.turnOnMove;
   }
 }

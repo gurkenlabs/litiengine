@@ -79,22 +79,6 @@ public abstract class Ability {
     return this.internalCalculateImpactArea(this.getExecutor().getAngle());
   }
 
-  protected Shape internalCalculateImpactArea(final float angle) {
-    final int impact = this.getAttributes().getImpact().getCurrentValue();
-    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact * 0.5;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact * 0.5;
-
-    // project
-    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
-    final double start = angle - impactAngle * 0.5 - 90;
-    if (impactAngle % 360 == 0) {
-      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
-    }
-
-    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
-  }
-
   public Ellipse2D calculatePotentialImpactArea() {
     final int range = this.getAttributes().getImpact().getCurrentValue();
     final double arcX = this.getExecutor().getCollisionBox().getCenterX() - range * 0.5;
@@ -110,10 +94,6 @@ public abstract class Ability {
    */
   public boolean canCast(final IGameLoop gameLoop) {
     return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
-  }
-
-  public boolean isCasting(final IGameLoop gameLoop) {
-    return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 
   /**
@@ -141,6 +121,10 @@ public abstract class Ability {
     return this.attributes;
   }
 
+  public CastType getCastType() {
+    return this.castType;
+  }
+
   /**
    * Gets the cooldown in seconds.
    *
@@ -161,6 +145,15 @@ public abstract class Ability {
 
   public String getDescription() {
     return this.description;
+  }
+
+  /**
+   * Gets the effects.
+   *
+   * @return the effects
+   */
+  protected List<IEffect> getEffects() {
+    return this.effects;
   }
 
   /**
@@ -190,6 +183,26 @@ public abstract class Ability {
     return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
+  protected Shape internalCalculateImpactArea(final float angle) {
+    final int impact = this.getAttributes().getImpact().getCurrentValue();
+    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
+    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact * 0.5;
+    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact * 0.5;
+
+    // project
+    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
+    final double start = angle - impactAngle * 0.5 - 90;
+    if (impactAngle % 360 == 0) {
+      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
+    }
+
+    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
+  }
+
+  public boolean isCasting(final IGameLoop gameLoop) {
+    return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
+  }
+
   /**
    * Checks if is multi target.
    *
@@ -212,22 +225,18 @@ public abstract class Ability {
     }
   }
 
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    for (final IEffect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
-      this.onEffectCeased(effect, consumer);
-    }
-  }
-
-  public CastType getCastType() {
-    return this.castType;
-  }
-
   private void onEffectApplied(final IEffect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectApplied(consumer);
 
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       this.onEffectApplied(followUp, consumer);
+    }
+  }
+
+  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
+    for (final IEffect effect : this.getEffects()) {
+      // registers to all effects and their follow up effects recursively
+      this.onEffectCeased(effect, consumer);
     }
   }
 
@@ -237,14 +246,5 @@ public abstract class Ability {
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       this.onEffectCeased(followUp, consumer);
     }
-  }
-
-  /**
-   * Gets the effects.
-   *
-   * @return the effects
-   */
-  protected List<IEffect> getEffects() {
-    return this.effects;
   }
 }

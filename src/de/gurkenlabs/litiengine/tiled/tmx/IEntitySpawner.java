@@ -6,26 +6,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
-  public int getInterval();
-
-  public void setInterval(int interval);
-
-  public int getAmount();
-
-  public void setAmount(int amount);
-
-  public int getSpawnDelay();
-
-  public void setSpawnDelay(int delay);
-
-  public List<MapLocation> getSpawnPoints();
-
-  public T createNew();
-
-  public SpawnMode getSpawnMode();
-
-  public void setSpawnMode(SpawnMode mode);
-
   public enum SpawnMode {
 
     /**
@@ -43,4 +23,24 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
      */
     ALLSPAWNPOINTS
   }
+
+  public T createNew();
+
+  public int getAmount();
+
+  public int getInterval();
+
+  public int getSpawnDelay();
+
+  public SpawnMode getSpawnMode();
+
+  public List<MapLocation> getSpawnPoints();
+
+  public void setAmount(int amount);
+
+  public void setInterval(int interval);
+
+  public void setSpawnDelay(int delay);
+
+  public void setSpawnMode(SpawnMode mode);
 }

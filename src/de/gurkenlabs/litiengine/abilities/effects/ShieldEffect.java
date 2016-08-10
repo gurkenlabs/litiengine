@@ -30,11 +30,6 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
   }
 
   @Override
-  protected Attribute<Short> getAttribute(final ICombatEntity entity) {
-    return entity.getAttributes().getShield();
-  }
-
-  @Override
   protected void apply(final ICombatEntity affectedEntity) {
     this.getAttribute(affectedEntity).modifyBaseValue(this.getModifier());
   }
@@ -43,5 +38,10 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
   public void cease(final ICombatEntity affectedEntity) {
     final AttributeModifier<Short> revert = new AttributeModifier<>(this.getModifier().getModification(), -this.getModifier().getModifyValue());
     this.getAttribute(affectedEntity).modifyBaseValue(revert);
+  }
+
+  @Override
+  protected Attribute<Short> getAttribute(final ICombatEntity entity) {
+    return entity.getAttributes().getShield();
   }
 }

@@ -67,6 +67,25 @@ public class CompressionUtilities {
     return output;
   }
 
+  public static void unzip(final InputStream zipfile, final File directory) throws IOException {
+    final ZipInputStream zfile = new ZipInputStream(zipfile);
+    ZipEntry entry;
+    while ((entry = zfile.getNextEntry()) != null) {
+      final File file = new File(directory, entry.getName());
+      if (entry.isDirectory()) {
+        file.mkdirs();
+      } else {
+        file.getParentFile().mkdirs();
+        try {
+          StreamUtilities.copy(zfile, file);
+        } finally {
+        }
+      }
+    }
+
+    zfile.close();
+  }
+
   public static void zip(File directory, final File zipfile) throws IOException {
     final URI base = directory.toURI();
     final Deque<File> queue = new LinkedList<>();
@@ -94,24 +113,5 @@ public class CompressionUtilities {
     } finally {
       res.close();
     }
-  }
-
-  public static void unzip(final InputStream zipfile, final File directory) throws IOException {
-    final ZipInputStream zfile = new ZipInputStream(zipfile);
-    ZipEntry entry;
-    while ((entry = zfile.getNextEntry()) != null) {
-      final File file = new File(directory, entry.getName());
-      if (entry.isDirectory()) {
-        file.mkdirs();
-      } else {
-        file.getParentFile().mkdirs();
-        try {
-          StreamUtilities.copy(zfile, file);
-        } finally {
-        }
-      }
-    }
-
-    zfile.close();
   }
 }

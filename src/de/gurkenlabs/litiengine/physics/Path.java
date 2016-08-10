@@ -47,6 +47,10 @@ public class Path {
     return this.path;
   }
 
+  public List<Point2D> getPoints() {
+    return this.points;
+  }
+
   public Point2D getStart() {
     return this.start;
   }
@@ -58,9 +62,5 @@ public class Path {
    */
   public Point2D getTarget() {
     return this.target;
-  }
-
-  public List<Point2D> getPoints() {
-    return this.points;
   }
 }

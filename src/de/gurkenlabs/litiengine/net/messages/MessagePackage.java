@@ -20,6 +20,24 @@ import de.gurkenlabs.util.zip.CompressionUtilities;
 public class MessagePackage<T> extends Package {
 
   /**
+   * Arrayconcat.
+   *
+   * @param A
+   *          the a
+   * @param B
+   *          the b
+   * @return the byte[]
+   */
+  private static byte[] arrayconcat(final byte[] A, final byte[] B) {
+    final int aLen = A.length;
+    final int bLen = B.length;
+    final byte[] C = new byte[aLen + bLen];
+    System.arraycopy(A, 0, C, 0, aLen);
+    System.arraycopy(B, 0, C, aLen, bLen);
+    return C;
+  }
+
+  /**
    * The Content length byte count. UDP does only support up to 64k.
    */
   private final int ContentLengthByteCount = 7;
@@ -81,24 +99,6 @@ public class MessagePackage<T> extends Package {
   public MessagePackage(final MessageType type, final T object) {
     super(type.getId());
     this.object = object;
-  }
-
-  /**
-   * Arrayconcat.
-   *
-   * @param A
-   *          the a
-   * @param B
-   *          the b
-   * @return the byte[]
-   */
-  private static byte[] arrayconcat(final byte[] A, final byte[] B) {
-    final int aLen = A.length;
-    final int bLen = B.length;
-    final byte[] C = new byte[aLen + bLen];
-    System.arraycopy(A, 0, C, 0, aLen);
-    System.arraycopy(B, 0, C, aLen, bLen);
-    return C;
   }
 
   /*

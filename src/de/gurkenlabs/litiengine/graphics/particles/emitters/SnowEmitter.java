@@ -21,12 +21,12 @@ import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 @EmitterInfo(maxParticles = 5000, spawnAmount = 50, particleMinTTL = 5000, particleMaxTTL = 10000, activateOnInit = false)
 public class SnowEmitter extends Weather {
 
+  /** The last camera focus. */
+  private Point2D lastCameraFocus;
+
   public SnowEmitter() {
     super(WeatherType.Snow);
   }
-
-  /** The last camera focus. */
-  private Point2D lastCameraFocus;
 
   /**
    * Creates a new Particle object.

@@ -28,15 +28,33 @@ public class AStarGrid {
     this.populateGrid(gridSizeX, gridSizeY);
   }
 
-  private void populateGrid(final int gridSizeX, final int gridSizeY) {
-    for (int x = 0; x < gridSizeX; x++) {
-      for (int y = 0; y < gridSizeY; y++) {
-        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
+  public boolean diagonalMovementOnCorners() {
+    return this.allowDiagonalMovementOnCorners;
+  }
 
-        // TODO: add terrain dependent penalty
-        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
+  public AStarNode[][] getGrid() {
+    return this.grid;
+  }
+
+  public List<AStarNode> getIntersectedNodes(final Rectangle2D rectangle) {
+    final Point2D start = new Point2D.Double(rectangle.getMinX(), rectangle.getMinY());
+    final Point2D end = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
+
+    final AStarNode startNode = this.getNodeFromMapLocation(start);
+    final AStarNode endNode = this.getNodeFromMapLocation(end);
+
+    final List<AStarNode> nodes = new ArrayList<>();
+    if (startNode == null || endNode == null) {
+      return nodes;
+    }
+
+    for (int x = startNode.getGridX(); x <= endNode.getGridX(); x++) {
+      for (int y = startNode.getGridY(); y <= endNode.getGridY(); y++) {
+        nodes.add(this.getGrid()[x][y]);
       }
     }
+
+    return nodes;
   }
 
   public List<AStarNode> getNeighbours(final AStarNode node) {
@@ -110,6 +128,29 @@ public class AStarGrid {
     return this.getGrid()[x][y];
   }
 
+  public int getNodeSize() {
+    return this.nodeSize;
+  }
+
+  public Dimension getSize() {
+    return this.size;
+  }
+
+  private void populateGrid(final int gridSizeX, final int gridSizeY) {
+    for (int x = 0; x < gridSizeX; x++) {
+      for (int y = 0; y < gridSizeY; y++) {
+        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
+
+        // TODO: add terrain dependent penalty
+        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
+      }
+    }
+  }
+
+  public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
+    this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
+  }
+
   /**
    * Updates the walkable attribute of nodes intersected by the specified
    * rectangle.
@@ -120,46 +161,5 @@ public class AStarGrid {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
       node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
     }
-  }
-
-  public List<AStarNode> getIntersectedNodes(final Rectangle2D rectangle) {
-    final Point2D start = new Point2D.Double(rectangle.getMinX(), rectangle.getMinY());
-    final Point2D end = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
-
-    final AStarNode startNode = this.getNodeFromMapLocation(start);
-    final AStarNode endNode = this.getNodeFromMapLocation(end);
-
-    final List<AStarNode> nodes = new ArrayList<>();
-    if (startNode == null || endNode == null) {
-      return nodes;
-    }
-
-    for (int x = startNode.getGridX(); x <= endNode.getGridX(); x++) {
-      for (int y = startNode.getGridY(); y <= endNode.getGridY(); y++) {
-        nodes.add(this.getGrid()[x][y]);
-      }
-    }
-
-    return nodes;
-  }
-
-  public int getNodeSize() {
-    return this.nodeSize;
-  }
-
-  public AStarNode[][] getGrid() {
-    return this.grid;
-  }
-
-  public Dimension getSize() {
-    return this.size;
-  }
-
-  public boolean diagonalMovementOnCorners() {
-    return this.allowDiagonalMovementOnCorners;
-  }
-
-  public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
-    this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
   }
 }

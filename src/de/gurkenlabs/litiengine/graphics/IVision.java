@@ -41,8 +41,6 @@ public interface IVision {
    */
   public Shape getRenderVisionShape();
 
-  public void updateVisionShape();
-
   /**
    * Intersects.
    *
@@ -73,5 +71,7 @@ public interface IVision {
    *          the y
    */
   public void renderMinimapFogOfWar(Graphics2D g, float minimapScale, int x, int y);
+
+  public void updateVisionShape();
 
 }

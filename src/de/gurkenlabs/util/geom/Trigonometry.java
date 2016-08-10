@@ -43,17 +43,6 @@ public class Trigonometry {
     }
   }
 
-  /**
-   * ATAN2
-   */
-  public static final float atan2Deg(final float y, final float x) {
-    return atan2(y, x) * DEG;
-  }
-
-  public static final float atan2DegStrict(final float y, final float x) {
-    return (float) Math.atan2(y, x) * DEG;
-  }
-
   public static final float atan2(float y, float x) {
     float add, mul;
 
@@ -89,14 +78,29 @@ public class Trigonometry {
   }
 
   /**
-   * SIN / COS (RAD)
+   * ATAN2
    */
-  public static final float sin(final float rad) {
-    return sin[(int) (rad * radToIndex) & SIN_MASK];
+  public static final float atan2Deg(final float y, final float x) {
+    return atan2(y, x) * DEG;
+  }
+
+  public static final float atan2DegStrict(final float y, final float x) {
+    return (float) Math.atan2(y, x) * DEG;
   }
 
   public static final float cos(final float rad) {
     return cos[(int) (rad * radToIndex) & SIN_MASK];
+  }
+
+  public static final float cosDeg(final float deg) {
+    return cos[(int) (deg * degToIndex) & SIN_MASK];
+  }
+
+  /**
+   * SIN / COS (RAD)
+   */
+  public static final float sin(final float rad) {
+    return sin[(int) (rad * radToIndex) & SIN_MASK];
   }
 
   /**
@@ -104,9 +108,5 @@ public class Trigonometry {
    */
   public static final float sinDeg(final float deg) {
     return sin[(int) (deg * degToIndex) & SIN_MASK];
-  }
-
-  public static final float cosDeg(final float deg) {
-    return cos[(int) (deg * degToIndex) & SIN_MASK];
   }
 }

@@ -38,6 +38,10 @@ public interface IScreenManager {
    */
   public IScreen getCurrentScreen();
 
+  public int getCursorOffsetX();
+
+  public int getCursorOffsetY();
+
   public Component getRenderComponent();
 
   /**
@@ -51,13 +55,15 @@ public interface IScreenManager {
 
   public void init(int width, int height, boolean fullscreen);
 
+  public boolean isFocusOwner();
+
   public void onFpsChanged(Consumer<Integer> fpsConsumer);
+
+  public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
-
-  public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   /**
    * Render the current screen.
@@ -72,17 +78,11 @@ public interface IScreenManager {
    */
   public void setCamera(ICamera camera);
 
-  public void setIconImage(Image image);
-
   public void setCursor(Image image);
-
-  public int getCursorOffsetX();
 
   public void setCursorOffsetX(int cursorOffsetX);
 
-  public int getCursorOffsetY();
-
   public void setCursorOffsetY(int cursorOffsetY);
 
-  public boolean isFocusOwner();
+  public void setIconImage(Image image);
 }

@@ -15,11 +15,11 @@ public abstract class SpritesheetEmitter extends Emitter {
     this.spriteSheet = spriteSheet;
   }
 
-  public Spritesheet getSpritesheet() {
-    return this.spriteSheet;
-  }
-
   protected Image getRandomSprite() {
     return this.getSpritesheet().getSprite(new Random().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
+  }
+
+  public Spritesheet getSpritesheet() {
+    return this.spriteSheet;
   }
 }

@@ -40,6 +40,11 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public float getAngle() {
+    return this.angle;
+  }
+
+  @Override
   public IAnimationController getAnimationController() {
     return this.animationController;
   }
@@ -75,11 +80,6 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public float getAngle() {
-    return this.angle;
-  }
-
-  @Override
   public int getMapId() {
     return this.mapId;
   }
@@ -90,8 +90,33 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public int hashCode() {
+    return this.mapId;
+  }
+
+  @Override
+  public String sendMessage(final String message) {
+    return null;
+  }
+
+  protected void setAngle(final float angle) {
+    this.angle = angle;
+  }
+
+  @Override
   public void setAnimationController(final IAnimationController animationController) {
     this.animationController = animationController;
+  }
+
+  /**
+   * Sets the map location.
+   *
+   * @param location
+   *          the new map location
+   */
+  @Override
+  public void setLocation(final Point2D location) {
+    this.mapLocation = location;
   }
 
   /**
@@ -109,30 +134,5 @@ public abstract class Entity implements IEntity {
   public void setSize(final float width, final float height) {
     this.width = width;
     this.height = height;
-  }
-
-  /**
-   * Sets the map location.
-   *
-   * @param location
-   *          the new map location
-   */
-  @Override
-  public void setLocation(final Point2D location) {
-    this.mapLocation = location;
-  }
-
-  protected void setAngle(final float angle) {
-    this.angle = angle;
-  }
-
-  @Override
-  public int hashCode() {
-    return this.mapId;
-  }
-
-  @Override
-  public String sendMessage(final String message) {
-    return null;
   }
 }

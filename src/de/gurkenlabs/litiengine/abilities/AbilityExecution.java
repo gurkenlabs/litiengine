@@ -56,6 +56,10 @@ public class AbilityExecution implements IUpdateable {
     return this.appliedEffects;
   }
 
+  public Point2D getCastLocation() {
+    return this.castLocation;
+  }
+
   /**
    * Gets the impact area.
    *
@@ -63,10 +67,6 @@ public class AbilityExecution implements IUpdateable {
    */
   public Shape getExecutionImpactArea() {
     return this.impactArea;
-  }
-
-  public Point2D getCastLocation() {
-    return this.castLocation;
   }
 
   /**

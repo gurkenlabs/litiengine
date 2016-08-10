@@ -84,6 +84,41 @@ public class CombatEntityVision implements IVision {
     return false;
   }
 
+  protected ICombatEntity getCombatEntity() {
+    return this.combatEntity;
+  }
+
+  protected IEnvironment getEnvironment() {
+    return this.environment;
+  }
+
+  protected Shape getFogOfWar() {
+    return this.fogOfWar;
+  }
+
+  /**
+   * Gets the map vision circle.
+   *
+   * @param mob
+   *          the mob
+   * @return the map vision circle
+   */
+  private Ellipse2D getMapVisionCircle(final ICombatEntity entity) {
+    return new Ellipse2D.Double(entity.getDimensionCenter().getX() - this.visionRadius, entity.getDimensionCenter().getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
+  }
+
+  /**
+   * Gets the render vision circle.
+   *
+   * @param entity
+   *          the mob
+   * @return the render vision circle
+   */
+  private Ellipse2D getRenderVisionArc(final IEntity entity) {
+    final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
+    return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -156,6 +191,19 @@ public class CombatEntityVision implements IVision {
     g.setTransform(oldTransform);
   }
 
+  protected void setFogOfWar(final Shape fogOfWar) {
+    this.fogOfWar = fogOfWar;
+  }
+
+  protected void setRenderVisionShape(final Shape renderVisionShape) {
+    this.renderVisionShape = renderVisionShape;
+  }
+
+  public void setVisionRadius(final int radius) {
+    this.visionRadius = radius;
+    this.visionDiameter = radius * 2;
+  }
+
   @Override
   public void updateVisionShape() {
     final Path2D path = new Path2D.Float();
@@ -179,54 +227,6 @@ public class CombatEntityVision implements IVision {
     rectangleArea.subtract(new Area(path));
 
     this.fogOfWar = rectangleArea;
-  }
-
-  public void setVisionRadius(final int radius) {
-    this.visionRadius = radius;
-    this.visionDiameter = radius * 2;
-  }
-
-  protected ICombatEntity getCombatEntity() {
-    return this.combatEntity;
-  }
-
-  protected Shape getFogOfWar() {
-    return this.fogOfWar;
-  }
-
-  protected void setFogOfWar(final Shape fogOfWar) {
-    this.fogOfWar = fogOfWar;
-  }
-
-  protected IEnvironment getEnvironment() {
-    return this.environment;
-  }
-
-  protected void setRenderVisionShape(final Shape renderVisionShape) {
-    this.renderVisionShape = renderVisionShape;
-  }
-
-  /**
-   * Gets the map vision circle.
-   *
-   * @param mob
-   *          the mob
-   * @return the map vision circle
-   */
-  private Ellipse2D getMapVisionCircle(final ICombatEntity entity) {
-    return new Ellipse2D.Double(entity.getDimensionCenter().getX() - this.visionRadius, entity.getDimensionCenter().getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
-  }
-
-  /**
-   * Gets the render vision circle.
-   *
-   * @param entity
-   *          the mob
-   * @return the render vision circle
-   */
-  private Ellipse2D getRenderVisionArc(final IEntity entity) {
-    final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
-    return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
 
 }

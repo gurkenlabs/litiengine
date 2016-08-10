@@ -16,6 +16,10 @@ public class SerializationHelper {
     return angle % 360;
   }
 
+  public static float decodeAngleFromShort(final short encodedAngle) {
+    return decodeSmallFloatingPointNumber(encodedAngle, 2);
+  }
+
   /**
    * Decodes a small floating point number, previously encoded with
    * {@link #encodeSmallFloatingPointNumber(float, int)
@@ -55,10 +59,6 @@ public class SerializationHelper {
     encodedAngle %= 360;
 
     return encodeSmallFloatingPointNumber(encodedAngle, 2);
-  }
-
-  public static float decodeAngleFromShort(final short encodedAngle) {
-    return decodeSmallFloatingPointNumber(encodedAngle, 2);
   }
 
   /**

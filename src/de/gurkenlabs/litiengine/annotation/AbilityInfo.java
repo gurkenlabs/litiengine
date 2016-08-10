@@ -20,6 +20,8 @@ import de.gurkenlabs.litiengine.abilities.CastType;
 @Inherited
 public @interface AbilityInfo {
 
+  CastType castType() default CastType.INSTANT;
+
   int cooldown() default 0;
 
   String description() default "";
@@ -37,6 +39,4 @@ public @interface AbilityInfo {
   int range() default 0;
 
   int value() default 0;
-
-  CastType castType() default CastType.INSTANT;
 }

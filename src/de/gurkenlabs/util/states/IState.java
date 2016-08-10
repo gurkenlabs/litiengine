@@ -5,13 +5,13 @@ import java.util.List;
 import de.gurkenlabs.litiengine.IGameLoop;
 
 public interface IState {
-  public String getName();
-
   public void enter();
+
+  public void executeBehaviour(IGameLoop loop);
 
   public void exit();
 
-  public void executeBehaviour(IGameLoop loop);
+  public String getName();
 
   public List<ITransition> getTransitions();
 }

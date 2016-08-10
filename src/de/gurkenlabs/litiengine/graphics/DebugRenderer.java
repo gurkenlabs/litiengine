@@ -21,19 +21,22 @@ import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
 
 public class DebugRenderer {
 
-  public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
-    // draw collision boxes from shape layer
-    if (Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
-      for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
-        g.setColor(Color.RED);
-        RenderEngine.drawShape(g, shape);
-      }
-    }
-
-    if (Game.getConfiguration().DEBUG.showTilesMetric()) {
-      // draw mouse tile info
-      drawTileBoundingBox(g, map, Input.MOUSE.getMapLocation());
-    }
+  /**
+   * Draw name.
+   *
+   * @param g
+   *          the g
+   * @param entity
+   *          the entity
+   */
+  private static void drawMapId(final Graphics2D g, final IEntity entity) {
+    g.setColor(Color.RED);
+    g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
+    final int x = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getX() + 10;
+    final int y = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getY();
+    RenderEngine.drawText(g, entity.getMapId() + "", x, y);
+    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
+    RenderEngine.drawText(g, locationString, x, y + 5);
   }
 
   private static void drawTileBoundingBox(final Graphics2D g, final IMap map, final Point2D location) {
@@ -88,21 +91,18 @@ public class DebugRenderer {
     }
   }
 
-  /**
-   * Draw name.
-   *
-   * @param g
-   *          the g
-   * @param entity
-   *          the entity
-   */
-  private static void drawMapId(final Graphics2D g, final IEntity entity) {
-    g.setColor(Color.RED);
-    g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
-    final int x = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getX() + 10;
-    final int y = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getY();
-    RenderEngine.drawText(g, entity.getMapId() + "", x, y);
-    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
-    RenderEngine.drawText(g, locationString, x, y + 5);
+  public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
+    // draw collision boxes from shape layer
+    if (Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
+      for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
+        g.setColor(Color.RED);
+        RenderEngine.drawShape(g, shape);
+      }
+    }
+
+    if (Game.getConfiguration().DEBUG.showTilesMetric()) {
+      // draw mouse tile info
+      drawTileBoundingBox(g, map, Input.MOUSE.getMapLocation());
+    }
   }
 }

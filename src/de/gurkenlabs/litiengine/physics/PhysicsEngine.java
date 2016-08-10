@@ -21,6 +21,16 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class PhysicsEngine.
  */
 public class PhysicsEngine implements IPhysicsEngine {
+  private static boolean collides(final Rectangle2D a, final Rectangle2D b) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private final List<ICollisionEntity> collisionEntities;
 
   private final List<Rectangle2D> staticCollisionBoxes;
@@ -36,13 +46,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
     this.allCollisionBoxes = new CopyOnWriteArrayList<>();
-  }
-
-  @Override
-  public void update(final IGameLoop loop) {
-    this.allCollisionBoxes.clear();
-    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
-    this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
   }
 
   @Override
@@ -65,94 +68,11 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.collisionEntities.clear();
   }
 
-  @Override
-  public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.allCollisionBoxes;
-  }
-
-  public List<Rectangle2D> getAllCollisionBoxes(final ICollisionEntity entity) {
-    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
-    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
-    allCollisionBoxes.addAll(this.staticCollisionBoxes);
-
-    return allCollisionBoxes;
-  }
-
-  @Override
-  public boolean move(final IMovableEntity entity, final Point2D target, final float delta) {
-    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
-    return this.move(entity, newPosition);
-  }
-
-  @Override
-  public boolean move(final IMovableEntity entity, final double x, final double y, final float delta) {
-    return this.move(entity, new Point2D.Double(x, y), delta);
-  }
-
-  @Override
-  public boolean move(final IMovableEntity entity, final float angle, final float delta) {
-    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
-    return this.move(entity, newPosition);
-  }
-
-  @Override
-  public boolean move(final IMovableEntity entity, final float delta) {
-    return this.move(entity, entity.getAngle(), delta);
-  }
-
-  @Override
-  public void remove(final ICollisionEntity entity) {
-    if (this.collisionEntities.contains(entity)) {
-      this.collisionEntities.remove(entity);
-    }
-  }
-
-  @Override
-  public void remove(final Rectangle2D staticCollisionBox) {
-    if (this.staticCollisionBoxes.contains(staticCollisionBox)) {
-      this.staticCollisionBoxes.remove(staticCollisionBox);
-    }
-  }
-
-  @Override
-  public void setBounds(final Rectangle2D environmentBounds) {
-    this.environmentBounds = environmentBounds;
-  }
-
-  @Override
-  public boolean collides(final Point2D point) {
-    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
-      if (collisionBox.contains(point)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
-  public boolean collides(final Rectangle2D rect) {
-    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+  public boolean collides(final ICollisionEntity entity, final Rectangle2D rect) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes(entity)) {
       if (collides(rect, collisionBox)) {
         return true;
       }
-    }
-
-    return false;
-  }
-
-  @Override
-  public boolean collides(final Rectangle2D rect, final int collisionType) {
-    if ((collisionType & COLLTYPE_ALL) == COLLTYPE_ALL) {
-      return this.collides(rect);
-    }
-
-    if ((collisionType & COLLTYPE_ENTITY) == COLLTYPE_ENTITY) {
-      return this.collidesWithAnyEntity(null, rect) != null;
-    }
-
-    if ((collisionType & COLLTYPE_STATIC) == COLLTYPE_STATIC) {
-      return this.collidesWithAnyStaticCollisionBox(null, rect) != null;
     }
 
     return false;
@@ -198,11 +118,40 @@ public class PhysicsEngine implements IPhysicsEngine {
     return null;
   }
 
-  public boolean collides(final ICollisionEntity entity, final Rectangle2D rect) {
-    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes(entity)) {
+  @Override
+  public boolean collides(final Point2D point) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+      if (collisionBox.contains(point)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean collides(final Rectangle2D rect) {
+    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (collides(rect, collisionBox)) {
         return true;
       }
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean collides(final Rectangle2D rect, final int collisionType) {
+    if ((collisionType & COLLTYPE_ALL) == COLLTYPE_ALL) {
+      return this.collides(rect);
+    }
+
+    if ((collisionType & COLLTYPE_ENTITY) == COLLTYPE_ENTITY) {
+      return this.collidesWithAnyEntity(null, rect) != null;
+    }
+
+    if ((collisionType & COLLTYPE_STATIC) == COLLTYPE_STATIC) {
+      return this.collidesWithAnyStaticCollisionBox(null, rect) != null;
     }
 
     return false;
@@ -233,16 +182,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return null;
-  }
-
-  private static boolean collides(final Rectangle2D a, final Rectangle2D b) {
-    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
-      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -284,6 +223,24 @@ public class PhysicsEngine implements IPhysicsEngine {
     return mob.getLocation();
   }
 
+  @Override
+  public List<Rectangle2D> getAllCollisionBoxes() {
+    return this.allCollisionBoxes;
+  }
+
+  public List<Rectangle2D> getAllCollisionBoxes(final ICollisionEntity entity) {
+    final List<Rectangle2D> allCollisionBoxes = new ArrayList<>();
+    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision() && entity.collidesWith(x)).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.staticCollisionBoxes);
+
+    return allCollisionBoxes;
+  }
+
+  @Override
+  public List<Rectangle2D> getStaticCollisionBoxes() {
+    return this.staticCollisionBoxes;
+  }
+
   /**
    * Checks if is in map.
    *
@@ -297,6 +254,22 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return this.environmentBounds.contains(collisionBox.getBounds());
+  }
+
+  @Override
+  public boolean move(final IMovableEntity entity, final double x, final double y, final float delta) {
+    return this.move(entity, new Point2D.Double(x, y), delta);
+  }
+
+  @Override
+  public boolean move(final IMovableEntity entity, final float delta) {
+    return this.move(entity, entity.getAngle(), delta);
+  }
+
+  @Override
+  public boolean move(final IMovableEntity entity, final float angle, final float delta) {
+    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
+    return this.move(entity, newPosition);
   }
 
   private boolean move(final IMovableEntity entity, Point2D newPosition) {
@@ -328,6 +301,26 @@ public class PhysicsEngine implements IPhysicsEngine {
     // set new map location
     entity.setLocation(newPosition);
     return success;
+  }
+
+  @Override
+  public boolean move(final IMovableEntity entity, final Point2D target, final float delta) {
+    final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
+    return this.move(entity, newPosition);
+  }
+
+  @Override
+  public void remove(final ICollisionEntity entity) {
+    if (this.collisionEntities.contains(entity)) {
+      this.collisionEntities.remove(entity);
+    }
+  }
+
+  @Override
+  public void remove(final Rectangle2D staticCollisionBox) {
+    if (this.staticCollisionBoxes.contains(staticCollisionBox)) {
+      this.staticCollisionBoxes.remove(staticCollisionBox);
+    }
   }
 
   private Point2D resolveCollision(final IMovableEntity entity, final Point2D newPosition, final Rectangle2D intersection) {
@@ -362,7 +355,14 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public List<Rectangle2D> getStaticCollisionBoxes() {
-    return this.staticCollisionBoxes;
+  public void setBounds(final Rectangle2D environmentBounds) {
+    this.environmentBounds = environmentBounds;
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
+    this.allCollisionBoxes.clear();
+    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
+    this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
   }
 }

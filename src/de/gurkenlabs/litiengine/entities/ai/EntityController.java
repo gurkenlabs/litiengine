@@ -13,12 +13,12 @@ public class EntityController<T extends Entity> extends StateMachine implements 
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public T getEntity() {
+    return this.entity;
   }
 
   @Override
-  public T getEntity() {
-    return this.entity;
+  public void update(final IGameLoop loop) {
+    super.update(loop);
   }
 }

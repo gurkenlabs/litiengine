@@ -3,10 +3,25 @@ package de.gurkenlabs.litiengine.entities;
 public enum Direction {
   DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);
 
-  private final byte flagValue;
+  public static Direction fromAngle(final float angle) {
+    if (angle >= 0 && angle < 45) {
+      return Direction.DOWN;
+    }
+    if (angle >= 45 && angle < 135) {
+      return Direction.RIGHT;
+    }
+    if (angle >= 135 && angle < 225) {
+      return Direction.UP;
+    }
+    if (angle >= 225 && angle < 315) {
+      return Direction.LEFT;
+    }
 
-  private Direction(final byte flagValue) {
-    this.flagValue = flagValue;
+    if (angle >= 315 && angle <= 360) {
+      return Direction.DOWN;
+    }
+
+    return Direction.UNDEFINED;
   }
 
   public static Direction fromFlagValue(final byte flagValue) {
@@ -35,25 +50,10 @@ public enum Direction {
     }
   }
 
-  public static Direction fromAngle(final float angle) {
-    if (angle >= 0 && angle < 45) {
-      return Direction.DOWN;
-    }
-    if (angle >= 45 && angle < 135) {
-      return Direction.RIGHT;
-    }
-    if (angle >= 135 && angle < 225) {
-      return Direction.UP;
-    }
-    if (angle >= 225 && angle < 315) {
-      return Direction.LEFT;
-    }
+  private final byte flagValue;
 
-    if (angle >= 315 && angle <= 360) {
-      return Direction.DOWN;
-    }
-
-    return Direction.UNDEFINED;
+  private Direction(final byte flagValue) {
+    this.flagValue = flagValue;
   }
 
   public byte getFlagValue() {

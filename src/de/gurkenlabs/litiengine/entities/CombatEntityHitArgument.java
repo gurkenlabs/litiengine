@@ -13,15 +13,15 @@ public class CombatEntityHitArgument {
     this.ability = ability;
   }
 
+  public Ability getAbility() {
+    return this.ability;
+  }
+
   public float getDamage() {
     return this.damage;
   }
 
   public ICombatEntity getEntity() {
     return this.entity;
-  }
-
-  public Ability getAbility() {
-    return this.ability;
   }
 }

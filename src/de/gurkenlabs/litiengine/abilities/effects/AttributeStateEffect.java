@@ -39,15 +39,6 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
     this.modifier = new AttributeModifier<>(modification, delta);
   }
 
-  /**
-   * Gets the modifier.
-   *
-   * @return the modifier
-   */
-  public AttributeModifier<T> getModifier() {
-    return this.modifier;
-  }
-
   @Override
   protected void apply(final ICombatEntity affectedEntity) {
     super.apply(affectedEntity);
@@ -61,4 +52,13 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   }
 
   protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
+
+  /**
+   * Gets the modifier.
+   *
+   * @return the modifier
+   */
+  public AttributeModifier<T> getModifier() {
+    return this.modifier;
+  }
 }

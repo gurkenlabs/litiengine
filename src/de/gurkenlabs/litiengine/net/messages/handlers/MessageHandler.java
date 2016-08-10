@@ -43,6 +43,18 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
   }
 
   /**
+   * Handle.
+   *
+   * @param message
+   *          the message
+   * @param address
+   *          the address
+   * @param port
+   *          the port
+   */
+  protected abstract void handle(T message, InetAddress address, int port);
+
+  /**
    * This method can be overwritten by concrete implementations to provide a
    * validation mechanism for the messages sent. E.g. one could test if a
    * certain field of the message is not null.
@@ -54,16 +66,4 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
   protected boolean validate(final T message) {
     return true;
   }
-
-  /**
-   * Handle.
-   *
-   * @param message
-   *          the message
-   * @param address
-   *          the address
-   * @param port
-   *          the port
-   */
-  protected abstract void handle(T message, InetAddress address, int port);
 }

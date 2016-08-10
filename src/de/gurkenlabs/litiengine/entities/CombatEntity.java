@@ -72,6 +72,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.setCollision(false);
   }
 
+  @Override
+  public List<IEffect> getAppliedEffects() {
+    return this.appliedEffects;
+  }
+
   /**
    * Gets the attributes.
    *
@@ -90,6 +95,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public Ellipse2D getHitBox() {
     return new Ellipse2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+  }
+
+  @Override
+  public ICombatEntity getTarget() {
+    return this.target;
   }
 
   @Override
@@ -178,6 +188,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
+  public boolean isNeutral() {
+    return this.getTeam() == 0;
+  }
+
+  @Override
   public void onDeath(final Consumer<ICombatEntity> consumer) {
     if (this.entityDeathConsumer.contains(consumer)) {
       return;
@@ -187,21 +202,21 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public void onResurrect(final Consumer<ICombatEntity> consumer) {
-    if (this.entityResurrectConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityResurrectConsumer.add(consumer);
-  }
-
-  @Override
   public void onHit(final Consumer<CombatEntityHitArgument> consumer) {
     if (this.entityHitConsumer.contains(consumer)) {
       return;
     }
 
     this.entityHitConsumer.add(consumer);
+  }
+
+  @Override
+  public void onResurrect(final Consumer<ICombatEntity> consumer) {
+    if (this.entityResurrectConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.entityResurrectConsumer.add(consumer);
   }
 
   /**
@@ -222,6 +237,22 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   /**
+   * Sets the indestructible.
+   *
+   * @param ind
+   *          the new indestructible
+   */
+  public void setIndestructible(final boolean ind) {
+    this.isIndestructible = ind;
+  }
+
+  @Override
+  public void setTarget(final ICombatEntity target) {
+    this.target = target;
+
+  }
+
+  /**
    * Sets the team.
    *
    * @param team
@@ -233,16 +264,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   /**
-   * Sets the indestructible.
-   *
-   * @param ind
-   *          the new indestructible
-   */
-  public void setIndestructible(final boolean ind) {
-    this.isIndestructible = ind;
-  }
-
-  /**
    * Sets the up attributes.
    *
    * @param attributes
@@ -250,26 +271,5 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   protected void setupAttributes(final CombatAttributes attributes) {
 
-  }
-
-  @Override
-  public ICombatEntity getTarget() {
-    return this.target;
-  }
-
-  @Override
-  public void setTarget(final ICombatEntity target) {
-    this.target = target;
-
-  }
-
-  @Override
-  public boolean isNeutral() {
-    return this.getTeam() == 0;
-  }
-
-  @Override
-  public List<IEffect> getAppliedEffects() {
-    return this.appliedEffects;
   }
 }

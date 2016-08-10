@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public interface ICollisionEntity extends IEntity {
+  public boolean collidesWith(ICollisionEntity otherEntity);
+
   /**
    * Gets the collision box.
    *
@@ -34,6 +36,4 @@ public interface ICollisionEntity extends IEntity {
    *          the new collision
    */
   public void setCollision(boolean collision);
-
-  public boolean collidesWith(ICollisionEntity otherEntity);
 }

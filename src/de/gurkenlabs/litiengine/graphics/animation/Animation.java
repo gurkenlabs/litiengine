@@ -65,12 +65,44 @@ public class Animation implements IUpdateable, ILaunchable {
     return this.spritesheet;
   }
 
+  private void initKeyFrames(final int[] keyFrames) {
+
+    // if no keyframes are specified, the animation takes in the whole
+    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
+    // keyframe
+    if (keyFrames.length == 0) {
+      for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
+        this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
+      }
+    } else {
+      for (int i = 0; i < keyFrames.length; i++) {
+        this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
+      }
+    }
+
+    if (this.keyframes.size() != 0) {
+      this.firstFrame = this.getKeyframes().get(0);
+    }
+  }
+
+  private boolean isLastKeyFrame() {
+    return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
+  }
+
   public boolean isLoop() {
     return this.loop;
   }
 
+  public boolean isPaused() {
+    return this.paused;
+  }
+
   public boolean isPlaying() {
     return !this.paused && this.keyframes.size() > 0 && this.playing;
+  }
+
+  public void pause() {
+    this.paused = true;
   }
 
   public void setFrameDuration(final int frameDuration) {
@@ -101,16 +133,8 @@ public class Animation implements IUpdateable, ILaunchable {
     this.currentFrame = this.getKeyframes().get(0);
   }
 
-  public void pause() {
-    this.paused = true;
-  }
-
   public void unpause() {
     this.paused = false;
-  }
-
-  public boolean isPaused() {
-    return this.paused;
   }
 
   @Override
@@ -132,29 +156,5 @@ public class Animation implements IUpdateable, ILaunchable {
     final int newFrameIndex = (this.getKeyframes().indexOf(this.currentFrame) + 1) % this.getKeyframes().size();
     this.currentFrame = this.getKeyframes().get(newFrameIndex);
     this.elapsedTicks = 0;
-  }
-
-  private void initKeyFrames(final int[] keyFrames) {
-
-    // if no keyframes are specified, the animation takes in the whole
-    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
-    // keyframe
-    if (keyFrames.length == 0) {
-      for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
-        this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
-      }
-    } else {
-      for (int i = 0; i < keyFrames.length; i++) {
-        this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
-      }
-    }
-
-    if (this.keyframes.size() != 0) {
-      this.firstFrame = this.getKeyframes().get(0);
-    }
-  }
-
-  private boolean isLastKeyFrame() {
-    return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
   }
 }

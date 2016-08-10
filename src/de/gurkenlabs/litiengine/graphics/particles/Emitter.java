@@ -123,6 +123,30 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.particles.add(particle);
   }
 
+  protected void addParticleColor(final Color... colors) {
+    for (final Color color : colors) {
+      if (!this.colors.contains(color)) {
+        this.colors.add(color);
+      }
+    }
+  }
+
+  /**
+   * Can take new particles.
+   *
+   * @return Whether-or-not the effect can hold any more particles.
+   */
+  protected boolean canTakeNewParticles() {
+    return this.particles.size() < this.maxParticles;
+  }
+
+  /**
+   * Creates the new particle.
+   *
+   * @return the particle
+   */
+  protected abstract Particle createNewParticle();
+
   /**
    * Deactivate.
    */
@@ -186,6 +210,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.particleMinTTL;
   }
 
+  public void getParticleMinTTL(final int minTTL) {
+    this.particleMinTTL = minTTL;
+  }
+
   /**
    * Gets the particles.
    *
@@ -199,6 +227,36 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.particleUpdateDelay;
   }
 
+  protected Color getRandomParticleColor() {
+    if (this.colors.size() == 0) {
+      return DEFAULT_PARTICLE_COLOR;
+    }
+
+    return this.colors.get(RANDOM.nextInt(this.colors.size()));
+  }
+
+  protected int getRandomParticleTTL() {
+    final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
+    if (ttlDiff <= 0) {
+      return this.getParticleMaxTTL();
+    }
+
+    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    return ttl;
+  }
+
+  protected int getRandomParticleX() {
+    return RANDOM.nextInt((int) this.getWidth());
+  }
+
+  protected int getRandomParticleY() {
+    return RANDOM.nextInt((int) this.getHeight());
+  }
+
+  public int getSpawnAmount() {
+    return this.spawnAmount;
+  }
+
   /**
    * Gets the spawn rate in milliseconds.
    *
@@ -206,10 +264,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    */
   public int getSpawnRate() {
     return this.spawnRate;
-  }
-
-  public int getSpawnAmount() {
-    return this.spawnAmount;
   }
 
   /**
@@ -242,45 +296,15 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.paused;
   }
 
-  public void togglePaused() {
-    this.paused = !this.paused;
-  }
-
-  public void setMaxParticles(final int maxPart) {
-    this.maxParticles = maxPart;
-  }
-
-  public void setOrigin(final Point2D location) {
-    this.setLocation(location);
-    this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
-  }
-
-  public void setParticleMaxTTL(final int maxTTL) {
-    this.particleMaxTTL = maxTTL;
-  }
-
-  public void getParticleMinTTL(final int minTTL) {
-    this.particleMinTTL = minTTL;
-  }
-
-  public void setParticleMinTTL(final int minTTL) {
-    this.particleMinTTL = minTTL;
-  }
-
-  public void setParticleUpdateRate(final int delay) {
-    this.particleUpdateDelay = delay;
-  }
-
-  public void setSpawnRate(final int spawnRate) {
-    this.spawnRate = spawnRate;
-  }
-
-  public void setSpawnAmount(final int spawnAmount) {
-    this.spawnAmount = spawnAmount;
-  }
-
-  public void setTimeToLive(final int ttl) {
-    this.timeToLive = ttl;
+  /**
+   * Particle can be removed.
+   *
+   * @param particle
+   *          the particle
+   * @return true, if successful
+   */
+  protected boolean particleCanBeRemoved(final Particle particle) {
+    return particle.timeToLiveReached();
   }
 
   @Override
@@ -296,6 +320,27 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
+  public void setMaxParticles(final int maxPart) {
+    this.maxParticles = maxPart;
+  }
+
+  public void setOrigin(final Point2D location) {
+    this.setLocation(location);
+    this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+  }
+
+  public void setParticleMaxTTL(final int maxTTL) {
+    this.particleMaxTTL = maxTTL;
+  }
+
+  public void setParticleMinTTL(final int minTTL) {
+    this.particleMinTTL = minTTL;
+  }
+
+  public void setParticleUpdateRate(final int delay) {
+    this.particleUpdateDelay = delay;
+  }
+
   /**
    * Sets the paused.
    *
@@ -306,6 +351,41 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.paused = paused;
   }
 
+  public void setSpawnAmount(final int spawnAmount) {
+    this.spawnAmount = spawnAmount;
+  }
+
+  public void setSpawnRate(final int spawnRate) {
+    this.spawnRate = spawnRate;
+  }
+
+  public void setTimeToLive(final int ttl) {
+    this.timeToLive = ttl;
+  }
+
+  /**
+   * Render particles of this effect. The particles are always rendered
+   * relatively to this effects render location. A particle doesn't have an own
+   * map location. It is always relative to the effect it is assigned to.
+   *
+   * @param g
+   *          the g
+   * @param p
+   *          the p
+   */
+  /**
+   * Spawn particle.
+   */
+  protected void spawnParticle() {
+    for (short i = 0; i < this.getSpawnAmount(); i++) {
+      if (!this.canTakeNewParticles()) {
+        return;
+      }
+
+      this.addParticle(this.createNewParticle());
+    }
+  }
+
   /**
    * Time to live reached.
    *
@@ -314,6 +394,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   @Override
   public boolean timeToLiveReached() {
     return this.activated && this.getTimeToLive() > 0 && this.getAliveTime() >= this.getTimeToLive();
+  }
+
+  public void togglePaused() {
+    this.paused = !this.paused;
   }
 
   /*
@@ -348,90 +432,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     if (loop.getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
-    }
-  }
-
-  protected void addParticleColor(final Color... colors) {
-    for (final Color color : colors) {
-      if (!this.colors.contains(color)) {
-        this.colors.add(color);
-      }
-    }
-  }
-
-  /**
-   * Can take new particles.
-   *
-   * @return Whether-or-not the effect can hold any more particles.
-   */
-  protected boolean canTakeNewParticles() {
-    return this.particles.size() < this.maxParticles;
-  }
-
-  /**
-   * Creates the new particle.
-   *
-   * @return the particle
-   */
-  protected abstract Particle createNewParticle();
-
-  protected Color getRandomParticleColor() {
-    if (this.colors.size() == 0) {
-      return DEFAULT_PARTICLE_COLOR;
-    }
-
-    return this.colors.get(RANDOM.nextInt(this.colors.size()));
-  }
-
-  protected int getRandomParticleTTL() {
-    final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
-    if (ttlDiff <= 0) {
-      return this.getParticleMaxTTL();
-    }
-
-    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
-    return ttl;
-  }
-
-  protected int getRandomParticleX() {
-    return RANDOM.nextInt((int) this.getWidth());
-  }
-
-  protected int getRandomParticleY() {
-    return RANDOM.nextInt((int) this.getHeight());
-  }
-
-  /**
-   * Particle can be removed.
-   *
-   * @param particle
-   *          the particle
-   * @return true, if successful
-   */
-  protected boolean particleCanBeRemoved(final Particle particle) {
-    return particle.timeToLiveReached();
-  }
-
-  /**
-   * Render particles of this effect. The particles are always rendered
-   * relatively to this effects render location. A particle doesn't have an own
-   * map location. It is always relative to the effect it is assigned to.
-   *
-   * @param g
-   *          the g
-   * @param p
-   *          the p
-   */
-  /**
-   * Spawn particle.
-   */
-  protected void spawnParticle() {
-    for (short i = 0; i < this.getSpawnAmount(); i++) {
-      if (!this.canTakeNewParticles()) {
-        return;
-      }
-
-      this.addParticle(this.createNewParticle());
     }
   }
 

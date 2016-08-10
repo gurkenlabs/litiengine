@@ -44,37 +44,6 @@ public class ImageCache {
   /** The Constant SPRITESHEET_CACHE. */
   public static final ImageCache IMAGES = new ImageCache("images");
 
-  /** The cache. */
-  private final ConcurrentHashMap<String, BufferedImage> cache;
-
-  /** The sub folder. */
-  private final String subFolder;
-
-  /**
-   * Instantiates a new image cache.
-   *
-   * @param subfolder
-   *          the subfolder
-   */
-  private ImageCache(final String subfolder) {
-    this.cache = new ConcurrentHashMap<>();
-    this.subFolder = subfolder;
-  }
-
-  public static void saveCache(final String path) {
-    final File cacheFile = new File(path, CACHE_DUMP_NAME);
-    try {
-      if (cacheFile.exists()) {
-        cacheFile.delete();
-      }
-
-      CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
-      System.out.println("cache dumped to " + cacheFile.toPath());
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
-  }
-
   public static void loadCache(final String path) {
     InputStream in = null;
     final File cacheFile = new File(path, CACHE_DUMP_NAME);
@@ -99,6 +68,37 @@ public class ImageCache {
     } catch (final IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public static void saveCache(final String path) {
+    final File cacheFile = new File(path, CACHE_DUMP_NAME);
+    try {
+      if (cacheFile.exists()) {
+        cacheFile.delete();
+      }
+
+      CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
+      System.out.println("cache dumped to " + cacheFile.toPath());
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /** The cache. */
+  private final ConcurrentHashMap<String, BufferedImage> cache;
+
+  /** The sub folder. */
+  private final String subFolder;
+
+  /**
+   * Instantiates a new image cache.
+   *
+   * @param subfolder
+   *          the subfolder
+   */
+  private ImageCache(final String subfolder) {
+    this.cache = new ConcurrentHashMap<>();
+    this.subFolder = subfolder;
   }
 
   /**
@@ -128,6 +128,26 @@ public class ImageCache {
   }
 
   /**
+   * Gets the file name.
+   *
+   * @param key
+   *          the key
+   * @return the file name
+   */
+  private String getFileName(final String key) {
+    return this.getSubFolderName() + "\\" + key;
+  }
+
+  /**
+   * Gets the sub folder name.
+   *
+   * @return the sub folder name
+   */
+  private String getSubFolderName() {
+    return CACHE_DIRECTORY + this.subFolder;
+  }
+
+  /**
    * Load all.
    */
   public void loadAll() {
@@ -150,54 +170,6 @@ public class ImageCache {
         }
       }
     }
-  }
-
-  /**
-   * Put.
-   *
-   * @param key
-   *          the key
-   * @param value
-   *          the value
-   * @return the buffered image
-   */
-  public BufferedImage put(final String key, final BufferedImage value) {
-    return this.cache.put(key, value);
-  }
-
-  /**
-   * Put persistent.
-   *
-   * @param key
-   *          the key
-   * @param value
-   *          the value
-   * @return the buffered image
-   */
-  public BufferedImage putPersistent(final String key, final BufferedImage value) {
-    this.cache.put(key, value);
-    this.saveImage(key, value);
-    return value;
-  }
-
-  /**
-   * Gets the file name.
-   *
-   * @param key
-   *          the key
-   * @return the file name
-   */
-  private String getFileName(final String key) {
-    return this.getSubFolderName() + "\\" + key;
-  }
-
-  /**
-   * Gets the sub folder name.
-   *
-   * @return the sub folder name
-   */
-  private String getSubFolderName() {
-    return CACHE_DIRECTORY + this.subFolder;
   }
 
   /**
@@ -230,6 +202,34 @@ public class ImageCache {
       e.printStackTrace();
       return null;
     }
+  }
+
+  /**
+   * Put.
+   *
+   * @param key
+   *          the key
+   * @param value
+   *          the value
+   * @return the buffered image
+   */
+  public BufferedImage put(final String key, final BufferedImage value) {
+    return this.cache.put(key, value);
+  }
+
+  /**
+   * Put persistent.
+   *
+   * @param key
+   *          the key
+   * @param value
+   *          the value
+   * @return the buffered image
+   */
+  public BufferedImage putPersistent(final String key, final BufferedImage value) {
+    this.cache.put(key, value);
+    this.saveImage(key, value);
+    return value;
   }
 
   /**

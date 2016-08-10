@@ -29,23 +29,54 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  */
 public class LightSource extends Entity implements IRenderable {
 
+  public static final String RECTANGLE = "rectangle";
+
+  public static final String ELLIPSE = "ellipse";
+
+  /**
+   * Gets the shadow ellipse.
+   *
+   * @param mob
+   *          the mob
+   * @return the shadow ellipse
+   */
+  private static Ellipse2D getShadowEllipse(final IEntity mob) {
+    final int ShadowHeight = (int) (mob.getHeight() / 4);
+    final int ShadowWidth = (int) (mob.getWidth() / 3);
+
+    final int yOffset = (int) mob.getHeight();
+    final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
+    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2;
+    return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
+  }
+
+  /**
+   * Checks if is in range.
+   *
+   * @param center
+   *          the center
+   * @param radius
+   *          the radius
+   * @return the predicate<? super mob>
+   */
+  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
+    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
+  }
+
   /** The brightness. */
   private int brightness;
-
   /** The color. */
   private final Color color;
-
   private final IEnvironment environment;
 
   /** The radius. */
   private int radius;
-  public static final String RECTANGLE = "rectangle";
-  public static final String ELLIPSE = "ellipse";
-  private String lightShapeType;
-
+  private final String lightShapeType;
   private Shape largeLightShape;
   private Shape midLightShape;
+
   private Shape smallLightShape;
+
   private final double gradientStepSize;
 
   /**
@@ -79,21 +110,55 @@ public class LightSource extends Entity implements IRenderable {
     this.lightShapeType = shapeType;
     switch (this.getLightShapeType()) {
     case LightSource.ELLIPSE:
-      largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      this.largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      this.midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      this.smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
       break;
     case LightSource.RECTANGLE:
-      largeLightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      midLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      smallLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      this.largeLightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      this.midLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      this.smallLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
       break;
     default:
-      largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      this.largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      this.midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
+      this.smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
       break;
     }
+  }
+
+  /**
+   * Gets the brightness.
+   *
+   * @return the brightness
+   */
+  public int getBrightness() {
+    return this.brightness;
+  }
+
+  /**
+   * Gets the color.
+   *
+   * @return the color
+   */
+  public Color getColor() {
+    return this.color;
+  }
+
+  public double getGradientStepSize() {
+    return this.gradientStepSize;
+  }
+
+  public Shape getLargeLightShape() {
+    return this.largeLightShape;
+  }
+
+  public String getLightShapeType() {
+    return this.lightShapeType;
+  }
+
+  public Shape getMidLightShape() {
+    return this.midLightShape;
   }
 
   /**
@@ -168,58 +233,6 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   /**
-   * Gets the shadow ellipse.
-   *
-   * @param mob
-   *          the mob
-   * @return the shadow ellipse
-   */
-  private static Ellipse2D getShadowEllipse(final IEntity mob) {
-    final int ShadowHeight = (int) (mob.getHeight() / 4);
-    final int ShadowWidth = (int) (mob.getWidth() / 3);
-
-    final int yOffset = (int) mob.getHeight();
-    final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2;
-    return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
-  }
-
-  /**
-   * Checks if is in range.
-   *
-   * @param center
-   *          the center
-   * @param radius
-   *          the radius
-   * @return the predicate<? super mob>
-   */
-  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
-    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
-  }
-
-  /**
-   * Gets the brightness.
-   *
-   * @return the brightness
-   */
-  public int getBrightness() {
-    return this.brightness;
-  }
-
-  public String getLightShapeType() {
-    return this.lightShapeType;
-  }
-
-  /**
-   * Gets the color.
-   *
-   * @return the color
-   */
-  public Color getColor() {
-    return this.color;
-  }
-
-  /**
    * Gets the radius.
    *
    * @return the radius
@@ -228,35 +241,13 @@ public class LightSource extends Entity implements IRenderable {
     return this.radius;
   }
 
-  public Shape getLargeLightShape() {
-    return largeLightShape;
-  }
-
-  public Shape getMidLightShape() {
-    return midLightShape;
-  }
-
   public Shape getSmallLightShape() {
-    return smallLightShape;
-  }
-
-  public double getGradientStepSize() {
-    return gradientStepSize;
+    return this.smallLightShape;
   }
 
   @Override
   public void render(final Graphics2D g) {
     this.renderShadows(g);
-  }
-
-  /**
-   * Sets the brightness.
-   *
-   * @param brightness
-   *          the new brightness
-   */
-  public void setBrightness(final int brightness) {
-    this.brightness = brightness;
   }
 
   /**
@@ -326,6 +317,16 @@ public class LightSource extends Entity implements IRenderable {
 
     // reset to old Paint object
     g.setPaint(oldPaint);
+  }
+
+  /**
+   * Sets the brightness.
+   *
+   * @param brightness
+   *          the new brightness
+   */
+  public void setBrightness(final int brightness) {
+    this.brightness = brightness;
   }
 
   /**

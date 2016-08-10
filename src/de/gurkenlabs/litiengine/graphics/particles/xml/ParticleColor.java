@@ -29,21 +29,8 @@ public class ParticleColor {
   }
 
   @XmlTransient
-  public int getRed() {
-    return this.red;
-  }
-
-  public void setRed(final int red) {
-    this.red = red;
-  }
-
-  @XmlTransient
-  public int getGreen() {
-    return this.green;
-  }
-
-  public void setGreen(final int green) {
-    this.green = green;
+  public int getAlpha() {
+    return this.alpha;
   }
 
   @XmlTransient
@@ -51,17 +38,30 @@ public class ParticleColor {
     return this.blue;
   }
 
-  public void setBlue(final int blue) {
-    this.blue = blue;
+  @XmlTransient
+  public int getGreen() {
+    return this.green;
   }
 
   @XmlTransient
-  public int getAlpha() {
-    return this.alpha;
+  public int getRed() {
+    return this.red;
   }
 
   public void setAlpha(final int alpha) {
     this.alpha = alpha;
+  }
+
+  public void setBlue(final int blue) {
+    this.blue = blue;
+  }
+
+  public void setGreen(final int green) {
+    this.green = green;
+  }
+
+  public void setRed(final int red) {
+    this.red = red;
   }
 
   public Color toColor() {

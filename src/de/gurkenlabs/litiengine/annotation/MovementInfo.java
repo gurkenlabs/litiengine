@@ -18,12 +18,12 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface MovementInfo {
 
+  boolean turnOnMove() default true;
+
   /**
    * The velocity in pixels per second.
    *
    * @return the velocity
    */
   short velocity() default 100;
-
-  boolean turnOnMove() default true;
 }

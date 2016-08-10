@@ -7,6 +7,8 @@ import de.gurkenlabs.util.console.ICommandManager;
 
 public interface IServer extends IIncomingPacketObserver, ILaunchable {
 
+  public ICommandManager getCommandManager();
+
   /**
    * Gets the connection manager.
    *
@@ -20,6 +22,4 @@ public interface IServer extends IIncomingPacketObserver, ILaunchable {
    * @return the sender
    */
   public IPacketSender getSender();
-
-  public ICommandManager getCommandManager();
 }

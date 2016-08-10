@@ -13,6 +13,21 @@ public class StateMachine implements IStateMachine {
   }
 
   @Override
+  public IState getCurrentState() {
+    return this.currentState;
+  }
+
+  @Override
+  public void setState(final IState newState) {
+    if (this.currentState != null) {
+      this.currentState.exit();
+    }
+
+    this.currentState = newState;
+    this.currentState.enter();
+  }
+
+  @Override
   public void update(final IGameLoop loop) {
     if (this.currentState == null) {
       return;
@@ -32,20 +47,5 @@ public class StateMachine implements IStateMachine {
       this.currentState.enter();
       return;
     }
-  }
-
-  @Override
-  public void setState(final IState newState) {
-    if (this.currentState != null) {
-      this.currentState.exit();
-    }
-
-    this.currentState = newState;
-    this.currentState.enter();
-  }
-
-  @Override
-  public IState getCurrentState() {
-    return this.currentState;
   }
 }

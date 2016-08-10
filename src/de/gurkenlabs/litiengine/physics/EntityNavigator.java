@@ -44,6 +44,13 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public void cancelNavigation(final Predicate<IMovableEntity> predicate) {
+    if (!this.cancelNavigationConditions.contains(predicate)) {
+      this.cancelNavigationConditions.add(predicate);
+    }
+  }
+
+  @Override
   public IMovableEntity getEntity() {
     return this.entity;
   }
@@ -59,8 +66,19 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public boolean isNavigating() {
+    return this.path != null;
+  }
+
+  @Override
   public void navigate(final Point2D target) {
     this.path = this.getPathFinder().findPath(this.entity, target);
+  }
+
+  @Override
+  public void rotateTowards(final Point2D target) {
+    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
+    this.entity.setAngle((float) angle);
   }
 
   @Override
@@ -129,23 +147,5 @@ public class EntityNavigator implements IEntityNavigator {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = loop.getDeltaTime() * 0.001f * this.entity.getVelocity();
     Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
-  }
-
-  @Override
-  public void rotateTowards(final Point2D target) {
-    final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
-    this.entity.setAngle((float) angle);
-  }
-
-  @Override
-  public boolean isNavigating() {
-    return this.path != null;
-  }
-
-  @Override
-  public void cancelNavigation(final Predicate<IMovableEntity> predicate) {
-    if (!this.cancelNavigationConditions.contains(predicate)) {
-      this.cancelNavigationConditions.add(predicate);
-    }
   }
 }

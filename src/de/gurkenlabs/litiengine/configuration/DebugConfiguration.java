@@ -38,6 +38,14 @@ public class DebugConfiguration extends ConfigurationGroup {
     return this.debugEnabled;
   }
 
+  public boolean isRenderAStarInfo() {
+    return this.renderAStarInfo;
+  }
+
+  public boolean renderBoundingBoxes() {
+    return this.isDebugEnabled() && this.renderBoundingBoxes;
+  }
+
   /**
    * Render collision boxes.
    *
@@ -66,14 +74,6 @@ public class DebugConfiguration extends ConfigurationGroup {
     return this.isDebugEnabled() && this.renderHitBoxes;
   }
 
-  public boolean renderBoundingBoxes() {
-    return this.isDebugEnabled() && this.renderBoundingBoxes;
-  }
-
-  public void setDebugEnabled(final boolean debugEnabled) {
-    this.debugEnabled = debugEnabled;
-  }
-
   /**
    * Render paths.
    *
@@ -81,6 +81,18 @@ public class DebugConfiguration extends ConfigurationGroup {
    */
   public boolean renderPaths() {
     return this.isDebugEnabled() && this.renderPaths;
+  }
+
+  public void setDebugEnabled(final boolean debugEnabled) {
+    this.debugEnabled = debugEnabled;
+  }
+
+  public void setRenderAStarInfo(final boolean renderAStarInfo) {
+    this.renderAStarInfo = renderAStarInfo;
+  }
+
+  public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {
+    this.renderBoundingBoxes = renderBoundingBoxes;
   }
 
   public void setRenderCollisionBoxes(final boolean renderCollisionBoxes) {
@@ -124,17 +136,5 @@ public class DebugConfiguration extends ConfigurationGroup {
   // game metric settings
   public boolean showTilesMetric() {
     return this.isDebugEnabled() && this.showTilesMetric;
-  }
-
-  public boolean isRenderAStarInfo() {
-    return this.renderAStarInfo;
-  }
-
-  public void setRenderAStarInfo(final boolean renderAStarInfo) {
-    this.renderAStarInfo = renderAStarInfo;
-  }
-
-  public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {
-    this.renderBoundingBoxes = renderBoundingBoxes;
   }
 }

@@ -52,6 +52,21 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
+  public GameTime getTime() {
+    return this.gameTime;
+  }
+
+  @Override
+  public float getTimeScale() {
+    return this.timeScale;
+  }
+
+  @Override
+  public int getUpdatablesCount() {
+    return this.updatables.size();
+  }
+
+  @Override
   public int getUpdateRate() {
     return this.updateRate;
   }
@@ -116,6 +131,11 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
+  public void setTimeScale(final float timeScale) {
+    this.timeScale = timeScale;
+  }
+
+  @Override
   public void terminate() {
     this.gameIsRunning = false;
   }
@@ -123,25 +143,5 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void unregisterFromUpdate(final IUpdateable updatable) {
     this.updatables.remove(updatable);
-  }
-
-  @Override
-  public float getTimeScale() {
-    return this.timeScale;
-  }
-
-  @Override
-  public void setTimeScale(final float timeScale) {
-    this.timeScale = timeScale;
-  }
-
-  @Override
-  public GameTime getTime() {
-    return this.gameTime;
-  }
-
-  @Override
-  public int getUpdatablesCount() {
-    return this.updatables.size();
   }
 }

@@ -15,6 +15,8 @@ public interface IEffect extends IUpdateable {
 
   public void cease(final ICombatEntity affectedEntity);
 
+  public List<EffectAppliance> getActiveAppliances();
+
   public int getDelay();
 
   public int getDuration();
@@ -22,8 +24,6 @@ public interface IEffect extends IUpdateable {
   public EffectTarget[] getEffectTargets();
 
   public List<IEffect> getFollowUpEffects();
-
-  public List<EffectAppliance> getActiveAppliances();
 
   public boolean isActive(ICombatEntity entity);
 

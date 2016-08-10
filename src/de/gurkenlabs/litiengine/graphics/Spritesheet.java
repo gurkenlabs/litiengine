@@ -20,6 +20,19 @@ public class Spritesheet {
 
   private static final List<Spritesheet> spritesheets = new CopyOnWriteArrayList<>();
 
+  public static Spritesheet find(final String path) {
+    if (path == null || path.isEmpty()) {
+      return null;
+    }
+
+    final Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst();
+    if (!sheet.isPresent()) {
+      return null;
+    }
+
+    return sheet.get();
+  }
+
   /** The path. */
   private final String path;
 
@@ -71,24 +84,6 @@ public class Spritesheet {
     this.hashCode = this.getPath().hashCode();
   }
 
-  public static Spritesheet find(final String path) {
-    if (path == null || path.isEmpty()) {
-      return null;
-    }
-
-    final Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().equalsIgnoreCase(path)).findFirst();
-    if (!sheet.isPresent()) {
-      return null;
-    }
-
-    return sheet.get();
-  }
-
-  @Override
-  public int hashCode() {
-    return this.hashCode;
-  }
-
   /**
    * Gets the sprites per row.
    *
@@ -96,6 +91,13 @@ public class Spritesheet {
    */
   public int getColumns() {
     return this.columns;
+  }
+
+  private Point getLocation(final int index) {
+    final int row = index / this.columns;
+    final int column = index % this.columns;
+
+    return new Point(column * this.getSpriteWidth(), row * this.getSpriteHeight());
   }
 
   /**
@@ -160,10 +162,8 @@ public class Spritesheet {
     return this.getRows() * this.getColumns();
   }
 
-  private Point getLocation(final int index) {
-    final int row = index / this.columns;
-    final int column = index % this.columns;
-
-    return new Point(column * this.getSpriteWidth(), row * this.getSpriteHeight());
+  @Override
+  public int hashCode() {
+    return this.hashCode;
   }
 }

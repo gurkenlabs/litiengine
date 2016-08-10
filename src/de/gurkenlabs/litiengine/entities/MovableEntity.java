@@ -27,13 +27,18 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public float getVelocity() {
-    return this.velocity;
+  public Point2D getMoveDestination() {
+    return this.moveDestination;
   }
 
   @Override
   public IEntityMovementController getMovementController() {
     return this.movementController;
+  }
+
+  @Override
+  public float getVelocity() {
+    return this.velocity;
   }
 
   @Override
@@ -43,6 +48,11 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     }
 
     this.entityMovedConsumer.add(consumer);
+  }
+
+  @Override
+  public void setAngle(final float angle) {
+    super.setAngle(angle);
   }
 
   /*
@@ -65,18 +75,13 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
+  public void setMoveDestination(final Point2D dest) {
+    this.moveDestination = dest;
+  }
+
+  @Override
   public void setMovementController(final IEntityMovementController movementController) {
     this.movementController = movementController;
-  }
-
-  @Override
-  public void setAngle(final float angle) {
-    super.setAngle(angle);
-  }
-
-  @Override
-  public boolean turnOnMove() {
-    return this.turnOnMove;
   }
 
   @Override
@@ -85,12 +90,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public Point2D getMoveDestination() {
-    return this.moveDestination;
-  }
-
-  @Override
-  public void setMoveDestination(final Point2D dest) {
-    this.moveDestination = dest;
+  public boolean turnOnMove() {
+    return this.turnOnMove;
   }
 }

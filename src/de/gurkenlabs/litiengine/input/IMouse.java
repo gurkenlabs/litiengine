@@ -24,6 +24,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
 
   public Point2D getMapLocation();
 
+  public boolean isLeftMouseButtonDown();
+
   /**
    * Checks if is pressed.
    *
@@ -31,9 +33,9 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    */
   public boolean isPressed();
 
-  public boolean isLeftMouseButtonDown();
-
   public boolean isRightMouseButtonDown();
+
+  public void onWheelMoved(int keyCode, Consumer<Integer> consumer);
 
   /**
    * Register mouse listener.
@@ -82,6 +84,4 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    *          the listener
    */
   public void unregisterMouseWheelListener(MouseWheelListener listener);
-
-  public void onWheelMoved(int keyCode, Consumer<Integer> consumer);
 }

@@ -14,19 +14,19 @@ import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
  * The Interface IEntityNavigator.
  */
 public interface IEntityNavigator extends IUpdateable {
+  public void cancelNavigation(Predicate<IMovableEntity> predicate);
+
   public IMovableEntity getEntity();
 
   public Path getPath();
 
   public IPathFinder getPathFinder();
 
-  public void navigate(Point2D target);
+  public boolean isNavigating();
 
-  public void stop();
+  public void navigate(Point2D target);
 
   public void rotateTowards(Point2D target);
 
-  public boolean isNavigating();
-
-  public void cancelNavigation(Predicate<IMovableEntity> predicate);
+  public void stop();
 }

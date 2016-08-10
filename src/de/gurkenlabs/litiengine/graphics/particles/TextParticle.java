@@ -15,6 +15,14 @@ public class TextParticle extends Particle {
     this.text = text;
   }
 
+  public Font getFont() {
+    return this.font;
+  }
+
+  public String getText() {
+    return this.text;
+  }
+
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
@@ -27,14 +35,6 @@ public class TextParticle extends Particle {
     final int x = fm.stringWidth(this.getText()) / 2;
     g.drawString(this.getText(), (int) renderLocation.getX() - x, (int) renderLocation.getY());
     g.setFont(oldFont);
-  }
-
-  public String getText() {
-    return this.text;
-  }
-
-  public Font getFont() {
-    return this.font;
   }
 
   public void setFont(final Font font) {

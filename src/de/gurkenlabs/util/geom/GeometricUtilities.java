@@ -13,26 +13,6 @@ import java.util.List;
 
 public class GeometricUtilities {
 
-  public static Shape scaleShape(final Shape shape, final double scale) {
-    final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
-    return transform.createTransformedShape(shape);
-  }
-
-  public static Shape translateShape(final Shape shape, final Point2D renderLocation) {
-    final AffineTransform t = new AffineTransform();
-    t.translate(renderLocation.getX(), renderLocation.getY());
-    return shape;
-
-  }
-
-  public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
-    return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
-  }
-
-  public static double distance(final Point2D p1, final Point2D p2) {
-    return Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
-  }
-
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])
@@ -57,28 +37,6 @@ public class GeometricUtilities {
     }
 
     return 360 - angle;
-  }
-
-  public static float getDeltaX(double angle) {
-    angle = angle - 90;
-
-    if (angle < 0) {
-      angle += 360;
-    }
-
-    angle = 360 - angle;
-    return Trigonometry.cosDeg((float) angle);
-  }
-
-  public static float getDeltaY(double angle) {
-    angle = angle - 90;
-
-    if (angle < 0) {
-      angle += 360;
-    }
-
-    angle = 360 - angle;
-    return Trigonometry.sinDeg((float) angle);
   }
 
   /**
@@ -113,6 +71,14 @@ public class GeometricUtilities {
     return rectangle.getX() <= p.getX() && rectangle.getY() <= p.getY() && rectangle.getX() + rectangle.getWidth() >= p.getX() && rectangle.getY() + rectangle.getHeight() >= p.getY();
   }
 
+  public static double distance(final double p1X, final double p1Y, final double p2X, final double p2Y) {
+    return Math.sqrt((p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y));
+  }
+
+  public static double distance(final Point2D p1, final Point2D p2) {
+    return Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+  }
+
   /**
    * Distance.
    *
@@ -126,6 +92,10 @@ public class GeometricUtilities {
     final double dx = Math.max(rect.getMinX() - p.getX(), p.getX() - rect.getMaxX());
     final double dy = Math.max(rect.getMinY() - p.getY(), p.getY() - rect.getMaxY());
     return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
+    return point1.distance(point2) < epsilon;
   }
 
   /**
@@ -145,6 +115,70 @@ public class GeometricUtilities {
     }
 
     return lines;
+  }
+
+  public static ArrayList<Line2D.Double> getConstrainingLines(final Area area) {
+    final ArrayList<double[]> areaPoints = new ArrayList<double[]>();
+    final ArrayList<Line2D.Double> areaSegments = new ArrayList<Line2D.Double>();
+    final double[] coords = new double[6];
+
+    for (final PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
+      // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
+      // Because the Area is composed of straight lines
+      final int type = pi.currentSegment(coords);
+      // We record a double array of {segment type, x coord, y coord}
+      final double[] pathIteratorCoords = { type, coords[0], coords[1] };
+      areaPoints.add(pathIteratorCoords);
+    }
+
+    double[] start = new double[3]; // To record where each polygon starts
+
+    for (int i = 0; i < areaPoints.size(); i++) {
+      // If we're not on the last point, return a line from this point to the
+      // next
+      final double[] currentElement = areaPoints.get(i);
+
+      // We need a default value in case we've reached the end of the ArrayList
+      double[] nextElement = { -1, -1, -1 };
+      if (i < areaPoints.size() - 1) {
+        nextElement = areaPoints.get(i + 1);
+      }
+
+      // Make the lines
+      if (currentElement[0] == PathIterator.SEG_MOVETO) {
+        start = currentElement; // Record where the polygon started to close it
+                                // later
+      }
+
+      if (nextElement[0] == PathIterator.SEG_LINETO) {
+        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], nextElement[1], nextElement[2]));
+      } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
+        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], start[1], start[2]));
+      }
+    }
+    return areaSegments;
+  }
+
+  public static float getDeltaX(double angle) {
+    angle = angle - 90;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    angle = 360 - angle;
+    return Trigonometry.cosDeg((float) angle);
+  }
+
+  public static float getDeltaY(double angle) {
+    angle = angle - 90;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    angle = 360 - angle;
+    return Trigonometry.sinDeg((float) angle);
   }
 
   /**
@@ -244,10 +278,10 @@ public class GeometricUtilities {
     return lines;
   }
 
-  public static Point2D getMidPoint(Point2D p1, Point2D p2) {
-    Point2D mid = new Point2D.Double();
-    double x = (p1.getX() + p2.getX()) / 2;
-    double y = (p1.getY() + p2.getY()) / 2;
+  public static Point2D getMidPoint(final Point2D p1, final Point2D p2) {
+    final Point2D mid = new Point2D.Double();
+    final double x = (p1.getX() + p2.getX()) / 2;
+    final double y = (p1.getY() + p2.getY()) / 2;
     mid.setLocation(x, y);
     return mid;
 
@@ -276,6 +310,13 @@ public class GeometricUtilities {
     final double y4 = y3 + k * (x2 - x1);
 
     return new Point2D.Double(x4, y4);
+  }
+
+  public static Point2D getPointOnCircle(final Point2D center, final double radius, final double angle) {
+    final double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
+    final double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
+
+    return new Point2D.Double(x, y);
   }
 
   /**
@@ -341,6 +382,14 @@ public class GeometricUtilities {
     return line;
   }
 
+  private static double getXDelta(final double angle, final double delta) {
+    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
+  private static double getYDelta(final double angle, final double delta) {
+    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
   /**
    * Intersects.
    *
@@ -358,59 +407,6 @@ public class GeometricUtilities {
       }
     }
     return null;
-  }
-
-  public static boolean equals(final Point2D point1, final Point2D point2, final double epsilon) {
-    return point1.distance(point2) < epsilon;
-  }
-
-  public static Point2D getPointOnCircle(final Point2D center, final double radius, final double angle) {
-    final double x = center.getX() + radius * Math.cos(Math.toRadians(angle));
-    final double y = center.getY() + radius * Math.sin(Math.toRadians(angle));
-
-    return new Point2D.Double(x, y);
-  }
-
-  public static ArrayList<Line2D.Double> getConstrainingLines(Area area) {
-    ArrayList<double[]> areaPoints = new ArrayList<double[]>();
-    ArrayList<Line2D.Double> areaSegments = new ArrayList<Line2D.Double>();
-    double[] coords = new double[6];
-
-    for (PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
-      // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
-      // Because the Area is composed of straight lines
-      int type = pi.currentSegment(coords);
-      // We record a double array of {segment type, x coord, y coord}
-      double[] pathIteratorCoords = { type, coords[0], coords[1] };
-      areaPoints.add(pathIteratorCoords);
-    }
-
-    double[] start = new double[3]; // To record where each polygon starts
-
-    for (int i = 0; i < areaPoints.size(); i++) {
-      // If we're not on the last point, return a line from this point to the
-      // next
-      double[] currentElement = areaPoints.get(i);
-
-      // We need a default value in case we've reached the end of the ArrayList
-      double[] nextElement = { -1, -1, -1 };
-      if (i < areaPoints.size() - 1) {
-        nextElement = areaPoints.get(i + 1);
-      }
-
-      // Make the lines
-      if (currentElement[0] == PathIterator.SEG_MOVETO) {
-        start = currentElement; // Record where the polygon started to close it
-                                // later
-      }
-
-      if (nextElement[0] == PathIterator.SEG_LINETO) {
-        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], nextElement[1], nextElement[2]));
-      } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
-        areaSegments.add(new Line2D.Double(currentElement[1], currentElement[2], start[1], start[2]));
-      }
-    }
-    return areaSegments;
   }
 
   /**
@@ -493,6 +489,11 @@ public class GeometricUtilities {
     return resultPoints.toArray(new Point2D[resultPoints.size()]);
   }
 
+  public static Shape scaleShape(final Shape shape, final double scale) {
+    final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
+    return transform.createTransformedShape(shape);
+  }
+
   /**
    * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A
    * VERY SLOW WAY OF CALCULATING INTERSECTIONS.
@@ -509,11 +510,10 @@ public class GeometricUtilities {
     return !areaA.isEmpty();
   }
 
-  private static double getXDelta(final double angle, final double delta) {
-    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
-  }
+  public static Shape translateShape(final Shape shape, final Point2D renderLocation) {
+    final AffineTransform t = new AffineTransform();
+    t.translate(renderLocation.getX(), renderLocation.getY());
+    return shape;
 
-  private static double getYDelta(final double angle, final double delta) {
-    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }

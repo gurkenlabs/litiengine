@@ -52,6 +52,24 @@ public abstract class AnimationController implements IAnimationController {
     this.getImageEffects().add(effect);
   }
 
+  protected String buildCurrentCacheKey() {
+    final StringBuilder cacheKey = new StringBuilder();
+    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
+    cacheKey.append('_');
+    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
+    cacheKey.append('_');
+    this.getImageEffects().forEach(x -> cacheKey.append(x.getName()));
+    return cacheKey.toString();
+  }
+
+  @Override
+  public void dispose() {
+    Game.getLoop().unregisterFromUpdate(this);
+    for (final Animation animation : this.getAnimations()) {
+      Game.getLoop().unregisterFromUpdate(animation);
+    }
+  }
+
   @Override
   public List<Animation> getAnimations() {
     return this.animations;
@@ -109,39 +127,6 @@ public abstract class AnimationController implements IAnimationController {
     this.currentAnimation.start();
   }
 
-  @Override
-  public void update(final IGameLoop loop) {
-    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
-      return;
-    }
-
-    if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
-      this.currentAnimation = this.defaultAnimation;
-
-      if (this.currentAnimation != null) {
-        this.currentAnimation.start();
-      }
-    }
-  }
-
-  @Override
-  public void dispose() {
-    Game.getLoop().unregisterFromUpdate(this);
-    for (final Animation animation : this.getAnimations()) {
-      Game.getLoop().unregisterFromUpdate(animation);
-    }
-  }
-
-  protected String buildCurrentCacheKey() {
-    final StringBuilder cacheKey = new StringBuilder();
-    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
-    cacheKey.append('_');
-    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
-    cacheKey.append('_');
-    this.getImageEffects().forEach(x -> cacheKey.append(x.getName()));
-    return cacheKey.toString();
-  }
-
   private void removeFinishedImageEffects() {
     final List<IImageEffect> effectsToRemove = new ArrayList<>();
     for (final IImageEffect effect : this.imageEffects) {
@@ -156,5 +141,20 @@ public abstract class AnimationController implements IAnimationController {
 
     this.imageEffects.removeAll(effectsToRemove);
     this.imageEffects.removeAll(Collections.singleton(null));
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
+    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
+      return;
+    }
+
+    if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
+      this.currentAnimation = this.defaultAnimation;
+
+      if (this.currentAnimation != null) {
+        this.currentAnimation.start();
+      }
+    }
   }
 }

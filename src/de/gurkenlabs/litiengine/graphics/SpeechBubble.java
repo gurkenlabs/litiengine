@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
-public class SpeechBubble implements IUpdateable, IRenderable{
+public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int DISPLAYTIME_PER_LETTER = 200;
   private static final int LETTER_WRITE_DELAY = 30;
   private static final Color SPEAK_FONT_COLOR = Color.WHITE;
@@ -31,13 +31,13 @@ public class SpeechBubble implements IUpdateable, IRenderable{
   private final Font font;
 
   private long lastTextDispay;
-  private long currentTextDisplayTime;
+  private final long currentTextDisplayTime;
   private String currentText;
   private String displayedText;
-  private Queue<Character> currentTextQueue;
+  private final Queue<Character> currentTextQueue;
   private long lastCharPoll;
-  
-  public SpeechBubble(IEntity entity, Font font, String text){
+
+  public SpeechBubble(final IEntity entity, final Font font, final String text) {
     this.TEXT_BOX_WIDTH = (int) (entity.getWidth() * 4);
     this.entity = entity;
     this.font = font;
@@ -54,9 +54,44 @@ public class SpeechBubble implements IUpdateable, IRenderable{
     Game.getEnvironment().add(this, RenderType.OVERLAY);
     Game.getLoop().registerForUpdate(this);
   }
-  
+
   @Override
-  public void update(IGameLoop loop) {
+  public void render(final Graphics2D g) {
+    if (this.displayedText == null || this.displayedText.isEmpty()) {
+      return;
+    }
+
+    final int PADDING = 5;
+    final Rectangle2D bounds = new Rectangle2D.Double(this.entity.getLocation().getX() + this.entity.getWidth() / 2.0 - this.TEXT_BOX_WIDTH / 2.0 - PADDING, this.entity.getLocation().getY() - 30 - PADDING, this.TEXT_BOX_WIDTH + 2 * PADDING, 25 + PADDING);
+    g.setColor(SPEAK_FONT_BACKGROUNDCOLOR);
+    RenderEngine.fillShape(g, bounds);
+
+    g.setColor(SPEAK_FONT_COLOR);
+    RenderEngine.drawShape(g, bounds, new BasicStroke(2 / Game.getInfo().renderScale()));
+
+    final FontRenderContext frc = g.getFontRenderContext();
+
+    final String text = this.displayedText + "";
+    final AttributedString styledText = new AttributedString(text);
+    styledText.addAttribute(TextAttribute.FONT, this.font);
+    final AttributedCharacterIterator iterator = styledText.getIterator();
+    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
+    measurer.setPosition(0);
+
+    final float x = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getX() + this.entity.getWidth() / 2.0f - this.TEXT_BOX_WIDTH / 2.0f;
+    float y = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getY() - 30;
+    while (measurer.getPosition() < text.length()) {
+      final TextLayout layout = measurer.nextLayout(this.TEXT_BOX_WIDTH);
+
+      y += layout.getAscent();
+      final float dx = layout.isLeftToRight() ? 0 : this.TEXT_BOX_WIDTH - layout.getAdvance();
+      layout.draw(g, x + dx, y);
+      y += layout.getDescent() + layout.getLeading();
+    }
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
     if (this.currentText == null) {
       Game.getEnvironment().remove(this);
       loop.unregisterFromUpdate(this);
@@ -80,39 +115,5 @@ public class SpeechBubble implements IUpdateable, IRenderable{
     }
 
     // continue displaying currently displayed text
-  }
-
-  @Override
-  public void render(Graphics2D g) {
-    if (this.displayedText == null || this.displayedText.isEmpty()) {
-      return;
-    }
-
-    final int PADDING = 5;
-    Rectangle2D bounds = new Rectangle2D.Double(this.entity.getLocation().getX() + this.entity.getWidth() / 2.0 - TEXT_BOX_WIDTH / 2.0 - PADDING, this.entity.getLocation().getY() - 30 - PADDING, TEXT_BOX_WIDTH + 2 * PADDING, 25 + PADDING);
-    g.setColor(SPEAK_FONT_BACKGROUNDCOLOR);
-    RenderEngine.fillShape(g, bounds);
-
-    g.setColor(SPEAK_FONT_COLOR);
-    RenderEngine.drawShape(g, bounds, new BasicStroke(2 / Game.getInfo().renderScale()));
-
-    FontRenderContext frc = g.getFontRenderContext();
-
-    String text = this.displayedText + "";
-    AttributedString styledText = new AttributedString(text);
-    styledText.addAttribute(TextAttribute.FONT, this.font);
-    AttributedCharacterIterator iterator = styledText.getIterator();
-    LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
-    measurer.setPosition(0);
-
-    float x = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getX() + this.entity.getWidth() / 2.0f - TEXT_BOX_WIDTH / 2.0f, y = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getY() - 30;
-    while (measurer.getPosition() < text.length()) {
-      TextLayout layout = measurer.nextLayout(TEXT_BOX_WIDTH);
-
-      y += layout.getAscent();
-      float dx = layout.isLeftToRight() ? 0 : TEXT_BOX_WIDTH - layout.getAdvance();
-      layout.draw(g, x + dx, y);
-      y += layout.getDescent() + layout.getLeading();
-    }
   }
 }

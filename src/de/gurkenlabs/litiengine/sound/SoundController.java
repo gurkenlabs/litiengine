@@ -9,43 +9,21 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 
 public class SoundController {
-  private static final int LOCK_TIME = 50;
-  private static long lastPlay;
-
-  private static final SoundPlayThread soundPlayThread = new SoundPlayThread();
-
-  public static boolean canPlay() {
-    if (Game.getLoop().getDeltaTime(lastPlay) > LOCK_TIME) {
-      return true;
-    }
-
-    return false;
-  }
-
-  public static void call(final Consumer<ISoundEngine> engine) {
-    if (canPlay()) {
-      soundPlayThread.enqueue(engine, false);
-      lastPlay = Game.getLoop().getTicks();
-    }
-  }
-
-  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, final boolean force) {
-    soundPlayThread.enqueue(engine, force);
-    lastPlay = Game.getLoop().getTicks();
-  }
-
-  public static void start() {
-    soundPlayThread.start();
-  }
-
-  public static void terminate() {
-    soundPlayThread.setRunning(false);
-  }
-
   public static class SoundPlayThread extends Thread {
     private boolean isRunning = true;
     private final Map<Consumer<ISoundEngine>, Long> reqTime = new ConcurrentHashMap<>();
     private final Queue<Consumer<ISoundEngine>> queue = new ConcurrentLinkedQueue<>();
+
+    public void enqueue(final Consumer<ISoundEngine> consumer, final boolean force) {
+      this.queue.add(consumer);
+      if (!force) {
+        this.reqTime.put(consumer, Game.getLoop().getTicks());
+      }
+    }
+
+    public boolean isRunning() {
+      return this.isRunning;
+    }
 
     @Override
     public void run() {
@@ -70,20 +48,43 @@ public class SoundController {
       }
     }
 
-    public boolean isRunning() {
-      return this.isRunning;
-    }
-
     public void setRunning(final boolean isRunning) {
       this.isRunning = isRunning;
     }
 
-    public void enqueue(final Consumer<ISoundEngine> consumer, final boolean force) {
-      this.queue.add(consumer);
-      if (!force) {
-        this.reqTime.put(consumer, Game.getLoop().getTicks());
-      }
+  }
+
+  private static final int LOCK_TIME = 50;
+
+  private static long lastPlay;
+
+  private static final SoundPlayThread soundPlayThread = new SoundPlayThread();
+
+  public static void call(final Consumer<ISoundEngine> engine) {
+    if (canPlay()) {
+      soundPlayThread.enqueue(engine, false);
+      lastPlay = Game.getLoop().getTicks();
+    }
+  }
+
+  public static void callIgnoreTimeout(final Consumer<ISoundEngine> engine, final boolean force) {
+    soundPlayThread.enqueue(engine, force);
+    lastPlay = Game.getLoop().getTicks();
+  }
+
+  public static boolean canPlay() {
+    if (Game.getLoop().getDeltaTime(lastPlay) > LOCK_TIME) {
+      return true;
     }
 
+    return false;
+  }
+
+  public static void start() {
+    soundPlayThread.start();
+  }
+
+  public static void terminate() {
+    soundPlayThread.setRunning(false);
   }
 }

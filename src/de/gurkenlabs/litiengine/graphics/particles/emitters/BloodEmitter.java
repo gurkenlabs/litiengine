@@ -38,6 +38,16 @@ public class BloodEmitter extends EntityEmitter {
   /*
    * (non-Javadoc)
    *
+   * @see de.gurkenlabs.liti.graphics.particles.Emitter#canTakeNewParticles()
+   */
+  @Override
+  protected boolean canTakeNewParticles() {
+    return !this.hasStopped && super.canTakeNewParticles();
+  }
+
+  /*
+   * (non-Javadoc)
+   *
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
    */
   @Override
@@ -72,15 +82,5 @@ public class BloodEmitter extends EntityEmitter {
       this.getParticles().forEach(particle -> particle.setDy(0));
       this.hasStopped = true;
     }
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#canTakeNewParticles()
-   */
-  @Override
-  protected boolean canTakeNewParticles() {
-    return !this.hasStopped && super.canTakeNewParticles();
   }
 }

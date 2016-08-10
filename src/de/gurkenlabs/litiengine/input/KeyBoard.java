@@ -62,74 +62,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.KeyEventDispatcher#dispatchKeyEvent(java.awt.event.KeyEvent)
-   */
-  @Override
-  public boolean dispatchKeyEvent(final KeyEvent e) {
-    final int eventId = e.getID();
-    final int keyCode = e.getKeyCode();
-    switch (eventId) {
-    case KeyEvent.KEY_PRESSED:
-      this.addPressedKey(keyCode);
-      break;
-    case KeyEvent.KEY_RELEASED:
-      this.removePressedKey(keyCode);
-      this.addTypedKey(keyCode);
-      this.addReleasedKey(keyCode);
-      break;
-    default:
-      break;
-    }
-
-    return true;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IKeyboard#registerForKeyDownEvents(de.gurkenlabs.
-   * liti.input.IKeyObserver)
-   */
-  @Override
-  public void registerForKeyDownEvents(final IKeyObserver observer) {
-    if (this.keyObservers.contains(observer)) {
-      return;
-    }
-
-    this.keyObservers.add(observer);
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.input.IKeyboard#unregisterFromKeyDownEvents(de.
-   * gurkenlabs.liti.input.IKeyObserver)
-   */
-  @Override
-  public void unregisterFromKeyDownEvents(final IKeyObserver observer) {
-    if (!this.keyObservers.contains(observer)) {
-      return;
-    }
-
-    this.keyObservers.remove(observer);
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
-  @Override
-  public void update(final IGameLoop gameLoop) {
-    this.executePressedKeys();
-    this.executeReleasedKeys();
-    this.executeTypedKeys();
-  }
-
   /**
    * Adds the pressed key.
    *
@@ -170,6 +102,31 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     }
 
     this.typedKeys.add(keyCode);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see java.awt.KeyEventDispatcher#dispatchKeyEvent(java.awt.event.KeyEvent)
+   */
+  @Override
+  public boolean dispatchKeyEvent(final KeyEvent e) {
+    final int eventId = e.getID();
+    final int keyCode = e.getKeyCode();
+    switch (eventId) {
+    case KeyEvent.KEY_PRESSED:
+      this.addPressedKey(keyCode);
+      break;
+    case KeyEvent.KEY_RELEASED:
+      this.removePressedKey(keyCode);
+      this.addTypedKey(keyCode);
+      this.addReleasedKey(keyCode);
+      break;
+    default:
+      break;
+    }
+
+    return true;
   }
 
   /**
@@ -220,6 +177,37 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.typedKeys.clear();
   }
 
+  @Override
+  public void onKeyPressed(final int keyCode, final Consumer<Integer> consumer) {
+    this.keyPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  }
+
+  @Override
+  public void onKeyReleased(final int keyCode, final Consumer<Integer> consumer) {
+    this.keyReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  }
+
+  @Override
+  public void onKeyTyped(final int keyCode, final Consumer<Integer> consumer) {
+    this.keyTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * de.gurkenlabs.liti.input.IKeyboard#registerForKeyDownEvents(de.gurkenlabs.
+   * liti.input.IKeyObserver)
+   */
+  @Override
+  public void registerForKeyDownEvents(final IKeyObserver observer) {
+    if (this.keyObservers.contains(observer)) {
+      return;
+    }
+
+    this.keyObservers.add(observer);
+  }
+
   /**
    * Removes the pressed key.
    *
@@ -235,18 +223,30 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.input.IKeyboard#unregisterFromKeyDownEvents(de.
+   * gurkenlabs.liti.input.IKeyObserver)
+   */
   @Override
-  public void onKeyTyped(final int keyCode, final Consumer<Integer> consumer) {
-    this.keyTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  public void unregisterFromKeyDownEvents(final IKeyObserver observer) {
+    if (!this.keyObservers.contains(observer)) {
+      return;
+    }
+
+    this.keyObservers.remove(observer);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.core.IUpdateable#update()
+   */
   @Override
-  public void onKeyReleased(final int keyCode, final Consumer<Integer> consumer) {
-    this.keyReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
-  }
-
-  @Override
-  public void onKeyPressed(final int keyCode, final Consumer<Integer> consumer) {
-    this.keyPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  public void update(final IGameLoop gameLoop) {
+    this.executePressedKeys();
+    this.executeReleasedKeys();
+    this.executeTypedKeys();
   }
 }

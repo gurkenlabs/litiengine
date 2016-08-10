@@ -64,8 +64,8 @@ public class Force {
     return this.cancelOnReached;
   }
 
-  public boolean hasReached(final ICollisionEntity entity) {
-    return new Ellipse2D.Double(this.getLocation().getX() - this.size * 0.5, this.getLocation().getY() - this.size * 0.5, this.size, this.size).intersects(entity.getCollisionBox());
+  public void end() {
+    this.hasEnded = true;
   }
 
   /**
@@ -95,8 +95,8 @@ public class Force {
     return this.hasEnded;
   }
 
-  public void end() {
-    this.hasEnded = true;
+  public boolean hasReached(final ICollisionEntity entity) {
+    return new Ellipse2D.Double(this.getLocation().getX() - this.size * 0.5, this.getLocation().getY() - this.size * 0.5, this.size, this.size).intersects(entity.getCollisionBox());
   }
 
   public void setCancelOnCollision(final boolean cancelOnCollision) {

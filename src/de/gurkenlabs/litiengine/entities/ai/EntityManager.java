@@ -12,15 +12,15 @@ public class EntityManager {
     this.entityControllers = new ConcurrentHashMap<>();
   }
 
+  public <T extends IEntity> void addController(final T entity, final IEntityController<T> controller) {
+    this.entityControllers.put(entity, controller);
+  }
+
   public IEntityController<? extends IEntity> getController(final IEntity entity) {
     if (this.entityControllers.containsKey(entity)) {
       return this.entityControllers.get(entity);
     }
 
     return null;
-  }
-
-  public <T extends IEntity> void addController(final T entity, final IEntityController<T> controller) {
-    this.entityControllers.put(entity, controller);
   }
 }

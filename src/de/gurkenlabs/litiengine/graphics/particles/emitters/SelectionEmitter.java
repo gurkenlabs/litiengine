@@ -70,6 +70,16 @@ public class SelectionEmitter extends Emitter {
     this.selected = true;
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
+   */
+  @Override
+  protected Particle createNewParticle() {
+    return null;
+  }
+
   /**
    * Creates a new Particle object.
    *
@@ -109,16 +119,6 @@ public class SelectionEmitter extends Emitter {
    */
   public void setSelected(final boolean selected) {
     this.selected = selected;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
-   */
-  @Override
-  protected Particle createNewParticle() {
-    return null;
   }
 
   /*

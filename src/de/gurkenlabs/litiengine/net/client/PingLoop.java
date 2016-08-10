@@ -22,60 +22,6 @@ import de.gurkenlabs.litiengine.net.messages.handlers.ClientMessageHandler;
  * The Class PingThread.
  */
 public class PingLoop extends ClientMessageHandler<PingResponseMessage> implements IPingLoop {
-  private final List<Consumer<Long>> pingRecordConsumer;
-  private final int clientId;
-  private final IPacketSender sender;
-
-  private final int port;
-
-  private final String serverIpAdress;
-
-  private PingThread pingLoop;
-
-  public PingLoop(final int clientId, final IMessageHandlerProvider provider, final IPacketSender sender, final String serverIpAdress, final int port) {
-    this.pingRecordConsumer = new ArrayList<>();
-    this.clientId = clientId;
-    this.sender = sender;
-    this.serverIpAdress = serverIpAdress;
-    this.port = port;
-    provider.register(MessageType.PING, this);
-  }
-
-  @Override
-  public void onPingRecorded(final Consumer<Long> consumer) {
-    if (this.pingRecordConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.pingRecordConsumer.add(consumer);
-  }
-
-  @Override
-  public void start() {
-    this.pingLoop = new PingThread(this.sender, this.serverIpAdress, this.port);
-    this.pingLoop.start();
-  }
-
-  @Override
-  public void terminate() {
-    this.pingLoop.terminate();
-  }
-
-  @Override
-  protected void handle(final PingResponseMessage message, final InetAddress address, final int port) {
-    if (this.pingLoop == null) {
-      return;
-    }
-
-    try {
-      if (address.getHostAddress().equals(InetAddress.getByName(this.serverIpAdress).getHostAddress())) {
-        this.pingLoop.pingAnswerReceived();
-      }
-    } catch (final UnknownHostException e) {
-      e.printStackTrace();
-    }
-  }
-
   private class PingThread extends Thread implements ILaunchable {
     /** The Constant TimeBetweenPings. */
     private final static int TimeBetweenPings = 1000;
@@ -136,5 +82,60 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     public void terminate() {
       this.isTerminated = true;
     }
+  }
+
+  private final List<Consumer<Long>> pingRecordConsumer;
+  private final int clientId;
+
+  private final IPacketSender sender;
+
+  private final int port;
+
+  private final String serverIpAdress;
+
+  private PingThread pingLoop;
+
+  public PingLoop(final int clientId, final IMessageHandlerProvider provider, final IPacketSender sender, final String serverIpAdress, final int port) {
+    this.pingRecordConsumer = new ArrayList<>();
+    this.clientId = clientId;
+    this.sender = sender;
+    this.serverIpAdress = serverIpAdress;
+    this.port = port;
+    provider.register(MessageType.PING, this);
+  }
+
+  @Override
+  protected void handle(final PingResponseMessage message, final InetAddress address, final int port) {
+    if (this.pingLoop == null) {
+      return;
+    }
+
+    try {
+      if (address.getHostAddress().equals(InetAddress.getByName(this.serverIpAdress).getHostAddress())) {
+        this.pingLoop.pingAnswerReceived();
+      }
+    } catch (final UnknownHostException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void onPingRecorded(final Consumer<Long> consumer) {
+    if (this.pingRecordConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.pingRecordConsumer.add(consumer);
+  }
+
+  @Override
+  public void start() {
+    this.pingLoop = new PingThread(this.sender, this.serverIpAdress, this.port);
+    this.pingLoop.start();
+  }
+
+  @Override
+  public void terminate() {
+    this.pingLoop.terminate();
   }
 }

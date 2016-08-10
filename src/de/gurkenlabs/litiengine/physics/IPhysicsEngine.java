@@ -26,9 +26,43 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public void clear();
 
+  public Point2D collides(Line2D rayCast);
+
+  /**
+   *
+   * @param rect
+   * @return true if there is any collision; otherwise false.
+   */
+  public boolean collides(Point2D point);
+
+  /**
+   *
+   * @param rect
+   * @return true if there is any collision; otherwise false.
+   */
+  public boolean collides(Rectangle2D rect);
+
+  /**
+   *
+   * @param rect
+   * @param collisionType
+   *          use the following flags
+   *          <ul>
+   *          <li>{@link COLLTYPE_ENTITY}</li>
+   *          <li>{@link COLLTYPE_STATIC}</li>
+   *          <li>{@link COLLTYPE_ALL}</li>
+   *          </ul>
+   * @return
+   */
+  public boolean collides(Rectangle2D rect, int collisionType);
+
   public List<Rectangle2D> getAllCollisionBoxes();
 
   public List<Rectangle2D> getStaticCollisionBoxes();
+
+  public boolean move(IMovableEntity entity, double x, double y, float delta);
+
+  public boolean move(IMovableEntity entity, float delta);
 
   /**
    * Moves the specified entity by the delta in the direction of the angle.
@@ -53,40 +87,6 @@ public interface IPhysicsEngine extends IUpdateable {
    * @return
    */
   public boolean move(IMovableEntity entity, Point2D target, float delta);
-
-  public boolean move(IMovableEntity entity, double x, double y, float delta);
-
-  public boolean move(IMovableEntity entity, float delta);
-
-  /**
-   *
-   * @param rect
-   * @return true if there is any collision; otherwise false.
-   */
-  public boolean collides(Point2D point);
-
-  public Point2D collides(Line2D rayCast);
-
-  /**
-   *
-   * @param rect
-   * @return true if there is any collision; otherwise false.
-   */
-  public boolean collides(Rectangle2D rect);
-
-  /**
-   *
-   * @param rect
-   * @param collisionType
-   *          use the following flags
-   *          <ul>
-   *          <li>{@link COLLTYPE_ENTITY}</li>
-   *          <li>{@link COLLTYPE_STATIC}</li>
-   *          <li>{@link COLLTYPE_ALL}</li>
-   *          </ul>
-   * @return
-   */
-  public boolean collides(Rectangle2D rect, int collisionType);
 
   public void remove(ICollisionEntity entity);
 

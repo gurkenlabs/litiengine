@@ -15,9 +15,8 @@ import de.gurkenlabs.tiled.tmx.MapOrientation;
  * The Interface IMapRenderer.
  */
 public interface IMapRenderer {
-  public void setPartitionsX(int partitions);
-  public void setPartitionsY(int partitions);
-  
+  public BufferedImage getLayerImage(IMap map, RenderType type);
+
   /**
    * Gets the map image.
    *
@@ -26,8 +25,6 @@ public interface IMapRenderer {
    * @return the map image
    */
   public BufferedImage getMapImage(IMap map);
-  
-  public BufferedImage getLayerImage(IMap map, RenderType type);
 
   public float getRenderProgress();
 
@@ -49,4 +46,8 @@ public interface IMapRenderer {
   public void render(Graphics2D g, Point2D offset, IMap map);
 
   public void renderLayers(Graphics2D g, Point2D offset, IMap map, RenderType type);
+
+  public void setPartitionsX(int partitions);
+
+  public void setPartitionsY(int partitions);
 }

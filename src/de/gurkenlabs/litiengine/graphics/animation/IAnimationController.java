@@ -11,18 +11,18 @@ public interface IAnimationController extends IUpdateable {
 
   public void add(IImageEffect effect);
 
+  public void dispose();
+
   public List<Animation> getAnimations();
 
   public Animation getCurrentAnimation();
 
-  public List<IImageEffect> getImageEffects();
-
-  public void playAnimation(final String animationName);
+  public BufferedImage getCurrentSprite();
 
   public BufferedImage getCurrentSprite(int width, int height);
 
-  public BufferedImage getCurrentSprite();
+  public List<IImageEffect> getImageEffects();
 
-  public void dispose();
+  public void playAnimation(final String animationName);
 
 }

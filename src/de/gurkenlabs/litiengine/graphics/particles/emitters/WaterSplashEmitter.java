@@ -40,6 +40,16 @@ public class WaterSplashEmitter extends Emitter {
     super(originX, originY);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
+   */
+  @Override
+  protected Particle createNewParticle() {
+    return null;
+  }
+
   /**
    * Creates a new Particle object.
    *
@@ -63,14 +73,9 @@ public class WaterSplashEmitter extends Emitter {
     this.addParticle(new OvalParticle(xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, life, color));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
-   */
-  @Override
-  protected Particle createNewParticle() {
-    return null;
+  float randomWithRange(final float min, final float max) {
+    final float range = max - min;
+    return (float) (Math.random() * range) + min;
   }
 
   /*
@@ -104,10 +109,5 @@ public class WaterSplashEmitter extends Emitter {
     for (byte i = 0; i < WHITE_COUNT; i++) {
       this.newParticle(WHITE, this.getParticleMaxTTL(), (short) 5);
     }
-  }
-
-  float randomWithRange(final float min, final float max) {
-    final float range = max - min;
-    return (float) (Math.random() * range) + min;
   }
 }

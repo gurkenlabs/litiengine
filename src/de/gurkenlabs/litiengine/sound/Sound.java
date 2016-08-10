@@ -10,15 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Sound {
   private static final List<Sound> sounds = new CopyOnWriteArrayList<>();
 
-  private final String name;
-  private final String path;
-
-  public Sound(final String path) {
-    this.name = path;
-    this.path = path;
-    sounds.add(this);
-  }
-
   public static Sound find(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -32,12 +23,22 @@ public class Sound {
     return sound.get();
   }
 
-  public String getPath() {
-    return this.path;
+  private final String name;
+
+  private final String path;
+
+  public Sound(final String path) {
+    this.name = path;
+    this.path = path;
+    sounds.add(this);
   }
 
   public String getName() {
     return this.name;
+  }
+
+  public String getPath() {
+    return this.path;
   }
 
   public URL getUrl() {

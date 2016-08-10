@@ -29,15 +29,6 @@ public abstract class ConfigurationGroup {
     this.prefix = info.prefix();
   }
 
-  /**
-   * Gets the prefix.
-   *
-   * @return the prefix
-   */
-  public String getPrefix() {
-    return this.prefix != null ? this.prefix : "";
-  }
-
   private Field getField(final String fieldName) {
     for (final Field field : this.getClass().getDeclaredFields()) {
       if (field.getName().equalsIgnoreCase(fieldName)) {
@@ -46,6 +37,15 @@ public abstract class ConfigurationGroup {
     }
 
     return null;
+  }
+
+  /**
+   * Gets the prefix.
+   *
+   * @return the prefix
+   */
+  public String getPrefix() {
+    return this.prefix != null ? this.prefix : "";
   }
 
   private Method getSetter(final String fieldName, final Class<?> fieldType) {
@@ -62,35 +62,6 @@ public abstract class ConfigurationGroup {
     }
 
     return null;
-  }
-
-  private <T> void setPropertyValue(final String propertyName, final T value) {
-    try {
-      final Method method = this.getSetter(propertyName, value.getClass());
-      if (method != null) {
-        // set the new value with the setter
-        method.invoke(this, value);
-      } else {
-        // if no setter is present, try to set the field directly
-        for (final Field field : this.getClass().getDeclaredFields()) {
-          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
-            if (!field.isAccessible()) {
-              field.setAccessible(true);
-            }
-
-            field.set(this, value);
-          }
-        }
-      }
-    } catch (final SecurityException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final InvocationTargetException e) {
-      e.printStackTrace();
-    }
   }
 
   /**
@@ -149,6 +120,35 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final NumberFormatException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private <T> void setPropertyValue(final String propertyName, final T value) {
+    try {
+      final Method method = this.getSetter(propertyName, value.getClass());
+      if (method != null) {
+        // set the new value with the setter
+        method.invoke(this, value);
+      } else {
+        // if no setter is present, try to set the field directly
+        for (final Field field : this.getClass().getDeclaredFields()) {
+          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
+            if (!field.isAccessible()) {
+              field.setAccessible(true);
+            }
+
+            field.set(this, value);
+          }
+        }
+      }
+    } catch (final SecurityException e) {
+      e.printStackTrace();
+    } catch (final IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (final IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (final InvocationTargetException e) {
       e.printStackTrace();
     }
   }

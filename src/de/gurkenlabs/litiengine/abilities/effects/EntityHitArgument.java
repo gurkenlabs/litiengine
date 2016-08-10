@@ -15,16 +15,16 @@ public class EntityHitArgument {
     this.kill = kill;
   }
 
+  public int getDamage() {
+    return this.damage;
+  }
+
   public ICombatEntity getExecutor() {
     return this.executor;
   }
 
   public ICombatEntity getHitEntity() {
     return this.hitEntity;
-  }
-
-  public int getDamage() {
-    return this.damage;
   }
 
   public boolean isKill() {

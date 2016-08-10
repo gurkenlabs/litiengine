@@ -10,6 +10,11 @@ public abstract class Transition implements ITransition {
   }
 
   @Override
+  public int compareTo(final ITransition other) {
+    return Integer.compare(this.getPriority(), other.getPriority());
+  }
+
+  @Override
   public abstract boolean conditionsFullfilled(IGameLoop loop);
 
   @Override
@@ -18,10 +23,5 @@ public abstract class Transition implements ITransition {
   @Override
   public int getPriority() {
     return this.priority;
-  }
-
-  @Override
-  public int compareTo(final ITransition other) {
-    return Integer.compare(this.getPriority(), other.getPriority());
   }
 }

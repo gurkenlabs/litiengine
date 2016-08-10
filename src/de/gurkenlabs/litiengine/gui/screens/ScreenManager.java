@@ -34,7 +34,30 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class ScreenManager extends JFrame implements IScreenManager {
+  /**
+   * The listener interface for receiving resizedEvent events. The class that is
+   * interested in processing a resizedEvent event implements this interface,
+   * and the object created with that class is registered with a component using
+   * the component's <code>addResizedEventListener<code> method. When the
+   * resizedEvent event occurs, that object's appropriate method is invoked.
+   *
+   * @see ResizedEventEvent
+   */
+  private class ResizedEventListener extends ComponentAdapter {
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
+     * ComponentEvent)
+     */
+    @Override
+    public void componentResized(final ComponentEvent evt) {
+      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+    }
+  }
+
   private static final long serialVersionUID = 7958549828482285935L;
+
   private static final int SCREENCHANGETIMEOUT = 200;
 
   /** The resolution observers. */
@@ -61,8 +84,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private IScreen currentScreen;
 
   private Image cursorImage;
-
   private int cursorOffsetX;
+
   private int cursorOffsetY;
 
   /** The last screen change. */
@@ -150,6 +173,16 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
+  public int getCursorOffsetX() {
+    return this.cursorOffsetX;
+  }
+
+  @Override
+  public int getCursorOffsetY() {
+    return this.cursorOffsetY;
+  }
+
+  @Override
   public Component getRenderComponent() {
     return this.renderCanvas;
   }
@@ -157,6 +190,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public Dimension getResolution() {
     return this.getSize();
+  }
+
+  @Override
+  public Point getScreenLocation() {
+    return this.getLocationOnScreen();
   }
 
   @Override
@@ -178,12 +216,24 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
+  public boolean isFocusOwner() {
+    return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
+  }
+
+  @Override
   public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
     if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
     }
 
     this.fpsChangedConsumer.add(fpsConsumer);
+  }
+
+  @Override
+  public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
+    if (!this.renderedConsumer.contains(renderedConsumer)) {
+      this.renderedConsumer.add(renderedConsumer);
+    }
   }
 
   @Override
@@ -199,13 +249,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void onScreenChanged(final Consumer<IScreen> screenConsumer) {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
-    }
-  }
-
-  @Override
-  public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
-    if (!this.renderedConsumer.contains(renderedConsumer)) {
-      this.renderedConsumer.add(renderedConsumer);
     }
   }
 
@@ -259,69 +302,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   }
 
-  @Override
-  public void setCamera(final ICamera camera) {
-    this.camera = camera;
-    this.getCamera().updateFocus();
-  }
-
-  /**
-   * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface,
-   * and the object created with that class is registered with a component using
-   * the component's <code>addResizedEventListener<code> method. When the
-   * resizedEvent event occurs, that object's appropriate method is invoked.
-   *
-   * @see ResizedEventEvent
-   */
-  private class ResizedEventListener extends ComponentAdapter {
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
-     * ComponentEvent)
-     */
-    @Override
-    public void componentResized(final ComponentEvent evt) {
-      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
-  }
-
-  @Override
-  public Point getScreenLocation() {
-    return this.getLocationOnScreen();
-  }
-
-  @Override
-  public void setCursor(final Image image) {
-    this.cursorImage = image;
-  }
-
-  @Override
-  public boolean isFocusOwner() {
-    return super.isFocusOwner() || this.getRenderComponent().isFocusOwner();
-  }
-
-  @Override
-  public int getCursorOffsetX() {
-    return this.cursorOffsetX;
-  }
-
-  @Override
-  public void setCursorOffsetX(final int cursorOffsetX) {
-    this.cursorOffsetX = cursorOffsetX;
-  }
-
-  @Override
-  public int getCursorOffsetY() {
-    return this.cursorOffsetY;
-  }
-
-  @Override
-  public void setCursorOffsetY(final int cursorOffsetY) {
-    this.cursorOffsetY = cursorOffsetY;
-  }
-
   private void saveScreenShot(final BufferedImage img) {
     try {
       try {
@@ -338,5 +318,26 @@ public class ScreenManager extends JFrame implements IScreenManager {
     } finally {
       this.takeScreenShot = false;
     }
+  }
+
+  @Override
+  public void setCamera(final ICamera camera) {
+    this.camera = camera;
+    this.getCamera().updateFocus();
+  }
+
+  @Override
+  public void setCursor(final Image image) {
+    this.cursorImage = image;
+  }
+
+  @Override
+  public void setCursorOffsetX(final int cursorOffsetX) {
+    this.cursorOffsetX = cursorOffsetX;
+  }
+
+  @Override
+  public void setCursorOffsetY(final int cursorOffsetY) {
+    this.cursorOffsetY = cursorOffsetY;
   }
 }

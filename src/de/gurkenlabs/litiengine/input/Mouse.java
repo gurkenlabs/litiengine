@@ -79,6 +79,12 @@ public class Mouse implements IMouse {
     this.sensitivity = Game.getConfiguration().INPUT.getMouseSensitivity();
   }
 
+  private MouseEvent createEvent(final MouseEvent original) {
+    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+        original.getButton());
+    return event;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -103,6 +109,11 @@ public class Mouse implements IMouse {
     return this.grabMouse;
   }
 
+  @Override
+  public boolean isLeftMouseButtonDown() {
+    return this.isLeftMouseButtonDown;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -111,6 +122,11 @@ public class Mouse implements IMouse {
   @Override
   public boolean isPressed() {
     return this.pressed;
+  }
+
+  @Override
+  public boolean isRightMouseButtonDown() {
+    return this.isRightMouseButtonDown;
   }
 
   /*
@@ -221,6 +237,11 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
   }
 
+  @Override
+  public void onWheelMoved(final int keyCode, final Consumer<Integer> consumer) {
+    this.wheelMovedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -279,6 +300,52 @@ public class Mouse implements IMouse {
   }
 
   /**
+   * Calculates the location of the ingame mouse by the position diff and locks
+   * the original mouse to the center of the screen.
+   *
+   * @param mouseLocation
+   *          The location of the original mouse.
+   */
+  private void setLocation(final Point mouseLocation) {
+    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
+      return;
+    }
+
+    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
+    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
+    final Point screenLocation = Game.getScreenManager().getScreenLocation();
+    final int grabX = (int) (screenLocation.x + screenCenterX);
+    final int grabY = (int) (screenLocation.y + screenCenterY);
+
+    // calculate diffs and new location for the ingame mouse
+    final double diffX = MouseInfo.getPointerInfo().getLocation().x - grabX;
+    final double diffY = MouseInfo.getPointerInfo().getLocation().y - grabY;
+    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
+    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
+
+    // ensure that x coordinates are within the screen
+    if (newX < 0) {
+      newX = 0;
+    } else if (newX > Game.getScreenManager().getResolution().getWidth()) {
+      newX = (int) Game.getScreenManager().getResolution().getWidth();
+    }
+
+    // ensure that y coordinates are within the screen
+    if (newY < 0) {
+      newY = 0;
+    } else if (newY > Game.getScreenManager().getResolution().getHeight()) {
+      newY = (int) Game.getScreenManager().getResolution().getHeight();
+    }
+
+    this.location = new Point(newX, newY);
+
+    // lock original mouse back to the center of the screen
+    this.isGrabbing = true;
+    this.robot.mouseMove(grabX, grabY);
+    this.isGrabbing = false;
+  }
+
+  /**
    * Sets the pressed.
    *
    * @param pressed
@@ -334,72 +401,5 @@ public class Mouse implements IMouse {
     }
 
     this.mouseWheelListeners.remove(listener);
-  }
-
-  /**
-   * Calculates the location of the ingame mouse by the position diff and locks
-   * the original mouse to the center of the screen.
-   *
-   * @param mouseLocation
-   *          The location of the original mouse.
-   */
-  private void setLocation(final Point mouseLocation) {
-    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
-      return;
-    }
-
-    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
-    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
-    final Point screenLocation = Game.getScreenManager().getScreenLocation();
-    final int grabX = (int) (screenLocation.x + screenCenterX);
-    final int grabY = (int) (screenLocation.y + screenCenterY);
-
-    // calculate diffs and new location for the ingame mouse
-    final double diffX = MouseInfo.getPointerInfo().getLocation().x - grabX;
-    final double diffY = MouseInfo.getPointerInfo().getLocation().y - grabY;
-    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
-    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
-
-    // ensure that x coordinates are within the screen
-    if (newX < 0) {
-      newX = 0;
-    } else if (newX > Game.getScreenManager().getResolution().getWidth()) {
-      newX = (int) Game.getScreenManager().getResolution().getWidth();
-    }
-
-    // ensure that y coordinates are within the screen
-    if (newY < 0) {
-      newY = 0;
-    } else if (newY > Game.getScreenManager().getResolution().getHeight()) {
-      newY = (int) Game.getScreenManager().getResolution().getHeight();
-    }
-
-    this.location = new Point(newX, newY);
-
-    // lock original mouse back to the center of the screen
-    this.isGrabbing = true;
-    this.robot.mouseMove(grabX, grabY);
-    this.isGrabbing = false;
-  }
-
-  private MouseEvent createEvent(final MouseEvent original) {
-    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
-        original.getButton());
-    return event;
-  }
-
-  @Override
-  public boolean isLeftMouseButtonDown() {
-    return this.isLeftMouseButtonDown;
-  }
-
-  @Override
-  public boolean isRightMouseButtonDown() {
-    return this.isRightMouseButtonDown;
-  }
-
-  @Override
-  public void onWheelMoved(final int keyCode, final Consumer<Integer> consumer) {
-    this.wheelMovedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 }

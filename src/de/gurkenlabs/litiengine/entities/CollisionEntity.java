@@ -23,6 +23,11 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
+  @Override
+  public boolean collidesWith(final ICollisionEntity otherEntity) {
+    return true;
+  }
+
   /**
    * Gets the collision box.
    *
@@ -31,12 +36,6 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   @Override
   public Rectangle2D getCollisionBox() {
     return this.collisionBox;
-  }
-
-  @Override
-  public void setLocation(final Point2D location) {
-    super.setLocation(location);
-    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   /**
@@ -53,10 +52,12 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Rectangle2D.Double(location.getX() + this.getWidth() * 0.5 - collisionBoxWidth * 0.5, location.getY() + this.getHeight() - collisionBoxHeight, collisionBoxWidth, collisionBoxHeight);
   }
 
-  @Override
-  public void setSize(final float width, final float height) {
-    super.setSize(width, height);
-    this.collisionBox = this.getCollisionBox(this.getLocation());
+  public float getCollisionBoxHeightFactor() {
+    return this.collisionBoxHeightFactor;
+  }
+
+  public float getCollisionBoxWidthFactor() {
+    return this.collisionBoxWidthFactor;
   }
 
   /**
@@ -80,26 +81,25 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collision = collision;
   }
 
-  @Override
-  public boolean collidesWith(final ICollisionEntity otherEntity) {
-    return true;
-  }
-
-  public float getCollisionBoxHeightFactor() {
-    return this.collisionBoxHeightFactor;
-  }
-
   public void setCollisionBoxHeightFactor(final float collisionBoxHeightFactor) {
     this.collisionBoxHeightFactor = collisionBoxHeightFactor;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
-  public float getCollisionBoxWidthFactor() {
-    return this.collisionBoxWidthFactor;
-  }
-
   public void setCollisionBoxWidthFactor(final float collisionBoxWidthFactor) {
     this.collisionBoxWidthFactor = collisionBoxWidthFactor;
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
+  @Override
+  public void setLocation(final Point2D location) {
+    super.setLocation(location);
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
+  @Override
+  public void setSize(final float width, final float height) {
+    super.setSize(width, height);
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 }

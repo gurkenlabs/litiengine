@@ -32,6 +32,8 @@ public abstract class ForceEffect extends Effect {
     }
   }
 
+  protected abstract Force applyForce(final ICombatEntity affectedEntity);
+
   @Override
   protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
     super.cease(loop, appliance);
@@ -41,18 +43,16 @@ public abstract class ForceEffect extends Effect {
     }
   }
 
-  @Override
-  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
-    return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
+  protected Force getAppliedForce() {
+    return this.appliedForce;
   }
 
   public float getStrength() {
     return this.strength;
   }
 
-  protected abstract Force applyForce(final ICombatEntity affectedEntity);
-
-  protected Force getAppliedForce() {
-    return this.appliedForce;
+  @Override
+  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
+    return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
   }
 }

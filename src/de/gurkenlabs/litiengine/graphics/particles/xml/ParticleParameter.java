@@ -6,6 +6,10 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter {
+  public static int randomInRange(final int min, final int max) {
+    return min + (int) (Math.random() * (max - min + 1));
+  }
+
   @XmlAttribute
   private float value;
 
@@ -32,51 +36,10 @@ public class ParticleParameter {
     this.maxValue = maxValue;
   }
 
-  @XmlTransient
-  public float getValue() {
-    return this.value;
-  }
-
-  @XmlTransient
-  public boolean isRandomValue() {
-    return this.randomValue;
-  }
-
-  @XmlTransient
-  public float getMinValue() {
-    return this.minValue;
-  }
-
-  @XmlTransient
-  public float getMaxValue() {
-    return this.maxValue;
-  }
-
-  public void setValue(final float value) {
-    this.value = value;
-  }
-
-  public void setRandomValue(final boolean randomValue) {
-    this.randomValue = randomValue;
-  }
-
-  public void setMinValue(final float minValue) {
-    this.minValue = minValue;
-  }
-
-  public void setMaxValue(final float maxValue) {
-    this.maxValue = maxValue;
-  }
-
-  @XmlTransient
-  public float getRandomNumber() {
-    return (float) (this.getMinValue() + Math.random() * (this.getMaxValue() - this.getMinValue() + 1));
-  }
-
   /**
    * Gets either the acutal value or a random value, depending on the random
    * number flag being set.
-   * 
+   *
    * @return
    */
   public float get() {
@@ -87,7 +50,44 @@ public class ParticleParameter {
     }
   }
 
-  public static int randomInRange(final int min, final int max) {
-    return min + (int) (Math.random() * (max - min + 1));
+  @XmlTransient
+  public float getMaxValue() {
+    return this.maxValue;
+  }
+
+  @XmlTransient
+  public float getMinValue() {
+    return this.minValue;
+  }
+
+  @XmlTransient
+  public float getRandomNumber() {
+    return (float) (this.getMinValue() + Math.random() * (this.getMaxValue() - this.getMinValue() + 1));
+  }
+
+  @XmlTransient
+  public float getValue() {
+    return this.value;
+  }
+
+  @XmlTransient
+  public boolean isRandomValue() {
+    return this.randomValue;
+  }
+
+  public void setMaxValue(final float maxValue) {
+    this.maxValue = maxValue;
+  }
+
+  public void setMinValue(final float minValue) {
+    this.minValue = minValue;
+  }
+
+  public void setRandomValue(final boolean randomValue) {
+    this.randomValue = randomValue;
+  }
+
+  public void setValue(final float value) {
+    this.value = value;
   }
 }

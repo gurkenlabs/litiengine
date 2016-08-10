@@ -47,44 +47,6 @@ public class Attribute<T extends Number> {
     Collections.sort(this.getModifiers());
   }
 
-  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
-    return this.getModifiers().contains(modifier);
-  }
-
-  /**
-   * Gets the current value.
-   *
-   * @return the current value
-   */
-  public T getCurrentValue() {
-    return this.applyModifiers(this.getBaseValue());
-  }
-
-  /**
-   * Modify base value.
-   *
-   * @param modifier
-   *          the modifier
-   */
-  public void modifyBaseValue(final AttributeModifier<T> modifier) {
-    this.baseValue = modifier.modify(this.getBaseValue());
-  }
-
-  /**
-   * Removes the modifier.
-   *
-   * @param modifier
-   *          the modifier
-   */
-  public void removeModifier(final AttributeModifier<T> modifier) {
-    if (!this.getModifiers().contains(modifier)) {
-      return;
-    }
-
-    this.getModifiers().remove(modifier);
-    Collections.sort(this.getModifiers());
-  }
-
   /**
    * Apply modifiers.
    *
@@ -115,12 +77,50 @@ public class Attribute<T extends Number> {
   }
 
   /**
+   * Gets the current value.
+   *
+   * @return the current value
+   */
+  public T getCurrentValue() {
+    return this.applyModifiers(this.getBaseValue());
+  }
+
+  /**
    * Gets the modifiers.
    *
    * @return the modifiers
    */
   public List<AttributeModifier<T>> getModifiers() {
     return this.modifiers;
+  }
+
+  public boolean isModifierApplied(final AttributeModifier<T> modifier) {
+    return this.getModifiers().contains(modifier);
+  }
+
+  /**
+   * Modify base value.
+   *
+   * @param modifier
+   *          the modifier
+   */
+  public void modifyBaseValue(final AttributeModifier<T> modifier) {
+    this.baseValue = modifier.modify(this.getBaseValue());
+  }
+
+  /**
+   * Removes the modifier.
+   *
+   * @param modifier
+   *          the modifier
+   */
+  public void removeModifier(final AttributeModifier<T> modifier) {
+    if (!this.getModifiers().contains(modifier)) {
+      return;
+    }
+
+    this.getModifiers().remove(modifier);
+    Collections.sort(this.getModifiers());
   }
 
   /**

@@ -22,60 +22,8 @@ public class AStarNode {
     this.walkable = walkable;
   }
 
-  public int getgCost() {
-    return this.gCost;
-  }
-
-  public void setgCost(final int gCost) {
-    this.gCost = gCost;
-  }
-
-  public int gethCost() {
-    return this.hCost;
-  }
-
-  public void sethCost(final int hCost) {
-    this.hCost = hCost;
-  }
-
-  public int getfCost() {
-    return this.getgCost() + this.gethCost();
-  }
-
-  public AStarNode getPredecessor() {
-    return this.predecessor;
-  }
-
-  public void setPredecessor(final AStarNode predecessor) {
-    this.predecessor = predecessor;
-  }
-
-  public boolean isWalkable() {
-    return this.walkable;
-  }
-
-  public void setWalkable(final boolean walkable) {
-    this.walkable = walkable;
-  }
-
   public Rectangle getBounds() {
     return this.bound;
-  }
-
-  public Point getLocation() {
-    return new Point((int) this.getBounds().getCenterX(), (int) this.getBounds().getCenterY());
-  }
-
-  public int getGridX() {
-    return this.gridX;
-  }
-
-  public int getGridY() {
-    return this.gridY;
-  }
-
-  public int getPenalty() {
-    return this.penalty;
   }
 
   public int getCosts(final AStarNode target) {
@@ -89,5 +37,57 @@ public class AStarNode {
     }
 
     return DIAGONAL_COST * dstX + STRAIGHT_COST * (dstY - dstX);
+  }
+
+  public int getfCost() {
+    return this.getgCost() + this.gethCost();
+  }
+
+  public int getgCost() {
+    return this.gCost;
+  }
+
+  public int getGridX() {
+    return this.gridX;
+  }
+
+  public int getGridY() {
+    return this.gridY;
+  }
+
+  public int gethCost() {
+    return this.hCost;
+  }
+
+  public Point getLocation() {
+    return new Point((int) this.getBounds().getCenterX(), (int) this.getBounds().getCenterY());
+  }
+
+  public int getPenalty() {
+    return this.penalty;
+  }
+
+  public AStarNode getPredecessor() {
+    return this.predecessor;
+  }
+
+  public boolean isWalkable() {
+    return this.walkable;
+  }
+
+  public void setgCost(final int gCost) {
+    this.gCost = gCost;
+  }
+
+  public void sethCost(final int hCost) {
+    this.hCost = hCost;
+  }
+
+  public void setPredecessor(final AStarNode predecessor) {
+    this.predecessor = predecessor;
+  }
+
+  public void setWalkable(final boolean walkable) {
+    this.walkable = walkable;
   }
 }

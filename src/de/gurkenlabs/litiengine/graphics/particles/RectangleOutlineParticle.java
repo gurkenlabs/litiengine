@@ -14,6 +14,10 @@ public class RectangleOutlineParticle extends Particle {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
   }
 
+  public float getStroke() {
+    return this.stroke;
+  }
+
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
@@ -22,10 +26,6 @@ public class RectangleOutlineParticle extends Particle {
     g.setStroke(new BasicStroke(this.stroke));
     g.draw(new Rectangle2D.Double(renderLocation.getX(), renderLocation.getY(), this.getWidth(), this.getHeight()));
     g.setStroke(oldStroke);
-  }
-
-  public float getStroke() {
-    return this.stroke;
   }
 
   public void setStroke(final float stroke) {

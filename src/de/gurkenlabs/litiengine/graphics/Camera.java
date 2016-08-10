@@ -34,6 +34,31 @@ public abstract class Camera implements ICamera {
   protected Camera() {
   }
 
+  /**
+   * Apply shake effect.
+   *
+   * @param cameraLocation
+   *          the camera location
+   * @return the point2 d
+   */
+  protected Point2D applyShakeEffect(final Point2D cameraLocation) {
+    if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
+      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * MathUtilities.randomSign(), cameraLocation.getY() + this.getShakeOffset() * MathUtilities.randomSign());
+    }
+
+    return cameraLocation;
+  }
+
+  @Override
+  public double getCenterX() {
+    return this.centerX;
+  }
+
+  @Override
+  public double getCenterY() {
+    return this.centerY;
+  }
+
   @Override
   public Point2D getFocus() {
     return this.focus;
@@ -70,6 +95,33 @@ public abstract class Camera implements ICamera {
   @Override
   public double getPixelOffsetY() {
     return this.getCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
+  }
+
+  /**
+   * Gets the shake duration.
+   *
+   * @return the shake duration
+   */
+  protected int getShakeDuration() {
+    return this.shakeDuration;
+  }
+
+  /**
+   * Gets the shake offset.
+   *
+   * @return the shake offset
+   */
+  protected double getShakeOffset() {
+    return this.shakeIntensity;
+  }
+
+  /**
+   * Gets the shake tick.
+   *
+   * @return the shake tick
+   */
+  protected long getShakeTick() {
+    return this.shakeTick;
   }
 
   @Override
@@ -125,6 +177,18 @@ public abstract class Camera implements ICamera {
     return new Point2D.Double(x, y);
   }
 
+  protected void setCenterX(final double centerX) {
+    this.centerX = centerX;
+  }
+
+  protected void setCenterY(final double centerY) {
+    this.centerY = centerY;
+  }
+
+  protected void setFocus(final Point2D focus) {
+    this.focus = focus;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -135,69 +199,5 @@ public abstract class Camera implements ICamera {
     this.shakeTick = Game.getLoop().getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
-  }
-
-  @Override
-  public double getCenterX() {
-    return this.centerX;
-  }
-
-  @Override
-  public double getCenterY() {
-    return this.centerY;
-  }
-
-  /**
-   * Apply shake effect.
-   *
-   * @param cameraLocation
-   *          the camera location
-   * @return the point2 d
-   */
-  protected Point2D applyShakeEffect(final Point2D cameraLocation) {
-    if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
-      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * MathUtilities.randomSign(), cameraLocation.getY() + this.getShakeOffset() * MathUtilities.randomSign());
-    }
-
-    return cameraLocation;
-  }
-
-  /**
-   * Gets the shake duration.
-   *
-   * @return the shake duration
-   */
-  protected int getShakeDuration() {
-    return this.shakeDuration;
-  }
-
-  /**
-   * Gets the shake offset.
-   *
-   * @return the shake offset
-   */
-  protected double getShakeOffset() {
-    return this.shakeIntensity;
-  }
-
-  /**
-   * Gets the shake tick.
-   *
-   * @return the shake tick
-   */
-  protected long getShakeTick() {
-    return this.shakeTick;
-  }
-
-  protected void setFocus(final Point2D focus) {
-    this.focus = focus;
-  }
-
-  protected void setCenterX(final double centerX) {
-    this.centerX = centerX;
-  }
-
-  protected void setCenterY(final double centerY) {
-    this.centerY = centerY;
   }
 }

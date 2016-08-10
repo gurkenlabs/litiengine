@@ -12,6 +12,10 @@ public class FreeFlightCamera extends Camera {
     this.location = location;
   }
 
+  public Point2D getLocation() {
+    return this.location;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -22,18 +26,14 @@ public class FreeFlightCamera extends Camera {
     return new Rectangle2D.Double(this.getFocus().getX() - this.getCenterX(), this.getFocus().getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
   }
 
+  public void setLocation(final Point2D location) {
+    this.location = location;
+  }
+
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.location));
     this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale());
     this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale());
-  }
-
-  public void setLocation(final Point2D location) {
-    this.location = location;
-  }
-
-  public Point2D getLocation() {
-    return this.location;
   }
 }

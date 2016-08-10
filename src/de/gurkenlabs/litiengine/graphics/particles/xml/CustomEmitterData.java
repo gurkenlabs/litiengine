@@ -103,165 +103,8 @@ public class CustomEmitterData {
   }
 
   @XmlTransient
-  public String getName() {
-    return this.name;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  @XmlTransient
-  public int getParticleMinTTL() {
-    return this.particleMinTTL;
-  }
-
-  public void setParticleMinTTL(final int particleMinTTL) {
-    this.particleMinTTL = particleMinTTL;
-  }
-
-  @XmlTransient
-  public int getParticleMaxTTL() {
-    return this.particleMaxTTL;
-  }
-
-  public void setParticleMaxTTL(final int particleMaxTTL) {
-    this.particleMaxTTL = particleMaxTTL;
-  }
-
-  @XmlTransient
-  public int getSpawnAmount() {
-    return this.spawnAmount;
-  }
-
-  public void setSpawnAmount(final int spawnAmount) {
-    this.spawnAmount = spawnAmount;
-  }
-
-  @XmlTransient
-  public int getSpawnRate() {
-    return this.spawnRate;
-  }
-
-  public void setSpawnRate(final int spawnRate) {
-    this.spawnRate = spawnRate;
-  }
-
-  @XmlTransient
-  public int getMaxParticles() {
-    return this.maxParticles;
-  }
-
-  public void setMaxParticles(final int maxParticles) {
-    this.maxParticles = maxParticles;
-  }
-
-  @XmlTransient
-  public int getEmitterTTL() {
-    return this.emitterTTL;
-  }
-
-  public void setEmitterTTL(final int emitterTTL) {
-    this.emitterTTL = emitterTTL;
-  }
-
-  @XmlTransient
-  public int getWidth() {
-    return this.width;
-  }
-
-  public void setWidth(final int width) {
-    this.width = width;
-  }
-
-  @XmlTransient
-  public int getHeight() {
-    return this.height;
-  }
-
-  public void setHeight(final int height) {
-    this.height = height;
-  }
-
-  @XmlTransient
-  public ParticleParameter getX() {
-    return this.x;
-  }
-
-  public void setX(final ParticleParameter x) {
-    this.x = x;
-  }
-
-  @XmlTransient
-  public ParticleParameter getY() {
-    return this.y;
-  }
-
-  public void setY(final ParticleParameter y) {
-    this.y = y;
-  }
-
-  @XmlTransient
-  public ParticleParameter getDeltaX() {
-    return this.deltaX;
-  }
-
-  public void setDeltaX(final ParticleParameter deltaX) {
-    this.deltaX = deltaX;
-  }
-
-  @XmlTransient
-  public ParticleParameter getDeltaY() {
-    return this.deltaY;
-  }
-
-  public void setDeltaY(final ParticleParameter deltaY) {
-    this.deltaY = deltaY;
-  }
-
-  @XmlTransient
-  public ParticleParameter getGravityX() {
-    return this.gravityX;
-  }
-
-  public void setGravityX(final ParticleParameter gravityX) {
-    this.gravityX = gravityX;
-  }
-
-  @XmlTransient
-  public ParticleParameter getGravityY() {
-    return this.gravityY;
-  }
-
-  public void setGravityY(final ParticleParameter gravityY) {
-    this.gravityY = gravityY;
-  }
-
-  @XmlTransient
-  public ParticleParameter getParticleWidth() {
-    return this.particleWidth;
-  }
-
-  public void setParticleWidth(final ParticleParameter particleWidth) {
-    this.particleWidth = particleWidth;
-  }
-
-  @XmlTransient
-  public ParticleParameter getParticleHeight() {
-    return this.particleHeight;
-  }
-
-  public void setParticleHeight(final ParticleParameter particleHeight) {
-    this.particleHeight = particleHeight;
-  }
-
-  @XmlTransient
-  public ParticleParameter getDeltaWidth() {
-    return this.deltaWidth;
-  }
-
-  public void setDeltaWidth(final ParticleParameter deltaWidth) {
-    this.deltaWidth = deltaWidth;
+  public List<ParticleColor> getColors() {
+    return this.colors;
   }
 
   @XmlTransient
@@ -269,35 +112,64 @@ public class CustomEmitterData {
     return this.deltaHeight;
   }
 
-  public void setDeltaHeight(final ParticleParameter deltaHeight) {
-    this.deltaHeight = deltaHeight;
+  @XmlTransient
+  public ParticleParameter getDeltaWidth() {
+    return this.deltaWidth;
   }
 
   @XmlTransient
-  public List<ParticleColor> getColors() {
-    return this.colors;
-  }
-
-  public void setColors(final List<ParticleColor> colors) {
-    this.colors = colors;
+  public ParticleParameter getDeltaX() {
+    return this.deltaX;
   }
 
   @XmlTransient
-  public int getUpdateRate() {
-    return this.updateRate;
-  }
-
-  public void setUpdateRate(final int updateRate) {
-    this.updateRate = updateRate;
+  public ParticleParameter getDeltaY() {
+    return this.deltaY;
   }
 
   @XmlTransient
-  public ParticleType getParticleType() {
-    return this.particleType;
+  public int getEmitterTTL() {
+    return this.emitterTTL;
   }
 
-  public void setParticleType(final ParticleType particleType) {
-    this.particleType = particleType;
+  @XmlTransient
+  public ParticleParameter getGravityX() {
+    return this.gravityX;
+  }
+
+  @XmlTransient
+  public ParticleParameter getGravityY() {
+    return this.gravityY;
+  }
+
+  @XmlTransient
+  public int getHeight() {
+    return this.height;
+  }
+
+  @XmlTransient
+  public int getMaxParticles() {
+    return this.maxParticles;
+  }
+
+  @XmlTransient
+  public String getName() {
+    return this.name;
+  }
+
+  @XmlTransient
+  public ParticleParameter getParticleHeight() {
+    return this.particleHeight;
+  }
+
+  @XmlTransient
+  public int getParticleMaxTTL() {
+    return this.particleMaxTTL;
+  }
+
+  @XmlTransient
+  public int getParticleMinTTL() {
+    return this.particleMinTTL;
   }
 
   @XmlTransient
@@ -305,8 +177,44 @@ public class CustomEmitterData {
     return this.particleText;
   }
 
-  public void setParticleText(final String particleText) {
-    this.particleText = particleText;
+  @XmlTransient
+  public ParticleType getParticleType() {
+    return this.particleType;
+  }
+
+  @XmlTransient
+  public ParticleParameter getParticleWidth() {
+    return this.particleWidth;
+  }
+
+  @XmlTransient
+  public int getSpawnAmount() {
+    return this.spawnAmount;
+  }
+
+  @XmlTransient
+  public int getSpawnRate() {
+    return this.spawnRate;
+  }
+
+  @XmlTransient
+  public int getUpdateRate() {
+    return this.updateRate;
+  }
+
+  @XmlTransient
+  public int getWidth() {
+    return this.width;
+  }
+
+  @XmlTransient
+  public ParticleParameter getX() {
+    return this.x;
+  }
+
+  @XmlTransient
+  public ParticleParameter getY() {
+    return this.y;
   }
 
   @XmlTransient
@@ -316,6 +224,98 @@ public class CustomEmitterData {
 
   public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
+  }
+
+  public void setColors(final List<ParticleColor> colors) {
+    this.colors = colors;
+  }
+
+  public void setDeltaHeight(final ParticleParameter deltaHeight) {
+    this.deltaHeight = deltaHeight;
+  }
+
+  public void setDeltaWidth(final ParticleParameter deltaWidth) {
+    this.deltaWidth = deltaWidth;
+  }
+
+  public void setDeltaX(final ParticleParameter deltaX) {
+    this.deltaX = deltaX;
+  }
+
+  public void setDeltaY(final ParticleParameter deltaY) {
+    this.deltaY = deltaY;
+  }
+
+  public void setEmitterTTL(final int emitterTTL) {
+    this.emitterTTL = emitterTTL;
+  }
+
+  public void setGravityX(final ParticleParameter gravityX) {
+    this.gravityX = gravityX;
+  }
+
+  public void setGravityY(final ParticleParameter gravityY) {
+    this.gravityY = gravityY;
+  }
+
+  public void setHeight(final int height) {
+    this.height = height;
+  }
+
+  public void setMaxParticles(final int maxParticles) {
+    this.maxParticles = maxParticles;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public void setParticleHeight(final ParticleParameter particleHeight) {
+    this.particleHeight = particleHeight;
+  }
+
+  public void setParticleMaxTTL(final int particleMaxTTL) {
+    this.particleMaxTTL = particleMaxTTL;
+  }
+
+  public void setParticleMinTTL(final int particleMinTTL) {
+    this.particleMinTTL = particleMinTTL;
+  }
+
+  public void setParticleText(final String particleText) {
+    this.particleText = particleText;
+  }
+
+  public void setParticleType(final ParticleType particleType) {
+    this.particleType = particleType;
+  }
+
+  public void setParticleWidth(final ParticleParameter particleWidth) {
+    this.particleWidth = particleWidth;
+  }
+
+  public void setSpawnAmount(final int spawnAmount) {
+    this.spawnAmount = spawnAmount;
+  }
+
+  public void setSpawnRate(final int spawnRate) {
+    this.spawnRate = spawnRate;
+  }
+
+  public void setUpdateRate(final int updateRate) {
+    this.updateRate = updateRate;
+  }
+
+  public void setWidth(final int width) {
+    this.width = width;
+  }
+
+  public void setX(final ParticleParameter x) {
+    this.x = x;
+  }
+
+  public void setY(final ParticleParameter y) {
+    this.y = y;
   }
 
 }

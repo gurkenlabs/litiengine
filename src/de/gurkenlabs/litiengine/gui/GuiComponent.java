@@ -136,22 +136,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.clickConsumer;
   }
 
-  protected List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
-    return this.hoverConsumer;
-  }
-
-  protected List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
-    return this.mousePressedConsumer;
-  }
-
-  protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
-    return this.mouseEnterConsumer;
-  }
-
-  protected List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
-    return this.mouseLeaveConsumer;
-  }
-
   /**
    * Gets the component id.
    *
@@ -159,6 +143,15 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public int getComponentId() {
     return this.id;
+  }
+
+  /**
+   * Gets the components.
+   *
+   * @return the components
+   */
+  protected List<GuiComponent> getComponents() {
+    return this.components;
   }
 
   /**
@@ -178,6 +171,26 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public Color getHoverColor() {
     return this.getBackGroundColor().darker();
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
+    return this.hoverConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
+    return this.mouseEnterConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
+    return this.mouseLeaveConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
+    return this.mousePressedConsumer;
+  }
+
+  public Point2D getPosition() {
+    return new Point2D.Double(this.getX(), this.getY());
   }
 
   /**
@@ -218,28 +231,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.x;
   }
 
-  public Point2D getPosition() {
-    return new Point2D.Double(this.getX(), this.getY());
-  }
-
-  @Override
-  public void setPosition(final double x, final double y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  @Override
-  public void setPosition(final Point2D newPosition) {
-    this.x = newPosition.getX();
-    this.y = newPosition.getY();
-  }
-
-  @Override
-  public void setDimension(final double width, final double height) {
-    this.width = width;
-    this.height = height;
-  }
-
   /**
    * Gets the y.
    *
@@ -249,6 +240,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public double getY() {
     return this.y;
   }
+
+  /**
+   * Initialize components.
+   */
+  protected abstract void initializeComponents();
 
   /**
    * Checks if is hovered.
@@ -337,6 +333,17 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
+  /**
+   * Mouse event should be forwarded.
+   *
+   * @param e
+   *          the e
+   * @return true, if successful
+   */
+  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -418,12 +425,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMousePressedConsumer().contains(callback)) {
-      this.getMousePressedConsumer().add(callback);
-    }
-  }
-
   public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseEnterConsumer().contains(callback)) {
       this.getMouseEnterConsumer().add(callback);
@@ -433,6 +434,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void onMouseLeave(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseLeaveConsumer().contains(callback)) {
       this.getMouseLeaveConsumer().add(callback);
+    }
+  }
+
+  public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMousePressedConsumer().contains(callback)) {
+      this.getMousePressedConsumer().add(callback);
     }
   }
 
@@ -490,8 +497,26 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   @Override
+  public void setDimension(final double width, final double height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  @Override
   public void setHeight(final int height) {
     this.height = height;
+  }
+
+  @Override
+  public void setPosition(final double x, final double y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  @Override
+  public void setPosition(final Point2D newPosition) {
+    this.x = newPosition.getX();
+    this.y = newPosition.getY();
   }
 
   public void setSelected(final boolean bool) {
@@ -553,29 +578,4 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.setSelected(!this.isSelected);
 
   }
-
-  /**
-   * Mouse event should be forwarded.
-   *
-   * @param e
-   *          the e
-   * @return true, if successful
-   */
-  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
-  }
-
-  /**
-   * Gets the components.
-   *
-   * @return the components
-   */
-  protected List<GuiComponent> getComponents() {
-    return this.components;
-  }
-
-  /**
-   * Initialize components.
-   */
-  protected abstract void initializeComponents();
 }

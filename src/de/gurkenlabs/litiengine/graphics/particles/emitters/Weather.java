@@ -38,6 +38,11 @@ public abstract class Weather extends Emitter {
     Game.getScreenManager().onResolutionChanged(resolution -> this.resolutionChanged());
   }
 
+  @Override
+  public Rectangle2D getBoundingBox() {
+    return Game.getScreenManager().getCamera().getViewPort();
+  }
+
   /**
    * Gets the screen dimensions.
    *
@@ -47,9 +52,26 @@ public abstract class Weather extends Emitter {
     return this.screenDimensions;
   }
 
+  public WeatherType getType() {
+    return this.type;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.particles.Emitter#particleCanBeRemoved(de.
+   * gurkenlabs.liti.graphics.particles.Particle)
+   */
   @Override
-  public Rectangle2D getBoundingBox() {
-    return Game.getScreenManager().getCamera().getViewPort();
+  protected boolean particleCanBeRemoved(final Particle particle) {
+    // since our weather effects are top-right-to-bottom-left, we need to remove
+    // particles that have reached the bottom left end
+    final Point2D renderLocation = particle.getLocation(this.getOrigin());
+    if (renderLocation.getX() < 0 || renderLocation.getY() > this.getScreenDimensions().height) {
+      return true;
+    }
+
+    return super.particleCanBeRemoved(particle);
   }
 
   /*
@@ -94,27 +116,5 @@ public abstract class Weather extends Emitter {
     particle.setDy(particle.getDy() * heightDifference);
     particle.setDeltaIncX(particle.getGravityX() * widthDifference);
     particle.setDeltaIncY(particle.getGravityY() * heightDifference);
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#particleCanBeRemoved(de.
-   * gurkenlabs.liti.graphics.particles.Particle)
-   */
-  @Override
-  protected boolean particleCanBeRemoved(final Particle particle) {
-    // since our weather effects are top-right-to-bottom-left, we need to remove
-    // particles that have reached the bottom left end
-    final Point2D renderLocation = particle.getLocation(this.getOrigin());
-    if (renderLocation.getX() < 0 || renderLocation.getY() > this.getScreenDimensions().height) {
-      return true;
-    }
-
-    return super.particleCanBeRemoved(particle);
-  }
-
-  public WeatherType getType() {
-    return this.type;
   }
 }

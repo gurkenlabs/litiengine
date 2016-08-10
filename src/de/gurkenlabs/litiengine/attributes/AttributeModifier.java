@@ -42,6 +42,34 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   }
 
   /**
+   * Ensure type.
+   *
+   * @param modValue
+   *          the mod value
+   * @param originalValue
+   *          the original value
+   * @return the t
+   */
+  @SuppressWarnings("unchecked")
+  private T ensureType(final Double modValue, final T originalValue) {
+    if (originalValue instanceof Double) {
+      return (T) modValue;
+    } else if (originalValue instanceof Float) {
+      return (T) Float.valueOf(modValue.floatValue());
+    } else if (originalValue instanceof Long) {
+      return (T) Long.valueOf(modValue.longValue());
+    } else if (originalValue instanceof Byte) {
+      return (T) Byte.valueOf(modValue.byteValue());
+    } else if (originalValue instanceof Short) {
+      return (T) Short.valueOf(modValue.shortValue());
+    } else if (originalValue instanceof Integer) {
+      return (T) Integer.valueOf(modValue.intValue());
+    }
+
+    return null;
+  }
+
+  /**
    * Gets the modification.
    *
    * @return the modification
@@ -86,33 +114,5 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     default:
       return modvalue;
     }
-  }
-
-  /**
-   * Ensure type.
-   *
-   * @param modValue
-   *          the mod value
-   * @param originalValue
-   *          the original value
-   * @return the t
-   */
-  @SuppressWarnings("unchecked")
-  private T ensureType(final Double modValue, final T originalValue) {
-    if (originalValue instanceof Double) {
-      return (T) modValue;
-    } else if (originalValue instanceof Float) {
-      return (T) Float.valueOf(modValue.floatValue());
-    } else if (originalValue instanceof Long) {
-      return (T) Long.valueOf(modValue.longValue());
-    } else if (originalValue instanceof Byte) {
-      return (T) Byte.valueOf(modValue.byteValue());
-    } else if (originalValue instanceof Short) {
-      return (T) Short.valueOf(modValue.shortValue());
-    } else if (originalValue instanceof Integer) {
-      return (T) Integer.valueOf(modValue.intValue());
-    }
-
-    return null;
   }
 }

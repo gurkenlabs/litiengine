@@ -42,10 +42,9 @@ public class UdpServer implements IServer {
     provider.register(MessageType.PING, new ClientConnectionPingMessageHandler(this.clientConnectionManager));
   }
 
-  protected boolean handleShutdownCommand(final String[] command) {
-    System.out.println("Shutting down server...");
-    this.terminate();
-    return true;
+  @Override
+  public ICommandManager getCommandManager() {
+    return this.commandManager;
   }
 
   /*
@@ -63,9 +62,10 @@ public class UdpServer implements IServer {
     return this.sender;
   }
 
-  @Override
-  public ICommandManager getCommandManager() {
-    return this.commandManager;
+  protected boolean handleShutdownCommand(final String[] command) {
+    System.out.println("Shutting down server...");
+    this.terminate();
+    return true;
   }
 
   @Override

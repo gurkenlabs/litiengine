@@ -72,26 +72,11 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  /**
-   * 1. Cease the effect after its duration. 2. apply all follow up effects 3.
-   * remove appliance 4. unregister from loop if all appliances are done
-   */
-  @Override
-  public void update(final IGameLoop loop) {
-
-    for (final Iterator<EffectAppliance> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
-      final EffectAppliance appliance = iterator.next();
-      // if the effect duration is reached
-      if (this.hasEnded(loop, appliance)) {
-
-        iterator.remove();
-        this.cease(loop, appliance);
-      }
-    }
-
-    // 4. unregister if all appliances are finished
-    if (this.getActiveAppliances().size() == 0) {
-      loop.unregisterFromUpdate(this);
+  protected void apply(final ICombatEntity entity) {
+    entity.getAppliedEffects().add(this);
+    final EffectArgument arg = new EffectArgument(this, entity);
+    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
+      consumer.accept(arg);
     }
   }
 
@@ -113,17 +98,34 @@ public abstract class Effect implements IEffect {
     }
   }
 
+  /**
+   * Can attack entity.
+   *
+   * @return the predicate<? super attackable entity>
+   */
+  private Predicate<? super ICombatEntity> canAttackEntity() {
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  }
+
   @Override
-  public boolean isActive(final ICombatEntity entity) {
-    for (final EffectAppliance app : this.getActiveAppliances()) {
-      for (final ICombatEntity affected : app.getAffectedEntities()) {
-        if (affected.equals(entity)) {
-          return true;
-        }
-      }
+  public void cease(final ICombatEntity entity) {
+    entity.getAppliedEffects().remove(this);
+    final EffectArgument arg = new EffectArgument(this, entity);
+    for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
+      consumer.accept(arg);
+    }
+  }
+
+  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
+    // 1. cease the effect for all affected entities
+    for (final ICombatEntity entity : appliance.getAffectedEntities()) {
+      this.cease(entity);
     }
 
-    return false;
+    // 2. apply follow up effects
+    this.getFollowUpEffects().forEach(followUp -> {
+      followUp.apply(loop, appliance.getImpactArea());
+    });
   }
 
   /**
@@ -133,6 +135,11 @@ public abstract class Effect implements IEffect {
    */
   public Ability getAbility() {
     return this.ability;
+  }
+
+  @Override
+  public List<EffectAppliance> getActiveAppliances() {
+    return this.appliances;
   }
 
   /**
@@ -165,6 +172,14 @@ public abstract class Effect implements IEffect {
     return this.effectTargets;
   }
 
+  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
+    return this.getEnvironment().findCombatEntities(impactArea);
+  }
+
+  public IEnvironment getEnvironment() {
+    return this.environment;
+  }
+
   /**
    * Gets the follow up effects.
    *
@@ -175,67 +190,17 @@ public abstract class Effect implements IEffect {
     return this.followUpEffects;
   }
 
-  public IEnvironment getEnvironment() {
-    return this.environment;
-  }
-
-  @Override
-  public void onEffectApplied(final Consumer<EffectArgument> consumer) {
-    if (!this.appliedConsumer.contains(consumer)) {
-      this.appliedConsumer.add(consumer);
-    }
-  }
-
-  @Override
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    if (!this.ceasedConsumer.contains(consumer)) {
-      this.ceasedConsumer.add(consumer);
-    }
-  }
-
-  /**
-   * Sets the delay.
-   *
-   * @param delay
-   *          the new delay
-   */
-  public void setDelay(final int delay) {
-    this.delay = delay;
-  }
-
-  /**
-   * Sets the duration.
-   *
-   * @param duration
-   *          the new duration
-   */
-  public void setDuration(final int duration) {
-    this.duration = duration;
-  }
-
   public EntityComparator getTargetPriorityComparator() {
     return this.targetPriorityComparator;
   }
 
-  public void setTargetPriorityComparator(final EntityComparator targetPriorityComparator) {
-    this.targetPriorityComparator = targetPriorityComparator;
-  }
-
-  @Override
-  public List<EffectAppliance> getActiveAppliances() {
-    return this.appliances;
-  }
-
-  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
-    // 1. cease the effect for all affected entities
-    for (final ICombatEntity entity : appliance.getAffectedEntities()) {
-      this.cease(entity);
-    }
-
-    // 2. apply follow up effects
-    this.getFollowUpEffects().forEach(followUp -> {
-      followUp.apply(loop, appliance.getImpactArea());
-    });
+  /**
+   * Gets the total duration.
+   *
+   * @return the total duration
+   */
+  protected long getTotalDuration() {
+    return this.getDuration() + this.getDelay();
   }
 
   protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
@@ -243,13 +208,17 @@ public abstract class Effect implements IEffect {
     return effectDuration > this.getDuration();
   }
 
-  /**
-   * Can attack entity.
-   *
-   * @return the predicate<? super attackable entity>
-   */
-  private Predicate<? super ICombatEntity> canAttackEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  @Override
+  public boolean isActive(final ICombatEntity entity) {
+    for (final EffectAppliance app : this.getActiveAppliances()) {
+      for (final ICombatEntity affected : app.getAffectedEntities()) {
+        if (affected.equals(entity)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -263,32 +232,6 @@ public abstract class Effect implements IEffect {
 
   private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
-  }
-
-  protected void apply(final ICombatEntity entity) {
-    entity.getAppliedEffects().add(this);
-    final EffectArgument arg = new EffectArgument(this, entity);
-    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
-      consumer.accept(arg);
-    }
-  }
-
-  @Override
-  public void cease(final ICombatEntity entity) {
-    entity.getAppliedEffects().remove(this);
-    final EffectArgument arg = new EffectArgument(this, entity);
-    for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
-      consumer.accept(arg);
-    }
-  }
-
-  /**
-   * Gets the total duration.
-   *
-   * @return the total duration
-   */
-  protected long getTotalDuration() {
-    return this.getDuration() + this.getDelay();
   }
 
   /**
@@ -339,8 +282,65 @@ public abstract class Effect implements IEffect {
     return affectedEntities;
   }
 
-  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return this.getEnvironment().findCombatEntities(impactArea);
+  @Override
+  public void onEffectApplied(final Consumer<EffectArgument> consumer) {
+    if (!this.appliedConsumer.contains(consumer)) {
+      this.appliedConsumer.add(consumer);
+    }
+  }
+
+  @Override
+  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
+    if (!this.ceasedConsumer.contains(consumer)) {
+      this.ceasedConsumer.add(consumer);
+    }
+  }
+
+  /**
+   * Sets the delay.
+   *
+   * @param delay
+   *          the new delay
+   */
+  public void setDelay(final int delay) {
+    this.delay = delay;
+  }
+
+  /**
+   * Sets the duration.
+   *
+   * @param duration
+   *          the new duration
+   */
+  public void setDuration(final int duration) {
+    this.duration = duration;
+  }
+
+  public void setTargetPriorityComparator(final EntityComparator targetPriorityComparator) {
+    this.targetPriorityComparator = targetPriorityComparator;
+  }
+
+  /**
+   * 1. Cease the effect after its duration. 2. apply all follow up effects 3.
+   * remove appliance 4. unregister from loop if all appliances are done
+   */
+  @Override
+  public void update(final IGameLoop loop) {
+
+    for (final Iterator<EffectAppliance> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
+      final EffectAppliance appliance = iterator.next();
+      // if the effect duration is reached
+      if (this.hasEnded(loop, appliance)) {
+
+        iterator.remove();
+        this.cease(loop, appliance);
+      }
+    }
+
+    // 4. unregister if all appliances are finished
+    if (this.getActiveAppliances().size() == 0) {
+      loop.unregisterFromUpdate(this);
+    }
   }
 
 }

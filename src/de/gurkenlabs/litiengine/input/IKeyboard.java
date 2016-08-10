@@ -12,6 +12,12 @@ import de.gurkenlabs.litiengine.IUpdateable;
  */
 public interface IKeyboard extends IUpdateable {
 
+  public void onKeyPressed(int keyCode, Consumer<Integer> consumer);
+
+  public void onKeyReleased(int keyCode, Consumer<Integer> consumer);
+
+  public void onKeyTyped(int keyCode, Consumer<Integer> consumer);
+
   /**
    * Register for key down events.
    *
@@ -19,12 +25,6 @@ public interface IKeyboard extends IUpdateable {
    *          the observer
    */
   public void registerForKeyDownEvents(IKeyObserver observer);
-
-  public void onKeyTyped(int keyCode, Consumer<Integer> consumer);
-
-  public void onKeyReleased(int keyCode, Consumer<Integer> consumer);
-
-  public void onKeyPressed(int keyCode, Consumer<Integer> consumer);
 
   /**
    * Unregister from key down events.

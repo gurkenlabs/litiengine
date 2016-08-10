@@ -55,10 +55,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
     this.bytesReceived = new CopyOnWriteArrayList<>();
   }
 
-  public void recordNetworkTraffic() {
-    Game.getLoop().registerForUpdate(this);
-  }
-
   /**
    * Gets the average frames per second.
    *
@@ -136,6 +132,47 @@ public class GameMetrics implements IUpdateable, IRenderable {
     this.bytesSent.add(size);
   }
 
+  public void recordNetworkTraffic() {
+    Game.getLoop().registerForUpdate(this);
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    final int OffsetX = 5;
+    final int OffsetY = 12;
+    int currentOffsetY = OffsetY;
+
+    g.setColor(Color.RED);
+    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+    final Runtime runtime = Runtime.getRuntime();
+    final float usedMemory = Float.valueOf(Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f);
+    final String memory = "memory: " + usedMemory + "MB";
+    g.drawString(memory, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
+    final String ping = "ping: " + this.getPing() + "ms";
+    g.drawString(ping, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
+    final float upStream = Float.valueOf(Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f);
+    final float downStream = Float.valueOf(Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f);
+    final String in = "in: " + this.getPackagesReceived() + " - " + downStream + "kb/s";
+    g.drawString(in, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
+    final String out = "out: " + this.getPackagesSent() + " - " + upStream + "kb/s";
+    g.drawString(out, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
+    final String fps = "fps: " + this.getFramesPerSecond();
+    g.drawString(fps, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+
+    final String ups = "ups: " + this.getUpdatesPerSecond();
+    g.drawString(ups, OffsetX, currentOffsetY);
+    currentOffsetY += OffsetY;
+  }
+
   /**
    * Sets the frames per second.
    *
@@ -178,42 +215,5 @@ public class GameMetrics implements IUpdateable, IRenderable {
       this.bytesSent.clear();
       this.bytesReceived.clear();
     }
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    final int OffsetX = 5;
-    final int OffsetY = 12;
-    int currentOffsetY = OffsetY;
-
-    g.setColor(Color.RED);
-    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-    final Runtime runtime = Runtime.getRuntime();
-    final float usedMemory = Float.valueOf(Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f);
-    final String memory = "memory: " + usedMemory + "MB";
-    g.drawString(memory, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
-
-    final String ping = "ping: " + this.getPing() + "ms";
-    g.drawString(ping, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
-
-    final float upStream = Float.valueOf(Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f);
-    final float downStream = Float.valueOf(Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f);
-    final String in = "in: " + this.getPackagesReceived() + " - " + downStream + "kb/s";
-    g.drawString(in, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
-
-    final String out = "out: " + this.getPackagesSent() + " - " + upStream + "kb/s";
-    g.drawString(out, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
-
-    final String fps = "fps: " + this.getFramesPerSecond();
-    g.drawString(fps, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
-
-    final String ups = "ups: " + this.getUpdatesPerSecond();
-    g.drawString(ups, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
   }
 }

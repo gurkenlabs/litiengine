@@ -7,8 +7,6 @@ import de.gurkenlabs.core.ILaunchable;
 public interface IGameLoop extends ILaunchable {
   public long convertToMs(final long ticks);
 
-  public int getUpdateRate();
-
   /**
    * Gets the time passed since the last tick.
    *
@@ -25,19 +23,21 @@ public interface IGameLoop extends ILaunchable {
    */
   public long getDeltaTime(final long ticks);
 
+  public long getTicks();
+
   public GameTime getTime();
 
   public float getTimeScale();
 
-  public void setTimeScale(float timeScale);
+  public int getUpdatablesCount();
 
-  public long getTicks();
+  public int getUpdateRate();
 
   public void onUpsTracked(final Consumer<Integer> upsConsumer);
 
   public void registerForUpdate(final IUpdateable updatable);
 
-  public void unregisterFromUpdate(final IUpdateable updatable);
+  public void setTimeScale(float timeScale);
 
-  public int getUpdatablesCount();
+  public void unregisterFromUpdate(final IUpdateable updatable);
 }

@@ -30,18 +30,6 @@ import de.gurkenlabs.util.image.ImageProcessing;
  */
 public class OrthogonalMapRenderer implements IMapRenderer {
   private static final String LAYER_RENDER_TYPE = "RENDERTYPE";
-  private float renderProcess;
-  private int totalTileCount;
-  private int tilesRendered;
-  private int partitionsX;
-  private int partitionsY;
-  private final Map<IMap, BufferedImage[][]> imageGrids;
-
-  public OrthogonalMapRenderer() {
-    this.partitionsX = 1;
-    this.partitionsY = 1;
-    this.imageGrids = new ConcurrentHashMap<>();
-  }
 
   /**
    * Gets the cache key.
@@ -65,6 +53,111 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final int index = tile.getGridId() - tileset.getFirstGridId();
     final Image img = new Spritesheet(tileset).getSprite(index);
     return ImageProcessing.applyAlphaChannel(img, tileset.getImage().getTransparentColor());
+  }
+
+  private float renderProcess;
+  private int totalTileCount;
+  private int tilesRendered;
+  private int partitionsX;
+
+  private int partitionsY;
+
+  private final Map<IMap, BufferedImage[][]> imageGrids;
+
+  public OrthogonalMapRenderer() {
+    this.partitionsX = 1;
+    this.partitionsY = 1;
+    this.imageGrids = new ConcurrentHashMap<>();
+  }
+
+  @Override
+  public BufferedImage getLayerImage(final IMap map, final RenderType type) {
+    if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
+      return ImageCache.MAPS.get(getCacheKey(map) + type);
+    }
+
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
+    final Graphics2D g = img.createGraphics();
+
+    this.renderProcess = 0;
+    this.totalTileCount = 0;
+    this.tilesRendered = 0;
+    for (final ITileLayer layer : map.getTileLayers()) {
+      this.totalTileCount += layer.getTiles().size();
+    }
+
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+
+      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
+        continue;
+      }
+
+      final RenderType renderType = RenderType.valueOf(renderTypeProp);
+      if (renderType != type) {
+        continue;
+      }
+
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+    }
+
+    g.dispose();
+
+    ImageCache.MAPS.putPersistent(getCacheKey(map) + type, img);
+    return img;
+  }
+
+  /**
+   * Gets the layer image.
+   *
+   * @param layer
+   *          the layer
+   * @param map
+   *          the map
+   * @return the layer image
+   */
+  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
+    // if we have already retrived the image, use the one from the cache to
+    // draw the layer
+    final String cacheKey = MessageFormat.format("{0}_{1}", getCacheKey(map), layer.getName());
+    if (ImageCache.MAPS.containsKey(cacheKey)) {
+      return ImageCache.MAPS.get(cacheKey);
+    }
+    final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(layer.getSizeInTiles().width * map.getTileSize().width, layer.getSizeInTiles().height * map.getTileSize().height);
+
+    // we need a graphics 2D object to work with transparency
+    final Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();
+
+    // set alpha value of the tiles by the layers value
+    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    imageGraphics.setComposite(ac);
+
+    layer.getTiles().parallelStream().forEach((tile) -> {
+      // get the tile from the tileset image
+      final int index = layer.getTiles().indexOf(tile);
+      if (tile.getGridId() == 0) {
+        this.tilesRendered++;
+        return;
+      }
+
+      final Image tileTexture = getTile(map, tile);
+
+      // draw the tile on the map image
+      final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
+      final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
+      imageGraphics.drawImage(tileTexture, x, y, null);
+      this.tilesRendered++;
+      this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
+    });
+
+    ImageCache.MAPS.putPersistent(
+
+        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+    return bufferedImage;
   }
 
   /*
@@ -111,45 +204,12 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     return img;
   }
 
-  @Override
-  public BufferedImage getLayerImage(final IMap map, final RenderType type) {
-    if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
-      return ImageCache.MAPS.get(getCacheKey(map) + type);
-    }
+  public int getPartitionsX() {
+    return this.partitionsX;
+  }
 
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
-    final Graphics2D g = img.createGraphics();
-
-    this.renderProcess = 0;
-    this.totalTileCount = 0;
-    this.tilesRendered = 0;
-    for (final ITileLayer layer : map.getTileLayers()) {
-      this.totalTileCount += layer.getTiles().size();
-    }
-
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-
-      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
-        continue;
-      }
-
-      final RenderType renderType = RenderType.valueOf(renderTypeProp);
-      if (renderType != type) {
-        continue;
-      }
-
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
-    }
-
-    g.dispose();
-
-    ImageCache.MAPS.putPersistent(getCacheKey(map) + type, img);
-    return img;
+  public int getPartitionsY() {
+    return this.partitionsY;
   }
 
   @Override
@@ -202,70 +262,13 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     RenderEngine.renderImage(g, mapImage, offset);
   }
 
-  /**
-   * Gets the layer image.
-   *
-   * @param layer
-   *          the layer
-   * @param map
-   *          the map
-   * @return the layer image
-   */
-  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
-    // if we have already retrived the image, use the one from the cache to
-    // draw the layer
-    final String cacheKey = MessageFormat.format("{0}_{1}", getCacheKey(map), layer.getName());
-    if (ImageCache.MAPS.containsKey(cacheKey)) {
-      return ImageCache.MAPS.get(cacheKey);
-    }
-    final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(layer.getSizeInTiles().width * map.getTileSize().width, layer.getSizeInTiles().height * map.getTileSize().height);
-
-    // we need a graphics 2D object to work with transparency
-    final Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();
-
-    // set alpha value of the tiles by the layers value
-    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
-    imageGraphics.setComposite(ac);
-
-    layer.getTiles().parallelStream().forEach((tile) -> {
-      // get the tile from the tileset image
-      final int index = layer.getTiles().indexOf(tile);
-      if (tile.getGridId() == 0) {
-        this.tilesRendered++;
-        return;
-      }
-
-      final Image tileTexture = getTile(map, tile);
-
-      // draw the tile on the map image
-      final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
-      final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
-      imageGraphics.drawImage(tileTexture, x, y, null);
-      this.tilesRendered++;
-      this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
-    });
-
-    ImageCache.MAPS.putPersistent(
-
-        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
-    return bufferedImage;
-  }
-
   @Override
   public void setPartitionsX(final int partitions) {
     this.partitionsX = partitions;
   }
 
-  public int getPartitionsX() {
-    return this.partitionsX;
-  }
-
   @Override
   public void setPartitionsY(final int partitions) {
     this.partitionsY = partitions;
-  }
-
-  public int getPartitionsY() {
-    return this.partitionsY;
   }
 }

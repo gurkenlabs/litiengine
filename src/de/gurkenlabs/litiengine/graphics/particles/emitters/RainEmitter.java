@@ -20,15 +20,15 @@ import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 @EmitterInfo(maxParticles = 3000, spawnAmount = 50, particleMinTTL = 20000, particleMaxTTL = 30000)
 public class RainEmitter extends Weather {
 
-  public RainEmitter() {
-    super(WeatherType.Rain);
-  }
-
   /** The Constant LIGHT_BLUE. */
   private static final Color LIGHT_BLUE = new Color(45, 166, 189, 100);
 
   /** The last camera focus. */
   private Point2D lastCameraFocus;
+
+  public RainEmitter() {
+    super(WeatherType.Rain);
+  }
 
   /**
    * Creates a new Particle object.

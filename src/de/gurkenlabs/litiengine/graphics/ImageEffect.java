@@ -20,6 +20,11 @@ public abstract class ImageEffect implements IImageEffect {
   }
 
   @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
   public int getTimeToLive() {
     return this.ttl;
   }
@@ -27,10 +32,5 @@ public abstract class ImageEffect implements IImageEffect {
   @Override
   public boolean timeToLiveReached() {
     return this.getTimeToLive() > 0 && this.getAliveTime() > this.getTimeToLive();
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
   }
 }

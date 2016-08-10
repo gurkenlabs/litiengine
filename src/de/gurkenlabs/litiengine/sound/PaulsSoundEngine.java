@@ -33,17 +33,8 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void playMusic(final Sound sound) {
-    if (sound == null) {
-      return;
-    }
-
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true), true);
-  }
-
-  @Override
-  public void rewind(final Sound sound) {
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()), true);
+  public boolean isPlaying(final String identifier) {
+    return this.soundSystem.playing(identifier);
   }
 
   @Override
@@ -52,16 +43,12 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public void playSound(final Sound sound) {
+  public void playMusic(final Sound sound) {
     if (sound == null) {
       return;
     }
 
-    SoundController.callIgnoreTimeout(engine -> {
-      final String identifier = this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-      this.add(new Playback(null, identifier));
-    }, true);
-
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.backgroundMusic(sound.getPath(), sound.getUrl(), sound.getPath(), true), true);
   }
 
   @Override
@@ -110,6 +97,29 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
+  public void playSound(final Sound sound) {
+    if (sound == null) {
+      return;
+    }
+
+    SoundController.callIgnoreTimeout(engine -> {
+      final String identifier = this.soundSystem.quickPlay(false, sound.getUrl(), sound.getName(), false, (float) this.getListenerPosition().getX(), (float) this.getListenerPosition().getY(), 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+      this.add(new Playback(null, identifier));
+    }, true);
+
+  }
+
+  @Override
+  public void rewind(final Sound sound) {
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.rewind(sound.getPath()), true);
+  }
+
+  @Override
+  public void stopMusic(final Sound s) {
+    SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()), true);
+  }
+
+  @Override
   public void terminate() {
     super.terminate();
     SoundController.callIgnoreTimeout(engine -> {
@@ -120,23 +130,13 @@ public class PaulsSoundEngine extends SoundEngine {
   }
 
   @Override
-  public boolean isPlaying(final String identifier) {
-    return this.soundSystem.playing(identifier);
-  }
-
-  @Override
-  public void updatePosition(final String identifier, final Point2D location) {
-    this.soundSystem.setPosition(identifier, (float) location.getX(), (float) location.getY(), 0);
-  }
-
-  @Override
   public void updateListenerPosition(final Point2D location) {
     this.soundSystem.setListenerPosition((float) location.getX(), (float) location.getY(), 0);
   }
 
   @Override
-  public void stopMusic(final Sound s) {
-    SoundController.callIgnoreTimeout(engine -> this.soundSystem.stop(s.getPath()), true);
+  public void updatePosition(final String identifier, final Point2D location) {
+    this.soundSystem.setPosition(identifier, (float) location.getX(), (float) location.getY(), 0);
   }
 
 }

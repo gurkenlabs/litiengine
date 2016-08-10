@@ -12,20 +12,108 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public abstract class SoundEngine implements ISoundEngine, IUpdateable {
+  private static final int UPDATE_RATE = 200;
+
+  protected static String getIdentifier(final IEntity entity, final Sound sound) {
+    return "entity-" + entity.getMapId() + "-" + sound.getName();
+  }
+
+  protected static String getIdentifier(final Point2D location, final Sound sound) {
+    return "location-" + location.getX() + ", " + location.getY() + "-" + sound.getName();
+  }
+
   private final List<Playback> playbacks;
   private final List<Predicate<IEntity>> entityPlayConditions;
   private final List<Predicate<Point2D>> playConditions;
+
   private float gain;
   private Point2D listenerPosition;
+
   private float maxListenerRadius;
 
-  private static final int UPDATE_RATE = 200;
   private long lastUpdate;
 
   public SoundEngine() {
     this.playbacks = new CopyOnWriteArrayList<>();
     this.entityPlayConditions = new CopyOnWriteArrayList<>();
     this.playConditions = new CopyOnWriteArrayList<>();
+  }
+
+  protected void add(final Playback playBack) {
+    if (this.playbacks.contains(playBack)) {
+      return;
+    }
+
+    this.playbacks.add(playBack);
+  }
+
+  @Override
+  public void addEntityPlayCondition(final Predicate<IEntity> predicate) {
+    this.entityPlayConditions.add(predicate);
+  }
+
+  @Override
+  public void addPlayCondition(final Predicate<Point2D> predicate) {
+    this.playConditions.add(predicate);
+  }
+
+  protected boolean canPlay(final IEntity entity) {
+    for (final Predicate<IEntity> condition : this.entityPlayConditions) {
+      if (!condition.test(entity)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  protected boolean canPlay(final Point2D location) {
+    for (final Predicate<Point2D> condition : this.playConditions) {
+      if (!condition.test(location)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @Override
+  public float getGain() {
+    return this.gain;
+  }
+
+  public Point2D getListenerPosition() {
+    return this.listenerPosition;
+  }
+
+  public float getMaxListenerRadius() {
+    return this.maxListenerRadius;
+  }
+
+  @Override
+  public void init(final float gain) {
+    this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
+    this.setGain(gain);
+  }
+
+  @Override
+  public void setGain(final float volume) {
+    this.gain = volume;
+  }
+
+  @Override
+  public void setMaxRadius(final float radius) {
+    this.maxListenerRadius = radius;
+  }
+
+  @Override
+  public void start() {
+    Game.getLoop().registerForUpdate(this);
+  }
+
+  @Override
+  public void terminate() {
+    Game.getLoop().unregisterFromUpdate(this);
   }
 
   @Override
@@ -59,90 +147,5 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
     }, true);
 
     this.lastUpdate = gameLoop.getTicks();
-  }
-
-  public float getMaxListenerRadius() {
-    return this.maxListenerRadius;
-  }
-
-  @Override
-  public void init(final float gain) {
-    this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
-    this.setGain(gain);
-  }
-
-  @Override
-  public void start() {
-    Game.getLoop().registerForUpdate(this);
-  }
-
-  @Override
-  public void terminate() {
-    Game.getLoop().unregisterFromUpdate(this);
-  }
-
-  @Override
-  public void setGain(final float volume) {
-    this.gain = volume;
-  }
-
-  @Override
-  public float getGain() {
-    return this.gain;
-  }
-
-  @Override
-  public void setMaxRadius(final float radius) {
-    this.maxListenerRadius = radius;
-  }
-
-  public Point2D getListenerPosition() {
-    return this.listenerPosition;
-  }
-
-  protected void add(final Playback playBack) {
-    if (this.playbacks.contains(playBack)) {
-      return;
-    }
-
-    this.playbacks.add(playBack);
-  }
-
-  protected static String getIdentifier(final IEntity entity, final Sound sound) {
-    return "entity-" + entity.getMapId() + "-" + sound.getName();
-  }
-
-  protected static String getIdentifier(final Point2D location, final Sound sound) {
-    return "location-" + location.getX() + ", " + location.getY() + "-" + sound.getName();
-  }
-
-  protected boolean canPlay(final IEntity entity) {
-    for (final Predicate<IEntity> condition : this.entityPlayConditions) {
-      if (!condition.test(entity)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  protected boolean canPlay(final Point2D location) {
-    for (final Predicate<Point2D> condition : this.playConditions) {
-      if (!condition.test(location)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  @Override
-  public void addEntityPlayCondition(final Predicate<IEntity> predicate) {
-    this.entityPlayConditions.add(predicate);
-  }
-
-  @Override
-  public void addPlayCondition(final Predicate<Point2D> predicate) {
-    this.playConditions.add(predicate);
   }
 }

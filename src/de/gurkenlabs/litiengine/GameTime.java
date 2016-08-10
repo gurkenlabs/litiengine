@@ -7,16 +7,16 @@ public class GameTime {
     this.gameLoop = loop;
   }
 
-  public long getYears() {
-    return this.getMilliseconds() / 1000 / 60 / 60 / 24 / 365;
-  }
-
   public long getDays() {
     return this.getMilliseconds() / 1000 / 60 / 60 / 24 % 365;
   }
 
   public long getHours() {
     return this.getMilliseconds() / 1000 / 60 / 60 % 24;
+  }
+
+  public long getMilliseconds() {
+    return this.gameLoop.convertToMs(this.gameLoop.getTicks());
   }
 
   public long getMinutes() {
@@ -27,7 +27,7 @@ public class GameTime {
     return this.getMilliseconds() / 1000 % 60;
   }
 
-  public long getMilliseconds() {
-    return this.gameLoop.convertToMs(this.gameLoop.getTicks());
+  public long getYears() {
+    return this.getMilliseconds() / 1000 / 60 / 60 / 24 / 365;
   }
 }

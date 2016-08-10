@@ -63,6 +63,10 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.maxFps = maxFps;
   }
 
+  public void setShowGameMetrics(final boolean showGameMetrics) {
+    this.showGameMetrics = showGameMetrics;
+  }
+
   /**
    * Sets the updaterate. On a very good machine the max update rate is sth.
    * around 500 but such a high value will never be beneficial for the player.
@@ -80,9 +84,5 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public boolean showGameMetrics() {
     return this.showGameMetrics;
-  }
-
-  public void setShowGameMetrics(final boolean showGameMetrics) {
-    this.showGameMetrics = showGameMetrics;
   }
 }

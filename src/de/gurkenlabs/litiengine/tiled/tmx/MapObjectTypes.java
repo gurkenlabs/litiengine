@@ -11,5 +11,5 @@ public class MapObjectTypes {
   public static final String COLLISIONBOX = "COLLISIONBOX";
   public static final String SHADOWBOX = "SHADOWBOX";
   public static final String LIGHTSOURCE = "LIGHTSOURCE";
-
+  public static final String SPAWNPOINT_PICKUP = "SPAWNPOINT_PICKUP";
 }

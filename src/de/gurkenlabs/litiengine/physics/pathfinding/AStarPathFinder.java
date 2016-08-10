@@ -16,14 +16,35 @@ import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class AStarPathFinder extends PathFinder {
-  private final AStarGrid grid;
+  /**
+   * TODO: Improve this optimization.
+   *
+   * @param path
+   * @return
+   */
+  private static List<AStarNode> optimizePath(final List<AStarNode> path) {
+    final List<AStarNode> optPath = new ArrayList<>();
+    double oldAngle = 0;
+    for (int i = 1; i < path.size(); i++) {
 
-  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, final int gridNodeSize) {
-    this.grid = new AStarGrid(physicsEngine, map, gridNodeSize);
+      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
+      if (angle != oldAngle) {
+        optPath.add(path.get(i));
+      }
+
+      oldAngle = angle;
+    }
+    return optPath;
   }
+
+  private final AStarGrid grid;
 
   public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map) {
     this.grid = new AStarGrid(physicsEngine, map, map.getTileSize().width);
+  }
+
+  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, final int gridNodeSize) {
+    this.grid = new AStarGrid(physicsEngine, map, gridNodeSize);
   }
 
   @Override
@@ -124,27 +145,6 @@ public class AStarPathFinder extends PathFinder {
     path2D.lineTo(targetNode.getLocation().x, targetNode.getLocation().y);
 
     return new Path(startNode.getLocation(), targetNode.getLocation(), path2D, pointsOfPath);
-  }
-
-  /**
-   * TODO: Improve this optimization.
-   *
-   * @param path
-   * @return
-   */
-  private static List<AStarNode> optimizePath(final List<AStarNode> path) {
-    final List<AStarNode> optPath = new ArrayList<>();
-    double oldAngle = 0;
-    for (int i = 1; i < path.size(); i++) {
-
-      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
-      if (angle != oldAngle) {
-        optPath.add(path.get(i));
-      }
-
-      oldAngle = angle;
-    }
-    return optPath;
   }
 
 }

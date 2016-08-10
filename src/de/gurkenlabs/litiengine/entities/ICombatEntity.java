@@ -8,15 +8,17 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 
 public interface ICombatEntity extends ICollisionEntity {
+  public void die();
+
+  public List<IEffect> getAppliedEffects();
+
   public CombatAttributes getAttributes();
 
   public Ellipse2D getHitBox();
 
-  public int getTeam();
-
   public ICombatEntity getTarget();
 
-  public void setTarget(final ICombatEntity target);
+  public int getTeam();
 
   /**
    *
@@ -25,25 +27,23 @@ public interface ICombatEntity extends ICollisionEntity {
    */
   public boolean hit(int damage, Ability ability);
 
-  public void die();
-
-  public void resurrect();
-
   public boolean isDead();
 
   public boolean isFriendly(final ICombatEntity entity);
 
-  public boolean isNeutral();
-
   public boolean isIndestructible();
+
+  public boolean isNeutral();
 
   public void onDeath(Consumer<ICombatEntity> consumer);
 
-  public void onResurrect(Consumer<ICombatEntity> consumer);
-
   public void onHit(Consumer<CombatEntityHitArgument> consumer);
 
-  public void setTeam(int team);
+  public void onResurrect(Consumer<ICombatEntity> consumer);
 
-  public List<IEffect> getAppliedEffects();
+  public void resurrect();
+
+  public void setTarget(final ICombatEntity target);
+
+  public void setTeam(int team);
 }

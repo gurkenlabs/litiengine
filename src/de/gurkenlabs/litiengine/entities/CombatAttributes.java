@@ -68,6 +68,13 @@ public class CombatAttributes {
 
   }
 
+  public void addXP(final int deltaXP) {
+    this.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.Add, deltaXP));
+    if (this.getExperience().getCurrentValue() >= this.getExperience().getMaxValue()) {
+      this.levelUp();
+    }
+  }
+
   /**
    * Gets the attack speed.
    *
@@ -93,13 +100,6 @@ public class CombatAttributes {
    */
   public RangeAttribute<Integer> getExperience() {
     return this.experience;
-  }
-
-  public void addXP(final int deltaXP) {
-    this.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.Add, deltaXP));
-    if (this.getExperience().getCurrentValue() >= this.getExperience().getMaxValue()) {
-      this.levelUp();
-    }
   }
 
   /**
@@ -148,22 +148,6 @@ public class CombatAttributes {
   }
 
   /**
-   * Update attributes.
-   */
-  protected void updateAttributes() {
-
-    // 10% increase per level
-    final float levelMultiplier = 1.1f;
-    final float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
-
-    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, maxXp));
-    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-  }
-
-  /**
    * Level up.
    */
   public void levelUp() {
@@ -184,5 +168,21 @@ public class CombatAttributes {
     if (!this.levelUpConsumer.contains(consumer)) {
       this.levelUpConsumer.add(consumer);
     }
+  }
+
+  /**
+   * Update attributes.
+   */
+  protected void updateAttributes() {
+
+    // 10% increase per level
+    final float levelMultiplier = 1.1f;
+    final float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
+
+    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, maxXp));
+    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
   }
 }

@@ -5,30 +5,6 @@ import java.util.Random;
 public class MathUtilities {
   private static Random RANDOM = new Random();
 
-  public static boolean randomBoolean() {
-    return RANDOM.nextDouble() < 0.5;
-  }
-
-  public static int randomSign() {
-    return randomBoolean() ? 1 : -1;
-  }
-
-  public static boolean probabilityIsTrue(final double probability) {
-    return RANDOM.nextDouble() < probability;
-  }
-
-  public static double randomInRange(final double min, final double max) {
-    if (min == max) {
-      return min;
-    }
-
-    if (min > max) {
-      throw new IllegalArgumentException("min value is > than max value");
-    }
-
-    return min + RANDOM.nextDouble() * (max - min);
-  }
-
   /**
    * The index probabilities must sum up to 1;
    *
@@ -48,5 +24,29 @@ public class MathUtilities {
     }
 
     return 0;
+  }
+
+  public static boolean probabilityIsTrue(final double probability) {
+    return RANDOM.nextDouble() < probability;
+  }
+
+  public static boolean randomBoolean() {
+    return RANDOM.nextDouble() < 0.5;
+  }
+
+  public static double randomInRange(final double min, final double max) {
+    if (min == max) {
+      return min;
+    }
+
+    if (min > max) {
+      throw new IllegalArgumentException("min value is > than max value");
+    }
+
+    return min + RANDOM.nextDouble() * (max - min);
+  }
+
+  public static int randomSign() {
+    return randomBoolean() ? 1 : -1;
   }
 }

@@ -20,18 +20,8 @@ public class WASDEntityController extends ClientEntityMovementController impleme
     Input.KEYBOARD.registerForKeyDownEvents(this);
   }
 
-  @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
-
-    if (this.moved) {
-      final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.dx, this.getControlledEntity().getLocation().getY() + this.dy);
-      Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation, this.stepSize * this.getControlledEntity().getVelocity() / 100.0f);
-
-      this.dx = 0;
-      this.dy = 0;
-      this.moved = false;
-    }
+  public float getStepSize() {
+    return this.stepSize;
   }
 
   @Override
@@ -65,12 +55,22 @@ public class WASDEntityController extends ClientEntityMovementController impleme
 
   }
 
-  public float getStepSize() {
-    return this.stepSize;
-  }
-
   public void setStepSize(final float stepSize) {
     this.stepSize = stepSize;
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
+    super.update(loop);
+
+    if (this.moved) {
+      final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.dx, this.getControlledEntity().getLocation().getY() + this.dy);
+      Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation, this.stepSize * this.getControlledEntity().getVelocity() / 100.0f);
+
+      this.dx = 0;
+      this.dy = 0;
+      this.moved = false;
+    }
   }
 
 }

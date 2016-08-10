@@ -103,6 +103,10 @@ public abstract class Particle implements ITimeToLive {
     return this.aliveTime;
   }
 
+  public Rectangle2D getBoundingBox(final Point2D origin) {
+    return new Rectangle2D.Double(origin.getX() + this.getxCurrent(), origin.getY() + this.getyCurrent(), this.getWidth(), this.getHeight());
+  }
+
   /**
    * Gets the color.
    *
@@ -119,6 +123,14 @@ public abstract class Particle implements ITimeToLive {
    */
   public int getColorAlpha() {
     return this.colorAlpha;
+  }
+
+  public float getDeltaHeight() {
+    return this.deltaHeight;
+  }
+
+  public float getDeltaWidth() {
+    return this.deltaWidth;
   }
 
   /**
@@ -216,7 +228,15 @@ public abstract class Particle implements ITimeToLive {
     return this.yCurrent;
   }
 
+  public boolean isApplyingStaticPhysics() {
+    return this.applyStaticPhysics;
+  }
+
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
+
+  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
+    this.applyStaticPhysics = applyStaticPhysics;
+  }
 
   /**
    * Sets the color.
@@ -243,24 +263,8 @@ public abstract class Particle implements ITimeToLive {
     this.colorAlpha = colorAlpha;
   }
 
-  /**
-   * Sets the dx.
-   *
-   * @param dx
-   *          the new dx
-   */
-  public void setDx(final float dx) {
-    this.dx = dx;
-  }
-
-  /**
-   * Sets the dy.
-   *
-   * @param dy
-   *          the new dy
-   */
-  public void setDy(final float dy) {
-    this.dy = dy;
+  public void setDeltaHeight(final float deltaHeight) {
+    this.deltaHeight = deltaHeight;
   }
 
   /**
@@ -281,6 +285,30 @@ public abstract class Particle implements ITimeToLive {
    */
   public void setDeltaIncY(final float gravityY) {
     this.gravityY = gravityY;
+  }
+
+  public void setDeltaWidth(final float deltaWidth) {
+    this.deltaWidth = deltaWidth;
+  }
+
+  /**
+   * Sets the dx.
+   *
+   * @param dx
+   *          the new dx
+   */
+  public void setDx(final float dx) {
+    this.dx = dx;
+  }
+
+  /**
+   * Sets the dy.
+   *
+   * @param dy
+   *          the new dy
+   */
+  public void setDy(final float dy) {
+    this.dy = dy;
   }
 
   /**
@@ -357,33 +385,5 @@ public abstract class Particle implements ITimeToLive {
 
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
-  }
-
-  public float getDeltaHeight() {
-    return this.deltaHeight;
-  }
-
-  public void setDeltaHeight(final float deltaHeight) {
-    this.deltaHeight = deltaHeight;
-  }
-
-  public float getDeltaWidth() {
-    return this.deltaWidth;
-  }
-
-  public void setDeltaWidth(final float deltaWidth) {
-    this.deltaWidth = deltaWidth;
-  }
-
-  public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(origin.getX() + this.getxCurrent(), origin.getY() + this.getyCurrent(), this.getWidth(), this.getHeight());
-  }
-
-  public boolean isApplyingStaticPhysics() {
-    return this.applyStaticPhysics;
-  }
-
-  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
-    this.applyStaticPhysics = applyStaticPhysics;
   }
 }

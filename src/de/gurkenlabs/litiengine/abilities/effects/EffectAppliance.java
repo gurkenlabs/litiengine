@@ -16,12 +16,12 @@ public class EffectAppliance {
     this.impactArea = impactArea;
   }
 
-  public long getAppliedTicks() {
-    return this.applied;
-  }
-
   public List<ICombatEntity> getAffectedEntities() {
     return this.affectedEntities;
+  }
+
+  public long getAppliedTicks() {
+    return this.applied;
   }
 
   public Shape getImpactArea() {
