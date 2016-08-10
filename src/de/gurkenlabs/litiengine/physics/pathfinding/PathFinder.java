@@ -70,12 +70,12 @@ public abstract class PathFinder implements IPathFinder {
       // checking for collision because this will always return true
       Point2D intersection = null;
       if (rectangleWithMargin.contains(start)) {
-        intersection = GeometricUtilities.intersectionPoint(line, collisionBox);
+        intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox);
         if (intersection != null) {
           intersectedShapes.put(rectangleWithMargin, intersection);
         }
       } else {
-        intersection = GeometricUtilities.intersectionPoint(line, rectangleWithMargin);
+        intersection = GeometricUtilities.getIntersectionPoint(line, rectangleWithMargin);
       }
 
       if (intersection != null) {

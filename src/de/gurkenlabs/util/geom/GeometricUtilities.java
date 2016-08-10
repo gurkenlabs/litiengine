@@ -399,7 +399,7 @@ public class GeometricUtilities {
    *          the rectangle
    * @return the point2 d
    */
-  public static Point2D intersectionPoint(final Line2D line, final Rectangle2D rectangle) {
+  public static Point2D getIntersectionPoint(final Line2D line, final Rectangle2D rectangle) {
     final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(line, rectangle);
     for (final Point2D p : intersectionPoints) {
       if (p != null && !p.equals(line.getP1()) && contains(rectangle, p)) {

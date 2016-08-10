@@ -72,8 +72,6 @@ public class AmbientLight {
         boxInLight.intersect(large);
 
         final Line2D[] bounds = GeometricUtilities.getLines(obj.getCollisionBox());
-
-        /** The gradient radius for our shadow. */
         for (final Line2D line : bounds) {
           if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && obj.getCollisionBox().contains(light.getDimensionCenter())) {
             continue;
