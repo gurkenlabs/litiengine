@@ -101,8 +101,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<Prop> getProps();
 
-  public List<IMapObject> getShadowBoxes();
-
   public List<MapLocation> getSpawnPoints();
 
   public WeatherType getWeather();

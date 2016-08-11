@@ -280,7 +280,7 @@ public class Environment implements IEnvironment {
   private void addStaticShadows() {
     // build map specific cache key, respecting the lights and color
     final StringBuilder sb = new StringBuilder();
-    for (final IMapObject col : this.getShadowBoxes()) {
+    for (final IMapObject col : this.getCollisionBoxes()) {
       sb.append(col.getId() + "_" + col.getCollisionBox());
     }
 
@@ -296,7 +296,7 @@ public class Environment implements IEnvironment {
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
-    for (final IMapObject col : this.getShadowBoxes()) {
+    for (final IMapObject col : this.getCollisionBoxes()) {
       final double shadowX = col.getCollisionBox().getX();
       final double shadowY = col.getCollisionBox().getY();
       final double shadowWidth = col.getCollisionBox().getWidth();
@@ -608,24 +608,6 @@ public class Environment implements IEnvironment {
   @Override
   public List<Prop> getProps() {
     return this.props;
-  }
-
-  @Override
-  public List<IMapObject> getShadowBoxes() {
-    final List<IMapObject> shadowBoxes = new ArrayList<>();
-    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject obj : shapeLayer.getMapObjects()) {
-        if (obj.getType() == null || obj.getType().isEmpty()) {
-          continue;
-        }
-
-        if (obj.getType().equals(MapObjectTypes.SHADOWBOX)) {
-          shadowBoxes.add(obj);
-        }
-      }
-    }
-
-    return shadowBoxes;
   }
 
   @Override

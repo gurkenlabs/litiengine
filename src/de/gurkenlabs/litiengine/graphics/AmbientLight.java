@@ -64,7 +64,7 @@ public class AmbientLight {
 
       // cut the light area where shadow Boxes are (this simulates light falling
       // into and out of rooms)
-      for (final IMapObject obj : this.environment.getShadowBoxes()) {
+      for (final IMapObject obj : this.environment.getCollisionBoxes()) {
         if (!GeometricUtilities.shapeIntersects(light.getLargeLightShape(), obj.getCollisionBox())) {
           continue;
         }
