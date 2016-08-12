@@ -262,7 +262,8 @@ public class Environment implements IEnvironment {
     if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
       return;
     }
-    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL)));
+    Material material = Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
     if (!mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
