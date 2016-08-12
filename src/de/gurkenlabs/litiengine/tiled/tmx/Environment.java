@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -42,7 +43,9 @@ import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.SnowEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.Weather;
 import de.gurkenlabs.tiled.tmx.IMap;
@@ -180,9 +183,27 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void addEffect(final IMapObject mapObject) {
-    // TODO Auto-generated method stub
+  public void addEmitter(final IMapObject mapObject) {
+    if (mapObject.getType() != MapObjectTypes.EMITTER) {
+      return;
+    }
+    Emitter emitter = null;
+    switch (mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)) {
+    case "fire":
+      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      this.getEmitters().add(emitter);
+      final LightSource light = new LightSource(this, new Point2D.Double(emitter.getOrigin().getX(), emitter.getOrigin().getY()), 32, 30, 50, Color.ORANGE, LightSource.ELLIPSE, 0.15);
+      this.getLightSources().add(light);
+      break;
+    case "shimmer":
+      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      this.getOverlayEmitters().add(emitter);
+      break;
+    }
 
+    if (emitter != null) {
+      emitter.setMapId(mapObject.getId());
+    }
   }
 
   @Override

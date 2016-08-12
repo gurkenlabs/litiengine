@@ -10,7 +10,10 @@ public class MapObjectProperties {
   public static final String MATERIAL = "material";
   public static final String HEALTH = "health";
   public static final String EMITTERTYPE = "emitterType";
-  public static final String MOBTYPE = "mobType";
+  public static final String MOBTYPE = "mobType";  
+  public static final String MINAMOUNT = "minAmount";
+  public static final String MAXAMOUNT = "maxAmount";
+  public static final String SPAWNRADIUS = "spawnRadius";
   public static final String LIGHTBRIGHTNESS = "lightBrightness";
   public static final String LIGHTCOLOR = "lightColor";
   public static final String LIGHTSHAPE = "lightShape";

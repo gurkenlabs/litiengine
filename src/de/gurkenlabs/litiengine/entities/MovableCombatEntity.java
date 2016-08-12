@@ -109,6 +109,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public void setMoveDestination(final Point2D dest) {
     this.moveDestination = dest;
+    this.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(this.getLocation(), this.getMoveDestination()));
   }
 
   @Override

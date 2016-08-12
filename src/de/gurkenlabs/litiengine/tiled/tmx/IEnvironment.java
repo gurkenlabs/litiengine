@@ -38,7 +38,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void addDecorMob(final IMapObject mapObject);
 
-  public void addEffect(final IMapObject mapObject);
+  public void addEmitter(final IMapObject mapObject);
 
   public void addLightSource(IMapObject mapObject);
 
