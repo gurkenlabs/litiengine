@@ -94,13 +94,11 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     float y = 0;
     while (measurer.getPosition() < this.currentText.length()) {
       final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
-      y += layout.getAscent() + layout.getLeading();
+      y += layout.getAscent() + layout.getLeading() + 0.2;
     }
 
     final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, PADDING, PADDING);
-    g.setFont(this.font);
-    g.getFontMetrics().getHeight();
-
+    
     // Build a path
     GeneralPath path = new GeneralPath();
     path.moveTo(bounds.getWidth() / 2.0 - TRIANGLE_SIZE / 2.0, bounds.getHeight());
