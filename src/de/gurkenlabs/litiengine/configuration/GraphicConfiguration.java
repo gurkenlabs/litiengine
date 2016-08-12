@@ -29,6 +29,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
   private int resolutionHeight;
 
   private int resolutionWidth;
+  
+  private boolean renderDynamicShadows;
 
   /**
    * Instantiates a new graphic configuration.
@@ -36,6 +38,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   public GraphicConfiguration() {
     this.graphicQuality = Quality.LOW;
     this.fullscreen = false;
+    this.renderDynamicShadows = false;
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
   }
@@ -112,5 +115,13 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setResolutionWidth(final int resolutionWidth) {
     this.resolutionWidth = resolutionWidth;
+  }
+
+  public boolean renderDynamicShadows() {
+    return this.renderDynamicShadows;
+  }
+
+  public void setRenderDynamicShadows(boolean renderDynamicShadows) {
+    this.renderDynamicShadows = renderDynamicShadows;
   }
 }
