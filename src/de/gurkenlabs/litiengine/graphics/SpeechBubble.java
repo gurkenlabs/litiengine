@@ -123,7 +123,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   @Override
   public void render(final Graphics2D g) {
-    if (this.displayedText == null || this.displayedText.isEmpty()) {
+    if (this.displayedText == null || this.displayedText.isEmpty() || !Game.getRenderEngine().canRender(this.entity)) {
       return;
     }
 

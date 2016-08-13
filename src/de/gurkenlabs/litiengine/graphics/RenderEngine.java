@@ -177,7 +177,7 @@ public class RenderEngine implements IRenderEngine {
 
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
 
-  private final List<Predicate<RenderEvent<IEntity>>> entityRenderingConditions;
+  private final List<Predicate<IEntity>> entityRenderingConditions;
 
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
 
@@ -206,7 +206,7 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void entityRenderingCondition(final Predicate<RenderEvent<IEntity>> predicate) {
+  public void entityRenderingCondition(final Predicate<IEntity> predicate) {
     if (!this.entityRenderingConditions.contains(predicate)) {
       this.entityRenderingConditions.add(predicate);
     }
@@ -311,16 +311,11 @@ public class RenderEngine implements IRenderEngine {
     if (entity == null) {
       return;
     }
-
-    final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
-    if (this.entityRenderingConditions.size() > 0) {
-      for (final Predicate<RenderEvent<IEntity>> consumer : this.entityRenderingConditions) {
-        if (!consumer.test(renderEvent)) {
-          return;
-        }
-      }
+    
+    if(!this.canRender(entity)){
+      return;
     }
-
+    RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
     if (this.entityRenderingConsumer.size() > 0) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
         consumer.accept(renderEvent);
@@ -376,5 +371,18 @@ public class RenderEngine implements IRenderEngine {
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));
     }
+  }
+
+  @Override
+  public boolean canRender(IEntity entity) {
+    if (this.entityRenderingConditions.size() > 0) {
+      for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
+        if (!consumer.test(entity)) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
   }
 }
