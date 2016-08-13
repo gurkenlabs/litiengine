@@ -329,8 +329,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public void setCursor(final Image image) {
     this.cursorImage = image;
-    this.setCursorOffsetX(-(image.getWidth(null) / 2));
-    this.setCursorOffsetY(-(image.getHeight(null) / 2));
   }
 
   @Override
