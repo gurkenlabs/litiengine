@@ -9,6 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.abilities.AbilityOrigin;
 import de.gurkenlabs.litiengine.abilities.CastType;
 
 // TODO: Auto-generated Javadoc
@@ -21,6 +22,8 @@ import de.gurkenlabs.litiengine.abilities.CastType;
 public @interface AbilityInfo {
 
   CastType castType() default CastType.INSTANT;
+
+  AbilityOrigin origin() default AbilityOrigin.COLLISIONBOX_CENTER;
 
   int cooldown() default 0;
 

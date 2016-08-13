@@ -69,9 +69,9 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     this.lastTextDispay = Game.getLoop().getTicks();
+    this.createBubbleImage();
     Game.getEnvironment().add(this, RenderType.OVERLAY);
     Game.getLoop().registerForUpdate(this);
-    this.createBubbleImage();
   }
 
   private void createBubbleImage() {

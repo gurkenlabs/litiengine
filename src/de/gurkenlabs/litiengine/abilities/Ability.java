@@ -3,7 +3,11 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.abilities;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -16,13 +20,15 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class Ability.
  */
 @AbilityInfo
-public abstract class Ability {
+public abstract class Ability implements IRenderable{
   private final List<Consumer<AbilityExecution>> abilityCastConsumer;
 
   /** The ability type. */
@@ -46,6 +52,10 @@ public abstract class Ability {
   private final boolean multiTarget;
 
   private final CastType castType;
+  
+  private final AbilityOrigin originType;
+
+  private Point2D origin;
 
   /**
    * Instantiates a new ability.
@@ -64,6 +74,7 @@ public abstract class Ability {
     this.multiTarget = info.multiTarget();
     this.description = info.description();
     this.castType = info.castType();
+    this.originType = info.origin();
   }
 
   public void addEffect(final IEffect effect) {
@@ -169,6 +180,29 @@ public abstract class Ability {
     return this.name;
   }
 
+  public Point2D getOrigin() {
+    switch (this.originType){
+    case COLLISIONBOX_CENTER:
+      return new Point2D.Double(executor.getCollisionBox().getCenterX(), executor.getCollisionBox().getCenterY());
+    case DIMENSION_CENTER:
+      return executor.getDimensionCenter();
+    case CUSTOM:
+      if(this.origin != null){
+        return new Point2D.Double(this.executor.getLocation().getX() + this.origin.getX(), this.executor.getLocation().getY() + this.origin.getY());
+      }
+    case LOCATION:
+    default:
+      return executor.getLocation();
+    }
+  }
+
+  /**
+   * Sets a custom offset from the executors map location as origion of this ability.
+   * @param origin
+   */
+  public void setOrigin(Point2D origin) {
+    this.origin = origin;
+  }
   /**
    * Gets the remaining cooldown in seconds.
    *
@@ -186,12 +220,12 @@ public abstract class Ability {
   protected Shape internalCalculateImpactArea(final float angle) {
     final int impact = this.getAttributes().getImpact().getCurrentValue();
     final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
-    final double arcX = this.getExecutor().getCollisionBox().getCenterX() - impact * 0.5;
-    final double arcY = this.getExecutor().getCollisionBox().getCenterY() - impact * 0.5;
+    final double arcX = this.getOrigin().getX() - impact * 0.5;
+    final double arcY = this.getOrigin().getY() - impact * 0.5;
 
     // project
     final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
-    final double start = angle - impactAngle * 0.5 - 90;
+    final double start = (angle) - 90;
     if (impactAngle % 360 == 0) {
       return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
     }
@@ -246,5 +280,16 @@ public abstract class Ability {
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       this.onEffectCeased(followUp, consumer);
     }
+  }
+
+  @Override
+  public void render(Graphics2D g) {
+    g.setColor(new Color(255, 255, 0, 100));
+    RenderEngine.fillShape(g, this.calculateImpactArea());
+    Stroke oldStroke = g.getStroke();
+    g.setStroke(new BasicStroke(2f));
+    g.setColor(new Color(255, 255, 0, 200));
+    RenderEngine.drawShape(g, this.calculateImpactArea());
+    g.setStroke(oldStroke);
   }
 }
