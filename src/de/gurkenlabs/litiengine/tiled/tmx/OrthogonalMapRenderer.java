@@ -76,7 +76,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       return ImageCache.MAPS.get(getCacheKey(map) + type);
     }
 
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     this.renderProcess = 0;
@@ -173,7 +173,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       return ImageCache.MAPS.get(getCacheKey(map));
     }
 
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixles().getWidth(), (int) map.getSizeInPixles().getHeight());
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     this.renderProcess = 0;
@@ -243,8 +243,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     final Rectangle2D viewPort = Game.getScreenManager().getCamera().getViewPort();
     final BufferedImage[][] imageGrid = this.imageGrids.get(map);
-    final double cellWidth = map.getSizeInPixles().getWidth() / this.getPartitionsX();
-    final double cellHeight = map.getSizeInPixles().getHeight() / this.getPartitionsY();
+    final double cellWidth = map.getSizeInPixels().getWidth() / this.getPartitionsX();
+    final double cellHeight = map.getSizeInPixels().getHeight() / this.getPartitionsY();
     for (int y = 0; y < this.getPartitionsY(); y++) {
       for (int x = 0; x < this.getPartitionsX(); x++) {
         final double cellX = x * cellWidth;

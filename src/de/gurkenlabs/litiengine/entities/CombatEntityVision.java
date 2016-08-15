@@ -220,8 +220,8 @@ public class CombatEntityVision implements IVision {
 
     this.renderVisionShape = renderPath;
 
-    final float width = (float) this.environment.getMap().getSizeInPixles().getWidth();
-    final float height = (float) this.environment.getMap().getSizeInPixles().getHeight();
+    final float width = (float) this.environment.getMap().getSizeInPixels().getWidth();
+    final float height = (float) this.environment.getMap().getSizeInPixels().getHeight();
     final Rectangle2D rect = new Rectangle2D.Float(0, 0, width, height);
     final Area rectangleArea = new Area(rect);
     rectangleArea.subtract(new Area(path));

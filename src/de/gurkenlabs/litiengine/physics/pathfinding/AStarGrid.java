@@ -20,7 +20,7 @@ public class AStarGrid {
 
   public AStarGrid(final IPhysicsEngine physicsEngine, final IMap map, final int nodeSize) {
     this.physicsEngine = physicsEngine;
-    this.size = map.getSizeInPixles();
+    this.size = map.getSizeInPixels();
     this.nodeSize = nodeSize;
     final int gridSizeX = this.size.width / nodeSize;
     final int gridSizeY = this.size.height / nodeSize;

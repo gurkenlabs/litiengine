@@ -32,7 +32,7 @@ public class AmbientLight {
   private void createImage() {
     final Color col = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
     final StringBuilder sb = new StringBuilder();
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixles().getWidth(), (int) this.environment.getMap().getSizeInPixles().getHeight());
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = (Graphics2D) img.getGraphics();
     for (final LightSource light : this.environment.getLightSources()) {
       sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" + light.getLocation().getY());
@@ -47,8 +47,8 @@ public class AmbientLight {
     }
 
     // create large rectangle and crop lights from it
-    final double mapWidth = this.environment.getMap().getSizeInPixles().getWidth();
-    final double mapHeight = this.environment.getMap().getSizeInPixles().getHeight();
+    final double mapWidth = this.environment.getMap().getSizeInPixels().getWidth();
+    final double mapHeight = this.environment.getMap().getSizeInPixels().getHeight();
     double longerDimension = mapWidth;
     if (mapWidth < mapHeight) {
       longerDimension = mapHeight;

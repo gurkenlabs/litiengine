@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
@@ -116,5 +117,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void remove(IRenderable renderable);
 
   public void setWeather(WeatherType weather);
+
+  AmbientLight getAmbientLight();
 
 }

@@ -325,6 +325,9 @@ public class Environment implements IEnvironment {
       final double shadowHeight = col.getCollisionBox().getHeight();
 
       final String shadowType = col.getCustomProperty(MapObjectProperties.SHADOWTYPE);
+      if (shadowType == null) {
+        continue;
+      }
       final String down = "DOWN";
       final String downLeft = "DOWNLEFT";
       final String downRight = "DOWNRIGHT";
@@ -418,7 +421,7 @@ public class Environment implements IEnvironment {
       }
     }
 
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixles().getWidth(), (int) this.getMap().getSizeInPixles().getHeight());
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = (Graphics2D) img.getGraphics();
     g.setColor(new Color(0, 0, 0, 75));
 
@@ -524,6 +527,7 @@ public class Environment implements IEnvironment {
     return entities;
   }
 
+  @Override
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
   }

@@ -201,7 +201,7 @@ public abstract class Game implements IInitializable, ILaunchable {
   public static void loadEnvironment(final IEnvironment env) {
     environment = env;
     environment.init();
-    getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixles().getWidth(), environment.getMap().getSizeInPixles().getHeight()));
+    getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixels().getWidth(), environment.getMap().getSizeInPixels().getHeight()));
   }
 
   private final RenderLoop renderLoop;
