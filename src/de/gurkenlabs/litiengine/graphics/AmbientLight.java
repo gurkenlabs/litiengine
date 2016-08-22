@@ -1,8 +1,10 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RadialGradientPaint;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
@@ -107,17 +109,20 @@ public class AmbientLight {
       }
       darkArea.subtract(large);
 
-      g.setColor(new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()));
+      Color[] colors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha())) };
+      g.setPaint(new RadialGradientPaint(new Point2D.Double(large.getBounds2D().getCenterX(), large.getBounds2D().getCenterY()), (float) (large.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, colors));
+      RenderEngine.fillShape(g, large);
       g.fill(large);
-
       large.subtract(mid);
 
-      g.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha() * 0.5)));
-      g.fill(large);
+//      g.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha() * 0.5)));
+      // g.fill(large);
 
       mid.subtract(small);
-      g.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha() * 0.25)));
-      g.fill(mid);
+      // g.setColor(new Color(this.getColor().getRed(),
+      // this.getColor().getGreen(), this.getColor().getBlue(), (int)
+      // (this.getAlpha() * 0.25)));
+      // g.fill(mid);
 
     }
     g.setColor(col);
