@@ -34,27 +34,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class ScreenManager extends JFrame implements IScreenManager {
-  /**
-   * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface,
-   * and the object created with that class is registered with a component using
-   * the component's <code>addResizedEventListener<code> method. When the
-   * resizedEvent event occurs, that object's appropriate method is invoked.
-   *
-   * @see ResizedEventEvent
-   */
-  private class ResizedEventListener extends ComponentAdapter {
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
-     * ComponentEvent)
-     */
-    @Override
-    public void componentResized(final ComponentEvent evt) {
-      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
-  }
 
   private static final long serialVersionUID = 7958549828482285935L;
 
@@ -340,4 +319,27 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
   }
+  
+  /**
+   * The listener interface for receiving resizedEvent events. The class that is
+   * interested in processing a resizedEvent event implements this interface,
+   * and the object created with that class is registered with a component using
+   * the component's <code>addResizedEventListener<code> method. When the
+   * resizedEvent event occurs, that object's appropriate method is invoked.
+   *
+   * @see ResizedEventEvent
+   */
+  private class ResizedEventListener extends ComponentAdapter {
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
+     * ComponentEvent)
+     */
+    @Override
+    public void componentResized(final ComponentEvent evt) {
+      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+    }
+  }
+
 }
