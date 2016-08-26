@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public abstract class AnimationController implements IAnimationController {
+  private static int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
   private final List<IImageEffect> imageEffects;
   private final Animation defaultAnimation;
@@ -45,10 +46,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void add(final IImageEffect effect) {
-    if (this.getImageEffects().contains(effect)) {
-      this.getImageEffects().remove(effect);
+    if(this.getImageEffects().size() >= MAX_IMAGE_EFFECTS){
+      return;
     }
-
+    
     this.getImageEffects().add(effect);
   }
 

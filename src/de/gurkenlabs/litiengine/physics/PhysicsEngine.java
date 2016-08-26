@@ -283,13 +283,13 @@ public class PhysicsEngine implements IPhysicsEngine {
       final Rectangle2D staticIntersection = this.collidesWithAnyStaticCollisionBox(entity, entityCollisionBox);
       if (staticIntersection != null) {
         newPosition = this.resolveCollision(entity, newPosition, staticIntersection);
-        success = false;
+        return false;
       }
 
       final Rectangle2D entityIntersection = this.collidesWithAnyEntity(entity, entityCollisionBox);
       if (entityIntersection != null) {
         newPosition = this.resolveCollision(entity, newPosition, entityIntersection);
-        success = false;
+        return false;
       }
     }
 

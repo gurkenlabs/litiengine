@@ -17,7 +17,7 @@ public class GameInfo {
     this.cooperation = "gurkenlabs";
     this.name = "LitiEngine Game";
     this.subTitle = "The ultimate java engine.";
-    this.description = "A game, created by the allmighty LITI ENGINE.";
+    this.description = "A game, created with the allmighty LITI ENGINE.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
     this.icon = "";
     this.logo = "";
