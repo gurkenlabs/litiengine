@@ -199,15 +199,15 @@ public class Camera implements ICamera {
 
   @Override
   public void updateFocus() {
-    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(),
-        Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
+    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
+        Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
 
   private double getViewPortCenterX() {
-    return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale();
+    return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().getRenderScale();
   }
 
   private double getViewPortCenterY() {
-    return Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale();
+    return Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().getRenderScale();
   }
 }

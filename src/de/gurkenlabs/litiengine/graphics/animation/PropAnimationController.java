@@ -26,7 +26,7 @@ public class PropAnimationController extends AnimationController {
     if (!prop.isIndestructible()) {
       propState = state.name().toLowerCase();
     }
-    final String path = Game.getInfo().spritesDirectory() + "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
+    final String path = Game.getInfo().getSpritesDirectory() + "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
     final Spritesheet sheet = Spritesheet.find(path);
     return sheet;
   }

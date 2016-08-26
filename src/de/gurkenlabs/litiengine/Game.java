@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
-import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
@@ -26,7 +25,6 @@ import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.util.io.StreamUtilities;
 
-@GameInfo(name = "LitiEngine Game", version = 1.0f)
 public abstract class Game {
   private final static List<Consumer<String>> startedConsumer;
   private final static List<Consumer<String>> terminatedConsumer;
@@ -39,10 +37,10 @@ public abstract class Game {
   private final static GameMetrics metrics;
   private final static EntityManager entityManager;
   private final static RenderLoop renderLoop;
+  private final static GameInfo info;
 
   private static IScreenManager screenManager;
   private static IEnvironment environment;
-  private static GameInfo info;
 
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
@@ -52,6 +50,7 @@ public abstract class Game {
     soundEngine = new PaulsSoundEngine();
     metrics = new GameMetrics();
     entityManager = new EntityManager();
+    info = new GameInfo();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -115,11 +114,9 @@ public abstract class Game {
     getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixels().getWidth(), environment.getMap().getSizeInPixels().getHeight()));
   }
 
-  public static void init(final GameInfo inf) {
-    info = inf;
-
+  public static void init() {
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    final String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
+    final String gameTitle = !getInfo().getSubTitle().isEmpty() ? getInfo().getName() + " - " + getInfo().getSubTitle() + " " + getInfo().getVersion() : getInfo().getName() + " - " + getInfo().getVersion();
     final ScreenManager scrMgr = new ScreenManager(gameTitle);
 
     // ensures that we terminate the game, when the window is closed
@@ -183,7 +180,7 @@ public abstract class Game {
     renderLoop.start();
     
     for(Consumer<String> cons : startedConsumer){
-      cons.accept(Game.getInfo().name());
+      cons.accept(Game.getInfo().getName());
     }
   }
 
@@ -194,7 +191,7 @@ public abstract class Game {
     renderLoop.terminate();
     
     for(Consumer<String> cons : terminatedConsumer){
-      cons.accept(Game.getInfo().name());
+      cons.accept(Game.getInfo().getName());
     }
     
     System.exit(0);

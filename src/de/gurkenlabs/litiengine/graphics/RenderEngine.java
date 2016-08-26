@@ -55,13 +55,13 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().renderScale()));
+    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().getRenderScale()));
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
     g.setTransform(t);
@@ -109,11 +109,11 @@ public class RenderEngine implements IRenderEngine {
   public static void fillShape(final Graphics2D g, final Shape shape) {
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
     g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getInfo().renderScale()));
+    g.setStroke(new BasicStroke(1 / Game.getInfo().getRenderScale()));
     g.fill(shape);
     g.setTransform(oldTransForm);
   }

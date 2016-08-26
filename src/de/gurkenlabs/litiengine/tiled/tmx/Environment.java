@@ -718,7 +718,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.getInfo().renderScale(), Game.getInfo().renderScale());
+    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
 
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
@@ -756,7 +756,7 @@ public class Environment implements IEnvironment {
 
     this.informConsumers(g, this.overlayRenderedConsumer);
 
-    g.scale(1.0 / Game.getInfo().renderScale(), 1.0 / Game.getInfo().renderScale());
+    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
   }
 
   @Override

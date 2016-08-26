@@ -34,7 +34,7 @@ public abstract class Weather extends Emitter {
   public Weather(final WeatherType type) {
     super((int) -Game.getScreenManager().getCamera().getViewPort().getCenterX(), (int) -Game.getScreenManager().getCamera().getViewPort().getCenterY() + WeatherEffectStartingY);
     this.type = type;
-    this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale()));
+    this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale()));
     Game.getScreenManager().onResolutionChanged(resolution -> this.resolutionChanged());
   }
 
@@ -82,7 +82,7 @@ public abstract class Weather extends Emitter {
   public void resolutionChanged() {
     // Update all particles to work properly with the new screen dimensions.
     final Dimension oldDimension = this.screenDimensions;
-    this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale()));
+    this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale()));
     for (final Particle p : this.getParticles()) {
       this.updateForNewScreenDimensions(p, oldDimension);
     }
