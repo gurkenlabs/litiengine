@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.graphics.IRenderComponent;
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
  * The screen manager manages all screens of a game. The method
@@ -40,11 +42,7 @@ public interface IScreenManager {
    */
   public IScreen getCurrentScreen();
 
-  public int getCursorOffsetX();
-
-  public int getCursorOffsetY();
-
-  public Component getRenderComponent();
+  public RenderComponent getRenderComponent();
 
   /**
    * Gets the frame size.
@@ -58,10 +56,6 @@ public interface IScreenManager {
   public void init(int width, int height, boolean fullscreen);
 
   public boolean isFocusOwner();
-
-  public void onFpsChanged(Consumer<Integer> fpsConsumer);
-
-  public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
@@ -80,11 +74,6 @@ public interface IScreenManager {
    */
   public void setCamera(ICamera camera);
 
-  public void setCursor(Image image);
-
-  public void setCursorOffsetX(int cursorOffsetX);
-
-  public void setCursorOffsetY(int cursorOffsetY);
 
   public void setIconImage(Image image);
 }

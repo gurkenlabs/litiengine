@@ -149,7 +149,7 @@ public abstract class Game {
     }
 
     if (getConfiguration().CLIENT.showGameMetrics()) {
-      getScreenManager().onRendered((g) -> getMetrics().render(g));
+      getScreenManager().getRenderComponent().onRendered((g) -> getMetrics().render(g));
     }
 
     if (getConfiguration().DEBUG.isDebugEnabled()) {
@@ -162,7 +162,7 @@ public abstract class Game {
 
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
-    getScreenManager().onFpsChanged(fps -> {
+    getScreenManager().getRenderComponent().onFpsChanged(fps -> {
       getMetrics().setFramesPerSecond(fps);
     });
 
