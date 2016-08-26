@@ -27,7 +27,9 @@ public interface IScreenManager {
    * @param type
    *          the type
    */
-  public void changeScreen(String screenName);
+  public void displayScreen(String screenName);
+  
+  public void displayScreen(IScreen screen);
 
   public ICamera getCamera();
 

@@ -32,7 +32,7 @@ public abstract class Weather extends Emitter {
    * Instantiates a new weather emitter.
    */
   public Weather(final WeatherType type) {
-    super((int) -Game.getScreenManager().getCamera().getCenterX(), (int) -Game.getScreenManager().getCamera().getCenterY() + WeatherEffectStartingY);
+    super((int) -Game.getScreenManager().getCamera().getViewPort().getCenterX(), (int) -Game.getScreenManager().getCamera().getViewPort().getCenterY() + WeatherEffectStartingY);
     this.type = type;
     this.screenDimensions = new Dimension((int) (Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale()), (int) (Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale()));
     Game.getScreenManager().onResolutionChanged(resolution -> this.resolutionChanged());

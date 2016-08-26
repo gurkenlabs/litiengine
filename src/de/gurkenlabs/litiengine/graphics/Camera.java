@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -12,8 +13,11 @@ import de.gurkenlabs.util.MathUtilities;
 /**
  * The Class Camera.
  */
-public abstract class Camera implements ICamera {
+public class Camera implements ICamera {
 
+  /**
+   * Provides the center location for the viewport.
+   */
   private Point2D focus;
 
   /** The shake duration. */
@@ -25,13 +29,13 @@ public abstract class Camera implements ICamera {
   /** The shake tick. */
   private long shakeTick;
 
-  private double centerX;
-  private double centerY;
+  private Rectangle2D viewPort;
 
   /**
    * Instantiates a new camera.
    */
-  protected Camera() {
+  public Camera() {
+    this.focus = new Point2D.Double(0, 0);
   }
 
   /**
@@ -47,16 +51,6 @@ public abstract class Camera implements ICamera {
     }
 
     return cameraLocation;
-  }
-
-  @Override
-  public double getCenterX() {
-    return this.centerX;
-  }
-
-  @Override
-  public double getCenterY() {
-    return this.centerY;
   }
 
   @Override
@@ -84,7 +78,7 @@ public abstract class Camera implements ICamera {
    */
   @Override
   public double getPixelOffsetX() {
-    return this.getCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
+    return this.getViewPortCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
   }
 
   /*
@@ -94,7 +88,7 @@ public abstract class Camera implements ICamera {
    */
   @Override
   public double getPixelOffsetY() {
-    return this.getCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
+    return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
   }
 
   /**
@@ -177,14 +171,6 @@ public abstract class Camera implements ICamera {
     return new Point2D.Double(x, y);
   }
 
-  protected void setCenterX(final double centerX) {
-    this.centerX = centerX;
-  }
-
-  protected void setCenterY(final double centerY) {
-    this.centerY = centerY;
-  }
-
   protected void setFocus(final Point2D focus) {
     this.focus = focus;
   }
@@ -199,5 +185,29 @@ public abstract class Camera implements ICamera {
     this.shakeTick = Game.getLoop().getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.ICamera#getCameraRegion()
+   */
+  @Override
+  public Rectangle2D getViewPort() {
+    return this.viewPort;
+  }
+
+  @Override
+  public void updateFocus() {
+    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(),
+        Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
+  }
+
+  private double getViewPortCenterX() {
+    return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale();
+  }
+
+  private double getViewPortCenterY() {
+    return Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale();
   }
 }

@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import de.gurkenlabs.litiengine.graphics.DefaultCamera;
+import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
@@ -113,7 +113,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void changeScreen(final String screen) {
+  public void displayScreen(final String screen) {
     // if the scren is already displayed or there is no screen with the
     // specified name
     if (this.currentScreen != null && this.currentScreen.getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
@@ -139,6 +139,11 @@ public class ScreenManager extends JFrame implements IScreenManager {
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.currentScreen);
     }
+  }
+
+  @Override
+  public void displayScreen(IScreen screen) {
+    this.displayScreen(screen.getName());
   }
 
   @Override
@@ -178,7 +183,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void init(final int width, final int height, final boolean fullscreen) {
-    this.setCamera(new DefaultCamera());
+    this.setCamera(new Camera());
     if (fullscreen) {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -319,7 +324,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
   }
-  
+
   /**
    * The listener interface for receiving resizedEvent events. The class that is
    * interested in processing a resizedEvent event implements this interface,
@@ -341,5 +346,4 @@ public class ScreenManager extends JFrame implements IScreenManager {
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
     }
   }
-
 }

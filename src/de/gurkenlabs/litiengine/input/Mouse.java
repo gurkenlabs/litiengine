@@ -75,7 +75,7 @@ public class Mouse implements IMouse {
     }
 
     this.setGrabMouse(true);
-    this.location = new Point((int) Game.getScreenManager().getCamera().getCenterX(), (int) Game.getScreenManager().getCamera().getCenterY());
+    this.location = new Point((int) Game.getScreenManager().getCamera().getViewPort().getCenterX(), (int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
     this.sensitivity = Game.getConfiguration().INPUT.getMouseSensitivity();
   }
 

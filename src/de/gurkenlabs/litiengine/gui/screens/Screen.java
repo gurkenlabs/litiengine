@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.gui.GuiComponent;
  *          the generic type
  */
 public abstract class Screen extends GuiComponent implements IScreen {
-
+  public static Screen GAME_SCREEN = new GameScreen();
   private final String name;
 
   /**
@@ -33,6 +33,11 @@ public abstract class Screen extends GuiComponent implements IScreen {
     }
 
     this.name = info.name();
+  }
+
+  protected Screen(String screenName) {
+    super(0, 0);
+    this.name = screenName;
   }
 
   @Override

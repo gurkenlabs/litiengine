@@ -1,17 +1,15 @@
 package de.gurkenlabs.litiengine;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.AnnotationFormatError;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
-import de.gurkenlabs.core.IInitializable;
-import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.annotation.GameInfo;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
@@ -28,46 +26,33 @@ import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.util.io.StreamUtilities;
 
-public abstract class Game implements IInitializable, ILaunchable {
+@GameInfo(name = "LitiEngine Game", version = 1.0f)
+public abstract class Game {
+  private final static List<Consumer<String>> startedConsumer;
+  private final static List<Consumer<String>> terminatedConsumer;
 
-  private static GameInfo info;
-  private static GameConfiguration configuration;
+  private final static GameConfiguration configuration;
+  private final static IRenderEngine graphicsEngine;
+  private final static IPhysicsEngine physicsEngine;
+  private final static ISoundEngine soundEngine;
+  private final static IGameLoop gameLoop;
+  private final static GameMetrics metrics;
+  private final static EntityManager entityManager;
+  private final static RenderLoop renderLoop;
+
   private static IScreenManager screenManager;
-  private static IRenderEngine graphicsEngine;
-  private static IPhysicsEngine physicsEngine;
-  private static ISoundEngine soundEngine;
-  private static IGameLoop gameLoop;
   private static IEnvironment environment;
+  private static GameInfo info;
 
-  private static GameMetrics metrics;
-
-  private static EntityManager entityManager;
-  private static RenderLoop renderLoop;
-
-  protected Game() {
-    final GameInfo inf = this.getClass().getAnnotation(GameInfo.class);
-    if (inf == null) {
-      throw new AnnotationFormatError("No GameInfo annotation found on game implementation " + this.getClass());
-    }
-    
-    info = inf;
-
-    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    final String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
-    final ScreenManager scrMgr = new ScreenManager(gameTitle);
-
-    // ensures that we terminate the game, when the window is closed
-    scrMgr.addWindowListener(new WindowHandler());
-    screenManager = scrMgr;
-  }
-  
   static {
+    startedConsumer = new CopyOnWriteArrayList<>();
+    terminatedConsumer = new CopyOnWriteArrayList<>();
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
     metrics = new GameMetrics();
     entityManager = new EntityManager();
-    
+
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
@@ -83,7 +68,7 @@ public abstract class Game implements IInitializable, ILaunchable {
     getLoop().registerForUpdate(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
-  
+
   public static GameConfiguration getConfiguration() {
     return configuration;
   }
@@ -130,8 +115,17 @@ public abstract class Game implements IInitializable, ILaunchable {
     getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixels().getWidth(), environment.getMap().getSizeInPixels().getHeight()));
   }
 
-  @Override
-  public void init() {
+  public static void init(final GameInfo inf) {
+    info = inf;
+
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    final String gameTitle = !getInfo().subTitle().isEmpty() ? getInfo().name() + " - " + getInfo().subTitle() + " " + getInfo().version() : getInfo().name() + " - " + getInfo().version();
+    final ScreenManager scrMgr = new ScreenManager(gameTitle);
+
+    // ensures that we terminate the game, when the window is closed
+    scrMgr.addWindowListener(new WindowHandler());
+    screenManager = scrMgr;
+    
     final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
     final InputStream defaultLoggingConfig = ClassLoader.getSystemResourceAsStream(LOGGING_CONFIG_FILE);
@@ -157,15 +151,15 @@ public abstract class Game implements IInitializable, ILaunchable {
       }
     }
 
-    if (Game.getConfiguration().CLIENT.showGameMetrics()) {
-      Game.getScreenManager().onRendered((g) -> getMetrics().render(g));
+    if (getConfiguration().CLIENT.showGameMetrics()) {
+      getScreenManager().onRendered((g) -> getMetrics().render(g));
     }
 
-    if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
-      Game.getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
+    if (getConfiguration().DEBUG.isDebugEnabled()) {
+      getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
 
-    Game.getRenderEngine().onMapRendered(e -> {
+    getRenderEngine().onMapRendered(e -> {
       DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject());
     });
 
@@ -183,98 +177,34 @@ public abstract class Game implements IInitializable, ILaunchable {
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
   }
 
-  @Override
-  public void start() {
+  public static void start() {
     gameLoop.start();
     soundEngine.start();
     renderLoop.start();
+    
+    for(Consumer<String> cons : startedConsumer){
+      cons.accept(Game.getInfo().name());
+    }
   }
 
-  @Override
-  public void terminate() {
+  public static void terminate() {
     gameLoop.terminate();
 
     soundEngine.terminate();
     renderLoop.terminate();
+    
+    for(Consumer<String> cons : terminatedConsumer){
+      cons.accept(Game.getInfo().name());
+    }
+    
     System.exit(0);
   }
-
-  /**
-   * The Class WindowHandler.
-   */
-  private class WindowHandler implements WindowListener {
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
-     */
-    @Override
-    public void windowActivated(final WindowEvent event) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
-     */
-    @Override
-    public void windowClosed(final WindowEvent event) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
-     */
-    @Override
-    public void windowClosing(final WindowEvent event) {
-      Game.this.terminate();
-      System.exit(0);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.
-     * WindowEvent)
-     */
-    @Override
-    public void windowDeactivated(final WindowEvent event) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.
-     * WindowEvent)
-     */
-    @Override
-    public void windowDeiconified(final WindowEvent event) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
-     */
-    @Override
-    public void windowIconified(final WindowEvent event) {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
-     */
-    @Override
-    public void windowOpened(final WindowEvent event) {
-    }
+  
+  public static void onStarted(Consumer<String> cons){
+    startedConsumer.add(cons);
   }
-
+  
+  public static void onTerminated(Consumer<String> cons){
+    terminatedConsumer.add(cons);
+  }
 }

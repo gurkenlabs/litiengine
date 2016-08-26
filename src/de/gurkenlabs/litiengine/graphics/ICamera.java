@@ -14,22 +14,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  */
 public interface ICamera {
   /**
-   * Gets the x offset of the camera, which defines the offset that is used to
-   * render the focus map location.
-   *
-   * @return the x offset
-   */
-  public double getCenterX();
-
-  /**
-   * Gets the y offset of the camera, which defines the offset that is used to
-   * render the focus map location.
-   *
-   * @return the x offset
-   */
-  public double getCenterY();
-
-  /**
    * Gets the map location that is focused by this camera.
    *
    * @return the focus map location

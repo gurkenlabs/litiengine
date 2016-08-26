@@ -4,9 +4,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
@@ -14,7 +12,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  */
 public class PositionLockCamera extends Camera {
   private final IEntity entity;
-  private Rectangle2D viewPort;
 
   public PositionLockCamera(final IEntity entity) {
     super();
@@ -24,16 +21,6 @@ public class PositionLockCamera extends Camera {
 
   public IEntity getLockedEntity() {
     return this.entity;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getCameraRegion()
-   */
-  @Override
-  public Rectangle2D getViewPort() {
-    return this.viewPort;
   }
 
   @Override
@@ -46,7 +33,7 @@ public class PositionLockCamera extends Camera {
     // localplayer camera causes flickering and bouncing of the sprite
     if (entity.equals(this.getLockedEntity()) && entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null) {
       final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
-      final Point2D location = new Point2D.Double(this.getFocus().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, this.getFocus().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
+      final Point2D location = new Point2D.Double(this.getFocus().getX() - entity.getWidth() / 2 - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, this.getFocus().getY() - entity.getHeight() / 2 - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
       return this.getViewPortLocation(location);
     }
 
@@ -55,12 +42,8 @@ public class PositionLockCamera extends Camera {
 
   @Override
   public void updateFocus() {
-    final Point2D cameraLocation = this.getLockedEntity().getLocation();
+    final Point2D cameraLocation = this.getLockedEntity().getDimensionCenter();
     this.setFocus(this.applyShakeEffect(cameraLocation));
-    this.setCenterX(Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getWidth() * 0.5);
-    this.setCenterY(Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().renderScale() - this.getLockedEntity().getHeight() * 0.5);
-    final Point2D focus = this.getFocus();
-    this.viewPort = new Rectangle2D.Double(focus.getX() - this.getCenterX(), focus.getY() - this.getCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().renderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().renderScale());
-
+    super.updateFocus();
   }
 }
