@@ -72,12 +72,7 @@ public class LightSource extends Entity implements IRenderable {
   /** The radius. */
   private int radius;
   private final String lightShapeType;
-  private Shape largeLightShape;
-  private Shape midLightShape;
-
-  private Shape smallLightShape;
-
-  private final double gradientStepSize;
+  private Shape lightShape;
 
   /**
    * Instantiates a new light source.
@@ -93,7 +88,7 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final Point2D location, final int width, final int height, final int brightness, final Color lightColor, final String shapeType, final double gradientStepFactor) {
+  public LightSource(final IEnvironment environment, final Point2D location, final int width, final int height, final int brightness, final Color lightColor, final String shapeType) {
     super();
     this.setLocation(location);
     this.color = lightColor;
@@ -104,25 +99,18 @@ public class LightSource extends Entity implements IRenderable {
       shorterDimension = height;
     }
     this.setRadius(shorterDimension / 2);
-    this.gradientStepSize = this.getRadius() * gradientStepFactor;
     this.setBrightness(brightness);
     this.setLocation(location);
     this.lightShapeType = shapeType;
     switch (this.getLightShapeType()) {
     case LightSource.ELLIPSE:
-      this.largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      this.midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      this.smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
-      break;
+      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+       break;
     case LightSource.RECTANGLE:
-      this.largeLightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      this.midLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      this.smallLightShape = new Rectangle2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      this.lightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
       break;
     default:
-      this.largeLightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      this.midLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize(), location.getY() + this.getGradientStepSize(), this.getWidth() - this.getGradientStepSize() * 2, this.getHeight() - this.getGradientStepSize() * 2);
-      this.smallLightShape = new Ellipse2D.Double(location.getX() + this.getGradientStepSize() * 2, location.getY() + this.getGradientStepSize() * 2, this.getWidth() - this.getGradientStepSize() * 4, this.getHeight() - this.getGradientStepSize() * 4);
+      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
       break;
     }
   }
@@ -145,21 +133,14 @@ public class LightSource extends Entity implements IRenderable {
     return this.color;
   }
 
-  public double getGradientStepSize() {
-    return this.gradientStepSize;
-  }
-
-  public Shape getLargeLightShape() {
-    return this.largeLightShape;
+  public Shape getLightShape() {
+    return this.lightShape;
   }
 
   public String getLightShapeType() {
     return this.lightShapeType;
   }
 
-  public Shape getMidLightShape() {
-    return this.midLightShape;
-  }
 
   /**
    * Gets the obstructed vision area.
@@ -241,9 +222,6 @@ public class LightSource extends Entity implements IRenderable {
     return this.radius;
   }
 
-  public Shape getSmallLightShape() {
-    return this.smallLightShape;
-  }
 
   @Override
   public void render(final Graphics2D g) {

@@ -192,7 +192,7 @@ public class Environment implements IEnvironment {
     case "fire":
       emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
       this.getEmitters().add(emitter);
-      final LightSource light = new LightSource(this, new Point2D.Double(emitter.getOrigin().getX(), emitter.getOrigin().getY()), 32, 30, 50, Color.ORANGE, LightSource.ELLIPSE, 0.15);
+      final LightSource light = new LightSource(this, new Point2D.Double(emitter.getOrigin().getX(), emitter.getOrigin().getY()), 32, 30, 50, Color.ORANGE, LightSource.ELLIPSE);
       this.getLightSources().add(light);
       break;
     case "shimmer":
@@ -231,8 +231,7 @@ public class Environment implements IEnvironment {
     default:
       lightType = LightSource.ELLIPSE;
     }
-    final LightSource light = new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), (int) mapObject.getDimension().getHeight(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType,
-        Double.parseDouble(mapObject.getCustomProperty(MapObjectProperties.LIGHTSTEPFACTOR)));
+    final LightSource light = new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), (int) mapObject.getDimension().getHeight(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
     this.getLightSources().add(light);
   }
 
@@ -430,7 +429,7 @@ public class Environment implements IEnvironment {
       final Area staticShadowArea = new Area(staticShadow);
       for (final LightSource light : this.getLightSources()) {
         if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
-          staticShadowArea.subtract(new Area(light.getLargeLightShape()));
+          staticShadowArea.subtract(new Area(light.getLightShape()));
         }
       }
       ar.add(staticShadowArea);

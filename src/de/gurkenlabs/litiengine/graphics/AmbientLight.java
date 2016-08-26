@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RadialGradientPaint;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
@@ -59,18 +60,16 @@ public class AmbientLight {
     for (final LightSource light : this.environment.getLightSources()) {
       final Point2D lightCenter = light.getDimensionCenter();
 
-      final Area large = new Area(light.getLargeLightShape());
-      final Area mid = new Area(light.getMidLightShape());
-      final Area small = new Area(light.getSmallLightShape());
+      final Area lightArea = new Area(light.getLightShape());
 
       // cut the light area where shadow Boxes are (this simulates light falling
       // into and out of rooms)
       for (final IMapObject obj : this.environment.getCollisionBoxes()) {
-        if (!GeometricUtilities.shapeIntersects(light.getLargeLightShape(), obj.getCollisionBox())) {
+        if (!GeometricUtilities.shapeIntersects(light.getLightShape(), obj.getCollisionBox())) {
           continue;
         }
         final Area boxInLight = new Area(obj.getCollisionBox());
-        boxInLight.intersect(large);
+        boxInLight.intersect(lightArea);
 
         final Line2D[] bounds = GeometricUtilities.getLines(obj.getCollisionBox());
         for (final Line2D line : bounds) {
@@ -99,30 +98,15 @@ public class AmbientLight {
           if (light.getDimensionCenter().getY() < obj.getCollisionBox().getMaxY() && !obj.getCollisionBox().contains(light.getDimensionCenter())) {
             shadowArea.add(boxInLight);
           }
-          shadowArea.intersect(large);
-          large.subtract(shadowArea);
-          mid.subtract(shadowArea);
-          small.subtract(shadowArea);
-
+          shadowArea.intersect(lightArea);
+          lightArea.subtract(shadowArea);
         }
       }
-      darkArea.subtract(large);
+      darkArea.subtract(lightArea);
 
       Color[] colors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha())) };
-      g.setPaint(new RadialGradientPaint(new Point2D.Double(large.getBounds2D().getCenterX(), large.getBounds2D().getCenterY()), (float) (large.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, colors));
-      RenderEngine.fillShape(g, large);
-      g.fill(large);
-      large.subtract(mid);
-
-//      g.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha() * 0.5)));
-      // g.fill(large);
-
-      mid.subtract(small);
-      // g.setColor(new Color(this.getColor().getRed(),
-      // this.getColor().getGreen(), this.getColor().getBlue(), (int)
-      // (this.getAlpha() * 0.25)));
-      // g.fill(mid);
-
+      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightArea.getBounds2D().getCenterX(), lightArea.getBounds2D().getCenterY()), (float) (lightArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, colors));
+      g.fill(lightArea);
     }
     g.setColor(col);
     g.fill(darkArea);
