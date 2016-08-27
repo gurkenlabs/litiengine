@@ -19,5 +19,7 @@ public interface IRenderComponent extends IInitializable{
 
   public void setCursorOffsetY(int cursorOffsetY);
   
-  public void render(IScreen screen);
+  public void render(IRenderable screen);
+  
+  public void takeScreenshot();
 }

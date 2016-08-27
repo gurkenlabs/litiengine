@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
@@ -36,7 +38,7 @@ public abstract class Game {
   private final static IGameLoop gameLoop;
   private final static GameMetrics metrics;
   private final static EntityManager entityManager;
-  private final static RenderLoop renderLoop;
+  private static RenderLoop renderLoop;
   private final static GameInfo info;
 
   private static IScreenManager screenManager;
@@ -56,16 +58,10 @@ public abstract class Game {
     // to initialize components
     configuration = new GameConfiguration();
     getConfiguration().load();
-
-    // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop();
-    renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
-
-    getLoop().registerForUpdate(getPhysicsEngine());
-    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
   }
 
   public static GameConfiguration getConfiguration() {
@@ -86,6 +82,10 @@ public abstract class Game {
 
   public static IGameLoop getLoop() {
     return gameLoop;
+  }
+  
+  public static RenderLoop getRenderLoop(){
+    return renderLoop;
   }
 
   public static GameMetrics getMetrics() {
@@ -115,9 +115,17 @@ public abstract class Game {
   }
 
   public static void init() {
-    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     final String gameTitle = !getInfo().getSubTitle().isEmpty() ? getInfo().getName() + " - " + getInfo().getSubTitle() + " " + getInfo().getVersion() : getInfo().getName() + " - " + getInfo().getVersion();
     final ScreenManager scrMgr = new ScreenManager(gameTitle);
+
+    // setup default exception handling for render and update loop
+    renderLoop = new RenderLoop(scrMgr.getRenderComponent(), scrMgr);
+    renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+
+    getLoop().registerForUpdate(getPhysicsEngine());
+    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
+    
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     // ensures that we terminate the game, when the window is closed
     scrMgr.addWindowListener(new WindowHandler());
@@ -172,6 +180,8 @@ public abstract class Game {
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
+    
+    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
   }
 
   public static void start() {

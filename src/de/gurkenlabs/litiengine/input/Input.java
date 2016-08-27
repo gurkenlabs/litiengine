@@ -10,7 +10,7 @@ package de.gurkenlabs.litiengine.input;
 public class Input {
 
   /** The keyboard. */
-  public static IKeyboard KEYBOARD = new KeyBoard();;
+  public static IKeyboard KEYBOARD = new KeyBoard();
 
   /** The mouse. */
   public static IMouse MOUSE = new Mouse();

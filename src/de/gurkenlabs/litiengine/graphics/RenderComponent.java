@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 
-import de.gurkenlabs.litiengine.gui.screens.IScreen;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
@@ -51,7 +50,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   @Override
   public void init() {
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> this.takeScreenShot = true);
     this.createBufferStrategy(3);
     this.bufferStrategy = this.getBufferStrategy();
   }
@@ -70,7 +68,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.setPreferredSize(size);
   }
 
-  public void render(IScreen screen) {
+  public void render(IRenderable screen) {
     final long currentMillis = System.currentTimeMillis();
     final Graphics2D g = (Graphics2D) this.bufferStrategy.getDrawGraphics();
 
@@ -168,5 +166,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     } finally {
       this.takeScreenShot = false;
     }
+  }
+
+  @Override
+  public void takeScreenshot() {
+    this.takeScreenShot = true;
   }
 }

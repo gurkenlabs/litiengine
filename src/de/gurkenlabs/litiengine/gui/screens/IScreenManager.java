@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.graphics.ICameraProvider;
 import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
@@ -20,7 +21,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * renders the current screen to the {@link #getRenderComponent()} of this
  * manager.
  */
-public interface IScreenManager {
+public interface IScreenManager extends ICameraProvider {
   public void addScreen(final IScreen screen);
 
   /**
@@ -32,8 +33,6 @@ public interface IScreenManager {
   public void displayScreen(String screenName);
   
   public void displayScreen(IScreen screen);
-
-  public ICamera getCamera();
 
   /**
    * Gets the current screen.
@@ -60,20 +59,6 @@ public interface IScreenManager {
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
-
-  /**
-   * Render the current screen.
-   */
-  public void renderCurrentScreen();
-
-  /**
-   * Sets the camera.
-   *
-   * @param camera
-   *          the new camera
-   */
-  public void setCamera(ICamera camera);
-
 
   public void setIconImage(Image image);
 }

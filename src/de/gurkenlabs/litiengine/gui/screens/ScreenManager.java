@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JFrame;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
@@ -85,11 +86,13 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     if (this.currentScreen != null) {
       this.currentScreen.suspend();
+      Game.getRenderLoop().unregister(this.currentScreen);
     }
 
     this.currentScreen = targetScreen;
     this.currentScreen.prepare();
     this.setVisible(true);
+    Game.getRenderLoop().register(this.currentScreen);
     this.lastScreenChange = System.currentTimeMillis();
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.currentScreen);
@@ -165,16 +168,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
     }
-  }
-
-  @Override
-  public void renderCurrentScreen() {
-    if (this.getState() == Frame.ICONIFIED || this.getCurrentScreen() == null) {
-      return;
-    }
-
-    this.getCamera().updateFocus();
-    this.getRenderComponent().render(this.getCurrentScreen());
   }
 
   @Override
