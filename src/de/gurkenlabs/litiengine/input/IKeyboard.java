@@ -17,6 +17,8 @@ public interface IKeyboard extends IUpdateable {
   public void onKeyReleased(int keyCode, Consumer<Integer> consumer);
 
   public void onKeyTyped(int keyCode, Consumer<Integer> consumer);
+  
+  public boolean isPressed(int keyCode);
 
   /**
    * Register for key down events.

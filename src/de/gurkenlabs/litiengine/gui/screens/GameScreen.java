@@ -13,7 +13,10 @@ public class GameScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    Game.getEnvironment().render(g);
+    if (Game.getEnvironment() != null) {
+      Game.getEnvironment().render(g);
+    }
+    
     super.render(g);
   }
 

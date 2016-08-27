@@ -249,4 +249,15 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.executeReleasedKeys();
     this.executeTypedKeys();
   }
+
+  @Override
+  public boolean isPressed(int keyCode) {
+    for(int key : this.pressedKeys){
+      if (key == keyCode){
+        return true;
+      }
+    }
+    
+    return false;
+  }
 }

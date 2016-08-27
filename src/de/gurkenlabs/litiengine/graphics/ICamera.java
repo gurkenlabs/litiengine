@@ -94,4 +94,5 @@ public interface ICamera {
   public void shake(double intensity, int duration);
 
   public void updateFocus();
+  public void setFocus(Point2D focus);
 }

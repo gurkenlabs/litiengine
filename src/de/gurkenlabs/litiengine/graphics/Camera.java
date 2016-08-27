@@ -170,8 +170,9 @@ public class Camera implements ICamera {
     final double y = mapLocation.getY() + this.getPixelOffsetY();
     return new Point2D.Double(x, y);
   }
-
-  protected void setFocus(final Point2D focus) {
+  
+  @Override
+  public void setFocus(final Point2D focus) {
     this.focus = focus;
   }
 

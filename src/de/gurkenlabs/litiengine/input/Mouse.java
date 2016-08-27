@@ -13,9 +13,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -38,7 +36,7 @@ public class Mouse implements IMouse {
   /** The mouse wheel listeners. */
   private final List<MouseWheelListener> mouseWheelListeners;
 
-  private final List<Map.Entry<Integer, Consumer<Integer>>> wheelMovedConsumer;
+  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
 
   private final float sensitivity;
 
@@ -235,11 +233,12 @@ public class Mouse implements IMouse {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
+    this.wheelMovedConsumer.forEach(cons -> cons.accept(e));
   }
 
   @Override
-  public void onWheelMoved(final int keyCode, final Consumer<Integer> consumer) {
-    this.wheelMovedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  public void onWheelMoved(final Consumer<MouseWheelEvent> consumer) {
+    this.wheelMovedConsumer.add(consumer);
   }
 
   /*

@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.input;
 import java.awt.Point;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
@@ -35,7 +36,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
 
   public boolean isRightMouseButtonDown();
 
-  public void onWheelMoved(int keyCode, Consumer<Integer> consumer);
+  public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
 
   /**
    * Register mouse listener.
