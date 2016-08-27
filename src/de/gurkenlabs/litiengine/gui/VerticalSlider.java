@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
 
 public class VerticalSlider extends Slider {
   private double minSliderY, maxSliderY;
-  public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "\\U+E804");
-  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\\U+E807");
+  public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "\uE807");
+  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE804");
 
   public VerticalSlider(double x, double y, double width, double height, float minValue, float maxValue, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, buttonSprite, sliderSprite, hoverSound, showArrowButtons);
@@ -24,10 +24,15 @@ public class VerticalSlider extends Slider {
     if (this.arrowButtonsShown()) {
       this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_UP.getText(), null, this.getHoverSound()));
       this.getButton1().setFont(ARROW_UP.getFont());
+      this.getButton1().setTextColor(this.getTextColor());
       this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_DOWN.getText(), null, null));
       this.getButton2().setFont(ARROW_DOWN.getFont());
+      this.getButton2().setTextColor(this.getTextColor());
+      this.getComponents().add(this.getButton1());
+      this.getComponents().add(this.getButton2());
     }
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), this.getWidth() * 2, this.getSliderSprite(), "", null, null));
+    this.getComponents().add(this.getSlider());
     super.prepare();
   }
 

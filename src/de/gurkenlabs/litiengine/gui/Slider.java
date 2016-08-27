@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -75,16 +74,12 @@ public abstract class Slider extends GuiComponent {
 
   public void setCurrentValue(float newValue) {
     if (newValue < this.getMinValue()) {
-      this.currentValue = 0;
-    } else if (newValue >= this.getMaxValue()) {
+      this.currentValue = this.getMinValue();
+    } else if (newValue > this.getMaxValue()) {
       this.currentValue = this.getMaxValue();
+    } else {
+      this.currentValue = newValue;
     }
-    this.currentValue = newValue;
-  }
-
-  @Override
-  public void render(Graphics2D g) {
-    super.render(g);
   }
 
   protected void setButton1(ImageComponent button1) {

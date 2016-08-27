@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
 
 public class HorizontalSlider extends Slider {
   private double minSliderX, maxSliderX;
-  public static Icon ARROW_RIGHT = new Icon(FontLoader.getIconFontThree(), "");
-  public static Icon ARROW_LEFT = new Icon(FontLoader.getIconFontThree(), "");
+  public static Icon ARROW_RIGHT = new Icon(FontLoader.getIconFontThree(), "\uE806");
+  public static Icon ARROW_LEFT = new Icon(FontLoader.getIconFontThree(), "\uE805");
 
   public HorizontalSlider(double x, double y, double width, double height, float minValue, float maxValue, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, buttonSprite, sliderSprite, hoverSound, showArrowButtons);
@@ -24,10 +24,15 @@ public class HorizontalSlider extends Slider {
     if (this.arrowButtonsShown()) {
       this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_LEFT.getText(), null, this.getHoverSound()));
       this.getButton1().setFont(ARROW_LEFT.getFont());
+      this.getButton1().setTextColor(this.getTextColor());
       this.setButton2(new ImageComponent(this.getX() + this.getWidth() - this.getHeight(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_RIGHT.getText(), null, null));
       this.getButton2().setFont(ARROW_RIGHT.getFont());
+      this.getButton2().setTextColor(this.getTextColor());
+      this.getComponents().add(this.getButton1());
+      this.getComponents().add(this.getButton2());
     }
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null, null));
+    this.getComponents().add(this.getSlider());
     super.prepare();
   }
 
@@ -47,6 +52,7 @@ public class HorizontalSlider extends Slider {
 
   @Override
   protected void initializeComponents() {
+
   }
 
   @Override
@@ -55,7 +61,7 @@ public class HorizontalSlider extends Slider {
     if (mouseX >= this.minSliderX && mouseX <= this.maxSliderX) {
       double relativeMouseX = mouseX - this.minSliderX;
       double percentage = relativeMouseX / (this.maxSliderX - this.minSliderX);
-      this.setCurrentValue((float) (this.getMinValue()+percentage*(this.getMaxValue()-this.getMinValue())));
+      this.setCurrentValue((float) (this.getMinValue() + percentage * (this.getMaxValue() - this.getMinValue())));
     }
   }
 
