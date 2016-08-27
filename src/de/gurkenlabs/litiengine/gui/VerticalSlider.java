@@ -24,16 +24,15 @@ public class VerticalSlider extends Slider {
     if (this.arrowButtonsShown()) {
       this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_UP.getText(), null, this.getHoverSound()));
       this.getButton1().setFont(ARROW_UP.getFont());
-      this.getButton1().setTextColor(this.getTextColor());
       this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_DOWN.getText(), null, null));
       this.getButton2().setFont(ARROW_DOWN.getFont());
-      this.getButton2().setTextColor(this.getTextColor());
       this.getComponents().add(this.getButton1());
       this.getComponents().add(this.getButton2());
     }
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), this.getWidth() * 2, this.getSliderSprite(), "", null, null));
     this.getComponents().add(this.getSlider());
     super.prepare();
+    this.setTextColor(this.getTextColor());
   }
 
   @Override

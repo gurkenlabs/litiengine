@@ -24,16 +24,15 @@ public class HorizontalSlider extends Slider {
     if (this.arrowButtonsShown()) {
       this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_LEFT.getText(), null, this.getHoverSound()));
       this.getButton1().setFont(ARROW_LEFT.getFont());
-      this.getButton1().setTextColor(this.getTextColor());
       this.setButton2(new ImageComponent(this.getX() + this.getWidth() - this.getHeight(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_RIGHT.getText(), null, null));
       this.getButton2().setFont(ARROW_RIGHT.getFont());
-      this.getButton2().setTextColor(this.getTextColor());
       this.getComponents().add(this.getButton1());
       this.getComponents().add(this.getButton2());
     }
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null, null));
     this.getComponents().add(this.getSlider());
     super.prepare();
+    this.setTextColor(this.getTextColor());
   }
 
   @Override
