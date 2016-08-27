@@ -29,6 +29,8 @@ public class ImageComponent extends GuiComponent {
   /** The text. */
   private String text;
 
+  private int textAlignment = TEXT_ALIGN_CENTER;
+
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image, final Sound hoverSound) {
     super(x, y, width, height);
     this.spritesheet = spritesheet;
@@ -117,7 +119,6 @@ public class ImageComponent extends GuiComponent {
 
   @Override
   public void render(final Graphics2D g) {
-
     if (this.isSuspended() || !this.isVisible()) {
       return;
     }
@@ -131,25 +132,39 @@ public class ImageComponent extends GuiComponent {
 
     g.setColor(this.getTextColor());
     g.setFont(this.getFont());
-    final FontMetrics fm = g.getFontMetrics();
+    if (this.getText() != null) {
+      final FontMetrics fm = g.getFontMetrics();
 
-    this.defaultTextY = this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-    this.defaultTextX = this.getX() + this.getWidth() / 2 - fm.stringWidth(this.getText()) / 2;
+      this.defaultTextY = this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
+      final int MINPADDING_X = 10;
+      switch (this.getTextAlignment()) {
+      case TEXT_ALIGN_LEFT:
+        this.defaultTextX = this.getX() + MINPADDING_X;
+        break;
+      case TEXT_ALIGN_RIGHT:
+        this.defaultTextX = this.getX() + this.getWidth() - MINPADDING_X - fm.stringWidth(this.getText());
+        break;
+      default:
+      case TEXT_ALIGN_CENTER:
+        this.defaultTextX = this.getX() + this.getWidth() / 2 - fm.stringWidth(this.getText()) / 2;
+        break;
+      }
 
-    float y;
-    if (this.getTextY() != this.defaultTextY && this.getTextY() >= 0) {
-      y = (float) this.getTextY();
-    } else {
-      y = (float) this.defaultTextY;
+      float y;
+      if (this.getTextY() != this.defaultTextY && this.getTextY() >= 0) {
+        y = (float) this.getTextY();
+      } else {
+        y = (float) this.defaultTextY;
+      }
+
+      float x;
+      if (this.getTextX() != this.defaultTextX && this.getTextX() >= 0) {
+        x = (float) this.getTextX();
+      } else {
+        x = (float) this.defaultTextX;
+      }
+      RenderEngine.drawText(g, this.getText(), x, y);
     }
-
-    float x;
-    if (this.getTextX() != this.defaultTextX && this.getTextX() >= 0) {
-      x = (float) this.getTextX();
-    } else {
-      x = (float) this.defaultTextX;
-    }
-    RenderEngine.drawText(g, this.getText(), x, y);
     super.render(g);
   }
 
@@ -214,5 +229,13 @@ public class ImageComponent extends GuiComponent {
 
   @Override
   protected void initializeComponents() {
+  }
+
+  public int getTextAlignment() {
+    return textAlignment;
+  }
+
+  public void setTextAlignment(int textAlignment) {
+    this.textAlignment = textAlignment;
   }
 }

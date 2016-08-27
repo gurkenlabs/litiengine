@@ -28,9 +28,9 @@ import de.gurkenlabs.tiled.tmx.IMapObject;
 public interface IEnvironment extends IInitializable, IRenderable {
 
   public void add(final int mapId, final IMovableCombatEntity entity);
-
   public void add(IRenderable renderable, RenderType type);
-
+  public void add(Prop prop);
+  
   public void addAmbientLight();
 
   public void addCollisionBox(IMapObject mapObject);
@@ -50,6 +50,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void addMovableEntity(final int mapId, final IMovableEntity entity);
 
   public void addProp(IMapObject mapObject);
+  
+
 
   public void addSpawnpoint(IMapObject mapObject);
 

@@ -261,15 +261,15 @@ public class Environment implements IEnvironment {
     if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
       return;
     }
+    
+    // set map properties by map object
     Material material = Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
     final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
+    prop.setMapId(mapObject.getId());
     if (!mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
-    if (!prop.isIndestructible()) {
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DAMAGED));
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DESTROYED));
-    }
+    
     prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
     prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
@@ -279,11 +279,23 @@ public class Environment implements IEnvironment {
       prop.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
     }
     prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    this.getProps().add(prop);
-    this.addCombatEntity(mapObject.getId(), prop);
+
     if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
       prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
     }
+    
+    this.add(prop);
+  }
+
+  @Override
+  public void add(Prop prop) {
+    if (!prop.isIndestructible()) {
+      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DAMAGED));
+      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DESTROYED));
+    }
+
+    this.getProps().add(prop);
+    this.addCombatEntity(prop.getMapId(), prop);
     if (prop.hasCollision()) {
       Game.getPhysicsEngine().add(prop);
     }

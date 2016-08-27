@@ -36,6 +36,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void add(final Animation animation) {
+    if(animation == null){
+      return;
+    }
+    
     final Optional<Animation> oldAnimation = this.animations.stream().filter(x -> x.getName().equalsIgnoreCase(animation.getName())).findFirst();
     if (oldAnimation.isPresent()) {
       this.animations.remove(oldAnimation.get());

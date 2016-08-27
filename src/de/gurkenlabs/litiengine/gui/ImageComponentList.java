@@ -29,7 +29,7 @@ public class ImageComponentList extends GuiComponent {
     this.rows = rows;
     this.columns = columns;
     this.rowHeight = this.getHeight() / (this.getRows() + 1);
-    this.columnWidth = this.getWidth() / (this.getColumns() + 1);
+    this.columnWidth = this.getWidth() / (this.getColumns());
     this.xOffset = this.columnWidth / this.getColumns();
     this.yOffset = this.rowHeight / this.getRows();
 

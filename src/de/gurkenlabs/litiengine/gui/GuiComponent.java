@@ -23,7 +23,10 @@ import de.gurkenlabs.litiengine.input.Input;
  * The Class GuiComponent.
  */
 public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener {
-
+  public static final int TEXT_ALIGN_LEFT = 1;
+  public static final int TEXT_ALIGN_RIGHT = 2;
+  public static final int TEXT_ALIGN_CENTER = 3;
+  
   /** The component id. */
   private static int componentId = 0;
 
@@ -64,7 +67,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private double width, height, x, y;
 
   protected GuiComponent(final double x, final double y) {
-    this.components = new ArrayList<>();
+    this.components = new CopyOnWriteArrayList<>();
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.hoverConsumer = new CopyOnWriteArrayList<>();
     this.mousePressedConsumer = new CopyOnWriteArrayList<>();
@@ -97,9 +100,26 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
-    this(x, y);
     this.width = width;
     this.height = height;
+    this.components = new ArrayList<>();
+    this.clickConsumer = new CopyOnWriteArrayList<>();
+    this.hoverConsumer = new CopyOnWriteArrayList<>();
+    this.mousePressedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
+    this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
+    this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+
+    this.setTextColor(DEFAULT_COLOR);
+    this.setBackGroundColor(DEFAULT_BG_COLOR);
+    this.id = ++componentId;
+    this.x = x;
+    this.y = y;
+
+    this.setVisible(true);
+    this.suspended = true;
+    this.setSelected(false);
+    this.initializeComponents();
   }
 
   /**
@@ -551,6 +571,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public void setTextColor(final Color color) {
     this.textColor = color;
+    for(GuiComponent comp: this.getComponents()){
+      comp.setTextColor(color);
+    }
   }
 
   /**

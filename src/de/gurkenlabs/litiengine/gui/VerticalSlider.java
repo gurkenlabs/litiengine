@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
 
 public class VerticalSlider extends Slider {
   private double minSliderY, maxSliderY;
-  public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "");
-  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "");
+  public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "\\U+E804");
+  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\\U+E807");
 
   public VerticalSlider(double x, double y, double width, double height, float minValue, float maxValue, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, buttonSprite, sliderSprite, hoverSound, showArrowButtons);

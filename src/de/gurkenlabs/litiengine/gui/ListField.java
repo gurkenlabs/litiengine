@@ -27,6 +27,8 @@ public class ListField extends GuiComponent {
   /** The list items. */
   private final ArrayList<ImageComponent> listEntries;
 
+  private int elementMargin = 0;
+
   /**
    * Instantiates a new list field.
    *
@@ -50,9 +52,9 @@ public class ListField extends GuiComponent {
     for (int i = 0; i < this.contents.length; i++) {
       ImageComponent entryComponent;
       if (this.contents[i] == null) {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + this.getHeight() / this.contents.length * i, this.getWidth(), this.getHeight() / this.contents.length, entrySprite, "", null, hoverSound);
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.contents.length + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.contents.length, entrySprite, "", null, hoverSound);
       } else {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + this.getHeight() / this.contents.length * i, this.getWidth(), this.getHeight() / this.contents.length, entrySprite, this.contents[i].toString(), null, hoverSound);
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.contents.length + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.contents.length, entrySprite, this.contents[i].toString(), null, hoverSound);
 
       }
       this.listEntries.add(entryComponent);
@@ -67,7 +69,7 @@ public class ListField extends GuiComponent {
    *
    * @return the all list items
    */
-  public ArrayList<ImageComponent> getAllListEntries() {
+  public ArrayList<ImageComponent> getListEntries() {
     return this.listEntries;
   }
 
@@ -97,8 +99,8 @@ public class ListField extends GuiComponent {
 
   public void setSelection(final int selection) {
     this.currentSelection = selection;
-    for (final ImageComponent comp : this.getAllListEntries()) {
-      if (comp != this.getAllListEntries().get(this.currentSelection)) {
+    for (final ImageComponent comp : this.getListEntries()) {
+      if (comp != this.getListEntries().get(this.currentSelection)) {
         comp.setSelected(false);
       } else {
         if (!comp.isSelected()) {
@@ -133,7 +135,7 @@ public class ListField extends GuiComponent {
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    for (final ImageComponent e : this.getAllListEntries()) {
+    for (final ImageComponent e : this.getListEntries()) {
       e.render(g);
       if (e.isSelected()) {
         final Rectangle2D border = new Rectangle2D.Double(e.getX(), e.getY(), e.getWidth() - 1, e.getHeight() - 1);
@@ -147,7 +149,7 @@ public class ListField extends GuiComponent {
    * Lock selection.
    */
   protected void lockSelection() {
-    if (this.currentSelection < 0 || this.currentSelection > this.getAllListEntries().size() - 1) {
+    if (this.currentSelection < 0 || this.currentSelection > this.getListEntries().size() - 1) {
       return;
     }
 
@@ -159,9 +161,9 @@ public class ListField extends GuiComponent {
   @Override
   public void prepare() {
     super.prepare();
-    for (final ImageComponent comp : this.getAllListEntries()) {
+    for (final ImageComponent comp : this.getListEntries()) {
       comp.onClicked(e -> {
-        this.setSelection(this.getAllListEntries().indexOf(e.getSender()));
+        this.setSelection(this.getListEntries().indexOf(e.getSender()));
         this.lockSelection();
       });
       comp.prepare();
@@ -171,5 +173,22 @@ public class ListField extends GuiComponent {
   @Override
   public void initializeComponents() {
 
+  }
+
+  public int getElementMargin() {
+    return elementMargin;
+  }
+
+  public void setElementMargin(int elementMargin) {
+    int marginDiff = elementMargin - this.elementMargin;
+    for (int i = 0; i < this.getListEntries().size(); i++) {
+      if (i == 0) {
+        continue;
+      }
+
+      this.getListEntries().get(i).setPosition(this.getListEntries().get(i).getPosition().getX(), this.getListEntries().get(i).getPosition().getY() + i * marginDiff);
+    }
+
+    this.elementMargin = elementMargin;
   }
 }
