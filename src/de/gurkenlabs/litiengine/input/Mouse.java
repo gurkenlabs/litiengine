@@ -38,6 +38,12 @@ public class Mouse implements IMouse {
 
   private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
 
+  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
+  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
+  private final List<Consumer<MouseEvent>> mousePressedConsumer;
+  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
+  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
+
   private final float sensitivity;
 
   private Robot robot;
@@ -64,6 +70,11 @@ public class Mouse implements IMouse {
     this.mouseMotionListeners = new CopyOnWriteArrayList<>();
     this.mouseWheelListeners = new CopyOnWriteArrayList<>();
     this.wheelMovedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseClickedConsumer = new CopyOnWriteArrayList<>();
+    this.mousePressedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseMovedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseReleasedConsumer = new CopyOnWriteArrayList<>();
 
     try {
       this.robot = new Robot();
@@ -136,6 +147,10 @@ public class Mouse implements IMouse {
   public void mouseClicked(final MouseEvent e) {
     this.setLocation(e.getPoint());
     this.mouseListeners.forEach(listener -> listener.mouseClicked(this.createEvent(e)));
+
+    for (Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
+      cons.accept(e);
+    }
   }
 
   /*
@@ -148,6 +163,10 @@ public class Mouse implements IMouse {
   public void mouseDragged(final MouseEvent e) {
     this.setLocation(e.getPoint());
     this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(this.createEvent(e)));
+    
+    for (Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
+      cons.accept(e);
+    }
   }
 
   /*
@@ -182,6 +201,10 @@ public class Mouse implements IMouse {
   public void mouseMoved(final MouseEvent e) {
     this.setLocation(e.getPoint());
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(this.createEvent(e)));
+    
+    for (Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
+      cons.accept(e);
+    }
   }
 
   /*
@@ -202,6 +225,10 @@ public class Mouse implements IMouse {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = true;
     }
+    
+    for (Consumer<MouseEvent> cons : this.mousePressedConsumer) {
+      cons.accept(e);
+    }
   }
 
   /*
@@ -221,6 +248,10 @@ public class Mouse implements IMouse {
 
     if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = false;
+    }
+    
+    for (Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
+      cons.accept(e);
     }
   }
 
@@ -400,5 +431,28 @@ public class Mouse implements IMouse {
     }
 
     this.mouseWheelListeners.remove(listener);
+  }
+
+  @Override
+  public void onClicked(Consumer<MouseEvent> consumer) {
+    this.mouseClickedConsumer.add(consumer);
+  }
+  
+  @Override
+  public void onPressed(Consumer<MouseEvent> consumer) {
+    this.mousePressedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onDragged(Consumer<MouseEvent> consumer) {
+    this.mouseDraggedConsumer.add(consumer);
+  }
+  @Override
+  public void onReleased(Consumer<MouseEvent> consumer) {
+    this.mouseReleasedConsumer.add(consumer);
+  }
+  @Override
+  public void onMoved(Consumer<MouseEvent> consumer) {
+    this.mouseMovedConsumer.add(consumer);
   }
 }

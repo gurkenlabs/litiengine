@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
@@ -37,6 +38,16 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public boolean isRightMouseButtonDown();
 
   public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
+
+  public void onClicked(Consumer<MouseEvent> consumer);
+
+  public void onPressed(Consumer<MouseEvent> consumer);
+
+  public void onDragged(Consumer<MouseEvent> consumer);
+
+  public void onReleased(Consumer<MouseEvent> consumer);
+
+  public void onMoved(Consumer<MouseEvent> consumer);
 
   /**
    * Register mouse listener.
