@@ -85,6 +85,8 @@ public class Icon {
 
   /** The zoom out. */
   public static Icon ZOOM_OUT = new Icon(FontLoader.getIconFontTwo(), "k");
+  
+  
 
   /** The font. */
   private final Font font;
@@ -100,7 +102,7 @@ public class Icon {
    * @param text
    *          the text
    */
-  private Icon(final Font font, final String text) {
+  Icon(final Font font, final String text) {
     this.font = font;
     this.text = text;
   }

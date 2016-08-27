@@ -37,15 +37,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private Color backGroundColor;
 
   /** The click consumer. */
-  private final List<Consumer<ComponentMouseEvent>> clickConsumer;
-
-  private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
-
-  private final List<Consumer<ComponentMouseEvent>> mousePressedConsumer;
-
-  private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
-
-  private final List<Consumer<ComponentMouseEvent>> mouseLeaveConsumer;
+  private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer;
 
   /** The components. */
   private final List<GuiComponent> components;
@@ -54,7 +46,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private final int id;
 
   /** The is hovered. */
-  private boolean isHovered, isPressed, isSelected;
+  private boolean isHovered, isPressed, isSelected, isDragged;
 
   /** The suspended. */
   private boolean suspended;
@@ -76,6 +68,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.hoverConsumer = new CopyOnWriteArrayList<>();
     this.mousePressedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
 
@@ -189,6 +182,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.mousePressedConsumer;
   }
 
+  protected List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
+    return this.mouseDraggedConsumer;
+  }
+
   public Point2D getPosition() {
     return new Point2D.Double(this.getX(), this.getY());
   }
@@ -255,6 +252,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.isHovered;
   }
 
+  public boolean isDragged() {
+    return this.isDragged();
+  }
+
   /**
    * Checks if is hovered.
    *
@@ -312,8 +313,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public void mouseDragged(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {
+      this.isDragged = false;
       return;
     }
+    this.isDragged = true;
+    this.getMouseDraggedConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
   /*
@@ -440,6 +444,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void onMousePressed(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMousePressedConsumer().contains(callback)) {
       this.getMousePressedConsumer().add(callback);
+    }
+  }
+
+  public void onMouseDragged(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMouseDraggedConsumer().contains(callback)) {
+      this.getMouseDraggedConsumer().add(callback);
     }
   }
 

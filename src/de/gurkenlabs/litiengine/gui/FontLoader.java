@@ -102,6 +102,10 @@ public class FontLoader {
   public static Font getIconFontTwo() {
     return getFont("icon-bit-two.ttf", 16f);
   }
+  
+  public static Font getIconFontThree() {
+    return getFont("fontello.ttf", 16f);
+  }
 
   /**
    * Gets the menu font1.
