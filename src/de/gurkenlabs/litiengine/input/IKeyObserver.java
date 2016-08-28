@@ -3,6 +3,8 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.event.KeyEvent;
+
 // TODO: Auto-generated Javadoc
 /**
  * An asynchronous update interface for receiving notifications about IKey
@@ -17,7 +19,7 @@ public interface IKeyObserver {
    * @param keyCode
    *          the key code
    */
-  public abstract void handlePressedKey(int keyCode);
+  public abstract void handlePressedKey(KeyEvent keyCode);
 
   /**
    * This method is called when information about an IKey which was previously
@@ -26,7 +28,7 @@ public interface IKeyObserver {
    * @param keyCode
    *          the key code
    */
-  public abstract void handleReleasedKey(int keyCode);
+  public abstract void handleReleasedKey(KeyEvent keyCode);
 
   /**
    * This method is called when information about an IKey which was previously
@@ -35,5 +37,5 @@ public interface IKeyObserver {
    * @param keyCode
    *          the key code
    */
-  public abstract void handleTypedKey(int keyCode);
+  public abstract void handleTypedKey(KeyEvent keyCode);
 }

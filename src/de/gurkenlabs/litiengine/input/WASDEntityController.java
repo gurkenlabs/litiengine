@@ -25,9 +25,9 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   }
 
   @Override
-  public void handlePressedKey(final int keyCode) {
+  public void handlePressedKey(final KeyEvent keyCode) {
 
-    switch (keyCode) {
+    switch (keyCode.getKeyCode()) {
     case KeyEvent.VK_W:
       this.dy -= this.stepSize;
       break;
@@ -46,12 +46,12 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   }
 
   @Override
-  public void handleReleasedKey(final int keyCode) {
+  public void handleReleasedKey(final KeyEvent keyCode) {
 
   }
 
   @Override
-  public void handleTypedKey(final int keyCode) {
+  public void handleTypedKey(final KeyEvent keyCode) {
 
   }
 

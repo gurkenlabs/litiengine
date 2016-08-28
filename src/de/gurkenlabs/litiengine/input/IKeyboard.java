@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.event.KeyEvent;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -12,12 +13,12 @@ import de.gurkenlabs.litiengine.IUpdateable;
  */
 public interface IKeyboard extends IUpdateable {
 
-  public void onKeyPressed(int keyCode, Consumer<Integer> consumer);
+  public void onKeyPressed(int keyCode, Consumer<KeyEvent> consumer);
 
-  public void onKeyReleased(int keyCode, Consumer<Integer> consumer);
+  public void onKeyReleased(int keyCode, Consumer<KeyEvent> consumer);
 
-  public void onKeyTyped(int keyCode, Consumer<Integer> consumer);
-  
+  public void onKeyTyped(int keyCode, Consumer<KeyEvent> consumer);
+
   public boolean isPressed(int keyCode);
 
   /**
@@ -35,4 +36,6 @@ public interface IKeyboard extends IUpdateable {
    *          the observer
    */
   public void unregisterFromKeyDownEvents(IKeyObserver observer);
+
+  public String getText(KeyEvent e);
 }
