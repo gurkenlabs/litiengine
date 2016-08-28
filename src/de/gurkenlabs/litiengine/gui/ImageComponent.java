@@ -7,6 +7,9 @@ import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -16,7 +19,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
-
+  private final List<Consumer<String>> textChangedConsumer;
   /** The font. */
   private Font font;
 
@@ -24,7 +27,7 @@ public class ImageComponent extends GuiComponent {
 
   private double imageX, imageY, imageWidth, imageHeight, textX, textY, defaultTextX, defaultTextY;
 
-  private final Spritesheet spritesheet;
+  private Spritesheet spritesheet;
 
   /** The text. */
   private String text;
@@ -33,12 +36,13 @@ public class ImageComponent extends GuiComponent {
 
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image, final Sound hoverSound) {
     super(x, y, width, height);
+    this.textChangedConsumer = new CopyOnWriteArrayList<>();
     this.spritesheet = spritesheet;
     if (FontLoader.getGuiFont() != null) {
       this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getHeight() * 3 / 6f)));
     }
 
-    this.setText(text);
+    this.text = text;
     this.textX = -1;
     this.textY = -1;
 
@@ -87,6 +91,10 @@ public class ImageComponent extends GuiComponent {
 
   public Spritesheet getSpritesheet() {
     return this.spritesheet;
+  }
+
+  public void setSpriteSheet(Spritesheet spr) {
+    this.spritesheet = spr;
   }
 
   /**
@@ -190,6 +198,9 @@ public class ImageComponent extends GuiComponent {
    */
   public void setText(final String text) {
     this.text = text;
+    for (Consumer<String> cons : this.textChangedConsumer) {
+      cons.accept(this.getText());
+    }
   }
 
   public void setFontSize(final int size) {
@@ -237,5 +248,9 @@ public class ImageComponent extends GuiComponent {
 
   public void setTextAlignment(int textAlignment) {
     this.textAlignment = textAlignment;
+  }
+
+  public void onTextChanged(final Consumer<String> cons) {
+    this.textChangedConsumer.add(cons);
   }
 }

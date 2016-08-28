@@ -15,15 +15,15 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
 public class TextFieldComponent extends ImageComponent implements IKeyObserver {
-  public static final String INTEGER_FORMAT = "[0-9]+";
+  public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
-
   private boolean cursorVisible;
   private long lastToggled;
   private final int textXOffset, flickerDelay;
 
   private String fullText;
+  private String lastText;
   private int maxLength = 0;
   private String format;
 
@@ -81,6 +81,12 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
         this.fullText = this.fullText.substring(0, this.fullText.length() - 1);
       }
 
+      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT)) {
+        if (this.fullText == null || this.fullText.isEmpty()) {
+          this.fullText = "0";
+        }
+      }
+
       break;
     case KeyEvent.VK_SPACE:
       if (this.fullText != "") {
@@ -97,10 +103,10 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       }
 
       String text = Input.KEYBOARD.getText(event);
-      if(text == null || text.isEmpty()){
+      if (text == null || text.isEmpty()) {
         break;
       }
-      
+
       // regex check to ensure certain formats
       if (this.getFormat() != null && !this.getFormat().isEmpty()) {
         Pattern pat = Pattern.compile(this.getFormat());
@@ -110,19 +116,33 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
         }
       }
 
+      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.fullText.equals("0")) {
+        this.fullText = "";
+      }
+
       this.fullText += text;
 
       break;
     }
   }
-
+  
+  @Override
+  public void setText(String text){
+    this.fullText = text;
+  }
+  
   @Override
   public void render(final Graphics2D g) {
     g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
-    this.setText(this.fullText);
-    while (fm.stringWidth(this.getText()) > this.getWidth() - this.textXOffset) {
-      this.setText(this.getText().substring(1));
+    if (this.lastText == null || !this.lastText.equals(this.fullText)) {
+      String newText = this.fullText;
+      while (fm.stringWidth(this.getText()) > this.getWidth() - this.textXOffset) {
+        newText = newText.substring(1);
+      }
+
+      super.setText(newText);
+      this.lastText = this.getText();
     }
 
     super.render(g);
