@@ -11,7 +11,7 @@ public class DropdownListField extends ListField {
   private boolean isDroppedDown;
 
   public DropdownListField(final int x, final int y, final int width, final int height, final Object[] content, final Spritesheet entrySprite, final Spritesheet buttonSprite, final Sound hoverSound) {
-    super(x, y, width, height, content, entrySprite, hoverSound);
+    super(x, y, width, height, content, entrySprite, null, hoverSound);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getListEntries().size(), entrySprite, "", null, hoverSound);
     this.dropDownButton = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getListEntries().size(), this.getHeight() / this.getListEntries().size(), buttonSprite, "", null, hoverSound);
 

@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
@@ -12,12 +15,13 @@ public abstract class Slider extends GuiComponent {
   private final Spritesheet buttonSprite, sliderSprite;
   private final Sound hoverSound;
   private boolean showArrowButtons, isDragging;
+  private final List<Consumer<Float>> changeConsumer;
 
   public Slider(double x, double y, double width, double height, float minValue, float maxValue, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
     super(x, y, width, height);
+    this.changeConsumer = new CopyOnWriteArrayList<Consumer<Float>>();
     this.minValue = minValue;
     this.maxValue = maxValue;
-    this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
     this.buttonSprite = buttonSprite;
     this.sliderSprite = sliderSprite;
     this.hoverSound = hoverSound;
@@ -38,6 +42,10 @@ public abstract class Slider extends GuiComponent {
 
   public Spritesheet getButtonSprite() {
     return this.buttonSprite;
+  }
+
+  public List<Consumer<Float>> getChangeConsumer() {
+    return this.changeConsumer;
   }
 
   public abstract Point2D getRelativeSliderPosition();
@@ -73,12 +81,12 @@ public abstract class Slider extends GuiComponent {
   }
 
   public void setCurrentValue(float newValue) {
-    if (newValue < this.getMinValue()) {
+    if (newValue >= this.getMinValue() && newValue <= this.getMaxValue()) {
+      this.currentValue = newValue;
+    } else if (newValue < this.getMinValue()) {
       this.currentValue = this.getMinValue();
     } else if (newValue > this.getMaxValue()) {
       this.currentValue = this.getMaxValue();
-    } else {
-      this.currentValue = newValue;
     }
   }
 
@@ -86,7 +94,7 @@ public abstract class Slider extends GuiComponent {
     this.button1 = button1;
     this.button1.onClicked(e -> {
       this.setCurrentValue(this.currentValue - (this.getMaxValue() - this.getMinValue()) / 50);
-      this.slider.setPosition(this.getRelativeSliderPosition());
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
     });
     this.getComponents().add(button1);
   }
@@ -95,10 +103,26 @@ public abstract class Slider extends GuiComponent {
     this.button2 = button2;
     this.button2.onClicked(e -> {
       this.setCurrentValue(this.currentValue + (this.getMaxValue() - this.getMinValue()) / 50);
-      this.slider.setPosition(this.getRelativeSliderPosition());
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
     });
     this.getComponents().add(button2);
 
+  }
+
+  @Override
+  protected void initializeComponents() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void prepare() {
+    super.prepare();
+     this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
+    this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+    this.onChange(e -> {
+      this.slider.setPosition(this.getRelativeSliderPosition());
+    });
   }
 
   protected void setSlider(ImageComponent slider) {
@@ -109,7 +133,7 @@ public abstract class Slider extends GuiComponent {
     Input.MOUSE.onDragged(e -> {
       if (this.isDragging()) {
         this.setValueRelativeToMousePosition();
-        this.slider.setPosition(this.getRelativeSliderPosition());
+        this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
       }
     });
 
@@ -118,8 +142,10 @@ public abstract class Slider extends GuiComponent {
         this.isDragging = false;
       }
     });
-
     this.getComponents().add(slider);
+  }
 
+  public void onChange(final Consumer<Float> c) {
+    this.getChangeConsumer().add(c);
   }
 }
