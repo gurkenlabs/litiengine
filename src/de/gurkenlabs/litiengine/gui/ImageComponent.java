@@ -42,10 +42,10 @@ public class ImageComponent extends GuiComponent {
     this.textX = -1;
     this.textY = -1;
 
-    this.imageWidth = this.getWidth() - this.getWidth() * 9 / 10;
-    this.imageHeight = this.getHeight() - this.getHeight() * 9 / 10;
-    this.imageX = this.getX() + this.getWidth() * 1 / 20;
-    this.imageY = this.getY() + this.getWidth() * 1 / 20;
+    this.imageWidth = this.getWidth() * 0.9;
+    this.imageHeight = this.getHeight() * 0.9;
+    this.imageX = this.getX() + this.getWidth() * 0.05;
+    this.imageY = this.getY() + this.getHeight() * 0.05;
     if (image != null) {
       this.image = image;
     }

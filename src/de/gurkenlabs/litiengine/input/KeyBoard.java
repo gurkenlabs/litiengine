@@ -70,7 +70,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    *          the key code
    */
   private void addPressedKey(final KeyEvent keyCode) {
-    if (this.pressedKeys.stream().anyMatch(key -> key.equals(keyCode))) {
+    if (this.pressedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
     }
 
@@ -84,7 +84,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    *          the key code
    */
   private void addReleasedKey(final KeyEvent keyCode) {
-    if (this.releasedKeys.stream().anyMatch(key -> key.equals(keyCode))) {
+    if (this.releasedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
     }
 
@@ -98,7 +98,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    *          the key code
    */
   private void addTypedKey(final KeyEvent keyCode) {
-    if (this.typedKeys.stream().anyMatch(key -> key.equals(keyCode))) {
+    if (this.typedKeys.stream().anyMatch(key -> key.getKeyCode() == keyCode.getKeyCode())) {
       return;
     }
 

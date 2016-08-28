@@ -87,7 +87,7 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public BufferedImage getCurrentSprite() {
-    if (this.getCurrentAnimation() == null) {
+    if (this.getCurrentAnimation() == null || this.getCurrentAnimation().getSpritesheet() == null) {
       return null;
     }
 

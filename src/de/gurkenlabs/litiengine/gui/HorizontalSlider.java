@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -37,9 +38,11 @@ public class HorizontalSlider extends Slider {
 
   @Override
   public void render(Graphics2D g) {
+    Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke((float) (this.getHeight() / 8)));
     g.setColor(this.getTextColor());
     g.drawLine((int) minSliderX, (int) (this.getY() + this.getHeight() / 2), (int) (this.getX() + this.getWidth() - this.getHeight()), (int) (this.getY() + this.getHeight() / 2));
+    g.setStroke(oldStroke);
     super.render(g);
 
   }

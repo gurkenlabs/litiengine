@@ -549,6 +549,15 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.y = newPosition.getY();
   }
 
+  
+  public void setX(double x) {
+    this.x = x;
+  }
+
+  public void setY(double y) {
+    this.y = y;
+  }
+
   public void setSelected(final boolean bool) {
     this.isSelected = bool;
   }
