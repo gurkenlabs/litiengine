@@ -15,7 +15,7 @@ public class ImageComponentList extends GuiComponent {
   private final int rows, columns;
   private final double rowHeight, columnWidth, xOffset, yOffset;
 
-  public ImageComponentList(final int x, final int y, final int width, final int height, final int rows, final int columns, final ArrayList<Image> images, final Spritesheet background,final Sound hoverSound) {
+  public ImageComponentList(final int x, final int y, final int width, final int height, final int rows, final int columns, final ArrayList<Image> images, final Spritesheet background, final Sound hoverSound) {
     super(x, y, width, height);
     if (images != null) {
       this.images = images;
@@ -28,10 +28,18 @@ public class ImageComponentList extends GuiComponent {
     this.cells = new ArrayList<>();
     this.rows = rows;
     this.columns = columns;
-    this.rowHeight = this.getHeight() / (this.getRows() + 1);
-    this.columnWidth = this.getWidth() / (this.getColumns());
-    this.xOffset = this.columnWidth / this.getColumns();
-    this.yOffset = this.rowHeight / this.getRows();
+    if (this.getRows() == 1) {
+      this.rowHeight = this.getHeight();
+    } else {
+      this.rowHeight = (this.getHeight() * 9 / 10) / (this.getRows());
+    }
+    if (this.getColumns() == 1) {
+      this.columnWidth = this.getWidth();
+    } else {
+      this.columnWidth = (this.getWidth() * 9 / 10) / (this.getColumns());
+    }
+    this.xOffset = (this.getWidth() * 1 / 10) / (this.getColumns() - 1);
+    this.yOffset = (this.getHeight() * 1 / 10) / (this.getRows() - 1);
 
     int imageCount = -1;
 
@@ -44,7 +52,7 @@ public class ImageComponentList extends GuiComponent {
         } else {
           img = null;
         }
-        final ImageComponent cell = new ImageComponent(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img,hoverSound);
+        final ImageComponent cell = new ImageComponent(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset) , this.columnWidth, this.rowHeight, this.getBackground(), "", img, hoverSound);
         this.cells.add(cell);
 
       }
