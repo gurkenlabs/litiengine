@@ -163,7 +163,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the components
    */
-  protected List<GuiComponent> getComponents() {
+  public List<GuiComponent> getComponents() {
     return this.components;
   }
 
