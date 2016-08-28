@@ -60,28 +60,16 @@ public class Spritesheet {
     this.hashCode = this.getPath().hashCode();
   }
 
-  /**
-   * Instantiates a new spritesheet.
-   *
-   * @param path
-   *          the path
-   * @param spriteWidth
-   *          the sprite width
-   * @param spriteHeight
-   *          the sprite height
-   * @param columns
-   *          the sprites per row
-   * @param rows
-   *          the rows
-   */
-  public Spritesheet(final String path, final int spriteWidth, final int spriteHeight, final int columns, final int rows) {
+  public Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
     this.path = path;
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
-    this.columns = columns;
-    this.rows = rows;
+
     spritesheets.add(this);
     this.hashCode = this.getPath().hashCode();
+    BufferedImage sprite = RenderEngine.getImage(this.getPath());
+    this.columns = sprite.getWidth() / this.spriteWidth;
+    this.rows= sprite.getHeight() / this.spriteHeight;
   }
 
   /**
@@ -94,8 +82,8 @@ public class Spritesheet {
   }
 
   private Point getLocation(final int index) {
-    final int row = index / this.columns;
-    final int column = index % this.columns;
+    final int row = index / this.getColumns();
+    final int column = index % this.getColumns();
 
     return new Point(column * this.getSpriteWidth(), row * this.getSpriteHeight());
   }
