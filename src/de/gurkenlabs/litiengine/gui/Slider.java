@@ -93,7 +93,7 @@ public abstract class Slider extends GuiComponent {
   protected void setButton1(ImageComponent button1) {
     this.button1 = button1;
     this.button1.onClicked(e -> {
-      this.setCurrentValue(this.currentValue - (this.getMaxValue() - this.getMinValue()) / 50);
+      this.setCurrentValue(this.getCurrentValue() - (this.getMaxValue() - this.getMinValue()) / 50);
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
     });
     this.getComponents().add(button1);
@@ -102,8 +102,9 @@ public abstract class Slider extends GuiComponent {
   protected void setButton2(ImageComponent button2) {
     this.button2 = button2;
     this.button2.onClicked(e -> {
-      this.setCurrentValue(this.currentValue + (this.getMaxValue() - this.getMinValue()) / 50);
+      this.setCurrentValue(this.getCurrentValue() + (this.getMaxValue() - this.getMinValue()) / 50);
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+
     });
     this.getComponents().add(button2);
 
@@ -118,8 +119,7 @@ public abstract class Slider extends GuiComponent {
   @Override
   public void prepare() {
     super.prepare();
-     this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
-    this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+    this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
     this.onChange(e -> {
       this.slider.setPosition(this.getRelativeSliderPosition());
     });
