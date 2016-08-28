@@ -261,7 +261,7 @@ public class Environment implements IEnvironment {
     if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
       return;
     }
-    
+
     // set map properties by map object
     Material material = Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
     final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
@@ -269,7 +269,7 @@ public class Environment implements IEnvironment {
     if (!mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
-    
+
     prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
     prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
@@ -283,7 +283,7 @@ public class Environment implements IEnvironment {
     if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
       prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
     }
-    
+
     this.add(prop);
   }
 
