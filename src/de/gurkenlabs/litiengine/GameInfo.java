@@ -1,17 +1,33 @@
 package de.gurkenlabs.litiengine;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+@XmlRootElement(name = "info")
 public class GameInfo {
+  @XmlElement
   private String cooperation;
+  
+  @XmlElement
   private String description;
+  
+
+  @XmlElement
+  private String name;
+
+  
+  @XmlElement
+  private String subTitle;
+
+  @XmlElement
+  private float version;
+  
+  private float renderScale;  
+  private String spritesDirectory;  
   private String[] developers;
   private String icon;
   private String logo;
-  private String name;
-  private String spritesDirectory;
-  private String subTitle;
-
-  private float version;
-  private float renderScale;
 
   public GameInfo() {
     this.cooperation = "gurkenlabs";
@@ -27,6 +43,7 @@ public class GameInfo {
     this.spritesDirectory = "sprites/";
   }
 
+  @XmlTransient
   public String getCooperation() {
     return this.cooperation;
   }
@@ -35,6 +52,7 @@ public class GameInfo {
     this.cooperation = cooperation;
   }
 
+  @XmlTransient
   public String getDescription() {
     return this.description;
   }
@@ -43,6 +61,7 @@ public class GameInfo {
     this.description = description;
   }
 
+  @XmlTransient
   public String[] getDevelopers() {
     return this.developers;
   }
@@ -51,6 +70,7 @@ public class GameInfo {
     this.developers = developers;
   }
 
+  @XmlTransient
   public String getIcon() {
     return this.icon;
   }
@@ -59,6 +79,7 @@ public class GameInfo {
     this.icon = icon;
   }
 
+  @XmlTransient
   public String getLogo() {
     return this.logo;
   }
@@ -67,6 +88,7 @@ public class GameInfo {
     this.logo = logo;
   }
 
+  @XmlTransient
   public String getName() {
     return this.name;
   }
@@ -75,6 +97,7 @@ public class GameInfo {
     this.name = name;
   }
 
+  @XmlTransient
   public String getSpritesDirectory() {
     return this.spritesDirectory;
   }
@@ -83,6 +106,7 @@ public class GameInfo {
     this.spritesDirectory = spritesDirectory;
   }
 
+  @XmlTransient
   public String getSubTitle() {
     return this.subTitle;
   }
@@ -91,6 +115,7 @@ public class GameInfo {
     this.subTitle = subTitle;
   }
 
+  @XmlTransient
   public float getVersion() {
     return this.version;
   }
@@ -99,6 +124,7 @@ public class GameInfo {
     this.version = version;
   }
 
+  @XmlTransient
   public float getRenderScale() {
     return this.renderScale;
   }

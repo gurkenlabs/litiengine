@@ -46,8 +46,11 @@ public class DropdownListField extends ListField {
   @Override
   public void prepare() {
     super.prepare();
-    this.chosenElementComponent.setText(this.getListEntries().get(this.getSelection()).getText());
-    this.chosenElementComponent.setVisible(true);
+    if (this.getListEntries().size() != 0) {
+      this.chosenElementComponent.setText(this.getListEntries().get(this.getSelection()).getText());
+      this.chosenElementComponent.setVisible(true);
+    }
+
     this.dropDownButton.onClicked(e -> this.toggleDropDown());
     this.dropDownButton.setFont(FontLoader.getIconFontOne().deriveFont((int) this.dropDownButton.getWidth() / 1.5f));
     this.dropDownButton.setText(Icon.ARROW_DOWN.getText());

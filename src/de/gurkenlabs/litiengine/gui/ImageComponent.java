@@ -234,7 +234,11 @@ public class ImageComponent extends GuiComponent {
     } else {
       img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(0), (int) this.getWidth(), (int) this.getHeight());
     }
-    ImageCache.SPRITES.putPersistent(cacheKey, img);
+
+    if (img != null) {
+      ImageCache.SPRITES.putPersistent(cacheKey, img);
+    }
+    
     return img;
   }
 

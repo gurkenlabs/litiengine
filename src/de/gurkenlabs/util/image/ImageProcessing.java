@@ -16,6 +16,12 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
 
 public class ImageProcessing {
   public static final int CROP_ALIGN_CENTER = 0;
@@ -26,6 +32,38 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
   public static final int CROP_VALIGN_BOTTOM = 3;
+
+  public static String encodeToString(BufferedImage image) {
+    String imageString = null;
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+    try {
+      ImageIO.write(image, "png", bos);
+      byte[] imageBytes = bos.toByteArray();
+
+      imageString = Base64.getEncoder().encodeToString(imageBytes);
+
+      bos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return imageString;
+  }
+  
+  public static BufferedImage decodeToImage(String imageString) {
+    
+    BufferedImage image = null;
+    byte[] imageByte;
+    try {
+        imageByte = Base64.getDecoder().decode(imageString);
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+        image = ImageIO.read(bis);
+        bis.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return image;
+}
 
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
@@ -338,6 +376,10 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
+    if(width == 0 || height == 0){
+      return null;
+    }
+    
     final int imageWidth = image.getWidth();
     final int imageHeight = image.getHeight();
 

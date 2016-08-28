@@ -72,7 +72,7 @@ public class Environment implements IEnvironment {
   private final List<IRenderable> groundRenderable;
   private final List<IRenderable> overlayRenderable;
 
-  private final IMap map;
+  private IMap map;
 
   private final Map<Integer, ICombatEntity> combatEntities;
   private final List<Prop> props;
@@ -87,17 +87,7 @@ public class Environment implements IEnvironment {
 
   private Weather weather;
 
-  /**
-   * Instantiates a new map container base.
-   *
-   * @param map
-   *          the map
-   */
-  public Environment(final String mapPath) {
-    final IMapLoader tmxLoader = new TmxMapLoader();
-    this.map = tmxLoader.LoadMap(mapPath);
-    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
-
+  private Environment() {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
     this.lightSources = new CopyOnWriteArrayList<>();
@@ -112,6 +102,25 @@ public class Environment implements IEnvironment {
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
+  }
+
+  /**
+   * Instantiates a new map container base.
+   *
+   * @param map
+   *          the map
+   */
+  public Environment(final String mapPath) {
+    this();
+    final IMapLoader tmxLoader = new TmxMapLoader();
+    this.map = tmxLoader.LoadMap(mapPath);
+    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
+  }
+
+  public Environment(IMap map) {
+    this();
+    this.map = map;
+    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
   }
 
   @Override
@@ -263,15 +272,21 @@ public class Environment implements IEnvironment {
     }
 
     // set map properties by map object
-    Material material = Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
     final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
-    if (!mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
 
-    prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
-    prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
+      prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
+      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    }
+
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
       prop.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
     }

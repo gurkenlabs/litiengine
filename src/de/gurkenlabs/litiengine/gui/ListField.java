@@ -166,7 +166,7 @@ public class ListField extends GuiComponent {
   @Override
   public void prepare() {
     if (this.buttonSprite != null) {
-      slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth()*3/4, this.getHeight(), 0, this.contents.length - 1, this.entrySprite, this.buttonSprite, null, false);
+      slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - 1, this.entrySprite, this.buttonSprite, null, false);
       this.getComponents().add(slider);
       slider.setCurrentValue(this.getSelection());
     }
@@ -189,13 +189,17 @@ public class ListField extends GuiComponent {
     });
 
     this.onChange(selection -> {
-      slider.setCurrentValue(selection);
-      slider.getSlider().setPosition(slider.getRelativeSliderPosition());
+      if (slider != null && slider.getSlider() != null) {
+        slider.setCurrentValue(selection);
+        slider.getSlider().setPosition(slider.getRelativeSliderPosition());
+      }
     });
-    slider.onChange(sliderValue -> {
-      this.setSelection(sliderValue.intValue());
-      slider.getSlider().setPosition(slider.getRelativeSliderPosition());
-    });
+    if (slider != null && slider.getSlider() != null) {
+      slider.onChange(sliderValue -> {
+        this.setSelection(sliderValue.intValue());
+        slider.getSlider().setPosition(slider.getRelativeSliderPosition());
+      });
+    }
 
   }
 
