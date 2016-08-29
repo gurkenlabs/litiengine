@@ -27,8 +27,8 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   private int maxLength = 0;
   private String format;
 
-  public TextFieldComponent(final int x, final int y, final int width, final int height, final Spritesheet spritesheet, final String text, final Sound hoverSound) {
-    super(x, y, width, height, spritesheet, text, null, hoverSound);
+  public TextFieldComponent(final int x, final int y, final int width, final int height, final Spritesheet spritesheet, final String text) {
+    super(x, y, width, height, spritesheet, text, null);
     this.fullText = this.getText();
     this.textXOffset = (int) (this.getWidth() / 10);
     this.flickerDelay = 100;

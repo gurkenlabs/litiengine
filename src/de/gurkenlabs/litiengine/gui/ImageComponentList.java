@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -16,9 +15,8 @@ public class ImageComponentList extends GuiComponent {
   private final int rows, columns;
   private final double rowHeight, columnWidth;
   private double xOffset, yOffset;
-  private final Sound hoverSound;
 
-  public ImageComponentList(final int x, final int y, final int width, final int height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background, final Sound hoverSound) {
+  public ImageComponentList(final int x, final int y, final int width, final int height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
     super(x, y, width, height);
     if (images != null) {
       this.images = images;
@@ -31,7 +29,6 @@ public class ImageComponentList extends GuiComponent {
     this.cells = new CopyOnWriteArrayList<>();
     this.rows = rows;
     this.columns = columns;
-    this.hoverSound = hoverSound;
 
     this.xOffset = this.getWidth() * 1 / 10;
     this.yOffset = this.getHeight() * 1 / 10;
@@ -93,7 +90,7 @@ public class ImageComponentList extends GuiComponent {
         } else {
           img = null;
         }
-        final ImageComponent cell = new ImageComponent(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img, this.hoverSound);
+        final ImageComponent cell = new ImageComponent(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
         this.cells.add(cell);
       }
     }

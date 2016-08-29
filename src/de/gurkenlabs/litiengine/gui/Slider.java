@@ -87,7 +87,7 @@ public abstract class Slider extends GuiComponent {
       this.currentValue = this.getMinValue();
     } else if (newValue > this.getMaxValue()) {
       this.currentValue = this.getMaxValue();
-    }
+    } 
   }
 
   protected void setButton1(ImageComponent button1) {

@@ -23,14 +23,14 @@ public class HorizontalSlider extends Slider {
   @Override
   public void prepare() {
     if (this.arrowButtonsShown()) {
-      this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_LEFT.getText(), null, this.getHoverSound()));
+      this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_LEFT.getText(), null));
       this.getButton1().setFont(ARROW_LEFT.getFont());
-      this.setButton2(new ImageComponent(this.getX() + this.getWidth() - this.getHeight(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_RIGHT.getText(), null, null));
+      this.setButton2(new ImageComponent(this.getX() + this.getWidth() - this.getHeight(), this.getY(), this.getHeight(), this.getHeight(), this.getButtonSprite(), ARROW_RIGHT.getText(), null));
       this.getButton2().setFont(ARROW_RIGHT.getFont());
       this.getComponents().add(this.getButton1());
       this.getComponents().add(this.getButton2());
     }
-    this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null, null));
+    this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null));
     this.getComponents().add(this.getSlider());
     super.prepare();
     this.setTextColor(this.getTextColor());

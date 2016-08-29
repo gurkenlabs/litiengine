@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -20,15 +19,16 @@ import de.gurkenlabs.litiengine.sound.Sound;
  */
 public class ListField extends GuiComponent {
   private final List<Consumer<Integer>> changeConsumer;
+  private ImageComponent selectedComponent;
   private final Object[] contents;
 
   /** The locked selection. */
-  private int currentSelection, lockedSelection;
+  private int selection, shownElements;;
 
   /** The list items. */
   private final CopyOnWriteArrayList<ImageComponent> listEntries;
 
-  private int elementMargin = 0;
+  private int elementMargin = 0, lowerBound = 0;
   private VerticalSlider slider;
   private Spritesheet buttonSprite, entrySprite;
 
@@ -46,25 +46,14 @@ public class ListField extends GuiComponent {
    * @param content
    *          the content
    */
-  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final Spritesheet entrySprite, final Spritesheet buttonSprite, final Sound hoverSound) {
-    super(x, y, width, height * content.length);
+  public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+    super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<Consumer<Integer>>();
     this.contents = content;
     this.listEntries = new CopyOnWriteArrayList<ImageComponent>();
     this.buttonSprite = buttonSprite;
     this.entrySprite = entrySprite;
-    for (int i = 0; i < this.contents.length; i++) {
-      ImageComponent entryComponent;
-      if (this.contents[i] == null) {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.contents.length + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.contents.length, this.entrySprite, "", null, hoverSound);
-      } else {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.contents.length + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.contents.length, this.entrySprite, this.contents[i].toString(), null, hoverSound);
-
-      }
-      this.listEntries.add(entryComponent);
-      this.getComponents().add(entryComponent);
-    }
-    this.setSelection(0);
+    this.shownElements = shownElements;
 
   }
 
@@ -75,6 +64,10 @@ public class ListField extends GuiComponent {
    */
   public CopyOnWriteArrayList<ImageComponent> getListEntries() {
     return this.listEntries;
+  }
+
+  public int getNumberOfShownElements() {
+    return this.shownElements;
   }
 
   public List<Consumer<Integer>> getChangeConsumer() {
@@ -98,26 +91,40 @@ public class ListField extends GuiComponent {
    * @return the selection
    */
   public int getSelection() {
-    return this.lockedSelection;
+    return this.selection;
   }
 
   public void setSelection(final int selection) {
     if (selection < 0 || selection >= this.contents.length) {
       return;
     }
-    this.currentSelection = selection;
-    for (final ImageComponent comp : this.getListEntries()) {
-      if (comp != this.getListEntries().get(this.currentSelection)) {
-        comp.setSelected(false);
+    int selectedComponentIndex = this.getListEntries().indexOf(this.selectedComponent);
+    if (selection > this.getSelection()) {
+      if (selection >= this.lowerBound + this.getNumberOfShownElements()) {
+        this.selectedComponent = this.getListEntry(this.getNumberOfShownElements() - 1);
+        this.lowerBound++;
       } else {
-        if (!comp.isSelected()) {
-
-        }
-        comp.setSelected(true);
+        this.selectedComponent = this.getListEntry(selectedComponentIndex + 1);
+      }
+    } else if (selection < this.getSelection()) {
+      if (selection <= this.lowerBound && lowerBound > 0) {
+        this.selectedComponent = this.getListEntry(0);
+        this.lowerBound--;
+      } else if (selectedComponentIndex > 0) {
+        this.selectedComponent = this.getListEntry(selectedComponentIndex - 1);
       }
     }
-    this.lockSelection();
+
+    // for (int i = this.lowerBound; i <= this.lowerBound +
+    // this.getNumberOfShownElements() - 1; i++) {
+    // this.getListEntry(i %
+    // this.getNumberOfShownElements()).setText(this.contents[i].toString());
+    // }
+    this.selection = selection;
+    this.selectedComponent.setSelected(true);
     this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelection()));
+    System.out.println(" Selection: " + this.getSelection() + " lowerBound: " + this.lowerBound + " upperBound: " + (this.lowerBound + this.getNumberOfShownElements() - 1) + " selectedComponent: " + this.getListEntries().indexOf(selectedComponent));
+
   }
 
   public void onChange(final Consumer<Integer> c) {
@@ -142,38 +149,37 @@ public class ListField extends GuiComponent {
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    for (final ImageComponent e : this.getListEntries()) {
-      e.render(g);
-      if (e.isSelected()) {
-        final Rectangle2D border = new Rectangle2D.Double(e.getX(), e.getY(), e.getWidth() - 1, e.getHeight() - 1);
-        g.setColor(Color.WHITE);
-        g.draw(border);
-      }
+    if (this.selectedComponent != null) {
+      final Rectangle2D border = new Rectangle2D.Double(this.selectedComponent.getX(), this.selectedComponent.getY(), this.selectedComponent.getWidth() - 1, this.selectedComponent.getHeight() - 1);
+      g.setColor(Color.WHITE);
+      g.draw(border);
     }
-  }
-
-  /**
-   * Lock selection.
-   */
-  protected void lockSelection() {
-    if (this.currentSelection < 0 || this.currentSelection > this.getListEntries().size() - 1) {
-      return;
-    }
-
-    this.lockedSelection = this.currentSelection;
   }
 
   @Override
   public void prepare() {
+    boolean showButtons = false;
     if (this.buttonSprite != null) {
-      slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - 1, this.entrySprite, this.buttonSprite, null, false);
-      this.getComponents().add(slider);
-      slider.setCurrentValue(this.getSelection());
+      showButtons = true;
+    }
+    slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - 1, this.entrySprite, this.buttonSprite, null, showButtons);
+    this.getComponents().add(slider);
+    slider.setCurrentValue(this.getSelection());
+
+    for (int i = 0; i < getNumberOfShownElements(); i++) {
+      ImageComponent entryComponent;
+      if (this.contents[i] == null) {
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements() + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, "", null);
+      } else {
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements() + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
+      }
+      this.getListEntries().add(entryComponent);
+      this.getComponents().add(entryComponent);
     }
     super.prepare();
     for (final ImageComponent comp : this.getListEntries()) {
       comp.onClicked(e -> {
-        this.setSelection(this.getListEntries().indexOf(e.getSender()));
+        this.setSelection(this.lowerBound + this.getListEntries().indexOf(comp) % this.getNumberOfShownElements());
       });
     }
 
@@ -189,18 +195,20 @@ public class ListField extends GuiComponent {
     });
 
     this.onChange(selection -> {
-      if (slider != null && slider.getSlider() != null) {
+      if (slider != null) {
         slider.setCurrentValue(selection);
         slider.getSlider().setPosition(slider.getRelativeSliderPosition());
       }
     });
-    if (slider != null && slider.getSlider() != null) {
+    if (slider != null) {
       slider.onChange(sliderValue -> {
+        System.out.println("SliderValue: " + sliderValue);
         this.setSelection(sliderValue.intValue());
         slider.getSlider().setPosition(slider.getRelativeSliderPosition());
       });
     }
-
+    this.selectedComponent = this.getListEntry(0);
+    this.setSelection(0);
   }
 
   @Override
@@ -213,15 +221,6 @@ public class ListField extends GuiComponent {
   }
 
   public void setElementMargin(int elementMargin) {
-    int marginDiff = elementMargin - this.elementMargin;
-    for (int i = 0; i < this.getListEntries().size(); i++) {
-      if (i == 0) {
-        continue;
-      }
-
-      this.getListEntries().get(i).setPosition(this.getListEntries().get(i).getPosition().getX(), this.getListEntries().get(i).getPosition().getY() + i * marginDiff);
-    }
-
     this.elementMargin = elementMargin;
   }
 }

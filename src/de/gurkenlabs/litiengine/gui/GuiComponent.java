@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.sound.Sound;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -26,7 +28,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public static final int TEXT_ALIGN_LEFT = 1;
   public static final int TEXT_ALIGN_RIGHT = 2;
   public static final int TEXT_ALIGN_CENTER = 3;
-  
+
   /** The component id. */
   private static int componentId = 0;
 
@@ -65,6 +67,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   /** The width. */
   private double width, height, x, y;
+
+  private Sound hoverSound;
 
   protected GuiComponent(final double x, final double y) {
     this.components = new CopyOnWriteArrayList<>();
@@ -120,6 +124,17 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.suspended = true;
     this.setSelected(false);
     this.initializeComponents();
+  }
+
+  public Sound getHoverSound() {
+    return hoverSound;
+  }
+
+  public void setHoverSound(Sound hoverSound) {
+    this.hoverSound = hoverSound;
+    for (final GuiComponent component : this.getComponents()) {
+      component.setHoverSound(hoverSound);
+    }
   }
 
   /**
@@ -481,6 +496,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (final GuiComponent component : this.getComponents()) {
       component.prepare();
     }
+    this.onHovered(e -> {
+      if (this.getHoverSound() != null) {
+        Game.getSoundEngine().playSound(this.getHoverSound());
+      }
+    });
+
     this.suspended = false;
     Input.MOUSE.registerMouseListener(this);
     Input.MOUSE.registerMouseMotionListener(this);
@@ -549,7 +570,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.y = newPosition.getY();
   }
 
-  
   public void setX(double x) {
     this.x = x;
   }
@@ -580,7 +600,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public void setTextColor(final Color color) {
     this.textColor = color;
-    for(GuiComponent comp: this.getComponents()){
+    for (GuiComponent comp : this.getComponents()) {
       comp.setTextColor(color);
     }
   }

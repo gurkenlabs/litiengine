@@ -17,8 +17,8 @@ public class Menu extends ImageComponentList {
   /** The menu buttons. */
   private final String[] items;
 
-  public Menu(final int x, final int y, final int width, final int height, int rows, int columns, final String[] items, final Spritesheet background, final Sound hoverSound) {
-    super(x, y, width, height, rows, columns, null, background, hoverSound);
+  public Menu(final int x, final int y, final int width, final int height, int rows, int columns, final String[] items, final Spritesheet background) {
+    super(x, y, width, height, rows, columns, null, background);
     this.items = items;
   }
 

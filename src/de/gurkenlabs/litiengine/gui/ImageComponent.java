@@ -33,8 +33,9 @@ public class ImageComponent extends GuiComponent {
   private String text;
 
   private int textAlignment = TEXT_ALIGN_CENTER;
+  private Sound hoverSound;
 
-  public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image, final Sound hoverSound) {
+  public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     super(x, y, width, height);
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
     this.spritesheet = spritesheet;
@@ -53,11 +54,14 @@ public class ImageComponent extends GuiComponent {
     if (image != null) {
       this.image = image;
     }
-    this.onHovered(e -> {
-      if (hoverSound != null) {
-        Game.getSoundEngine().playSound(hoverSound);
-      }
-    });
+  }
+
+  public Sound getHoverSound() {
+    return hoverSound;
+  }
+
+  public void setHoverSound(Sound hoverSound) {
+    this.hoverSound = hoverSound;
   }
 
   /**
