@@ -125,19 +125,19 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       break;
     }
   }
-  
+
   @Override
-  public void setText(String text){
+  public void setText(String text) {
     this.fullText = text;
   }
-  
+
   @Override
   public void render(final Graphics2D g) {
     g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
     if (this.lastText == null || !this.lastText.equals(this.fullText)) {
       String newText = this.fullText;
-      while (fm.stringWidth(this.getText()) > this.getWidth() - this.textXOffset) {
+      while (this.getText() != null && fm.stringWidth(this.getText()) > this.getWidth() - this.textXOffset) {
         newText = newText.substring(1);
       }
 

@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -39,8 +40,11 @@ public class ImageComponent extends GuiComponent {
     super(x, y, width, height);
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
     this.spritesheet = spritesheet;
-    if (FontLoader.getGuiFont() != null) {
-      this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getHeight() * 3 / 6f)));
+    try {
+      this.setFont(FontLoader.getDefaultFont().deriveFont((float) (this.getHeight() * 3 / 6f)));
+      this.setTextColor(Color.BLACK);
+    } catch (Exception e) {
+      System.out.println("default font not found.");
     }
 
     this.text = text;
@@ -242,7 +246,7 @@ public class ImageComponent extends GuiComponent {
     if (img != null) {
       ImageCache.SPRITES.putPersistent(cacheKey, img);
     }
-    
+
     return img;
   }
 
