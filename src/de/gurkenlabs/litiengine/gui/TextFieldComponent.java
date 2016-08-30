@@ -20,7 +20,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
   private boolean cursorVisible;
   private long lastToggled;
-  private final int textXOffset, flickerDelay;
+  private final int flickerDelay;
 
   private String fullText;
   private String lastText;
@@ -30,10 +30,8 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   public TextFieldComponent(final int x, final int y, final int width, final int height, final Spritesheet spritesheet, final String text) {
     super(x, y, width, height, spritesheet, text, null);
     this.fullText = this.getText();
-    this.textXOffset = (int) (this.getWidth() / 10);
     this.flickerDelay = 100;
     Input.KEYBOARD.registerForKeyDownEvents(this);
-
     this.onClicked(e -> {
       if (!this.isSelected()) {
         this.toggleSelection();
@@ -137,11 +135,11 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     final FontMetrics fm = g.getFontMetrics();
     if (this.lastText == null || !this.lastText.equals(this.fullText)) {
       String newText = this.fullText;
-      while (this.getText() != null && fm.stringWidth(this.getText()) > this.getWidth() - this.textXOffset) {
+      while (this.getText() != null && fm.stringWidth(this.getText()) > this.getWidth() - this.getTextX()) {
         newText = newText.substring(1);
       }
 
-      super.setText(newText);
+      this.setText(newText);
       this.lastText = this.getText();
     }
 
@@ -151,10 +149,10 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       this.cursorVisible = !this.cursorVisible;
       this.lastToggled = Game.getLoop().getTicks();
     }
-
     if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.textXOffset / 2 + fm.stringWidth(this.getText()), this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2, this.getWidth() / 20,
-          this.getHeight() - 2 * (fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2));
+      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getText()) , this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2 - this.getFont().getSize(), this.getWidth() / 20,
+          this.getFont().getSize());
+      g.setColor(this.getTextColor());
       g.fill(cursor);
     }
   }
