@@ -7,7 +7,7 @@ import de.gurkenlabs.tiled.tmx.IMapObject;
 
 public class QuestObjective {
   private String description;
-  private boolean fulfilled;
+  private boolean completed;
   private int objectiveNumber;
   private Quest quest;
   private ObjectiveType objectiveType;
@@ -25,15 +25,15 @@ public class QuestObjective {
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
-  public boolean isFulfilled() {
-    return fulfilled;
+  public boolean isCompleted() {
+    return this.completed;
   }
 
-  protected void setFulfilled(boolean fulfilled) {
-    this.fulfilled = fulfilled;
+  protected void complete() {
+    this.completed = true;
   }
 
   public int getObjectiveNumber() {
@@ -60,8 +60,8 @@ public class QuestObjective {
     return this.failed;
   }
 
-  public void setFailed(boolean failed) {
-    this.failed = failed;
+  public void fail() {
+    this.failed = true;
   }
 
   public void setDescription(String description) {
@@ -88,4 +88,8 @@ public class QuestObjective {
     this.objectiveEntities = entities;
   }
 
+  public void reset() {
+    this.failed = false;
+    this.completed = false;
+  }
 }

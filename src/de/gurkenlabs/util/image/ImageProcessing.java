@@ -49,21 +49,21 @@ public class ImageProcessing {
     }
     return imageString;
   }
-  
+
   public static BufferedImage decodeToImage(String imageString) {
-    
+
     BufferedImage image = null;
     byte[] imageByte;
     try {
-        imageByte = Base64.getDecoder().decode(imageString);
-        ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-        image = ImageIO.read(bis);
-        bis.close();
+      imageByte = Base64.getDecoder().decode(imageString);
+      ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+      image = ImageIO.read(bis);
+      bis.close();
     } catch (Exception e) {
-        e.printStackTrace();
+      e.printStackTrace();
     }
     return image;
-}
+  }
 
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
@@ -376,10 +376,10 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
-    if(width == 0 || height == 0){
+    if (width == 0 || height == 0) {
       return null;
     }
-    
+
     final int imageWidth = image.getWidth();
     final int imageHeight = image.getHeight();
 
@@ -388,6 +388,33 @@ public class ImageProcessing {
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
+  }
+
+  public static BufferedImage scaleImage(BufferedImage image, int max) {
+    double width = image.getWidth();
+    double height = image.getHeight();
+
+    if (width == 0 || height == 0) {
+      return null;
+    }
+    double dWidth = 0;
+    double dHeight = 0;
+    double ratio = width / height;
+    double newHeight = width / ratio;
+    double newWidth = height * ratio;
+
+    if (newWidth == newHeight) {
+      dWidth = max;
+      dHeight = max;
+    } else if (newWidth > newHeight) {
+      dWidth = max;
+      dHeight = ((double) height / (double) width) * max;
+    } else {
+      dHeight = max;
+      dWidth = ((double) width / (double) height) * max;
+    }
+
+    return scaleImage(image, (int) dWidth, (int) dHeight);
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {

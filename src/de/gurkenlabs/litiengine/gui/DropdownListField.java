@@ -3,20 +3,15 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.Graphics2D;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public class DropdownListField extends ListField {
   /** The drop down button. */
-  private final ImageComponent dropDownButton, chosenElementComponent;
+  private  ImageComponent dropDownButton, chosenElementComponent;
   private boolean isDroppedDown;
 
   public DropdownListField(final int x, final int y, final int width, final int height, final Object[] content, int elementsShown, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
-    super(x, y, width, height, content, elementsShown, entrySprite, null);
-    this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getListEntries().size(), entrySprite, "", null);
-    this.dropDownButton = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getListEntries().size(), this.getHeight() / this.getListEntries().size(), buttonSprite, "", null);
+    super(x, y, width, height, content, elementsShown, entrySprite, buttonSprite);
 
-    this.getComponents().add(this.dropDownButton);
-    this.getComponents().add(this.chosenElementComponent);
   }
 
   @Override
@@ -45,7 +40,11 @@ public class DropdownListField extends ListField {
 
   @Override
   public void prepare() {
-    super.prepare();
+    this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getListEntries().size(), this.getEntrySprite(), "", null);
+    this.dropDownButton = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getListEntries().size(), this.getHeight() / this.getListEntries().size(), this.getButtonSprite(), "", null);
+
+    this.getComponents().add(this.dropDownButton);
+    this.getComponents().add(this.chosenElementComponent);
     if (this.getListEntries().size() != 0) {
       this.chosenElementComponent.setText(this.getListEntries().get(this.getSelection()).getText());
       this.chosenElementComponent.setVisible(true);

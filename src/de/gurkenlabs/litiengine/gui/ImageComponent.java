@@ -97,6 +97,22 @@ public class ImageComponent extends GuiComponent {
     return this.imageY;
   }
 
+  public void setImageX(double newX) {
+    this.imageX = newX;
+  }
+
+  public void setImageY(double newY) {
+    this.imageY = newY;
+  }
+
+  public void setImageWidth(double newWidth) {
+    this.imageWidth = newWidth;
+  }
+
+  public void setImageHeight(double newHeight) {
+    this.imageHeight = newHeight;
+  }
+
   public Spritesheet getSpritesheet() {
     return this.spritesheet;
   }

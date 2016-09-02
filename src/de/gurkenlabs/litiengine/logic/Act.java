@@ -1,13 +1,14 @@
 package de.gurkenlabs.litiengine.logic;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Act {
   private List<Quest> quests;
   private boolean completed;
 
   public Act() {
-    // TODO Auto-generated constructor stub
+    this.quests = new CopyOnWriteArrayList<Quest>();
   }
 
   public void addQuest(Quest q) {
@@ -26,8 +27,8 @@ public class Act {
     return completed;
   }
 
-  public void setCompleted(boolean completed) {
-    this.completed = completed;
+  public void complete() {
+    this.completed = true;
   }
 
 }

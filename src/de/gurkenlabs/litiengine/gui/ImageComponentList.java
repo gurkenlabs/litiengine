@@ -30,20 +30,20 @@ public class ImageComponentList extends GuiComponent {
     this.rows = rows;
     this.columns = columns;
 
-    this.xOffset = this.getWidth() * 1 / 10;
-    this.yOffset = this.getHeight() * 1 / 10;
     if (this.getRows() == 1) {
       this.rowHeight = this.getHeight();
+      this.yOffset = 0;
     } else {
-      this.rowHeight = (this.getHeight() * 9 / 10) / (this.getRows());
-      this.yOffset /= (this.getRows() - 1);
+      this.rowHeight = (this.getHeight() / this.getRows()) * 9 / 10;
+      this.yOffset = (this.getHeight() / (this.getRows() - 1)) * 1 / 10;
 
     }
     if (this.getColumns() == 1) {
       this.columnWidth = this.getWidth();
+      this.xOffset = 0;
     } else {
-      this.columnWidth = (this.getWidth() * 9 / 10) / (this.getColumns());
-      this.xOffset /= (this.getColumns() - 1);
+      this.columnWidth = (this.getWidth() / this.getColumns()) * 9 / 10;
+      this.xOffset = (this.getWidth() / (this.getColumns() - 1)) * 1 / 10;
 
     }
 

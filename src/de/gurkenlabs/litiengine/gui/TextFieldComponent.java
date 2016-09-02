@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.IKeyObserver;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";

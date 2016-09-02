@@ -3,8 +3,10 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +30,7 @@ public class ListField extends GuiComponent {
   /** The list items. */
   private final CopyOnWriteArrayList<ImageComponent> listEntries;
 
-  private int elementMargin = 0, lowerBound = 0;
+  private int lowerBound = 0;
   private VerticalSlider slider;
   private Spritesheet buttonSprite, entrySprite;
 
@@ -94,6 +96,22 @@ public class ListField extends GuiComponent {
     return this.selection;
   }
 
+  public Spritesheet getButtonSprite() {
+    return this.buttonSprite;
+  }
+
+  public void setButtonSprite(Spritesheet buttonSprite) {
+    this.buttonSprite = buttonSprite;
+  }
+
+  public Spritesheet getEntrySprite() {
+    return this.entrySprite;
+  }
+
+  public void setEntrySprite(Spritesheet entrySprite) {
+    this.entrySprite = entrySprite;
+  }
+
   public void setSelection(final int selection) {
     if (selection < 0 || selection >= this.contents.length) {
       return;
@@ -115,6 +133,9 @@ public class ListField extends GuiComponent {
 
   private void refresh() {
     for (int i = 0; i < this.getNumberOfShownElements(); i++) {
+      if (this.contents.length <= i) {
+        continue;
+      }
       this.getListEntry(i).setText(this.contents[i + this.lowerBound].toString());
     }
     if (this.getSelection() >= this.lowerBound && this.getSelection() < this.lowerBound + this.getNumberOfShownElements()) {
@@ -144,9 +165,12 @@ public class ListField extends GuiComponent {
   public void render(final Graphics2D g) {
     super.render(g);
     if (this.selectedComponent != null) {
-      final Rectangle2D border = new Rectangle2D.Double(this.selectedComponent.getX(), this.selectedComponent.getY(), this.selectedComponent.getWidth() - 1, this.selectedComponent.getHeight() - 1);
+      Stroke oldStroke = g.getStroke();
+      g.setStroke(new BasicStroke(2));
+      final Rectangle2D border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
       g.setColor(Color.WHITE);
       g.draw(border);
+      g.setStroke(oldStroke);
     }
   }
 
@@ -162,14 +186,17 @@ public class ListField extends GuiComponent {
 
     for (int i = 0; i < getNumberOfShownElements(); i++) {
       ImageComponent entryComponent;
+      if (this.contents.length <= i) {
+        continue;
+      }
       if (this.contents[i] == null) {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements() + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, "", null);
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, "", null);
       } else {
-        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements() + this.getElementMargin()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
+        entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
       }
       this.getListEntries().add(entryComponent);
-      this.getComponents().add(entryComponent);
     }
+    this.getComponents().addAll(this.getListEntries());
     super.prepare();
     for (final ImageComponent comp : this.getListEntries()) {
       comp.onClicked(e -> {
@@ -207,8 +234,6 @@ public class ListField extends GuiComponent {
       });
 
     }
-    // this.selectedComponent = this.getListEntry(0);
-    // this.setSelection(0);
   }
 
   @Override
@@ -216,11 +241,4 @@ public class ListField extends GuiComponent {
 
   }
 
-  public int getElementMargin() {
-    return elementMargin;
-  }
-
-  public void setElementMargin(int elementMargin) {
-    this.elementMargin = elementMargin;
-  }
 }

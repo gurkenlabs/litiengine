@@ -34,16 +34,16 @@ public class Quest implements IUpdateable {
     return this.completed;
   }
 
-  public void setCompleted(boolean completed) {
-    this.completed = completed;
+  public void complete() {
+    this.completed = true;
   }
 
   public boolean isFailed() {
     return this.failed;
   }
 
-  public void setFailed(boolean failed) {
-    this.failed = failed;
+  public void fail() {
+    this.failed = true;
   }
 
   public int getQuestNumber() {
@@ -52,9 +52,14 @@ public class Quest implements IUpdateable {
 
   @Override
   public void update(IGameLoop loop) {
-    this.completed = this.getObjectives().stream().allMatch(val -> val.isFulfilled() == true);
+    this.completed = this.getObjectives().stream().allMatch(val -> val.isCompleted() == true);
     this.failed = this.getObjectives().stream().anyMatch(val -> val.isFailed() == true);
 
   }
 
+  public void reset() {
+    this.failed = false;
+    this.completed = false;
+  }
+  
 }

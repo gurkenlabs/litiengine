@@ -45,7 +45,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer;
 
   /** The components. */
-  private final List<GuiComponent> components;
+  private final CopyOnWriteArrayList<GuiComponent> components;
 
   /** The id. */
   private final int id;
@@ -106,7 +106,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   protected GuiComponent(final double x, final double y, final double width, final double height) {
     this.width = width;
     this.height = height;
-    this.components = new ArrayList<>();
+    this.components = new CopyOnWriteArrayList<>();
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.hoverConsumer = new CopyOnWriteArrayList<>();
     this.mousePressedConsumer = new CopyOnWriteArrayList<>();
@@ -178,7 +178,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the components
    */
-  public List<GuiComponent> getComponents() {
+  public CopyOnWriteArrayList<GuiComponent> getComponents() {
     return this.components;
   }
 
@@ -503,6 +503,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     });
 
     this.suspended = false;
+    this.visible = true;
     Input.MOUSE.registerMouseListener(this);
     Input.MOUSE.registerMouseMotionListener(this);
   }
@@ -628,12 +629,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void suspend() {
-    for (final GuiComponent component : this.getComponents()) {
-      component.suspend();
-    }
     Input.MOUSE.unregisterMouseListener(this);
     Input.MOUSE.unregisterMouseMotionListener(this);
     this.suspended = true;
+    this.visible = false;
+    for (IGuiComponent childComp : this.getComponents()) {
+      this.getComponents().remove(childComp);
+    }
+    for (final GuiComponent component : this.getComponents()) {
+      component.suspend();
+    }
   }
 
   public void toggleSelection() {
