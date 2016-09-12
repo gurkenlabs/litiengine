@@ -18,7 +18,20 @@ import de.gurkenlabs.tiled.tmx.ITileset;
  */
 public class Spritesheet {
 
-  private static final List<Spritesheet> spritesheets = new CopyOnWriteArrayList<>();
+  public static final List<Spritesheet> spritesheets = new CopyOnWriteArrayList<>();
+
+  public static Spritesheet findByName(final String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    final Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getPath().endsWith(name)).findFirst();
+    if (!sheet.isPresent()) {
+      return null;
+    }
+
+    return sheet.get();
+  }
 
   public static Spritesheet find(final String path) {
     if (path == null || path.isEmpty()) {
@@ -37,16 +50,16 @@ public class Spritesheet {
   private final String path;
 
   /** The rows. */
-  private final int rows;
+  private int rows;
 
   /** The sprite height. */
-  private final int spriteHeight;
+  private int spriteHeight;
 
   /** The sprites per row. */
-  private final int columns;
+  private int columns;
 
   /** The sprite width. */
-  private final int spriteWidth;
+  private int spriteWidth;
 
   private final int hashCode;
 
@@ -67,9 +80,18 @@ public class Spritesheet {
 
     spritesheets.add(this);
     this.hashCode = this.getPath().hashCode();
+    this.updateRowsAndCols();
+  }
+  
+  private void updateRowsAndCols(){
     BufferedImage sprite = RenderEngine.getImage(this.getPath());
-    this.columns = sprite.getWidth() / this.spriteWidth;
-    this.rows= sprite.getHeight() / this.spriteHeight;
+    if (sprite != null && sprite.getWidth() != 0 && sprite.getHeight() != 0 && this.spriteWidth != 0 && this.spriteHeight != 0) {
+      this.columns = sprite.getWidth() / this.spriteWidth;
+      this.rows = sprite.getHeight() / this.spriteHeight;
+    } else {
+      this.columns = 0;
+      this.rows = 0;
+    }
   }
 
   /**
@@ -153,5 +175,15 @@ public class Spritesheet {
   @Override
   public int hashCode() {
     return this.hashCode;
+  }
+
+  public void setSpriteHeight(int spriteHeight) {
+    this.spriteHeight = spriteHeight;
+    this.updateRowsAndCols();
+  }
+
+  public void setSpriteWidth(int spriteWidth) {
+    this.spriteWidth = spriteWidth;
+    this.updateRowsAndCols();
   }
 }

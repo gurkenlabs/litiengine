@@ -19,19 +19,17 @@ public class GameFile implements Serializable {
   private static final long serialVersionUID = -2101786184799276518L;
 
   @XmlElementWrapper(name = "maps")
+  @XmlElement(name = "map")
   private List<Map> maps;
 
-  @XmlElementWrapper(name = "maplayers")
-  private HashMap<String, String> mapLayer;
-
   @XmlElementWrapper(name = "spriteSheets")
+  @XmlElement(name = "sprite")
   private List<SpriteSheetInfo> spriteSheets;
 
   @XmlElement
   private GameInfo info;
 
   public GameFile() {
-    this.mapLayer = new HashMap<>();
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
     this.info = new GameInfo();
@@ -40,15 +38,6 @@ public class GameFile implements Serializable {
   @XmlTransient
   public List<Map> getMaps() {
     return maps;
-  }
-
-  @XmlTransient
-  public HashMap<String, String> getMapLayer() {
-    return mapLayer;
-  }
-
-  public void setMapLayer(HashMap<String, String> mapLayer) {
-    this.mapLayer = mapLayer;
   }
 
   @XmlTransient

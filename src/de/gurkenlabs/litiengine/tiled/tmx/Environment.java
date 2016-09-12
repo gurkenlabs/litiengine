@@ -61,7 +61,9 @@ import de.gurkenlabs.util.image.ImageProcessing;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-
+  public static String MAP_PROPERTY_AMBIENTALPHA = "AMBIENTALPHA";
+  public static String MAP_PROPERTY_AMBIENTLIGHT = "AMBIENTLIGHT";
+  
   private static int localIdSequence = 0;
   private static int mapIdSequence;
   private final List<MapLocation> spawnPoints;
@@ -146,8 +148,8 @@ public class Environment implements IEnvironment {
 
   @Override
   public void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty("AMBIENTALPHA");
-    final String colorProp = this.getMap().getCustomProperty("AMBIENTLIGHT");
+    final String alphaProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTALPHA);
+    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTLIGHT);
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {

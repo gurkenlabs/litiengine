@@ -16,7 +16,7 @@ public class SpriteSheetInfo {
 
   @XmlAttribute(name = "path")
   private String path;
-
+  
   @XmlAttribute(name = "width")
   private int width;
 
@@ -31,7 +31,7 @@ public class SpriteSheetInfo {
     this.path = path;
     this.width = width;
     this.height = height;
-    this.setImage(ImageProcessing.encodeToString( RenderEngine.getImage(basepath + this.getPath())));
+    this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + this.getPath())));
   }
 
   @XmlTransient
@@ -69,4 +69,6 @@ public class SpriteSheetInfo {
   public void setImage(String image) {
     this.image = image;
   }
+  
+  
 }

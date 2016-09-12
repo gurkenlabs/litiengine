@@ -4,6 +4,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +20,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
+  private final List<Consumer<String>> changeConfirmedConsumers;
   private boolean cursorVisible;
   private long lastToggled;
   private final int flickerDelay;
@@ -28,6 +32,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
   public TextFieldComponent(final int x, final int y, final int width, final int height, final Spritesheet spritesheet, final String text) {
     super(x, y, width, height, spritesheet, text, null);
+    this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.fullText = this.getText();
     this.flickerDelay = 100;
     Input.KEYBOARD.registerForKeyDownEvents(this);
@@ -60,7 +65,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
   @Override
   public void handleTypedKey(final KeyEvent event) {
-    if (!this.isSelected()) {
+    if (this.isSuspended() || !this.isSelected() || !this.isVisible()) {
       return;
     }
 
@@ -92,7 +97,9 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       break;
     case KeyEvent.VK_ENTER:
       this.toggleSelection();
-      log.info("Typed \"" + this.getText() + "\" into TextField with ComponentID " + this.getComponentId());
+      for(Consumer<String> cons : this.changeConfirmedConsumers){
+        cons.accept(this.fullText);
+      }
       break;
     default:
       if (this.getMaxLength() > 0 && this.fullText.length() >= this.getMaxLength()) {
@@ -170,6 +177,10 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
   public void setFormat(String format) {
     this.format = format;
+  }
+
+  public void onChangeConfirmed(Consumer<String> cons) {
+    this.changeConfirmedConsumers.add(cons);
   }
 
 }

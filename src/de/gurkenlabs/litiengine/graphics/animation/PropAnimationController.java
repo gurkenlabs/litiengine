@@ -11,7 +11,14 @@ public class PropAnimationController extends AnimationController {
   private static final String INTACT = "intact";
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
-
+ 
+  private final Prop prop;
+  
+  public PropAnimationController(final IEntity prop) {
+    super(createAnimation((Prop) prop, PropState.INTACT));
+    this.prop = (Prop) prop;
+  }
+  
   public static Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = findSpriteSheet(prop, state);
     if (spritesheet == null) {
@@ -26,16 +33,9 @@ public class PropAnimationController extends AnimationController {
     if (!prop.isIndestructible()) {
       propState = state.name().toLowerCase();
     }
-    final String path = Game.getInfo().getSpritesDirectory() + "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
-    final Spritesheet sheet = Spritesheet.find(path);
+    final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
+    final Spritesheet sheet = Spritesheet.findByName(name);
     return sheet;
-  }
-
-  private final Prop prop;
-
-  public PropAnimationController(final IEntity prop) {
-    super(createAnimation((Prop) prop, PropState.INTACT));
-    this.prop = (Prop) prop;
   }
 
   @Override
