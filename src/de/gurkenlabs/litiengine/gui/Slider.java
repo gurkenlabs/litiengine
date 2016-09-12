@@ -10,18 +10,19 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
 public abstract class Slider extends GuiComponent {
-  private float minValue, maxValue, currentValue;
+  private float minValue, maxValue, currentValue, stepSize;
   private ImageComponent button1, button2, slider;
   private final Spritesheet buttonSprite, sliderSprite;
   private final Sound hoverSound;
   private boolean showArrowButtons, isDragging;
   private final List<Consumer<Float>> changeConsumer;
 
-  public Slider(double x, double y, double width, double height, float minValue, float maxValue, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
+  public Slider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<Consumer<Float>>();
     this.minValue = minValue;
     this.maxValue = maxValue;
+    this.stepSize = stepSize;
     this.buttonSprite = buttonSprite;
     this.sliderSprite = sliderSprite;
     this.hoverSound = hoverSound;
@@ -68,6 +69,10 @@ public abstract class Slider extends GuiComponent {
     return this.currentValue;
   }
 
+  public float getStepSize() {
+    return this.stepSize;
+  }
+
   public ImageComponent getButton1() {
     return this.button1;
   }
@@ -87,13 +92,17 @@ public abstract class Slider extends GuiComponent {
       this.currentValue = this.getMinValue();
     } else if (newValue > this.getMaxValue()) {
       this.currentValue = this.getMaxValue();
-    } 
+    }
+  }
+
+  public void setStepSize(float stepSize) {
+    this.stepSize = stepSize;
   }
 
   protected void setButton1(ImageComponent button1) {
     this.button1 = button1;
     this.button1.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() - (this.getMaxValue() - this.getMinValue()) / 50);
+      this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
     });
     this.getComponents().add(button1);
@@ -102,7 +111,7 @@ public abstract class Slider extends GuiComponent {
   protected void setButton2(ImageComponent button2) {
     this.button2 = button2;
     this.button2.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() + (this.getMaxValue() - this.getMinValue()) / 50);
+      this.setCurrentValue(this.getCurrentValue() + this.getStepSize());
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
 
     });

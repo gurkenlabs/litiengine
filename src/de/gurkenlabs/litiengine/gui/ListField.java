@@ -180,7 +180,7 @@ public class ListField extends GuiComponent {
     if (this.buttonSprite != null) {
       showButtons = true;
     }
-    slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - 1, this.entrySprite, this.buttonSprite, null, showButtons);
+    slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - 1, 1, this.entrySprite, this.buttonSprite, null, showButtons);
     this.getComponents().add(slider);
     slider.setCurrentValue(this.getSelection());
 
@@ -226,7 +226,7 @@ public class ListField extends GuiComponent {
     });
     if (slider != null) {
       slider.onChange(sliderValue -> {
-        if (sliderValue <= this.contents.length - (this.getNumberOfShownElements() - 1)) {
+        if (sliderValue < this.contents.length - (this.getNumberOfShownElements())) {
           this.lowerBound = (sliderValue.intValue());
         }
         slider.getSlider().setPosition(slider.getRelativeSliderPosition());
