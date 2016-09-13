@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,10 +31,10 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   private int maxLength = 0;
   private String format;
 
-  public TextFieldComponent(final int x, final int y, final int width, final int height, final Spritesheet spritesheet, final String text) {
+  public TextFieldComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text) {
     super(x, y, width, height, spritesheet, text, null);
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
-    this.fullText = this.getText();
+    this.setText(text);
     this.flickerDelay = 100;
     Input.KEYBOARD.registerForKeyDownEvents(this);
     this.onClicked(e -> {
@@ -72,37 +73,38 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     switch (event.getKeyCode()) {
     case KeyEvent.VK_BACK_SPACE:
       if (Input.KEYBOARD.isPressed(KeyEvent.VK_SHIFT)) {
-        while (this.fullText.length() >= 1 && this.fullText.charAt(this.fullText.length() - 1) == ' ') {
-          this.fullText = this.fullText.substring(0, this.fullText.length() - 1);
+        while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) == ' ') {
+          this.setText(this.getText().substring(0, this.getText().length() - 1));
         }
 
-        while (this.fullText.length() >= 1 && this.fullText.charAt(this.fullText.length() - 1) != ' ') {
-          this.fullText = this.fullText.substring(0, this.fullText.length() - 1);
+        while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) != ' ') {
+          this.setText(this.getText().substring(0, this.getText().length() - 1));
         }
-      } else if (this.fullText.length() >= 1) {
-        this.fullText = this.fullText.substring(0, this.fullText.length() - 1);
+      } else if (this.getText().length() >= 1) {
+        this.setText(this.getText().substring(0, this.getText().length() - 1));
       }
 
       if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT)) {
-        if (this.fullText == null || this.fullText.isEmpty()) {
-          this.fullText = "0";
+        if (this.getText() == null || this.getText().isEmpty()) {
+          this.setText("0");
         }
       }
 
       break;
     case KeyEvent.VK_SPACE:
-      if (this.fullText != "") {
-        this.fullText += " ";
+      if (this.getText() != "") {
+        this.setText(getText() + " ");
       }
       break;
     case KeyEvent.VK_ENTER:
       this.toggleSelection();
-      for(Consumer<String> cons : this.changeConfirmedConsumers){
-        cons.accept(this.fullText);
+      for (Consumer<String> cons : this.changeConfirmedConsumers) {
+        cons.accept(this.getText());
       }
+      log.log(Level.INFO, "\"" + this.getText() + "\"" + " typed into TextField with ComponentID " + this.getComponentId());
       break;
     default:
-      if (this.getMaxLength() > 0 && this.fullText.length() >= this.getMaxLength()) {
+      if (this.getMaxLength() > 0 && this.getText().length() >= this.getMaxLength()) {
         break;
       }
 
@@ -114,20 +116,25 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       // regex check to ensure certain formats
       if (this.getFormat() != null && !this.getFormat().isEmpty()) {
         Pattern pat = Pattern.compile(this.getFormat());
-        Matcher mat = pat.matcher(this.fullText + text);
+        Matcher mat = pat.matcher(this.getText() + text);
         if (!mat.matches()) {
           break;
         }
       }
 
-      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.fullText.equals("0")) {
-        this.fullText = "";
+      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.getText().equals("0")) {
+        this.setText("");
       }
 
-      this.fullText += text;
+      this.setText(this.getText() + text);
 
       break;
     }
+  }
+
+  @Override
+  public String getText() {
+    return this.fullText;
   }
 
   @Override
@@ -139,9 +146,9 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   public void render(final Graphics2D g) {
     g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
-    if (this.lastText == null || !this.lastText.equals(this.fullText)) {
-      String newText = this.fullText;
-      while (this.getText() != null && fm.stringWidth(this.getText()) > this.getWidth() - this.getTextX()) {
+    if (this.lastText == null || !this.lastText.equals(this.getText())) {
+      String newText = this.getText();
+      while (newText.length() > 1 && fm.stringWidth(this.getText()) > this.getWidth() - this.getTextX() * 2) {
         newText = newText.substring(1);
       }
 
@@ -156,8 +163,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       this.lastToggled = Game.getLoop().getTicks();
     }
     if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getText()) , this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2 - this.getFont().getSize(), this.getWidth() / 20,
-          this.getFont().getSize());
+      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getText()), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);
       g.setColor(this.getTextColor());
       g.fill(cursor);
     }

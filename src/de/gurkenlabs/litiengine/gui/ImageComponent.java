@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -26,7 +25,7 @@ public class ImageComponent extends GuiComponent {
 
   private Image image;
 
-  private double imageX, imageY, imageWidth, imageHeight, textX, textY, defaultTextX, defaultTextY;
+  private double imageX, imageY, imageWidth, imageHeight, textX, textY, defaultTextX, defaultTextY, x_Padding;
 
   private Spritesheet spritesheet;
 
@@ -46,6 +45,7 @@ public class ImageComponent extends GuiComponent {
     } catch (Exception e) {
       System.out.println("default font not found.");
     }
+    this.x_Padding = this.getWidth() / 10;
 
     this.text = text;
     this.textX = -1;
@@ -167,35 +167,28 @@ public class ImageComponent extends GuiComponent {
     if (this.getText() != null) {
       final FontMetrics fm = g.getFontMetrics();
 
-      this.defaultTextY = this.getY() + fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-      final int MINPADDING_X = 10;
+      this.defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
       switch (this.getTextAlignment()) {
       case TEXT_ALIGN_LEFT:
-        this.defaultTextX = this.getX() + MINPADDING_X;
+        this.defaultTextX = this.x_Padding;
         break;
       case TEXT_ALIGN_RIGHT:
-        this.defaultTextX = this.getX() + this.getWidth() - MINPADDING_X - fm.stringWidth(this.getText());
+        this.defaultTextX = this.getWidth() - this.x_Padding - fm.stringWidth(this.getText());
         break;
       default:
       case TEXT_ALIGN_CENTER:
-        this.defaultTextX = this.getX() + this.getWidth() / 2 - fm.stringWidth(this.getText()) / 2;
+        this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getText()) / 2;
         break;
       }
 
-      float y;
-      if (this.getTextY() != this.defaultTextY && this.getTextY() >= 0) {
-        y = (float) this.getTextY();
-      } else {
-        y = (float) this.defaultTextY;
+      if (this.getTextY() < 0) {
+        this.setTextY(this.defaultTextY);
       }
 
-      float x;
-      if (this.getTextX() != this.defaultTextX && this.getTextX() >= 0) {
-        x = (float) this.getTextX();
-      } else {
-        x = (float) this.defaultTextX;
+      if (this.getTextX() < 0) {
+        this.setTextX(this.defaultTextX);
       }
-      RenderEngine.drawText(g, this.getText(), x, y);
+      RenderEngine.drawText(g, this.getText(), this.getX() + this.getTextX(), this.getY() + this.getTextY());
     }
     super.render(g);
   }

@@ -7,17 +7,15 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public abstract class Slider extends GuiComponent {
   private float minValue, maxValue, currentValue, stepSize;
   private ImageComponent button1, button2, slider;
   private final Spritesheet buttonSprite, sliderSprite;
-  private final Sound hoverSound;
   private boolean showArrowButtons, isDragging;
   private final List<Consumer<Float>> changeConsumer;
 
-  public Slider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
+  public Slider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, boolean showArrowButtons) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<Consumer<Float>>();
     this.minValue = minValue;
@@ -25,16 +23,11 @@ public abstract class Slider extends GuiComponent {
     this.stepSize = stepSize;
     this.buttonSprite = buttonSprite;
     this.sliderSprite = sliderSprite;
-    this.hoverSound = hoverSound;
     this.showArrowButtons = showArrowButtons;
   }
 
   public boolean isDragging() {
     return this.isDragging;
-  }
-
-  public Sound getHoverSound() {
-    return this.hoverSound;
   }
 
   public boolean arrowButtonsShown() {

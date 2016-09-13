@@ -15,7 +15,7 @@ public class HorizontalSlider extends Slider {
   public static Icon ARROW_LEFT = new Icon(FontLoader.getIconFontThree(), "\uE805");
 
   public HorizontalSlider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
-    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, hoverSound, showArrowButtons);
+    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);
     this.minSliderX = this.getX() + this.getHeight();
     this.maxSliderX = this.getX() + this.getWidth() - this.getHeight() * 3;
   }

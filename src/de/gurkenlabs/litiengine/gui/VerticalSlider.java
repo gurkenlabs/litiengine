@@ -15,7 +15,7 @@ public class VerticalSlider extends Slider {
   public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE804");
 
   public VerticalSlider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, Sound hoverSound, boolean showArrowButtons) {
-    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, hoverSound, showArrowButtons);
+    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);
     this.minSliderY = this.getY() + this.getWidth();
     this.maxSliderY = this.getY() + this.getHeight() - this.getWidth() * 3;
   }
@@ -33,7 +33,6 @@ public class VerticalSlider extends Slider {
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), this.getWidth() * 2, this.getSliderSprite(), "", null));
     this.getComponents().add(this.getSlider());
     super.prepare();
-    this.setTextColor(this.getTextColor());
   }
 
   @Override

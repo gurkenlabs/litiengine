@@ -33,7 +33,7 @@ public class MathUtilities {
   public static boolean randomBoolean() {
     return RANDOM.nextDouble() < 0.5;
   }
-
+  
   public static double randomInRange(final double min, final double max) {
     if (min == max) {
       return min;

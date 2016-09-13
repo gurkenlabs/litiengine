@@ -129,7 +129,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public Sound getHoverSound() {
     return hoverSound;
   }
-
+  
   public void setHoverSound(Sound hoverSound) {
     this.hoverSound = hoverSound;
     for (final GuiComponent component : this.getComponents()) {
