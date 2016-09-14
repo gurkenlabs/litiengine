@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RadialGradientPaint;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
@@ -35,7 +34,7 @@ public class AmbientLight {
     final Color col = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
     final StringBuilder sb = new StringBuilder();
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = (Graphics2D) img.getGraphics();
+    final Graphics2D g = img.createGraphics();
     for (final LightSource light : this.environment.getLightSources()) {
       sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" + light.getLocation().getY());
     }

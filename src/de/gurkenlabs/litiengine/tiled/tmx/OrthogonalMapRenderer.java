@@ -130,7 +130,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(layer.getSizeInTiles().width * map.getTileSize().width, layer.getSizeInTiles().height * map.getTileSize().height);
 
     // we need a graphics 2D object to work with transparency
-    final Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();
+    final Graphics2D imageGraphics = bufferedImage.createGraphics();
 
     // set alpha value of the tiles by the layers value
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());

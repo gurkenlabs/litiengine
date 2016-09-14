@@ -98,9 +98,8 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       break;
     case KeyEvent.VK_ENTER:
       this.toggleSelection();
-      for (Consumer<String> cons : this.changeConfirmedConsumers) {
-        cons.accept(this.getText());
-      }
+      this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
+
       log.log(Level.INFO, "\"" + this.getText() + "\"" + " typed into TextField with ComponentID " + this.getComponentId());
       break;
     default:

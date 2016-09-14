@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
@@ -10,13 +13,15 @@ public class NumberAdjuster extends TextFieldComponent {
   public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "\uE84B");
   public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE84A");
   BigDecimal step, lowerBound, upperBound, currentValue;
+  private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
   public NumberAdjuster(double x, double y, double width, double height, Spritesheet textBackground, Spritesheet buttonBackground, double lowerBound, double upperBound, double startValue, double stepSize) {
     super(x, y, width, height, textBackground, startValue + "");
     this.buttonSprite = buttonBackground;
+    this.valueChangeConsumers = new CopyOnWriteArrayList<>();
     this.lowerBound = BigDecimal.valueOf(lowerBound);
     this.upperBound = BigDecimal.valueOf(upperBound);
-    this.currentValue = BigDecimal.valueOf(startValue);
+    this.setCurrentValue(BigDecimal.valueOf(startValue));
     this.step = BigDecimal.valueOf(stepSize);
     this.setFormat(DOUBLE_FORMAT);
 
@@ -51,7 +56,6 @@ public class NumberAdjuster extends TextFieldComponent {
       } else {
         this.setCurrentValue(this.getUpperBound());
       }
-      this.setText(this.getCurrentValue() + "");
 
     });
     this.button2.onClicked(c -> {
@@ -60,13 +64,10 @@ public class NumberAdjuster extends TextFieldComponent {
       } else {
         this.setCurrentValue(this.getLowerBound());
       }
-      this.setText(this.getCurrentValue() + "");
-
     });
     this.onChangeConfirmed(e -> {
       try {
         this.setCurrentValue(BigDecimal.valueOf(Double.parseDouble(this.getText())));
-        this.setText(this.getCurrentValue() + "");
       } catch (Exception ex) {
         System.out.println("only numerical values allowed!");
       }
@@ -104,7 +105,13 @@ public class NumberAdjuster extends TextFieldComponent {
   public void setCurrentValue(BigDecimal newValue) {
     if (newValue.compareTo(this.getUpperBound()) <= 0 && newValue.compareTo(this.getLowerBound()) >= 0) {
       this.currentValue = newValue;
+      this.setText(this.getCurrentValue() + "");
+      this.valueChangeConsumers.forEach(c -> c.accept(this.getCurrentValue()));
+
     }
   }
 
+  public void onValueChange(Consumer<BigDecimal> cons) {
+    this.valueChangeConsumers.add(cons);
+  }
 }

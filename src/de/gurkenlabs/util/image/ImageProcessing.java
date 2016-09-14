@@ -421,7 +421,7 @@ public class ImageProcessing {
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
 
     // Draw the image on to the buffered image
-    final Graphics2D g2d = (Graphics2D) bimage.getGraphics();
+    final Graphics2D g2d = bimage.createGraphics();
     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
     g2d.drawImage(img, 0, 0, null);
     g2d.dispose();

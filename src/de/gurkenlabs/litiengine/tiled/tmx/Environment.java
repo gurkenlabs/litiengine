@@ -63,7 +63,7 @@ import de.gurkenlabs.util.image.ImageProcessing;
 public class Environment implements IEnvironment {
   public static String MAP_PROPERTY_AMBIENTALPHA = "AMBIENTALPHA";
   public static String MAP_PROPERTY_AMBIENTLIGHT = "AMBIENTLIGHT";
-  
+
   private static int localIdSequence = 0;
   private static int mapIdSequence;
   private final List<MapLocation> spawnPoints;
@@ -450,7 +450,7 @@ public class Environment implements IEnvironment {
     }
 
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = (Graphics2D) img.getGraphics();
+    final Graphics2D g = img.createGraphics();
     g.setColor(new Color(0, 0, 0, 75));
 
     final Area ar = new Area();

@@ -27,9 +27,9 @@ import de.gurkenlabs.litiengine.input.Input;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
   private static final long serialVersionUID = 5092360478850476013L;
-  
+
   private final List<Consumer<Graphics2D>> renderedConsumer;
-  
+
   private final List<Consumer<Integer>> fpsChangedConsumer;
 
   private BufferStrategy bufferStrategy;
@@ -41,12 +41,11 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   private int frameCount = 0;
 
   private boolean takeScreenShot;
-  
+
   private Image cursorImage;
   private int cursorOffsetX;
 
   private int cursorOffsetY;
-
 
   @Override
   public void init() {
@@ -57,13 +56,13 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   public RenderComponent(Dimension size) {
     this.renderedConsumer = new CopyOnWriteArrayList<>();
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
-    
+
     // hide default cursor
     final BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
     this.setCursor(blankCursor);
     this.setSize(size);
-    
+
     // canvas will scale when the size of this jframe gets changed
     this.setPreferredSize(size);
   }
@@ -88,7 +87,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
     if (this.takeScreenShot) {
       final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-      final Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+      final Graphics2D imgGraphics = img.createGraphics();
       screen.render(imgGraphics);
 
       final Point2D cursorlocation = new Point2D.Double(Input.MOUSE.getLocation().getX() + this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() + this.getCursorOffsetY());
@@ -126,7 +125,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
   }
-  
+
   public int getCursorOffsetX() {
     return this.cursorOffsetX;
   }
@@ -134,13 +133,13 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   public int getCursorOffsetY() {
     return this.cursorOffsetY;
   }
-  
+
   public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
     if (!this.renderedConsumer.contains(renderedConsumer)) {
       this.renderedConsumer.add(renderedConsumer);
     }
   }
-  
+
   public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
     if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
@@ -149,7 +148,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.fpsChangedConsumer.add(fpsConsumer);
   }
 
-  
   private void saveScreenShot(final BufferedImage img) {
     try {
       try {

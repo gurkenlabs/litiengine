@@ -493,6 +493,32 @@ public class GeometricUtilities {
     final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
   }
+  public static Shape scaleRect(final Rectangle2D shape, final int max){
+    double width = shape.getWidth();
+    double height = shape.getHeight();
+
+    if (width == 0 || height == 0) {
+      return null;
+    }
+    double dWidth = 0;
+    double dHeight = 0;
+    double ratio = width / height;
+    double newHeight = width / ratio;
+    double newWidth = height * ratio;
+
+    if (newWidth == newHeight) {
+      dWidth = max;
+      dHeight = max;
+    } else if (newWidth > newHeight) {
+      dWidth = max;
+      dHeight = ((double) height / (double) width) * max;
+    } else {
+      dHeight = max;
+      dWidth = ((double) width / (double) height) * max;
+    }
+    final AffineTransform transform = AffineTransform.getScaleInstance(dWidth, dHeight);
+    return transform.createTransformedShape(shape);
+  }
 
   /**
    * Shape intersects. WARNING: USE THIS METHOD WITH CAUTION BECAUSE IT IS A

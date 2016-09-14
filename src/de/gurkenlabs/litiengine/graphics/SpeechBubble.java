@@ -78,13 +78,13 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final int TRIANGLE_SIZE = 6;
 
     BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
-    Graphics2D g = (Graphics2D) img.getGraphics();
+    Graphics2D g = img.createGraphics();
     g.setFont(this.font);
     int stringWidth = g.getFontMetrics().stringWidth(this.currentText);
-    if(stringWidth < this.textBoxWidth){
+    if (stringWidth < this.textBoxWidth) {
       this.textBoxWidth = stringWidth;
     }
-    
+
     final FontRenderContext frc = g.getFontRenderContext();
     final AttributedString styledText = new AttributedString(this.currentText);
     styledText.addAttribute(TextAttribute.FONT, this.font);
@@ -98,7 +98,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, PADDING, PADDING);
-    
+
     // Build a path
     GeneralPath path = new GeneralPath();
     path.moveTo(bounds.getWidth() / 2.0 - TRIANGLE_SIZE / 2.0, bounds.getHeight());

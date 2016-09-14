@@ -193,8 +193,8 @@ public class ImageCache {
       }
 
       final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
-      compatibleImg.getGraphics().drawImage(img, 0, 0, null);
-      compatibleImg.getGraphics().dispose();
+      compatibleImg.createGraphics().drawImage(img, 0, 0, null);
+      compatibleImg.createGraphics().dispose();
 
       this.cache.put(key, compatibleImg);
       return compatibleImg;
