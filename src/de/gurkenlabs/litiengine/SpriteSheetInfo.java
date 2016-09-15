@@ -24,10 +24,10 @@ public class SpriteSheetInfo {
   private int height;
 
   @XmlAttribute(name = "collisionBoxWidthFactor")
-  private double collisionBoxWidthFactor;
+  private int collisionBoxWidth;
 
   @XmlAttribute(name = "collisionBoxHeightFactor")
-  private double collisionBoxHeightFactor;
+  private int collisionBoxHeight;
 
   @XmlAttribute(name = "collisionBoxX")
   private int collisionBoxX;
@@ -38,13 +38,13 @@ public class SpriteSheetInfo {
   public SpriteSheetInfo() {
   }
 
-  public SpriteSheetInfo(String basepath, String path, int width, int height, double collisionBoxWidthFactor, double collisionBoxHeightFactor, int collisionBoxX, int collisionBoxY) {
+  public SpriteSheetInfo(String basepath, String path, int width, int height, int collisionBoxWidthFactor, int collisionBoxHeightFactor, int collisionBoxX, int collisionBoxY) {
     super();
     this.path = path;
     this.width = width;
     this.height = height;
-    this.collisionBoxWidthFactor = collisionBoxWidthFactor;
-    this.collisionBoxHeightFactor = collisionBoxHeightFactor;
+    this.collisionBoxWidth = collisionBoxWidthFactor;
+    this.collisionBoxHeight = collisionBoxHeightFactor;
     this.collisionBoxX = collisionBoxX;
     this.collisionBoxY = collisionBoxY;
     this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + this.getPath())));
@@ -78,21 +78,21 @@ public class SpriteSheetInfo {
   }
 
   @XmlTransient
-  public double getCollisionBoxWidthFactor() {
-    return this.collisionBoxWidthFactor;
+  public int getCollisionBoxWidth() {
+    return this.collisionBoxWidth;
   }
 
-  public void setCollisionBoxWidthFactor(double collisionBoxWidthFactor) {
-    this.collisionBoxWidthFactor = collisionBoxWidthFactor;
+  public void setCollisionBoxWidth(int collisionBoxWidth) {
+    this.collisionBoxWidth = collisionBoxWidth;
   }
 
   @XmlTransient
-  public double getCollisionBoxHeightFactor() {
-    return this.collisionBoxHeightFactor;
+  public int getCollisionBoxHeight() {
+    return this.collisionBoxHeight;
   }
 
-  public void setCollisionBoxHeightFactor(double collisionBoxHeightFactor) {
-    this.collisionBoxHeightFactor = collisionBoxHeightFactor;
+  public void setCollisionBoxHeight(int collisionBoxHeight) {
+    this.collisionBoxHeight = collisionBoxHeight;
   }
 
   @XmlTransient

@@ -159,7 +159,7 @@ public class ListField extends GuiComponent {
       this.selectedComponent = null;
     }
 
-    System.out.println(" Selection: " + this.getSelection() + " lowerBound: " + this.getLowerBound() + " upperBound: " + (this.getLowerBound() + this.getNumberOfShownElements() - 1) + " selectedComponent: " + this.getListEntries().indexOf(selectedComponent));
+//    System.out.println(" Selection: " + this.getSelection() + " lowerBound: " + this.getLowerBound() + " upperBound: " + (this.getLowerBound() + this.getNumberOfShownElements() - 1) + " selectedComponent: " + this.getListEntries().indexOf(selectedComponent));
 
   }
 

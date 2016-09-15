@@ -51,19 +51,10 @@ public class NumberAdjuster extends TextFieldComponent {
     this.getComponents().add(button2);
     super.prepare();
     this.button1.onClicked(c -> {
-      if (this.getCurrentValue().compareTo(this.getUpperBound().subtract(this.getStepSize())) <= 0) {
-        this.setCurrentValue(this.getCurrentValue().add(this.getStepSize()));
-      } else {
-        this.setCurrentValue(this.getUpperBound());
-      }
-
+      this.setCurrentValue(this.getCurrentValue().add(this.getStepSize()));
     });
     this.button2.onClicked(c -> {
-      if (this.getCurrentValue().compareTo(this.getLowerBound().add(this.getStepSize())) >= 0) {
-        this.setCurrentValue(this.getCurrentValue().subtract(this.getStepSize()));
-      } else {
-        this.setCurrentValue(this.getLowerBound());
-      }
+      this.setCurrentValue(this.getCurrentValue().subtract(this.getStepSize()));
     });
     this.onChangeConfirmed(e -> {
       try {
@@ -80,6 +71,9 @@ public class NumberAdjuster extends TextFieldComponent {
 
   public void setLowerBound(BigDecimal lowerBound) {
     this.lowerBound = lowerBound;
+    if (this.getCurrentValue().compareTo(this.getLowerBound()) < 0) {
+      this.setCurrentValue(this.getLowerBound());
+    }
   }
 
   public BigDecimal getUpperBound() {
@@ -96,6 +90,9 @@ public class NumberAdjuster extends TextFieldComponent {
 
   public void setUpperBound(BigDecimal upperBound) {
     this.upperBound = upperBound;
+    if (this.getCurrentValue().compareTo(this.getUpperBound()) > 0) {
+      this.setCurrentValue(this.getUpperBound());
+    }
   }
 
   public BigDecimal getCurrentValue() {
@@ -103,12 +100,16 @@ public class NumberAdjuster extends TextFieldComponent {
   }
 
   public void setCurrentValue(BigDecimal newValue) {
-    if (newValue.compareTo(this.getUpperBound()) <= 0 && newValue.compareTo(this.getLowerBound()) >= 0) {
+    if (newValue.compareTo(this.getUpperBound()) > 0) {
+      this.currentValue = this.getUpperBound();
+    } else if (newValue.compareTo(this.getLowerBound()) < 0) {
+      this.currentValue = this.getLowerBound();
+    } else {
       this.currentValue = newValue;
-      this.setText(this.getCurrentValue() + "");
-      this.valueChangeConsumers.forEach(c -> c.accept(this.getCurrentValue()));
-
     }
+    this.setText(this.getCurrentValue() + "");
+    this.valueChangeConsumers.forEach(c -> c.accept(this.getCurrentValue()));
+
   }
 
   public void onValueChange(Consumer<BigDecimal> cons) {
