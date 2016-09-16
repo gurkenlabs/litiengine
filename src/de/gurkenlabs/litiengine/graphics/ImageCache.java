@@ -35,13 +35,10 @@ public class ImageCache {
 
   public static final String IMAGES_DIRECTORY = "images";
 
-  /** The Constant MAP_CACHE. */
   public static final ImageCache MAPS = new ImageCache("map");
 
-  /** The Constant SPRITESHEET_CACHE. */
   public static final ImageCache SPRITES = new ImageCache("sprites");
 
-  /** The Constant SPRITESHEET_CACHE. */
   public static final ImageCache IMAGES = new ImageCache("images");
 
   public static void loadCache(final String path) {
