@@ -7,11 +7,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -33,7 +36,9 @@ public class ListField extends GuiComponent {
   private int lowerBound = 0;
 
   private VerticalSlider slider;
+
   private Spritesheet buttonSprite, entrySprite;
+  private boolean arrowKeyNavigation;
 
   /**
    * Instantiates a new list field.
@@ -81,12 +86,24 @@ public class ListField extends GuiComponent {
     return this.selectedComponent;
   }
 
+  public VerticalSlider getSlider() {
+    return this.slider;
+  }
+
   public int getLowerBound() {
     return this.lowerBound;
   }
 
   public void setLowerBound(int lowerBound) {
     this.lowerBound = lowerBound;
+  }
+
+  public boolean isArrowKeyNavigation() {
+    return this.arrowKeyNavigation;
+  }
+
+  public void setArrowKeyNavigation(boolean arrowKeyNavigation) {
+    this.arrowKeyNavigation = arrowKeyNavigation;
   }
 
   /**
@@ -159,7 +176,10 @@ public class ListField extends GuiComponent {
       this.selectedComponent = null;
     }
 
-//    System.out.println(" Selection: " + this.getSelection() + " lowerBound: " + this.getLowerBound() + " upperBound: " + (this.getLowerBound() + this.getNumberOfShownElements() - 1) + " selectedComponent: " + this.getListEntries().indexOf(selectedComponent));
+    // System.out.println(" Selection: " + this.getSelection() + " lowerBound: "
+    // + this.getLowerBound() + " upperBound: " + (this.getLowerBound() +
+    // this.getNumberOfShownElements() - 1) + " selectedComponent: " +
+    // this.getListEntries().indexOf(selectedComponent));
 
   }
 
@@ -191,6 +211,33 @@ public class ListField extends GuiComponent {
     }
   }
 
+  private void prepareInput() {
+    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_UP, e -> {
+      if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
+        return;
+      }
+      this.setSelection(this.getSelection() - 1);
+    });
+
+    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_DOWN, e -> {
+      if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
+        return;
+      }
+      this.setSelection(this.getSelection() + 1);
+    });
+
+    Input.MOUSE.onWheelMoved(e -> {
+      if (this.isHovered()) {
+        if (e.getWheelRotation() < 0) {
+          this.setSelection(this.getSelection() - 1);
+        } else {
+          this.setSelection(this.getSelection() + 1);
+        }
+        return;
+      }
+    });
+  }
+
   @Override
   public void prepare() {
     boolean showButtons = false;
@@ -214,24 +261,15 @@ public class ListField extends GuiComponent {
       this.getListEntries().add(entryComponent);
     }
     this.getComponents().addAll(this.getListEntries());
+
     super.prepare();
+
     for (final ImageComponent comp : this.getListEntries()) {
       comp.onClicked(e -> {
         this.setSelection(this.getLowerBound() + this.getListEntries().indexOf(comp) % this.getNumberOfShownElements());
         this.refresh();
       });
     }
-
-    Input.MOUSE.onWheelMoved(e -> {
-      if (this.isHovered()) {
-        if (e.getWheelRotation() < 0) {
-          this.setSelection(this.getSelection() - 1);
-        } else {
-          this.setSelection(this.getSelection() + 1);
-        }
-        return;
-      }
-    });
 
     this.onChange(selection -> {
       if (slider != null) {
@@ -247,6 +285,7 @@ public class ListField extends GuiComponent {
       });
 
     }
+    this.prepareInput();
   }
 
   @Override
