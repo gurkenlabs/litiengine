@@ -45,7 +45,7 @@ public class ImageComponent extends GuiComponent {
     } catch (Exception e) {
       System.out.println("default font not found.");
     }
-    this.x_Padding = this.getWidth() / 10;
+    this.x_Padding = this.getWidth() / 16;
 
     this.text = text;
     this.textX = -1;
@@ -130,6 +130,31 @@ public class ImageComponent extends GuiComponent {
     return this.text;
   }
 
+  public String getTextToRender(Graphics2D g) {
+    FontMetrics fm = g.getFontMetrics();
+    String newText = this.getText();
+    double xMargin;
+    switch (this.getTextAlignment()) {
+    case TEXT_ALIGN_LEFT:
+      xMargin = 2 * this.getTextX();
+      break;
+    case TEXT_ALIGN_CENTER:
+      xMargin = this.getWidth() * 1 / 16;
+      break;
+    case TEXT_ALIGN_RIGHT:
+      xMargin = this.getTextX();
+      break;
+    default:
+      xMargin = 2 * this.getTextX();
+      break;
+    }
+    while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - xMargin) {
+      newText = newText.substring(1, newText.length());
+    }
+    return newText;
+
+  }
+
   public double getTextX() {
     return this.textX;
   }
@@ -164,7 +189,7 @@ public class ImageComponent extends GuiComponent {
 
     g.setColor(this.getTextColor());
     g.setFont(this.getFont());
-    if (this.getText() != null) {
+    if (this.getTextToRender(g) != null) {
       final FontMetrics fm = g.getFontMetrics();
 
       this.defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
@@ -173,11 +198,11 @@ public class ImageComponent extends GuiComponent {
         this.defaultTextX = this.x_Padding;
         break;
       case TEXT_ALIGN_RIGHT:
-        this.defaultTextX = this.getWidth() - this.x_Padding - fm.stringWidth(this.getText());
+        this.defaultTextX = this.getWidth() - this.x_Padding - fm.stringWidth(this.getTextToRender(g));
         break;
       default:
       case TEXT_ALIGN_CENTER:
-        this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getText()) / 2;
+        this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2;
         break;
       }
 
@@ -188,7 +213,7 @@ public class ImageComponent extends GuiComponent {
       if (this.getTextX() < 0) {
         this.setTextX(this.defaultTextX);
       }
-      RenderEngine.drawText(g, this.getText(), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+      RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
     }
     super.render(g);
   }

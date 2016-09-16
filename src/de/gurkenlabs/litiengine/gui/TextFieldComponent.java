@@ -27,7 +27,6 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
   private final int flickerDelay;
 
   private String fullText;
-  private String lastText;
   private int maxLength = 0;
   private String format;
 
@@ -143,26 +142,16 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
   @Override
   public void render(final Graphics2D g) {
+    super.render(g);
     g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
-    if (this.lastText == null || !this.lastText.equals(this.getText())) {
-      String newText = this.getText();
-      while (newText.length() > 1 && fm.stringWidth(this.getText()) > this.getWidth() - this.getTextX() * 2) {
-        newText = newText.substring(1);
-      }
-
-      this.setText(newText);
-      this.lastText = this.getText();
-    }
-
-    super.render(g);
 
     if (this.isSelected() && Game.getLoop().getDeltaTime(this.lastToggled) > this.flickerDelay) {
       this.cursorVisible = !this.cursorVisible;
       this.lastToggled = Game.getLoop().getTicks();
     }
     if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getText()), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);
+      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);
       g.setColor(this.getTextColor());
       g.fill(cursor);
     }
