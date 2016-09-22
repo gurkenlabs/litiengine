@@ -160,7 +160,7 @@ public class ListField extends GuiComponent {
     this.getChangeConsumer().add(c);
   }
 
-  private void refresh() {
+  public void refresh() {
     for (int i = 0; i < this.getNumberOfShownElements(); i++) {
       if (this.contents.length <= i) {
         continue;
@@ -173,22 +173,6 @@ public class ListField extends GuiComponent {
     } else {
       this.selectedComponent = null;
     }
-
-    // System.out.println(" Selection: " + this.getSelection() + " lowerBound: "
-    // + this.getLowerBound() + " upperBound: " + (this.getLowerBound() +
-    // this.getNumberOfShownElements() - 1) + " selectedComponent: " +
-    // this.getListEntries().indexOf(selectedComponent));
-
-  }
-
-  /**
-   * Removes the list entry.
-   *
-   * @param listIndex
-   *          the list index
-   */
-  public void removeListEntry(final int listIndex) {
-    this.listEntries.remove(listIndex);
   }
 
   /*
@@ -245,8 +229,12 @@ public class ListField extends GuiComponent {
     if (this.buttonSprite != null) {
       showButtons = true;
     }
-    this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - this.getNumberOfShownElements(), 1, this.entrySprite, this.buttonSprite, null, showButtons);
-    this.getSlider().setCurrentValue(this.getLowerBound());
+    int sliderMax = this.contents.length - this.getNumberOfShownElements();
+    if (sliderMax > 0) {
+      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, sliderMax, 1, this.buttonSprite, this.buttonSprite, null, showButtons);
+      this.getSlider().setCurrentValue(this.getLowerBound());
+      this.getComponents().add(this.getSlider());
+    }
 
     for (int i = 0; i < getNumberOfShownElements(); i++) {
       ImageComponent entryComponent;
@@ -262,7 +250,6 @@ public class ListField extends GuiComponent {
       this.getListEntries().add(entryComponent);
     }
     this.getComponents().addAll(this.getListEntries());
-    this.getComponents().add(this.getSlider());
 
     super.prepare();
 
@@ -285,8 +272,8 @@ public class ListField extends GuiComponent {
         this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());
         this.refresh();
       });
-
     }
+
     this.prepareInput();
   }
 

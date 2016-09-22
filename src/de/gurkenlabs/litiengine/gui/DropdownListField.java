@@ -102,6 +102,7 @@ public class DropdownListField extends GuiComponent {
       this.getContentList().prepare();
     }
     this.isDroppedDown = !this.isDroppedDown;
+    this.getContentList().refresh();
   }
 
   private void prepareInput() {
@@ -137,7 +138,7 @@ public class DropdownListField extends GuiComponent {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.content, this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
     this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
-    double buttonWidth = this.getButtonSprite().getSpriteWidth() * 3 / 4, buttonHeight = buttonWidth;
+    double buttonHeight = this.getHeight() / this.getNumberOfShownElements(), buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());
 
@@ -152,15 +153,20 @@ public class DropdownListField extends GuiComponent {
       this.chosenElementComponent.setText(this.getListEntries().get(this.getSelection()).getText());
     }
 
-    this.dropDownButton.onClicked(e -> this.toggleDropDown());
+    this.dropDownButton.onClicked(e -> {
+      this.toggleDropDown();
+    });
 
-    this.getContentList().onChange(c -> {
-      this.chosenElementComponent.setText(this.getListEntries().get(c).getText());
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelection()));
+    this.onChange(c -> {
+      this.chosenElementComponent.setText(this.content[c].toString());
       if (this.getContentList().isSuspended() || !this.getContentList().isVisible()) {
         return;
       }
       this.toggleDropDown();
+    });
+
+    this.getContentList().onChange(c -> {
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelection()));
     });
   }
 

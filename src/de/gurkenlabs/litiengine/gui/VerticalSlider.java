@@ -31,7 +31,7 @@ public class VerticalSlider extends Slider {
     }
     this.sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6;
     this.minSliderY = this.getY() + this.getWidth();
-    this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
+    this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + this.sliderHeight);
     this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSprite(), "", null));
     this.getComponents().add(this.getSliderComponent());
     super.prepare();
