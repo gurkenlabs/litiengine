@@ -8,13 +8,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -227,6 +225,9 @@ public class ListField extends GuiComponent {
     });
 
     Input.MOUSE.onWheelMoved(e -> {
+      if (this.isSuspended() || !this.isVisible()) {
+        return;
+      }
       if (this.isHovered()) {
         if (e.getWheelRotation() < 0) {
           this.setSelection(this.getSelection() - 1);
@@ -244,9 +245,8 @@ public class ListField extends GuiComponent {
     if (this.buttonSprite != null) {
       showButtons = true;
     }
-    slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - this.getNumberOfShownElements(), 1, this.entrySprite, this.buttonSprite, null, showButtons);
-    this.getComponents().add(slider);
-    slider.setCurrentValue(this.getLowerBound());
+    this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.buttonSprite.getSpriteWidth() * 3 / 4, this.getHeight(), 0, this.contents.length - this.getNumberOfShownElements(), 1, this.entrySprite, this.buttonSprite, null, showButtons);
+    this.getSlider().setCurrentValue(this.getLowerBound());
 
     for (int i = 0; i < getNumberOfShownElements(); i++) {
       ImageComponent entryComponent;
@@ -258,9 +258,11 @@ public class ListField extends GuiComponent {
       } else {
         entryComponent = new ImageComponent(this.getX(), this.getY() + (this.getHeight() / this.getNumberOfShownElements()) * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
       }
+      entryComponent.setTextAlignment(TEXT_ALIGN_LEFT);
       this.getListEntries().add(entryComponent);
     }
     this.getComponents().addAll(this.getListEntries());
+    this.getComponents().add(this.getSlider());
 
     super.prepare();
 
@@ -272,15 +274,15 @@ public class ListField extends GuiComponent {
     }
 
     this.onChange(selection -> {
-      if (slider != null) {
-        slider.setCurrentValue(this.getLowerBound());
-        slider.getSlider().setPosition(slider.getRelativeSliderPosition());
+      if (this.getSlider() != null) {
+        this.getSlider().setCurrentValue(this.getLowerBound());
+        this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());
       }
     });
-    if (slider != null) {
-      slider.onChange(sliderValue -> {
+    if (this.getSlider() != null) {
+      this.getSlider().onChange(sliderValue -> {
         this.setLowerBound(sliderValue.intValue());
-        slider.getSlider().setPosition(slider.getRelativeSliderPosition());
+        this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());
         this.refresh();
       });
 

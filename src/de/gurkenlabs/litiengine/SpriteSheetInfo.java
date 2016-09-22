@@ -23,30 +23,15 @@ public class SpriteSheetInfo {
   @XmlAttribute(name = "height")
   private int height;
 
-  @XmlAttribute(name = "collisionBoxWidthFactor")
-  private int collisionBoxWidth;
-
-  @XmlAttribute(name = "collisionBoxHeightFactor")
-  private int collisionBoxHeight;
-
-  @XmlAttribute(name = "collisionBoxX")
-  private int collisionBoxX;
-
-  @XmlAttribute(name = "collisionBoxY")
-  private int collisionBoxY;
-
+ 
   public SpriteSheetInfo() {
   }
 
-  public SpriteSheetInfo(String basepath, String path, int width, int height, int collisionBoxWidthFactor, int collisionBoxHeightFactor, int collisionBoxX, int collisionBoxY) {
+  public SpriteSheetInfo(String basepath, String path, int width, int height) {
     super();
     this.path = path;
     this.width = width;
     this.height = height;
-    this.collisionBoxWidth = collisionBoxWidthFactor;
-    this.collisionBoxHeight = collisionBoxHeightFactor;
-    this.collisionBoxX = collisionBoxX;
-    this.collisionBoxY = collisionBoxY;
     this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + this.getPath())));
   }
 
@@ -75,42 +60,6 @@ public class SpriteSheetInfo {
 
   public void setHeight(int h) {
     this.height = h;
-  }
-
-  @XmlTransient
-  public int getCollisionBoxWidth() {
-    return this.collisionBoxWidth;
-  }
-
-  public void setCollisionBoxWidth(int collisionBoxWidth) {
-    this.collisionBoxWidth = collisionBoxWidth;
-  }
-
-  @XmlTransient
-  public int getCollisionBoxHeight() {
-    return this.collisionBoxHeight;
-  }
-
-  public void setCollisionBoxHeight(int collisionBoxHeight) {
-    this.collisionBoxHeight = collisionBoxHeight;
-  }
-
-  @XmlTransient
-  public int getCollisionBoxX() {
-    return this.collisionBoxX;
-  }
-
-  public void setCollisionBoxX(int collisionBoxX) {
-    this.collisionBoxX = collisionBoxX;
-  }
-
-  @XmlTransient
-  public int getCollisionBoxY() {
-    return this.collisionBoxY;
-  }
-
-  public void setCollisionBoxY(int collisionBoxY) {
-    this.collisionBoxY = collisionBoxY;
   }
 
   @XmlTransient

@@ -10,7 +10,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -129,7 +128,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public Sound getHoverSound() {
     return hoverSound;
   }
-  
+
   public void setHoverSound(Sound hoverSound) {
     this.hoverSound = hoverSound;
     for (final GuiComponent component : this.getComponents()) {
@@ -634,10 +633,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.suspended = true;
     this.visible = false;
     for (IGuiComponent childComp : this.getComponents()) {
+      childComp.suspend();
       this.getComponents().remove(childComp);
-    }
-    for (final GuiComponent component : this.getComponents()) {
-      component.suspend();
     }
   }
 

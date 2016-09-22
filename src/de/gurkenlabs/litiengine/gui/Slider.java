@@ -74,7 +74,7 @@ public abstract class Slider extends GuiComponent {
     return this.button2;
   }
 
-  public ImageComponent getSlider() {
+  public ImageComponent getSliderComponent() {
     return this.slider;
   }
 
