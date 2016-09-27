@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -23,16 +28,27 @@ public class SpriteSheetInfo {
   @XmlAttribute(name = "height")
   private int height;
 
- 
+  @XmlAttribute(name = "name")
+  private String name;
+
   public SpriteSheetInfo() {
   }
 
   public SpriteSheetInfo(String basepath, String path, int width, int height) {
     super();
-    this.path = path;
-    this.width = width;
-    this.height = height;
+    this.setPath(path);
+    this.setWidth(width);
+    this.setHeight(height);
     this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + this.getPath())));
+    this.initializeName();
+  }
+
+  private void initializeName() {
+    String name = this.getPath();
+
+    String[] parts = name.split("\\\\");
+    this.setName(parts[parts.length - 1].replaceAll("\\.(jpg|png|gif|bmp)", ""));
+    System.out.println(this.getName());
   }
 
   @XmlTransient
@@ -55,7 +71,7 @@ public class SpriteSheetInfo {
 
   @XmlTransient
   public int getHeight() {
-    return height;
+    return this.height;
   }
 
   public void setHeight(int h) {
@@ -64,11 +80,20 @@ public class SpriteSheetInfo {
 
   @XmlTransient
   public String getImage() {
-    return image;
+    return this.image;
   }
 
   public void setImage(String image) {
     this.image = image;
+  }
+
+  @XmlTransient
+  public String getName() {
+    return this.name;
+  }
+
+  public void setName(String n) {
+    this.name = n;
   }
 
 }

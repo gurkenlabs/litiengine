@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.input.Input;
 public class DropdownListField extends GuiComponent {
   /** The drop down button. */
   private ImageComponent dropDownButton, chosenElementComponent;
+
   private boolean isDroppedDown;
   private ListField contentList;
   private final List<Consumer<Integer>> changeConsumer;
@@ -23,7 +24,7 @@ public class DropdownListField extends GuiComponent {
 
   public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE804");
 
-  public DropdownListField(final int x, final int y, final int width, final int height, final Object[] content, int elementsShown, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+  public DropdownListField(final double x, final double y, final double width, final double height, final Object[] content, int elementsShown, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
     this.content = content;
     this.numberOfShownElements = elementsShown;
@@ -39,7 +40,11 @@ public class DropdownListField extends GuiComponent {
   }
 
   public ListField getContentList() {
-    return contentList;
+    return this.contentList;
+  }
+
+  public ImageComponent getDropDownButton() {
+    return this.dropDownButton;
   }
 
   public List<Consumer<Integer>> getChangeConsumer() {
@@ -47,7 +52,7 @@ public class DropdownListField extends GuiComponent {
   }
 
   public Spritesheet getEntrySprite() {
-    return entrySprite;
+    return this.entrySprite;
   }
 
   public void setEntrySprite(Spritesheet entrySprite) {
@@ -55,7 +60,7 @@ public class DropdownListField extends GuiComponent {
   }
 
   public Spritesheet getButtonSprite() {
-    return buttonSprite;
+    return this.buttonSprite;
   }
 
   public void setButtonSprite(Spritesheet buttonSprite) {
@@ -63,15 +68,15 @@ public class DropdownListField extends GuiComponent {
   }
 
   public ImageComponent getChosenElementComponent() {
-    return chosenElementComponent;
+    return this.chosenElementComponent;
   }
 
   public boolean isDroppedDown() {
-    return isDroppedDown;
+    return this.isDroppedDown;
   }
 
   public int getNumberOfShownElements() {
-    return numberOfShownElements;
+    return this.numberOfShownElements;
   }
 
   public CopyOnWriteArrayList<ImageComponent> getListEntries() {

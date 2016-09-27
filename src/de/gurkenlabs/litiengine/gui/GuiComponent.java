@@ -4,6 +4,8 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -16,6 +18,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
@@ -24,6 +27,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * The Class GuiComponent.
  */
 public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener {
+  private final List<Consumer<String>> textChangedConsumer;
+  private int textAlignment = TEXT_ALIGN_CENTER;
   public static final int TEXT_ALIGN_LEFT = 1;
   public static final int TEXT_ALIGN_RIGHT = 2;
   public static final int TEXT_ALIGN_CENTER = 3;
@@ -65,9 +70,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private boolean visible;
 
   /** The width. */
-  private double width, height, x, y;
+  private double width, height, x, y, defaultTextX, defaultTextY, x_Padding, textX, textY;
 
   private Sound hoverSound;
+
+  private Font font;
+  private String text;
 
   protected GuiComponent(final double x, final double y) {
     this.components = new CopyOnWriteArrayList<>();
@@ -77,15 +85,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
+    this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
     this.setBackGroundColor(DEFAULT_BG_COLOR);
     this.id = ++componentId;
     this.x = x;
     this.y = y;
-
-    this.setVisible(true);
-    this.suspended = true;
+    this.x_Padding = this.getWidth() / 16;
+    this.textX = -1;
+    this.textY = -1;
     this.setSelected(false);
     this.initializeComponents();
   }
@@ -112,15 +121,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
     this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+    this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
     this.setBackGroundColor(DEFAULT_BG_COLOR);
     this.id = ++componentId;
     this.x = x;
     this.y = y;
-
-    this.setVisible(true);
-    this.suspended = true;
+    this.textX = -1;
+    this.textY = -1;
+    this.x_Padding = this.getWidth() / 16;
     this.setSelected(false);
     this.initializeComponents();
   }
@@ -134,6 +144,47 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (final GuiComponent component : this.getComponents()) {
       component.setHoverSound(hoverSound);
     }
+  }
+
+  public Font getFont() {
+    return this.font;
+  }
+
+  public String getText() {
+    return this.text;
+  }
+
+  public String getTextToRender(Graphics2D g) {
+    FontMetrics fm = g.getFontMetrics();
+    String newText = this.getText();
+    double xMargin;
+    switch (this.getTextAlignment()) {
+    case TEXT_ALIGN_LEFT:
+      xMargin = 2 * this.getTextX();
+      break;
+    case TEXT_ALIGN_CENTER:
+      xMargin = this.getWidth() * 1 / 16;
+      break;
+    case TEXT_ALIGN_RIGHT:
+      xMargin = this.getTextX();
+      break;
+    default:
+      xMargin = 2 * this.getTextX();
+      break;
+    }
+    while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - xMargin) {
+      newText = newText.substring(1, newText.length());
+    }
+    return newText;
+
+  }
+
+  public double getTextX() {
+    return this.textX;
+  }
+
+  public double getTextY() {
+    return this.textY;
   }
 
   /**
@@ -528,6 +579,35 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       return;
     }
 
+    g.setColor(this.getTextColor());
+    g.setFont(this.getFont());
+    if (this.getText() != null) {
+      final FontMetrics fm = g.getFontMetrics();
+
+      this.defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
+      switch (this.getTextAlignment()) {
+      case TEXT_ALIGN_LEFT:
+        this.defaultTextX = this.x_Padding;
+        break;
+      case TEXT_ALIGN_RIGHT:
+        this.defaultTextX = this.getWidth() - this.x_Padding - fm.stringWidth(this.getTextToRender(g));
+        break;
+      default:
+      case TEXT_ALIGN_CENTER:
+        this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2;
+        break;
+      }
+
+      if (this.getTextY() < 0) {
+        this.setTextY(this.defaultTextY);
+      }
+
+      if (this.getTextX() < 0) {
+        this.setTextX(this.defaultTextX);
+      }
+      RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+    }
+
     for (final GuiComponent component : this.getComponents()) {
       if (!component.isVisible() || component.isSuspended()) {
         continue;
@@ -537,14 +617,46 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  /**
-   * Sets the back ground color.
-   *
-   * @param backGroundColor
-   *          the new back ground color
-   */
+  public void setFont(final Font font) {
+    this.font = font;
+    for (GuiComponent comp : this.getComponents()) {
+      comp.setFont(font);
+    }
+  }
+
+  public void setText(final String text) {
+    this.text = text;
+    for (Consumer<String> cons : this.textChangedConsumer) {
+      cons.accept(this.getText());
+    }
+  }
+
+  public void setFontSize(final int size) {
+    this.font = new Font(this.getFont().getName(), Font.PLAIN, size);
+  }
+
+  public void setTextX(final double x) {
+    this.textX = x;
+  }
+
+  public void setTextY(final double y) {
+    this.textY = y;
+  }
+
   public void setBackGroundColor(final Color backGroundColor) {
     this.backGroundColor = backGroundColor;
+  }
+
+  public int getTextAlignment() {
+    return textAlignment;
+  }
+
+  public void setTextAlignment(int textAlignment) {
+    this.textAlignment = textAlignment;
+  }
+
+  public void onTextChanged(final Consumer<String> cons) {
+    this.textChangedConsumer.add(cons);
   }
 
   @Override

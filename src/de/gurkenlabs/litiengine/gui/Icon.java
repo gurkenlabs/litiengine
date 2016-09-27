@@ -102,7 +102,7 @@ public class Icon {
    * @param text
    *          the text
    */
-  Icon(final Font font, final String text) {
+  public Icon(final Font font, final String text) {
     this.font = font;
     this.text = text;
   }
