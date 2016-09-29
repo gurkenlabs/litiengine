@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public class ImageComponentList extends GuiComponent {
 
@@ -16,7 +15,7 @@ public class ImageComponentList extends GuiComponent {
   private final double rowHeight, columnWidth;
   private double xOffset, yOffset;
 
-  public ImageComponentList(final int x, final int y, final int width, final int height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
+  public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
     super(x, y, width, height);
     if (images != null) {
       this.images = images;
@@ -36,7 +35,6 @@ public class ImageComponentList extends GuiComponent {
     } else {
       this.rowHeight = (this.getHeight() / this.getRows()) * 9 / 10;
       this.yOffset = (this.getHeight() / (this.getRows() - 1)) * 1 / 10;
-
     }
     if (this.getColumns() == 1) {
       this.columnWidth = this.getWidth();
@@ -67,6 +65,18 @@ public class ImageComponentList extends GuiComponent {
 
   public int getRows() {
     return this.rows;
+  }
+
+  public void setXOffset(double xOffset) {
+    this.xOffset = xOffset;
+    this.suspend();
+    this.prepare();
+  }
+
+  public void setYOffset(double yOffset) {
+    this.yOffset = yOffset;
+    this.suspend();
+    this.prepare();
   }
 
   @Override

@@ -1,10 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -48,7 +43,6 @@ public class SpriteSheetInfo {
 
     String[] parts = name.split("\\\\");
     this.setName(parts[parts.length - 1].replaceAll("\\.(jpg|png|gif|bmp)", ""));
-    System.out.println(this.getName());
   }
 
   @XmlTransient
