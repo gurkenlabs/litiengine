@@ -10,6 +10,7 @@ import javax.xml.bind.Unmarshaller;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
+import de.gurkenlabs.litiengine.graphics.particles.LowQualityRectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.particles.OvalParticle;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
@@ -33,37 +34,41 @@ public class CustomEmitter extends Emitter {
     }
 
     // set emitter parameters
-    this.setMaxParticles(this.emitterData.getMaxParticles());
-    this.setParticleMinTTL(this.emitterData.getParticleMinTTL());
-    this.setParticleMaxTTL(this.emitterData.getParticleMaxTTL());
-    this.setTimeToLive(this.emitterData.getEmitterTTL());
-    this.setSpawnAmount(this.emitterData.getSpawnAmount());
-    this.setSpawnRate(this.emitterData.getSpawnRate());
-    this.setParticleUpdateRate(this.emitterData.getUpdateRate());
-    this.setSize(this.emitterData.getWidth(), this.emitterData.getHeight());
+    this.setMaxParticles(this.getEmitterData().getMaxParticles());
+    this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
+    this.setParticleMaxTTL(this.getEmitterData().getParticleMaxTTL());
+    this.setTimeToLive(this.getEmitterData().getEmitterTTL());
+    this.setSpawnAmount(this.getEmitterData().getSpawnAmount());
+    this.setSpawnRate(this.getEmitterData().getSpawnRate());
+    this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());
+    this.setSize(this.getEmitterData().getWidth(), this.getEmitterData().getHeight());
 
-    for (final ParticleColor color : this.emitterData.getColors()) {
+    for (final ParticleColor color : this.getEmitterData().getColors()) {
       this.addParticleColor(color.toColor());
     }
+  }
+
+  public CustomEmitterData getEmitterData() {
+    return this.emitterData;
   }
 
   @Override
   protected Particle createNewParticle() {
     float x, y, deltaX, deltaY, gravityX, gravityY, width, height, deltaWidth, deltaHeight;
 
-    x = this.emitterData.getX().get();
-    y = this.emitterData.getY().get();
-    deltaX = this.emitterData.getDeltaX().get();
-    deltaY = this.emitterData.getDeltaY().get();
-    gravityX = this.emitterData.getGravityX().get();
-    gravityY = this.emitterData.getGravityY().get();
-    width = this.emitterData.getParticleWidth().get();
-    height = this.emitterData.getParticleHeight().get();
-    deltaWidth = this.emitterData.getDeltaWidth().get();
-    deltaHeight = this.emitterData.getDeltaHeight().get();
+    x = this.getEmitterData().getX().get();
+    y = this.getEmitterData().getY().get();
+    deltaX = this.getEmitterData().getDeltaX().get();
+    deltaY = this.getEmitterData().getDeltaY().get();
+    gravityX = this.getEmitterData().getGravityX().get();
+    gravityY = this.getEmitterData().getGravityY().get();
+    width = this.getEmitterData().getParticleWidth().get();
+    height = this.getEmitterData().getParticleHeight().get();
+    deltaWidth = this.getEmitterData().getDeltaWidth().get();
+    deltaHeight = this.getEmitterData().getDeltaHeight().get();
 
     Particle particle;
-    switch (this.emitterData.getParticleType()) {
+    switch (this.getEmitterData().getParticleType()) {
     case LeftLineParticle:
       particle = new LeftLineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
@@ -72,6 +77,9 @@ public class CustomEmitter extends Emitter {
       break;
     case RectangleFillParticle:
       particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
+      break;
+    case LowQualityRectangleFillParticle:
+      particle = new LowQualityRectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case RectangleOutlineParticle:
       particle = new RectangleOutlineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
@@ -83,7 +91,7 @@ public class CustomEmitter extends Emitter {
       particle = new ShimmerParticle(new Rectangle2D.Float(x, y, this.getWidth(), this.getHeight()), x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case TextParticle:
-      particle = new TextParticle(this.emitterData.getParticleText(), x, y, deltaX, deltaY, gravityX, gravityY, this.getRandomParticleTTL(), this.getRandomParticleColor());
+      particle = new TextParticle(this.getEmitterData().getParticleText(), x, y, deltaX, deltaY, gravityX, gravityY, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     default:
       particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
@@ -92,7 +100,7 @@ public class CustomEmitter extends Emitter {
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
-    particle.setApplyStaticPhysics(this.emitterData.isApplyingStaticPhysics());
+    particle.setApplyStaticPhysics(this.getEmitterData().isApplyingStaticPhysics());
     return particle;
   }
 

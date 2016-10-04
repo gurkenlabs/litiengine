@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  * An abstract implementation for emitters that are bound to
  * {@link de.gurkenlabs.litiengine.entities.IEntity#getLocation()}.
  */
-public abstract class EntityEmitter extends Emitter {
+public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
 
   /** The entity. */
   private final IEntity entity;
@@ -27,20 +27,10 @@ public abstract class EntityEmitter extends Emitter {
     this.entity = entity;
   }
 
-  /**
-   * Gets the entity.
-   *
-   * @return the entity
-   */
   public IEntity getEntity() {
     return this.entity;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.entities.Entity#getMapLocation()
-   */
   @Override
   public Point2D getLocation() {
     if (this.getEntity() == null) {
@@ -50,12 +40,7 @@ public abstract class EntityEmitter extends Emitter {
     return this.getEntity().getDimensionCenter();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.entities.Entity#setMapLocation(java.awt.geom.Point2D)
-   */
+
   @Override
   public void setLocation(final Point2D location) {
   }
