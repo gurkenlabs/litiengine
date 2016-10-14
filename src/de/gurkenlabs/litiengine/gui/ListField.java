@@ -80,6 +80,10 @@ public class ListField extends GuiComponent {
     return this.changeConsumer;
   }
 
+  public Object[] getContentArray() {
+    return this.contents;
+  }
+
   public ImageComponent getSelectedComponent() {
     return this.selectedComponent;
   }

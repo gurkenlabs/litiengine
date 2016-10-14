@@ -9,10 +9,9 @@ public class MapObjectTypes {
   public static final String MOB = "MOB";
   public static final String DECORMOB = "DECORMOB";
   public static final String COLLISIONBOX = "COLLISIONBOX";
-  public static final String SHADOWBOX = "SHADOWBOX";
   public static final String LIGHTSOURCE = "LIGHTSOURCE";
   public static final String SPAWNPOINT_PICKUP = "SPAWNPOINT_PICKUP";
 
-  public static final String[] ALL = { EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, PROP, MOB, DECORMOB, COLLISIONBOX, SHADOWBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP };
+  public static final String[] ALL = { EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, PROP, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP };
 
 }

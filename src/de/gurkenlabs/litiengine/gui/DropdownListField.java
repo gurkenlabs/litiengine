@@ -140,7 +140,7 @@ public class DropdownListField extends GuiComponent {
 
   @Override
   public void prepare() {
-    this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.content, this.numberOfShownElements, this.entrySprite, this.buttonSprite);
+    this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
     this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
     double buttonHeight = this.getHeight() / this.getNumberOfShownElements(), buttonWidth = buttonHeight;
@@ -163,7 +163,7 @@ public class DropdownListField extends GuiComponent {
     });
 
     this.onChange(c -> {
-      this.chosenElementComponent.setText(this.content[c].toString());
+      this.chosenElementComponent.setText(this.getContentArray()[c].toString());
       if (this.getContentList().isSuspended() || !this.getContentList().isVisible()) {
         return;
       }
@@ -177,6 +177,10 @@ public class DropdownListField extends GuiComponent {
 
   public void onChange(final Consumer<Integer> c) {
     this.getChangeConsumer().add(c);
+  }
+
+  public Object[] getContentArray() {
+    return this.content;
   }
 
   @Override
