@@ -132,7 +132,7 @@ public class Spritesheet {
    * @return the path
    */
   public String getPath() {
-    return this.path;
+    return this.path != null ? this.path : "";
   }
 
   /**

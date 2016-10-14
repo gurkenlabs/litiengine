@@ -120,7 +120,7 @@ public class ImageProcessing {
    * @return the image
    */
   public static Image applyAlphaChannel(final Image img, final Color color) {
-    if (color == null) {
+    if (color == null || img == null) {
       return img;
     }
 

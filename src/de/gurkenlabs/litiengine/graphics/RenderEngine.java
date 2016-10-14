@@ -148,7 +148,11 @@ public class RenderEngine implements IRenderEngine {
       e.printStackTrace();
       return null;
     }
-
+    
+    if(img == null){
+      return null;
+    }
+    
     final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
     compatibleImg.createGraphics().drawImage(img, 0, 0, null);
 
