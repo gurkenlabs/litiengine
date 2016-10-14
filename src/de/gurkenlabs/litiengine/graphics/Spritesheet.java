@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
@@ -63,6 +64,8 @@ public class Spritesheet {
 
   private final int hashCode;
 
+  private BufferedImage image;
+
   public Spritesheet(final ITileset tileset) {
     this.path = tileset.getImage().getAbsoluteSourcePath();
     this.spriteWidth = tileset.getTileDimension().width;
@@ -82,9 +85,20 @@ public class Spritesheet {
     this.hashCode = this.getPath().hashCode();
     this.updateRowsAndCols();
   }
-  
-  private void updateRowsAndCols(){
-    BufferedImage sprite = RenderEngine.getImage(this.getPath());
+
+  public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+    this.image = image;
+    
+    this.path = path;
+    this.spriteWidth = spriteWidth;
+    this.spriteHeight = spriteHeight;
+    spritesheets.add(this);
+    this.hashCode = this.getPath().hashCode();
+    this.updateRowsAndCols();
+  }
+
+  private void updateRowsAndCols() {
+    BufferedImage sprite =  this.getImage();
     if (sprite != null && sprite.getWidth() != 0 && sprite.getHeight() != 0 && this.spriteWidth != 0 && this.spriteHeight != 0) {
       this.columns = sprite.getWidth() / this.spriteWidth;
       this.rows = sprite.getHeight() / this.spriteHeight;
@@ -93,7 +107,9 @@ public class Spritesheet {
       this.rows = 0;
     }
   }
-
+  public BufferedImage getImage(){
+    return this.image != null ? this.image : RenderEngine.getImage(this.getPath());
+  }
   /**
    * Gets the sprites per row.
    *
@@ -134,7 +150,7 @@ public class Spritesheet {
       return ImageCache.SPRITES.get(imageCacheKey);
     }
 
-    final BufferedImage bigImg = RenderEngine.getImage(this.getPath());
+    final BufferedImage bigImg = this.getImage();
     if (bigImg == null) {
       return null;
     }
