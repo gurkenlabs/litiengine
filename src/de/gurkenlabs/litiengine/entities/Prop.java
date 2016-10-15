@@ -49,7 +49,7 @@ public class Prop extends CombatEntity {
     }
   }
 
-  protected void setMaterial(final Material material) {
+  public void setMaterial(final Material material) {
     this.material = material;
   }
 }

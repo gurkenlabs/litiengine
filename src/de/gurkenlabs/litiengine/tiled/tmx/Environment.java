@@ -282,7 +282,7 @@ public class Environment implements IEnvironment {
     }
 
     if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      prop.getAttributes().getHealth().addMaxModifier(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
     }
 
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
