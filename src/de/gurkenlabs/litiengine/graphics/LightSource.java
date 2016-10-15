@@ -32,6 +32,7 @@ public class LightSource extends Entity implements IRenderable {
   public static final String RECTANGLE = "rectangle";
 
   public static final String ELLIPSE = "ellipse";
+  public static final String[] SHAPETYPES = { RECTANGLE, ELLIPSE };
 
   /**
    * Gets the shadow ellipse.
@@ -66,12 +67,12 @@ public class LightSource extends Entity implements IRenderable {
   /** The brightness. */
   private int brightness;
   /** The color. */
-  private final Color color;
+  private Color color;
   private final IEnvironment environment;
 
   /** The radius. */
   private int radius;
-  private final String lightShapeType;
+  private String lightShapeType;
   private Shape lightShape;
 
   /**
@@ -105,7 +106,7 @@ public class LightSource extends Entity implements IRenderable {
     switch (this.getLightShapeType()) {
     case LightSource.ELLIPSE:
       this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-       break;
+      break;
     case LightSource.RECTANGLE:
       this.lightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
       break;
@@ -140,7 +141,6 @@ public class LightSource extends Entity implements IRenderable {
   public String getLightShapeType() {
     return this.lightShapeType;
   }
-
 
   /**
    * Gets the obstructed vision area.
@@ -221,7 +221,6 @@ public class LightSource extends Entity implements IRenderable {
   public int getRadius() {
     return this.radius;
   }
-
 
   @Override
   public void render(final Graphics2D g) {
@@ -317,5 +316,9 @@ public class LightSource extends Entity implements IRenderable {
    */
   private void setRadius(final int radius) {
     this.radius = radius;
+  }
+
+  public void setColor(Color result) {
+    this.color = result;
   }
 }
