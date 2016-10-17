@@ -75,22 +75,18 @@ public class ParticleParameter {
     return this.randomValue;
   }
 
-  @XmlTransient
   public void setMaxValue(final float maxValue) {
     this.maxValue = maxValue;
   }
 
-  @XmlTransient
   public void setMinValue(final float minValue) {
     this.minValue = minValue;
   }
 
-  @XmlTransient
   public void setRandomValue(final boolean randomValue) {
     this.randomValue = randomValue;
   }
 
-  @XmlTransient
   public void setValue(final float value) {
     this.value = value;
   }
