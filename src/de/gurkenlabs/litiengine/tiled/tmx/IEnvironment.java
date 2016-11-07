@@ -11,7 +11,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.core.IInitializable;
+import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -28,9 +30,11 @@ import de.gurkenlabs.tiled.tmx.IMapObject;
 public interface IEnvironment extends IInitializable, IRenderable {
 
   public void add(final int mapId, final IMovableCombatEntity entity);
+
   public void add(IRenderable renderable, RenderType type);
+
   public void add(Prop prop);
-  
+
   public void addAmbientLight();
 
   public void addCollisionBox(IMapObject mapObject);
@@ -50,8 +54,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void addMovableEntity(final int mapId, final IMovableEntity entity);
 
   public void addProp(IMapObject mapObject);
-  
-
 
   public void addSpawnpoint(IMapObject mapObject);
 
@@ -61,7 +63,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
-  public List<IMapObject> getCollisionBoxes();
+  public List<IMapObject> getCollisionBoxMapObjects();
+
+  public List<Collider> getColliders();
 
   public Collection<ICombatEntity> getCombatEntities();
 
@@ -106,7 +110,13 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<MapLocation> getSpawnPoints();
 
+  public List<IEntity> getAllEntities();
+
+  public List<IMapObject> getMapObjects();
+
   public WeatherType getWeather();
+
+  public AmbientLight getAmbientLight();
 
   public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
 
@@ -119,7 +129,5 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void remove(IRenderable renderable);
 
   public void setWeather(WeatherType weather);
-
-  AmbientLight getAmbientLight();
 
 }

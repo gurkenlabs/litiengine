@@ -89,20 +89,18 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final Point2D location, final int width, final int height, final int brightness, final Color lightColor, final String shapeType) {
+  public LightSource(final IEnvironment environment, final int brightness, final Color lightColor, final String shapeType) {
     super();
-    this.setLocation(location);
     this.color = lightColor;
     this.environment = environment;
-    this.setSize(width, height);
-    int shorterDimension = width;
-    if (width > height) {
-      shorterDimension = height;
-    }
-    this.setRadius(shorterDimension / 2);
+
     this.setBrightness(brightness);
-    this.setLocation(location);
     this.lightShapeType = shapeType;
+  }
+
+  @Override
+  public void setLocation(Point2D location) {
+    super.setLocation(location);
     switch (this.getLightShapeType()) {
     case LightSource.ELLIPSE:
       this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
@@ -114,6 +112,16 @@ public class LightSource extends Entity implements IRenderable {
       this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
       break;
     }
+  }
+
+  @Override
+  public void setSize(float width, float height) {
+    super.setSize(width, height);
+    double shorterDimension = width;
+    if (width > height) {
+      shorterDimension = height;
+    }
+    this.setRadius((int) shorterDimension / 2);
   }
 
   /**

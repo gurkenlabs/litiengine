@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
@@ -34,9 +35,11 @@ public abstract class Entity implements IEntity {
    */
   protected Entity() {
     this.mapLocation = new Point(0, 0);
-
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.setSize(info.width(), info.height());
+    if (Game.getEnvironment() != null) {
+      Game.getEnvironment().getAllEntities().add(this);
+    }
   }
 
   @Override

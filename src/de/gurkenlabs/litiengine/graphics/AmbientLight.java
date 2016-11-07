@@ -11,8 +11,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
-import de.gurkenlabs.tiled.tmx.IMapObject;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -30,22 +30,29 @@ public class AmbientLight {
     this.createImage();
   }
 
-  private void createImage() {
-    final Color col = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
-    final StringBuilder sb = new StringBuilder();
+  public void createImage() {
+    final Color color = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
-    for (final LightSource light : this.environment.getLightSources()) {
-      sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" + light.getLocation().getY());
-    }
+
+    // final StringBuilder sb = new StringBuilder();
+
+    // for (final LightSource light : this.environment.getLightSources()) {
+    // sb.append(light.getRadius() + "_" + light.getLocation().getX() + "_" +
+    // light.getLocation().getY());
+    // }
 
     // build map specific cache key, respecting the lights and color
-    final String cacheKey = "AMBIENT_" + this.environment.getMap().getName().replaceAll("[\\/]", "-") + "_" + sb.toString().hashCode() + "_" + this.getColor().getRed() + "_" + this.getColor().getGreen() + "_" + this.getColor().getBlue() + "_" + this.getAlpha();
-    final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
-    if (cachedImg != null) {
-      this.image = cachedImg;
-      return;
-    }
+    // final String cacheKey = "AMBIENT_" +
+    // this.environment.getMap().getName().replaceAll("[\\/]", "-") + "_" +
+    // sb.toString().hashCode() + "_" + this.getColor().getRed() + "_" +
+    // this.getColor().getGreen() + "_" + this.getColor().getBlue() + "_" +
+    // this.getAlpha() + ".png";
+    // final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
+    // if (cachedImg != null) {
+    // this.image = cachedImg;
+    // return;
+    // }
 
     // create large rectangle and crop lights from it
     final double mapWidth = this.environment.getMap().getSizeInPixels().getWidth();
@@ -63,16 +70,16 @@ public class AmbientLight {
 
       // cut the light area where shadow Boxes are (this simulates light falling
       // into and out of rooms)
-      for (final IMapObject obj : this.environment.getCollisionBoxes()) {
-        if (!GeometricUtilities.shapeIntersects(light.getLightShape(), obj.getCollisionBox())) {
+      for (final Collider col : this.environment.getColliders()) {
+        if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
           continue;
         }
-        final Area boxInLight = new Area(obj.getCollisionBox());
+        final Area boxInLight = new Area(col.getCollisionBox());
         boxInLight.intersect(lightArea);
 
-        final Line2D[] bounds = GeometricUtilities.getLines(obj.getCollisionBox());
+        final Line2D[] bounds = GeometricUtilities.getLines(col.getCollisionBox());
         for (final Line2D line : bounds) {
-          if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && obj.getCollisionBox().contains(light.getDimensionCenter())) {
+          if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getCollisionBox().contains(light.getDimensionCenter())) {
             continue;
           }
           final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
@@ -94,7 +101,7 @@ public class AmbientLight {
           shadowParallelogram.closePath();
 
           final Area shadowArea = new Area(shadowParallelogram);
-          if (light.getDimensionCenter().getY() < obj.getCollisionBox().getMaxY() && !obj.getCollisionBox().contains(light.getDimensionCenter())) {
+          if (light.getDimensionCenter().getY() < col.getCollisionBox().getMaxY() && !col.getCollisionBox().contains(light.getDimensionCenter())) {
             shadowArea.add(boxInLight);
           }
           shadowArea.intersect(lightArea);
@@ -104,14 +111,19 @@ public class AmbientLight {
       darkArea.subtract(lightArea);
 
       Color[] colors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), (int) (this.getAlpha())) };
-      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightArea.getBounds2D().getCenterX(), lightArea.getBounds2D().getCenterY()), (float) (lightArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, colors));
+      try {
+        g.setPaint(new RadialGradientPaint(new Point2D.Double(lightArea.getBounds2D().getCenterX(), lightArea.getBounds2D().getCenterY()), (float) (lightArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, colors));
+      } catch (Exception e) {
+        g.setColor(light.getColor());
+      }
       g.fill(lightArea);
     }
-    g.setColor(col);
+    g.setColor(color);
     g.fill(darkArea);
     g.dispose();
     this.image = img;
-    ImageCache.IMAGES.putPersistent(cacheKey, img);
+
+    // ImageCache.IMAGES.put(cacheKey, img);
   }
 
   public int getAlpha() {

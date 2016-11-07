@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
+import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -38,7 +38,6 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
@@ -78,10 +77,13 @@ public class Environment implements IEnvironment {
 
   private final Map<Integer, ICombatEntity> combatEntities;
   private final List<Prop> props;
+  private final List<Collider> colliders;
+  private final List<IMapObject> mapObjects;
   private final Map<Integer, IMovableEntity> movableEntities;
   private final List<Emitter> groundEmitters;
   private final List<Emitter> emitters;
   private final List<Emitter> overlayEmitters;
+  private final List<IEntity> entities;
 
   private final List<LightSource> lightSources;
   private Image staticShadowImage;
@@ -94,6 +96,7 @@ public class Environment implements IEnvironment {
     this.movableEntities = new ConcurrentHashMap<>();
     this.lightSources = new CopyOnWriteArrayList<>();
     this.props = new CopyOnWriteArrayList<>();
+    this.colliders = new CopyOnWriteArrayList<>();
     this.emitters = new CopyOnWriteArrayList<>();
     this.groundEmitters = new CopyOnWriteArrayList<>();
     this.overlayEmitters = new CopyOnWriteArrayList<>();
@@ -101,6 +104,8 @@ public class Environment implements IEnvironment {
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
     this.spawnPoints = new CopyOnWriteArrayList<>();
+    this.entities = new CopyOnWriteArrayList<>();
+    this.mapObjects = new CopyOnWriteArrayList<>();
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
@@ -163,9 +168,15 @@ public class Environment implements IEnvironment {
 
   @Override
   public void addCollisionBox(final IMapObject mapObject) {
-    if (mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
-      Game.getPhysicsEngine().add(mapObject.getCollisionBox());
+    if (!mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+      return;
     }
+    Collider col = new Collider();
+    col.setLocation(mapObject.getLocation());
+    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    col.setMapId(mapObject.getId());
+    this.getColliders().add(col);
+    Game.getPhysicsEngine().add(col.getBoundingBox());
   }
 
   @Override
@@ -203,7 +214,9 @@ public class Environment implements IEnvironment {
     case "fire":
       emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
       this.getEmitters().add(emitter);
-      final LightSource light = new LightSource(this, new Point2D.Double(emitter.getOrigin().getX(), emitter.getOrigin().getY()), 32, 30, 50, Color.ORANGE, LightSource.ELLIPSE);
+      final LightSource light = new LightSource(this, 50, Color.ORANGE, LightSource.ELLIPSE);
+      light.setSize(emitter.getWidth(), emitter.getHeight());
+      light.setLocation(emitter.getLocation());
       this.getLightSources().add(light);
       break;
     case "shimmer":
@@ -242,7 +255,10 @@ public class Environment implements IEnvironment {
     default:
       lightType = LightSource.ELLIPSE;
     }
-    final LightSource light = new LightSource(this, new Point(mapObject.getLocation()), (int) mapObject.getDimension().getWidth(), (int) mapObject.getDimension().getHeight(), brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
+    final LightSource light = new LightSource(this, brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
+    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+    light.setLocation(mapObject.getLocation());
+    light.setMapId(mapObject.getId());
     this.getLightSources().add(light);
   }
 
@@ -254,6 +270,7 @@ public class Environment implements IEnvironment {
     this.addProp(mapObject);
     this.addDecorMob(mapObject);
     this.addMob(mapObject);
+    this.getMapObjects().add(mapObject);
   }
 
   @Override
@@ -329,24 +346,26 @@ public class Environment implements IEnvironment {
 
   private void addStaticShadows() {
     // build map specific cache key, respecting the lights and color
-    final StringBuilder sb = new StringBuilder();
-    for (final IMapObject col : this.getCollisionBoxes()) {
-      sb.append(col.getId() + "_" + col.getCollisionBox());
-    }
-
-    final String cacheKey = "STATICSHADOWS_" + this.getMap().getName().replaceAll("[\\/]", "-") + "_" + sb.toString().hashCode();
-    final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
-    if (cachedImg != null) {
-      this.staticShadowImage = cachedImg;
-      return;
-    }
+    // final StringBuilder sb = new StringBuilder();
+    // for (final IMapObject col : this.getCollisionBoxes()) {
+    // sb.append(col.getId() + "_" + col.getCollisionBox());
+    // }
+    //
+    // final String cacheKey = "STATICSHADOWS_" +
+    // this.getMap().getName().replaceAll("[\\/]", "-") + "_" +
+    // sb.toString().hashCode();
+    // final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
+    // if (cachedImg != null) {
+    // this.staticShadowImage = cachedImg;
+    // return;
+    // }
 
     final int shadowOffset = 10;
     final List<Path2D> staticShadows = new ArrayList<>();
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
-    for (final IMapObject col : this.getCollisionBoxes()) {
+    for (final IMapObject col : this.getCollisionBoxMapObjects()) {
       final double shadowX = col.getCollisionBox().getX();
       final double shadowY = col.getCollisionBox().getY();
       final double shadowWidth = col.getCollisionBox().getWidth();
@@ -356,39 +375,28 @@ public class Environment implements IEnvironment {
       if (shadowType == null) {
         continue;
       }
-      final String down = "DOWN";
-      final String downLeft = "DOWNLEFT";
-      final String downRight = "DOWNRIGHT";
-      final String left = "LEFT";
-      final String leftDown = "LEFTDOWN";
-      final String leftRight = "LEFTRIGHT";
-      final String rightLeft = "RIGHTLEFT";
-      final String right = "RIGHT";
-      final String rightDown = "RIGHTDOWN";
-      final String noOffset = "NOOFFSET";
-
       final Path2D parallelogram = new Path2D.Double();
-      if (shadowType.equals(down)) {
+      if (shadowType.equals(Collider.StaticShadowType.DOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(downLeft)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.DOWNLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(downRight)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.DOWNRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(left)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -396,7 +404,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(leftDown)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -404,7 +412,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(leftRight)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFTRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -412,7 +420,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(rightLeft)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -420,7 +428,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(right)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -428,7 +436,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(rightDown)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -436,7 +444,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(noOffset)) {
+      } else if (shadowType.equals(Collider.StaticShadowType.NOOFFSET)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -469,7 +477,7 @@ public class Environment implements IEnvironment {
     g.dispose();
 
     this.staticShadowImage = img;
-    ImageCache.IMAGES.putPersistent(cacheKey, img);
+    // ImageCache.IMAGES.put(cacheKey, img);
   }
 
   @Override
@@ -546,13 +554,14 @@ public class Environment implements IEnvironment {
     return entities;
   }
 
-  private List<IEntity> getAllEntities() {
-    final List<IEntity> entities = new ArrayList<>();
-    entities.addAll(this.getCombatEntities());
-    entities.addAll(this.getMovableEntities());
-    entities.addAll(this.getEmitters());
-    entities.addAll(this.getProps());
-    return entities;
+  @Override
+  public List<IEntity> getAllEntities() {
+    return this.entities;
+  }
+
+  @Override
+  public List<IMapObject> getMapObjects() {
+    return this.mapObjects;
   }
 
   @Override
@@ -561,7 +570,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<IMapObject> getCollisionBoxes() {
+  public List<IMapObject> getCollisionBoxMapObjects() {
     final List<IMapObject> collisionBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
       for (final IMapObject obj : shapeLayer.getMapObjects()) {
@@ -576,6 +585,12 @@ public class Environment implements IEnvironment {
     }
 
     return collisionBoxes;
+  }
+
+  @Override
+  public List<Collider> getColliders() {
+    return this.colliders;
+
   }
 
   @Override
@@ -771,6 +786,7 @@ public class Environment implements IEnvironment {
     RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
 
     if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
+      this.getAmbientLight().createImage();
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
     }
 

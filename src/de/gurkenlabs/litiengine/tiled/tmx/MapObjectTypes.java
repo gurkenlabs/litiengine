@@ -1,5 +1,9 @@
 package de.gurkenlabs.litiengine.tiled.tmx;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MapObjectTypes {
   public static final String EMITTER = "EMITTER";
   public static final String SPAWNPOINT = "SPAWNPOINT";
@@ -12,6 +16,6 @@ public class MapObjectTypes {
   public static final String LIGHTSOURCE = "LIGHTSOURCE";
   public static final String SPAWNPOINT_PICKUP = "SPAWNPOINT_PICKUP";
 
-  public static final String[] ALL = { EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, PROP, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP };
+  public static final List<String> ALL = new ArrayList<String>(Arrays.asList(EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, PROP, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP));;
 
 }
