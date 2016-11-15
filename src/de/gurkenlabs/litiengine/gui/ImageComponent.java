@@ -15,7 +15,6 @@ import de.gurkenlabs.util.image.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
 
-
   private Image image;
 
   private double imageX, imageY, imageWidth, imageHeight;
@@ -36,14 +35,25 @@ public class ImageComponent extends GuiComponent {
 
     this.setText(text);
 
-
-    this.imageWidth = this.getWidth() * 0.9;
-    this.imageHeight = this.getHeight() * 0.9;
-    this.imageX = this.getX() + this.getWidth() * 0.05;
-    this.imageY = this.getY() + this.getHeight() * 0.05;
     if (image != null) {
       this.image = image;
     }
+  }
+
+  @Override
+  public void setHeight(double height) {
+    super.setHeight(height);
+    this.imageHeight = this.getHeight() * 0.9;
+    this.imageY = this.getY() + this.getHeight() * 0.05;
+
+  }
+
+  @Override
+  public void setWidth(double width) {
+    super.setWidth(width);
+    this.imageWidth = this.getWidth() * 0.9;
+    this.imageX = this.getX() + this.getWidth() * 0.05;
+
   }
 
   public Sound getHoverSound() {
@@ -53,7 +63,6 @@ public class ImageComponent extends GuiComponent {
   public void setHoverSound(Sound hoverSound) {
     this.hoverSound = hoverSound;
   }
-
 
   public Image getImage() {
     return this.image;
@@ -105,8 +114,6 @@ public class ImageComponent extends GuiComponent {
    * @return the text
    */
 
-
- 
   public void relocateImage(final int x, final int y, final int width, final int height) {
     this.imageX = x;
     this.imageY = y;
@@ -134,14 +141,9 @@ public class ImageComponent extends GuiComponent {
     super.render(g);
   }
 
-  
-  
-
   public void setImage(final Image image) {
     this.image = image;
   }
-
-
 
   public Image getBackground() {
     if (this.getSpritesheet() == null) {
@@ -173,6 +175,5 @@ public class ImageComponent extends GuiComponent {
   @Override
   protected void initializeComponents() {
   }
-
 
 }

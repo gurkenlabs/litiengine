@@ -83,7 +83,11 @@ public class DropdownListField extends GuiComponent {
     return this.getContentList().getListEntries();
   }
 
-  public int getSelection() {
+  public Object getSelectedObject() {
+    return this.getContentArray()[this.getContentList().getSelection()];
+  }
+
+  public int getSelectedIndex() {
     return this.getContentList().getSelection();
   }
 
@@ -115,14 +119,14 @@ public class DropdownListField extends GuiComponent {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
-      this.getContentList().setSelection(this.getSelection() - 1);
+      this.getContentList().setSelection(this.getSelectedIndex() - 1);
     });
 
     Input.KEYBOARD.onKeyTyped(KeyEvent.VK_DOWN, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
-      this.getContentList().setSelection(this.getSelection() + 1);
+      this.getContentList().setSelection(this.getSelectedIndex() + 1);
     });
 
     Input.MOUSE.onWheelMoved(e -> {
@@ -130,9 +134,9 @@ public class DropdownListField extends GuiComponent {
         return;
       }
       if (e.getWheelRotation() < 0) {
-        this.getContentList().setSelection(this.getSelection() - 1);
+        this.getContentList().setSelection(this.getSelectedIndex() - 1);
       } else {
-        this.getContentList().setSelection(this.getSelection() + 1);
+        this.getContentList().setSelection(this.getSelectedIndex() + 1);
       }
       return;
     });
@@ -155,7 +159,7 @@ public class DropdownListField extends GuiComponent {
     this.getContentList().suspend();
 
     if (this.getListEntries().size() != 0) {
-      this.chosenElementComponent.setText(this.getListEntries().get(this.getSelection()).getText());
+      this.chosenElementComponent.setText(this.getListEntries().get(this.getSelectedIndex()).getText());
     }
 
     this.dropDownButton.onClicked(e -> {
@@ -171,7 +175,7 @@ public class DropdownListField extends GuiComponent {
     });
 
     this.getContentList().onChange(c -> {
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelection()));
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelectedIndex()));
     });
   }
 

@@ -113,8 +113,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
-    this.width = width;
-    this.height = height;
+    this.setWidth(width);
+    this.setHeight(height);
     this.components = new CopyOnWriteArrayList<>();
     this.clickConsumer = new CopyOnWriteArrayList<>();
     this.hoverConsumer = new CopyOnWriteArrayList<>();
@@ -679,7 +679,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   @Override
-  public void setHeight(final int height) {
+  public void setHeight(final double height) {
     this.height = height;
   }
 
@@ -744,7 +744,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   @Override
-  public void setWidth(final int width) {
+  public void setWidth(final double width) {
     this.width = width;
   }
 

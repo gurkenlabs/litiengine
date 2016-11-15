@@ -10,14 +10,16 @@ public class PropAnimationController extends AnimationController {
   private static final String INTACT = "intact";
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
- 
+
   private final Prop prop;
-  
+
   public PropAnimationController(final IEntity prop) {
     super(createAnimation((Prop) prop, PropState.INTACT));
     this.prop = (Prop) prop;
+    this.add(createAnimation(this.prop, PropState.DAMAGED));
+    this.add(createAnimation(this.prop, PropState.DESTROYED));
   }
-  
+
   public static Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = findSpriteSheet(prop, state);
     if (spritesheet == null) {

@@ -32,7 +32,7 @@ public class CheckBox extends ImageComponent {
     this.setChecked(!this.checked);
   }
 
-  private void setChecked(boolean checked) {
+  public void setChecked(boolean checked) {
     this.checked = checked;
     this.getChangeConsumer().forEach(consumer -> consumer.accept(this.isChecked()));
     this.refreshText();

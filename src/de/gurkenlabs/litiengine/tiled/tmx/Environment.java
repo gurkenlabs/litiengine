@@ -235,14 +235,14 @@ public class Environment implements IEnvironment {
     if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
       return;
     }
-    final String propBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String propColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    if (propBrightness == null || propBrightness.isEmpty() || propColor == null || propColor.isEmpty()) {
+    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
       return;
     }
 
-    final int brightness = Integer.parseInt(propBrightness);
-    final Color color = Color.decode(propColor);
+    final int brightness = Integer.parseInt(mapObjectBrightness);
+    final Color color = Color.decode(mapObjectColor);
 
     String lightType;
     switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
@@ -323,11 +323,6 @@ public class Environment implements IEnvironment {
 
   @Override
   public void add(Prop prop) {
-    if (!prop.isIndestructible()) {
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DAMAGED));
-      prop.getAnimationController().add(PropAnimationController.createAnimation(prop, PropState.DESTROYED));
-    }
-
     this.getProps().add(prop);
     this.addCombatEntity(prop.getMapId(), prop);
     if (prop.hasCollision()) {
@@ -482,21 +477,17 @@ public class Environment implements IEnvironment {
 
   @Override
   public void clear() {
-    this.dispose(this.combatEntities.values());
-    this.dispose(this.movableEntities.values());
-    this.dispose(this.getLightSources());
-    this.dispose(this.getGroundEmitters());
-    this.dispose(this.getEmitters());
-    this.dispose(this.getOverlayEmitters());
-    this.dispose(this.getProps());
-    this.spawnPoints.clear();
-    this.combatEntities.clear();
-    this.movableEntities.clear();
-    this.lightSources.clear();
+    this.dispose(this.getAllEntities());
+    this.getCombatEntities().clear();
+    this.getMovableEntities().clear();
+    this.getLightSources().clear();
     this.getGroundEmitters().clear();
     this.getEmitters().clear();
     this.getOverlayEmitters().clear();
     this.getProps().clear();
+    this.getColliders().clear();
+    this.getSpawnPoints().clear();
+    this.getAllEntities().clear();
   }
 
   private void dispose(final Collection<? extends IEntity> entities) {

@@ -73,6 +73,8 @@ public abstract class AnimationController implements IAnimationController {
     for (final Animation animation : this.getAnimations()) {
       Game.getLoop().unregisterFromUpdate(animation);
     }
+    this.getAnimations().clear();
+    this.getImageEffects().clear();
   }
 
   @Override
