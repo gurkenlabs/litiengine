@@ -150,6 +150,10 @@ public class LightSource extends Entity implements IRenderable {
     return this.lightShapeType;
   }
 
+  public void setLightShapeType(String shapeType) {
+    this.lightShapeType = shapeType;
+  }
+
   /**
    * Gets the obstructed vision area.
    *

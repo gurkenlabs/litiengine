@@ -35,12 +35,10 @@ import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
@@ -61,7 +59,7 @@ import de.gurkenlabs.util.image.ImageProcessing;
  */
 public class Environment implements IEnvironment {
   public static String MAP_PROPERTY_AMBIENTALPHA = "AMBIENTALPHA";
-  public static String MAP_PROPERTY_AMBIENTLIGHT = "AMBIENTLIGHT";
+  public static String MAP_PROPERTY_AMBIENTCOLOR = "AMBIENTLIGHT";
 
   private static int localIdSequence = 0;
   private static int mapIdSequence;
@@ -154,7 +152,7 @@ public class Environment implements IEnvironment {
   @Override
   public void addAmbientLight() {
     final String alphaProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTLIGHT);
+    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTCOLOR);
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {

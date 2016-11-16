@@ -10,6 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -26,7 +28,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
 /**
  * The Class GuiComponent.
  */
-public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener {
+public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, MouseWheelListener {
   private final List<Consumer<String>> textChangedConsumer;
   private int textAlignment = TEXT_ALIGN_CENTER;
   public static final int TEXT_ALIGN_LEFT = 1;
@@ -47,6 +49,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer, mouseReleasedConsumer;
+  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
 
   /** The components. */
   private final CopyOnWriteArrayList<GuiComponent> components;
@@ -86,6 +89,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
     this.mouseReleasedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseWheelConsumer = new CopyOnWriteArrayList<>();
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
@@ -123,6 +127,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
     this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
     this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+    this.mouseWheelConsumer = new CopyOnWriteArrayList<>();
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
@@ -157,6 +162,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   public String getTextToRender(Graphics2D g) {
+    if (this.getText() == null) {
+      return "";
+    }
     FontMetrics fm = g.getFontMetrics();
     String newText = this.getText();
     double xMargin;
@@ -174,6 +182,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       xMargin = 2 * this.getTextX();
       break;
     }
+
     while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - xMargin) {
       newText = newText.substring(1, newText.length());
     }
@@ -275,6 +284,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
     return this.mouseDraggedConsumer;
+  }
+
+  public List<Consumer<ComponentMouseWheelEvent>> getMouseWheelConsumer() {
+    return this.mouseWheelConsumer;
   }
 
   public Point2D getPosition() {
@@ -451,6 +464,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.getMouseLeaveConsumer().forEach(consumer -> consumer.accept(new ComponentMouseEvent(e, this)));
   }
 
+  @Override
+  public void mouseWheelMoved(MouseWheelEvent e) {
+    this.getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
+
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -551,6 +570,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
+  public void onMouseWheelScrolled(final Consumer<ComponentMouseWheelEvent> callback) {
+    if (!this.getMouseWheelConsumer().contains(callback)) {
+      this.getMouseWheelConsumer().add(callback);
+    }
+  }
+
   /**
    * Prepare.
    */
@@ -568,6 +593,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.suspended = false;
     this.visible = true;
     Input.MOUSE.registerMouseListener(this);
+    Input.MOUSE.registerMouseWheelListener(this);
     Input.MOUSE.registerMouseMotionListener(this);
   }
 
@@ -754,6 +780,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public void suspend() {
     Input.MOUSE.unregisterMouseListener(this);
+    Input.MOUSE.unregisterMouseWheelListener(this);
     Input.MOUSE.unregisterMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;

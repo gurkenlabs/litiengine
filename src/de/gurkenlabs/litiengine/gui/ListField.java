@@ -212,12 +212,12 @@ public class ListField extends GuiComponent {
       this.setSelection(this.getSelection() + 1);
     });
 
-    Input.MOUSE.onWheelMoved(e -> {
+    this.onMouseWheelScrolled(e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
       }
       if (this.isHovered()) {
-        if (e.getWheelRotation() < 0) {
+        if (e.getEvent().getWheelRotation() < 0) {
           this.setSelection(this.getSelection() - 1);
         } else {
           this.setSelection(this.getSelection() + 1);

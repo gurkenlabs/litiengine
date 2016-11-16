@@ -129,17 +129,21 @@ public class DropdownListField extends GuiComponent {
       this.getContentList().setSelection(this.getSelectedIndex() + 1);
     });
 
-    Input.MOUSE.onWheelMoved(e -> {
+    this.onMouseWheelScrolled(e -> {
       if (this.isSuspended() || !this.isVisible() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
-      if (e.getWheelRotation() < 0) {
+      if (e.getEvent().getWheelRotation() < 0) {
         this.getContentList().setSelection(this.getSelectedIndex() - 1);
       } else {
         this.getContentList().setSelection(this.getSelectedIndex() + 1);
       }
       return;
     });
+  }
+
+  public void setSelection(int selectionIndex) {
+    this.getContentList().setSelection(selectionIndex);
   }
 
   @Override
