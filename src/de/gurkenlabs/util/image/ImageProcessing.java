@@ -266,6 +266,10 @@ public class ImageProcessing {
   }
 
   public static BufferedImage getCompatibleImage(final int width, final int height) {
+    if(width == 0 && height == 0){
+      return null;
+    }
+    
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();

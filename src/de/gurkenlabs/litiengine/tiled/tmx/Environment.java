@@ -95,14 +95,14 @@ public class Environment implements IEnvironment {
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
-    
+
     this.lightSources = new CopyOnWriteArrayList<>();
     this.colliders = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
     this.spawnPoints = new CopyOnWriteArrayList<>();
-    
+
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
   }
@@ -701,36 +701,32 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final int mapId) {
-    if (this.movableEntities.containsKey(mapId)) {
-      this.movableEntities.remove(mapId);
-    }
+    this.movableEntities.remove(mapId);
+    this.combatEntities.remove(mapId);
 
-    if (this.combatEntities.containsKey(mapId)) {
-      this.combatEntities.remove(mapId);
-    }
-    
     this.removeEntity(mapId, RenderType.NORMAL);
     this.removeEntity(mapId, RenderType.GROUND);
     this.removeEntity(mapId, RenderType.OVERLAY);
   }
-  
-  private void removeEntity(int mapId, RenderType renderType){
-    ArrayList<IEntity> remove = new ArrayList<>();
+
+  private void removeEntity(int mapId, RenderType renderType) {
+    IEntity remove = null;
     for (IEntity e : this.entities.get(renderType)) {
       if (e.getMapId() == mapId) {
         // Remove the current element from the iterator and the list.
-        remove.add(e);
+        remove = e;
         break;
       }
     }
-    
-    this.entities.get(renderType).removeAll(remove);
+
+    this.entities.get(renderType).remove(remove);
   }
 
   @Override
   public void remove(IEntity entity) {
-    // TODO Auto-generated method stub
-
+    this.movableEntities.values().remove(entity);
+    this.combatEntities.values().remove(entity);
+    this.entities.get(entity.getRenderType()).remove(entity);
   }
 
   @Override
@@ -771,7 +767,7 @@ public class Environment implements IEnvironment {
     RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
 
     if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      //this.getAmbientLight().createImage();
+      // this.getAmbientLight().createImage();
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
     }
 
