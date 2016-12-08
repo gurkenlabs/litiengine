@@ -154,7 +154,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   @Override
   public void update(final IGameLoop loop) {
     if (this.currentText == null) {
-      Game.getEnvironment().remove(this);
+      Game.getEnvironment().removeRenderable(this);
       loop.unregisterFromUpdate(this);
       return;
     }

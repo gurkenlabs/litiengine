@@ -28,37 +28,22 @@ import de.gurkenlabs.tiled.tmx.IMapObject;
  * The Interface IMapContainer.
  */
 public interface IEnvironment extends IInitializable, IRenderable {
-
-  public void add(final int mapId, final IMovableCombatEntity entity);
+  public void clear();
+  
+  public void add(IEntity entity);
 
   public void add(IRenderable renderable, RenderType type);
 
-  public void add(Prop prop);
-
   public void addAmbientLight();
+  
+  public Collection<ICombatEntity> getCombatEntities();
 
-  public void addCollisionBox(IMapObject mapObject);
+  public Collection<IMovableEntity> getMovableEntities();
 
-  public void addCombatEntity(final int mapId, final ICombatEntity entity);
-
-  public void addDecorMob(final IMapObject mapObject);
-
-  public void addEmitter(final IMapObject mapObject);
-
-  public void addLightSource(IMapObject mapObject);
-
-  public void addMapObject(final IMapObject mapObject);
-
-  public void addMob(final IMapObject mapObject);
-
-  public void addMovableEntity(final int mapId, final IMovableEntity entity);
-
-  public void addProp(IMapObject mapObject);
-
-  public void addSpawnpoint(IMapObject mapObject);
-
-  public void clear();
-
+  public List<IEntity> getEntities();
+  
+  public List<IEntity> getEntities(RenderType renderType);
+  
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
@@ -67,13 +52,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<Collider> getColliders();
 
-  public Collection<ICombatEntity> getCombatEntities();
-
   public ICombatEntity getCombatEntity(final int mapId);
-
-  public List<Emitter> getEmitters();
-
-  public List<Emitter> getGroundEmitters();
 
   public List<IRenderable> getGroundRenderable();
 
@@ -98,21 +77,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public int getMapId();
 
-  public Collection<IMovableEntity> getMovableEntities();
-
   public IMovableEntity getMovableEntity(final int mapId);
-
-  public List<Emitter> getOverlayEmitters();
 
   public List<IRenderable> getOverlayRenderable();
 
-  public List<Prop> getProps();
-
   public List<MapLocation> getSpawnPoints();
-
-  public List<IEntity> getAllEntities();
-
-  public List<IMapObject> getMapObjects();
 
   public WeatherType getWeather();
 
@@ -125,9 +94,28 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
   public void remove(final int mapId);
+  
+  public void remove(final IEntity entity);
 
-  public void remove(IRenderable renderable);
+  public void removeRenderable(IRenderable renderable);
 
   public void setWeather(WeatherType weather);
+  
+  public void addCollisionBox(IMapObject mapObject);
+
+  public void addDecorMob(final IMapObject mapObject);
+
+  public void addEmitter(final IMapObject mapObject);
+
+  public void addLightSource(IMapObject mapObject);
+
+  public void addMapObject(final IMapObject mapObject);
+
+  public void addMob(final IMapObject mapObject);
+
+  public void addProp(final IMapObject mapObject);
+
+  public void addSpawnpoint(final IMapObject mapObject);
+
 
 }

@@ -7,15 +7,18 @@ import java.awt.Color;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 /**
  * The Class HitBloodEmitter.
  */
 @EmitterInfo(maxParticles = 20, spawnAmount = 20, emitterTTL = 20000, particleMinTTL = 10000, particleMaxTTL = 20000)
+@EntityInfo(renderType = RenderType.GROUND)
 public class HitEmitter extends Emitter {
   private static final int MAX_MOVE_TIME = 500;
   /** The hit color. */

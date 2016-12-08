@@ -9,6 +9,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Interface EntityInfo.
@@ -31,4 +33,6 @@ public @interface EntityInfo {
    * @return the int
    */
   float width() default 32;
+  
+  RenderType renderType() default RenderType.NORMAL;
 }

@@ -7,16 +7,19 @@ import java.awt.Color;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class BloodEmitter.
  */
 @EmitterInfo(maxParticles = 150, spawnAmount = 100, emitterTTL = 15000, particleMinTTL = 15000, particleMaxTTL = 15000)
+@EntityInfo(renderType = RenderType.GROUND)
 public class BloodEmitter extends EntityEmitter {
 
   /** The Constant MAX_MOVE_TIME. */

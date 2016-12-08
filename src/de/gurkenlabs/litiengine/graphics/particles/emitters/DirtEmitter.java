@@ -6,16 +6,19 @@ package de.gurkenlabs.litiengine.graphics.particles.emitters;
 import java.awt.Color;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class DirtEmitter.
  */
 @EmitterInfo(maxParticles = 3, spawnAmount = 3, emitterTTL = 100, particleMinTTL = 100, particleMaxTTL = 100)
+@EntityInfo(renderType = RenderType.GROUND)
 public class DirtEmitter extends EntityEmitter {
 
   /** The Constant REDISH_BROWN. */

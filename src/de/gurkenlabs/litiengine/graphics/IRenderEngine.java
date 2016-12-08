@@ -35,10 +35,14 @@ public interface IRenderEngine {
   public void render(Graphics2D g, List<? extends IRenderable> renderables);
 
   public void render(Graphics2D g, List<? extends IRenderable> renderables, IVision vision);
-
+  
   public void renderEntities(Graphics2D g, List<? extends IEntity> entities);
 
+  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, boolean sort);
+
   public void renderEntities(Graphics2D g, List<? extends IEntity> entities, IVision vision);
+  
+  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, boolean sort, IVision vision);
 
   public void renderEntity(Graphics2D g, IEntity entity);
 

@@ -10,6 +10,7 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 /**
  * The Class Entity.
@@ -29,7 +30,9 @@ public abstract class Entity implements IEntity {
   private float width;
 
   private IAnimationController animationController;
-
+  
+  private RenderType renderType;
+ 
   /**
    * Instantiates a new entity.
    */
@@ -37,11 +40,27 @@ public abstract class Entity implements IEntity {
     this.mapLocation = new Point(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.setSize(info.width(), info.height());
+    this.renderType = info.renderType();
     if (Game.getEnvironment() != null) {
-      Game.getEnvironment().getAllEntities().add(this);
+      Game.getEnvironment().getEntities().add(this);
     }
   }
-
+  
+  @Override
+  public void setRenderType(RenderType renderType) {
+    this.renderType = renderType;
+  }
+  
+  @Override
+  public void setHeight(float height) {
+    this.height = height;
+  }
+  
+  @Override
+  public void setWidth(float width) {
+    this.width = width;
+  }
+  
   @Override
   public float getAngle() {
     return this.angle;
@@ -137,5 +156,9 @@ public abstract class Entity implements IEntity {
   public void setSize(final float width, final float height) {
     this.width = width;
     this.height = height;
+  }
+
+  public RenderType getRenderType() {
+    return renderType;
   }
 }

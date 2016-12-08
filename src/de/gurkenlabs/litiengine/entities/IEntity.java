@@ -4,11 +4,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 public interface IEntity {
   public float getAngle();
 
   public IAnimationController getAnimationController();
+  
+  public RenderType getRenderType();
 
   public Rectangle2D getBoundingBox();
 
@@ -43,4 +46,10 @@ public interface IEntity {
   public void setMapId(int mapId);
 
   public void setSize(float width, float height);
+  
+  public void setRenderType(RenderType renderType);
+  
+  public void setHeight(float height);
+  
+  public void setWidth(float width);
 }

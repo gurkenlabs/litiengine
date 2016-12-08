@@ -148,11 +148,11 @@ public class RenderEngine implements IRenderEngine {
       e.printStackTrace();
       return null;
     }
-    
-    if(img == null){
+
+    if (img == null) {
       return null;
     }
-    
+
     final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
     compatibleImg.createGraphics().drawImage(img, 0, 0, null);
 
@@ -274,21 +274,29 @@ public class RenderEngine implements IRenderEngine {
 
   @Override
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities) {
+    this.renderEntities(g, entities, true);
+  }
+  
+  @Override
+  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
     final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
-    // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
-    // BETTER DATASTRUCTURE FOR THE (HEAP)
-    // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
-    try {
-      Collections.sort(entitiesToRender, this.entityComparator);
-    } catch (final IllegalArgumentException e) {
-      for (final IEntity entity : entities) {
-        this.renderEntity(g, entity);
-      }
 
-      return;
+    if (sort) {
+      // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
+      // BETTER DATASTRUCTURE FOR THE (HEAP)
+      // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
+      try {
+        Collections.sort(entitiesToRender, this.entityComparator);
+      } catch (final IllegalArgumentException e) {
+        for (final IEntity entity : entities) {
+          this.renderEntity(g, entity);
+        }
+
+        return;
+      }
     }
 
     for (final IEntity entity : entitiesToRender) {
@@ -298,6 +306,10 @@ public class RenderEngine implements IRenderEngine {
 
   @Override
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, final IVision vision) {
+    this.renderEntities(g, entities, true, vision);
+  }
+  @Override
+  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -305,7 +317,7 @@ public class RenderEngine implements IRenderEngine {
       g.setClip(vision.getRenderVisionShape());
     }
 
-    this.renderEntities(g, entities);
+    this.renderEntities(g, entities, sort);
 
     g.setClip(oldClip);
   }
@@ -315,8 +327,8 @@ public class RenderEngine implements IRenderEngine {
     if (entity == null) {
       return;
     }
-    
-    if(!this.canRender(entity)){
+
+    if (!this.canRender(entity)) {
       return;
     }
     RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
@@ -386,7 +398,7 @@ public class RenderEngine implements IRenderEngine {
         }
       }
     }
-    
+
     return true;
   }
 }
