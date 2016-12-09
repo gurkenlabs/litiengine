@@ -66,7 +66,37 @@ public class Spritesheet {
 
   private BufferedImage image;
 
-  public Spritesheet(final ITileset tileset) {
+  public static Spritesheet load(final ITileset tileset){
+    Spritesheet sprite = new Spritesheet(tileset);
+    if(find(sprite.getPath()) == null){
+      return find(sprite.getPath());
+    }
+    
+    spritesheets.add(sprite);
+    return sprite;
+  }
+  
+  public static Spritesheet load(final String path, final int spriteWidth, final int spriteHeight){
+    Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
+    if(find(sprite.getPath()) == null){
+      return find(sprite.getPath());
+    }
+    
+    spritesheets.add(sprite);
+    return sprite;
+  }
+  
+  public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight){
+    Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
+    if(find(sprite.getPath()) == null){
+      return find(sprite.getPath());
+    }
+    
+    spritesheets.add(sprite);
+    return sprite;
+  }
+  
+  private Spritesheet(final ITileset tileset) {
     this.path = tileset.getImage().getAbsoluteSourcePath();
     
     this.spriteWidth = tileset.getTileDimension().width;
@@ -77,7 +107,7 @@ public class Spritesheet {
     this.hashCode = this.getPath().hashCode();
   }
 
-  public Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
+  private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
     this.path = path;
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
@@ -87,7 +117,7 @@ public class Spritesheet {
     this.updateRowsAndCols();
   }
 
-  public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+  private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     this.image = image;
     
     this.path = path;
