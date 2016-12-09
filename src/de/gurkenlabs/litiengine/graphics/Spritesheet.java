@@ -49,7 +49,7 @@ public class Spritesheet {
 
   /** The path. */
   private final String path;
-
+  
   /** The rows. */
   private int rows;
 
@@ -68,6 +68,7 @@ public class Spritesheet {
 
   public Spritesheet(final ITileset tileset) {
     this.path = tileset.getImage().getAbsoluteSourcePath();
+    
     this.spriteWidth = tileset.getTileDimension().width;
     this.spriteHeight = tileset.getTileDimension().height;
     this.columns = tileset.getImage().getDimension().width / tileset.getTileDimension().width;
@@ -145,7 +146,7 @@ public class Spritesheet {
   }
 
   public BufferedImage getSprite(final int index) {
-    final String imageCacheKey = MessageFormat.format("{0}_{1}", this.getPath().hashCode(), index);
+    final String imageCacheKey = MessageFormat.format("{0}_{1}", this.hashCode, index);
     if (ImageCache.SPRITES.containsKey(imageCacheKey)) {
       return ImageCache.SPRITES.get(imageCacheKey);
     }

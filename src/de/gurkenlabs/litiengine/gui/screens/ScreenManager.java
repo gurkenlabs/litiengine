@@ -43,9 +43,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   /** The last screen change. */
   private long lastScreenChange = 0;
+  
+  private Dimension resolution;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
+    this.resolution = this.getSize();
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
@@ -121,7 +124,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public Dimension getResolution() {
-    return this.getSize();
+    return this.resolution;
   }
 
   @Override
@@ -139,6 +142,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
     } else {
       this.setSize(new Dimension(width, height));
     }
+    
+    this.resolution = this.getSize();
 
     this.setVisible(true);
     this.getRenderComponent().init();

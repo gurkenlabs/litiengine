@@ -132,16 +132,6 @@ public class Camera implements ICamera {
   /*
    * (non-Javadoc)
    *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(double, double)
-   */
-  @Override
-  public Point2D getViewPortLocation(final double x, final double y) {
-    return this.getViewPortLocation(new Point2D.Double(x, y));
-  }
-
-  /*
-   * (non-Javadoc)
-   *
    * @see
    * de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(de.gurkenlabs.liti.
    * entities.Entity)
@@ -166,9 +156,17 @@ public class Camera implements ICamera {
    */
   @Override
   public Point2D getViewPortLocation(final Point2D mapLocation) {
-    final double x = mapLocation.getX() + this.getPixelOffsetX();
-    final double y = mapLocation.getY() + this.getPixelOffsetY();
-    return new Point2D.Double(x, y);
+    return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
+  }
+  
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(double, double)
+   */
+  @Override
+  public Point2D getViewPortLocation(final double x, final double y) {
+    return new Point2D.Double( x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
   
   @Override

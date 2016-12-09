@@ -33,8 +33,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void add(IEntity entity);
 
   public void add(IRenderable renderable, RenderType type);
-
-  public void addAmbientLight();
   
   public Collection<ICombatEntity> getCombatEntities();
 
@@ -48,13 +46,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
-  public List<IMapObject> getCollisionBoxMapObjects();
-
   public List<Collider> getColliders();
 
   public ICombatEntity getCombatEntity(final int mapId);
 
-  public List<IRenderable> getGroundRenderable();
+  public IMovableEntity getMovableEntity(final int mapId);
 
   public List<LightSource> getLightSources();
 
@@ -76,10 +72,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
    * @return
    */
   public int getMapId();
-
-  public IMovableEntity getMovableEntity(final int mapId);
-
-  public List<IRenderable> getOverlayRenderable();
 
   public List<MapLocation> getSpawnPoints();
 
@@ -116,6 +108,4 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void addProp(final IMapObject mapObject);
 
   public void addSpawnpoint(final IMapObject mapObject);
-
-
 }

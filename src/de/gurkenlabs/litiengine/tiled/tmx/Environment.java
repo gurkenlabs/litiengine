@@ -15,7 +15,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +33,6 @@ import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -161,21 +159,6 @@ public class Environment implements IEnvironment {
     default:
       break;
     }
-  }
-
-  @Override
-  public void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTCOLOR);
-    int ambientAlpha = 0;
-    Color ambientColor = Color.WHITE;
-    try {
-      ambientAlpha = Integer.parseInt(alphaProp);
-      ambientColor = Color.decode(colorProp);
-    } catch (final NumberFormatException e) {
-    }
-
-    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   @Override
@@ -552,24 +535,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<IMapObject> getCollisionBoxMapObjects() {
-    final List<IMapObject> collisionBoxes = new ArrayList<>();
-    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject obj : shapeLayer.getMapObjects()) {
-        if (obj.getType() == null || obj.getType().isEmpty()) {
-          continue;
-        }
-
-        if (obj.getType().equals(MapObjectTypes.COLLISIONBOX)) {
-          collisionBoxes.add(obj);
-        }
-      }
-    }
-
-    return collisionBoxes;
-  }
-
-  @Override
   public List<Collider> getColliders() {
     return this.colliders;
 
@@ -589,7 +554,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  @Override
   public List<IRenderable> getGroundRenderable() {
     return this.groundRenderable;
   }
@@ -636,7 +600,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  @Override
   public List<IRenderable> getOverlayRenderable() {
     return this.overlayRenderable;
   }
@@ -802,5 +765,36 @@ public class Environment implements IEnvironment {
     if (weather != null) {
       this.weather.activate(Game.getLoop());
     }
+  }
+  
+  private List<IMapObject> getCollisionBoxMapObjects() {
+    final List<IMapObject> collisionBoxes = new ArrayList<>();
+    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject obj : shapeLayer.getMapObjects()) {
+        if (obj.getType() == null || obj.getType().isEmpty()) {
+          continue;
+        }
+
+        if (obj.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+          collisionBoxes.add(obj);
+        }
+      }
+    }
+
+    return collisionBoxes;
+  }
+
+  private void addAmbientLight() {
+    final String alphaProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTALPHA);
+    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTCOLOR);
+    int ambientAlpha = 0;
+    Color ambientColor = Color.WHITE;
+    try {
+      ambientAlpha = Integer.parseInt(alphaProp);
+      ambientColor = Color.decode(colorProp);
+    } catch (final NumberFormatException e) {
+    }
+
+    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 }

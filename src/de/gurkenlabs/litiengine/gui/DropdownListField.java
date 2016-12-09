@@ -155,6 +155,7 @@ public class DropdownListField extends GuiComponent {
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());
 
+    this.getComponents().clear();
     this.getComponents().add(this.contentList);
     this.getComponents().add(this.chosenElementComponent);
     this.getComponents().add(this.dropDownButton);
