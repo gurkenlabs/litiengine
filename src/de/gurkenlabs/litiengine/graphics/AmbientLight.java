@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.entities.Collider;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
 import de.gurkenlabs.util.image.ImageProcessing;

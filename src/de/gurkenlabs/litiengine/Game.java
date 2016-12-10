@@ -13,6 +13,7 @@ import java.util.logging.LogManager;
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
@@ -24,7 +25,6 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 

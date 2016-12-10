@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.abilities.effects;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 
 public class SoundEffect extends Effect {
   private final Sound[] sounds;

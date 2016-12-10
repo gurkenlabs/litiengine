@@ -1,7 +1,7 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -36,22 +36,26 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectTypes;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.SnowEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.Weather;
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.IMapLoader;
-import de.gurkenlabs.tiled.tmx.IMapObject;
-import de.gurkenlabs.tiled.tmx.IMapObjectLayer;
-import de.gurkenlabs.tiled.tmx.TmxMapLoader;
-import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.IMapLoader;
+import de.gurkenlabs.tilemap.IMapObject;
+import de.gurkenlabs.tilemap.IMapObjectLayer;
+import de.gurkenlabs.tilemap.TmxMapLoader;
+import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 

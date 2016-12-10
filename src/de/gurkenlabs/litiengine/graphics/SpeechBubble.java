@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class SpeechBubble implements IUpdateable, IRenderable {

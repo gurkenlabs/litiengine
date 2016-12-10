@@ -1,7 +1,7 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
@@ -16,13 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.ITile;
-import de.gurkenlabs.tiled.tmx.ITileLayer;
-import de.gurkenlabs.tiled.tmx.ITileset;
-import de.gurkenlabs.tiled.tmx.MapOrientation;
-import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.ITile;
+import de.gurkenlabs.tilemap.ITileLayer;
+import de.gurkenlabs.tilemap.ITileset;
+import de.gurkenlabs.tilemap.MapOrientation;
+import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**

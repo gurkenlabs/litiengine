@@ -1,14 +1,15 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.MapOrientation;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.MapOrientation;
 
 // TODO: Auto-generated Javadoc
 /**

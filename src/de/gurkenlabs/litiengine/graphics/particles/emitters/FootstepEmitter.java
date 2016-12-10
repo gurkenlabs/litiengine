@@ -6,10 +6,10 @@ import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
-import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 
 @EmitterInfo(maxParticles = 1, spawnAmount = 1, emitterTTL = 5000, particleMinTTL = 5000, particleMaxTTL = 5000)
 @EntityInfo(renderType = RenderType.GROUND)

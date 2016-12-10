@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.xml.Map;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.xml.Map;
 
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {

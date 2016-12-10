@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 // TODO: Auto-generated Javadoc

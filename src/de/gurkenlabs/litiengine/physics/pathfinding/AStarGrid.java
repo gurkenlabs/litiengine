@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
-import de.gurkenlabs.tiled.tmx.IMap;
+import de.gurkenlabs.tilemap.IMap;
 
 public class AStarGrid {
   private final IPhysicsEngine physicsEngine;

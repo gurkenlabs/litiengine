@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.graphics;
 
 public enum RenderType {
   GROUND, NORMAL, OVERLAY

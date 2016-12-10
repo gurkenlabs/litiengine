@@ -1,9 +1,10 @@
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment;
 
 import java.util.List;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 
 public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
   public enum SpawnMode {

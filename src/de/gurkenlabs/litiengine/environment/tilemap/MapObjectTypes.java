@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.util.ArrayList;
 import java.util.Arrays;

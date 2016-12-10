@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * The Class DamageMultiplierEffect.

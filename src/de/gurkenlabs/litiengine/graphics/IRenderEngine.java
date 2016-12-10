@@ -9,10 +9,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.tiled.tmx.IMapRenderer;
-import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.MapOrientation;
 
 /**
  * The Interface IGraphicsEngine.

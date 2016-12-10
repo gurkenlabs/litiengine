@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.EntityComparator;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * The Class Effect.

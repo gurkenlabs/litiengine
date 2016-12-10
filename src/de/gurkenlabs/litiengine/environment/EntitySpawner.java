@@ -1,10 +1,11 @@
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment;
 
 import java.util.List;
 import java.util.Random;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private class SpawnThread extends Thread {

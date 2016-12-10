@@ -4,7 +4,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 // TODO: Auto-generated Javadoc
 /**

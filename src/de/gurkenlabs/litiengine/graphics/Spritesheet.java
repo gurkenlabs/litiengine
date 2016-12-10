@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.tiled.tmx.ITileset;
+import de.gurkenlabs.tilemap.ITileset;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {

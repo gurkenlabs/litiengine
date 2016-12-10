@@ -15,8 +15,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.IVision;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 
 // TODO: Auto-generated Javadoc
 /**

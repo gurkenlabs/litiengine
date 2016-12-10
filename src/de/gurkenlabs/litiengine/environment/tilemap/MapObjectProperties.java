@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.tiled.tmx;
+package de.gurkenlabs.litiengine.environment.tilemap;
 
 public class MapObjectProperties {
   public static final String TEAM = "team";

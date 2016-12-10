@@ -15,9 +15,9 @@ import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.tiled.tmx.IMap;
-import de.gurkenlabs.tiled.tmx.ITile;
-import de.gurkenlabs.tiled.tmx.utilities.MapUtilities;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.ITile;
+import de.gurkenlabs.tilemap.utilities.MapUtilities;
 
 public class DebugRenderer {
 

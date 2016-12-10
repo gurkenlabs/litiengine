@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.logic;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.tiled.tmx.IMapObject;
+import de.gurkenlabs.tilemap.IMapObject;
 
 public class QuestObjective {
   private String description;

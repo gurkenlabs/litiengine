@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.abilities.effects;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.physics.Force;
-import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
 
 public abstract class ForceEffect extends Effect {
   /** The strength. */

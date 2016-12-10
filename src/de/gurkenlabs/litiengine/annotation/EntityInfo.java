@@ -9,7 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 // TODO: Auto-generated Javadoc
 /**

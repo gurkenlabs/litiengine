@@ -9,9 +9,9 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.environment.WeatherType;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
-import de.gurkenlabs.litiengine.tiled.tmx.WeatherType;
 
 // TODO: Auto-generated Javadoc
 /**
