@@ -772,7 +772,7 @@ public class Environment implements IEnvironment {
       this.weather.activate(Game.getLoop());
     }
   }
-  
+
   private List<IMapObject> getCollisionBoxMapObjects() {
     final List<IMapObject> collisionBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
