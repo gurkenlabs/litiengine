@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -25,6 +26,9 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
+import de.gurkenlabs.tilemap.IMap;
+import de.gurkenlabs.tilemap.xml.Map;
+import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 
@@ -41,6 +45,7 @@ public abstract class Game {
   private final static EntityManager entityManager;
   private static RenderLoop renderLoop;
   private final static GameInfo info;
+  private final static List<IMap> maps;
 
   private static IScreenManager screenManager;
   private static IEnvironment environment;
@@ -54,6 +59,7 @@ public abstract class Game {
     metrics = new GameMetrics();
     entityManager = new EntityManager();
     info = new GameInfo();
+    maps = new CopyOnWriteArrayList<>();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -107,6 +113,24 @@ public abstract class Game {
 
   public static ISoundEngine getSoundEngine() {
     return soundEngine;
+  }
+  
+  public static List<IMap> getMaps(){
+    return maps;
+  }
+  
+  public static IMap getMap(String mapName){
+    if(mapName == null || mapName.isEmpty() || maps.size() == 0){
+      return null;
+    }
+    
+    for(IMap map : maps){
+      if(map.getName().equals(mapName)){
+        return map;
+      }
+    }
+    
+    return null;
   }
 
   public static void loadEnvironment(final IEnvironment env) {
@@ -194,6 +218,34 @@ public abstract class Game {
       cons.accept(Game.getInfo().getName());
     }
   }
+  
+  public static void load(String gameResourceFile){
+    GameFile file = GameFile.load(gameResourceFile);
+    if(file == null){
+      return;
+    }
+    
+    int mapCnt = 0;
+    for(IMap m : file.getMaps()){
+      if(getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))){
+        continue;
+      }
+      
+      getMaps().add(m);
+      mapCnt++;
+    }
+    
+    int spriteCnt = 0;
+    for(SpriteSheetInfo sprite : file.getSpriteSheets()){
+      int before = Spritesheet.spritesheets.size();
+      Spritesheet.load(ImageProcessing.decodeToImage(sprite.getImage()), sprite.getPath(), sprite.getWidth(), sprite.getHeight());
+      if(Spritesheet.spritesheets.size() > before){
+        spriteCnt++;
+      }
+    }
+    
+    System.out.println(mapCnt + " maps and " + spriteCnt + " spritesheets loaded from '" + gameResourceFile + "'");
+  } 
 
   public static void terminate() {
     gameLoop.terminate();

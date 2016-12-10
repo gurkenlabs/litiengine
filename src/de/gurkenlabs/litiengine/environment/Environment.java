@@ -39,6 +39,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectTypes;
+import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -58,14 +59,12 @@ import de.gurkenlabs.tilemap.TmxMapLoader;
 import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.io.FileUtilities;
 
 /**
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-  public static String MAP_PROPERTY_AMBIENTALPHA = "AMBIENTALPHA";
-  public static String MAP_PROPERTY_AMBIENTCOLOR = "AMBIENTLIGHT";
-
   private static int localIdSequence = 0;
   private static int mapIdSequence;
   private final List<MapLocation> spawnPoints;
@@ -117,8 +116,14 @@ public class Environment implements IEnvironment {
    */
   public Environment(final String mapPath) {
     this();
-    final IMapLoader tmxLoader = new TmxMapLoader();
-    this.map = tmxLoader.LoadMap(mapPath);
+    IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
+    if (loadedMap == null) {
+      final IMapLoader tmxLoader = new TmxMapLoader();
+      this.map = tmxLoader.LoadMap(mapPath);
+    }else{
+      this.map = loadedMap;
+    }
+    
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
@@ -791,8 +796,8 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MAP_PROPERTY_AMBIENTCOLOR);
+    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
+    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {

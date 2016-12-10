@@ -21,14 +21,33 @@ public class FileUtilities {
     }
   }
 
+  public static String getFileName(String path) {
+    String name = path;
+    final int pos = name.lastIndexOf(".");
+    if (pos > 0) {
+      name = name.substring(0, pos);
+    }
+
+    int lastBackslash = name.lastIndexOf("/");
+    if (lastBackslash != -1) {
+      name = name.substring(lastBackslash + 1, name.length());
+    } else {
+      int lastForwardSlash = name.lastIndexOf("\\");
+      if (lastForwardSlash != -1) {
+        name = name.substring(lastForwardSlash + 1, name.length());
+      }
+    }
+    
+    return name;
+  }
+
   public static String getParentDirPath(String fileOrDirPath) {
     if (fileOrDirPath.contains(File.separator)) {
       return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(File.separatorChar, fileOrDirPath.length()));
-    }
-    else if(fileOrDirPath.contains("/")) {
+    } else if (fileOrDirPath.contains("/")) {
       return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf("/") + 1);
     }
-    
+
     return "";
   }
 }

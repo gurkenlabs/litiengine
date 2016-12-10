@@ -57,6 +57,7 @@ public class Spritesheet {
 
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fileStream))) {
       String line;
+      int cnt = 0;
       while ((line = br.readLine()) != null) {
         
         if(line.isEmpty() || line.startsWith(COMMENT_CHAR)){
@@ -75,11 +76,14 @@ public class Spritesheet {
           int height = Integer.parseInt(items.get(2));
 
           sprites.add(load(name, width, height));
+          cnt++;
         } catch (NumberFormatException nfe) {
           nfe.printStackTrace();
           continue;
         }
       }
+      
+      System.out.println(cnt + " spritesheets loaded from '" + spriteInfoFile + "'");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -108,11 +112,11 @@ public class Spritesheet {
   }
 
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
-    if (find(sprite.getPath()) == null) {
-      return find(sprite.getPath());
+    if (find(path) != null) {
+      return find(path);
     }
 
+    Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
     spritesheets.add(sprite);
     return sprite;
   }
