@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import de.gurkenlabs.util.io.FileUtilities;
+
 public class Configuration {
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
@@ -91,7 +93,7 @@ public class Configuration {
    */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
-    InputStream settingsStream = ClassLoader.getSystemResourceAsStream(this.getFileName());
+    InputStream settingsStream = FileUtilities.getGameFile(this.getFileName());
     if (!settingsFile.exists() && settingsStream == null) {
       if (!settingsFile.exists() || !settingsFile.isFile()) {
         try {

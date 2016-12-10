@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.litiengine.tiled.tmx.IEnvironment;
+import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 
 public abstract class Game {
@@ -133,7 +134,7 @@ public abstract class Game {
     
     final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
-    final InputStream defaultLoggingConfig = ClassLoader.getSystemResourceAsStream(LOGGING_CONFIG_FILE);
+    final InputStream defaultLoggingConfig = FileUtilities.getGameFile(LOGGING_CONFIG_FILE);
 
     // if a specific file exists, load it
     // otherwise try to find a default logging configuration in any resource

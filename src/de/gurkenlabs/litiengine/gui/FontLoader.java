@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.util.io.FileUtilities;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -146,15 +147,9 @@ public class FontLoader {
     try {
       final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-      InputStream fontStream = null;
-      try {
-        fontStream = ClassLoader.getSystemResourceAsStream(fontName);
-        if (fontStream == null) {
-          fontStream = new FileInputStream(fontName);
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        return null;
+      InputStream fontStream = FileUtilities.getGameFile(fontName);
+      if(fontStream == null){
+        log.severe("font '" + fontName +"' could not be loaded");
       }
 
       final Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream);

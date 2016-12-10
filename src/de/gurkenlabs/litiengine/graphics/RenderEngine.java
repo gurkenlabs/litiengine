@@ -40,6 +40,8 @@ import de.gurkenlabs.litiengine.tiled.tmx.RenderType;
 import de.gurkenlabs.tiled.tmx.IMap;
 import de.gurkenlabs.tiled.tmx.MapOrientation;
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.io.StreamUtilities;
 
 /**
  * The Class GraphicsEngine.
@@ -134,19 +136,15 @@ public class RenderEngine implements IRenderEngine {
 
     // try to get image from resource folder first and as a fallback get it from
     // a normal folder
-    BufferedImage img;
-    try {
-      final InputStream imageFromResource = ClassLoader.getSystemResourceAsStream(absolutPath);
-      if (imageFromResource != null) {
-        img = ImageIO.read(imageFromResource);
-      } else {
-        try (final InputStream imageFile = new FileInputStream(absolutPath)) {
-          img = ImageIO.read(imageFile);
-        }
+    BufferedImage img = null;
+    final InputStream imageFile = FileUtilities.getGameFile(absolutPath);
+    if (imageFile != null) {
+      try {
+        img = ImageIO.read(imageFile);
+      } catch (final IOException e) {
+        e.printStackTrace();
+        return null;
       }
-    } catch (final IOException e) {
-      e.printStackTrace();
-      return null;
     }
 
     if (img == null) {
@@ -276,7 +274,7 @@ public class RenderEngine implements IRenderEngine {
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities) {
     this.renderEntities(g, entities, true);
   }
-  
+
   @Override
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
@@ -308,6 +306,7 @@ public class RenderEngine implements IRenderEngine {
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, final IVision vision) {
     this.renderEntities(g, entities, true, vision);
   }
+
   @Override
   public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort, final IVision vision) {
     // set render shape according to the vision
