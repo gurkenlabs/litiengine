@@ -171,6 +171,7 @@ public class Environment implements IEnvironment {
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setMapId(mapObject.getId());
     this.getColliders().add(col);
+    this.entities.get(RenderType.OVERLAY).add(col);
     Game.getPhysicsEngine().add(col.getBoundingBox());
   }
 
@@ -248,6 +249,7 @@ public class Environment implements IEnvironment {
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());
     this.getLightSources().add(light);
+    this.entities.get(RenderType.OVERLAY).add(light);
   }
 
   @Override
