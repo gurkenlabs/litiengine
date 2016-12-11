@@ -28,9 +28,6 @@ public class Spritesheet {
 
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
 
-  /** The path. */
-  private final String path;
-
   private final String name;
 
   /** The rows. */
@@ -121,7 +118,6 @@ public class Spritesheet {
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     this.image = image;
 
-    this.path = path;
     this.name = FileUtilities.getFileName(path);
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
@@ -129,9 +125,6 @@ public class Spritesheet {
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
     spritesheets.put(this.name.toLowerCase(), this);
-    if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
-      System.out.println("added " + image.hashCode() + " (" + path + ")");
-    }
   }
 
   private Spritesheet(final ITileset tileset) {
@@ -143,7 +136,7 @@ public class Spritesheet {
   }
 
   public BufferedImage getImage() {
-    return this.image != null ? this.image : RenderEngine.getImage(this.getPath());
+    return this.image;
   }
 
   /**
@@ -153,10 +146,6 @@ public class Spritesheet {
    */
   public int getColumns() {
     return this.columns;
-  }
-
-  public String getPath() {
-    return this.path != null ? this.path : "";
   }
 
   /**

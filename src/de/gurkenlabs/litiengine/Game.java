@@ -237,7 +237,7 @@ public abstract class Game {
     int spriteCnt = 0;
     for(SpriteSheetInfo sprite : file.getSpriteSheets()){
       int before = Spritesheet.spritesheets.size();
-      Spritesheet.load(ImageProcessing.decodeToImage(sprite.getImage()), sprite.getPath(), sprite.getWidth(), sprite.getHeight());
+      Spritesheet.load(ImageProcessing.decodeToImage(sprite.getImage()), sprite.getName(), sprite.getWidth(), sprite.getHeight());
       if(Spritesheet.spritesheets.size() > before){
         spriteCnt++;
       }

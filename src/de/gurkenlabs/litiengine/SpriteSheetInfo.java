@@ -8,15 +8,13 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "sprite")
 public class SpriteSheetInfo {
 
   @XmlElement
   private String image;
-
-  @XmlAttribute(name = "path")
-  private String path;
 
   @XmlAttribute(name = "width")
   private int width;
@@ -31,7 +29,6 @@ public class SpriteSheetInfo {
   }
 
   public SpriteSheetInfo(Spritesheet sprite){
-    this.setPath(sprite.getPath());
     this.setWidth(sprite.getSpriteWidth());
     this.setHeight(sprite.getSpriteHeight());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage()));
@@ -39,28 +36,12 @@ public class SpriteSheetInfo {
   }
   
   public SpriteSheetInfo(String basepath, String path, int width, int height) {
-    this.setPath(path);
     this.setWidth(width);
     this.setHeight(height);
-    this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + this.getPath())));
-    this.initializeName();
+    this.setName(FileUtilities.getFileName(path));
+    this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + path)));
   }
 
-  private void initializeName() {
-    String name = this.getPath();
-
-    String[] parts = name.split("\\\\");
-    this.setName(parts[parts.length - 1].replaceAll("\\.(jpg|png|gif|bmp)", ""));
-  }
-
-  @XmlTransient
-  public String getPath() {
-    return this.path;
-  }
-
-  public void setPath(String p) {
-    this.path = p;
-  }
 
   @XmlTransient
   public int getWidth() {
