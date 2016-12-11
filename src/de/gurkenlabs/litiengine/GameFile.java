@@ -7,15 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
 
-import javax.print.attribute.standard.Compression;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -25,10 +22,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.xml.Map;
 import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.zip.CompressionUtilities;
 
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {

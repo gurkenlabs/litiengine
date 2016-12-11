@@ -17,7 +17,6 @@ import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -40,7 +39,6 @@ import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.StreamUtilities;
 
 /**
  * The Class GraphicsEngine.

@@ -3,16 +3,12 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.gui.screens;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.ICameraProvider;
-import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**

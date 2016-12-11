@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,11 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.tilemap.ITileset;
 import de.gurkenlabs.util.io.FileUtilities;
 
