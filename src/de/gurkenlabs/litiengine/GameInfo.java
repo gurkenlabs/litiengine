@@ -132,4 +132,8 @@ public class GameInfo {
   public void setRenderScale(float renderScale) {
     this.renderScale = renderScale;
   }
+  
+  public String toString(){
+    return !this.getSubTitle().isEmpty() ? this.getName() + " - " + this.getSubTitle() + " " + this.getVersion() : this.getName() + " - " + this.getVersion();
+  }
 }

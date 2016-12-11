@@ -126,7 +126,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       break;
     }
 
-    return true;
+    return false;
   }
 
   /**

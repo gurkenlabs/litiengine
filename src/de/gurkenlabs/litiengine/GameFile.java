@@ -100,8 +100,13 @@ public class GameFile implements Serializable {
     return null;
   }
 
-  public void save(String path, String fileName, boolean compress) {
-    File newFile = new File(path + "/" + fileName + "." + FILE_EXTENSION);
+  public String save(String fileName, boolean compress) {
+    
+    if(!fileName.endsWith("." + FILE_EXTENSION)){
+      fileName +="." + FILE_EXTENSION;
+    }
+    
+    File newFile = new File(fileName);
 
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
@@ -127,5 +132,7 @@ public class GameFile implements Serializable {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    return newFile.toString();
   }
 }

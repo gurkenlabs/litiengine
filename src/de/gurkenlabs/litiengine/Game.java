@@ -140,8 +140,7 @@ public abstract class Game {
   }
 
   public static void init() {
-    final String gameTitle = !getInfo().getSubTitle().isEmpty() ? getInfo().getName() + " - " + getInfo().getSubTitle() + " " + getInfo().getVersion() : getInfo().getName() + " - " + getInfo().getVersion();
-    final ScreenManager scrMgr = new ScreenManager(gameTitle);
+    final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop(scrMgr.getRenderComponent(), scrMgr);

@@ -61,4 +61,8 @@ public interface IScreenManager extends ICameraProvider {
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
 
   public void setIconImage(Image image);
+  
+  public void setTitle(String string);
+  
+  public String getTitle();
 }
