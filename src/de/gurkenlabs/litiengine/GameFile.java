@@ -44,23 +44,37 @@ public class GameFile implements Serializable {
   @XmlElement(name = "sprite")
   private List<SpriteSheetInfo> spriteSheets;
 
+  @XmlElementWrapper(name = "spriteFiles")
+  @XmlElement(name = "spritefile")
+  private String[] spriteFiles;
+
   public GameFile() {
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
+    this.spriteFiles = new String[] {};
   }
 
   @XmlTransient
   public List<Map> getMaps() {
-    return maps;
+    return this.maps;
   }
 
   @XmlTransient
   public List<SpriteSheetInfo> getSpriteSheets() {
-    return spriteSheets;
+    return this.spriteSheets;
+  }
+
+  @XmlTransient
+  public String[] getSpriteFiles() {
+    return this.spriteFiles;
   }
 
   public void setSpriteSheets(List<SpriteSheetInfo> spriteSheets) {
     this.spriteSheets = spriteSheets;
+  }
+
+  public void setSpriteFiles(String[] spriteFiles) {
+    this.spriteFiles = spriteFiles;
   }
 
   public static GameFile load(String file) {
@@ -101,11 +115,11 @@ public class GameFile implements Serializable {
   }
 
   public String save(String fileName, boolean compress) {
-    
-    if(!fileName.endsWith("." + FILE_EXTENSION)){
-      fileName +="." + FILE_EXTENSION;
+
+    if (!fileName.endsWith("." + FILE_EXTENSION)) {
+      fileName += "." + FILE_EXTENSION;
     }
-    
+
     File newFile = new File(fileName);
 
     try {
@@ -132,7 +146,7 @@ public class GameFile implements Serializable {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
     return newFile.toString();
   }
 }

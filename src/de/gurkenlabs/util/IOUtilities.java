@@ -34,4 +34,39 @@ public class IOUtilities {
 
     return fileNames;
   }
+
+  public static List<String> findFiles(List<String> fileNames, Path dir, String... files) {
+    final String[] blackList = new String[] { "\\bin", "\\screenshots" };
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+      for (Path path : stream) {
+        if (path.toFile().isDirectory()) {
+          boolean blacklisted = false;
+          for (String black : blackList) {
+            if (path.toAbsolutePath().toString().contains(black)) {
+              blacklisted = true;
+              break;
+            }
+          }
+
+          if (!blacklisted) {
+            findFiles(fileNames, path, files);
+          }
+
+        } else {
+          for (String file : files) {
+            if (path.toAbsolutePath().toString().endsWith(file)) {
+
+              fileNames.add(path.toAbsolutePath().toString());
+            }
+          }
+
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return fileNames;
+  }
+
 }

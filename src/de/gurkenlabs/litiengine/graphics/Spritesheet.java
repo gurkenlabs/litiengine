@@ -6,14 +6,18 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
@@ -22,11 +26,11 @@ import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {
 
-  public static final List<Spritesheet> spritesheets = new CopyOnWriteArrayList<>();
+  public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
 
   /** The path. */
   private final String path;
-  
+
   private final String name;
 
   /** The rows. */
@@ -47,7 +51,7 @@ public class Spritesheet {
 
   public static List<Spritesheet> load(final String spriteInfoFile) {
     final String COMMENT_CHAR = "#";
-    
+
     ArrayList<Spritesheet> sprites = new ArrayList<>();
     InputStream fileStream = FileUtilities.getGameFile(spriteInfoFile);
     if (fileStream == null) {
@@ -56,33 +60,32 @@ public class Spritesheet {
 
     try (BufferedReader br = new BufferedReader(new InputStreamReader(fileStream))) {
       String line;
-      int cnt = 0;
       while ((line = br.readLine()) != null) {
-        
-        if(line.isEmpty() || line.startsWith(COMMENT_CHAR)){
+
+        if (line.isEmpty() || line.startsWith(COMMENT_CHAR)) {
           continue;
         }
-        
+
         List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
         if (items.size() < 3) {
           continue;
         }
 
         try {
-          String name = Game.getInfo().getSpritesDirectory() + items.get(0);
+          String dir = FileUtilities.getParentDirPath(spriteInfoFile);
+          String name = Paths.get(dir, items.get(0)).toString();
 
           int width = Integer.parseInt(items.get(1));
           int height = Integer.parseInt(items.get(2));
 
           sprites.add(load(name, width, height));
-          cnt++;
         } catch (NumberFormatException nfe) {
           nfe.printStackTrace();
           continue;
         }
       }
-      
-      System.out.println(cnt + " spritesheets loaded from '" + spriteInfoFile + "'");
+
+      System.out.println(sprites.size() + " spritesheets loaded from '" + spriteInfoFile + "'");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -91,31 +94,16 @@ public class Spritesheet {
   }
 
   public static Spritesheet load(final ITileset tileset) {
-    Spritesheet found = find(tileset.getImage().getAbsoluteSourcePath());
-    if (found != null) {
-      return found;
-    }
-
     Spritesheet sprite = new Spritesheet(tileset);
     return sprite;
   }
 
   public static Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {
-    Spritesheet found = find(path);
-    if (found != null) {
-      return found;
-    }
-
     Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
     return sprite;
   }
 
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    Spritesheet found = find(path);
-    if (found != null) {
-      return found;
-    }
-
     Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
     return sprite;
   }
@@ -124,15 +112,10 @@ public class Spritesheet {
     if (path == null || path.isEmpty()) {
       return null;
     }
-    
+
     String name = FileUtilities.getFileName(path);
 
-    final Optional<Spritesheet> sheet = spritesheets.stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst();
-    if (!sheet.isPresent()) {
-      return null;
-    }
-
-    return sheet.get();
+    return spritesheets.get(name.toLowerCase());
   }
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
@@ -145,8 +128,10 @@ public class Spritesheet {
 
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
-    spritesheets.add(this);
-    System.out.println("added " + image.hashCode() + " (" + path + ")");
+    spritesheets.put(this.name.toLowerCase(), this);
+    if (Game.getConfiguration().DEBUG.isDebugEnabled()) {
+      System.out.println("added " + image.hashCode() + " (" + path + ")");
+    }
   }
 
   private Spritesheet(final ITileset tileset) {
@@ -173,12 +158,14 @@ public class Spritesheet {
   public String getPath() {
     return this.path != null ? this.path : "";
   }
-  
+
   /**
-   * The unique name of this spritesheet. A spritesheet can always be identified by this name within a game project.
+   * The unique name of this spritesheet. A spritesheet can always be identified
+   * by this name within a game project.
+   * 
    * @return The name of the spritesheet.
    */
-  public String getName(){
+  public String getName() {
     return this.name;
   }
 

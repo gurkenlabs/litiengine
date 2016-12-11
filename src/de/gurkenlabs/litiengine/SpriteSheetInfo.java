@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 @XmlRootElement(name = "sprite")
@@ -29,8 +30,15 @@ public class SpriteSheetInfo {
   public SpriteSheetInfo() {
   }
 
+  public SpriteSheetInfo(Spritesheet sprite){
+    this.setPath(sprite.getPath());
+    this.setWidth(sprite.getSpriteWidth());
+    this.setHeight(sprite.getSpriteHeight());
+    this.setImage(ImageProcessing.encodeToString(sprite.getImage()));
+    this.setName(sprite.getName());
+  }
+  
   public SpriteSheetInfo(String basepath, String path, int width, int height) {
-    super();
     this.setPath(path);
     this.setWidth(width);
     this.setHeight(height);
