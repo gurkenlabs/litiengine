@@ -149,7 +149,7 @@ public class ImageComponent extends GuiComponent {
     if (this.getSpritesheet() == null) {
       return null;
     }
-    final String cacheKey = MessageFormat.format("{0}_{1}_{2}_{3}x{4}", this.getSpritesheet().getPath().hashCode(), this.isHovered(), this.isPressed(), this.getWidth(), this.getHeight());
+    final String cacheKey = MessageFormat.format("{0}_{1}_{2}_{3}x{4}", this.getSpritesheet().getName().hashCode(), this.isHovered(), this.isPressed(), this.getWidth(), this.getHeight());
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
