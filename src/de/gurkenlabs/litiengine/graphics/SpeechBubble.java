@@ -15,7 +15,9 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.gurkenlabs.litiengine.Game;
@@ -26,6 +28,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class SpeechBubble implements IUpdateable, IRenderable {
+  private static final Map<IEntity, SpeechBubble> activeSpeechBubbles = new ConcurrentHashMap<>();
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int DISPLAYTIME_MIN = 2000;
   private static final int LETTER_WRITE_DELAY = 30;
@@ -48,13 +51,28 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private String displayedText;
   private final Queue<Character> currentTextQueue;
   private long lastCharPoll;
+  
+  private boolean cancelled;
 
-  public SpeechBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
+  public static SpeechBubble create(final IEntity entity, final Font font, final String text) {
+    return new SpeechBubble(entity, font, text);
+  }
+
+  public static SpeechBubble create(final IEntity entity, final Font font, final String text, final Sound typeSound) {
+    return new SpeechBubble(entity, font, text, typeSound);
+  }
+
+  private SpeechBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
     this(entity, font, text);
     this.typeSound = typeSound;
   }
 
-  public SpeechBubble(final IEntity entity, final Font font, final String text) {
+  private SpeechBubble(final IEntity entity, final Font font, final String text) {
+    SpeechBubble active = activeSpeechBubbles.get(entity);
+    if(active != null){
+      active.cancel();
+    }
+    
     this.textBoxWidth = (int) (entity.getWidth() * 4);
     this.entity = entity;
     this.font = font;
@@ -71,6 +89,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     this.createBubbleImage();
     Game.getEnvironment().add(this, RenderType.OVERLAY);
     Game.getLoop().registerForUpdate(this);
+    activeSpeechBubbles.put(entity, this);
   }
 
   private void createBubbleImage() {
@@ -152,7 +171,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   @Override
   public void update(final IGameLoop loop) {
-    if (this.currentText == null) {
+    if (this.currentText == null || this.cancelled) {
       Game.getEnvironment().removeRenderable(this);
       loop.unregisterFromUpdate(this);
       return;
@@ -178,5 +197,9 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     // continue displaying currently displayed text
+  }
+  
+  private void cancel(){
+    this.cancelled = true;
   }
 }

@@ -84,10 +84,8 @@ public class DebugRenderer {
 
     if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
-      if (collisionEntity.hasCollision()) {
-        g.setColor(Color.RED);
-        RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
-      }
+      g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
+      RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
     }
   }
 

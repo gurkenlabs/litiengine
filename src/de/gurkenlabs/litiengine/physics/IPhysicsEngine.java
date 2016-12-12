@@ -59,7 +59,9 @@ public interface IPhysicsEngine extends IUpdateable {
   public List<Rectangle2D> getAllCollisionBoxes();
 
   public List<Rectangle2D> getStaticCollisionBoxes();
-
+  
+  public List<ICollisionEntity> getCollisionEntities();
+  
   public boolean move(IMovableEntity entity, double x, double y, float delta);
 
   public boolean move(IMovableEntity entity, float delta);

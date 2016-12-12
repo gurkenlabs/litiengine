@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -37,21 +38,25 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IMovableEntity> getMovableEntities();
 
-  public List<IEntity> getEntities();
+  public Collection<IEntity> getEntities();
   
-  public List<IEntity> getEntities(RenderType renderType);
+  public Collection<IEntity> getEntities(RenderType renderType);
   
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
-  public List<Collider> getColliders();
+  public Collection<Collider> getColliders();
 
   public ICombatEntity getCombatEntity(final int mapId);
 
   public IMovableEntity getMovableEntity(final int mapId);
+  
+  public IEntity get(final int mapId);
 
-  public List<LightSource> getLightSources();
+  public Collection<LightSource> getLightSources();
+  
+  public Collection<Trigger> getTriggers();
 
   /**
    * Gets the next unique local map id. (All local map ids are negative).

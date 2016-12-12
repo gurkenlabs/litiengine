@@ -4,6 +4,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics2D;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -31,17 +32,17 @@ public interface IRenderEngine {
 
   public void render(Graphics2D g, IRenderable renderable);
 
-  public void render(Graphics2D g, List<? extends IRenderable> renderables);
+  public void render(Graphics2D g, Collection<? extends IRenderable> renderables);
 
-  public void render(Graphics2D g, List<? extends IRenderable> renderables, IVision vision);
+  public void render(Graphics2D g, Collection<? extends IRenderable> renderables, IVision vision);
   
-  public void renderEntities(Graphics2D g, List<? extends IEntity> entities);
+  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities);
 
-  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, boolean sort);
+  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, boolean sort);
 
-  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, IVision vision);
+  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, IVision vision);
   
-  public void renderEntities(Graphics2D g, List<? extends IEntity> entities, boolean sort, IVision vision);
+  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, boolean sort, IVision vision);
 
   public void renderEntity(Graphics2D g, IEntity entity);
 

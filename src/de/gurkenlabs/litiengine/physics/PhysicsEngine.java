@@ -240,7 +240,12 @@ public class PhysicsEngine implements IPhysicsEngine {
   public List<Rectangle2D> getStaticCollisionBoxes() {
     return this.staticCollisionBoxes;
   }
-
+  
+  @Override
+  public List<ICollisionEntity> getCollisionEntities() {
+    return this.collisionEntities;
+  }
+  
   /**
    * Checks if is in map.
    *
@@ -365,4 +370,6 @@ public class PhysicsEngine implements IPhysicsEngine {
     this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
     this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
   }
+
+
 }

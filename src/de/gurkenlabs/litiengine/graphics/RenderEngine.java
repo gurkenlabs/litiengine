@@ -19,6 +19,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -255,12 +256,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics2D g, final List<? extends IRenderable> renderables) {
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
 
   @Override
-  public void render(final Graphics2D g, final List<? extends IRenderable> renderables, final IVision vision) {
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -272,12 +273,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
     this.renderEntities(g, entities, true);
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
@@ -304,12 +305,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final IVision vision) {
     this.renderEntities(g, entities, true, vision);
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final List<? extends IEntity> entities, boolean sort, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, boolean sort, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -338,19 +339,16 @@ public class RenderEngine implements IRenderEngine {
       }
     }
 
-    boolean rendered = false;
     if (entity.getAnimationController() != null) {
       final BufferedImage img = entity.getAnimationController().getCurrentSprite();
       renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
-      rendered = true;
     }
 
     if (entity instanceof IRenderable) {
       ((IRenderable) entity).render(g);
-      rendered = true;
     }
 
-    if (rendered && this.entityRenderedConsumer.size() > 0) {
+    if (this.entityRenderedConsumer.size() > 0) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
         consumer.accept(renderEvent);
       }

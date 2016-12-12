@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectTypes;
@@ -67,7 +68,7 @@ import de.gurkenlabs.util.io.FileUtilities;
 public class Environment implements IEnvironment {
   private static int localIdSequence = 0;
   private static int mapIdSequence;
-  private final List<MapLocation> spawnPoints;
+
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
@@ -77,12 +78,15 @@ public class Environment implements IEnvironment {
 
   private IMap map;
 
-  private final Map<RenderType, List<IEntity>> entities;
-  private final List<Collider> colliders;
+  private final Map<RenderType, Map<Integer, IEntity>> entities;
+
   private final Map<Integer, IMovableEntity> movableEntities;
   private final Map<Integer, ICombatEntity> combatEntities;
-
-  private final List<LightSource> lightSources;
+  
+  private final List<MapLocation> spawnPoints;
+  private final Collection<LightSource> lightSources;
+  private final Collection<Trigger> triggers;
+  private final Collection<Collider> colliders;
   private Image staticShadowImage;
   private AmbientLight ambientLight;
 
@@ -90,15 +94,16 @@ public class Environment implements IEnvironment {
 
   private Environment() {
     this.entities = new ConcurrentHashMap<>();
-    this.entities.put(RenderType.GROUND, new CopyOnWriteArrayList<>());
-    this.entities.put(RenderType.NORMAL, new CopyOnWriteArrayList<>());
-    this.entities.put(RenderType.OVERLAY, new CopyOnWriteArrayList<>());
+    this.entities.put(RenderType.GROUND, new ConcurrentHashMap<>());
+    this.entities.put(RenderType.NORMAL, new ConcurrentHashMap<>());
+    this.entities.put(RenderType.OVERLAY, new ConcurrentHashMap<>());
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
 
     this.lightSources = new CopyOnWriteArrayList<>();
     this.colliders = new CopyOnWriteArrayList<>();
+    this.triggers = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -137,6 +142,11 @@ public class Environment implements IEnvironment {
 
   @Override
   public void add(final IEntity entity) {
+    // set local map id if none is set for the entity
+    if(entity.getMapId() == 0){
+      entity.setMapId(this.getLocalMapId());
+    }
+    
     if (entity instanceof ICombatEntity) {
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
@@ -151,8 +161,20 @@ public class Environment implements IEnvironment {
         Game.getPhysicsEngine().add(coll);
       }
     }
+    
+    if(entity instanceof Collider){
+      this.colliders.add((Collider)entity);
+    }
+    
+    if(entity instanceof LightSource){
+      this.lightSources.add((LightSource)entity);
+    }
+    
+    if(entity instanceof Trigger){
+      this.triggers.add((Trigger)entity);
+    }
 
-    this.entities.get(entity.getRenderType()).add(entity);
+    this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
   }
 
   @Override
@@ -179,8 +201,7 @@ public class Environment implements IEnvironment {
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setMapId(mapObject.getId());
-    this.getColliders().add(col);
-    this.entities.get(RenderType.OVERLAY).add(col);
+    this.add(col);
     Game.getPhysicsEngine().add(col.getBoundingBox());
   }
 
@@ -257,8 +278,7 @@ public class Environment implements IEnvironment {
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());
-    this.getLightSources().add(light);
-    this.entities.get(RenderType.OVERLAY).add(light);
+    this.add(light);
   }
 
   @Override
@@ -322,6 +342,328 @@ public class Environment implements IEnvironment {
     this.getSpawnPoints().add(new MapLocation(mapObject.getId(), new Point(mapObject.getLocation())));
   }
 
+  @Override
+  public void clear() {
+    this.dispose(this.getEntities());
+    this.getCombatEntities().clear();
+    this.getMovableEntities().clear();
+    this.getLightSources().clear();
+    this.getColliders().clear();
+    this.getSpawnPoints().clear();
+    this.entities.get(RenderType.GROUND).clear();
+    this.entities.get(RenderType.NORMAL).clear();
+    this.entities.get(RenderType.OVERLAY).clear();
+  }
+
+  @Override
+  public List<ICombatEntity> findCombatEntities(final Shape shape) {
+    return this.findCombatEntities(shape, (entity) -> true);
+  }
+
+  @Override
+  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
+    final ArrayList<ICombatEntity> entities = new ArrayList<>();
+    if (shape == null) {
+      return entities;
+    }
+
+    // for rectangle we can just use the intersects method
+    if (shape instanceof Rectangle2D) {
+      final Rectangle2D rect = (Rectangle2D) shape;
+      for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+        if (combatEntity.getHitBox().intersects(rect)) {
+          entities.add(combatEntity);
+        }
+      }
+
+      return entities;
+    }
+
+    // for other shapes, we check if the shape's bounds intersect the hitbox and
+    // if so, we then check if the actual shape intersects the hitbox
+    for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
+        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
+          entities.add(combatEntity);
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  @Override
+  public Collection<IEntity> getEntities() {
+    ArrayList<IEntity> ent = new ArrayList<>();
+    ent.addAll(this.entities.get(RenderType.GROUND).values());
+    ent.addAll(this.entities.get(RenderType.NORMAL).values());
+    ent.addAll(this.entities.get(RenderType.OVERLAY).values());
+    return ent;
+  }
+
+  @Override
+  public Collection<IEntity> getEntities(RenderType renderType) {
+    return this.entities.get(renderType).values();
+  }
+
+  @Override
+  public AmbientLight getAmbientLight() {
+    return this.ambientLight;
+  }
+
+  @Override
+  public Collection<Collider> getColliders() {
+    return this.colliders;
+
+  }
+
+  @Override
+  public Collection<ICombatEntity> getCombatEntities() {
+    return this.combatEntities.values();
+  }
+
+  @Override
+  public ICombatEntity getCombatEntity(final int mapId) {
+    if (this.combatEntities.containsKey(mapId)) {
+      return this.combatEntities.get(mapId);
+    }
+
+    return null;
+  }
+
+  public Collection<IRenderable> getGroundRenderable() {
+    return this.groundRenderable;
+  }
+
+  @Override
+  public Collection<LightSource> getLightSources() {
+    return this.lightSources;
+  }
+
+  /**
+   * Negative map ids are only used locally.
+   */
+  @Override
+  public synchronized int getLocalMapId() {
+    return --localIdSequence;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.map.IMapContainer#getMap()
+   */
+  @Override
+  public IMap getMap() {
+    return this.map;
+  }
+
+  @Override
+  public synchronized int getMapId() {
+    return ++mapIdSequence;
+  }
+
+  @Override
+  public Collection<IMovableEntity> getMovableEntities() {
+    return this.movableEntities.values();
+  }
+  
+  @Override
+  public IEntity get(int mapId) {
+    IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
+    if(entity != null){
+      return entity;
+    }
+    
+    entity = this.entities.get(RenderType.NORMAL).get(mapId);
+    if(entity != null){
+      return entity;
+    }
+    
+    entity = this.entities.get(RenderType.OVERLAY).get(mapId);
+    if(entity != null){
+      return entity;
+    }
+    
+    return null;
+  }
+
+  @Override
+  public IMovableEntity getMovableEntity(final int mapId) {
+    if (this.movableEntities.containsKey(mapId)) {
+      return this.movableEntities.get(mapId);
+    }
+
+    return null;
+  }
+
+  public List<IRenderable> getOverlayRenderable() {
+    return this.overlayRenderable;
+  }
+
+  @Override
+  public List<MapLocation> getSpawnPoints() {
+    return this.spawnPoints;
+  }
+  
+  @Override
+  public Collection<Trigger> getTriggers() {
+    return this.triggers;
+  }
+
+  public Image getStaticShadowImage() {
+    return this.staticShadowImage;
+  }
+
+  @Override
+  public WeatherType getWeather() {
+    return this.weather == null ? WeatherType.Clear : this.weather.getType();
+  }
+
+  @Override
+  public void init() {
+    this.loadMapObjects();
+    this.addStaticShadows();
+    this.addAmbientLight();
+  }
+
+  @Override
+  public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
+    this.entitiesRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onMapRendered(final Consumer<Graphics2D> consumer) {
+    this.mapRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
+    this.overlayRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void remove(final int mapId) {
+    this.movableEntities.remove(mapId);
+    this.combatEntities.remove(mapId);
+
+    this.removeEntity(mapId, RenderType.NORMAL);
+    this.removeEntity(mapId, RenderType.GROUND);
+    this.removeEntity(mapId, RenderType.OVERLAY);
+  }
+
+  @Override
+  public void remove(IEntity entity) {
+    this.movableEntities.values().remove(entity);
+    this.combatEntities.values().remove(entity);
+    this.entities.get(entity.getRenderType()).remove(entity);
+  }
+
+  @Override
+  public void removeRenderable(final IRenderable renderable) {
+    if (this.getGroundRenderable().contains(renderable)) {
+      this.getGroundRenderable().remove(renderable);
+    }
+
+    if (this.getOverlayRenderable().contains(renderable)) {
+      this.getOverlayRenderable().remove(renderable);
+    }
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
+
+    Game.getRenderEngine().renderMap(g, this.getMap());
+    this.informConsumers(g, this.mapRenderedConsumer);
+
+    for (final IRenderable rend : this.getGroundRenderable()) {
+      rend.render(g);
+    }
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
+    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
+      Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
+    }
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
+    this.informConsumers(g, this.entitiesRenderedConsumer);
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
+
+    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
+
+    // render static shadows
+    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+
+    if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
+      // this.getAmbientLight().createImage();
+      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+    }
+
+    if (this.weather != null) {
+      this.weather.render(g);
+    }
+
+    for (final IRenderable rend : this.getOverlayRenderable()) {
+      rend.render(g);
+    }
+
+    this.informConsumers(g, this.overlayRenderedConsumer);
+
+    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
+  }
+
+  @Override
+  public void setWeather(final WeatherType weather) {
+    switch (weather) {
+    case Rain:
+      this.weather = new RainEmitter();
+      break;
+    case Snow:
+      this.weather = new SnowEmitter();
+      break;
+    case Clear:
+    default:
+      this.weather = null;
+      break;
+    }
+
+    if (weather != null) {
+      this.weather.activate(Game.getLoop());
+    }
+  }
+  
+  private void loadMapObjects() {
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+      }
+    }
+  }
+
+  private void removeEntity(int mapId, RenderType renderType) {
+    IEntity remove = null;
+    for (IEntity e : this.entities.get(renderType).values()) {
+      if (e.getMapId() == mapId) {
+        // Remove the current element from the iterator and the list.
+        remove = e;
+        break;
+      }
+    }
+
+    this.entities.get(renderType).remove(remove);
+  }
+  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
+    for (final Consumer<Graphics2D> consumer : consumers) {
+      consumer.accept(g);
+    }
+  }
+  
   private void addStaticShadows() {
     // build map specific cache key, respecting the lights and color
     // final StringBuilder sb = new StringBuilder();
@@ -458,19 +800,6 @@ public class Environment implements IEnvironment {
     // ImageCache.IMAGES.put(cacheKey, img);
   }
 
-  @Override
-  public void clear() {
-    this.dispose(this.getEntities());
-    this.getCombatEntities().clear();
-    this.getMovableEntities().clear();
-    this.getLightSources().clear();
-    this.getColliders().clear();
-    this.getSpawnPoints().clear();
-    this.entities.get(RenderType.GROUND).clear();
-    this.entities.get(RenderType.NORMAL).clear();
-    this.entities.get(RenderType.OVERLAY).clear();
-  }
-
   private void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
@@ -488,296 +817,7 @@ public class Environment implements IEnvironment {
       }
     }
   }
-
-  @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape) {
-    return this.findCombatEntities(shape, (entity) -> true);
-  }
-
-  @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
-    final ArrayList<ICombatEntity> entities = new ArrayList<>();
-    if (shape == null) {
-      return entities;
-    }
-
-    // for rectangle we can just use the intersects method
-    if (shape instanceof Rectangle2D) {
-      final Rectangle2D rect = (Rectangle2D) shape;
-      for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
-        if (combatEntity.getHitBox().intersects(rect)) {
-          entities.add(combatEntity);
-        }
-      }
-
-      return entities;
-    }
-
-    // for other shapes, we check if the shape's bounds intersect the hitbox and
-    // if so, we then check if the actual shape intersects the hitbox
-    for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
-      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
-        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
-          entities.add(combatEntity);
-        }
-      }
-    }
-
-    return entities;
-  }
-
-  @Override
-  public List<IEntity> getEntities() {
-    ArrayList<IEntity> ent = new ArrayList<>();
-    ent.addAll(this.entities.get(RenderType.GROUND));
-    ent.addAll(this.entities.get(RenderType.NORMAL));
-    ent.addAll(this.entities.get(RenderType.OVERLAY));
-    return ent;
-  }
-
-  @Override
-  public List<IEntity> getEntities(RenderType renderType) {
-    return this.entities.get(renderType);
-  }
-
-  @Override
-  public AmbientLight getAmbientLight() {
-    return this.ambientLight;
-  }
-
-  @Override
-  public List<Collider> getColliders() {
-    return this.colliders;
-
-  }
-
-  @Override
-  public Collection<ICombatEntity> getCombatEntities() {
-    return this.combatEntities.values();
-  }
-
-  @Override
-  public ICombatEntity getCombatEntity(final int mapId) {
-    if (this.combatEntities.containsKey(mapId)) {
-      return this.combatEntities.get(mapId);
-    }
-
-    return null;
-  }
-
-  public List<IRenderable> getGroundRenderable() {
-    return this.groundRenderable;
-  }
-
-  @Override
-  public List<LightSource> getLightSources() {
-    return this.lightSources;
-  }
-
-  /**
-   * Negative map ids are only used locally.
-   */
-  @Override
-  public synchronized int getLocalMapId() {
-    return --localIdSequence;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.map.IMapContainer#getMap()
-   */
-  @Override
-  public IMap getMap() {
-    return this.map;
-  }
-
-  @Override
-  public synchronized int getMapId() {
-    return ++mapIdSequence;
-  }
-
-  @Override
-  public Collection<IMovableEntity> getMovableEntities() {
-    return this.movableEntities.values();
-  }
-
-  @Override
-  public IMovableEntity getMovableEntity(final int mapId) {
-    if (this.movableEntities.containsKey(mapId)) {
-      return this.movableEntities.get(mapId);
-    }
-
-    return null;
-  }
-
-  public List<IRenderable> getOverlayRenderable() {
-    return this.overlayRenderable;
-  }
-
-  @Override
-  public List<MapLocation> getSpawnPoints() {
-    return this.spawnPoints;
-  }
-
-  public Image getStaticShadowImage() {
-    return this.staticShadowImage;
-  }
-
-  @Override
-  public WeatherType getWeather() {
-    return this.weather == null ? WeatherType.Clear : this.weather.getType();
-  }
-
-  protected Weather getWeatherEmitter() {
-    return this.weather;
-  }
-
-  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
-    for (final Consumer<Graphics2D> consumer : consumers) {
-      consumer.accept(g);
-    }
-  }
-
-  @Override
-  public void init() {
-    this.loadMapObjects();
-    this.addStaticShadows();
-    this.addAmbientLight();
-  }
-
-  private void loadMapObjects() {
-    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-          continue;
-        }
-
-        this.addMapObject(mapObject);
-      }
-    }
-  }
-
-  @Override
-  public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
-    this.entitiesRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onMapRendered(final Consumer<Graphics2D> consumer) {
-    this.mapRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
-    this.overlayRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void remove(final int mapId) {
-    this.movableEntities.remove(mapId);
-    this.combatEntities.remove(mapId);
-
-    this.removeEntity(mapId, RenderType.NORMAL);
-    this.removeEntity(mapId, RenderType.GROUND);
-    this.removeEntity(mapId, RenderType.OVERLAY);
-  }
-
-  private void removeEntity(int mapId, RenderType renderType) {
-    IEntity remove = null;
-    for (IEntity e : this.entities.get(renderType)) {
-      if (e.getMapId() == mapId) {
-        // Remove the current element from the iterator and the list.
-        remove = e;
-        break;
-      }
-    }
-
-    this.entities.get(renderType).remove(remove);
-  }
-
-  @Override
-  public void remove(IEntity entity) {
-    this.movableEntities.values().remove(entity);
-    this.combatEntities.values().remove(entity);
-    this.entities.get(entity.getRenderType()).remove(entity);
-  }
-
-  @Override
-  public void removeRenderable(final IRenderable renderable) {
-    if (this.getGroundRenderable().contains(renderable)) {
-      this.getGroundRenderable().remove(renderable);
-    }
-
-    if (this.getOverlayRenderable().contains(renderable)) {
-      this.getOverlayRenderable().remove(renderable);
-    }
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
-
-    Game.getRenderEngine().renderMap(g, this.getMap());
-    this.informConsumers(g, this.mapRenderedConsumer);
-
-    for (final IRenderable rend : this.getGroundRenderable()) {
-      rend.render(g);
-    }
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND), false);
-    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
-      Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
-    }
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL));
-    this.informConsumers(g, this.entitiesRenderedConsumer);
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY), false);
-
-    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
-
-    // render static shadows
-    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
-
-    if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      // this.getAmbientLight().createImage();
-      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
-    }
-
-    if (this.weather != null) {
-      this.weather.render(g);
-    }
-
-    for (final IRenderable rend : this.getOverlayRenderable()) {
-      rend.render(g);
-    }
-
-    this.informConsumers(g, this.overlayRenderedConsumer);
-
-    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
-  }
-
-  @Override
-  public void setWeather(final WeatherType weather) {
-    switch (weather) {
-    case Rain:
-      this.weather = new RainEmitter();
-      break;
-    case Snow:
-      this.weather = new SnowEmitter();
-      break;
-    case Clear:
-    default:
-      this.weather = null;
-      break;
-    }
-
-    if (weather != null) {
-      this.weather.activate(Game.getLoop());
-    }
-  }
-
+  
   private List<IMapObject> getCollisionBoxMapObjects() {
     final List<IMapObject> collisionBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
