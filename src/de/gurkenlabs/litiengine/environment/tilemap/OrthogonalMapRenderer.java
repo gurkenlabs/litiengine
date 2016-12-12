@@ -52,7 +52,15 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     // get the grid id relative to the sprite sheet since we use a 0 based
     // approach to calculate the position
     final int index = tile.getGridId() - tileset.getFirstGridId();
-    final Image img = Spritesheet.load(tileset).getSprite(index);
+    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    if (sprite == null) {
+      sprite = Spritesheet.load(tileset);
+      if (sprite == null) {
+        return null;
+      }
+    }
+
+    final Image img = sprite.getSprite(index);
     return ImageProcessing.applyAlphaChannel(img, tileset.getImage().getTransparentColor());
   }
 

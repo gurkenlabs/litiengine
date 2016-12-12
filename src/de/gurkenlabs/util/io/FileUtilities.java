@@ -22,6 +22,10 @@ public class FileUtilities {
   }
 
   public static String getFileName(String path) {
+    if(path == null || path.isEmpty()){
+      return "";
+    }
+    
     String name = path;
     final int pos = name.lastIndexOf(".");
     if (pos > 0) {

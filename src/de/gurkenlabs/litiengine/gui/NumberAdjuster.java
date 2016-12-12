@@ -51,10 +51,10 @@ public class NumberAdjuster extends TextFieldComponent {
     this.getComponents().add(button2);
     super.prepare();
     this.button1.onClicked(c -> {
-      this.setCurrentValue(this.getCurrentValue().add(this.getStepSize()));
+      this.increment();
     });
     this.button2.onClicked(c -> {
-      this.setCurrentValue(this.getCurrentValue().subtract(this.getStepSize()));
+      this.decrement();
     });
     this.onChangeConfirmed(e -> {
       try {
@@ -63,6 +63,14 @@ public class NumberAdjuster extends TextFieldComponent {
         System.out.println("only numerical values allowed!");
       }
     });
+  }
+
+  public void increment() {
+    this.setCurrentValue(this.getCurrentValue().add(this.getStepSize()));
+  }
+
+  public void decrement() {
+    this.setCurrentValue(this.getCurrentValue().subtract(this.getStepSize()));
   }
 
   public BigDecimal getLowerBound() {

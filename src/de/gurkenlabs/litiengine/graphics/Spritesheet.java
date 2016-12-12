@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +17,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
+import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.tilemap.ITileset;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {
-
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
-
+  
+  private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private final String name;
 
   /** The rows. */
@@ -87,6 +90,15 @@ public class Spritesheet {
   }
 
   public static Spritesheet load(final ITileset tileset) {
+    if (tileset == null || tileset.getImage() == null) {
+      return null;
+    }
+
+    if (tileset.getImage().getAbsoluteSourcePath() == null) {
+      System.out.println("tileset '" + tileset.getName() + "' could not be loaded because the absolut path was not set. Consider finding the spritesheet by the name instead.");
+      return null;
+    }
+
     Spritesheet sprite = new Spritesheet(tileset);
     return sprite;
   }
@@ -124,7 +136,7 @@ public class Spritesheet {
   }
 
   private Spritesheet(final ITileset tileset) {
-    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath()), tileset.getImage().getAbsoluteSourcePath(), tileset.getTileDimension().width, tileset.getTileDimension().height);
+    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath()), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
   private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
@@ -166,13 +178,19 @@ public class Spritesheet {
 
     final BufferedImage bigImg = this.getImage();
     if (bigImg == null) {
+      log.warning("no image defined for sprite '" + this.getName() +"'");
       return null;
     }
 
     final Point position = this.getLocation(index);
-    final BufferedImage smallImage = bigImg.getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
-    ImageCache.SPRITES.putPersistent(imageCacheKey, smallImage);
-    return smallImage;
+    try {
+      final BufferedImage smallImage = bigImg.getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
+      ImageCache.SPRITES.putPersistent(imageCacheKey, smallImage);
+      return smallImage;
+    } catch (RasterFormatException rfe) {
+      log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" +position.x +"," + position.y +"] from sprite'" + this.getName() + "'");
+      return null;
+    }
   }
 
   /**

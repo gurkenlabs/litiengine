@@ -127,6 +127,10 @@ public class ListField extends GuiComponent {
   public int getSelection() {
     return this.selection;
   }
+  
+  public Object getSelectedObject(){
+    return this.getContentArray()[this.getSelection()];
+  }
 
   public Spritesheet getButtonSprite() {
     return this.buttonSprite;

@@ -126,6 +126,10 @@ public class RenderEngine implements IRenderEngine {
    * @return the image
    */
   public static BufferedImage getImage(final String absolutPath) {
+    if(absolutPath == null || absolutPath.isEmpty()){
+      return null;
+    }
+    
     final String cacheKey = absolutPath.hashCode() + "";
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       return ImageCache.IMAGES.get(cacheKey);

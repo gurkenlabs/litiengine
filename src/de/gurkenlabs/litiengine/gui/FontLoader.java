@@ -106,6 +106,10 @@ public class FontLoader {
   public static Font getIconFontThree() {
     return getFont("fontello.ttf", 16f);
   }
+  
+  public static Font getFontAwesome(){
+    return getFont("fontawesome-webfont.ttf", 16f);
+  }
 
   /**
    * Gets the menu font1.
