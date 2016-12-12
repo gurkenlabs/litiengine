@@ -22,10 +22,10 @@ public class FileUtilities {
   }
 
   public static String getFileName(String path) {
-    if(path == null || path.isEmpty()){
+    if (path == null || path.isEmpty()) {
       return "";
     }
-    
+
     String name = path;
     final int pos = name.lastIndexOf(".");
     if (pos > 0) {
@@ -41,7 +41,7 @@ public class FileUtilities {
         name = name.substring(lastForwardSlash + 1, name.length());
       }
     }
-    
+
     return name;
   }
 
@@ -53,5 +53,27 @@ public class FileUtilities {
     }
 
     return "";
+  }
+
+  public static String getExtension(String fileName) {
+    try {
+      return fileName.substring(fileName.lastIndexOf(".") + 1);
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  public static boolean deleteDir(File dir) {
+    if (dir.isDirectory()) {
+      String[] children = dir.list();
+      for (int i = 0; i < children.length; i++) {
+        boolean success = deleteDir(new File(dir, children[i]));
+        if (!success) {
+          return false;
+        }
+      }
+    }
+
+    return dir.delete(); // The directory is empty now and can be deleted.
   }
 }

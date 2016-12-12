@@ -17,6 +17,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.image.ImageSerializer;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.zip.CompressionUtilities;
 
@@ -76,16 +77,6 @@ public class ImageCache {
   /** The sub folder. */
   private final String subFolder;
 
-  /**
-   * Instantiates a new image cache.
-   *
-   * @param subfolder
-   *          the subfolder
-   */
-  private ImageCache(final String subfolder) {
-    this.cache = new ConcurrentHashMap<>();
-    this.subFolder = subfolder;
-  }
 
   /**
    * Contains key.
@@ -114,26 +105,6 @@ public class ImageCache {
   }
 
   /**
-   * Gets the file name.
-   *
-   * @param key
-   *          the key
-   * @return the file name
-   */
-  private String getFileName(final String key) {
-    return this.getSubFolderName() + "\\" + key;
-  }
-
-  /**
-   * Gets the sub folder name.
-   *
-   * @return the sub folder name
-   */
-  private String getSubFolderName() {
-    return CACHE_DIRECTORY + this.subFolder;
-  }
-
-  /**
    * Load all.
    */
   public void loadAll() {
@@ -155,38 +126,6 @@ public class ImageCache {
           child.delete();
         }
       }
-    }
-  }
-
-  /**
-   * Load image.
-   *
-   * @param key
-   *          the key
-   * @return the buffered image
-   */
-  private synchronized BufferedImage loadImage(final String key) {
-    final File file = new File(this.getFileName(key));
-    if (!file.exists()) {
-      return null;
-    }
-
-    BufferedImage img;
-    try {
-      img = ImageIO.read(file);
-      if (img == null) {
-        return null;
-      }
-
-      final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
-      compatibleImg.createGraphics().drawImage(img, 0, 0, null);
-      compatibleImg.createGraphics().dispose();
-
-      this.cache.put(key, compatibleImg);
-      return compatibleImg;
-    } catch (final Exception e) {
-      e.printStackTrace();
-      return null;
     }
   }
 
@@ -217,7 +156,63 @@ public class ImageCache {
     this.saveImage(key, value);
     return value;
   }
+  
+  public void clearPersistent(){
+    final File dir = new File(this.getSubFolderName());
+    if (!dir.exists() || !dir.isDirectory()) {
+      return;
+    }
+    
+    System.out.println("deleted '" + dir.toString() + "'");
+    FileUtilities.deleteDir(dir);
+    this.cache.clear();
+  }
+  
+  /**
+   * Instantiates a new image cache.
+   *
+   * @param subfolder
+   *          the subfolder
+   */
+  private ImageCache(final String subfolder) {
+    this.cache = new ConcurrentHashMap<>();
+    this.subFolder = subfolder;
+  }
+  
+  /**
+   * Gets the file name.
+   *
+   * @param key
+   *          the key
+   * @return the file name
+   */
+  private String getFileName(final String key) {
+    return this.getSubFolderName() + "\\" + key;
+  }
 
+  /**
+   * Gets the sub folder name.
+   *
+   * @return the sub folder name
+   */
+  private String getSubFolderName() {
+    return CACHE_DIRECTORY + this.subFolder;
+  }
+
+  /**
+   * Load image.
+   *
+   * @param key
+   *          the key
+   * @return the buffered image
+   */
+  private synchronized BufferedImage loadImage(final String key) {
+    final BufferedImage img = ImageSerializer.loadImage(this.getFileName(key));
+    
+    this.cache.put(key, img);
+    return img;
+  }
+  
   /**
    * Save image.
    *
@@ -227,21 +222,6 @@ public class ImageCache {
    *          the value
    */
   private void saveImage(final String key, final BufferedImage value) {
-    try {
-      final File file = new File(this.getFileName(key));
-      final Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("png");
-      final ImageWriter writer = iter.next();
-      final ImageWriteParam iwp = writer.getDefaultWriteParam();
-
-      file.getParentFile().mkdirs();
-      try (final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile())) {
-        writer.setOutput(output);
-        final IIOImage outimage = new IIOImage(value, null, null);
-        writer.write(null, outimage, iwp);
-        writer.dispose();
-      }
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
+    ImageSerializer.saveImage(this.getFileName(key), value);
   }
 }

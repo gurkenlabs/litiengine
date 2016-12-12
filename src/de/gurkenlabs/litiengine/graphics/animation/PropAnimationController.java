@@ -30,6 +30,10 @@ public class PropAnimationController extends AnimationController {
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
+    if(prop == null || prop.getSpritePath() == null || prop.getSpritePath().isEmpty()){
+      return null;
+    }
+    
     String propState = state.name().toLowerCase();
     final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
     final Spritesheet sheet = Spritesheet.find(name);

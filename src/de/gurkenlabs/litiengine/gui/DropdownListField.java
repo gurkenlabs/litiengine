@@ -143,7 +143,24 @@ public class DropdownListField extends GuiComponent {
   }
 
   public void setSelection(int selectionIndex) {
+    if(this.getContentList() == null){
+      return;
+    }
+    
     this.getContentList().setSelection(selectionIndex);
+  }
+  
+  public void setSelection(Object selectedObject){
+    if(selectedObject == null){
+      return;
+    }
+    
+    for(int i = 0; i < this.getContentArray().length; i++){
+      if(this.getContentArray()[i] != null && this.getContentArray()[i].equals(selectedObject)){
+        this.setSelection(i);
+        return;
+      }
+    }
   }
 
   @Override
