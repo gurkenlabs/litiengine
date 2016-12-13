@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.Graphics2D;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -10,70 +10,93 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class Trigger extends CollisionEntity implements IUpdateable {
-  private final Collection<Consumer<String>> triggeredConsumer;
+  public static final String TOGGLE_MESSAGE = "toggle";
+  private final Collection<Consumer<TriggerEvent>> activatedConsumer;
+  private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
   private final String message;
   private int target;
-  private final TriggerActivation activation;
-  private boolean oneTime;
-  private boolean activated;
+  private List<IEntity> activated;
 
-  public Trigger(String message, TriggerActivation activation) {
-    this.triggeredConsumer = new CopyOnWriteArrayList<>();
+  private final String name;
+
+  public Trigger(String name, String message) {
+    this.activatedConsumer = new CopyOnWriteArrayList<>();
+    this.deactivatedConsumer = new CopyOnWriteArrayList<>();
+    this.activated = new CopyOnWriteArrayList<>();
+    this.name = name;
     this.message = message;
-    this.activation = activation;
     Game.getLoop().registerForUpdate(this);
   }
 
   @Override
   public void update(IGameLoop loop) {
-    switch (this.activation) {
-    case COLLISION:
-      ICollisionEntity collEntity = null;
-      for (ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
-        if (coll.getCollisionBox().intersects(this.getCollisionBox())) {
-          collEntity = coll;
-          break;
-        }
+    List<IEntity> collEntities = new CopyOnWriteArrayList<>();
+    for (ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
+      if (coll.getCollisionBox().intersects(this.getCollisionBox())) {
+        collEntities.add(coll);
       }
-
-      if (collEntity != null) {
-        if (this.getTarget() == 0) {
-          this.target = collEntity.getMapId();
-        }
-
-        this.activate();
-      } else {
-        this.activated = false;
-      }
-
-      break;
-    default:
-      break;
     }
+
+    for(IEntity ent : collEntities){
+      if(this.activated.contains(ent)){
+        continue;
+      }
+      
+      this.activate(ent, ent.getMapId());
+    }
+    
+    // send deactivation event
+    for(IEntity ent : this.activated){
+      if(!collEntities.contains(ent)){
+        for(Consumer<TriggerEvent> cons : this.deactivatedConsumer){
+          cons.accept(new TriggerEvent(this.message, ent, this.target != 0 ? this.target : ent.getMapId()));
+        }
+      }
+    }
+    
+    this.activated = collEntities;
   }
 
-  public void activate() {
-    if (this.activated || this.target == 0) {
+  @Override
+  public String sendMessage(int sender, final String message) {
+    if (message == null || message.isEmpty()) {
+      return null;
+    }
+
+    if (message.equals(TOGGLE_MESSAGE)) {
+      this.activate(Game.getEnvironment().get(sender), sender);
+    }
+
+    return null;
+  }
+
+  public void activate(IEntity activator, int tar) {
+    if (this.activated.contains(activator) || this.getTarget() == 0 && tar == 0) {
       return;
     }
 
-    IEntity entity = Game.getEnvironment().get(this.target);
+    // always take local target if it is set
+    int t = this.getTarget() == 0 ? tar : this.getTarget();
+    IEntity entity = Game.getEnvironment().get(t);
     if (entity == null) {
       return;
     }
 
-    for (Consumer<String> cons : this.triggeredConsumer) {
-      cons.accept(this.message);
+    for (Consumer<TriggerEvent> cons : this.activatedConsumer) {
+      cons.accept(new TriggerEvent(this.message, activator, tar));
     }
 
     entity.sendMessage(this.getMapId(), this.message);
-    this.activated = true;
+    this.activated.add(activator);
+  }
+
+  public void activate() {
+    this.activate(Game.getEnvironment().get(this.getMapId()), this.target);
   }
 
   public String getMessage() {
@@ -84,23 +107,18 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.target;
   }
 
-  public TriggerActivation getActivation() {
-    return this.activation;
-  }
-
-  public boolean isOneTime() {
-    return oneTime;
-  }
-
-  public void setOneTime(boolean oneTime) {
-    this.oneTime = oneTime;
-  }
-
   public void setTarget(int target) {
     this.target = target;
   }
 
-  public void onTriggered(Consumer<String> cons) {
-    this.triggeredConsumer.add(cons);
+  public String getName() {
+    return this.name;
+  }
+
+  public void onActivated(Consumer<TriggerEvent> cons) {
+    this.activatedConsumer.add(cons);
+  }
+  public void onDeactivated(Consumer<TriggerEvent> cons) {
+    this.deactivatedConsumer.add(cons);
   }
 }
