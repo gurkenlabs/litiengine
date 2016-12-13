@@ -655,6 +655,10 @@ public class Environment implements IEnvironment {
         break;
       }
     }
+    
+    if(remove == null){
+      return;
+    }
 
     this.entities.get(renderType).remove(remove);
   }
