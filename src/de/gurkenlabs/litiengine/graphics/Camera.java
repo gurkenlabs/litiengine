@@ -7,13 +7,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.util.MathUtilities;
 
 /**
  * The Class Camera.
  */
-public class Camera implements ICamera {
+public class Camera implements ICamera, IUpdateable {
 
   /**
    * Provides the center location for the viewport.
@@ -28,6 +30,12 @@ public class Camera implements ICamera {
 
   /** The shake tick. */
   private long shakeTick;
+  
+  private int shakeDelay;
+  private long lastShake;
+  
+  private double shakeOffsetX;
+  private double shakeOffsetY;
 
   private Rectangle2D viewPort;
 
@@ -36,21 +44,22 @@ public class Camera implements ICamera {
    */
   public Camera() {
     this.focus = new Point2D.Double(0, 0);
+    Game.getLoop().registerForUpdate(this);
   }
-
-  /**
-   * Apply shake effect.
-   *
-   * @param cameraLocation
-   *          the camera location
-   * @return the point2 d
-   */
-  protected Point2D applyShakeEffect(final Point2D cameraLocation) {
-    if (this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration()) {
-      return new Point2D.Double(cameraLocation.getX() + this.getShakeOffset() * MathUtilities.randomSign(), cameraLocation.getY() + this.getShakeOffset() * MathUtilities.randomSign());
-    }
-
-    return cameraLocation;
+  
+  @Override
+  public void update(IGameLoop loop) {
+   if(!this.isShakeEffectActive()){
+     this.shakeOffsetX = 0;
+     this.shakeOffsetY = 0;
+     return;
+   }
+   
+   if(loop.getDeltaTime(this.lastShake) > shakeDelay){
+     this.shakeOffsetX =this.getShakeIntensity() * MathUtilities.randomSign();
+     this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
+     this.lastShake = loop.getTicks();
+   }    
   }
 
   @Override
@@ -89,33 +98,6 @@ public class Camera implements ICamera {
   @Override
   public double getPixelOffsetY() {
     return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
-  }
-
-  /**
-   * Gets the shake duration.
-   *
-   * @return the shake duration
-   */
-  protected int getShakeDuration() {
-    return this.shakeDuration;
-  }
-
-  /**
-   * Gets the shake offset.
-   *
-   * @return the shake offset
-   */
-  protected double getShakeOffset() {
-    return this.shakeIntensity;
-  }
-
-  /**
-   * Gets the shake tick.
-   *
-   * @return the shake tick
-   */
-  protected long getShakeTick() {
-    return this.shakeTick;
   }
 
   @Override
@@ -180,7 +162,7 @@ public class Camera implements ICamera {
    * @see de.gurkenlabs.liti.graphics.ICamera#shake(int, int)
    */
   @Override
-  public void shake(final double intensity, final int shakeDuration) {
+  public void shake(final double intensity, final int delay, final int shakeDuration) {
     this.shakeTick = Game.getLoop().getTicks();
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
@@ -198,10 +180,56 @@ public class Camera implements ICamera {
 
   @Override
   public void updateFocus() {
+    this.focus = this.applyShakeEffect(this.focus);
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
         Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
+  
+  /**
+   * Gets the shake duration.
+   *
+   * @return the shake duration
+   */
+  private int getShakeDuration() {
+    return this.shakeDuration;
+  }
 
+  /**
+   * Gets the shake offset.
+   *
+   * @return the shake offset
+   */
+  private double getShakeIntensity() {
+    return this.shakeIntensity;
+  }
+
+  /**
+   * Gets the shake tick.
+   *
+   * @return the shake tick
+   */
+  private long getShakeTick() {
+    return this.shakeTick;
+  }
+  
+  /**
+   * Apply shake effect.
+   *
+   * @param cameraLocation
+   *          the camera location
+   * @return the point2 d
+   */
+  private Point2D applyShakeEffect(final Point2D cameraLocation) {
+    if (this.isShakeEffectActive()) {
+      return new Point2D.Double(cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
+    }
+
+    return cameraLocation;
+  }
+  
+  private boolean isShakeEffectActive(){
+    return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
+  }
   private double getViewPortCenterX() {
     return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().getRenderScale();
   }

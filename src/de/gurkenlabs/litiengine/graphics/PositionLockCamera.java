@@ -43,7 +43,7 @@ public class PositionLockCamera extends Camera {
   @Override
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedEntity().getDimensionCenter();
-    this.setFocus(this.applyShakeEffect(cameraLocation));
+    this.setFocus(cameraLocation);
     super.updateFocus();
   }
 }

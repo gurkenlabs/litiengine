@@ -31,7 +31,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable{
 
   @Override
   public void updateFocus() {
-    this.setFocus(this.applyShakeEffect(this.location));
+    this.setFocus(this.location);
     super.updateFocus();
   }
   
