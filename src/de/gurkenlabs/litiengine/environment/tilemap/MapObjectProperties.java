@@ -17,4 +17,5 @@ public class MapObjectProperties {
   public static final String LIGHTCOLOR = "lightColor";
   public static final String LIGHTSHAPE = "lightShape";
   public static final String SHADOWTYPE = "shadowType";
+  public static final String TRIGGERMESSAGE ="triggermessage";
 }

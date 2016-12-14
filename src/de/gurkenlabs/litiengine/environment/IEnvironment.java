@@ -96,20 +96,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void removeRenderable(IRenderable renderable);
 
   public void setWeather(WeatherType weather);
-  
-  public void addCollisionBox(IMapObject mapObject);
-
-  public void addDecorMob(final IMapObject mapObject);
-
-  public void addEmitter(final IMapObject mapObject);
-
-  public void addLightSource(IMapObject mapObject);
 
   public void addMapObject(final IMapObject mapObject);
-
-  public void addMob(final IMapObject mapObject);
-
-  public void addProp(final IMapObject mapObject);
-
-  public void addSpawnpoint(final IMapObject mapObject);
 }

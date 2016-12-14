@@ -17,6 +17,6 @@ public class MapObjectTypes {
   public static final String TRIGGER = "TRIGGER";
   public static final String SPAWNPOINT_PICKUP = "SPAWNPOINT_PICKUP";
 
-  public static final List<String> ALL = new ArrayList<String>(Arrays.asList(EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, PROP, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP));;
+  public static final List<String> ALL = new ArrayList<String>(Arrays.asList(PROP, TRIGGER, EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, SPAWNPOINT_PICKUP));;
 
 }

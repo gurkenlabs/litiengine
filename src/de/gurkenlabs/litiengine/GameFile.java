@@ -116,7 +116,10 @@ public class GameFile implements Serializable {
     }
 
     File newFile = new File(fileName);
-
+    if(newFile.exists()){
+      newFile.delete();
+    }
+    
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();

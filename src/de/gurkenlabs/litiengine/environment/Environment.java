@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class Environment implements IEnvironment {
 
   private final Map<Integer, IMovableEntity> movableEntities;
   private final Map<Integer, ICombatEntity> combatEntities;
-  
+
   private final List<MapLocation> spawnPoints;
   private final Collection<LightSource> lightSources;
   private final Collection<Trigger> triggers;
@@ -125,10 +126,10 @@ public class Environment implements IEnvironment {
     if (loadedMap == null) {
       final IMapLoader tmxLoader = new TmxMapLoader();
       this.map = tmxLoader.LoadMap(mapPath);
-    }else{
+    } else {
       this.map = loadedMap;
     }
-    
+
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
@@ -143,10 +144,10 @@ public class Environment implements IEnvironment {
   @Override
   public void add(final IEntity entity) {
     // set local map id if none is set for the entity
-    if(entity.getMapId() == 0){
+    if (entity.getMapId() == 0) {
       entity.setMapId(this.getLocalMapId());
     }
-    
+
     if (entity instanceof ICombatEntity) {
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
@@ -161,17 +162,17 @@ public class Environment implements IEnvironment {
         Game.getPhysicsEngine().add(coll);
       }
     }
-    
-    if(entity instanceof Collider){
-      this.colliders.add((Collider)entity);
+
+    if (entity instanceof Collider) {
+      this.colliders.add((Collider) entity);
     }
-    
-    if(entity instanceof LightSource){
-      this.lightSources.add((LightSource)entity);
+
+    if (entity instanceof LightSource) {
+      this.lightSources.add((LightSource) entity);
     }
-    
-    if(entity instanceof Trigger){
-      this.triggers.add((Trigger)entity);
+
+    if (entity instanceof Trigger) {
+      this.triggers.add((Trigger) entity);
     }
 
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
@@ -193,153 +194,15 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void addCollisionBox(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
-      return;
-    }
-    Collider col = new Collider();
-    col.setLocation(mapObject.getLocation());
-    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    col.setMapId(mapObject.getId());
-    this.add(col);
-    Game.getPhysicsEngine().add(col.getBoundingBox());
-  }
-
-  @Override
-  public void addDecorMob(final IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.DECORMOB)) {
-      return;
-    }
-    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.MOBTYPE));
-    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
-      mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
-      mob.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
-    }
-    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    mob.setMapId(mapObject.getId());
-    this.add(mob);
-  }
-
-  @Override
-  public void addEmitter(final IMapObject mapObject) {
-    if (mapObject.getType() != MapObjectTypes.EMITTER) {
-      return;
-    }
-    Emitter emitter = null;
-    switch (mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)) {
-    case "fire":
-      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      this.add(emitter);
-      final LightSource light = new LightSource(this, 50, Color.ORANGE, LightSource.ELLIPSE);
-      light.setSize(emitter.getWidth(), emitter.getHeight());
-      light.setLocation(emitter.getLocation());
-      this.getLightSources().add(light);
-      break;
-    case "shimmer":
-      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      this.add(emitter);
-      break;
-    }
-
-    if (emitter != null) {
-      emitter.setMapId(mapObject.getId());
-    }
-  }
-
-  @Override
-  public void addLightSource(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
-      return;
-    }
-    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
-      return;
-    }
-
-    final int brightness = Integer.parseInt(mapObjectBrightness);
-    final Color color = Color.decode(mapObjectColor);
-
-    String lightType;
-    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
-    case LightSource.ELLIPSE:
-      lightType = LightSource.ELLIPSE;
-      break;
-    case LightSource.RECTANGLE:
-      lightType = LightSource.RECTANGLE;
-      break;
-    default:
-      lightType = LightSource.ELLIPSE;
-    }
-    final LightSource light = new LightSource(this, brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
-    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    light.setLocation(mapObject.getLocation());
-    light.setMapId(mapObject.getId());
-    this.add(light);
-  }
-
-  @Override
   public void addMapObject(final IMapObject mapObject) {
     this.addCollisionBox(mapObject);
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
     this.addProp(mapObject);
+    this.addEmitter(mapObject);
     this.addDecorMob(mapObject);
     this.addMob(mapObject);
-  }
-
-  @Override
-  public void addMob(final IMapObject mapObject) {
-
-  }
-
-  @Override
-  public void addProp(final IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
-      return;
-    }
-
-    // set map properties by map object
-    Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
-    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
-    prop.setMapId(mapObject.getId());
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
-      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
-      prop.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
-      prop.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
-    }
-    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-
-    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
-      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
-    }
-    prop.setMapId(mapObject.getId());
-    this.add(prop);
-  }
-
-  @Override
-  public void addSpawnpoint(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.SPAWNPOINT)) {
-      return;
-    }
-
-    this.getSpawnPoints().add(new MapLocation(mapObject.getId(), new Point(mapObject.getLocation())));
+    this.addTrigger(mapObject);
   }
 
   @Override
@@ -467,24 +330,24 @@ public class Environment implements IEnvironment {
   public Collection<IMovableEntity> getMovableEntities() {
     return this.movableEntities.values();
   }
-  
+
   @Override
   public IEntity get(int mapId) {
     IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
-    if(entity != null){
+    if (entity != null) {
       return entity;
     }
-    
+
     entity = this.entities.get(RenderType.NORMAL).get(mapId);
-    if(entity != null){
+    if (entity != null) {
       return entity;
     }
-    
+
     entity = this.entities.get(RenderType.OVERLAY).get(mapId);
-    if(entity != null){
+    if (entity != null) {
       return entity;
     }
-    
+
     return null;
   }
 
@@ -505,7 +368,7 @@ public class Environment implements IEnvironment {
   public List<MapLocation> getSpawnPoints() {
     return this.spawnPoints;
   }
-  
+
   @Override
   public Collection<Trigger> getTriggers() {
     return this.triggers;
@@ -557,6 +420,18 @@ public class Environment implements IEnvironment {
     this.movableEntities.values().remove(entity);
     this.combatEntities.values().remove(entity);
     this.entities.get(entity.getRenderType()).remove(entity);
+    
+    if(entity instanceof Collider){
+      this.colliders.remove(entity);
+    }
+    
+    if(entity instanceof LightSource){
+      this.lightSources.remove(entity);
+    }
+    
+    if(entity instanceof Trigger){
+      this.triggers.remove(entity);
+    }
   }
 
   @Override
@@ -633,7 +508,151 @@ public class Environment implements IEnvironment {
       this.weather.activate(Game.getLoop());
     }
   }
-  
+
+  protected void addCollisionBox(final IMapObject mapObject) {
+    if (!mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+      return;
+    }
+    Collider col = new Collider();
+    col.setLocation(mapObject.getLocation());
+    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    col.setMapId(mapObject.getId());
+    this.add(col);
+    Game.getPhysicsEngine().add(col.getBoundingBox());
+  }
+
+  protected void addDecorMob(final IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.DECORMOB)) {
+      return;
+    }
+    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.MOBTYPE));
+    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
+      mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
+      mob.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    }
+    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    mob.setMapId(mapObject.getId());
+    this.add(mob);
+  }
+
+  protected void addTrigger(IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.TRIGGER)) {
+      return;
+    }
+
+    String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
+    Trigger trigger = new Trigger(mapObject.getName(), message);
+    trigger.setMapId(mapObject.getId());
+    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
+    this.add(trigger);
+  }
+
+  protected void addEmitter(final IMapObject mapObject) {
+    if (mapObject.getType() != MapObjectTypes.EMITTER) {
+      return;
+    }
+    Emitter emitter = null;
+    switch (mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)) {
+    case "fire":
+      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      final LightSource light = new LightSource(this, 50, Color.ORANGE, LightSource.ELLIPSE);
+      light.setSize(emitter.getWidth(), emitter.getHeight());
+      light.setLocation(emitter.getLocation());
+      this.add(light);
+      break;
+    case "shimmer":
+      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      break;
+    }
+
+    if (emitter != null) {
+      emitter.setMapId(mapObject.getId());
+      this.add(emitter);
+    }
+  }
+
+  protected void addLightSource(final IMapObject mapObject) {
+    if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
+      return;
+    }
+    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
+      return;
+    }
+
+    final int brightness = Integer.parseInt(mapObjectBrightness);
+    final Color color = Color.decode(mapObjectColor);
+
+    String lightType;
+    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
+    case LightSource.ELLIPSE:
+      lightType = LightSource.ELLIPSE;
+      break;
+    case LightSource.RECTANGLE:
+      lightType = LightSource.RECTANGLE;
+      break;
+    default:
+      lightType = LightSource.ELLIPSE;
+    }
+    final LightSource light = new LightSource(this, brightness, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
+    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+    light.setLocation(mapObject.getLocation());
+    light.setMapId(mapObject.getId());
+    this.add(light);
+  }
+
+  protected void addMob(final IMapObject mapObject) {
+
+  }
+
+  protected void addProp(final IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
+      return;
+    }
+
+    // set map properties by map object
+    Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
+    prop.setMapId(mapObject.getId());
+    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
+      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
+      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
+      prop.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
+      prop.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    }
+    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+
+    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
+      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
+    }
+    prop.setMapId(mapObject.getId());
+    this.add(prop);
+  }
+
+  protected void addSpawnpoint(final IMapObject mapObject) {
+    if (!mapObject.getType().equals(MapObjectTypes.SPAWNPOINT)) {
+      return;
+    }
+
+    this.getSpawnPoints().add(new MapLocation(mapObject.getId(), new Point(mapObject.getLocation())));
+  }
+
   private void loadMapObjects() {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -655,19 +674,20 @@ public class Environment implements IEnvironment {
         break;
       }
     }
-    
-    if(remove == null){
+
+    if (remove == null) {
       return;
     }
 
     this.entities.get(renderType).remove(remove);
   }
+
   private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
     for (final Consumer<Graphics2D> consumer : consumers) {
       consumer.accept(g);
     }
   }
-  
+
   private void addStaticShadows() {
     // build map specific cache key, respecting the lights and color
     // final StringBuilder sb = new StringBuilder();
@@ -821,7 +841,7 @@ public class Environment implements IEnvironment {
       }
     }
   }
-  
+
   private List<IMapObject> getCollisionBoxMapObjects() {
     final List<IMapObject> collisionBoxes = new ArrayList<>();
     for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {

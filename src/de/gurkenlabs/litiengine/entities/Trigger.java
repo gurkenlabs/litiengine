@@ -18,7 +18,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public static final String TOGGLE_MESSAGE = "toggle";
   private final Collection<Consumer<TriggerEvent>> activatedConsumer;
   private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
-  private final String message;
+  private String message;
   private int target;
   private List<IEntity> activated;
 
@@ -115,6 +115,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.name;
   }
 
+  public void setMessage(String message){
+    this.message = message;
+  }
+  
   public void onActivated(Consumer<TriggerEvent> cons) {
     this.activatedConsumer.add(cons);
   }
