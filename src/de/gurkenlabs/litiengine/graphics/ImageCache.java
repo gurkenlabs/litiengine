@@ -208,6 +208,9 @@ public class ImageCache {
    */
   private synchronized BufferedImage loadImage(final String key) {
     final BufferedImage img = ImageSerializer.loadImage(this.getFileName(key));
+    if(img == null){
+      return null;
+    }
     
     this.cache.put(key, img);
     return img;

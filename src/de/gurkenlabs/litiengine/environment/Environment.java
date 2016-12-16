@@ -865,7 +865,7 @@ public class Environment implements IEnvironment {
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {
-      ambientAlpha = Integer.parseInt(alphaProp);
+      ambientAlpha = (int)Double.parseDouble(alphaProp);
       ambientColor = Color.decode(colorProp);
     } catch (final NumberFormatException e) {
     }
