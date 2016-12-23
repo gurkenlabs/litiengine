@@ -33,7 +33,7 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_TOPCENTER = 2;
   public static final int CROP_VALIGN_BOTTOM = 3;
 
-  public static String encodeToString(BufferedImage image) {
+  public static String encodeToString(final BufferedImage image) {
     String imageString = null;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -65,6 +65,54 @@ public class ImageProcessing {
     return image;
   }
 
+  public static BufferedImage rotate(final BufferedImage bufferedImage, double radians) {
+
+    AffineTransform tx = new AffineTransform();
+    tx.rotate(radians, bufferedImage.getWidth() / 2, bufferedImage.getHeight() / 2);
+
+    AffineTransformOp op = new AffineTransformOp(tx,
+        AffineTransformOp.TYPE_BILINEAR);
+    return op.filter(bufferedImage, null);
+  }
+  
+  /**
+   * Removes all pixels that have transparency and a color value between BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
+   * @param image
+   * @return
+   */
+  public static BufferedImage removeShadows(final BufferedImage image){
+    final Color LIGHT_SHADOW = new Color(100,100,100);
+    
+    final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
+    // Draw the image on to the buffered image
+    final Graphics2D bGr = bimage.createGraphics();
+    bGr.drawImage(image, 0, 0, null);
+    bGr.dispose();
+    
+    for (int y = 0; y < bimage.getHeight(); y++) {
+      for (int x = 0; x < bimage.getWidth(); x++) {
+        // if the current pixel is not transparent, we cannot stroke it
+        int rgb = bimage.getRGB(x, y);
+        int alpha = (rgb>>24) & 0xff;
+        int r = (rgb & 0xFF0000) >> 16;
+        int g = (rgb & 0xFF00) >> 8;
+        int b = rgb & 0xFF;
+        
+        if (alpha < 255 &&
+            r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() &&
+            g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() &&
+            b >= Color.BLACK.getBlue()  && b <= LIGHT_SHADOW.getBlue())
+        {
+          // Set fully transparent but keep color
+          bimage.setRGB(x, y, rgb & 0xFFFFFF);
+        }
+      }
+    }
+    
+    return bimage;
+  }
+
+  
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
@@ -321,7 +369,7 @@ public class ImageProcessing {
    *          the y
    * @return true, if successful
    */
-  private static boolean needsBorder(final BufferedImage image, final int x, final int y) {
+  public static boolean needsBorder(final BufferedImage image, final int x, final int y) {
     if (y < 0 || y >= image.getHeight()) {
       return false;
     }
@@ -452,5 +500,24 @@ public class ImageProcessing {
     g.dispose();
 
     return resizedImage;
+  }
+  
+  public static BufferedImage toBufferedImage(Image img)
+  {
+      if (img instanceof BufferedImage)
+      {
+          return (BufferedImage) img;
+      }
+
+      // Create a buffered image with transparency
+      BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+      // Draw the image on to the buffered image
+      Graphics2D bGr = bimage.createGraphics();
+      bGr.drawImage(img, 0, 0, null);
+      bGr.dispose();
+
+      // Return the buffered image
+      return bimage;
   }
 }

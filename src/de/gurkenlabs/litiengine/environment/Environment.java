@@ -407,30 +407,42 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final int mapId) {
-    this.movableEntities.remove(mapId);
-    this.combatEntities.remove(mapId);
-
-    this.removeEntity(mapId, RenderType.NORMAL);
-    this.removeEntity(mapId, RenderType.GROUND);
-    this.removeEntity(mapId, RenderType.OVERLAY);
+    IEntity ent = this.get(mapId);
+    if(ent == null){
+      System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
+      return;
+    }
+    
+    this.remove(ent);
   }
 
   @Override
   public void remove(IEntity entity) {
-    this.movableEntities.values().remove(entity);
-    this.combatEntities.values().remove(entity);
-    this.entities.get(entity.getRenderType()).remove(entity);
+    this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
     
-    if(entity instanceof Collider){
+    if (entity instanceof ICollisionEntity) {
+      ICollisionEntity coll = (ICollisionEntity) entity;
+      Game.getPhysicsEngine().remove(coll);
+    }
+
+    if (entity instanceof Collider) {
       this.colliders.remove(entity);
     }
-    
-    if(entity instanceof LightSource){
+
+    if (entity instanceof LightSource) {
       this.lightSources.remove(entity);
     }
-    
-    if(entity instanceof Trigger){
+
+    if (entity instanceof Trigger) {
       this.triggers.remove(entity);
+    }
+    
+    if(entity instanceof IMovableEntity) {
+      this.movableEntities.values().remove(entity);
+    }
+    
+    if(entity instanceof ICombatEntity) {
+      this.combatEntities.values().remove(entity);
     }
   }
 
@@ -665,23 +677,6 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private void removeEntity(int mapId, RenderType renderType) {
-    IEntity remove = null;
-    for (IEntity e : this.entities.get(renderType).values()) {
-      if (e.getMapId() == mapId) {
-        // Remove the current element from the iterator and the list.
-        remove = e;
-        break;
-      }
-    }
-
-    if (remove == null) {
-      return;
-    }
-
-    this.entities.get(renderType).remove(remove);
-  }
-
   private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
     for (final Consumer<Graphics2D> consumer : consumers) {
       consumer.accept(g);
@@ -865,7 +860,7 @@ public class Environment implements IEnvironment {
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {
-      ambientAlpha = (int)Double.parseDouble(alphaProp);
+      ambientAlpha = (int) Double.parseDouble(alphaProp);
       ambientColor = Color.decode(colorProp);
     } catch (final NumberFormatException e) {
     }
