@@ -18,4 +18,9 @@ public class MapObjectProperties {
   public static final String LIGHTSHAPE = "lightShape";
   public static final String SHADOWTYPE = "shadowType";
   public static final String TRIGGERMESSAGE ="triggermessage";
+  
+  public class Terrain{
+    public static final String REFLECTION = "reflection";
+    public static final String FRICTION = "friction";
+  }
 }

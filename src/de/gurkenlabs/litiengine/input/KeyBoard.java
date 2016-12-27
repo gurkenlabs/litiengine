@@ -65,7 +65,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 
   /**
    * Adds the pressed key.
-   *
+   * 
    * @param keyCode
    *          the key code
    */
@@ -115,6 +115,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     final int eventId = e.getID();
     switch (eventId) {
     case KeyEvent.KEY_PRESSED:
+      // on an avg. win 10 machine, this event fires every ~33 ms when a key is pressed down
       this.addPressedKey(e);
       break;
     case KeyEvent.KEY_RELEASED:
@@ -133,6 +134,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * Execute pressed keys.
    */
   private void executePressedKeys() {
+    // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
       this.keyPressedConsumer.forEach(consumer -> {
         if (consumer.getKey().intValue() == key.getKeyCode()) {

@@ -13,7 +13,10 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   private boolean moved;
   private float dx;
   private float dy;
-
+  public WASDEntityController(final IMovableEntity entity){
+    this(entity, 1);
+  }
+  
   public WASDEntityController(final IMovableEntity entity, final float stepSize) {
     super(entity);
     this.stepSize = stepSize;
@@ -65,7 +68,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
 
     if (this.moved) {
       final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.dx, this.getControlledEntity().getLocation().getY() + this.dy);
-      Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation, this.stepSize * this.getControlledEntity().getVelocity() / 100.0f);
+      Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation, this.stepSize * this.getControlledEntity().getVelocity() / Game.getConfiguration().CLIENT.getUpdaterate());
 
       this.dx = 0;
       this.dy = 0;
