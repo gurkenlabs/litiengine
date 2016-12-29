@@ -26,4 +26,6 @@ public @interface MovementInfo {
    * @return the velocity
    */
   short velocity() default 100;
+  
+  float acceleration() default 0;
 }

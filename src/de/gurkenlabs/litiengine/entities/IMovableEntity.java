@@ -16,6 +16,12 @@ public interface IMovableEntity extends ICollisionEntity {
    * @return
    */
   public float getVelocity();
+  
+  /**
+   * Gets a value that defines how long it takes the entity to reach the full velocity (in ms).
+   * @return
+   */
+  public float getAcceleration();
 
   public void onMoved(Consumer<IMovableEntity> consumer);
 
@@ -32,6 +38,10 @@ public interface IMovableEntity extends ICollisionEntity {
   public void setMovementController(IEntityMovementController movementController);
 
   public void setTurnOnMove(boolean turn);
+  
+  public void setVelocity(short velocity);
+
+  public void setAcceleration(float acceleration);
 
   public boolean turnOnMove();
 }

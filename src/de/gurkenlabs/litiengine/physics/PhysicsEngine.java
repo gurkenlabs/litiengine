@@ -277,7 +277,8 @@ public class PhysicsEngine implements IPhysicsEngine {
     return this.move(entity, newPosition);
   }
 
-  private boolean move(final IMovableEntity entity, Point2D newPosition) {
+  @Override
+  public boolean move(final IMovableEntity entity, Point2D newPosition) {
     boolean success = true;
     if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));

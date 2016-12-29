@@ -13,7 +13,8 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public abstract class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
-  private final short velocity;
+  private short velocity;
+  private float acceleration;
   private boolean turnOnMove;
   private Point2D moveDestination;
 
@@ -27,7 +28,16 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
+    this.acceleration = info.acceleration();
     this.setTurnOnMove(info.turnOnMove());
+  }
+
+  public void setVelocity(short velocity) {
+    this.velocity = velocity;
+  }
+
+  public void setAcceleration(float acceleration) {
+    this.acceleration = acceleration;
   }
 
   @Override
@@ -50,6 +60,11 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
   }
 
+  @Override
+  public float getAcceleration() {
+    return this.acceleration;
+  }
+  
   /**
    * Checks if is idle.
    *

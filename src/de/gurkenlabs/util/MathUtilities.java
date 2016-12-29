@@ -49,4 +49,8 @@ public class MathUtilities {
   public static int randomSign() {
     return randomBoolean() ? 1 : -1;
   }
+  
+  public static double clamp(double value, double min, double max){
+   return Math.max(min, Math.min(max, value));
+  }
 }

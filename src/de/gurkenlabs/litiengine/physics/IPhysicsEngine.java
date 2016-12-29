@@ -80,6 +80,7 @@ public interface IPhysicsEngine extends IUpdateable {
    */
   public boolean move(IMovableEntity entity, float angle, float delta);
 
+  public boolean move(final IMovableEntity entity, Point2D newPosition);
   /**
    * Moves the specified entity towards target by the delta.
    *
