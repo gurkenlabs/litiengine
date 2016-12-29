@@ -14,7 +14,9 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private short velocity;
-  private float acceleration;
+  private int acceleration;
+  private int deceleration;
+  
   private boolean turnOnMove;
   private Point2D moveDestination;
 
@@ -29,6 +31,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
     this.acceleration = info.acceleration();
+    this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
   }
 
@@ -36,7 +39,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
     this.velocity = velocity;
   }
 
-  public void setAcceleration(float acceleration) {
+  public void setAcceleration(int acceleration) {
     this.acceleration = acceleration;
   }
 
@@ -61,7 +64,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   }
 
   @Override
-  public float getAcceleration() {
+  public int getAcceleration() {
     return this.acceleration;
   }
   
@@ -140,5 +143,13 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
+  }
+
+  public int getDeceleration() {
+    return this.deceleration;
+  }
+
+  public void setDeceleration(int deceleration) {
+    this.deceleration = deceleration;
   }
 }

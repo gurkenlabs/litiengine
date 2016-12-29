@@ -13,7 +13,8 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class MovableEntity extends CollisionEntity implements IMovableEntity {
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private short velocity;
-  private float acceleration;
+  private int acceleration;
+  private int deceleration;
   private Point2D moveDestination;
 
   private boolean turnOnMove;
@@ -25,6 +26,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
     this.acceleration = info.acceleration();
+    this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
   }
 
@@ -47,7 +49,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     this.velocity = velocity;
   }
 
-  public void setAcceleration(float acceleration) {
+  public void setAcceleration(int acceleration) {
     this.acceleration = acceleration;
   }
 
@@ -105,7 +107,17 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public float getAcceleration() {
+  public int getAcceleration() {
     return this.acceleration;
   }
+
+  public int getDeceleration() {
+    return this.deceleration;
+  }
+
+  public void setDeceleration(int deceleration) {
+    this.deceleration = deceleration;
+  }
+  
+  
 }

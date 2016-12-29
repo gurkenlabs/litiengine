@@ -8,14 +8,17 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.MathUtilities;
 
+/**
+ * TODO: Apply friction to terrain in order to slow down acceleration and speed
+ * up deceleration.
+ */
 public class WASDEntityController extends ClientEntityMovementController implements IKeyObserver {
   private double velocityX, velocityY;
 
   private boolean movedX, movedY;
   private float dx;
   private float dy;
-  
-  int deceleration = 1000;
+
   public WASDEntityController(final IMovableEntity entity) {
     super(entity);
 
@@ -23,7 +26,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   }
 
   @Override
-  public void handlePressedKey(final KeyEvent keyCode) {   
+  public void handlePressedKey(final KeyEvent keyCode) {
 
     switch (keyCode.getKeyCode()) {
     case KeyEvent.VK_W:
@@ -54,44 +57,65 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   public void handleTypedKey(final KeyEvent keyCode) {
 
   }
-  
+
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
     double maxPixelsPerTick = this.getControlledEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate();
-    double inc = this.getControlledEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1/this.getControlledEntity().getAcceleration() * maxPixelsPerTick;
-    double dec = deceleration == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0/deceleration * maxPixelsPerTick;
-    double relativDec = dec / maxPixelsPerTick;
+    double inc = this.getControlledEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getAcceleration() * maxPixelsPerTick;
+    double dec = this.getControlledEntity().getDeceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;
-    
+
     if (this.movedX) {
       this.velocityX += this.dx * inc;
       this.velocityX = MathUtilities.clamp(this.velocityX, -maxPixelsPerTick, maxPixelsPerTick);
       this.dx = 0;
       this.movedX = false;
-    }else{
-      // TODO: depends on friction
-      this.velocityX *= 1 - relativDec;
-      if(Math.abs(this.velocityX) < STOP_THRESHOLD){
+    } else {
+      if (this.velocityX > 0) {
+        if (dec > this.velocityX) {
+          this.velocityX = 0;
+        } else {
+          this.velocityX -= dec;
+        }
+      } else if(this.velocityX < 0){
+        if (dec < this.velocityX) {
+          this.velocityX = 0;
+        } else {
+          this.velocityX += dec;
+        }
+      }
+
+      if (Math.abs(this.velocityX) < STOP_THRESHOLD) {
         this.velocityX = 0;
       }
     }
-    
+
     if (this.movedY) {
       this.velocityY += this.dy * inc;
       this.velocityY = MathUtilities.clamp(this.velocityY, -maxPixelsPerTick, maxPixelsPerTick);
       this.dy = 0;
       this.movedY = false;
-    }else{
-      // TODO: depends on friction
-      this.velocityY *= 1 - relativDec;
-      if(Math.abs(this.velocityY) < STOP_THRESHOLD){
+    } else {
+      if (this.velocityY > 0) {
+        if (dec > this.velocityY) {
+          this.velocityY = 0;
+        } else {
+          this.velocityY -= dec;
+        }
+      } else if(this.velocityY < 0){
+        if (dec < this.velocityY) {
+          this.velocityY = 0;
+        } else {
+          this.velocityY += dec;
+        }
+      }
+
+      if (Math.abs(this.velocityY) < STOP_THRESHOLD) {
         this.velocityY = 0;
       }
     }
-    
-    System.out.println("dec: " + dec + "; relDec: " + relativDec + "; velx: " + velocityX + "; velY: " + velocityY);
-    
+
     final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.velocityX, this.getControlledEntity().getLocation().getY() + this.velocityY);
     Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation);
   }
