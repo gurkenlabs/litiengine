@@ -93,7 +93,7 @@ public class Configuration {
    */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
-    InputStream settingsStream = FileUtilities.getGameFile(this.getFileName());
+    InputStream settingsStream = FileUtilities.getGameResource(this.getFileName());
     if (!settingsFile.exists() && settingsStream == null) {
       if (!settingsFile.exists() || !settingsFile.isFile()) {
         try {

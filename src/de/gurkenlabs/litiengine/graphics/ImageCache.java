@@ -42,7 +42,7 @@ public class ImageCache {
   public static final ImageCache IMAGES = new ImageCache("images");
 
   public static void loadCache(final String path) {
-    InputStream in = FileUtilities.getGameFile(CACHE_DUMP_NAME);
+    InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME);
     final File cacheFile = new File(path, CACHE_DUMP_NAME);
     if (in == null) {
       System.out.println("loading stream from " + cacheFile.toPath() + " failed!");

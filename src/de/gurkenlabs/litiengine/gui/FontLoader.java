@@ -150,7 +150,7 @@ public class FontLoader {
     try {
       final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-      InputStream fontStream = FileUtilities.getGameFile(fontName);
+      InputStream fontStream = FileUtilities.getGameResource(fontName);
       if(fontStream == null){
         log.severe("font '" + fontName +"' could not be loaded");
       }

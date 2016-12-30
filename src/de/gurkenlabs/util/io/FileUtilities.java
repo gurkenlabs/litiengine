@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class FileUtilities {
-  public static InputStream getGameFile(String file) {
+  public static InputStream getGameResource(String file) {
     try {
       final InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
       if (resourceStream != null) {

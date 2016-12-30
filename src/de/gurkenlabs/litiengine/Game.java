@@ -155,19 +155,6 @@ public abstract class Game {
     
     final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
-    final InputStream defaultLoggingConfig = FileUtilities.getGameFile(LOGGING_CONFIG_FILE);
-
-    // if a specific file exists, load it
-    // otherwise try to find a default logging configuration in any resource
-    // folder.
-    if (!new File(LOGGING_CONFIG_FILE).exists() && defaultLoggingConfig != null) {
-      try {
-        StreamUtilities.copy(defaultLoggingConfig, new File(LOGGING_CONFIG_FILE));
-      } catch (final IOException e) {
-        e.printStackTrace();
-      }
-    }
-
     if (new File(LOGGING_CONFIG_FILE).exists()) {
       System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
 

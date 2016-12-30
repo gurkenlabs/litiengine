@@ -170,7 +170,7 @@ public class RenderEngine implements IRenderEngine {
     // try to get image from resource folder first and as a fallback get it from
     // a normal folder
     BufferedImage img = null;
-    final InputStream imageFile = FileUtilities.getGameFile(absolutPath);
+    final InputStream imageFile = FileUtilities.getGameResource(absolutPath);
     if (imageFile != null) {
       try {
         img = ImageIO.read(imageFile);

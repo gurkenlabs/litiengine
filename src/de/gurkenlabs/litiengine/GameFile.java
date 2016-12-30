@@ -83,7 +83,7 @@ public class GameFile implements Serializable {
         gameFile = (GameFile) um.unmarshal(zipStream);
       } catch (ZipException e) {
         InputStream stream = null;
-        stream = FileUtilities.getGameFile(file);
+        stream = FileUtilities.getGameResource(file);
         if (stream == null) {
           return null;
         }

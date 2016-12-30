@@ -49,7 +49,7 @@ public class Spritesheet {
     final String COMMENT_CHAR = "#";
 
     ArrayList<Spritesheet> sprites = new ArrayList<>();
-    InputStream fileStream = FileUtilities.getGameFile(spriteInfoFile);
+    InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
     if (fileStream == null) {
       return sprites;
     }
