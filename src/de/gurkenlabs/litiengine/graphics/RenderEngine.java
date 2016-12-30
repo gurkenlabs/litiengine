@@ -45,6 +45,37 @@ import de.gurkenlabs.util.io.FileUtilities;
  * The Class GraphicsEngine.
  */
 public class RenderEngine implements IRenderEngine {
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+
+  private final List<Predicate<IEntity>> entityRenderingConditions;
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
+
+  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
+
+  /** The map renderer. */
+  private final Map<MapOrientation, IMapRenderer> mapRenderer;
+
+  private final EntityYComparator entityComparator;
+
+  /**
+   * Instantiates a new graphics engine.
+   *
+   * @param mapRenderer
+   *          the map renderer
+   */
+  public RenderEngine() {
+    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
+    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.mapRenderer = new HashMap<>();
+    this.entityComparator = new EntityYComparator();
+
+    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+  }
+
   public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
@@ -127,10 +158,10 @@ public class RenderEngine implements IRenderEngine {
    * @return the image
    */
   public static BufferedImage getImage(final String absolutPath) {
-    if(absolutPath == null || absolutPath.isEmpty()){
+    if (absolutPath == null || absolutPath.isEmpty()) {
       return null;
     }
-    
+
     final String cacheKey = absolutPath.hashCode() + "";
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       return ImageCache.IMAGES.get(cacheKey);
@@ -160,53 +191,35 @@ public class RenderEngine implements IRenderEngine {
     return compatibleImg;
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
+  public static void renderImage(final Graphics2D g, final Image image, double x, double y) {
     if (image == null) {
       return;
     }
 
     final AffineTransform t = new AffineTransform();
-    t.translate(renderLocation.getX(), renderLocation.getY());
+    t.translate(x, y);
     g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
+    renderImage(g, image, renderLocation.getX(), renderLocation.getY());
+  }
+
+  public static void renderImage(final Graphics2D g, final Image image, double x, double y, final float angle) {
+    if (image == null) {
+      return;
+    }
+
     final AffineTransform t = new AffineTransform();
 
-    t.translate(renderLocation.getX(), renderLocation.getY());
+    t.translate(x, y);
     t.rotate(Math.toRadians(angle), image.getWidth(null) * 0.5, image.getHeight(null) * 0.5);
 
     g.drawImage(image, t, null);
   }
 
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-
-  private final List<Predicate<IEntity>> entityRenderingConditions;
-
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-
-  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
-
-  /** The map renderer. */
-  private final Map<MapOrientation, IMapRenderer> mapRenderer;
-
-  private final EntityYComparator entityComparator;
-
-  /**
-   * Instantiates a new graphics engine.
-   *
-   * @param mapRenderer
-   *          the map renderer
-   */
-  public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new HashMap<>();
-    this.entityComparator = new EntityYComparator();
-
-    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
+    renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
   }
 
   @Override
@@ -362,7 +375,7 @@ public class RenderEngine implements IRenderEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).renderLayers(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map, type);
+    this.mapRenderer.get(map.getOrientation()).renderOverlay(g, map, Game.getScreenManager().getCamera().getViewPort());
 
   }
 
@@ -380,7 +393,7 @@ public class RenderEngine implements IRenderEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).render(g, Game.getScreenManager().getCamera().getViewPortLocation(0, 0), map);
+    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getScreenManager().getCamera().getViewPort());
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));

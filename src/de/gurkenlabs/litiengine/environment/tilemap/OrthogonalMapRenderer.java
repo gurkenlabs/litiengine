@@ -4,14 +4,14 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -20,10 +20,13 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.ITile;
+import de.gurkenlabs.tilemap.ITileAnimation;
+import de.gurkenlabs.tilemap.ITileAnimationFrame;
 import de.gurkenlabs.tilemap.ITileLayer;
 import de.gurkenlabs.tilemap.ITileset;
 import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.tilemap.utilities.MapUtilities;
+import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 /**
@@ -31,6 +34,9 @@ import de.gurkenlabs.util.image.ImageProcessing;
  */
 public class OrthogonalMapRenderer implements IMapRenderer {
   private static final String LAYER_RENDER_TYPE = "RENDERTYPE";
+
+  public OrthogonalMapRenderer() {
+  }
 
   /**
    * Gets the cache key.
@@ -43,15 +49,103 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     return MessageFormat.format("map_{0}_version_{1}", map.getName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
   }
 
-  public static Image getTile(final IMap map, final ITile tile) {
+  @Override
+  public BufferedImage getMapImage(final IMap map) {
+    if (ImageCache.MAPS.containsKey(getCacheKey(map))) {
+      return ImageCache.MAPS.get(getCacheKey(map));
+    }
+
+    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
+    final Graphics2D g = img.createGraphics();
+
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
+        final RenderType renderType = RenderType.valueOf(renderTypeProp);
+        if (renderType == RenderType.OVERLAY) {
+          continue;
+        }
+      }
+
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+    }
+
+    g.dispose();
+
+    ImageCache.MAPS.put(getCacheKey(map), img);
+    return img;
+  }
+
+  @Override
+  public MapOrientation getSupportedOrientation() {
+    return MapOrientation.orthogonal;
+  }
+
+  @Override
+  public void render(final Graphics2D g, final IMap map) {
+    this.render(g, map, 0, 0);
+  }
+
+  @Override
+  public void render(Graphics2D g, IMap map, double offsetX, double offsetY) {
+    final BufferedImage mapImage = this.getMapImage(map);
+    RenderEngine.renderImage(g, mapImage, offsetX, offsetY);
+  }
+
+  @Override
+  public void render(Graphics2D g, IMap map, Rectangle2D viewport) {
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
+        final RenderType renderType = RenderType.valueOf(renderTypeProp);
+        if (renderType == RenderType.OVERLAY) {
+          continue;
+        }
+      }
+
+      renderLayerImage(g, layer, map, viewport);
+    }
+  }
+
+  @Override
+  public void renderOverlay(final Graphics2D g, final IMap map, Rectangle2D viewport) {
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
+      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
+        continue;
+      }
+
+      final RenderType renderType = RenderType.valueOf(renderTypeProp);
+      if (renderType != RenderType.OVERLAY) {
+        continue;
+      }
+
+      renderLayerImage(g, layer, map, viewport);
+    }
+  }
+
+  private static Image getTileImage(final IMap map, final ITile tile) {
+    if (tile == null) {
+      return null;
+    }
+
     final ITileset tileset = MapUtilities.findTileSet(map, tile);
     if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
       return null;
     }
 
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    final int index = tile.getGridId() - tileset.getFirstGridId();
     Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
     if (sprite == null) {
       sprite = Spritesheet.load(tileset);
@@ -60,63 +154,32 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       }
     }
 
+    // get the grid id relative to the sprite sheet since we use a 0 based
+    // approach to calculate the position
+    int index = tile.getGridId() - tileset.getFirstGridId();
+    
+    // support for animated tiles
+    ITileAnimation animation = MapUtilities.getAnimation(map, index);
+    if (animation != null && animation.getFrames().size() > 0) {
+      long playedMs = Game.getLoop().getTime().getMilliseconds();
+
+      int totalDuration = animation.getTotalDuration();
+      long animationsPlayed = playedMs / totalDuration;
+
+      long deltaTicks = playedMs - animationsPlayed * totalDuration;
+      int currentPlayTime = 0;
+      for (ITileAnimationFrame frame : animation.getFrames()) {
+        currentPlayTime += frame.getDuration();
+        if (deltaTicks < currentPlayTime) {
+          // found the current animation frame
+          index = frame.getTileId();
+          break;
+        }
+      }
+
+    }
+
     final Image img = sprite.getSprite(index);
-    return ImageProcessing.applyAlphaChannel(img, tileset.getImage().getTransparentColor());
-  }
-
-  private float renderProcess;
-  private int totalTileCount;
-  private int tilesRendered;
-  private int partitionsX;
-
-  private int partitionsY;
-
-  private final Map<IMap, BufferedImage[][]> imageGrids;
-
-  public OrthogonalMapRenderer() {
-    this.partitionsX = 1;
-    this.partitionsY = 1;
-    this.imageGrids = new ConcurrentHashMap<>();
-  }
-
-  @Override
-  public BufferedImage getLayerImage(final IMap map, final RenderType type) {
-    if (ImageCache.MAPS.containsKey(getCacheKey(map) + type)) {
-      return ImageCache.MAPS.get(getCacheKey(map) + type);
-    }
-
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
-
-    this.renderProcess = 0;
-    this.totalTileCount = 0;
-    this.tilesRendered = 0;
-    for (final ITileLayer layer : map.getTileLayers()) {
-      this.totalTileCount += layer.getTiles().size();
-    }
-
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-
-      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
-        continue;
-      }
-
-      final RenderType renderType = RenderType.valueOf(renderTypeProp);
-      if (renderType != type) {
-        continue;
-      }
-
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
-    }
-
-    g.dispose();
-
-    ImageCache.MAPS.putPersistent(getCacheKey(map) + type, img);
     return img;
   }
 
@@ -149,18 +212,15 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       // get the tile from the tileset image
       final int index = layer.getTiles().indexOf(tile);
       if (tile.getGridId() == 0) {
-        this.tilesRendered++;
         return;
       }
 
-      final Image tileTexture = getTile(map, tile);
+      final Image tileTexture = getTileImage(map, tile);
 
-      // draw the tile on the map image
+      // draw the tile on the layer image
       final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
       final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
-      imageGraphics.drawImage(tileTexture, x, y, null);
-      this.tilesRendered++;
-      this.renderProcess = this.tilesRendered / (float) this.totalTileCount;
+      RenderEngine.renderImage(imageGraphics, tileTexture, x, y);
     });
 
     ImageCache.MAPS.putPersistent(
@@ -169,115 +229,46 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     return bufferedImage;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.graphics.IMapRenderer#getMapImage(de.gurkenlabs.tiled.
-   * tmx.IMap)
+  /**
+   * Renders the tiles from the specified layer that lie within the bounds of
+   * the viewport. This layer rendering is not cached and renders all tiles
+   * directly onto the graphics object.
+   * 
+   * @param g
+   * @param layer
+   * @param map
+   * @param viewport
    */
-  @Override
-  public BufferedImage getMapImage(final IMap map) {
-    if (ImageCache.MAPS.containsKey(getCacheKey(map))) {
-      return ImageCache.MAPS.get(getCacheKey(map));
-    }
+  private void renderLayerImage(Graphics2D g, final ITileLayer layer, final IMap map, Rectangle2D viewport) {
+    Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
+    Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
+    double offsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
+    double offsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
 
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
+    // set alpha value of the tiles by the layers value
+    final Composite oldComp = g.getComposite();
+    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    g.setComposite(ac);
 
-    this.renderProcess = 0;
-    this.totalTileCount = 0;
-    this.tilesRendered = 0;
-    for (final ITileLayer layer : map.getTileLayers()) {
-      this.totalTileCount += layer.getTiles().size();
-    }
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
-        continue;
+    int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
+    int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
+    int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
+    int endY = MathUtilities.clamp(endTile.y, 0, layer.getSizeInTiles().height);
+
+    offsetX += (startX - startTile.x) * map.getTileSize().width;
+    offsetY += (startY - startTile.y) * map.getTileSize().height;
+    double renderX = offsetX;
+    for (int x = startX; x <= endX; x++) {
+      double renderY = offsetY;
+      for (int y = startY; y <= endY; y++) {
+        final Image tileTexture = getTileImage(map, layer.getTile(x, y));
+        RenderEngine.renderImage(g, tileTexture, renderX, renderY);
+        renderY += map.getTileSize().height;
       }
 
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-        final RenderType renderType = RenderType.valueOf(renderTypeProp);
-        if (renderType == RenderType.OVERLAY) {
-          continue;
-        }
-      }
-
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+      renderX += map.getTileSize().width;
     }
 
-    g.dispose();
-
-    ImageCache.MAPS.putPersistent(getCacheKey(map), img);
-    return img;
-  }
-
-  public int getPartitionsX() {
-    return this.partitionsX;
-  }
-
-  public int getPartitionsY() {
-    return this.partitionsY;
-  }
-
-  @Override
-  public float getRenderProgress() {
-    return this.renderProcess;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IMapRenderer#getSupportedOrientation()
-   */
-  @Override
-  public MapOrientation getSupportedOrientation() {
-    return MapOrientation.orthogonal;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IMapRenderer#render(java.awt.Graphics,
-   * de.gurkenlabs.tiled.tmx.IMap)
-   */
-  @Override
-  public void render(final Graphics2D g, final Point2D offset, final IMap map) {
-    // draw all tile layers to the graphics object
-    if (!this.imageGrids.containsKey(map)) {
-      final BufferedImage mapImage = this.getMapImage(map);
-      this.imageGrids.put(map, ImageProcessing.getSubImages(mapImage, this.getPartitionsY(), this.getPartitionsX()));
-    }
-
-    final Rectangle2D viewPort = Game.getScreenManager().getCamera().getViewPort();
-    final BufferedImage[][] imageGrid = this.imageGrids.get(map);
-    final double cellWidth = map.getSizeInPixels().getWidth() / this.getPartitionsX();
-    final double cellHeight = map.getSizeInPixels().getHeight() / this.getPartitionsY();
-    for (int y = 0; y < this.getPartitionsY(); y++) {
-      for (int x = 0; x < this.getPartitionsX(); x++) {
-        final double cellX = x * cellWidth;
-        final double cellY = y * cellHeight;
-        if (viewPort.intersects(new Rectangle2D.Double(cellX, cellY, cellWidth, cellHeight))) {
-          RenderEngine.renderImage(g, imageGrid[y][x], Game.getScreenManager().getCamera().getViewPortLocation(new Point2D.Double(cellX, cellY)));
-        }
-      }
-    }
-  }
-
-  @Override
-  public void renderLayers(final Graphics2D g, final Point2D offset, final IMap map, final RenderType type) {
-    final BufferedImage mapImage = this.getLayerImage(map, type);
-    RenderEngine.renderImage(g, mapImage, offset);
-  }
-
-  @Override
-  public void setPartitionsX(final int partitions) {
-    this.partitionsX = partitions;
-  }
-
-  @Override
-  public void setPartitionsY(final int partitions) {
-    this.partitionsY = partitions;
+    g.setComposite(oldComp);
   }
 }

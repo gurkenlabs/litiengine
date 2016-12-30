@@ -4,20 +4,16 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.MapOrientation;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IMapRenderer.
  */
 public interface IMapRenderer {
-  public BufferedImage getLayerImage(IMap map, RenderType type);
-
   /**
    * Gets the map image.
    *
@@ -27,8 +23,6 @@ public interface IMapRenderer {
    */
   public BufferedImage getMapImage(IMap map);
 
-  public float getRenderProgress();
-
   /**
    * Gets the supported orientation.
    *
@@ -37,18 +31,22 @@ public interface IMapRenderer {
   public MapOrientation getSupportedOrientation();
 
   /**
-   * Render.
+   * Renders the entire map (without overlay layers) onto the specified graphics object.
    *
    * @param g
    *          the g
    * @param map
    *          the map
    */
-  public void render(Graphics2D g, Point2D offset, IMap map);
+  public void render(Graphics2D g, IMap map);
+  
+  public void render(Graphics2D g, IMap map, double offsetX, double offsetY);
+  
+  /*
+   * Renders all layers (without the overlay layers) of the specified map.
+   * The viewport defines the region of the map that is about to be rendered.
+   */
+  public void render(Graphics2D g, IMap map, Rectangle2D viewport);
 
-  public void renderLayers(Graphics2D g, Point2D offset, IMap map, RenderType type);
-
-  public void setPartitionsX(int partitions);
-
-  public void setPartitionsY(int partitions);
+  public void renderOverlay(Graphics2D g, IMap map, Rectangle2D viewport);
 }

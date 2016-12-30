@@ -33,7 +33,7 @@ public class MathUtilities {
   public static boolean randomBoolean() {
     return RANDOM.nextDouble() < 0.5;
   }
-  
+
   public static double randomInRange(final double min, final double max) {
     if (min == max) {
       return min;
@@ -49,8 +49,20 @@ public class MathUtilities {
   public static int randomSign() {
     return randomBoolean() ? 1 : -1;
   }
-  
-  public static double clamp(double value, double min, double max){
-   return Math.max(min, Math.min(max, value));
+
+  public static double clamp(double value, double min, double max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  public static int clamp(int value, int min, int max) {
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
   }
 }
