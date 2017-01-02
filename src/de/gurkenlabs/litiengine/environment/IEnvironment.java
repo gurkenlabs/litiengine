@@ -29,20 +29,22 @@ import de.gurkenlabs.tilemap.IMapObject;
  */
 public interface IEnvironment extends IInitializable, IRenderable {
   public void clear();
-  
+
   public void add(IEntity entity);
 
   public void add(IRenderable renderable, RenderType type);
-  
+
   public Collection<ICombatEntity> getCombatEntities();
 
   public Collection<IMovableEntity> getMovableEntities();
 
   public Collection<IEntity> getEntities();
-  
+
   public Collection<IEntity> getEntities(RenderType renderType);
-  
+
   public List<ICombatEntity> findCombatEntities(Shape shape);
+
+  public List<IEntity> findEntities(Shape shape);
 
   public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
@@ -51,11 +53,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public ICombatEntity getCombatEntity(final int mapId);
 
   public IMovableEntity getMovableEntity(final int mapId);
-  
+
   public IEntity get(final int mapId);
 
   public Collection<LightSource> getLightSources();
-  
+
   public Collection<Trigger> getTriggers();
 
   /**
@@ -90,7 +92,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
   public void remove(final int mapId);
-  
+
   public void remove(final IEntity entity);
 
   public void removeRenderable(IRenderable renderable);

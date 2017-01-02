@@ -79,6 +79,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private Font font;
   private String text;
+  private float xMargin;
 
   protected GuiComponent(final double x, final double y) {
     this.components = new CopyOnWriteArrayList<>();
@@ -142,6 +143,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.initializeComponents();
   }
 
+
   public Sound getHoverSound() {
     return hoverSound;
   }
@@ -167,23 +169,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
     FontMetrics fm = g.getFontMetrics();
     String newText = this.getText();
-    double xMargin;
-    switch (this.getTextAlignment()) {
-    case TEXT_ALIGN_LEFT:
-      xMargin = 2 * this.getTextX();
-      break;
-    case TEXT_ALIGN_CENTER:
-      xMargin = this.getWidth() * 1 / 16;
-      break;
-    case TEXT_ALIGN_RIGHT:
-      xMargin = this.getTextX();
-      break;
-    default:
-      xMargin = 2 * this.getTextX();
-      break;
-    }
 
-    while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - xMargin) {
+    while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - this.getTextXMargin()) {
       newText = newText.substring(1, newText.length());
     }
     return newText;
@@ -192,6 +179,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public double getTextX() {
     return this.textX;
+  }
+
+  public float getTextXMargin() {
+    return this.xMargin;
   }
 
   public double getTextY() {
@@ -676,6 +667,20 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public void setTextX(final double x) {
     this.textX = x;
+    switch (this.getTextAlignment()) {
+    case TEXT_ALIGN_LEFT:
+      this.setTextXMargin((float) (2 * this.getTextX()));
+      break;
+    case TEXT_ALIGN_CENTER:
+      this.setTextXMargin((float) (this.getWidth() * 1 / 16));
+      break;
+    case TEXT_ALIGN_RIGHT:
+      this.setTextXMargin((float) this.getTextX());
+      break;
+    default:
+      this.setTextXMargin((float) (2 * this.getTextX()));
+      break;
+    }
   }
 
   public void setTextY(final double y) {
@@ -754,6 +759,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (GuiComponent comp : this.getComponents()) {
       comp.setTextColor(color);
     }
+  }
+
+  public void setTextXMargin(float xMargin) {
+    this.xMargin = xMargin;
   }
 
   /**

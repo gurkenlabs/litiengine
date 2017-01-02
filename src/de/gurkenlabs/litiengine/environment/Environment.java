@@ -224,6 +224,35 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public List<IEntity> findEntities(final Shape shape) {
+    final ArrayList<IEntity> entities = new ArrayList<>();
+    if (shape == null) {
+      return entities;
+    }
+    if (shape instanceof Rectangle2D) {
+      final Rectangle2D rect = (Rectangle2D) shape;
+      for (final IEntity entity : this.getEntities()) {
+        if (entity.getBoundingBox().intersects(rect)) {
+          entities.add(entity);
+        }
+      }
+      return entities;
+    }
+    // for other shapes, we check if the shape's bounds intersect the hitbox
+    // and
+    // if so, we then check if the actual shape intersects the hitbox
+    for (final IEntity entity : this.getEntities()) {
+      if (entity.getBoundingBox().intersects(shape.getBounds())) {
+        if (GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
+          entities.add(entity);
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
     final ArrayList<ICombatEntity> entities = new ArrayList<>();
     if (shape == null) {
@@ -408,18 +437,18 @@ public class Environment implements IEnvironment {
   @Override
   public void remove(final int mapId) {
     IEntity ent = this.get(mapId);
-    if(ent == null){
+    if (ent == null) {
       System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
       return;
     }
-    
+
     this.remove(ent);
   }
 
   @Override
   public void remove(IEntity entity) {
     this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
-    
+
     if (entity instanceof ICollisionEntity) {
       ICollisionEntity coll = (ICollisionEntity) entity;
       Game.getPhysicsEngine().remove(coll);
@@ -436,12 +465,12 @@ public class Environment implements IEnvironment {
     if (entity instanceof Trigger) {
       this.triggers.remove(entity);
     }
-    
-    if(entity instanceof IMovableEntity) {
+
+    if (entity instanceof IMovableEntity) {
       this.movableEntities.values().remove(entity);
     }
-    
-    if(entity instanceof ICombatEntity) {
+
+    if (entity instanceof ICombatEntity) {
       this.combatEntities.values().remove(entity);
     }
   }
@@ -633,7 +662,7 @@ public class Environment implements IEnvironment {
     if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
-    
+
     if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
       prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
     }

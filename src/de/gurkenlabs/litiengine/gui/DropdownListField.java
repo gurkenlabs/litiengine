@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.gui;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -16,6 +17,7 @@ public class DropdownListField extends GuiComponent {
   private boolean isDroppedDown;
   private ListField contentList;
   private final List<Consumer<Integer>> changeConsumer;
+  private float standardFontSize;
 
   private Object[] content;
   private int numberOfShownElements;
@@ -143,20 +145,20 @@ public class DropdownListField extends GuiComponent {
   }
 
   public void setSelection(int selectionIndex) {
-    if(this.getContentList() == null){
+    if (this.getContentList() == null) {
       return;
     }
-    
+
     this.getContentList().setSelection(selectionIndex);
   }
-  
-  public void setSelection(Object selectedObject){
-    if(selectedObject == null){
+
+  public void setSelection(Object selectedObject) {
+    if (selectedObject == null) {
       return;
     }
-    
-    for(int i = 0; i < this.getContentArray().length; i++){
-      if(this.getContentArray()[i] != null && this.getContentArray()[i].equals(selectedObject)){
+
+    for (int i = 0; i < this.getContentArray().length; i++) {
+      if (this.getContentArray()[i] != null && this.getContentArray()[i].equals(selectedObject)) {
         this.setSelection(i);
         return;
       }
@@ -168,6 +170,7 @@ public class DropdownListField extends GuiComponent {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
     this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
+    this.standardFontSize = this.chosenElementComponent.getFont().getSize2D();
     double buttonHeight = this.getHeight() / this.getNumberOfShownElements(), buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());
