@@ -122,6 +122,10 @@ public class Spritesheet {
 
     return spritesheets.get(name.toLowerCase());
   }
+  
+  public static void remove(final String path){
+    spritesheets.values().removeIf(x -> x.getName().equals(path));
+  }
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     this.image = image;
