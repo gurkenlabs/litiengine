@@ -36,6 +36,8 @@ public interface IEntity {
    *          the new map location
    */
   public void setLocation(Point2D location);
+  
+  public void setLocation(double x, double y);
 
   /**
    * Sets an id which should only be filled when an entity gets added due to map

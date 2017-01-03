@@ -30,9 +30,9 @@ public abstract class Entity implements IEntity {
   private float width;
 
   private IAnimationController animationController;
-  
+
   private RenderType renderType;
- 
+
   /**
    * Instantiates a new entity.
    */
@@ -45,22 +45,22 @@ public abstract class Entity implements IEntity {
       Game.getEnvironment().getEntities().add(this);
     }
   }
-  
+
   @Override
   public void setRenderType(RenderType renderType) {
     this.renderType = renderType;
   }
-  
+
   @Override
   public void setHeight(float height) {
     this.height = height;
   }
-  
+
   @Override
   public void setWidth(float width) {
     this.width = width;
   }
-  
+
   @Override
   public float getAngle() {
     return this.angle;
@@ -139,6 +139,11 @@ public abstract class Entity implements IEntity {
   @Override
   public void setLocation(final Point2D location) {
     this.mapLocation = location;
+  }
+
+  @Override
+  public void setLocation(double x, double y) {
+    this.mapLocation = new Point2D.Double(x, y);
   }
 
   /**
