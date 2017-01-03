@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
+import java.util.stream.IntStream;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -28,6 +29,7 @@ import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class OrthogonalMapRenderer.
@@ -157,7 +159,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     // get the grid id relative to the sprite sheet since we use a 0 based
     // approach to calculate the position
     int index = tile.getGridId() - tileset.getFirstGridId();
-    
+
     // support for animated tiles
     ITileAnimation animation = MapUtilities.getAnimation(map, index);
     if (animation != null && animation.getFrames().size() > 0) {
@@ -242,8 +244,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   private void renderLayerImage(Graphics2D g, final ITileLayer layer, final IMap map, Rectangle2D viewport) {
     Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
     Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
-    double offsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
-    double offsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
+    double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
+    double viewportOffsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
 
     // set alpha value of the tiles by the layers value
     final Composite oldComp = g.getComposite();
@@ -255,19 +257,15 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
     int endY = MathUtilities.clamp(endTile.y, 0, layer.getSizeInTiles().height);
 
-    offsetX += (startX - startTile.x) * map.getTileSize().width;
-    offsetY += (startY - startTile.y) * map.getTileSize().height;
-    double renderX = offsetX;
-    for (int x = startX; x <= endX; x++) {
-      double renderY = offsetY;
+    final double offsetX = viewportOffsetX + (startX - startTile.x) * map.getTileSize().width;
+    final double offsetY = viewportOffsetY + (startY - startTile.y) * map.getTileSize().height;
+
+    IntStream.range(startX, endX + 1).parallel().forEach(x -> {
       for (int y = startY; y <= endY; y++) {
         final Image tileTexture = getTileImage(map, layer.getTile(x, y));
-        RenderEngine.renderImage(g, tileTexture, renderX, renderY);
-        renderY += map.getTileSize().height;
+        RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
       }
-
-      renderX += map.getTileSize().width;
-    }
+    });
 
     g.setComposite(oldComp);
   }
