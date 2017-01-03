@@ -558,6 +558,7 @@ public class Environment implements IEnvironment {
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setMapId(mapObject.getId());
+    col.setShadowType(Collider.StaticShadowType.valueOf(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
     this.add(col);
     Game.getPhysicsEngine().add(col.getBoundingBox());
   }
@@ -898,7 +899,7 @@ public class Environment implements IEnvironment {
       }
     } catch (final NumberFormatException e) {
     }
-    
+
     if (ambientAlpha > 0) {
       this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
     }
