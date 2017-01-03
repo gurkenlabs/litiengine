@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.function.Predicate;
 
@@ -25,6 +26,8 @@ public interface IEntityNavigator extends IUpdateable {
   public boolean isNavigating();
 
   public void navigate(Point2D target);
+  
+  public void navigate(Path2D path);
 
   public void rotateTowards(Point2D target);
 

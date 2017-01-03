@@ -4,6 +4,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -12,7 +13,21 @@ import java.util.Collections;
 import java.util.List;
 
 public class GeometricUtilities {
-
+  public static List<Point2D> getPoints(final Path2D path){
+    PathIterator pi = path.getPathIterator(null);
+    final double[] coordinates = new double[22];
+    List<Point2D> points = new ArrayList<>();
+    while(!pi.isDone()){
+      pi.next();
+      
+      pi.currentSegment(coordinates);
+      Point2D currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
+      points.add(currentPoint);
+    }
+    
+    return points;
+  }
+  
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])

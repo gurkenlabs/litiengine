@@ -3,6 +3,7 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -72,7 +73,14 @@ public class EntityNavigator implements IEntityNavigator {
 
   @Override
   public void navigate(final Point2D target) {
-    this.path = this.getPathFinder().findPath(this.entity, target);
+    if (this.getPathFinder() != null) {
+      this.path = this.getPathFinder().findPath(this.entity, target);
+    }
+  }
+
+  @Override
+  public void navigate(Path2D path) {
+    this.path = new Path(path);
   }
 
   @Override

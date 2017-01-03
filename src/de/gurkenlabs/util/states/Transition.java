@@ -4,9 +4,15 @@ import de.gurkenlabs.litiengine.IGameLoop;
 
 public abstract class Transition implements ITransition {
   private final int priority;
+  private IState state;
 
   protected Transition(final int priority) {
     this.priority = priority;
+  }
+
+  protected Transition(final int priority, IState state) {
+    this(priority);
+    this.state = state;
   }
 
   @Override
@@ -18,7 +24,9 @@ public abstract class Transition implements ITransition {
   public abstract boolean conditionsFullfilled(IGameLoop loop);
 
   @Override
-  public abstract IState getNextState();
+  public IState getNextState() {
+    return this.state;
+  }
 
   @Override
   public int getPriority() {

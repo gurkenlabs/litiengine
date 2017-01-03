@@ -4,8 +4,12 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
+
+import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
  * The Class Path.
@@ -36,6 +40,18 @@ public class Path {
     this.target = target;
     this.path = path;
     this.points = points;
+  }
+
+  public Path(final Path2D path) {
+    this.path = path;
+    this.points = GeometricUtilities.getPoints(this.path);
+    if (this.points.size() > 0) {
+      this.start = this.points.get(0);
+      this.target = this.points.get(this.points.size() - 1);
+    } else {
+      this.start = null;
+      this.target = null;
+    }
   }
 
   /**
