@@ -77,7 +77,6 @@ public class ImageCache {
   /** The sub folder. */
   private final String subFolder;
 
-
   /**
    * Contains key.
    *
@@ -152,22 +151,26 @@ public class ImageCache {
    * @return the buffered image
    */
   public BufferedImage putPersistent(final String key, final BufferedImage value) {
+    if (key == null || key.isEmpty() || value == null) {
+      return null;
+    }
+
     this.cache.put(key, value);
     this.saveImage(key, value);
     return value;
   }
-  
-  public void clearPersistent(){
+
+  public void clearPersistent() {
     final File dir = new File(this.getSubFolderName());
     if (!dir.exists() || !dir.isDirectory()) {
       return;
     }
-    
+
     System.out.println("deleted '" + dir.toString() + "'");
     FileUtilities.deleteDir(dir);
     this.cache.clear();
   }
-  
+
   /**
    * Instantiates a new image cache.
    *
@@ -178,7 +181,7 @@ public class ImageCache {
     this.cache = new ConcurrentHashMap<>();
     this.subFolder = subfolder;
   }
-  
+
   /**
    * Gets the file name.
    *
@@ -208,14 +211,14 @@ public class ImageCache {
    */
   private synchronized BufferedImage loadImage(final String key) {
     final BufferedImage img = ImageSerializer.loadImage(this.getFileName(key));
-    if(img == null){
+    if (img == null) {
       return null;
     }
-    
+
     this.cache.put(key, img);
     return img;
   }
-  
+
   /**
    * Save image.
    *

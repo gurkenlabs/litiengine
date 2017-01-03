@@ -142,10 +142,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
       // this.device.setFullScreenWindow(this);
-    } else {
-      this.setSize(new Dimension(width, height));
     }
     
+    this.setSize(Game.getConfiguration().GRAPHICS.getResolution());
     this.resolution = this.getSize();
 
     this.setVisible(true);
