@@ -889,11 +889,18 @@ public class Environment implements IEnvironment {
     int ambientAlpha = 0;
     Color ambientColor = Color.WHITE;
     try {
-      ambientAlpha = (int) Double.parseDouble(alphaProp);
-      ambientColor = Color.decode(colorProp);
+      if (alphaProp != null && !alphaProp.isEmpty()) {
+        ambientAlpha = (int) Double.parseDouble(alphaProp);
+      }
+
+      if (colorProp != null && !colorProp.isEmpty()) {
+        ambientColor = Color.decode(colorProp);
+      }
     } catch (final NumberFormatException e) {
     }
-
-    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+    
+    if (ambientAlpha > 0) {
+      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+    }
   }
 }
