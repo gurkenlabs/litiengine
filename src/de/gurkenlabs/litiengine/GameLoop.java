@@ -99,7 +99,9 @@ public class GameLoop extends Thread implements IGameLoop {
         ++this.totalTicks;
         this.updatables.forEach(updatable -> {
           try {
-            updatable.update(this);
+            if (updatable != null) {
+              updatable.update(this);
+            }
           } catch (final Exception e) {
             final StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
