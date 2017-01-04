@@ -30,12 +30,17 @@ public class Camera implements ICamera, IUpdateable {
 
   /** The shake tick. */
   private long shakeTick;
-  
+
   private int shakeDelay;
   private long lastShake;
-  
+
   private double shakeOffsetX;
   private double shakeOffsetY;
+
+  private float zoom;
+  private int zoomDelay;
+  private long zoomTick;
+  private float zoomStep;
 
   private Rectangle2D viewPort;
 
@@ -46,20 +51,32 @@ public class Camera implements ICamera, IUpdateable {
     this.focus = new Point2D.Double(0, 0);
     Game.getLoop().registerForUpdate(this);
   }
-  
+
   @Override
   public void update(IGameLoop loop) {
-   if(!this.isShakeEffectActive()){
-     this.shakeOffsetX = 0;
-     this.shakeOffsetY = 0;
-     return;
-   }
-   
-   if(loop.getDeltaTime(this.lastShake) > shakeDelay){
-     this.shakeOffsetX =this.getShakeIntensity() * MathUtilities.randomSign();
-     this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
-     this.lastShake = loop.getTicks();
-   }    
+    if (Game.getInfo().getRenderScale() != this.zoom && this.zoom > 0) {
+      if (loop.getDeltaTime(this.zoomTick) > this.zoomDelay) {
+        Game.getInfo().setRenderScale(this.zoom);
+        this.zoom = 0;
+        this.zoomDelay = 0;
+      } else {
+
+        float newRenderScale = Game.getInfo().getRenderScale() + this.zoomStep;
+        Game.getInfo().setRenderScale(newRenderScale);
+      }
+    }
+
+    if (!this.isShakeEffectActive()) {
+      this.shakeOffsetX = 0;
+      this.shakeOffsetY = 0;
+      return;
+    }
+
+    if (loop.getDeltaTime(this.lastShake) > shakeDelay) {
+      this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
+      this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
+      this.lastShake = loop.getTicks();
+    }
   }
 
   @Override
@@ -140,7 +157,7 @@ public class Camera implements ICamera, IUpdateable {
   public Point2D getViewPortLocation(final Point2D mapLocation) {
     return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
   }
-  
+
   /*
    * (non-Javadoc)
    *
@@ -148,9 +165,9 @@ public class Camera implements ICamera, IUpdateable {
    */
   @Override
   public Point2D getViewPortLocation(final double x, final double y) {
-    return new Point2D.Double( x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
+    return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
-  
+
   @Override
   public void setFocus(final Point2D focus) {
     this.focus = focus;
@@ -164,8 +181,21 @@ public class Camera implements ICamera, IUpdateable {
   @Override
   public void shake(final double intensity, final int delay, final int shakeDuration) {
     this.shakeTick = Game.getLoop().getTicks();
+    this.shakeDelay = delay;
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
+  }
+
+  @Override
+  public void setZoom(float zoom, int delay) {
+    this.zoomTick = Game.getLoop().getTicks();
+    this.zoom = zoom;
+    this.zoomDelay = delay;
+
+    double tickduration = 1000 / Game.getLoop().getUpdateRate();
+    double tickAmount = delay / tickduration;
+    float totalDelta = zoom - Game.getInfo().getRenderScale();
+    this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
   }
 
   /*
@@ -184,7 +214,7 @@ public class Camera implements ICamera, IUpdateable {
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
         Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
-  
+
   /**
    * Gets the shake duration.
    *
@@ -211,7 +241,7 @@ public class Camera implements ICamera, IUpdateable {
   private long getShakeTick() {
     return this.shakeTick;
   }
-  
+
   /**
    * Apply shake effect.
    *
@@ -226,10 +256,11 @@ public class Camera implements ICamera, IUpdateable {
 
     return cameraLocation;
   }
-  
-  private boolean isShakeEffectActive(){
+
+  private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
   }
+
   private double getViewPortCenterX() {
     return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().getRenderScale();
   }

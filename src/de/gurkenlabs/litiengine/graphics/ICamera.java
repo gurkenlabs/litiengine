@@ -83,16 +83,11 @@ public interface ICamera {
    */
   public Point2D getViewPortLocation(Point2D point);
 
-  /**
-   * Shake the camera by the given offset for the given duration.
-   *
-   * @param intensity
-   *          the intensity
-   * @param duration
-   *          the duration in update calls.
-   */
-  public void shake(double intensity, final int updateSkip, int duration);
+  public void shake(double intensity, final int delay, int duration);
+
+  public void setZoom(float zoom, int delay);
 
   public void updateFocus();
+
   public void setFocus(Point2D focus);
 }
