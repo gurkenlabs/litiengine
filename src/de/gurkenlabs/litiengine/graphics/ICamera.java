@@ -6,13 +6,14 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
  * The Interface ICamera defines methods that allow to determine where entities
  * or tiles are rendered on the current screen.
  */
-public interface ICamera {
+public interface ICamera extends IUpdateable {
   /**
    * Gets the map location that is focused by this camera.
    *

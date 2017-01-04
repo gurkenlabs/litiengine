@@ -43,7 +43,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   /** The last screen change. */
   private long lastScreenChange = 0;
-  
+
   private Dimension resolution;
 
   public ScreenManager(final String gameTitle) {
@@ -69,7 +69,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.screens.add(screen);
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
-    if(this.getCurrentScreen() == null){
+    if (this.getCurrentScreen() == null) {
       this.displayScreen(screen);
     }
   }
@@ -143,7 +143,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
       // this.device.setFullScreenWindow(this);
     }
-    
+
     this.setSize(Game.getConfiguration().GRAPHICS.getResolution());
     this.resolution = this.getSize();
 
@@ -154,10 +154,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public boolean isFocusOwner() {
-    if(this.getRenderComponent() instanceof Component && ((Component)this.getRenderComponent()).isFocusOwner()){
+    if (this.getRenderComponent() instanceof Component && ((Component) this.getRenderComponent()).isFocusOwner()) {
       return true;
     }
-    
+
     return super.isFocusOwner();
   }
 
@@ -179,7 +179,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void setCamera(final ICamera camera) {
+    if (this.getCamera() != null) {
+      Game.getLoop().unregisterFromUpdate(this.camera);
+    }
+
     this.camera = camera;
+    Game.getLoop().registerForUpdate(this.getCamera());
     this.getCamera().updateFocus();
   }
 

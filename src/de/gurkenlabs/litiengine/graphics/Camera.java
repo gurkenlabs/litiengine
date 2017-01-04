@@ -15,7 +15,7 @@ import de.gurkenlabs.util.MathUtilities;
 /**
  * The Class Camera.
  */
-public class Camera implements ICamera, IUpdateable {
+public class Camera implements ICamera {
 
   /**
    * Provides the center location for the viewport.
@@ -49,16 +49,21 @@ public class Camera implements ICamera, IUpdateable {
    */
   public Camera() {
     this.focus = new Point2D.Double(0, 0);
-    Game.getLoop().registerForUpdate(this);
   }
 
   @Override
   public void update(IGameLoop loop) {
-    if (Game.getInfo().getRenderScale() != this.zoom && this.zoom > 0) {
-      if (loop.getDeltaTime(this.zoomTick) > this.zoomDelay) {
+    if(Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().equals(this)){
+      return;
+    }
+    
+    if (this.zoom > 0 && Game.getInfo().getRenderScale() != this.zoom) {
+      if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
         Game.getInfo().setRenderScale(this.zoom);
         this.zoom = 0;
         this.zoomDelay = 0;
+        this.zoomTick = 0;
+        this.zoomStep = 0;
       } else {
 
         float newRenderScale = Game.getInfo().getRenderScale() + this.zoomStep;
@@ -188,14 +193,22 @@ public class Camera implements ICamera, IUpdateable {
 
   @Override
   public void setZoom(float zoom, int delay) {
-    this.zoomTick = Game.getLoop().getTicks();
-    this.zoom = zoom;
-    this.zoomDelay = delay;
+    if (delay == 0) {
+      Game.getInfo().setRenderScale(zoom);
+      this.zoom = 0;
+      this.zoomDelay = 0;
+      this.zoomTick = 0;
+      this.zoomStep = 0;
+    } else {
+      this.zoomTick = Game.getLoop().getTicks();
+      this.zoom = zoom;
+      this.zoomDelay = delay;
 
-    double tickduration = 1000 / Game.getLoop().getUpdateRate();
-    double tickAmount = delay / tickduration;
-    float totalDelta = zoom - Game.getInfo().getRenderScale();
-    this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
+      double tickduration = 1000 / Game.getLoop().getUpdateRate();
+      double tickAmount = delay / tickduration;
+      float totalDelta = zoom - Game.getInfo().getRenderScale();
+      this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
+    }
   }
 
   /*
