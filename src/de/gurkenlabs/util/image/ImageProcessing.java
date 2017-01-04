@@ -70,49 +70,45 @@ public class ImageProcessing {
     AffineTransform tx = new AffineTransform();
     tx.rotate(radians, bufferedImage.getWidth() / 2, bufferedImage.getHeight() / 2);
 
-    AffineTransformOp op = new AffineTransformOp(tx,
-        AffineTransformOp.TYPE_BILINEAR);
+    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
     return op.filter(bufferedImage, null);
   }
-  
+
   /**
-   * Removes all pixels that have transparency and a color value between BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
+   * Removes all pixels that have transparency and a color value between
+   * BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
+   * 
    * @param image
    * @return
    */
-  public static BufferedImage removeShadows(final BufferedImage image){
-    final Color LIGHT_SHADOW = new Color(100,100,100);
-    
+  public static BufferedImage removeShadows(final BufferedImage image) {
+    final Color LIGHT_SHADOW = new Color(100, 100, 100);
+
     final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
     bGr.drawImage(image, 0, 0, null);
     bGr.dispose();
-    
+
     for (int y = 0; y < bimage.getHeight(); y++) {
       for (int x = 0; x < bimage.getWidth(); x++) {
         // if the current pixel is not transparent, we cannot stroke it
         int rgb = bimage.getRGB(x, y);
-        int alpha = (rgb>>24) & 0xff;
+        int alpha = (rgb >> 24) & 0xff;
         int r = (rgb & 0xFF0000) >> 16;
         int g = (rgb & 0xFF00) >> 8;
         int b = rgb & 0xFF;
-        
-        if (alpha < 255 &&
-            r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() &&
-            g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() &&
-            b >= Color.BLACK.getBlue()  && b <= LIGHT_SHADOW.getBlue())
-        {
+
+        if (alpha < 255 && r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() && g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() && b >= Color.BLACK.getBlue() && b <= LIGHT_SHADOW.getBlue()) {
           // Set fully transparent but keep color
           bimage.setRGB(x, y, rgb & 0xFFFFFF);
         }
       }
     }
-    
+
     return bimage;
   }
 
-  
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
@@ -133,27 +129,22 @@ public class ImageProcessing {
       return image;
     }
 
-    final BufferedImage shadow = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-    final Graphics2D graphics = shadow.createGraphics();
-
     // Transform visible pixels to a semi-transparent black
-    final BufferedImage shadowImage = flashVisiblePixels(image, new Color(0, 0, 0, 40));
+    final BufferedImage shadowImage = flashVisiblePixels(image, new Color(0, 0, 0, 30));
     final AffineTransform tx = new AffineTransform();
 
     // Flip the image vertically
-    tx.concatenate(AffineTransform.getScaleInstance(1, -1));
+    tx.concatenate(AffineTransform.getScaleInstance(1, -0.2));
     tx.concatenate(AffineTransform.getTranslateInstance(0, -shadowImage.getHeight()));
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
-    // Drawing the rotated image at the required drawing locations
 
-    final BufferedImage scaledImage = scaleImage(rotatedImage, rotatedImage.getWidth(), rotatedImage.getHeight() / 3);
+    final BufferedImage shadow = new BufferedImage(image.getWidth(), image.getHeight() + rotatedImage.getHeight(), image.getType());
+    final Graphics2D g2D = shadow.createGraphics();
+    g2D.drawImage(rotatedImage, xOffset, yOffset, null);
+    g2D.drawImage(image, 0, 0, null);
 
-    // since the lower quarter of the image is empty space for the shadow, we
-    // need to draw the shadow with respect to this empty space
-    graphics.drawImage(scaledImage, xOffset, yOffset - (scaledImage.getHeight() / 4 + 1), null);
-
-    graphics.dispose();
+    g2D.dispose();
 
     return shadow;
   }
@@ -314,10 +305,10 @@ public class ImageProcessing {
   }
 
   public static BufferedImage getCompatibleImage(final int width, final int height) {
-    if(width == 0 && height == 0){
+    if (width == 0 && height == 0) {
       return null;
     }
-    
+
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();
@@ -501,23 +492,21 @@ public class ImageProcessing {
 
     return resizedImage;
   }
-  
-  public static BufferedImage toBufferedImage(Image img)
-  {
-      if (img instanceof BufferedImage)
-      {
-          return (BufferedImage) img;
-      }
 
-      // Create a buffered image with transparency
-      BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+  public static BufferedImage toBufferedImage(Image img) {
+    if (img instanceof BufferedImage) {
+      return (BufferedImage) img;
+    }
 
-      // Draw the image on to the buffered image
-      Graphics2D bGr = bimage.createGraphics();
-      bGr.drawImage(img, 0, 0, null);
-      bGr.dispose();
+    // Create a buffered image with transparency
+    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 
-      // Return the buffered image
-      return bimage;
+    // Draw the image on to the buffered image
+    Graphics2D bGr = bimage.createGraphics();
+    bGr.drawImage(img, 0, 0, null);
+    bGr.dispose();
+
+    // Return the buffered image
+    return bimage;
   }
 }
