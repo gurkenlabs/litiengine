@@ -134,7 +134,7 @@ public class ImageProcessing {
     final AffineTransform tx = new AffineTransform();
 
     // Flip the image vertically
-    tx.concatenate(AffineTransform.getScaleInstance(1, -0.2));
+    tx.concatenate(AffineTransform.getScaleInstance(1, -0.15));
     tx.concatenate(AffineTransform.getTranslateInstance(0, -shadowImage.getHeight()));
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);

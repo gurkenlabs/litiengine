@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.tilemap.ITileset;
 import de.gurkenlabs.util.io.FileUtilities;
 

@@ -23,11 +23,16 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.animation.NarratorPortraitAnimationController;
 import de.gurkenlabs.litiengine.gui.FontLoader;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class Narrator implements IUpdateable, IRenderable {
+  public enum Emotion {
+    NORMAL, ANGRY, SAD, SURPRISED, BORED, HAPPY, SILENT
+  }
+
   private static final int DISPLAYTIME_MIN = 2000;
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private int layout;
@@ -48,6 +53,7 @@ public class Narrator implements IUpdateable, IRenderable {
   private long lastTextDispay;
   private int letterTypeDelay = 30;
 
+  private Emotion emotion;
   private String name;
   private boolean narrating;
   private double padding;
@@ -55,15 +61,17 @@ public class Narrator implements IUpdateable, IRenderable {
 
   private Sound typingSound;
   private float portraitWidth, portraitHeight, textboxWidth, textBoxX, textBoxY, portraitX, portraitY;
+  private NarratorPortraitAnimationController animationController;
 
   public Narrator(final IEnvironment environment, final String narratorName, int layout) {
     this.setLayout(layout);
     this.setName(narratorName);
-
+    this.setEmotion(Emotion.NORMAL);
     this.setRenderLocation(new Point2D.Double(0, Game.getScreenManager().getResolution().getHeight() * (6 / 8.0)));
     this.setSize(Game.getScreenManager().getResolution().getWidth(), Game.getScreenManager().getResolution().getHeight() * (2 / 8.0));
     this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getBoxHeight() / 6)));
     Game.getLoop().registerForUpdate(this);
+    this.animationController = new NarratorPortraitAnimationController(this);
   }
 
   public Narrator(final IEnvironment environment, final String narratorName) {
@@ -92,6 +100,10 @@ public class Narrator implements IUpdateable, IRenderable {
     g.dispose();
 
     this.setBackgroundImage(img);
+  }
+
+  public NarratorPortraitAnimationController getAnimationController() {
+    return this.animationController;
   }
 
   public int getLayout() {
@@ -154,6 +166,10 @@ public class Narrator implements IUpdateable, IRenderable {
     return this.typingSound;
   }
 
+  public Emotion getEmotion() {
+    return this.emotion;
+  }
+
   public boolean isNarrating() {
     return this.narrating;
   }
@@ -182,10 +198,11 @@ public class Narrator implements IUpdateable, IRenderable {
     }
     g.drawImage(this.getBackgroundImage(), (int) this.getRenderLocation().getX(), (int) this.getRenderLocation().getY(), null);
     RenderEngine.renderImage(g, this.getBackgroundImage(), this.getRenderLocation());
-    BufferedImage img = ImageProcessing.getCompatibleImage((int) this.portraitWidth, (int) this.portraitHeight);
-    img.getGraphics().fillRect(0, 0, img.getWidth(), img.getHeight());
-    RenderEngine.renderImage(g, img, new Point2D.Double(this.portraitX, this.portraitY));
-
+    BufferedImage img = this.getAnimationController().getCurrentSprite();
+    if (img != null) {
+      img = ImageProcessing.scaleImage(img, (int) this.portraitWidth);
+      RenderEngine.renderImage(g, img, new Point2D.Double(this.portraitX, this.portraitY));
+    }
     g.setColor(this.getFontColor());
     final FontRenderContext frc = g.getFontRenderContext();
 
@@ -204,6 +221,10 @@ public class Narrator implements IUpdateable, IRenderable {
       layout.draw(g, textBoxX + dx, textY);
       textY += layout.getDescent() + layout.getLeading();
     }
+  }
+
+  public void setEmotion(Emotion emotion) {
+    this.emotion = emotion;
   }
 
   public void setBackground(final Image background) {

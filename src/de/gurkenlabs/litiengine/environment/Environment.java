@@ -328,7 +328,6 @@ public class Environment implements IEnvironment {
       this.narrators = new CopyOnWriteArrayList<>();
     }
     Narrator newNarrator = new Narrator(this, name, layout);
-    System.out.println(newNarrator.getName() + " - " + newNarrator.getLayout());
     this.getNarrators().add(newNarrator);
   }
 
