@@ -28,43 +28,55 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class Narrator implements IUpdateable, IRenderable {
-
-  private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int DISPLAYTIME_MIN = 2000;
-  private int letterTypeDelay = 30;
+  private static final int DISPLAYTIME_PER_LETTER = 120;
+  private int layout;
 
-  private Color fontColor = Color.WHITE;
+  private Image background;
   private Color backgroundColor = new Color(0, 0, 0, 100);
   private Color borderColor = new Color(0, 0, 0, 180);
 
-  private Sound typingSound;
-  private Font font;
-  private Point2D renderLocation;
-  private Image background;
-
-  private double padding;
   private double boxWidth, boxHeight;
-  private long lastTextDispay;
-  private long currentTextDisplayTime;
   private String currentText;
-
-  private String displayedText;
+  private long currentTextDisplayTime;
   private Queue<Character> currentTextQueue;
+  private String displayedText;
+
+  private Font font;
+  private Color fontColor = Color.WHITE;
   private long lastCharPoll;
+  private long lastTextDispay;
+  private int letterTypeDelay = 30;
 
+  private String name;
   private boolean narrating;
+  private double padding;
+  private Point2D renderLocation;
 
-  public Narrator(IEnvironment environment) {
-    this.setSize(Game.getScreenManager().getResolution().getWidth(), (double) (Game.getScreenManager().getResolution().getHeight() * (2 / 8.0)));
-    this.setRenderLocation(new Point2D.Double(0, (double) (Game.getScreenManager().getResolution().getHeight() * (6 / 8.0))));
-    this.setPadding((this.getBoxHeight() / 4));
-    this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getPadding() * 0.7)));
+  private Sound typingSound;
+  private float portraitWidth, portraitHeight, textboxWidth, textBoxX, textBoxY, portraitX, portraitY;
+
+  public Narrator(final IEnvironment environment, final String narratorName, int layout) {
+    this.setLayout(layout);
+    this.setName(narratorName);
+
+    this.setRenderLocation(new Point2D.Double(0, Game.getScreenManager().getResolution().getHeight() * (6 / 8.0)));
+    this.setSize(Game.getScreenManager().getResolution().getWidth(), Game.getScreenManager().getResolution().getHeight() * (2 / 8.0));
+    this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getBoxHeight() / 6)));
     Game.getLoop().registerForUpdate(this);
   }
 
+  public Narrator(final IEnvironment environment, final String narratorName) {
+    this(environment, narratorName, 0);
+  }
+
+  public void cancel() {
+    this.narrating = false;
+  }
+
   private void createBackgroundImage() {
-    BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getBoxWidth(), (int) this.getBoxHeight());
-    Graphics2D g = img.createGraphics();
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getBoxWidth(), (int) this.getBoxHeight());
+    final Graphics2D g = img.createGraphics();
     g.setFont(this.getFont());
 
     final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, img.getWidth(), img.getHeight(), this.getPadding(), this.getPadding());
@@ -73,7 +85,7 @@ public class Narrator implements IUpdateable, IRenderable {
     g.fill(bounds);
 
     g.setColor(this.getBorderColor());
-    Stroke oldStroke = g.getStroke();
+    final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke((float) (this.getPadding() / 8)));
     g.draw(bounds);
     g.setStroke(oldStroke);
@@ -82,13 +94,98 @@ public class Narrator implements IUpdateable, IRenderable {
     this.setBackgroundImage(img);
   }
 
+  public int getLayout() {
+    return this.layout;
+  }
+
+  public Image getBackground() {
+    return this.background;
+  }
+
+  public Color getBackgroundColor() {
+    return this.backgroundColor;
+  }
+
+  public Image getBackgroundImage() {
+    return this.background;
+  }
+
+  public Color getBorderColor() {
+    return this.borderColor;
+  }
+
+  public double getBoxHeight() {
+    return this.boxHeight;
+  }
+
+  public double getBoxWidth() {
+    return this.boxWidth;
+  }
+
+  public String getCurrentText() {
+    return this.currentText;
+  }
+
+  public Font getFont() {
+    return this.font;
+  }
+
+  public Color getFontColor() {
+    return this.fontColor;
+  }
+
+  public int getLetterTypeDelay() {
+    return this.letterTypeDelay;
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public double getPadding() {
+    return this.padding;
+  }
+
+  public Point2D getRenderLocation() {
+    return this.renderLocation;
+  }
+
+  public Sound getTypingSound() {
+    return this.typingSound;
+  }
+
+  public boolean isNarrating() {
+    return this.narrating;
+  }
+
+  public void narrate(final String text) {
+    for (final Narrator otherNarrator : Game.getEnvironment().getNarrators()) {
+      if (otherNarrator != this && otherNarrator.isNarrating()) {
+        otherNarrator.cancel();
+      }
+    }
+    this.narrating = true;
+    this.currentText = text;
+    this.currentTextDisplayTime = DISPLAYTIME_MIN + text.length() * DISPLAYTIME_PER_LETTER;
+    this.currentTextQueue = new ConcurrentLinkedQueue<>();
+    this.displayedText = "";
+    for (int i = 0; i < this.currentText.length(); i++) {
+      this.currentTextQueue.add(this.currentText.charAt(i));
+    }
+    this.lastTextDispay = Game.getLoop().getTicks();
+  }
+
   @Override
-  public void render(Graphics2D g) {
+  public void render(final Graphics2D g) {
     if (this.displayedText == null || this.displayedText.isEmpty() || !this.isNarrating()) {
       return;
     }
-    g.drawImage(getBackgroundImage(), (int) this.getRenderLocation().getX(), (int) this.getRenderLocation().getY(), null);
+    g.drawImage(this.getBackgroundImage(), (int) this.getRenderLocation().getX(), (int) this.getRenderLocation().getY(), null);
     RenderEngine.renderImage(g, this.getBackgroundImage(), this.getRenderLocation());
+    BufferedImage img = ImageProcessing.getCompatibleImage((int) this.portraitWidth, (int) this.portraitHeight);
+    img.getGraphics().fillRect(0, 0, img.getWidth(), img.getHeight());
+    RenderEngine.renderImage(g, img, new Point2D.Double(this.portraitX, this.portraitY));
+
     g.setColor(this.getFontColor());
     final FontRenderContext frc = g.getFontRenderContext();
 
@@ -98,16 +195,71 @@ public class Narrator implements IUpdateable, IRenderable {
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);
-    final float x = (float) (this.getRenderLocation().getX() + this.getPadding() / 2);
-    float y = (float) (this.getRenderLocation().getY() + this.getPadding() / 2);
+    float textY = this.textBoxY;
     while (measurer.getPosition() < text.length()) {
-      final TextLayout layout = measurer.nextLayout((float) (this.getBoxWidth() - this.getPadding() / 2));
+      final TextLayout layout = measurer.nextLayout((float) (this.textboxWidth));
 
-      y += layout.getAscent();
-      final float dx = layout.isLeftToRight() ? 0 : (float) (this.getBoxWidth() - this.getPadding() / 2) - layout.getAdvance();
-      layout.draw(g, x + dx, y);
-      y += layout.getDescent() + layout.getLeading();
+      textY += layout.getAscent();
+      final float dx = layout.isLeftToRight() ? 0 : (float) (this.textboxWidth) - layout.getAdvance();
+      layout.draw(g, textBoxX + dx, textY);
+      textY += layout.getDescent() + layout.getLeading();
     }
+  }
+
+  public void setBackground(final Image background) {
+    this.background = background;
+  }
+
+  public void setBackgroundColor(final Color backgroundColor) {
+    this.backgroundColor = backgroundColor;
+  }
+
+  public void setBackgroundImage(final BufferedImage img) {
+    this.background = img;
+  }
+
+  public void setBorderColor(final Color borderColor) {
+    this.borderColor = borderColor;
+  }
+
+  public void setFont(final Font textFont) {
+    this.font = textFont;
+  }
+
+  public void setFontColor(final Color fontColor) {
+    this.fontColor = fontColor;
+  }
+
+  public void setLayout(final int newLayout) {
+    this.layout = newLayout;
+  }
+
+  public void setLetterTypeDelay(final int letterTypeDelay) {
+    this.letterTypeDelay = letterTypeDelay;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public void setPadding(final double padding) {
+    this.padding = padding;
+    this.createBackgroundImage();
+  }
+
+  public void setRenderLocation(final Point2D renderLocation) {
+    this.renderLocation = renderLocation;
+  }
+
+  public void setSize(final double width, final double height) {
+    this.boxWidth = width;
+    this.boxHeight = height;
+    this.setPadding(this.getBoxWidth() / 20d);
+    this.setupLayout();
+  }
+
+  public void setTypingSound(final Sound typingSound) {
+    this.typingSound = typingSound;
   }
 
   @Override
@@ -126,7 +278,7 @@ public class Narrator implements IUpdateable, IRenderable {
 
     // display new text
     if (!this.currentTextQueue.isEmpty() && this.currentText != null) {
-      if (loop.getDeltaTime(this.lastCharPoll) > letterTypeDelay) {
+      if (loop.getDeltaTime(this.lastCharPoll) > this.letterTypeDelay) {
         this.displayedText += this.currentTextQueue.poll();
         this.lastCharPoll = loop.getTicks();
         if (this.getTypingSound() != null) {
@@ -138,123 +290,21 @@ public class Narrator implements IUpdateable, IRenderable {
     // continue displaying currently displayed text
   }
 
-  public void cancel() {
-    this.narrating = false;
-  }
-
-  public void narrate(String text) {
-    this.narrating = true;
-    this.currentText = text;
-    this.currentTextDisplayTime = DISPLAYTIME_MIN + text.length() * DISPLAYTIME_PER_LETTER;
-    this.currentTextQueue = new ConcurrentLinkedQueue<>();
-    this.displayedText = "";
-    for (int i = 0; i < this.currentText.length(); i++) {
-      this.currentTextQueue.add(this.currentText.charAt(i));
+  private void setupLayout() {
+    this.portraitHeight = (float) (this.getBoxHeight() - this.getPadding());
+    this.portraitWidth = this.portraitHeight;
+    this.textboxWidth = (float) (this.getPadding() * 16);
+    this.portraitY = (float) (this.getRenderLocation().getY() + this.getPadding() / 2);
+    this.textBoxY = this.portraitY;
+    switch (this.getLayout()) {
+    case 0:
+      this.portraitX = (float) (this.getRenderLocation().getX() + this.getPadding() / 2);
+      this.textBoxX = (float) (this.portraitX + this.portraitWidth + this.getPadding() / 2);
+      break;
+    case 1:
+      this.textBoxX = (float) (this.getRenderLocation().getX() + this.getPadding() / 2);
+      this.portraitX = (float) (this.getRenderLocation().getX() + this.getBoxWidth() - this.getPadding() / 2 - this.portraitWidth);
+      break;
     }
-    this.lastTextDispay = Game.getLoop().getTicks();
-
-  }
-
-  public Sound getTypingSound() {
-    return this.typingSound;
-  }
-
-  public Image getBackgroundImage() {
-    return this.background;
-  }
-
-  public String getCurrentText() {
-    return this.currentText;
-  }
-
-  public double getPadding() {
-    return this.padding;
-  }
-
-  public Point2D getRenderLocation() {
-    return this.renderLocation;
-  }
-
-  public Font getFont() {
-    return this.font;
-  }
-
-  public Color getBackgroundColor() {
-    return this.backgroundColor;
-  }
-
-  public Color getBorderColor() {
-    return this.borderColor;
-  }
-
-  public Image getBackground() {
-    return this.background;
-  }
-
-  public Color getFontColor() {
-    return this.fontColor;
-  }
-
-  public int getLetterTypeDelay() {
-    return this.letterTypeDelay;
-  }
-
-  public double getBoxWidth() {
-    return this.boxWidth;
-  }
-
-  public double getBoxHeight() {
-    return this.boxHeight;
-  }
-
-  public boolean isNarrating() {
-    return this.narrating;
-  }
-
-  public void setLetterTypeDelay(int letterTypeDelay) {
-    this.letterTypeDelay = letterTypeDelay;
-  }
-
-  public void setBackgroundColor(Color backgroundColor) {
-    this.backgroundColor = backgroundColor;
-  }
-
-  public void setBorderColor(Color borderColor) {
-    this.borderColor = borderColor;
-  }
-
-  public void setFontColor(Color fontColor) {
-    this.fontColor = fontColor;
-  }
-
-  public void setBackground(Image background) {
-    this.background = background;
-  }
-
-  public void setSize(double x, double y) {
-    this.boxWidth = x;
-    this.boxHeight = y;
-    this.createBackgroundImage();
-  }
-
-  public void setBackgroundImage(BufferedImage img) {
-    this.background = img;
-  }
-
-  public void setPadding(double padding) {
-    this.padding = padding;
-    this.createBackgroundImage();
-  }
-
-  public void setTypingSound(Sound typingSound) {
-    this.typingSound = typingSound;
-  }
-
-  public void setFont(Font textFont) {
-    this.font = textFont;
-  }
-
-  public void setRenderLocation(Point2D renderLocation) {
-    this.renderLocation = renderLocation;
   }
 }

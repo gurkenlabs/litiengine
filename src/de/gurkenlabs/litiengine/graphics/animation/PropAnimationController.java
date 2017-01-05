@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.IGameLoop;

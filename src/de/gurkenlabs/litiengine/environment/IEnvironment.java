@@ -34,6 +34,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void add(IRenderable renderable, RenderType type);
 
+  public void addNarrator(final String name, final int layout);
+  public void addNarrator(final String name);
+
   public Collection<ICombatEntity> getCombatEntities();
 
   public Collection<IMovableEntity> getMovableEntities();
@@ -54,7 +57,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IMovableEntity getMovableEntity(final int mapId);
 
-  public Narrator getNarrator();
+  public Narrator getNarrator(final int index);
+
+  public Narrator getNarrator(final String name);
+
+  public Collection<Narrator> getNarrators();
 
   public IEntity get(final int mapId);
 
@@ -94,6 +101,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
   public void remove(final int mapId);
+
+  public void removeNarrator(final String name);
+
+  public void removeNarrator(final int index);
 
   public void remove(final IEntity entity);
 

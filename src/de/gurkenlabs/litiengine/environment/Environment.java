@@ -70,27 +70,27 @@ public class Environment implements IEnvironment {
   private static int localIdSequence = 0;
   private static int mapIdSequence;
 
-  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
-  private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
-  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
-
-  private final List<IRenderable> groundRenderable;
-  private final List<IRenderable> overlayRenderable;
-
-  private IMap map;
-  private Narrator narrator;
-
-  private final Map<RenderType, Map<Integer, IEntity>> entities;
-
-  private final Map<Integer, IMovableEntity> movableEntities;
+  private AmbientLight ambientLight;
+  private final Collection<Collider> colliders;
   private final Map<Integer, ICombatEntity> combatEntities;
 
-  private final List<MapLocation> spawnPoints;
+  private final Map<RenderType, Map<Integer, IEntity>> entities;
+  private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
+
+  private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
-  private final Collection<Trigger> triggers;
-  private final Collection<Collider> colliders;
+
+  private IMap map;
+
+  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
+  private final Map<Integer, IMovableEntity> movableEntities;
+
+  private final List<IRenderable> overlayRenderable;
+  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+  private final List<MapLocation> spawnPoints;
   private Image staticShadowImage;
-  private AmbientLight ambientLight;
+  private final Collection<Trigger> triggers;
+  private CopyOnWriteArrayList<Narrator> narrators;
 
   private Weather weather;
 
@@ -113,7 +113,14 @@ public class Environment implements IEnvironment {
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
-    this.narrator = new Narrator(this);
+  }
+
+  public Environment(final IMap map) {
+    this();
+    this.map = map;
+    this.setMapTitleAndDescription();
+    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
+    Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
 
   /**
@@ -124,7 +131,7 @@ public class Environment implements IEnvironment {
    */
   public Environment(final String mapPath) {
     this();
-    IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
+    final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
     if (loadedMap == null) {
       final IMapLoader tmxLoader = new TmxMapLoader();
       this.map = tmxLoader.LoadMap(mapPath);
@@ -134,24 +141,6 @@ public class Environment implements IEnvironment {
     this.setMapTitleAndDescription();
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
-  }
-
-  public Environment(IMap map) {
-    this();
-    this.map = map;
-    this.setMapTitleAndDescription();
-    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
-    Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
-  }
-
-  private void setMapTitleAndDescription() {
-
-    final String mapTitle = this.getMap().getCustomProperty(MapProperty.MAP_TITLE);
-    this.getMap().setTitle(mapTitle);
-
-    final String mapDescription = this.getMap().getCustomProperty(MapProperty.MAP_DESCRIPTION);
-    this.getMap().setDescription(mapDescription);
-
   }
 
   @Override
@@ -170,7 +159,7 @@ public class Environment implements IEnvironment {
     }
 
     if (entity instanceof ICollisionEntity) {
-      ICollisionEntity coll = (ICollisionEntity) entity;
+      final ICollisionEntity coll = (ICollisionEntity) entity;
       if (coll.hasCollision()) {
         Game.getPhysicsEngine().add(coll);
       }
@@ -206,366 +195,24 @@ public class Environment implements IEnvironment {
     }
   }
 
-  @Override
-  public void addMapObject(final IMapObject mapObject) {
-    this.addCollisionBox(mapObject);
-    this.addLightSource(mapObject);
-    this.addSpawnpoint(mapObject);
-    this.addProp(mapObject);
-    this.addEmitter(mapObject);
-    this.addDecorMob(mapObject);
-    this.addMob(mapObject);
-    this.addTrigger(mapObject);
-  }
-
-  @Override
-  public void clear() {
-    this.dispose(this.getEntities());
-    this.getCombatEntities().clear();
-    this.getMovableEntities().clear();
-    this.getLightSources().clear();
-    this.getColliders().clear();
-    this.getSpawnPoints().clear();
-    this.entities.get(RenderType.GROUND).clear();
-    this.entities.get(RenderType.NORMAL).clear();
-    this.entities.get(RenderType.OVERLAY).clear();
-  }
-
-  @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape) {
-    return this.findCombatEntities(shape, (entity) -> true);
-  }
-
-  @Override
-  public List<IEntity> findEntities(final Shape shape) {
-    final ArrayList<IEntity> entities = new ArrayList<>();
-    if (shape == null) {
-      return entities;
-    }
-    if (shape instanceof Rectangle2D) {
-      final Rectangle2D rect = (Rectangle2D) shape;
-      for (final IEntity entity : this.getEntities()) {
-        if (entity.getBoundingBox().intersects(rect)) {
-          entities.add(entity);
-        }
-      }
-      return entities;
-    }
-    // for other shapes, we check if the shape's bounds intersect the hitbox
-    // and
-    // if so, we then check if the actual shape intersects the hitbox
-    for (final IEntity entity : this.getEntities()) {
-      if (entity.getBoundingBox().intersects(shape.getBounds())) {
-        if (GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
-          entities.add(entity);
-        }
-      }
-    }
-
-    return entities;
-  }
-
-  @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
-    final ArrayList<ICombatEntity> entities = new ArrayList<>();
-    if (shape == null) {
-      return entities;
-    }
-
-    // for rectangle we can just use the intersects method
-    if (shape instanceof Rectangle2D) {
-      final Rectangle2D rect = (Rectangle2D) shape;
-      for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
-        if (combatEntity.getHitBox().intersects(rect)) {
-          entities.add(combatEntity);
-        }
+  private void addAmbientLight() {
+    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
+    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
+    int ambientAlpha = 0;
+    Color ambientColor = Color.WHITE;
+    try {
+      if (alphaProp != null && !alphaProp.isEmpty()) {
+        ambientAlpha = (int) Double.parseDouble(alphaProp);
       }
 
-      return entities;
-    }
-
-    // for other shapes, we check if the shape's bounds intersect the hitbox and
-    // if so, we then check if the actual shape intersects the hitbox
-    for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
-      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
-        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
-          entities.add(combatEntity);
-        }
+      if (colorProp != null && !colorProp.isEmpty()) {
+        ambientColor = Color.decode(colorProp);
       }
+    } catch (final NumberFormatException e) {
     }
 
-    return entities;
-  }
-
-  @Override
-  public Collection<IEntity> getEntities() {
-    ArrayList<IEntity> ent = new ArrayList<>();
-    ent.addAll(this.entities.get(RenderType.GROUND).values());
-    ent.addAll(this.entities.get(RenderType.NORMAL).values());
-    ent.addAll(this.entities.get(RenderType.OVERLAY).values());
-    return ent;
-  }
-
-  @Override
-  public Collection<IEntity> getEntities(RenderType renderType) {
-    return this.entities.get(renderType).values();
-  }
-
-  @Override
-  public AmbientLight getAmbientLight() {
-    return this.ambientLight;
-  }
-
-  @Override
-  public Collection<Collider> getColliders() {
-    return this.colliders;
-
-  }
-
-  @Override
-  public Collection<ICombatEntity> getCombatEntities() {
-    return this.combatEntities.values();
-  }
-
-  @Override
-  public ICombatEntity getCombatEntity(final int mapId) {
-    if (this.combatEntities.containsKey(mapId)) {
-      return this.combatEntities.get(mapId);
-    }
-
-    return null;
-  }
-
-  public Collection<IRenderable> getGroundRenderable() {
-    return this.groundRenderable;
-  }
-
-  @Override
-  public Collection<LightSource> getLightSources() {
-    return this.lightSources;
-  }
-
-  /**
-   * Negative map ids are only used locally.
-   */
-  @Override
-  public synchronized int getLocalMapId() {
-    return --localIdSequence;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.map.IMapContainer#getMap()
-   */
-  @Override
-  public IMap getMap() {
-    return this.map;
-  }
-
-  @Override
-  public synchronized int getMapId() {
-    return ++mapIdSequence;
-  }
-
-  @Override
-  public Collection<IMovableEntity> getMovableEntities() {
-    return this.movableEntities.values();
-  }
-
-  @Override
-  public Narrator getNarrator() {
-    return this.narrator;
-  }
-
-  @Override
-  public IEntity get(int mapId) {
-    IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    entity = this.entities.get(RenderType.NORMAL).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    entity = this.entities.get(RenderType.OVERLAY).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  @Override
-  public IMovableEntity getMovableEntity(final int mapId) {
-    if (this.movableEntities.containsKey(mapId)) {
-      return this.movableEntities.get(mapId);
-    }
-
-    return null;
-  }
-
-  public List<IRenderable> getOverlayRenderable() {
-    return this.overlayRenderable;
-  }
-
-  @Override
-  public List<MapLocation> getSpawnPoints() {
-    return this.spawnPoints;
-  }
-
-  @Override
-  public Collection<Trigger> getTriggers() {
-    return this.triggers;
-  }
-
-  public Image getStaticShadowImage() {
-    return this.staticShadowImage;
-  }
-
-  @Override
-  public WeatherType getWeather() {
-    return this.weather == null ? WeatherType.Clear : this.weather.getType();
-  }
-
-  @Override
-  public void init() {
-    this.loadMapObjects();
-    this.addStaticShadows();
-    this.addAmbientLight();
-  }
-
-  @Override
-  public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
-    this.entitiesRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onMapRendered(final Consumer<Graphics2D> consumer) {
-    this.mapRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
-    this.overlayRenderedConsumer.add(consumer);
-  }
-
-  @Override
-  public void remove(final int mapId) {
-    IEntity ent = this.get(mapId);
-    if (ent == null) {
-      System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
-      return;
-    }
-
-    this.remove(ent);
-  }
-
-  @Override
-  public void remove(IEntity entity) {
-    this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
-
-    if (entity instanceof ICollisionEntity) {
-      ICollisionEntity coll = (ICollisionEntity) entity;
-      Game.getPhysicsEngine().remove(coll);
-    }
-
-    if (entity instanceof Collider) {
-      this.colliders.remove(entity);
-    }
-
-    if (entity instanceof LightSource) {
-      this.lightSources.remove(entity);
-    }
-
-    if (entity instanceof Trigger) {
-      this.triggers.remove(entity);
-    }
-
-    if (entity instanceof IMovableEntity) {
-      this.movableEntities.values().remove(entity);
-    }
-
-    if (entity instanceof ICombatEntity) {
-      this.combatEntities.values().remove(entity);
-    }
-  }
-
-  @Override
-  public void removeRenderable(final IRenderable renderable) {
-    if (this.getGroundRenderable().contains(renderable)) {
-      this.getGroundRenderable().remove(renderable);
-    }
-
-    if (this.getOverlayRenderable().contains(renderable)) {
-      this.getOverlayRenderable().remove(renderable);
-    }
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
-
-    Game.getRenderEngine().renderMap(g, this.getMap());
-    this.informConsumers(g, this.mapRenderedConsumer);
-
-    for (final IRenderable rend : this.getGroundRenderable()) {
-      rend.render(g);
-    }
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
-    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
-      Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
-    }
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
-    this.informConsumers(g, this.entitiesRenderedConsumer);
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
-
-    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
-
-    // render static shadows
-    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
-
-    if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      // this.getAmbientLight().createImage();
-      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
-    }
-
-    if (this.weather != null) {
-      this.weather.render(g);
-    }
-
-    for (final IRenderable rend : this.getOverlayRenderable()) {
-      rend.render(g);
-    }
-
-    this.informConsumers(g, this.overlayRenderedConsumer);
-    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
-    this.narrator.render(g);
-
-  }
-
-  @Override
-  public void setWeather(final WeatherType weather) {
-    switch (weather) {
-    case Rain:
-      this.weather = new RainEmitter();
-      break;
-    case Snow:
-      this.weather = new SnowEmitter();
-      break;
-    case Clear:
-    default:
-      this.weather = null;
-      break;
-    }
-
-    if (weather != null) {
-      this.weather.activate(Game.getLoop());
+    if (ambientAlpha > 0) {
+      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
     }
   }
 
@@ -573,7 +220,7 @@ public class Environment implements IEnvironment {
     if (!mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
       return;
     }
-    Collider col = new Collider();
+    final Collider col = new Collider();
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setMapId(mapObject.getId());
@@ -597,18 +244,6 @@ public class Environment implements IEnvironment {
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
     this.add(mob);
-  }
-
-  protected void addTrigger(IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.TRIGGER)) {
-      return;
-    }
-
-    String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
-    Trigger trigger = new Trigger(mapObject.getName(), message);
-    trigger.setMapId(mapObject.getId());
-    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
-    this.add(trigger);
   }
 
   protected void addEmitter(final IMapObject mapObject) {
@@ -666,8 +301,35 @@ public class Environment implements IEnvironment {
     this.add(light);
   }
 
+  @Override
+  public void addMapObject(final IMapObject mapObject) {
+    this.addCollisionBox(mapObject);
+    this.addLightSource(mapObject);
+    this.addSpawnpoint(mapObject);
+    this.addProp(mapObject);
+    this.addEmitter(mapObject);
+    this.addDecorMob(mapObject);
+    this.addMob(mapObject);
+    this.addTrigger(mapObject);
+  }
+
   protected void addMob(final IMapObject mapObject) {
 
+  }
+
+  @Override
+  public void addNarrator(final String name) {
+    this.addNarrator(name, 0);
+  }
+
+  @Override
+  public void addNarrator(final String name, final int layout) {
+    if (this.getNarrators() == null) {
+      this.narrators = new CopyOnWriteArrayList<>();
+    }
+    Narrator newNarrator = new Narrator(this, name, layout);
+    System.out.println(newNarrator.getName() + " - " + newNarrator.getLayout());
+    this.getNarrators().add(newNarrator);
   }
 
   protected void addProp(final IMapObject mapObject) {
@@ -676,7 +338,7 @@ public class Environment implements IEnvironment {
     }
 
     // set map properties by map object
-    Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
     final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
     if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
@@ -712,24 +374,6 @@ public class Environment implements IEnvironment {
     }
 
     this.getSpawnPoints().add(new MapLocation(mapObject.getId(), new Point(mapObject.getLocation())));
-  }
-
-  private void loadMapObjects() {
-    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-          continue;
-        }
-
-        this.addMapObject(mapObject);
-      }
-    }
-  }
-
-  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
-    for (final Consumer<Graphics2D> consumer : consumers) {
-      consumer.accept(g);
-    }
   }
 
   private void addStaticShadows() {
@@ -868,6 +512,31 @@ public class Environment implements IEnvironment {
     // ImageCache.IMAGES.put(cacheKey, img);
   }
 
+  protected void addTrigger(final IMapObject mapObject) {
+    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.TRIGGER)) {
+      return;
+    }
+
+    final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
+    final Trigger trigger = new Trigger(mapObject.getName(), message);
+    trigger.setMapId(mapObject.getId());
+    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
+    this.add(trigger);
+  }
+
+  @Override
+  public void clear() {
+    this.dispose(this.getEntities());
+    this.getCombatEntities().clear();
+    this.getMovableEntities().clear();
+    this.getLightSources().clear();
+    this.getColliders().clear();
+    this.getSpawnPoints().clear();
+    this.entities.get(RenderType.GROUND).clear();
+    this.entities.get(RenderType.NORMAL).clear();
+    this.entities.get(RenderType.OVERLAY).clear();
+  }
+
   private void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
@@ -884,6 +553,103 @@ public class Environment implements IEnvironment {
         }
       }
     }
+  }
+
+  @Override
+  public List<ICombatEntity> findCombatEntities(final Shape shape) {
+    return this.findCombatEntities(shape, (entity) -> true);
+  }
+
+  @Override
+  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
+    final ArrayList<ICombatEntity> entities = new ArrayList<>();
+    if (shape == null) {
+      return entities;
+    }
+
+    // for rectangle we can just use the intersects method
+    if (shape instanceof Rectangle2D) {
+      final Rectangle2D rect = (Rectangle2D) shape;
+      for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+        if (combatEntity.getHitBox().intersects(rect)) {
+          entities.add(combatEntity);
+        }
+      }
+
+      return entities;
+    }
+
+    // for other shapes, we check if the shape's bounds intersect the hitbox and
+    // if so, we then check if the actual shape intersects the hitbox
+    for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
+      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
+        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
+          entities.add(combatEntity);
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  @Override
+  public List<IEntity> findEntities(final Shape shape) {
+    final ArrayList<IEntity> entities = new ArrayList<>();
+    if (shape == null) {
+      return entities;
+    }
+    if (shape instanceof Rectangle2D) {
+      final Rectangle2D rect = (Rectangle2D) shape;
+      for (final IEntity entity : this.getEntities()) {
+        if (entity.getBoundingBox().intersects(rect)) {
+          entities.add(entity);
+        }
+      }
+      return entities;
+    }
+    // for other shapes, we check if the shape's bounds intersect the hitbox
+    // and
+    // if so, we then check if the actual shape intersects the hitbox
+    for (final IEntity entity : this.getEntities()) {
+      if (entity.getBoundingBox().intersects(shape.getBounds())) {
+        if (GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
+          entities.add(entity);
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  @Override
+  public IEntity get(final int mapId) {
+    IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
+    if (entity != null) {
+      return entity;
+    }
+
+    entity = this.entities.get(RenderType.NORMAL).get(mapId);
+    if (entity != null) {
+      return entity;
+    }
+
+    entity = this.entities.get(RenderType.OVERLAY).get(mapId);
+    if (entity != null) {
+      return entity;
+    }
+
+    return null;
+  }
+
+  @Override
+  public AmbientLight getAmbientLight() {
+    return this.ambientLight;
+  }
+
+  @Override
+  public Collection<Collider> getColliders() {
+    return this.colliders;
+
   }
 
   private List<IMapObject> getCollisionBoxMapObjects() {
@@ -903,24 +669,313 @@ public class Environment implements IEnvironment {
     return collisionBoxes;
   }
 
-  private void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
-    int ambientAlpha = 0;
-    Color ambientColor = Color.WHITE;
-    try {
-      if (alphaProp != null && !alphaProp.isEmpty()) {
-        ambientAlpha = (int) Double.parseDouble(alphaProp);
-      }
+  @Override
+  public Collection<ICombatEntity> getCombatEntities() {
+    return this.combatEntities.values();
+  }
 
-      if (colorProp != null && !colorProp.isEmpty()) {
-        ambientColor = Color.decode(colorProp);
-      }
-    } catch (final NumberFormatException e) {
+  @Override
+  public ICombatEntity getCombatEntity(final int mapId) {
+    if (this.combatEntities.containsKey(mapId)) {
+      return this.combatEntities.get(mapId);
     }
 
-    if (ambientAlpha > 0) {
-      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+    return null;
+  }
+
+  @Override
+  public Collection<IEntity> getEntities() {
+    final ArrayList<IEntity> ent = new ArrayList<>();
+    ent.addAll(this.entities.get(RenderType.GROUND).values());
+    ent.addAll(this.entities.get(RenderType.NORMAL).values());
+    ent.addAll(this.entities.get(RenderType.OVERLAY).values());
+    return ent;
+  }
+
+  @Override
+  public Collection<IEntity> getEntities(final RenderType renderType) {
+    return this.entities.get(renderType).values();
+  }
+
+  public Collection<IRenderable> getGroundRenderable() {
+    return this.groundRenderable;
+  }
+
+  @Override
+  public Collection<LightSource> getLightSources() {
+    return this.lightSources;
+  }
+
+  /**
+   * Negative map ids are only used locally.
+   */
+  @Override
+  public synchronized int getLocalMapId() {
+    return --localIdSequence;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.map.IMapContainer#getMap()
+   */
+  @Override
+  public IMap getMap() {
+    return this.map;
+  }
+
+  @Override
+  public synchronized int getMapId() {
+    return ++mapIdSequence;
+  }
+
+  @Override
+  public Collection<IMovableEntity> getMovableEntities() {
+    return this.movableEntities.values();
+  }
+
+  @Override
+  public IMovableEntity getMovableEntity(final int mapId) {
+    if (this.movableEntities.containsKey(mapId)) {
+      return this.movableEntities.get(mapId);
+    }
+
+    return null;
+  }
+
+  @Override
+  public Narrator getNarrator(final int index) {
+    return this.getNarrators().get(index);
+  }
+
+  @Override
+  public Narrator getNarrator(final String name) {
+    for (Narrator narrator : this.getNarrators()) {
+      if (narrator.getName() == name) {
+        return narrator;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public CopyOnWriteArrayList<Narrator> getNarrators() {
+    return this.narrators;
+  }
+
+  public List<IRenderable> getOverlayRenderable() {
+    return this.overlayRenderable;
+  }
+
+  @Override
+  public List<MapLocation> getSpawnPoints() {
+    return this.spawnPoints;
+  }
+
+  public Image getStaticShadowImage() {
+    return this.staticShadowImage;
+  }
+
+  @Override
+  public Collection<Trigger> getTriggers() {
+    return this.triggers;
+  }
+
+  @Override
+  public WeatherType getWeather() {
+    return this.weather == null ? WeatherType.Clear : this.weather.getType();
+  }
+
+  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
+    for (final Consumer<Graphics2D> consumer : consumers) {
+      consumer.accept(g);
+    }
+  }
+
+  @Override
+  public void init() {
+    this.loadMapObjects();
+    this.addStaticShadows();
+    this.addAmbientLight();
+  }
+
+  private void loadMapObjects() {
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+      }
+    }
+  }
+
+  @Override
+  public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
+    this.entitiesRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onMapRendered(final Consumer<Graphics2D> consumer) {
+    this.mapRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onOverlayRendered(final Consumer<Graphics2D> consumer) {
+    this.overlayRenderedConsumer.add(consumer);
+  }
+
+  @Override
+  public void remove(final IEntity entity) {
+    this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
+
+    if (entity instanceof ICollisionEntity) {
+      final ICollisionEntity coll = (ICollisionEntity) entity;
+      Game.getPhysicsEngine().remove(coll);
+    }
+
+    if (entity instanceof Collider) {
+      this.colliders.remove(entity);
+    }
+
+    if (entity instanceof LightSource) {
+      this.lightSources.remove(entity);
+    }
+
+    if (entity instanceof Trigger) {
+      this.triggers.remove(entity);
+    }
+
+    if (entity instanceof IMovableEntity) {
+      this.movableEntities.values().remove(entity);
+    }
+
+    if (entity instanceof ICombatEntity) {
+      this.combatEntities.values().remove(entity);
+    }
+  }
+
+  @Override
+  public void remove(final int mapId) {
+    final IEntity ent = this.get(mapId);
+    if (ent == null) {
+      System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
+      return;
+    }
+
+    this.remove(ent);
+  }
+
+  @Override
+  public void removeNarrator(final String name) {
+    if (this.getNarrators() == null) {
+      return;
+    }
+    for (Narrator narrator : this.getNarrators()) {
+      if (narrator.getName() == name) {
+        this.getNarrators().remove(narrator);
+      }
+    }
+
+  }
+
+  @Override
+  public void removeNarrator(final int index) {
+    if (this.getNarrators() == null || this.getNarrators().size() <= index) {
+      return;
+    }
+    this.getNarrators().remove(index);
+  }
+
+  @Override
+  public void removeRenderable(final IRenderable renderable) {
+    if (this.getGroundRenderable().contains(renderable)) {
+      this.getGroundRenderable().remove(renderable);
+    }
+
+    if (this.getOverlayRenderable().contains(renderable)) {
+      this.getOverlayRenderable().remove(renderable);
+    }
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
+
+    Game.getRenderEngine().renderMap(g, this.getMap());
+    this.informConsumers(g, this.mapRenderedConsumer);
+
+    for (final IRenderable rend : this.getGroundRenderable()) {
+      rend.render(g);
+    }
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
+    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
+      Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
+    }
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
+    this.informConsumers(g, this.entitiesRenderedConsumer);
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
+
+    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
+
+    // render static shadows
+    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+
+    if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
+      // this.getAmbientLight().createImage();
+      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+    }
+
+    if (this.weather != null) {
+      this.weather.render(g);
+    }
+
+    for (final IRenderable rend : this.getOverlayRenderable()) {
+      rend.render(g);
+    }
+
+    this.informConsumers(g, this.overlayRenderedConsumer);
+    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
+    if (this.getNarrators() == null || this.getNarrators().isEmpty()) {
+      return;
+    }
+    for (final Narrator narr : this.getNarrators()) {
+      narr.render(g);
+    }
+
+  }
+
+  private void setMapTitleAndDescription() {
+
+    final String mapTitle = this.getMap().getCustomProperty(MapProperty.MAP_TITLE);
+    this.getMap().setTitle(mapTitle);
+
+    final String mapDescription = this.getMap().getCustomProperty(MapProperty.MAP_DESCRIPTION);
+    this.getMap().setDescription(mapDescription);
+
+  }
+
+  @Override
+  public void setWeather(final WeatherType weather) {
+    switch (weather) {
+    case Rain:
+      this.weather = new RainEmitter();
+      break;
+    case Snow:
+      this.weather = new SnowEmitter();
+      break;
+    case Clear:
+    default:
+      this.weather = null;
+      break;
+    }
+
+    if (weather != null) {
+      this.weather.activate(Game.getLoop());
     }
   }
 }
