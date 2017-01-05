@@ -78,6 +78,7 @@ public class Environment implements IEnvironment {
   private final List<IRenderable> overlayRenderable;
 
   private IMap map;
+  private Narrator narrator;
 
   private final Map<RenderType, Map<Integer, IEntity>> entities;
 
@@ -112,6 +113,7 @@ public class Environment implements IEnvironment {
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
+    this.narrator = new Narrator(this);
   }
 
   /**
@@ -129,7 +131,7 @@ public class Environment implements IEnvironment {
     } else {
       this.map = loadedMap;
     }
-
+    this.setMapTitleAndDescription();
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
@@ -137,8 +139,19 @@ public class Environment implements IEnvironment {
   public Environment(IMap map) {
     this();
     this.map = map;
+    this.setMapTitleAndDescription();
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
+  }
+
+  private void setMapTitleAndDescription() {
+
+    final String mapTitle = this.getMap().getCustomProperty(MapProperty.MAP_TITLE);
+    this.getMap().setTitle(mapTitle);
+
+    final String mapDescription = this.getMap().getCustomProperty(MapProperty.MAP_DESCRIPTION);
+    this.getMap().setDescription(mapDescription);
+
   }
 
   @Override
@@ -361,6 +374,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Narrator getNarrator() {
+    return this.narrator;
+  }
+
+  @Override
   public IEntity get(int mapId) {
     IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
     if (entity != null) {
@@ -526,8 +544,9 @@ public class Environment implements IEnvironment {
     }
 
     this.informConsumers(g, this.overlayRenderedConsumer);
-
     g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
+    this.narrator.render(g);
+
   }
 
   @Override

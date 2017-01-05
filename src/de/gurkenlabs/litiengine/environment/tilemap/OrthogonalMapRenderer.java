@@ -48,7 +48,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @return the cache key
    */
   public static String getCacheKey(final IMap map) {
-    return MessageFormat.format("map_{0}_version_{1}", map.getName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
+    return MessageFormat.format("map_{0}_version_{1}", map.getFileName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
   }
 
   @Override

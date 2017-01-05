@@ -54,11 +54,11 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   
   private boolean cancelled;
 
-  public static SpeechBubble create(final IEntity entity, final Font font, final String text) {
+  public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text) {
     return new SpeechBubble(entity, font, text);
   }
 
-  public static SpeechBubble create(final IEntity entity, final Font font, final String text, final Sound typeSound) {
+  public static SpeechBubble createEntityBubbleWithTypingSound(final IEntity entity, final Font font, final String text, final Sound typeSound) {
     return new SpeechBubble(entity, font, text, typeSound);
   }
 

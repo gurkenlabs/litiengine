@@ -54,6 +54,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IMovableEntity getMovableEntity(final int mapId);
 
+  public Narrator getNarrator();
+
   public IEntity get(final int mapId);
 
   public Collection<LightSource> getLightSources();

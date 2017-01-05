@@ -123,7 +123,7 @@ public abstract class Game {
     }
     
     for(IMap map : maps){
-      if(map.getName().equals(mapName)){
+      if(map.getFileName().equals(mapName)){
         return map;
       }
     }
@@ -211,7 +211,7 @@ public abstract class Game {
     
     int mapCnt = 0;
     for(IMap m : file.getMaps()){
-      if(getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))){
+      if(getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))){
         continue;
       }
       
