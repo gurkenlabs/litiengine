@@ -37,7 +37,6 @@ public class WindowHandler implements WindowListener {
   @Override
   public void windowClosing(final WindowEvent event) {
     Game.terminate();
-    System.exit(0);
   }
 
   /*

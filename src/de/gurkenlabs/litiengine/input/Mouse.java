@@ -4,7 +4,6 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.AWTException;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.MouseEvent;
@@ -59,8 +58,6 @@ public class Mouse implements IMouse {
   private boolean isRightMouseButtonDown;
 
   private boolean grabMouse;
-
-  private boolean isGrabbing;
 
   private Point lastLocation;
 
@@ -164,7 +161,13 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
-    this.setLocation(e);
+    if (!this.grabMouse) {
+      this.lastLocation = e.getPoint();
+      this.location = e.getPoint();
+    } else {
+      this.setLocation(e);
+    }
+    
     this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
   }
 
@@ -393,7 +396,7 @@ public class Mouse implements IMouse {
    *          The location of the original mouse.
    */
   private void setLocation(MouseEvent e) {
-    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
+    if (this.grabMouse && !Game.getScreenManager().isFocusOwner()) {
       return;
     }
 
@@ -410,12 +413,10 @@ public class Mouse implements IMouse {
       final Point screenLocation = Game.getScreenManager().getScreenLocation();
       final int grabX = (int) (screenLocation.x + screenCenterX);
       final int grabY = (int) (screenLocation.y + screenCenterY);
-     
+
       // lock original mouse back to the center of the screen
-      this.isGrabbing = true;
       this.robot.mouseMove(grabX, grabY);
-      this.isGrabbing = false;
-      
+
       // calculate diffs and new location for the ingame mouse
       diffX = e.getXOnScreen() - grabX;
       diffY = e.getYOnScreen() - grabY;

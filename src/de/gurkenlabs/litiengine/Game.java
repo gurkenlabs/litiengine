@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
@@ -32,7 +33,7 @@ import de.gurkenlabs.util.io.StreamUtilities;
 
 public abstract class Game {
   private final static List<Consumer<String>> startedConsumer;
-  private final static List<Consumer<String>> terminatedConsumer;
+  private final static List<Predicate<String>> terminatingConsumer;
 
   private final static GameConfiguration configuration;
   private final static IRenderEngine graphicsEngine;
@@ -50,7 +51,7 @@ public abstract class Game {
 
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
-    terminatedConsumer = new CopyOnWriteArrayList<>();
+    terminatingConsumer = new CopyOnWriteArrayList<>();
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
@@ -231,14 +232,16 @@ public abstract class Game {
   }
 
   public static void terminate() {
+    for (Predicate<String> cons : terminatingConsumer) {
+      if(!cons.test(Game.getInfo().getName())){
+        return;
+      }
+    }
+    
     gameLoop.terminate();
 
     soundEngine.terminate();
     renderLoop.terminate();
-
-    for (Consumer<String> cons : terminatedConsumer) {
-      cons.accept(Game.getInfo().getName());
-    }
 
     System.exit(0);
   }
@@ -247,7 +250,11 @@ public abstract class Game {
     startedConsumer.add(cons);
   }
 
-  public static void onTerminated(Consumer<String> cons) {
-    terminatedConsumer.add(cons);
+  /**
+   * Returning false prevents the terminate event to continue.
+   * @param cons
+   */
+  public static void onTerminating(Predicate<String> cons) {
+    terminatingConsumer.add(cons);
   }
 }

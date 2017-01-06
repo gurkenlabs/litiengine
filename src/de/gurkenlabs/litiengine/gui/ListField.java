@@ -116,6 +116,10 @@ public class ListField extends GuiComponent {
    * @return the list item
    */
   public ImageComponent getListEntry(final int listIndex) {
+    if (listIndex <= 0 || listIndex > this.listEntries.size()) {
+      return null;
+    }
+
     return this.listEntries.get(listIndex);
   }
 
@@ -127,8 +131,8 @@ public class ListField extends GuiComponent {
   public int getSelection() {
     return this.selection;
   }
-  
-  public Object getSelectedObject(){
+
+  public Object getSelectedObject() {
     return this.getContentArray()[this.getSelection()];
   }
 
@@ -173,11 +177,16 @@ public class ListField extends GuiComponent {
       if (this.contents.length <= i) {
         continue;
       }
-      this.getListEntry(i).setText(this.contents[i + this.getLowerBound()].toString());
+      
+      if (this.getListEntry(i) != null) {
+        this.getListEntry(i).setText(this.contents[i + this.getLowerBound()].toString());
+      }
     }
     if (this.getSelection() >= this.getLowerBound() && this.getSelection() < this.getLowerBound() + this.getNumberOfShownElements()) {
       this.selectedComponent = this.getListEntry(this.getSelection() - this.getLowerBound());
-      this.selectedComponent.setSelected(true);
+      if (this.selectedComponent != null) {
+        this.selectedComponent.setSelected(true);
+      }
     } else {
       this.selectedComponent = null;
     }

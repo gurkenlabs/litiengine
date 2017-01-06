@@ -40,7 +40,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectTypes;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -217,7 +217,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addCollisionBox(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
       return;
     }
     final Collider col = new Collider();
@@ -229,15 +229,16 @@ public class Environment implements IEnvironment {
     if (shadowType != null && !shadowType.isEmpty()) {
       col.setShadowType(Collider.StaticShadowType.valueOf(shadowType));
     }
-    
+
     this.add(col);
     Game.getPhysicsEngine().add(col.getBoundingBox());
   }
 
   protected void addDecorMob(final IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.DECORMOB)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
       return;
     }
+
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.MOBTYPE));
     mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
@@ -252,7 +253,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addEmitter(final IMapObject mapObject) {
-    if (mapObject.getType() != MapObjectTypes.EMITTER) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER || mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE) == null) {
       return;
     }
     Emitter emitter = null;
@@ -276,7 +277,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addLightSource(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.LIGHTSOURCE)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
       return;
     }
     final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
@@ -337,7 +338,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addProp(final IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.PROP)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
       return;
     }
 
@@ -373,7 +374,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
-    if (!mapObject.getType().equals(MapObjectTypes.SPAWNPOINT)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
       return;
     }
 
@@ -517,7 +518,7 @@ public class Environment implements IEnvironment {
   }
 
   protected void addTrigger(final IMapObject mapObject) {
-    if (!mapObject.getType().equalsIgnoreCase(MapObjectTypes.TRIGGER)) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
       return;
     }
 
@@ -664,7 +665,7 @@ public class Environment implements IEnvironment {
           continue;
         }
 
-        if (obj.getType().equals(MapObjectTypes.COLLISIONBOX)) {
+        if (MapObjectType.get(obj.getType()) == MapObjectType.COLLISIONBOX) {
           collisionBoxes.add(obj);
         }
       }
@@ -869,6 +870,22 @@ public class Environment implements IEnvironment {
     }
 
     this.remove(ent);
+  }
+
+  @Override
+  public void reloadFromMap(int mapId) {
+    this.remove(mapId);
+
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty() || mapObject.getId() != mapId) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+        break;
+      }
+    }
   }
 
   @Override

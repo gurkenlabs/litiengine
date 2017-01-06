@@ -7,6 +7,7 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -44,11 +45,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
   /** The last screen change. */
   private long lastScreenChange = 0;
 
-  private Dimension resolution;
-
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
-    this.resolution = this.getSize();
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
@@ -58,8 +56,8 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.setBackground(Color.BLACK);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.addComponentListener(new ResizedEventListener());
-
-    RenderComponent comp = new RenderComponent(this.getResolution());
+    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    RenderComponent comp = new RenderComponent(Game.getConfiguration().GRAPHICS.getResolution());
     this.add(comp);
     this.renderCanvas = comp;
   }
@@ -127,7 +125,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public Dimension getResolution() {
-    return this.resolution;
+    return this.getRenderComponent().getSize();
   }
 
   @Override
@@ -145,7 +143,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
 
     this.setSize(Game.getConfiguration().GRAPHICS.getResolution());
-    this.resolution = this.getSize();
 
     this.setVisible(true);
     this.getRenderComponent().init();

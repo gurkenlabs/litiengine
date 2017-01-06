@@ -36,6 +36,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void addNarrator(final String name, final int layout);
   public void addNarrator(final String name);
+  
+  public void reloadFromMap(final int mapId);
 
   public Collection<ICombatEntity> getCombatEntities();
 
