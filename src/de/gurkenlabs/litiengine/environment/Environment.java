@@ -224,7 +224,12 @@ public class Environment implements IEnvironment {
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setMapId(mapObject.getId());
-    col.setShadowType(Collider.StaticShadowType.valueOf(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
+
+    String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
+    if (shadowType != null && !shadowType.isEmpty()) {
+      col.setShadowType(Collider.StaticShadowType.valueOf(shadowType));
+    }
+    
     this.add(col);
     Game.getPhysicsEngine().add(col.getBoundingBox());
   }

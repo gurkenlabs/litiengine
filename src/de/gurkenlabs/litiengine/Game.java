@@ -63,7 +63,7 @@ public abstract class Game {
     // to initialize components
     configuration = new GameConfiguration();
     getConfiguration().load();
-    
+
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
@@ -88,8 +88,8 @@ public abstract class Game {
   public static IGameLoop getLoop() {
     return gameLoop;
   }
-  
-  public static RenderLoop getRenderLoop(){
+
+  public static RenderLoop getRenderLoop() {
     return renderLoop;
   }
 
@@ -112,22 +112,22 @@ public abstract class Game {
   public static ISoundEngine getSoundEngine() {
     return soundEngine;
   }
-  
-  public static List<IMap> getMaps(){
+
+  public static List<IMap> getMaps() {
     return maps;
   }
-  
-  public static IMap getMap(String mapName){
-    if(mapName == null || mapName.isEmpty() || maps.size() == 0){
+
+  public static IMap getMap(String mapName) {
+    if (mapName == null || mapName.isEmpty() || maps.size() == 0) {
       return null;
     }
-    
-    for(IMap map : maps){
-      if(map.getFileName().equals(mapName)){
+
+    for (IMap map : maps) {
+      if (map.getFileName().equals(mapName)) {
         return map;
       }
     }
-    
+
     return null;
   }
 
@@ -146,13 +146,13 @@ public abstract class Game {
 
     getLoop().registerForUpdate(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
-    
+
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     // ensures that we terminate the game, when the window is closed
     scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
-    
+
     final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
     if (new File(LOGGING_CONFIG_FILE).exists()) {
@@ -189,7 +189,7 @@ public abstract class Game {
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
-    
+
     Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
   }
 
@@ -197,58 +197,57 @@ public abstract class Game {
     gameLoop.start();
     soundEngine.start();
     renderLoop.start();
-    
-    for(Consumer<String> cons : startedConsumer){
+
+    for (Consumer<String> cons : startedConsumer) {
       cons.accept(Game.getInfo().getName());
     }
   }
-  
-  public static void load(String gameResourceFile){
+
+  public static void load(String gameResourceFile) {
     GameFile file = GameFile.load(gameResourceFile);
-    if(file == null){
+    if (file == null) {
       return;
     }
-    
+
     int mapCnt = 0;
-    for(IMap m : file.getMaps()){
-      if(getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))){
+    for (IMap m : file.getMaps()) {
+      if (getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))) {
         continue;
       }
-      
+
       getMaps().add(m);
       mapCnt++;
     }
-    
-    int spriteCnt = 0;
-    for(SpriteSheetInfo sprite : file.getSpriteSheets()){
-      int before = Spritesheet.spritesheets.size();
-      Spritesheet.load(ImageProcessing.decodeToImage(sprite.getImage()), sprite.getName(), sprite.getWidth(), sprite.getHeight());
-      if(Spritesheet.spritesheets.size() > before){
-        spriteCnt++;
-      }
+
+    for (String spriteFile : file.getSpriteFiles()) {
+      Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
     }
-    
-    System.out.println(mapCnt + " maps and " + spriteCnt + " spritesheets loaded from '" + gameResourceFile + "'");
-  } 
+
+    for (SpriteSheetInfo tileset : file.getTileSets()) {
+      Spritesheet.load(tileset);
+    }
+
+    System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
+  }
 
   public static void terminate() {
     gameLoop.terminate();
 
     soundEngine.terminate();
     renderLoop.terminate();
-    
-    for(Consumer<String> cons : terminatedConsumer){
+
+    for (Consumer<String> cons : terminatedConsumer) {
       cons.accept(Game.getInfo().getName());
     }
-    
+
     System.exit(0);
   }
-  
-  public static void onStarted(Consumer<String> cons){
+
+  public static void onStarted(Consumer<String> cons) {
     startedConsumer.add(cons);
   }
-  
-  public static void onTerminated(Consumer<String> cons){
+
+  public static void onTerminated(Consumer<String> cons) {
     terminatedConsumer.add(cons);
   }
 }

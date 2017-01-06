@@ -19,12 +19,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.tilemap.ITileset;
+import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
-  
+
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private final String name;
 
@@ -44,6 +46,13 @@ public class Spritesheet {
 
   private BufferedImage image;
 
+  /**
+   * The sprite info file must be located under the
+   * {@link de.gurkenlags.litiengine.GameInfo#getSpritesDirectory()}. directory.
+   * 
+   * @param spriteInfoFile
+   * @return
+   */
   public static List<Spritesheet> load(final String spriteInfoFile) {
     final String COMMENT_CHAR = "#";
 
@@ -94,7 +103,6 @@ public class Spritesheet {
     }
 
     if (tileset.getImage().getAbsoluteSourcePath() == null) {
-      System.out.println("tileset '" + tileset.getName() + "' could not be loaded because the absolut path was not set. Consider finding the spritesheet by the name instead.");
       return null;
     }
 
@@ -106,6 +114,10 @@ public class Spritesheet {
     Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
 
     return sprite;
+  }
+
+  public static Spritesheet load(final SpriteSheetInfo info) {
+    return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
   }
 
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
@@ -122,8 +134,8 @@ public class Spritesheet {
 
     return spritesheets.get(name.toLowerCase());
   }
-  
-  public static void remove(final String path){
+
+  public static void remove(final String path) {
     spritesheets.values().removeIf(x -> x.getName().equals(path));
   }
 
@@ -136,7 +148,7 @@ public class Spritesheet {
 
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
-    
+
     spritesheets.put(this.name.toLowerCase(), this);
   }
 
@@ -182,7 +194,7 @@ public class Spritesheet {
     }
 
     if (this.getImage() == null) {
-      log.warning("no image defined for sprite '" + this.getName() +"'");
+      log.warning("no image defined for sprite '" + this.getName() + "'");
       return null;
     }
 
@@ -192,7 +204,7 @@ public class Spritesheet {
       ImageCache.SPRITES.putPersistent(imageCacheKey, smallImage);
       return smallImage;
     } catch (RasterFormatException rfe) {
-      log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" +position.x +"," + position.y +"] from sprite'" + this.getName() + "'");
+      log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" + position.x + "," + position.y + "] from sprite'" + this.getName() + "'");
       return null;
     }
   }

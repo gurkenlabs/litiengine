@@ -55,7 +55,7 @@ public class GameFile implements Serializable {
   }
 
   @XmlTransient
-  public List<SpriteSheetInfo> getSpriteSheets() {
+  public List<SpriteSheetInfo> getTileSets() {
     return this.spriteSheets;
   }
 
