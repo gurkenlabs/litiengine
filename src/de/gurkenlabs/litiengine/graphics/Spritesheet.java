@@ -104,6 +104,7 @@ public class Spritesheet {
 
   public static Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {
     Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
+
     return sprite;
   }
 
@@ -135,15 +136,16 @@ public class Spritesheet {
 
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
+    
     spritesheets.put(this.name.toLowerCase(), this);
   }
 
   private Spritesheet(final ITileset tileset) {
-    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath()), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
+    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
   private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
-    this(RenderEngine.getImage(path), path, spriteWidth, spriteHeight);
+    this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
   }
 
   public BufferedImage getImage() {

@@ -86,6 +86,10 @@ public class DropdownListField extends GuiComponent {
   }
 
   public Object getSelectedObject() {
+    if(this.getContentArray().length == 0){
+      return null;
+    }
+    
     return this.getContentArray()[this.getContentList().getSelection()];
   }
 

@@ -149,6 +149,10 @@ public class RenderEngine implements IRenderEngine {
     g.setTransform(oldTransForm);
   }
 
+  public static BufferedImage getImage(final String absolutPath) {
+    return getImage(absolutPath, false);
+  }
+
   /**
    * Gets the image by the specified relative path. This method supports both,
    * loading images from a folder and loading them from the resources.
@@ -157,13 +161,13 @@ public class RenderEngine implements IRenderEngine {
    *          the image
    * @return the image
    */
-  public static BufferedImage getImage(final String absolutPath) {
+  public static BufferedImage getImage(final String absolutPath, boolean forceLoad) {
     if (absolutPath == null || absolutPath.isEmpty()) {
       return null;
     }
 
     final String cacheKey = absolutPath.hashCode() + "";
-    if (ImageCache.IMAGES.containsKey(cacheKey)) {
+    if (!forceLoad && ImageCache.IMAGES.containsKey(cacheKey)) {
       return ImageCache.IMAGES.get(cacheKey);
     }
 
