@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.util.MathUtilities;
 
 /**
  * This implementation provides information about the mouse input in the
@@ -57,10 +58,11 @@ public class Mouse implements IMouse {
   private boolean isLeftMouseButtonDown;
   private boolean isRightMouseButtonDown;
 
-  /** The grab mouse. */
   private boolean grabMouse;
 
   private boolean isGrabbing;
+
+  private Point lastLocation;
 
   /**
    * Instantiates a new mouse.
@@ -83,15 +85,10 @@ public class Mouse implements IMouse {
       e.printStackTrace();
     }
 
-    this.setGrabMouse(true);
     this.location = new Point((int) Game.getScreenManager().getCamera().getViewPort().getCenterX(), (int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
+    this.lastLocation = this.location;
     this.sensitivity = Game.getConfiguration().INPUT.getMouseSensitivity();
-  }
-
-  private MouseEvent createEvent(final MouseEvent original) {
-    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
-        original.getButton());
-    return event;
+    this.grabMouse = true;
   }
 
   /*
@@ -107,15 +104,6 @@ public class Mouse implements IMouse {
   @Override
   public Point2D getMapLocation() {
     return Game.getScreenManager().getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getInfo().getRenderScale(), this.getLocation().getY() / Game.getInfo().getRenderScale()));
-  }
-
-  /**
-   * Checks if is grab mouse.
-   *
-   * @return true, if is grab mouse
-   */
-  public boolean isGrabMouse() {
-    return this.grabMouse;
   }
 
   @Override
@@ -145,7 +133,7 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseClicked(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.mouseListeners.forEach(listener -> listener.mouseClicked(this.createEvent(e)));
 
     for (Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
@@ -161,9 +149,9 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseDragged(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(this.createEvent(e)));
-    
+
     for (Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
       cons.accept(e);
     }
@@ -176,7 +164,7 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
   }
 
@@ -187,7 +175,7 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseExited(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.mouseListeners.forEach(listener -> listener.mouseExited(this.createEvent(e)));
   }
 
@@ -199,9 +187,9 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseMoved(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(this.createEvent(e)));
-    
+
     for (Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
       cons.accept(e);
     }
@@ -214,7 +202,7 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mousePressed(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.setPressed(true);
     this.mouseListeners.forEach(listener -> listener.mousePressed(this.createEvent(e)));
 
@@ -225,7 +213,7 @@ public class Mouse implements IMouse {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = true;
     }
-    
+
     for (Consumer<MouseEvent> cons : this.mousePressedConsumer) {
       cons.accept(e);
     }
@@ -238,7 +226,7 @@ public class Mouse implements IMouse {
    */
   @Override
   public void mouseReleased(final MouseEvent e) {
-    this.setLocation(e.getPoint());
+    this.setLocation(e);
     this.setPressed(false);
     this.mouseListeners.forEach(listener -> listener.mouseReleased(this.createEvent(e)));
 
@@ -249,7 +237,7 @@ public class Mouse implements IMouse {
     if (SwingUtilities.isRightMouseButton(e)) {
       this.isRightMouseButtonDown = false;
     }
-    
+
     for (Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
       cons.accept(e);
     }
@@ -319,70 +307,9 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.add(listener);
   }
 
-  /**
-   * Sets the grab mouse.
-   *
-   * @param grabMouse
-   *          the new grab mouse
-   */
-  public void setGrabMouse(final boolean grabMouse) {
-    this.grabMouse = grabMouse;
-  }
-
-  /**
-   * Calculates the location of the ingame mouse by the position diff and locks
-   * the original mouse to the center of the screen.
-   *
-   * @param mouseLocation
-   *          The location of the original mouse.
-   */
-  private void setLocation(final Point mouseLocation) {
-    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
-      return;
-    }
-
-    final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
-    final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
-    final Point screenLocation = Game.getScreenManager().getScreenLocation();
-    final int grabX = (int) (screenLocation.x + screenCenterX);
-    final int grabY = (int) (screenLocation.y + screenCenterY);
-
-    // calculate diffs and new location for the ingame mouse
-    final double diffX = MouseInfo.getPointerInfo().getLocation().x - grabX;
-    final double diffY = MouseInfo.getPointerInfo().getLocation().y - grabY;
-    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
-    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
-
-    // ensure that x coordinates are within the screen
-    if (newX < 0) {
-      newX = 0;
-    } else if (newX > Game.getScreenManager().getResolution().getWidth()) {
-      newX = (int) Game.getScreenManager().getResolution().getWidth();
-    }
-
-    // ensure that y coordinates are within the screen
-    if (newY < 0) {
-      newY = 0;
-    } else if (newY > Game.getScreenManager().getResolution().getHeight()) {
-      newY = (int) Game.getScreenManager().getResolution().getHeight();
-    }
-
-    this.location = new Point(newX, newY);
-
-    // lock original mouse back to the center of the screen
-    this.isGrabbing = true;
-    this.robot.mouseMove(grabX, grabY);
-    this.isGrabbing = false;
-  }
-
-  /**
-   * Sets the pressed.
-   *
-   * @param pressed
-   *          the new pressed
-   */
-  public void setPressed(final boolean pressed) {
-    this.pressed = pressed;
+  @Override
+  public void setGrabMouse(boolean grab) {
+    this.grabMouse = grab;
   }
 
   /*
@@ -437,7 +364,7 @@ public class Mouse implements IMouse {
   public void onClicked(Consumer<MouseEvent> consumer) {
     this.mouseClickedConsumer.add(consumer);
   }
-  
+
   @Override
   public void onPressed(Consumer<MouseEvent> consumer) {
     this.mousePressedConsumer.add(consumer);
@@ -447,12 +374,74 @@ public class Mouse implements IMouse {
   public void onDragged(Consumer<MouseEvent> consumer) {
     this.mouseDraggedConsumer.add(consumer);
   }
+
   @Override
   public void onReleased(Consumer<MouseEvent> consumer) {
     this.mouseReleasedConsumer.add(consumer);
   }
+
   @Override
   public void onMoved(Consumer<MouseEvent> consumer) {
     this.mouseMovedConsumer.add(consumer);
+  }
+
+  /**
+   * Calculates the location of the ingame mouse by the position diff and locks
+   * the original mouse to the center of the screen.
+   *
+   * @param mouseLocation
+   *          The location of the original mouse.
+   */
+  private void setLocation(MouseEvent e) {
+    if (this.isGrabbing || !Game.getScreenManager().isFocusOwner()) {
+      return;
+    }
+
+    double diffX, diffY;
+    if (!this.grabMouse) {
+      // get diff relative from last mouse location
+      diffX = e.getX() - this.lastLocation.x;
+      diffY = e.getY() - this.lastLocation.y;
+      this.lastLocation = e.getPoint();
+    } else {
+      // get diff relative from grabbed position
+      final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
+      final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
+      final Point screenLocation = Game.getScreenManager().getScreenLocation();
+      final int grabX = (int) (screenLocation.x + screenCenterX);
+      final int grabY = (int) (screenLocation.y + screenCenterY);
+     
+      // lock original mouse back to the center of the screen
+      this.isGrabbing = true;
+      this.robot.mouseMove(grabX, grabY);
+      this.isGrabbing = false;
+      
+      // calculate diffs and new location for the ingame mouse
+      diffX = e.getXOnScreen() - grabX;
+      diffY = e.getYOnScreen() - grabY;
+    }
+
+    // set new mouse location
+    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
+    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
+    newX = MathUtilities.clamp(newX, 0, (int) Game.getScreenManager().getResolution().getWidth());
+    newY = MathUtilities.clamp(newY, 0, (int) Game.getScreenManager().getResolution().getHeight());
+    this.location = new Point(newX, newY);
+  }
+
+  private MouseEvent createEvent(final MouseEvent original) {
+    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+        original.getButton());
+    return event;
+  }
+
+  /**
+   * Sets the pressed.
+   *
+   * @param pressed
+   *          the new pressed
+   */
+  private void setPressed(final boolean pressed) {
+    this.pressed = pressed;
   }
 }
