@@ -113,6 +113,24 @@ public class RenderEngine implements IRenderEngine {
   }
 
   /**
+   * Draws the given string to the specified map location.
+   * @param g
+   * @param text
+   * @param x
+   * @param y
+   */
+  public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+    Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x , y);
+    g.drawString(text, (int) viewPortLocation.getX()* Game.getInfo().getRenderScale(), (int) viewPortLocation.getY()* Game.getInfo().getRenderScale());
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  /**
    * PERFORMANCE HINT: The larger the text is, the more time it needs to render
    * especially with antialiasing turned on.
    *
