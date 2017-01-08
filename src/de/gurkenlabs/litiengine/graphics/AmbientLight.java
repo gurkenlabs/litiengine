@@ -11,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -18,13 +19,11 @@ import de.gurkenlabs.util.geom.Vector2D;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class AmbientLight {
-  private final IEnvironment environment;
   private Image image;
   private Color color;
   private int alpha;
 
-  public AmbientLight(final IEnvironment environment, final Color ambientColor, final int ambientAlpha) {
-    this.environment = environment;
+  public AmbientLight(final Color ambientColor, final int ambientAlpha) {
     this.color = ambientColor;
     this.alpha = ambientAlpha;
     this.createImage();
@@ -32,7 +31,7 @@ public class AmbientLight {
 
   public void createImage() {
     final Color color = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) Game.getEnvironment().getMap().getSizeInPixels().getWidth(), (int) Game.getEnvironment().getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     // final StringBuilder sb = new StringBuilder();
@@ -55,22 +54,22 @@ public class AmbientLight {
     // }
 
     // create large rectangle and crop lights from it
-    final double mapWidth = this.environment.getMap().getSizeInPixels().getWidth();
-    final double mapHeight = this.environment.getMap().getSizeInPixels().getHeight();
+    final double mapWidth = Game.getEnvironment().getMap().getSizeInPixels().getWidth();
+    final double mapHeight = Game.getEnvironment().getMap().getSizeInPixels().getHeight();
     double longerDimension = mapWidth;
     if (mapWidth < mapHeight) {
       longerDimension = mapHeight;
     }
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
 
-    for (final LightSource light : this.environment.getLightSources()) {
+    for (final LightSource light : Game.getEnvironment().getLightSources()) {
       final Point2D lightCenter = light.getDimensionCenter();
 
       final Area lightArea = new Area(light.getLightShape());
 
       // cut the light area where shadow Boxes are (this simulates light falling
       // into and out of rooms)
-      for (final Collider col : this.environment.getColliders()) {
+      for (final Collider col : Game.getEnvironment().getColliders()) {
         if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
           continue;
         }

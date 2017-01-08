@@ -90,6 +90,10 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
+    if(shape == null){
+      return;
+    }
+    
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());

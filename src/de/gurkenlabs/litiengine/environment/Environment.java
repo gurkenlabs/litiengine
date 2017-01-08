@@ -212,7 +212,7 @@ public class Environment implements IEnvironment {
     }
 
     if (ambientAlpha > 0) {
-      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+      this.ambientLight = new AmbientLight(ambientColor, ambientAlpha);
     }
   }
 
@@ -525,6 +525,9 @@ public class Environment implements IEnvironment {
     final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
     final Trigger trigger = new Trigger(mapObject.getName(), message);
     trigger.setMapId(mapObject.getId());
+    trigger.setCollisionBoxHeightFactor(1);
+    trigger.setCollisionBoxWidthFactor(1);
+    trigger.setSize((float)mapObject.getDimension().getWidth(), (float)mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
     this.add(trigger);
   }
@@ -875,7 +878,11 @@ public class Environment implements IEnvironment {
   @Override
   public void reloadFromMap(int mapId) {
     this.remove(mapId);
-
+    this.loadFromMap(mapId);
+  }
+  
+  @Override
+  public void loadFromMap(int mapId) {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       for (final IMapObject mapObject : layer.getMapObjects()) {
         if (mapObject.getType() == null || mapObject.getType().isEmpty() || mapObject.getId() != mapId) {
