@@ -3,8 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -27,9 +25,6 @@ import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.util.image.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.StreamUtilities;
 
 public abstract class Game {
   private final static List<Consumer<String>> startedConsumer;

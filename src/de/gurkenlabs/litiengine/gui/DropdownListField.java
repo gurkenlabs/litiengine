@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;

@@ -5,7 +5,6 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics2D;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

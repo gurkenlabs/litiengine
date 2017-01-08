@@ -3,16 +3,11 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.util.Random;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
-import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 import de.gurkenlabs.litiengine.input.ClientEntityMovementController;
-import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @CombatAttributesInfo(velocityFactor = 0.1f)
 public class DecorMob extends MovableEntity {

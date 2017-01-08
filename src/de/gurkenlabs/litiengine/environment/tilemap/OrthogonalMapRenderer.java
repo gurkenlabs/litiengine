@@ -29,7 +29,6 @@ import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
-import de.gurkenlabs.util.logging.Stopwatch;
 
 /**
  * The Class OrthogonalMapRenderer.

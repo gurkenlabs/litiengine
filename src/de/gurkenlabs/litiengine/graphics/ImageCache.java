@@ -7,16 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
-
-import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.image.ImageSerializer;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.zip.CompressionUtilities;
