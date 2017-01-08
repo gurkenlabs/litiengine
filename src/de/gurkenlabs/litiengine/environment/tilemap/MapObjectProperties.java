@@ -19,8 +19,13 @@ public class MapObjectProperties {
   public static final String SHADOWTYPE = "shadowType";
   public static final String TRIGGERMESSAGE ="triggermessage";
   
-  public class Terrain{
+  public class TerrainProperties{
     public static final String REFLECTION = "reflection";
     public static final String FRICTION = "friction";
+  }
+  
+  public class DecorMobProperties{
+    public static final String BEHAVIOUR = "decormob-behaviour";
+    public static final String VELOCITY = "decormob-velocity";
   }
 }

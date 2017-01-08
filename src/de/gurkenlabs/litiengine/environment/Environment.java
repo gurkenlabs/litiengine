@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -239,7 +240,12 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.MOBTYPE));
+    short velocity = (short) (100 / Game.getInfo().getRenderScale());
+    if (mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.VELOCITY) != null) {
+      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.VELOCITY));
+    }
+
+    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.BEHAVIOUR)), velocity);
     mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
       mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
@@ -249,6 +255,7 @@ public class Environment implements IEnvironment {
     }
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
+    
     this.add(mob);
   }
 
@@ -527,7 +534,7 @@ public class Environment implements IEnvironment {
     trigger.setMapId(mapObject.getId());
     trigger.setCollisionBoxHeightFactor(1);
     trigger.setCollisionBoxWidthFactor(1);
-    trigger.setSize((float)mapObject.getDimension().getWidth(), (float)mapObject.getDimension().getHeight());
+    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
     this.add(trigger);
   }
@@ -880,7 +887,7 @@ public class Environment implements IEnvironment {
     this.remove(mapId);
     this.loadFromMap(mapId);
   }
-  
+
   @Override
   public void loadFromMap(int mapId) {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {

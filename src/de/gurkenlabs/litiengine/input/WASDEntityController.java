@@ -61,7 +61,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
-    double maxPixelsPerTick = this.getControlledEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate();
+    double maxPixelsPerTick = this.getControlledEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate() * loop.getTimeScale();
     double inc = this.getControlledEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getAcceleration() * maxPixelsPerTick;
     double dec = this.getControlledEntity().getDeceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;

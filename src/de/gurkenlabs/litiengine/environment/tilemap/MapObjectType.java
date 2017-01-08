@@ -1,11 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public enum MapObjectType {
-  PROP, EMITTER, SPAWNPOINT, SPAWNPOINT_CREEP, LANE, MOB, DECORMOB, COLLISIONBOX, LIGHTSOURCE, TRIGGER, SPAWNPOINT_PICKUP, UNKNOWN;
+  PROP, EMITTER, SPAWNPOINT, LANE, DECORMOB, COLLISIONBOX, LIGHTSOURCE, TRIGGER, UNKNOWN;
 
   public static MapObjectType get(String mapObjectType) {
     if (mapObjectType == null || mapObjectType.isEmpty()) {

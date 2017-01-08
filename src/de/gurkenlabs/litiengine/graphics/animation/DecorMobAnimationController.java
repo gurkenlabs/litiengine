@@ -17,6 +17,10 @@ public class DecorMobAnimationController extends AnimationController {
   }
 
   private static Spritesheet findSpriteSheet(final DecorMob mob) {
+    if(mob.getMobType() == null){
+      return null;
+    }
+    
     final String path = Game.getInfo().getSpritesDirectory() + "decormob-" + mob.getMobType().toLowerCase() + ".png";
     final Spritesheet sheet = Spritesheet.find(path);
     return sheet;
