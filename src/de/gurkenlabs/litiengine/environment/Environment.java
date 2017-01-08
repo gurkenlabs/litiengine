@@ -78,17 +78,18 @@ public class Environment implements IEnvironment {
 
   private final Map<RenderType, Map<Integer, IEntity>> entities;
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
-
+  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
+  
   private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
 
   private IMap map;
 
-  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
   private final Map<Integer, IMovableEntity> movableEntities;
 
   private final List<IRenderable> overlayRenderable;
-  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+
   private final List<MapLocation> spawnPoints;
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
@@ -392,10 +393,10 @@ public class Environment implements IEnvironment {
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
     for (final IMapObject col : this.getCollisionBoxMapObjects()) {
-      final double shadowX = col.getCollisionBox().getX();
-      final double shadowY = col.getCollisionBox().getY();
-      final double shadowWidth = col.getCollisionBox().getWidth();
-      final double shadowHeight = col.getCollisionBox().getHeight();
+      final double shadowX = col.getBoundingBox().getX();
+      final double shadowY = col.getBoundingBox().getY();
+      final double shadowWidth = col.getBoundingBox().getWidth();
+      final double shadowHeight = col.getBoundingBox().getHeight();
 
       final Collider.StaticShadowType shadowType = StaticShadowType.get(col.getCustomProperty(MapObjectProperties.SHADOWTYPE));
       if (shadowType == StaticShadowType.NONE) {
@@ -855,6 +856,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final int mapId) {
+    this.getSpawnPoints().removeIf(x -> x.getMapId() == mapId);
     final IEntity ent = this.get(mapId);
     if (ent == null) {
       System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
