@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
  * The Class ShimmerEmitter.
  */
 @EntityInfo(width = 64, height = 64)
-@EmitterInfo(maxParticles = 10, spawnAmount = 10, spawnRate = 10, activateOnInit = false)
+@EmitterInfo(maxParticles = 10, spawnAmount = 10, spawnRate = 10, activateOnInit = true)
 public class ShimmerEmitter extends Emitter {
 
   /**

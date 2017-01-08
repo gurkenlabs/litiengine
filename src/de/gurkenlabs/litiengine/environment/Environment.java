@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.Collider.StaticShadowType;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
@@ -255,7 +256,7 @@ public class Environment implements IEnvironment {
     }
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
-    
+
     this.add(mob);
   }
 
@@ -267,10 +268,6 @@ public class Environment implements IEnvironment {
     switch (mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)) {
     case "fire":
       emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      final LightSource light = new LightSource(this, 50, Color.ORANGE, LightSource.ELLIPSE);
-      light.setSize(emitter.getWidth(), emitter.getHeight());
-      light.setLocation(emitter.getLocation());
-      this.add(light);
       break;
     case "shimmer":
       emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
@@ -389,21 +386,6 @@ public class Environment implements IEnvironment {
   }
 
   private void addStaticShadows() {
-    // build map specific cache key, respecting the lights and color
-    // final StringBuilder sb = new StringBuilder();
-    // for (final IMapObject col : this.getCollisionBoxes()) {
-    // sb.append(col.getId() + "_" + col.getCollisionBox());
-    // }
-    //
-    // final String cacheKey = "STATICSHADOWS_" +
-    // this.getMap().getName().replaceAll("[\\/]", "-") + "_" +
-    // sb.toString().hashCode();
-    // final Image cachedImg = ImageCache.IMAGES.get(cacheKey);
-    // if (cachedImg != null) {
-    // this.staticShadowImage = cachedImg;
-    // return;
-    // }
-
     final int shadowOffset = 10;
     final List<Path2D> staticShadows = new ArrayList<>();
     // check if the collision boxes have shadows. if so, determine which
@@ -415,10 +397,11 @@ public class Environment implements IEnvironment {
       final double shadowWidth = col.getCollisionBox().getWidth();
       final double shadowHeight = col.getCollisionBox().getHeight();
 
-      final String shadowType = col.getCustomProperty(MapObjectProperties.SHADOWTYPE);
-      if (shadowType == null) {
+      final Collider.StaticShadowType shadowType = StaticShadowType.get(col.getCustomProperty(MapObjectProperties.SHADOWTYPE));
+      if (shadowType == StaticShadowType.NONE) {
         continue;
       }
+
       final Path2D parallelogram = new Path2D.Double();
       if (shadowType.equals(Collider.StaticShadowType.DOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
@@ -513,15 +496,14 @@ public class Environment implements IEnvironment {
           staticShadowArea.subtract(new Area(light.getLightShape()));
         }
       }
-      ar.add(staticShadowArea);
 
+      ar.add(staticShadowArea);
     }
 
     g.fill(ar);
     g.dispose();
 
     this.staticShadowImage = img;
-    // ImageCache.IMAGES.put(cacheKey, img);
   }
 
   protected void addTrigger(final IMapObject mapObject) {
@@ -897,6 +879,9 @@ public class Environment implements IEnvironment {
         }
 
         this.addMapObject(mapObject);
+        if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
+          this.addStaticShadows();
+        }
         break;
       }
     }

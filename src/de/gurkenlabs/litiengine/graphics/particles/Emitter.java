@@ -177,15 +177,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.aliveTime;
   }
 
-  @Override
-  public Rectangle2D getBoundingBox() {
-    if (this.boundingBox == null) {
-      this.boundingBox = new Rectangle2D.Double(this.getOrigin().getX() - this.getWidth() / 2, this.getOrigin().getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
-    }
-
-    return this.boundingBox;
-  }
-
   /**
    * Gets the max particles.
    *

@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
  */
 
 @EntityInfo(width = 32, height = 64)
-@EmitterInfo(maxParticles = 200, spawnAmount = 200, activateOnInit = false, particleMinTTL = 300, particleMaxTTL = 1200)
+@EmitterInfo(maxParticles = 200, spawnAmount = 200, activateOnInit = true, particleMinTTL = 300, particleMaxTTL = 1200)
 public class FireEmitter extends Emitter {
   /** One of the four colors used by the fire particles. */
   private static final Color DARK_ORANGE = new Color(208, 117, 29, 100);
@@ -58,7 +58,7 @@ public class FireEmitter extends Emitter {
    */
   @Override
   public Point2D getOrigin() {
-    return new Point2D.Double(this.getLocation().getX() + this.getWidth() * 0.5, this.getLocation().getY() + this.getHeight());
+    return new Point2D.Double(this.getLocation().getX(), this.getLocation().getY() + this.getHeight());
   }
 
   /**
