@@ -55,6 +55,7 @@ import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.SnowEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.Weather;
+import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.IMapLoader;
 import de.gurkenlabs.tilemap.IMapObject;
@@ -80,7 +81,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
-  
+
   private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
 
@@ -243,11 +244,11 @@ public class Environment implements IEnvironment {
     }
 
     short velocity = (short) (100 / Game.getInfo().getRenderScale());
-    if (mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.VELOCITY) != null) {
-      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.VELOCITY));
+    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
+      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));
     }
 
-    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DecorMobProperties.BEHAVIOUR)), velocity);
+    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)), velocity);
     mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
       mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
@@ -262,11 +263,17 @@ public class Environment implements IEnvironment {
   }
 
   protected void addEmitter(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER || mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE) == null) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
       return;
     }
+
     Emitter emitter = null;
-    switch (mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)) {
+    String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
+    if (emitterType == null || emitterType.isEmpty()) {
+      return;
+    }
+
+    switch (emitterType) {
     case "fire":
       emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
       break;
@@ -275,7 +282,13 @@ public class Environment implements IEnvironment {
       break;
     }
 
+    // try to load custom emitter
+    if (emitter == null && emitterType.endsWith(".xml")) {
+      emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y, emitterType);
+    }
+
     if (emitter != null) {
+      emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
       emitter.setMapId(mapObject.getId());
       this.add(emitter);
     }

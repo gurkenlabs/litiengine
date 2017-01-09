@@ -71,7 +71,7 @@ public class FireEmitter extends Emitter {
    * @param maxAxisMovement
    *          the max axis movement
    */
-  public void newParticle(final Color color, final int life, final short maxAxisMovement) {
+  public void newParticle(final Color color, final int life, final double maxAxisMovement) {
     final boolean randBool = Math.random() >= 0.5;
 
     final float xCoord = (float) (this.getWidth() * 0.5 + Math.random() * maxAxisMovement * (randBool ? -1f : 1f));
@@ -104,16 +104,16 @@ public class FireEmitter extends Emitter {
     }
 
     for (byte i = 0; i < REDISH_BROWN_COUNT; i++) {
-      this.newParticle(REDISH_BROWN, this.getParticleMaxTTL(), (short) 10);
+      this.newParticle(REDISH_BROWN, this.getParticleMaxTTL(), this.getWidth() / 4);
     }
     for (byte i = 0; i < DARK_ORANGE_COUNT; i++) {
-      this.newParticle(DARK_ORANGE, this.getRandomParticleTTL(), (short) 8);
+      this.newParticle(DARK_ORANGE, this.getRandomParticleTTL(), this.getWidth() / 5);
     }
     for (byte i = 0; i < GOLD_COUNT; i++) {
-      this.newParticle(GOLD, this.getRandomParticleTTL(), (short) 7);
+      this.newParticle(GOLD, this.getRandomParticleTTL(), this.getWidth() / 6);
     }
     for (byte i = 0; i < YELLOW_COUNT; i++) {
-      this.newParticle(YELLOW, this.getParticleMinTTL(), (short) 5);
+      this.newParticle(YELLOW, this.getParticleMinTTL(), this.getWidth() / 7);
     }
   }
 }

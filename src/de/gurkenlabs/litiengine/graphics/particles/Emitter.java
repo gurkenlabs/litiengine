@@ -98,7 +98,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.activate(Game.getLoop());
     }
   }
-
+  
   /**
    * Activate.
    */

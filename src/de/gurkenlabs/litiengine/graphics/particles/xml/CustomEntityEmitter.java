@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.graphics.particles.IEntityEmitter;
 public class CustomEntityEmitter extends CustomEmitter implements IEntityEmitter {
   private final IEntity entity;
 
-  public CustomEntityEmitter(IEntity entity, final URL emitterXml) {
+  public CustomEntityEmitter(IEntity entity, final String emitterXml) {
     super(entity.getLocation().getX(), entity.getLocation().getY(), emitterXml);
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());

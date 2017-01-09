@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 public class FileUtilities {
   public static InputStream getGameResource(String file) {
@@ -75,5 +79,67 @@ public class FileUtilities {
     }
 
     return dir.delete(); // The directory is empty now and can be deleted.
+  }
+  
+  public static List<String> findFiles(List<String> fileNames, Path dir, String extension) {
+    final String[] blackList = new String[] { "\\bin", "\\screenshots" };
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+      for (Path path : stream) {
+        if (path.toFile().isDirectory()) {
+          boolean blacklisted = false;
+          for (String black : blackList) {
+            if (path.toAbsolutePath().toString().contains(black)) {
+              blacklisted = true;
+              break;
+            }
+          }
+
+          if (!blacklisted) {
+            findFiles(fileNames, path, extension);
+          }
+
+        } else if (path.toAbsolutePath().toString().endsWith(extension)) {
+          fileNames.add(path.toAbsolutePath().toString());
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return fileNames;
+  }
+
+  public static List<String> findFiles(List<String> fileNames, Path dir, String... files) {
+    final String[] blackList = new String[] { "\\bin", "\\screenshots" };
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+      for (Path path : stream) {
+        if (path.toFile().isDirectory()) {
+          boolean blacklisted = false;
+          for (String black : blackList) {
+            if (path.toAbsolutePath().toString().contains(black)) {
+              blacklisted = true;
+              break;
+            }
+          }
+
+          if (!blacklisted) {
+            findFiles(fileNames, path, files);
+          }
+
+        } else {
+          for (String file : files) {
+            if (path.toAbsolutePath().toString().endsWith(file)) {
+
+              fileNames.add(path.toAbsolutePath().toString());
+            }
+          }
+
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return fileNames;
   }
 }

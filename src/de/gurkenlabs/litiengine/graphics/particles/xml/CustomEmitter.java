@@ -1,12 +1,20 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
@@ -18,21 +26,26 @@ import de.gurkenlabs.litiengine.graphics.particles.RectangleOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
+import de.gurkenlabs.util.io.FileUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
+  public static Map<String, CustomEmitterData> loadedCustomEmitters;
+
   private CustomEmitterData emitterData;
+  static {
+    loadedCustomEmitters = new ConcurrentHashMap<>();
+  }
 
-  public CustomEmitter(final double originX, final double originY, final URL emitterXml) {
+  public CustomEmitter(final double originX, final double originY, final String emitterXml) {
     super(originX, originY);
-    try {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
-      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      this.emitterData = (CustomEmitterData) jaxbUnmarshaller.unmarshal(emitterXml);
-    } catch (final JAXBException e) {
-      e.printStackTrace();
+    
+    this.emitterData = load(emitterXml);
+    if(this.emitterData == null){
+      this.deactivate();
+      return;
     }
-
+    
     // set emitter parameters
     this.setMaxParticles(this.getEmitterData().getMaxParticles());
     this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
@@ -46,6 +59,36 @@ public class CustomEmitter extends Emitter {
     for (final ParticleColor color : this.getEmitterData().getColors()) {
       this.addParticleColor(color.toColor());
     }
+  }
+
+  public static CustomEmitterData load(String emitterXml) {
+    String name = FileUtilities.getFileName(emitterXml);
+    if (loadedCustomEmitters.containsKey(name)) {
+      return loadedCustomEmitters.get(name);
+    }
+
+    try {
+      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
+      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      
+      
+      if(!new File(emitterXml).exists()){
+        emitterXml = Paths.get(Game.getInfo().getEmitterDirectory(), emitterXml).toString();
+      }
+      
+      InputStream xml = FileUtilities.getGameResource(emitterXml);
+      if(xml == null){
+        return null;
+      }
+      
+      CustomEmitterData loaded = (CustomEmitterData) jaxbUnmarshaller.unmarshal(xml);
+      loadedCustomEmitters.put(name, loaded);
+      return loaded;
+    } catch (final JAXBException e) {
+      e.printStackTrace();
+    }
+
+    return null;
   }
 
   public CustomEmitterData getEmitterData() {

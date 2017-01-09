@@ -25,6 +25,7 @@ public class GameInfo {
   
   private float renderScale;  
   private String spritesDirectory;  
+  private String emitterDirectory;
   private String[] developers;
   private String icon;
   private String logo;
@@ -41,6 +42,7 @@ public class GameInfo {
 
     this.renderScale = 3.0f;
     this.spritesDirectory = "sprites/";
+    this.emitterDirectory = "emitters/";
   }
 
   @XmlTransient
@@ -135,5 +137,13 @@ public class GameInfo {
   
   public String toString(){
     return !this.getSubTitle().isEmpty() ? this.getName() + " - " + this.getSubTitle() + " " + this.getVersion() : this.getName() + " - " + this.getVersion();
+  }
+
+  public String getEmitterDirectory() {
+    return emitterDirectory;
+  }
+
+  public void setEmitterDirectory(String emitterDirectory) {
+    this.emitterDirectory = emitterDirectory;
   }
 }
