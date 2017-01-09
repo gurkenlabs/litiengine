@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
@@ -35,6 +36,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update(IGameLoop loop) {
+    
+    if(!Game.getPhysicsEngine().collides(this.getCollisionBox(), IPhysicsEngine.COLLTYPE_ENTITY)){
+      return;
+    }
+    
     List<IEntity> collEntities = new CopyOnWriteArrayList<>();
     for (ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
       if (coll.getCollisionBox().intersects(this.getCollisionBox())) {

@@ -28,6 +28,16 @@ public class GeometricUtilities {
     return points;
   }
   
+  public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) <= a.getWidth() * 0.5 + b.getWidth() * 0.5) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) <= a.getHeight() * 0.5 + b.getHeight() * 0.5) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+  
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])

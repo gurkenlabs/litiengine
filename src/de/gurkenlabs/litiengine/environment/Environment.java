@@ -545,6 +545,7 @@ public class Environment implements IEnvironment {
   public void clear() {
     Game.getPhysicsEngine().clear();
     this.dispose(this.getEntities());
+    this.dispose(this.getTriggers());
     this.getCombatEntities().clear();
     this.getMovableEntities().clear();
     this.getLightSources().clear();
