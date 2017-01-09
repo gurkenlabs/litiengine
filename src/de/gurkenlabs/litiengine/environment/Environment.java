@@ -543,6 +543,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void clear() {
+    Game.getPhysicsEngine().clear();
     this.dispose(this.getEntities());
     this.getCombatEntities().clear();
     this.getMovableEntities().clear();
@@ -845,6 +846,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final IEntity entity) {
+    if(entity == null){
+      return;
+    }
+    
     this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
 
     if (entity instanceof ICollisionEntity) {

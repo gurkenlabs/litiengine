@@ -24,6 +24,10 @@ public class Animation implements IUpdateable, ILaunchable {
   private long elapsedTicks;
   private boolean paused;
 
+  public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
+    this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);
+  }
+
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(name, spritesheet, loop, keyFrameDurations);
 
@@ -32,18 +36,20 @@ public class Animation implements IUpdateable, ILaunchable {
     }
   }
 
-  public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
+  public Animation(final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
+    this(spritesheet.getName(), spritesheet, loop, keyFrameDurations);
+  }
 
-    
+  public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this.name = name;
     this.spritesheet = spritesheet;
     this.loop = loop;
     this.keyframes = new ArrayList<>();
-    if(spritesheet == null){
+    if (spritesheet == null) {
       System.out.println("no spritesheet defined for animation " + name);
       return;
     }
-    
+
     this.initKeyFrames(keyFrameDurations);
     if (this.getKeyframes().size() == 0) {
       System.out.println("No keyframes defined for animation " + this.getName() + " (spitesheet: " + spritesheet.getName() + ")");
@@ -74,10 +80,10 @@ public class Animation implements IUpdateable, ILaunchable {
 
   private void initKeyFrames(final int[] keyFrames) {
 
-    if(this.getSpritesheet() == null){
+    if (this.getSpritesheet() == null) {
       return;
     }
-    
+
     // if no keyframes are specified, the animation takes in the whole
     // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
     // keyframe
