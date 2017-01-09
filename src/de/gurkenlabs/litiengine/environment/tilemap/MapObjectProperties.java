@@ -19,6 +19,7 @@ public class MapObjectProperties {
 
   // light source
   public static final String LIGHTBRIGHTNESS = "lightBrightness";
+  public static final String LIGHTINTENSITY = "lightIntensity";
   public static final String LIGHTCOLOR = "lightColor";
   public static final String LIGHTSHAPE = "lightShape";
 

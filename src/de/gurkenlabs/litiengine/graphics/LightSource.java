@@ -36,6 +36,42 @@ public class LightSource extends Entity implements IRenderable {
   public static final String ELLIPSE = "ellipse";
   public static final String[] SHAPETYPES = { RECTANGLE, ELLIPSE };
 
+  /** The brightness. */
+  private int brightness;
+  private int intensity;
+  /** The color. */
+  private Color color;
+  private final IEnvironment environment;
+
+  /** The radius. */
+  private int radius;
+  private String lightShapeType;
+  private Shape lightShape;
+
+  /**
+   * Instantiates a new light source.
+   *
+   * @param location
+   *          the location
+   * @param diameter
+   *          the light inner radius
+   * @param lightOuterRadius
+   *          the light outer radius
+   * @param brightness
+   *          the brightness
+   * @param lightColor
+   *          the light color
+   */
+  public LightSource(final IEnvironment environment, final int brightness, final int intensity,  final Color lightColor, final String shapeType) {
+    super();
+    this.color = lightColor;
+    this.intensity = intensity;
+    this.environment = environment;
+
+    this.setBrightness(brightness);
+    this.lightShapeType = shapeType;
+  }
+  
   /**
    * Gets the shadow ellipse.
    *
@@ -66,39 +102,6 @@ public class LightSource extends Entity implements IRenderable {
     return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
   }
 
-  /** The brightness. */
-  private int brightness;
-  /** The color. */
-  private Color color;
-  private final IEnvironment environment;
-
-  /** The radius. */
-  private int radius;
-  private String lightShapeType;
-  private Shape lightShape;
-
-  /**
-   * Instantiates a new light source.
-   *
-   * @param location
-   *          the location
-   * @param diameter
-   *          the light inner radius
-   * @param lightOuterRadius
-   *          the light outer radius
-   * @param brightness
-   *          the brightness
-   * @param lightColor
-   *          the light color
-   */
-  public LightSource(final IEnvironment environment, final int brightness, final Color lightColor, final String shapeType) {
-    super();
-    this.color = lightColor;
-    this.environment = environment;
-
-    this.setBrightness(brightness);
-    this.lightShapeType = shapeType;
-  }
 
   @Override
   public void setLocation(Point2D location) {
@@ -334,5 +337,13 @@ public class LightSource extends Entity implements IRenderable {
 
   public void setColor(Color result) {
     this.color = result;
+  }
+
+  public int getIntensity() {
+    return intensity;
+  }
+
+  public void setIntensity(int intensity) {
+    this.intensity = intensity;
   }
 }
