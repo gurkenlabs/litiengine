@@ -65,6 +65,8 @@ public class AmbientLight {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       renderLightSource(g, light, longerDimension);
     }
+    
+    // TODO: cut out regions on map where no layer has a tile
 
     g.setComposite(comp);
     g.dispose();
@@ -122,9 +124,10 @@ public class AmbientLight {
 
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
+    final Area lightRadiusArea = new Area(light.getLightShape());
     Color[] transColors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
     try {
-      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightArea.getBounds2D().getCenterX(), lightArea.getBounds2D().getCenterY()), (float) (lightArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
+      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightRadiusArea.getBounds2D().getCenterX(), lightRadiusArea.getBounds2D().getCenterY()), (float) (lightRadiusArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
     } catch (Exception e) {
       g.setColor(light.getColor());
     }
