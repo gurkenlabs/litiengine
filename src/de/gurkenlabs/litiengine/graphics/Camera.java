@@ -222,7 +222,7 @@ public class Camera implements ICamera {
 
   @Override
   public void updateFocus() {
-    this.focus = this.applyShakeEffect(this.focus);
+    this.setFocus(this.applyShakeEffect(this.getFocus()));
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
         Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
