@@ -6,10 +6,13 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,6 +25,7 @@ import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
@@ -76,10 +80,21 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     g.setClip(new Rectangle(0, 0, (int) this.getWidth(), (int) this.getHeight()));
     screen.render(g);
 
-    if (this.cursorImage != null) {
-      RenderEngine.renderImage(g, this.cursorImage, new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY()));
+    Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
+    if (this.cursorImage != null && (Input.MOUSE.isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
+
+      Point2D locationWithOffset = new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY());
+      RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
+
     }
 
+    if (Game.getConfiguration().DEBUG.isRenderDebugMouse()) {
+      g.setColor(Color.RED);
+      final int DEBUG_MOUSE_SIZE = 5;
+      g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() + DEBUG_MOUSE_SIZE));
+      g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY(), Input.MOUSE.getLocation().getX() + DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY()));
+    }
+    
     for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
       consumer.accept(g);
     }
@@ -117,12 +132,26 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     }
   }
 
+  @Override
+  public void setCursor(Image image, int offsetX, int offsetY) {
+    this.setCursor(image);
+    this.setCursorOffset(offsetX, offsetY);
+  }
+
+  @Override
   public void setCursorOffsetX(final int cursorOffsetX) {
     this.cursorOffsetX = cursorOffsetX;
   }
 
+  @Override
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
+  }
+
+  @Override
+  public void setCursorOffset(int x, int y) {
+    this.cursorOffsetX = x;
+    this.cursorOffsetY = y;
   }
 
   public int getCursorOffsetX() {

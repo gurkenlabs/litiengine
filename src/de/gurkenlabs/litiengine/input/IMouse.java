@@ -38,6 +38,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public boolean isRightMouseButtonDown();
 
   public void setGrabMouse(boolean grab);
+  
+  public boolean isGrabMouse();
   public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
 
   public void onClicked(Consumer<MouseEvent> consumer);

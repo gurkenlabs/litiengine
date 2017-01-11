@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.List;
@@ -70,7 +71,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.displayScreen(screen);
     }
   }
-
+  
   @Override
   public void displayScreen(final String screen) {
     // if the scren is already displayed or there is no screen with the

@@ -315,6 +315,11 @@ public class Mouse implements IMouse {
     this.grabMouse = grab;
   }
 
+  @Override
+  public boolean isGrabMouse() {
+    return this.grabMouse;
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -415,7 +420,7 @@ public class Mouse implements IMouse {
       final int grabY = (int) (screenLocation.y + screenCenterY);
 
       // lock original mouse back to the center of the screen
-      this.robot.mouseMove(grabX, grabY);
+      this.robot.mouseMove(grabX - Game.getScreenManager().getRenderComponent().getCursorOffsetX(), grabY - Game.getScreenManager().getRenderComponent().getCursorOffsetY());
 
       // calculate diffs and new location for the ingame mouse
       diffX = e.getXOnScreen() - grabX;
@@ -427,6 +432,7 @@ public class Mouse implements IMouse {
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
     newX = MathUtilities.clamp(newX, 0, (int) Game.getScreenManager().getResolution().getWidth());
     newY = MathUtilities.clamp(newY, 0, (int) Game.getScreenManager().getResolution().getHeight());
+
     this.location = new Point(newX + Game.getScreenManager().getRenderComponent().getCursorOffsetX(), newY + Game.getScreenManager().getRenderComponent().getCursorOffsetY());
   }
 

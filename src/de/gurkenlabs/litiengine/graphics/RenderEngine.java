@@ -213,7 +213,7 @@ public class RenderEngine implements IRenderEngine {
     final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
     compatibleImg.createGraphics().drawImage(img, 0, 0, null);
 
-    ImageCache.IMAGES.putPersistent(cacheKey, compatibleImg);
+    ImageCache.IMAGES.put(cacheKey, compatibleImg);
     return compatibleImg;
   }
 

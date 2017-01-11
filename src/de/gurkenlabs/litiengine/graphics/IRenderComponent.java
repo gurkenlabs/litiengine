@@ -13,10 +13,14 @@ public interface IRenderComponent extends IInitializable{
   public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
   public void setCursor(Image image);
+  
+  public void setCursor(Image image, int offsetX, int offsetY);
 
   public void setCursorOffsetX(int cursorOffsetX);
 
   public void setCursorOffsetY(int cursorOffsetY);
+  
+  public void setCursorOffset(int x, int y);
   
   public void render(IRenderable screen);
   

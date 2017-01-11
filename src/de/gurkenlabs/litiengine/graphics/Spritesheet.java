@@ -201,7 +201,7 @@ public class Spritesheet {
     final Point position = this.getLocation(index);
     try {
       final BufferedImage smallImage = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
-      ImageCache.SPRITES.putPersistent(imageCacheKey, smallImage);
+      ImageCache.SPRITES.put(imageCacheKey, smallImage);
       return smallImage;
     } catch (RasterFormatException rfe) {
       log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" + position.x + "," + position.y + "] from sprite'" + this.getName() + "'");

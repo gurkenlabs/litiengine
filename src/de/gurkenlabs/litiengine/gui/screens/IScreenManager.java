@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.gui.screens;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.ICameraProvider;
@@ -47,6 +48,8 @@ public interface IScreenManager extends ICameraProvider {
   public Dimension getResolution();
 
   public Point getScreenLocation();
+  
+  public Rectangle getBounds();
 
   public void init(int width, int height, boolean fullscreen);
 

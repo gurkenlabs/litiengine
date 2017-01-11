@@ -22,7 +22,8 @@ public class DebugConfiguration extends ConfigurationGroup {
   private boolean renderPaths = false;
 
   private boolean renderAStarInfo = false;
-
+  
+  private boolean renderDebugMouse = false;
   /** The show mouse target metric. */
   private boolean showMouseTargetMetric = true;
 
@@ -136,5 +137,13 @@ public class DebugConfiguration extends ConfigurationGroup {
   // game metric settings
   public boolean showTilesMetric() {
     return this.isDebugEnabled() && this.showTilesMetric;
+  }
+
+  public boolean isRenderDebugMouse() {
+    return this.isDebugEnabled() && this.renderDebugMouse;
+  }
+
+  public void setRenderDebugMouse(boolean renderDebugMouse) {
+    this.renderDebugMouse = renderDebugMouse;
   }
 }

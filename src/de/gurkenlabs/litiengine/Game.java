@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -215,24 +216,36 @@ public abstract class Game {
       mapCnt++;
     }
 
+    List<Spritesheet> loadedSprites = new ArrayList<>();
     for (String spriteFile : file.getSpriteFiles()) {
-      Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
+      List<Spritesheet> sprites = Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
+      loadedSprites.addAll(sprites);
     }
 
     for (SpriteSheetInfo tileset : file.getTileSets()) {
-      Spritesheet.load(tileset);
+      Spritesheet sprite = Spritesheet.load(tileset);
+      loadedSprites.add(sprite);
     }
 
+    int spriteload = 0;
+    for (Spritesheet s : loadedSprites) {
+      for (int i = 0; i < s.getRows()* s.getColumns(); i++) {
+        s.getSprite(i);
+        spriteload++;
+      }
+    }
+    
+    System.out.println(spriteload + " sprites loaded to memory");
     System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
   }
 
   public static void terminate() {
     for (Predicate<String> cons : terminatingConsumer) {
-      if(!cons.test(Game.getInfo().getName())){
+      if (!cons.test(Game.getInfo().getName())) {
         return;
       }
     }
-    
+
     gameLoop.terminate();
 
     soundEngine.terminate();
@@ -247,6 +260,7 @@ public abstract class Game {
 
   /**
    * Returning false prevents the terminate event to continue.
+   * 
    * @param cons
    */
   public static void onTerminating(Predicate<String> cons) {
