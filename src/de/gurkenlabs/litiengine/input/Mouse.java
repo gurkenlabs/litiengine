@@ -167,7 +167,7 @@ public class Mouse implements IMouse {
     } else {
       this.setLocation(e);
     }
-    
+
     this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
   }
 
@@ -405,7 +405,7 @@ public class Mouse implements IMouse {
       // get diff relative from last mouse location
       diffX = e.getX() - this.lastLocation.x;
       diffY = e.getY() - this.lastLocation.y;
-      this.lastLocation = e.getPoint();
+      this.lastLocation = new Point(e.getPoint().x + Game.getScreenManager().getRenderComponent().getCursorOffsetX(), e.getPoint().y + Game.getScreenManager().getRenderComponent().getCursorOffsetY());
     } else {
       // get diff relative from grabbed position
       final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
@@ -427,7 +427,7 @@ public class Mouse implements IMouse {
     int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
     newX = MathUtilities.clamp(newX, 0, (int) Game.getScreenManager().getResolution().getWidth());
     newY = MathUtilities.clamp(newY, 0, (int) Game.getScreenManager().getResolution().getHeight());
-    this.location = new Point(newX, newY);
+    this.location = new Point(newX + Game.getScreenManager().getRenderComponent().getCursorOffsetX(), newY + Game.getScreenManager().getRenderComponent().getCursorOffsetY());
   }
 
   private MouseEvent createEvent(final MouseEvent original) {
