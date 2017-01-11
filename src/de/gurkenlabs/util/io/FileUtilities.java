@@ -59,6 +59,10 @@ public class FileUtilities {
     return "";
   }
 
+  public static String getExtension(File file) {
+    return getExtension(file.getAbsolutePath());
+  }
+
   public static String getExtension(String fileName) {
     try {
       return fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -80,7 +84,7 @@ public class FileUtilities {
 
     return dir.delete(); // The directory is empty now and can be deleted.
   }
-  
+
   public static List<String> findFiles(List<String> fileNames, Path dir, String extension) {
     final String[] blackList = new String[] { "\\bin", "\\screenshots" };
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
