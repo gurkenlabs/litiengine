@@ -52,6 +52,7 @@ public class Camera implements ICamera {
   public Camera() {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
+    this.zoom = Game.getInfo().getRenderScale();
   }
 
   @Override
