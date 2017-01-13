@@ -35,7 +35,7 @@ public abstract class Game {
   private final static IRenderEngine graphicsEngine;
   private final static IPhysicsEngine physicsEngine;
   private final static ISoundEngine soundEngine;
-  private final static IGameLoop gameLoop;
+  private static IGameLoop gameLoop;
   private final static GameMetrics metrics;
   private final static EntityManager entityManager;
   private static RenderLoop renderLoop;
@@ -59,11 +59,6 @@ public abstract class Game {
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
-    getConfiguration().load();
-
-    final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
-    updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    gameLoop = updateLoop;
   }
 
   public static GameConfiguration getConfiguration() {
@@ -135,6 +130,12 @@ public abstract class Game {
   }
 
   public static void init() {
+    getConfiguration().load();
+
+    final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    gameLoop = updateLoop;
+    
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
     // setup default exception handling for render and update loop
@@ -246,6 +247,7 @@ public abstract class Game {
       }
     }
 
+    getConfiguration().save();
     gameLoop.terminate();
 
     soundEngine.terminate();

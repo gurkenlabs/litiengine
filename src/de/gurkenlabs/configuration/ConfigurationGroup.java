@@ -6,6 +6,8 @@ package de.gurkenlabs.configuration;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import de.gurkenlabs.annotation.ConfigurationGroupInfo;
@@ -110,7 +112,10 @@ public abstract class ConfigurationGroup {
         this.setPropertyValue(propertyName, Long.parseLong(value));
       } else if (field.getType().equals(String.class)) {
         this.setPropertyValue(propertyName, value);
-      } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+      } else if(field.getType().equals(String[].class)){
+        this.setPropertyValue(propertyName, value.split(","));
+      }
+        else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
         final Object[] enumArray = field.getType().getEnumConstants();
 
         for (final Object enumConst : enumArray) {
@@ -186,7 +191,9 @@ public abstract class ConfigurationGroup {
           properties.setProperty(this.getPrefix() + field.getName(), Long.toString(field.getLong(this)));
         } else if (field.getType().equals(String.class)) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
-        } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+        } else if (field.getType().equals(String[].class)) {   
+          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[])field.get(this)) : "");
+        }else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
           final String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
           properties.setProperty(this.getPrefix() + field.getName(), value);
         }

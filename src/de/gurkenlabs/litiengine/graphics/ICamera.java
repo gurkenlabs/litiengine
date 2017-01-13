@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -87,8 +88,12 @@ public interface ICamera extends IUpdateable {
   public void shake(double intensity, final int delay, int duration);
 
   public void setZoom(float zoom, int delay);
+  
+  public float getZoom();
 
   public void updateFocus();
 
   public void setFocus(Point2D focus);
+  
+  public void onZoomChanged(Consumer<Float> zoomCons);
 }

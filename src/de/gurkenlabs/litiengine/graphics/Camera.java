@@ -5,6 +5,9 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -15,7 +18,7 @@ import de.gurkenlabs.util.MathUtilities;
  * The Class Camera.
  */
 public class Camera implements ICamera {
-
+  private final List<Consumer<Float>> zoomChangedConsumer;
   /**
    * Provides the center location for the viewport.
    */
@@ -47,15 +50,16 @@ public class Camera implements ICamera {
    * Instantiates a new camera.
    */
   public Camera() {
+    this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
   }
 
   @Override
   public void update(IGameLoop loop) {
-    if(Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().equals(this)){
+    if (Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().equals(this)) {
       return;
     }
-    
+
     if (this.zoom > 0 && Game.getInfo().getRenderScale() != this.zoom) {
       if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
         Game.getInfo().setRenderScale(this.zoom);
@@ -208,6 +212,15 @@ public class Camera implements ICamera {
       float totalDelta = zoom - Game.getInfo().getRenderScale();
       this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
     }
+
+    for (Consumer<Float> cons : this.zoomChangedConsumer) {
+      cons.accept(this.zoom);
+    }
+  }
+
+  @Override
+  public float getZoom() {
+    return this.zoom;
   }
 
   /*
@@ -225,6 +238,11 @@ public class Camera implements ICamera {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
         Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
+  }
+
+  @Override
+  public void onZoomChanged(Consumer<Float> zoomCons) {
+    this.zoomChangedConsumer.add(zoomCons);
   }
 
   /**
