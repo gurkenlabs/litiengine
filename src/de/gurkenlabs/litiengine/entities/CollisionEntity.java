@@ -24,7 +24,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public boolean collidesWith(final ICollisionEntity otherEntity) {
+  public boolean canCollideWith(final ICollisionEntity otherEntity) {
     return true;
   }
 

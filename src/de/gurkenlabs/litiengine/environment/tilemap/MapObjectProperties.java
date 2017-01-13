@@ -24,7 +24,14 @@ public class MapObjectProperties {
   public static final String LIGHTSHAPE = "lightShape";
 
   public static final String SHADOWTYPE = "shadowType";
+
+  // trigger
   public static final String TRIGGERMESSAGE = "triggermessage";
+  public static final String TRIGGERTARGET = "triggerTarget";
+  public static final String TRIGGERACTIVATION = "triggerActivation";
+  public static final String TRIGGERACTIVATORS = "triggerActivators";
+  public static final String TRIGGERONETIME = "triggerOneTime";
+
   public static final String SPAWN_TYPE = "spawnType";
   public static final String CUSTOM_MAPOBJECT_TYPE = "customMapObjectType";
 

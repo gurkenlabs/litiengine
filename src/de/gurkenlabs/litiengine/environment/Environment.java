@@ -40,6 +40,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -532,7 +533,36 @@ public class Environment implements IEnvironment {
     }
 
     final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
-    final Trigger trigger = new Trigger(mapObject.getName(), message);
+
+    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
+    final String target = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGET);
+    final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
+    final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
+    final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
+    
+    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool);
+    if (target != null && !target.isEmpty()) {
+      try {
+        trigger.setTarget(Integer.parseInt(target));
+      } catch (NumberFormatException ne) {
+        ne.printStackTrace();
+      }
+    }
+
+    if (activators != null && !activators.isEmpty()) {
+      String[] split = activators.split(",");
+      for (String s : split) {
+        if (s == null || s.isEmpty()) {
+          continue;
+        }
+        try {
+          trigger.addActivator(Integer.parseInt(s));
+        } catch (NumberFormatException ne) {
+          ne.printStackTrace();
+        }
+      }
+    }
+
     trigger.setMapId(mapObject.getId());
     trigger.setCollisionBoxHeightFactor(1);
     trigger.setCollisionBoxWidthFactor(1);
@@ -847,10 +877,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final IEntity entity) {
-    if(entity == null){
+    if (entity == null) {
       return;
     }
-    
+
     this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
 
     if (entity instanceof ICollisionEntity) {
