@@ -539,7 +539,7 @@ public class Environment implements IEnvironment {
     final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
     final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
     final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
-    
+
     final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool);
     if (target != null && !target.isEmpty()) {
       try {
@@ -936,9 +936,10 @@ public class Environment implements IEnvironment {
         }
 
         this.addMapObject(mapObject);
-        if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
+        if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX || MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
           this.addStaticShadows();
         }
+
         break;
       }
     }
