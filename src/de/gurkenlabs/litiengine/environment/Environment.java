@@ -581,6 +581,7 @@ public class Environment implements IEnvironment {
     this.getLightSources().clear();
     this.getColliders().clear();
     this.getSpawnPoints().clear();
+    this.getTriggers().clear();
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
