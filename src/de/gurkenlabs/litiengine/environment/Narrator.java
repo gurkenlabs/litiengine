@@ -207,7 +207,7 @@ public class Narrator implements IUpdateable, IRenderable {
     final FontRenderContext frc = g.getFontRenderContext();
 
     final String text = this.displayedText;
-    if(text == null){
+    if(text == null || text.isEmpty()){
       return;
     }
     
