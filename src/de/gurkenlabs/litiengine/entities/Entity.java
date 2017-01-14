@@ -117,7 +117,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public String sendMessage(int sender, final String message) {
+  public String sendMessage(Object sender, final String message) {
     return null;
   }
 

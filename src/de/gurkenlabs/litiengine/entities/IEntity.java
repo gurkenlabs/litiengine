@@ -25,7 +25,7 @@ public interface IEntity {
 
   public float getWidth();
 
-  public String sendMessage(int sender, String message);
+  public String sendMessage(Object sender, String message);
 
   public void setAnimationController(IAnimationController animationController);
 

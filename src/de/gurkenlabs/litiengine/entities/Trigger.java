@@ -100,40 +100,53 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   @Override
-  public String sendMessage(int sender, final String message) {
-    if (this.activationType == TriggerActivation.COLLISION || message == null || message.isEmpty() || (this.activators.size() > 0 && !this.activators.contains(sender))) {
+  public String sendMessage(Object sender, final String message) {
+    if (this.activationType == TriggerActivation.COLLISION && (sender != null && sender instanceof IEntity) || message == null || message.isEmpty()) {
       return null;
     }
 
-    if (message.equals(USE_MESSAGE)) {
-      this.activate(Game.getEnvironment().get(sender), sender);
+    if (sender instanceof IEntity) {
+      IEntity ent = (IEntity) sender;
+      // already triggered by the entity
+      if (this.activators.contains(ent.getMapId())) {
+        return null;
+      }
+
+      if (message.equals(USE_MESSAGE)) {
+        this.activate(ent, ent.getMapId());
+      }
     }
 
     return null;
   }
 
   public void activate(IEntity activator, int tar) {
-    if (this.isOneTimeTrigger && this.triggered || this.getActivationType() == TriggerActivation.COLLISION && this.activated.contains(activator) || this.getTarget() == 0 && tar == 0) {
+    if (this.isOneTimeTrigger && this.triggered || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.activated.contains(activator)) {
       return;
-    }
-
-    for (Consumer<TriggerEvent> cons : this.activatedConsumer) {
-      cons.accept(new TriggerEvent(this.message, activator, tar));
     }
 
     this.triggered = true;
     // always take local target if it is set
     int t = this.getTarget() == 0 ? tar : this.getTarget();
-    IEntity entity = Game.getEnvironment().get(t);
-    if (entity == null) {
-      System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + t + "' could not be found on the environment");
-      return;
+
+    // if we actually have a trigger target, we send the message to the target
+    if (t != 0) {
+      IEntity entity = Game.getEnvironment().get(t);
+      if (entity == null) {
+        System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + t + "' could not be found on the environment");
+        return;
+      }
+
+      entity.sendMessage(this, this.message);
+      this.activated.add(activator);
     }
 
-    entity.sendMessage(this.getMapId(), this.message);
-    this.activated.add(activator);
-    
-    if(this.isOneTimeTrigger && this.triggered){
+    // also send the trigger event to all registered consumers
+    for (Consumer<TriggerEvent> cons : this.activatedConsumer) {
+      cons.accept(new TriggerEvent(this.message, activator, tar));
+    }
+
+    if (this.isOneTimeTrigger && this.triggered) {
       Game.getEnvironment().remove(this);
     }
   }
@@ -172,5 +185,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public TriggerActivation getActivationType() {
     return activationType;
+  }
+
+  @Override
+  public String toString() {
+    return "trigger: " + this.getName() + "[" + this.getMapId() + "]";
   }
 }
