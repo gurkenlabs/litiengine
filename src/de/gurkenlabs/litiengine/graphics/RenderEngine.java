@@ -90,11 +90,12 @@ public class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
-    if(shape == null){
+    if (shape == null) {
       return;
     }
-    
+
     final AffineTransform oldTransForm = g.getTransform();
+    final Stroke oldStroke = g.getStroke();
     final AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
     t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
@@ -103,6 +104,7 @@ public class RenderEngine implements IRenderEngine {
     g.setStroke(stroke);
     g.draw(shape);
     g.setTransform(oldTransForm);
+    g.setStroke(oldStroke);
   }
 
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
@@ -118,6 +120,7 @@ public class RenderEngine implements IRenderEngine {
 
   /**
    * Draws the given string to the specified map location.
+   * 
    * @param g
    * @param text
    * @param x
@@ -129,8 +132,8 @@ public class RenderEngine implements IRenderEngine {
     }
 
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x , y);
-    g.drawString(text, (int) viewPortLocation.getX()* Game.getInfo().getRenderScale(), (int) viewPortLocation.getY()* Game.getInfo().getRenderScale());
+    Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x, y);
+    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
