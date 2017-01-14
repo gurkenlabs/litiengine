@@ -35,9 +35,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void add(IRenderable renderable, RenderType type);
 
   public void addNarrator(final String name, final int layout);
+
   public void addNarrator(final String name);
-  
+
   public void reloadFromMap(final int mapId);
+
   public void loadFromMap(final int mapId);
 
   public Collection<ICombatEntity> getCombatEntities();
@@ -102,6 +104,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onMapRendered(final Consumer<Graphics2D> consumer);
 
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
+
+  public void onInitialized(final Consumer<IEnvironment> consumer);
 
   public void remove(final int mapId);
 

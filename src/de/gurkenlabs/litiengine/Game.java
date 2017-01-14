@@ -12,6 +12,8 @@ import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
@@ -30,6 +32,7 @@ import de.gurkenlabs.tilemap.IMap;
 public abstract class Game {
   private final static List<Consumer<String>> startedConsumer;
   private final static List<Predicate<String>> terminatingConsumer;
+  private final static List<Consumer<IEnvironment>> environmentLoadedConsumer;
 
   private final static GameConfiguration configuration;
   private final static IRenderEngine graphicsEngine;
@@ -48,6 +51,7 @@ public abstract class Game {
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
     terminatingConsumer = new CopyOnWriteArrayList<>();
+    environmentLoadedConsumer = new CopyOnWriteArrayList<>();
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new PaulsSoundEngine();
@@ -125,8 +129,20 @@ public abstract class Game {
 
   public static void loadEnvironment(final IEnvironment env) {
     environment = env;
-    environment.init();
-    getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, environment.getMap().getSizeInPixels().getWidth(), environment.getMap().getSizeInPixels().getHeight()));
+    Game.getPhysicsEngine().clear();
+    if (getEnvironment() != null) {
+      getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, getEnvironment().getMap().getSizeInPixels().getWidth(), getEnvironment().getMap().getSizeInPixels().getHeight()));
+      for (IEntity entity : getEnvironment().getEntities()) {
+        if (entity instanceof ICollisionEntity) {
+          final ICollisionEntity coll = (ICollisionEntity) entity;
+          Game.getPhysicsEngine().add(coll);
+        }
+      }
+    }
+
+    for (Consumer<IEnvironment> cons : environmentLoadedConsumer) {
+      cons.accept(getEnvironment());
+    }
   }
 
   public static void init() {
@@ -135,7 +151,7 @@ public abstract class Game {
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
-    
+
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
     // setup default exception handling for render and update loop
@@ -230,12 +246,12 @@ public abstract class Game {
 
     int spriteload = 0;
     for (Spritesheet s : loadedSprites) {
-      for (int i = 0; i < s.getRows()* s.getColumns(); i++) {
+      for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
         s.getSprite(i);
         spriteload++;
       }
     }
-    
+
     System.out.println(spriteload + " sprites loaded to memory");
     System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
   }
@@ -267,5 +283,9 @@ public abstract class Game {
    */
   public static void onTerminating(Predicate<String> cons) {
     terminatingConsumer.add(cons);
+  }
+
+  public static void onEnvironmentLoaded(Consumer<IEnvironment> cons) {
+    environmentLoadedConsumer.add(cons);
   }
 }

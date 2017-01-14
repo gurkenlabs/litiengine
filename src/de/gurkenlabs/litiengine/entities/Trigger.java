@@ -176,10 +176,18 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   public void onActivated(Consumer<TriggerEvent> cons) {
+    if (this.activatedConsumer.contains(cons)) {
+      return;
+    }
+
     this.activatedConsumer.add(cons);
   }
 
   public void onDeactivated(Consumer<TriggerEvent> cons) {
+    if (this.deactivatedConsumer.contains(cons)) {
+      return;
+    }
+    
     this.deactivatedConsumer.add(cons);
   }
 

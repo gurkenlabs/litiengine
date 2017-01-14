@@ -82,6 +82,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
+  private final List<Consumer<IEnvironment>> initializedConsumer;
 
   private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
@@ -99,6 +100,8 @@ public class Environment implements IEnvironment {
 
   private Weather weather;
 
+  private boolean initialized;
+
   private Environment() {
     this.entities = new ConcurrentHashMap<>();
     this.entities.put(RenderType.GROUND, new ConcurrentHashMap<>());
@@ -111,9 +114,12 @@ public class Environment implements IEnvironment {
     this.lightSources = new CopyOnWriteArrayList<>();
     this.colliders = new CopyOnWriteArrayList<>();
     this.triggers = new CopyOnWriteArrayList<>();
+
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.initializedConsumer = new CopyOnWriteArrayList<>();
+
     this.spawnPoints = new CopyOnWriteArrayList<>();
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
@@ -123,7 +129,6 @@ public class Environment implements IEnvironment {
   public Environment(final IMap map) {
     this();
     this.map = map;
-    this.setMapTitleAndDescription();
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
@@ -143,7 +148,7 @@ public class Environment implements IEnvironment {
     } else {
       this.map = loadedMap;
     }
-    this.setMapTitleAndDescription();
+
     mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
@@ -217,7 +222,7 @@ public class Environment implements IEnvironment {
     }
 
     if (ambientAlpha > 0) {
-      this.ambientLight = new AmbientLight(ambientColor, ambientAlpha);
+      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
     }
   }
 
@@ -350,7 +355,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void addNarrator(final String name) {
-    this.addNarrator(name, 0);
+    this.addNarrator(name, Narrator.LAYOUT_LEFT);
   }
 
   @Override
@@ -585,6 +590,7 @@ public class Environment implements IEnvironment {
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
+    this.initialized = false;
   }
 
   private void dispose(final Collection<? extends IEntity> entities) {
@@ -843,10 +849,20 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void init() {
+  public final void init() {
+    if (this.initialized) {
+      return;
+    }
+
     this.loadMapObjects();
     this.addStaticShadows();
     this.addAmbientLight();
+
+    for (Consumer<IEnvironment> cons : this.initializedConsumer) {
+      cons.accept(this);
+    }
+
+    this.initialized = true;
   }
 
   private void loadMapObjects() {
@@ -948,15 +964,11 @@ public class Environment implements IEnvironment {
 
   @Override
   public void removeNarrator(final String name) {
-    if (this.getNarrators() == null) {
+    if (this.getNarrators() == null || name == null || name.isEmpty()) {
       return;
     }
-    for (Narrator narrator : this.getNarrators()) {
-      if (narrator.getName() == name) {
-        this.getNarrators().remove(narrator);
-      }
-    }
-
+    
+    this.getNarrators().removeIf(n -> n.getName().equals(name));
   }
 
   @Override
@@ -1028,16 +1040,6 @@ public class Environment implements IEnvironment {
 
   }
 
-  private void setMapTitleAndDescription() {
-
-    final String mapTitle = this.getMap().getCustomProperty(MapProperty.MAP_TITLE);
-    this.getMap().setTitle(mapTitle);
-
-    final String mapDescription = this.getMap().getCustomProperty(MapProperty.MAP_DESCRIPTION);
-    this.getMap().setDescription(mapDescription);
-
-  }
-
   @Override
   public void setWeather(final WeatherType weather) {
     switch (weather) {
@@ -1056,5 +1058,11 @@ public class Environment implements IEnvironment {
     if (weather != null) {
       this.weather.activate(Game.getLoop());
     }
+  }
+
+  @Override
+  public void onInitialized(Consumer<IEnvironment> consumer) {
+    // TODO Auto-generated method stub
+
   }
 }

@@ -29,6 +29,9 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class Narrator implements IUpdateable, IRenderable {
+  public static final int LAYOUT_LEFT = 0;
+  public static final int LAYOUT_RIGHT = 1;
+
   public enum Emotion {
     NORMAL, ANGRY, SAD, SURPRISED, BORED, HAPPY, SILENT
   }
@@ -207,10 +210,10 @@ public class Narrator implements IUpdateable, IRenderable {
     final FontRenderContext frc = g.getFontRenderContext();
 
     final String text = this.displayedText;
-    if(text == null || text.isEmpty()){
+    if (text == null || text.isEmpty()) {
       return;
     }
-    
+
     final AttributedString styledText = new AttributedString(text);
     styledText.addAttribute(TextAttribute.FONT, this.font);
     final AttributedCharacterIterator iterator = styledText.getIterator();
@@ -322,11 +325,11 @@ public class Narrator implements IUpdateable, IRenderable {
     this.portraitY = (float) (this.getRenderLocation().getY() + this.getPadding() / 2);
     this.textBoxY = this.portraitY;
     switch (this.getLayout()) {
-    case 0:
+    case LAYOUT_LEFT:
       this.portraitX = (float) (this.getRenderLocation().getX() + this.getPadding() / 2);
       this.textBoxX = (float) (this.portraitX + this.portraitWidth + this.getPadding() / 2);
       break;
-    case 1:
+    case LAYOUT_RIGHT:
       this.textBoxX = (float) (this.getRenderLocation().getX() + this.getPadding() / 2);
       this.portraitX = (float) (this.getRenderLocation().getX() + this.getBoxWidth() - this.getPadding() / 2 - this.portraitWidth);
       break;
