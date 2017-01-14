@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +64,7 @@ import de.gurkenlabs.tilemap.IMapObject;
 import de.gurkenlabs.tilemap.IMapObjectLayer;
 import de.gurkenlabs.tilemap.TmxMapLoader;
 import de.gurkenlabs.tilemap.utilities.MapUtilities;
+import de.gurkenlabs.tilemap.xml.Property;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
@@ -545,7 +547,14 @@ public class Environment implements IEnvironment {
     final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
     final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
 
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool);
+    Map<String, String> triggerArguments = new HashMap<>();
+    for(Property prop : mapObject.getAllCustomProperties()){
+      if(MapObjectProperties.isCustom(prop.getName())){
+        triggerArguments.put(prop.getName(), prop.getValue());
+      }
+    }
+    
+    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
     if (target != null && !target.isEmpty()) {
       try {
         trigger.setTarget(Integer.parseInt(target));

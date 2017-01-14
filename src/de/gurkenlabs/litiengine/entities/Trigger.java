@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -23,7 +25,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public static final String USE_MESSAGE = "use";
   private final Collection<Consumer<TriggerEvent>> activatedConsumer;
   private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
-
+  private final Map<String, String> arguments;
   private final List<Integer> activators;
   private String message;
   private int target;
@@ -36,12 +38,13 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final String name;
 
   public Trigger(String name, String message) {
-    this(TriggerActivation.COLLISION, name, message, false);
+    this(TriggerActivation.COLLISION, name, message, false, new ConcurrentHashMap<>());
   }
 
-  public Trigger(TriggerActivation activation, String name, String message, boolean isOneTime) {
+  public Trigger(TriggerActivation activation, String name, String message, boolean isOneTime, Map<String, String> arguments) {
     this.activatedConsumer = new CopyOnWriteArrayList<>();
     this.deactivatedConsumer = new CopyOnWriteArrayList<>();
+    this.arguments = arguments;
     this.activators = new CopyOnWriteArrayList<>();
     this.activated = new CopyOnWriteArrayList<>();
     this.name = name;
@@ -91,7 +94,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     for (IEntity ent : this.activated) {
       if (!collEntities.contains(ent)) {
         for (Consumer<TriggerEvent> cons : this.deactivatedConsumer) {
-          cons.accept(new TriggerEvent(this.message, ent, this.target != 0 ? this.target : ent.getMapId()));
+          cons.accept(new TriggerEvent(this.message, ent, this.target != 0 ? this.target : ent.getMapId(), this.arguments));
         }
       }
     }
@@ -143,7 +146,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
     // also send the trigger event to all registered consumers
     for (Consumer<TriggerEvent> cons : this.activatedConsumer) {
-      cons.accept(new TriggerEvent(this.message, activator, tar));
+      cons.accept(new TriggerEvent(this.message, activator, tar, this.arguments));
     }
 
     if (this.isOneTimeTrigger && this.triggered) {
@@ -187,7 +190,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     if (this.deactivatedConsumer.contains(cons)) {
       return;
     }
-    
+
     this.deactivatedConsumer.add(cons);
   }
 
