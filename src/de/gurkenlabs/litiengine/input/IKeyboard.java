@@ -38,4 +38,6 @@ public interface IKeyboard extends IUpdateable {
   public void unregisterFromKeyDownEvents(IKeyObserver observer);
 
   public String getText(KeyEvent e);
+  
+  public void consumeAlt(boolean consume);
 }

@@ -44,6 +44,8 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   /** The typed keys. */
   private final List<KeyEvent> typedKeys;
 
+  private boolean consumeAlt;
+
   /**
    * Instantiates a new key board.
    */
@@ -112,16 +114,21 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    */
   @Override
   public boolean dispatchKeyEvent(final KeyEvent e) {
+    if (this.consumeAlt && e.getKeyCode() == KeyEvent.VK_ALT) {
+      e.consume();
+    }
     final int eventId = e.getID();
     switch (eventId) {
     case KeyEvent.KEY_PRESSED:
-      // on an avg. win 10 machine, this event fires every ~33 ms when a key is pressed down
+      // on an avg. win 10 machine, this event fires every ~33 ms when a key is
+      // pressed down
       this.addPressedKey(e);
       break;
     case KeyEvent.KEY_RELEASED:
       this.removePressedKey(e);
       this.addTypedKey(e);
       this.addReleasedKey(e);
+
       break;
     default:
       break;
@@ -363,7 +370,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
         return "8";
       case KeyEvent.VK_NUMPAD9:
         return "9";
-        
+
       case KeyEvent.VK_NUMBER_SIGN:
         return "#";
       case KeyEvent.VK_PERIOD:
@@ -391,5 +398,10 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       }
     }
 
+  }
+
+  @Override
+  public void consumeAlt(boolean consume) {
+    this.consumeAlt = consume;
   }
 }
