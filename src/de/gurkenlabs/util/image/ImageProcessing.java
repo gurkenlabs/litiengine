@@ -419,18 +419,39 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
+    return scaleImage(image, width, height, false);
+  }
+
+  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, boolean keepRatio) {
     if (width == 0 || height == 0) {
       return null;
     }
 
     final int imageWidth = image.getWidth();
     final int imageHeight = image.getHeight();
+    double newWidth = width;
+    double newHeight = height;
+    if (keepRatio) {
+      final double ratioWidth = image.getWidth() / (double) image.getHeight();
+      final double ratioHeight = image.getHeight() / (double) image.getWidth();
 
-    final double scaleX = (double) width / imageWidth;
-    final double scaleY = (double) height / imageHeight;
+      newHeight = newWidth * ratioHeight;
+      if (newHeight > height) {
+        newHeight = height;
+        newWidth = newHeight * ratioWidth;
+      }
+    }
+
+    final double scaleX = (double) newWidth / imageWidth;
+    final double scaleY = (double) newHeight / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    return bilinearScaleOp.filter(image, new BufferedImage(width, height, image.getType()));
+    BufferedImage scaled = bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
+    BufferedImage newImg = getCompatibleImage(width, height);
+    Graphics2D g = (Graphics2D) newImg.getGraphics();
+    g.drawImage(scaled, 0, 0, null);
+    g.dispose();
+    return newImg;
   }
 
   public static BufferedImage scaleImage(BufferedImage image, int max) {
@@ -458,6 +479,19 @@ public class ImageProcessing {
     }
 
     return scaleImage(image, (int) dWidth, (int) dHeight);
+  }
+
+  public static BufferedImage scaleImageWidth(BufferedImage image, int newWidth) {
+    double width = image.getWidth();
+    double height = image.getHeight();
+    if (width == 0 || height == 0) {
+      return null;
+    }
+
+    double ratio = newWidth / width;
+    double newHeight = height * ratio;
+
+    return scaleImage(image, (int) newWidth, (int) newHeight);
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
