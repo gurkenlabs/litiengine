@@ -372,7 +372,7 @@ public abstract class Particle implements ITimeToLive {
     this.xCurrent += this.dx * updateRatio;
     this.yCurrent += this.dy * updateRatio;
 
-    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), IPhysicsEngine.COLLTYPE_STATIC)) {
+    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), IPhysicsEngine.COLLTYPE_ALL)) {
       this.xCurrent -= this.dx * updateRatio;
       this.yCurrent -= this.dy * updateRatio;
     }

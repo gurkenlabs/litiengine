@@ -12,6 +12,7 @@ import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
@@ -137,6 +138,10 @@ public abstract class Game {
           final ICollisionEntity coll = (ICollisionEntity) entity;
           Game.getPhysicsEngine().add(coll);
         }
+      }
+      
+      for(Collider coll : getEnvironment().getColliders()){
+        Game.getPhysicsEngine().add(coll.getBoundingBox());
       }
     }
 

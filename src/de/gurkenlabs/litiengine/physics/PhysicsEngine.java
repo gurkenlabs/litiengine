@@ -130,7 +130,7 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     if ((collisionType & COLLTYPE_STATIC) == COLLTYPE_STATIC) {
-      return this.collidesWithAnyStaticCollisionBox(null, rect) != null;
+      return this.collidesWithAnyStaticCollisionBox(rect) != null;
     }
 
     return false;
@@ -179,12 +179,15 @@ public class PhysicsEngine implements IPhysicsEngine {
       return false;
     }
 
-    if (entity.hasCollision()) {
-      if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
-        Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
-        entity.setLocation(resolvedPosition);
-      }
+    // resolve collision for current location
+    if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
+      Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
+      entity.setLocation(resolvedPosition);
+      success = false;
+    }
 
+    // resolve collision for new location;
+    if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
       Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
       entity.setLocation(resolvedPosition);
       return false;
@@ -238,7 +241,7 @@ public class PhysicsEngine implements IPhysicsEngine {
    */
   private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Rectangle2D collisionBox) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
-      if (otherEntity.equals(entity)) {
+      if (entity != null && otherEntity.equals(entity)) {
         continue;
       }
 
@@ -263,7 +266,7 @@ public class PhysicsEngine implements IPhysicsEngine {
    *          the new position
    * @return true, if successful
    */
-  private Rectangle2D collidesWithAnyStaticCollisionBox(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
+  private Rectangle2D collidesWithAnyStaticCollisionBox(final Rectangle2D entityCollisionBox) {
     for (final Rectangle2D collisionBox : this.staticCollisionBoxes) {
       if (GeometricUtilities.intersects(collisionBox, entityCollisionBox)) {
         return collisionBox.createIntersection(entityCollisionBox);
@@ -303,8 +306,10 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   /**
-   * With the current physics implementation is is possible to glitch through other entities, if their collisionbox is smaller than the velocity of 
-   * the moving entity and they also move towards the currently moving entity.
+   * With the current physics implementation is is possible to glitch through
+   * other entities, if their collisionbox is smaller than the velocity of the
+   * moving entity and they also move towards the currently moving entity.
+   * 
    * @param entity
    * @param newPosition
    * @return
