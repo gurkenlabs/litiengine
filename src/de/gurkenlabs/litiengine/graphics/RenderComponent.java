@@ -82,10 +82,8 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
     Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
     if (this.cursorImage != null && (Input.MOUSE.isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
-
       Point2D locationWithOffset = new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY());
       RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
-
     }
 
     if (Game.getConfiguration().DEBUG.isRenderDebugMouse()) {
