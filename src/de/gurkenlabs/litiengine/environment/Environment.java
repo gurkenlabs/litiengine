@@ -193,8 +193,9 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
-      if (emitter.isActivateOnInit())
+      if (emitter.isActivateOnInit()) {
         emitter.activate(Game.getLoop());
+      }
     }
   }
 
