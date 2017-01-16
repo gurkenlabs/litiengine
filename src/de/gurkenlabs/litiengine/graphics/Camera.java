@@ -179,6 +179,15 @@ public class Camera implements ICamera {
 
   @Override
   public void setFocus(final Point2D focus) {
+    // dunno why but without the factor of 0.01 sometimes everything starts to get wavy while rendering ...
+    // it seems to be an issue with the focus location being exactly dividable by up to 4?? (maybe even more for higher renderscales)
+    // this is somehow related to the rendering scale: if the rendering scale is lower this will only be affected by lower dividable numbers (e.g. renderscale of 6 only has an issue with 1 and 0.5)
+    // seems like java cannot place certain images onto their exact pixel location with an AffineTransform...
+    double fraction = focus.getY() - Math.floor(focus.getY());
+    if(MathUtilities.isInt(fraction * 4)){
+      focus.setLocation(focus.getX(), focus.getY() + 0.01);
+    }
+    
     this.focus = focus;
   }
 
@@ -237,8 +246,8 @@ public class Camera implements ICamera {
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
-    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), this.getFocus().getY() - this.getViewPortCenterY(), Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(),
-        Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
+    double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
+    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
 
   @Override

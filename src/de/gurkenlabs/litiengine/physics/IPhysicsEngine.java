@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 /**
  * The Interface IPhysicsEngine.
  */
-public interface IPhysicsEngine extends IUpdateable {
+public interface IPhysicsEngine extends IUpdateable{
   public static final int COLLTYPE_ENTITY = 1;
   public static final int COLLTYPE_STATIC = 2;
   public static final int COLLTYPE_ALL = COLLTYPE_ENTITY | COLLTYPE_STATIC;

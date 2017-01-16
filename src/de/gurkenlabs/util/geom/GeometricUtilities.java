@@ -29,8 +29,8 @@ public class GeometricUtilities {
   }
   
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
-    if (Math.abs(a.getCenterX() - b.getCenterX()) <= a.getWidth() * 0.5 + b.getWidth() * 0.5) {
-      if (Math.abs(a.getCenterY() - b.getCenterY()) <= a.getHeight() * 0.5 + b.getHeight() * 0.5) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
         return true;
       }
     }

@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.util.MathUtilities;
 
 /**
  * The Class LocalPlayerCamera.
@@ -43,6 +44,7 @@ public class PositionLockCamera extends Camera {
   @Override
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedEntity().getDimensionCenter();
+
     this.setFocus(cameraLocation);
     super.updateFocus();
   }

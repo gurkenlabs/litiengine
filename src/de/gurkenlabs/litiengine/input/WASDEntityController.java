@@ -78,7 +78,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
         } else {
           this.velocityX -= dec;
         }
-      } else if(this.velocityX < 0){
+      } else if (this.velocityX < 0) {
         if (dec < this.velocityX) {
           this.velocityX = 0;
         } else {
@@ -103,7 +103,7 @@ public class WASDEntityController extends ClientEntityMovementController impleme
         } else {
           this.velocityY -= dec;
         }
-      } else if(this.velocityY < 0){
+      } else if (this.velocityY < 0) {
         if (dec < this.velocityY) {
           this.velocityY = 0;
         } else {
@@ -114,6 +114,10 @@ public class WASDEntityController extends ClientEntityMovementController impleme
       if (Math.abs(this.velocityY) < STOP_THRESHOLD) {
         this.velocityY = 0;
       }
+    }
+
+    if (this.velocityX == 0 && this.velocityY == 0) {
+      return;
     }
 
     final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.velocityX, this.getControlledEntity().getLocation().getY() + this.velocityY);
