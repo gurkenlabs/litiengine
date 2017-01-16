@@ -722,6 +722,17 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Trigger getTrigger(int mapId) {
+    for (Trigger t : this.getTriggers()) {
+      if (t.getMapId() == mapId) {
+        return t;
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
   }

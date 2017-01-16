@@ -73,6 +73,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<LightSource> getLightSources();
 
   public Collection<Trigger> getTriggers();
+  
+  public Trigger getTrigger(int mapId);
 
   /**
    * Gets the next unique local map id. (All local map ids are negative).

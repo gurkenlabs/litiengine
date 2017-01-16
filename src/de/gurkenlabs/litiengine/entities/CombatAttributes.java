@@ -26,6 +26,8 @@ public class CombatAttributes {
   /** The damage multiplier. */
   private final Attribute<Float> damageMultiplier;
 
+  private final Attribute<Integer> vision;
+
   /** The experience. */
   private final RangeAttribute<Integer> experience;
 
@@ -65,6 +67,7 @@ public class CombatAttributes {
     this.attackSpeed = new Attribute<>(info.attackSpeed());
     this.damageMultiplier = new Attribute<>(info.damageMultiplier());
     this.healthRegeneration = new Attribute<>(info.healthRegenerationPerSecond());
+    this.vision = new Attribute<Integer>(info.vision());
 
   }
 
@@ -145,6 +148,14 @@ public class CombatAttributes {
    */
   public Attribute<Float> getVelocity() {
     return this.velocity;
+  }
+
+  /**
+   * The vision radius of the combat entity.
+   * @return
+   */
+  public Attribute<Integer> getVision() {
+    return this.vision;
   }
 
   /**

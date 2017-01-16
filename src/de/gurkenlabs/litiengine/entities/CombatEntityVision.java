@@ -24,9 +24,6 @@ import de.gurkenlabs.litiengine.graphics.IVision;
  */
 public class CombatEntityVision implements IVision {
 
-  /** The Constant DefaultLitiVision. */
-  public static final int VISION_RADIUS = 200;
-
   /** The Constant FogOfWarColor. */
   protected static final Color FogOfWarColor = new Color(0, 0, 0, 127);
 
@@ -54,8 +51,8 @@ public class CombatEntityVision implements IVision {
   public CombatEntityVision(final IEnvironment environment, final ICombatEntity combatEntity) {
     this.environment = environment;
     this.combatEntity = combatEntity;
-    this.visionRadius = VISION_RADIUS;
-    this.visionDiameter = VISION_RADIUS * 2;
+    this.visionRadius = this.combatEntity.getAttributes().getVision().getCurrentValue();
+    this.visionDiameter = this.combatEntity.getAttributes().getVision().getCurrentValue() * 2;
   }
 
   /*
