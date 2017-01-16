@@ -190,6 +190,12 @@ public class Environment implements IEnvironment {
     }
 
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
+
+    if (entity instanceof Emitter) {
+      Emitter emitter = (Emitter) entity;
+      if (emitter.isActivateOnInit())
+        emitter.activate(Game.getLoop());
+    }
   }
 
   @Override
@@ -250,6 +256,9 @@ public class Environment implements IEnvironment {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
       return;
     }
+    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) == null) {
+      return;
+    }
 
     short velocity = (short) (100 / Game.getInfo().getRenderScale());
     if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
@@ -257,6 +266,11 @@ public class Environment implements IEnvironment {
     }
 
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)), velocity);
+
+    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+      mob.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    }
+
     mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
       mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
@@ -548,12 +562,12 @@ public class Environment implements IEnvironment {
     final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
 
     Map<String, String> triggerArguments = new HashMap<>();
-    for(Property prop : mapObject.getAllCustomProperties()){
-      if(MapObjectProperties.isCustom(prop.getName())){
+    for (Property prop : mapObject.getAllCustomProperties()) {
+      if (MapObjectProperties.isCustom(prop.getName())) {
         triggerArguments.put(prop.getName(), prop.getValue());
       }
     }
-    
+
     final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
     if (target != null && !target.isEmpty()) {
       try {
@@ -976,7 +990,7 @@ public class Environment implements IEnvironment {
     if (this.getNarrators() == null || name == null || name.isEmpty()) {
       return;
     }
-    
+
     this.getNarrators().removeIf(n -> n.getName().equals(name));
   }
 

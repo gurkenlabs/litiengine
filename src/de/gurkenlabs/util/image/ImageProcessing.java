@@ -34,6 +34,9 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_BOTTOM = 3;
 
   public static String encodeToString(final BufferedImage image) {
+    if(image == null){
+      return null;
+    }
     String imageString = null;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -51,7 +54,10 @@ public class ImageProcessing {
   }
 
   public static BufferedImage decodeToImage(String imageString) {
-
+    if(imageString == null){
+      return null;
+    }
+    
     BufferedImage image = null;
     byte[] imageByte;
     try {

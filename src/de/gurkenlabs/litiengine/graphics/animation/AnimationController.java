@@ -27,7 +27,9 @@ public abstract class AnimationController implements IAnimationController {
 
     if (animations != null && animations.length > 0) {
       for (final Animation anim : animations) {
-        this.animations.add(anim);
+        if (anim != null) {
+          this.animations.add(anim);
+        }
       }
     }
 
@@ -36,10 +38,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void add(final Animation animation) {
-    if(animation == null){
+    if (animation == null) {
       return;
     }
-    
+
     final Optional<Animation> oldAnimation = this.animations.stream().filter(x -> x.getName().equalsIgnoreCase(animation.getName())).findFirst();
     if (oldAnimation.isPresent()) {
       this.animations.remove(oldAnimation.get());
@@ -50,10 +52,10 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void add(final IImageEffect effect) {
-    if(this.getImageEffects().size() >= MAX_IMAGE_EFFECTS){
+    if (this.getImageEffects().size() >= MAX_IMAGE_EFFECTS) {
       return;
     }
-    
+
     this.getImageEffects().add(effect);
   }
 
@@ -116,8 +118,7 @@ public abstract class AnimationController implements IAnimationController {
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do
     // nothing
-    if (this.getAnimations() == null 
-        || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName)) 
+    if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
         || (this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName))) {
       return;
     }
@@ -127,7 +128,7 @@ public abstract class AnimationController implements IAnimationController {
       this.getCurrentAnimation().terminate();
     }
 
-    final Animation anim = this.getAnimations().stream().filter(x -> x.getName().equalsIgnoreCase(animationName)).findFirst().get();
+    final Animation anim = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst().get();
     if (anim == null) {
       return;
     }

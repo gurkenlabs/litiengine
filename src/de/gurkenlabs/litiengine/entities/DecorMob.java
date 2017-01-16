@@ -9,8 +9,8 @@ import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 import de.gurkenlabs.litiengine.input.ClientEntityMovementController;
 
-@CombatAttributesInfo(velocityFactor = 0.1f)
-public class DecorMob extends MovableEntity {
+@CombatAttributesInfo(health = 1)
+public class DecorMob extends MovableCombatEntity {
   private final String mobType;
   private final MovementBehaviour behaviour;
 
@@ -29,7 +29,7 @@ public class DecorMob extends MovableEntity {
     default:
       break;
     }
-    
+
     this.setVelocity(velocity);
   }
 
@@ -88,13 +88,16 @@ public class DecorMob extends MovableEntity {
 
       final float pixelsPerTick = gameLoop.getDeltaTime() * 0.001F * this.getControlledEntity().getVelocity();
       this.getPhysicsEngine().move(this.getControlledEntity(), this.angle, pixelsPerTick);
-/*
-      for (final IMovableEntity mob : Game.getEnvironment().getMovableEntities()) {
-        if (!mob.equals(this) && mob.getLocation().distance(this.getControlledEntity().getLocation()) < DETECTION_RADIUS) {
-          final float angle = (float) (GeometricUtilities.calcRotationAngleInDegrees(this.getControlledEntity().getDimensionCenter(), mob.getDimensionCenter()) - 180);
-          this.getPhysicsEngine().move(this.getControlledEntity(), angle, pixelsPerTick * 5);
-        }
-      }*/
+      /*
+       * for (final IMovableEntity mob :
+       * Game.getEnvironment().getMovableEntities()) { if (!mob.equals(this) &&
+       * mob.getLocation().distance(this.getControlledEntity().getLocation()) <
+       * DETECTION_RADIUS) { final float angle = (float)
+       * (GeometricUtilities.calcRotationAngleInDegrees(this.getControlledEntity
+       * ().getDimensionCenter(), mob.getDimensionCenter()) - 180);
+       * this.getPhysicsEngine().move(this.getControlledEntity(), angle,
+       * pixelsPerTick * 5); } }
+       */
     }
 
     public void calculateNextAngleChange() {
