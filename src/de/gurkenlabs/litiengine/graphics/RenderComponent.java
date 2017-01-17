@@ -148,8 +148,8 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   @Override
   public void setCursorOffset(int x, int y) {
-    this.cursorOffsetX = x;
-    this.cursorOffsetY = y;
+    this.setCursorOffsetX(x);
+    this.setCursorOffsetY(y);
   }
 
   public int getCursorOffsetX() {

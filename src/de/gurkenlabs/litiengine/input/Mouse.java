@@ -393,6 +393,12 @@ public class Mouse implements IMouse {
     this.mouseMovedConsumer.add(consumer);
   }
 
+  @Override
+  public void setLocation(Point adjustMouse) {
+    this.location = adjustMouse;
+    this.lastLocation = adjustMouse;
+  }
+  
   /**
    * Calculates the location of the ingame mouse by the position diff and locks
    * the original mouse to the center of the screen.

@@ -99,6 +99,8 @@ public class AmbientLight {
       sb.append(light.getHeight());
     }
 
+    sb.append(this.environment.getMap().getSizeInPixels());
+
     int key = sb.toString().hashCode();
     return "ambientlight-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
   }

@@ -64,6 +64,10 @@ public class Camera implements ICamera {
     if (this.zoom > 0 && Game.getInfo().getRenderScale() != this.zoom) {
       if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
         Game.getInfo().setRenderScale(this.zoom);
+        for (Consumer<Float> cons : this.zoomChangedConsumer) {
+          cons.accept(this.zoom);
+        }
+        
         this.zoom = 0;
         this.zoomDelay = 0;
         this.zoomTick = 0;
@@ -72,6 +76,9 @@ public class Camera implements ICamera {
 
         float newRenderScale = Game.getInfo().getRenderScale() + this.zoomStep;
         Game.getInfo().setRenderScale(newRenderScale);
+        for (Consumer<Float> cons : this.zoomChangedConsumer) {
+          cons.accept(newRenderScale);
+        }
       }
     }
 
@@ -208,6 +215,10 @@ public class Camera implements ICamera {
   public void setZoom(float zoom, int delay) {
     if (delay == 0) {
       Game.getInfo().setRenderScale(zoom);
+      for (Consumer<Float> cons : this.zoomChangedConsumer) {
+        cons.accept(zoom);
+      }
+      
       this.zoom = 0;
       this.zoomDelay = 0;
       this.zoomTick = 0;
@@ -221,10 +232,6 @@ public class Camera implements ICamera {
       double tickAmount = delay / tickduration;
       float totalDelta = zoom - Game.getInfo().getRenderScale();
       this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
-    }
-
-    for (Consumer<Float> cons : this.zoomChangedConsumer) {
-      cons.accept(this.zoom);
     }
   }
 

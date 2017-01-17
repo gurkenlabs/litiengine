@@ -25,6 +25,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public Point getLocation();
 
   public Point2D getMapLocation();
+  
+  public void setLocation(Point adjustMouse);
 
   public boolean isLeftMouseButtonDown();
 
