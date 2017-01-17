@@ -230,9 +230,7 @@ public class Environment implements IEnvironment {
     } catch (final NumberFormatException e) {
     }
 
-    if (ambientAlpha > 0) {
       this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
-    }
   }
 
   protected void addCollisionBox(final IMapObject mapObject) {
