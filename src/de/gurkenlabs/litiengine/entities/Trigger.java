@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
   private final Map<String, String> arguments;
   private final List<Integer> activators;
+  private final List<Integer> targets;
   private String message;
-  private int target;
   private List<IEntity> activated;
   private final TriggerActivation activationType;
   private final boolean isOneTimeTrigger;
@@ -46,6 +47,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.deactivatedConsumer = new CopyOnWriteArrayList<>();
     this.arguments = arguments;
     this.activators = new CopyOnWriteArrayList<>();
+    this.targets = new CopyOnWriteArrayList<>();
     this.activated = new CopyOnWriteArrayList<>();
     this.name = name;
     this.message = message;
@@ -58,6 +60,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public void addActivator(int mapId) {
     this.activators.add(mapId);
+  }
+
+  public void addTarget(int mapId) {
+    this.targets.add(mapId);
   }
 
   public List<Integer> getActivators() {
@@ -94,7 +100,13 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     for (IEntity ent : this.activated) {
       if (!collEntities.contains(ent)) {
         for (Consumer<TriggerEvent> cons : this.deactivatedConsumer) {
-          cons.accept(new TriggerEvent(this.message, ent, this.target != 0 ? this.target : ent.getMapId(), this.arguments));
+          List<Integer> targets = this.getTargets();
+          if (targets.size() == 0) {
+            targets = new ArrayList<>();
+            targets.add(ent.getMapId());
+          }
+
+          cons.accept(new TriggerEvent(this.message, ent, targets, this.arguments));
         }
       }
     }
@@ -129,24 +141,34 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     this.triggered = true;
-    // always take local target if it is set
-    int t = this.getTarget() == 0 ? tar : this.getTarget();
-
-    // if we actually have a trigger target, we send the message to the target
-    if (t != 0) {
-      IEntity entity = Game.getEnvironment().get(t);
-      if (entity == null) {
-        System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + t + "' could not be found on the environment");
-        return;
+    // always take local targets if there are any
+    List<Integer> targets = this.getTargets();
+    if (targets.size() == 0) {
+      // as a fallback send the message to the tar
+      targets = new ArrayList<>();
+      if(tar > 0){
+      targets.add(tar);
       }
+    }
+    
+    // if we actually have a trigger target, we send the message to the target
+    if (targets.size() > 0) {
+      for(int target : targets){
+        IEntity entity = Game.getEnvironment().get(target);
+        if (entity == null) {
+          System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + target + "' could not be found on the environment");
+          continue;
+        }
 
-      entity.sendMessage(this, this.message);
-      this.activated.add(activator);
+        entity.sendMessage(this, this.message);
+        this.activated.add(activator);
+      }
     }
 
+    final TriggerEvent te = new TriggerEvent(this.message, activator, targets, this.arguments);
     // also send the trigger event to all registered consumers
     for (Consumer<TriggerEvent> cons : this.activatedConsumer) {
-      cons.accept(new TriggerEvent(this.message, activator, tar, this.arguments));
+      cons.accept(te);
     }
 
     if (this.isOneTimeTrigger && this.triggered) {
@@ -154,20 +176,12 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
   }
 
-  public void activate() {
-    this.activate(Game.getEnvironment().get(this.getMapId()), this.target);
-  }
-
   public String getMessage() {
     return this.message;
   }
 
-  public int getTarget() {
-    return this.target;
-  }
-
-  public void setTarget(int target) {
-    this.target = target;
+  public List<Integer> getTargets() {
+    return this.targets;
   }
 
   public String getName() {

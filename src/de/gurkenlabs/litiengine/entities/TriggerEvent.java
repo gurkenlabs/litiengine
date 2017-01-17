@@ -1,17 +1,18 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.util.List;
 import java.util.Map;
 
 public class TriggerEvent {
   private final String message;
   private final IEntity entity;
-  private final int target;
+  private final List<Integer> targets;
   private final Map<String, String> arguments;
 
-  public TriggerEvent(String message, IEntity entity, int target, Map<String, String> arguments) {
+  public TriggerEvent(String message, IEntity entity, List<Integer> targets, Map<String, String> arguments) {
     super();
     this.message = message;
-    this.target = target;
+    this.targets = targets;
     this.entity = entity;
     this.arguments = arguments;
   }
@@ -20,8 +21,8 @@ public class TriggerEvent {
     return this.message;
   }
 
-  public int getTarget() {
-    return this.target;
+  public List<Integer> getTargets() {
+    return this.targets;
   }
 
   public IEntity getEntity() {

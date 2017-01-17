@@ -557,7 +557,7 @@ public class Environment implements IEnvironment {
     final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
 
     final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
-    final String target = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGET);
+    final String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
     final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
     final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
     final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
@@ -570,11 +570,17 @@ public class Environment implements IEnvironment {
     }
 
     final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
-    if (target != null && !target.isEmpty()) {
-      try {
-        trigger.setTarget(Integer.parseInt(target));
-      } catch (NumberFormatException ne) {
-        ne.printStackTrace();
+    if (targets != null && !targets.isEmpty()) {
+      String[] split = targets.split(",");
+      for (String s : split) {
+        if (s == null || s.isEmpty()) {
+          continue;
+        }
+        try {
+          trigger.addTarget(Integer.parseInt(s));
+        } catch (NumberFormatException ne) {
+          ne.printStackTrace();
+        }
       }
     }
 
