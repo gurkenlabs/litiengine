@@ -23,7 +23,7 @@ public class DropdownListField extends GuiComponent {
   private Spritesheet entrySprite, buttonSprite;
   private boolean arrowKeyNavigation;
 
-  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE804");
+  public static FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
 
   public DropdownListField(final double x, final double y, final double width, final double height, final Object[] content, int elementsShown, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);

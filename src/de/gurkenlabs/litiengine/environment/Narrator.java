@@ -72,7 +72,7 @@ public class Narrator implements IUpdateable, IRenderable {
     this.setEmotion(Emotion.NORMAL);
     this.setRenderLocation(new Point2D.Double(0, Game.getScreenManager().getResolution().getHeight() * (6 / 8.0)));
     this.setSize(Game.getScreenManager().getResolution().getWidth(), Game.getScreenManager().getResolution().getHeight() * (2 / 8.0));
-    this.setFont(FontLoader.getGuiFont().deriveFont((float) (this.getBoxHeight() / 6)));
+    this.setFont(FontLoader.load("04B_11_.ttf").deriveFont((float) (this.getBoxHeight() / 6)));
     Game.getLoop().registerForUpdate(this);
     this.animationController = new NarratorPortraitAnimationController(this);
   }

@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 public class NumberAdjuster extends TextFieldComponent {
   private ImageComponent button1, button2;
   private Spritesheet buttonSprite;
-  public static Icon ARROW_UP = new Icon(FontLoader.getIconFontThree(), "\uE84B");
-  public static Icon ARROW_DOWN = new Icon(FontLoader.getIconFontThree(), "\uE84A");
+  public static FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
+  public static FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
   BigDecimal step, lowerBound, upperBound, currentValue;
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 

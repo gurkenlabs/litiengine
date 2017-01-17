@@ -8,8 +8,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class CheckBox extends ImageComponent {
   private boolean checked;
-  public static Icon CHECK = new Icon(FontLoader.getIconFontThree(), "\uE847");
-  public static Icon CROSS = new Icon(FontLoader.getIconFontThree(), "\uE843");
+  public static FontIcon CHECK = new FontIcon(ICON_FONT, "\uE847");
+  public static FontIcon CROSS = new FontIcon(ICON_FONT, "\uE843");
   private final List<Consumer<Boolean>> changeConsumer;
 
   public CheckBox(double x, double y, double width, double height, Spritesheet spritesheet, boolean checked) {

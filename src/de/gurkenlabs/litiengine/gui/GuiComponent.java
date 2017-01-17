@@ -29,6 +29,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * The Class GuiComponent.
  */
 public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, MouseWheelListener {
+  protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
+  protected static final Font TEXT_FONT = FontLoader.load("Arial").deriveFont(8f);
   private final List<Consumer<String>> textChangedConsumer;
   private int textAlignment = TEXT_ALIGN_CENTER;
   public static final int TEXT_ALIGN_LEFT = 1;
