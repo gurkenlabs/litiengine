@@ -94,6 +94,9 @@ public class AmbientLight {
       sb.append(light.getColor());
       sb.append(light.getLocation());
       sb.append(light.getRadius());
+      sb.append(light.getLightShapeType());
+      sb.append(light.getWidth());
+      sb.append(light.getHeight());
     }
 
     int key = sb.toString().hashCode();
@@ -104,6 +107,11 @@ public class AmbientLight {
     final Point2D lightCenter = light.getDimensionCenter();
 
     final Area lightArea = new Area(light.getLightShape());
+    if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
+      g.setColor(light.getColor());
+      g.fill(lightArea);
+      return;
+    }
 
     // cut the light area where shadow Boxes are (this simulates light falling
     // into and out of rooms)
