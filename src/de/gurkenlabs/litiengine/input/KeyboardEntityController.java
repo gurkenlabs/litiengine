@@ -12,39 +12,41 @@ import de.gurkenlabs.util.MathUtilities;
  * TODO: Apply friction to terrain in order to slow down acceleration and speed
  * up deceleration.
  */
-public class WASDEntityController extends ClientEntityMovementController implements IKeyObserver {
+public class KeyboardEntityController extends ClientEntityMovementController implements IKeyObserver {
   private double velocityX, velocityY;
-
+  private final int up, down, left, right;
   private boolean movedX, movedY;
   private float dx;
   private float dy;
 
-  public WASDEntityController(final IMovableEntity entity) {
-    super(entity);
+  public KeyboardEntityController(final IMovableEntity entity) {
+    this(entity, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
+  }
 
+  public KeyboardEntityController(final IMovableEntity entity, final int up, final int down, final int left, final int right) {
+    super(entity);
+    this.up = up;
+    this.down = down;
+    this.left = left;
+    this.right = right;
     Input.KEYBOARD.registerForKeyDownEvents(this);
   }
 
   @Override
   public void handlePressedKey(final KeyEvent keyCode) {
 
-    switch (keyCode.getKeyCode()) {
-    case KeyEvent.VK_W:
+    if (keyCode.getKeyCode() == this.up) {
       this.dy--;
       this.movedY = true;
-      break;
-    case KeyEvent.VK_A:
-      this.dx--;
-      this.movedX = true;
-      break;
-    case KeyEvent.VK_S:
+    } else if (keyCode.getKeyCode() == this.down) {
       this.movedY = true;
       this.dy++;
-      break;
-    case KeyEvent.VK_D:
+    } else if (keyCode.getKeyCode() == this.left) {
+      this.dx--;
+      this.movedX = true;
+    } else if (keyCode.getKeyCode() == this.right) {
       this.dx++;
       this.movedX = true;
-      break;
     }
   }
 

@@ -11,6 +11,7 @@ import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.AttributedCharacterIterator;
@@ -90,7 +91,7 @@ public class Narrator implements IUpdateable, IRenderable {
     final Graphics2D g = img.createGraphics();
     g.setFont(this.getFont());
 
-    final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, img.getWidth(), img.getHeight(), this.getPadding(), this.getPadding());
+    final Rectangle2D bounds = new Rectangle2D.Double(0, 0, img.getWidth(), img.getHeight());
 
     g.setColor(this.getBackgroundColor());
     g.fill(bounds);
