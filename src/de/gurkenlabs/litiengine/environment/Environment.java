@@ -733,6 +733,20 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Trigger getTrigger(String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    for (Trigger t : this.getTriggers()) {
+      if (t.getName() != null && t.getName().equals(name)) {
+        return t;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
   }
@@ -795,6 +809,17 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<LightSource> getLightSources() {
     return this.lightSources;
+  }
+
+  @Override
+  public LightSource getLightSource(int mapId) {
+    for (LightSource light : this.getLightSources()) {
+      if (light.getMapId() == mapId) {
+        return light;
+      }
+    }
+
+    return null;
   }
 
   /**

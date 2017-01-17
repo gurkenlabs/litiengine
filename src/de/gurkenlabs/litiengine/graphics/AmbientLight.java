@@ -36,6 +36,12 @@ public class AmbientLight {
   }
 
   public void createImage() {
+    String cacheKey = this.getCacheKey();
+    if (ImageCache.IMAGES.containsKey(cacheKey)) {
+      this.image = ImageCache.IMAGES.get(cacheKey);
+      return;
+    }
+
     final Color color = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
@@ -63,17 +69,35 @@ public class AmbientLight {
       if (light.getIntensity() <= 0) {
         continue;
       }
-      
+
       float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       renderLightSource(g, light, longerDimension);
     }
-    
+
     // TODO: cut out regions on map where no layer has a tile
 
     g.setComposite(comp);
     g.dispose();
     this.image = img;
+    ImageCache.IMAGES.put(cacheKey, img);
+  }
+
+  private String getCacheKey() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getColor());
+    sb.append(this.getAlpha());
+
+    for (LightSource light : this.environment.getLightSources()) {
+      sb.append(light.getBrightness());
+      sb.append(light.getIntensity());
+      sb.append(light.getColor());
+      sb.append(light.getLocation());
+      sb.append(light.getRadius());
+    }
+
+    int key = sb.toString().hashCode();
+    return "ambientlight-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
   }
 
   private void renderLightSource(Graphics2D g, LightSource light, double longerDimension) {
@@ -147,6 +171,7 @@ public class AmbientLight {
   }
 
   public Image getImage() {
+    this.createImage();
     return this.image;
   }
 
