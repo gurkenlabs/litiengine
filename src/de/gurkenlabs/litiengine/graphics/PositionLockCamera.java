@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.util.MathUtilities;
 
 /**
  * The Class LocalPlayerCamera.

@@ -69,27 +69,23 @@ public class PropAnimationController extends AnimationController {
     // add a shadow at the lower end of the current sprite.
     final int ShadowYOffset = (int) (currentImage.getHeight());
     final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
-    return ImageCache.SPRITES.put(cacheKey, shadow);
+    return ImageCache.SPRITES.putPersistent(cacheKey, shadow);
   }
 
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
     switch (this.prop.getState()) {
-    case INTACT:
-      this.playAnimation(INTACT);
-      break;
     case DAMAGED:
       this.playAnimation(DAMAGED);
       break;
     case DESTROYED:
       this.playAnimation(DESTROYED);
       break;
+    case INTACT:
     default:
       this.playAnimation(INTACT);
       break;
     }
-
   }
-
 }
