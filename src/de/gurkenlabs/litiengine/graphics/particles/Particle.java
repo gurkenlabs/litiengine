@@ -54,6 +54,7 @@ public abstract class Particle implements ITimeToLive {
 
   private boolean applyStaticPhysics;
 
+  private int collisionType;
   /**
    * Constructs a new particle.
    *
@@ -96,6 +97,7 @@ public abstract class Particle implements ITimeToLive {
     this.timeToLive = life;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
+    this.setCollisionType(IPhysicsEngine.COLLTYPE_ALL);
   }
 
   @Override
@@ -372,7 +374,7 @@ public abstract class Particle implements ITimeToLive {
     this.xCurrent += this.dx * updateRatio;
     this.yCurrent += this.dy * updateRatio;
 
-    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), IPhysicsEngine.COLLTYPE_ALL)) {
+    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
       this.xCurrent -= this.dx * updateRatio;
       this.yCurrent -= this.dy * updateRatio;
     }
@@ -385,5 +387,13 @@ public abstract class Particle implements ITimeToLive {
 
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
+  }
+
+  public int getCollisionType() {
+    return collisionType;
+  }
+
+  public void setCollisionType(int collisionType) {
+    this.collisionType = collisionType;
   }
 }
