@@ -28,7 +28,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 /**
  * The Class LightSource.
  */
-@EntityInfo(renderType = RenderType.OVERLAY)
+@EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
 
   public static final String RECTANGLE = "rectangle";
