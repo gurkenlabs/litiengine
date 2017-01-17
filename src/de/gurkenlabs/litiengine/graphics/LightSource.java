@@ -48,6 +48,8 @@ public class LightSource extends Entity implements IRenderable {
   private String lightShapeType;
   private Shape lightShape;
 
+  private boolean activated;
+
   /**
    * Instantiates a new light source.
    *
@@ -62,7 +64,7 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final int brightness, final int intensity,  final Color lightColor, final String shapeType) {
+  public LightSource(final IEnvironment environment, final int brightness, final int intensity, final Color lightColor, final String shapeType) {
     super();
     this.color = lightColor;
     this.intensity = intensity;
@@ -70,8 +72,21 @@ public class LightSource extends Entity implements IRenderable {
 
     this.setBrightness(brightness);
     this.lightShapeType = shapeType;
+    this.activated = true;
   }
-  
+
+  public void activate() {
+    this.activated = true;
+  }
+
+  public void deactivate() {
+    this.activated = false;
+  }
+
+  public void toggle() {
+    this.activated = !this.activated;
+  }
+
   /**
    * Gets the shadow ellipse.
    *
@@ -101,7 +116,6 @@ public class LightSource extends Entity implements IRenderable {
   private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
     return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
   }
-
 
   @Override
   public void setLocation(Point2D location) {
@@ -135,7 +149,7 @@ public class LightSource extends Entity implements IRenderable {
    * @return the brightness
    */
   public int getBrightness() {
-    return this.brightness;
+    return this.activated ? this.brightness : 0;
   }
 
   /**
