@@ -55,10 +55,7 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.RainEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.SnowEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.Weather;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.IMapLoader;
@@ -101,8 +98,6 @@ public class Environment implements IEnvironment {
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
   private CopyOnWriteArrayList<Narrator> narrators;
-
-  private Weather weather;
 
   private boolean initialized;
 
@@ -911,11 +906,6 @@ public class Environment implements IEnvironment {
     return this.triggers;
   }
 
-  @Override
-  public WeatherType getWeather() {
-    return this.weather == null ? WeatherType.Clear : this.weather.getType();
-  }
-
   private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
     for (final Consumer<Graphics2D> consumer : consumers) {
       consumer.accept(g);
@@ -1095,10 +1085,6 @@ public class Environment implements IEnvironment {
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
     }
 
-    if (this.weather != null) {
-      this.weather.render(g);
-    }
-
     for (final IRenderable rend : this.getOverlayRenderable()) {
       rend.render(g);
     }
@@ -1112,26 +1098,6 @@ public class Environment implements IEnvironment {
       narr.render(g);
     }
 
-  }
-
-  @Override
-  public void setWeather(final WeatherType weather) {
-    switch (weather) {
-    case Rain:
-      this.weather = new RainEmitter();
-      break;
-    case Snow:
-      this.weather = new SnowEmitter();
-      break;
-    case Clear:
-    default:
-      this.weather = null;
-      break;
-    }
-
-    if (weather != null) {
-      this.weather.activate(Game.getLoop());
-    }
   }
 
   @Override

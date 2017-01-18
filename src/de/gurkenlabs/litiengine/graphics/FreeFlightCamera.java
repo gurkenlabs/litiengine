@@ -37,7 +37,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable{
   
   private void handleFreeFlightCamera(final IGameLoop gameLoop) {
     final int SCROLL_PIXELS_PER_SECOND = 400;
-    final int SCROLL_PADDING = 5;
+    final int SCROLL_PADDING = 20;
     final int SCROLL_BORDER = 100;
     final Point mouseLocation = Input.MOUSE.getLocation();
 

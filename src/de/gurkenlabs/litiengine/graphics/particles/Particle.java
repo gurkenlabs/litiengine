@@ -236,7 +236,7 @@ public abstract class Particle implements ITimeToLive {
 
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
-  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
+  public void setApplyPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
   }
 

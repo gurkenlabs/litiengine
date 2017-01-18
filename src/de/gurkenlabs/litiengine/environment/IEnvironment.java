@@ -101,7 +101,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<MapLocation> getSpawnPoints();
 
-  public WeatherType getWeather();
 
   public AmbientLight getAmbientLight();
 
@@ -122,8 +121,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void remove(final IEntity entity);
 
   public void removeRenderable(IRenderable renderable);
-
-  public void setWeather(WeatherType weather);
 
   public void addMapObject(final IMapObject mapObject);
 }
