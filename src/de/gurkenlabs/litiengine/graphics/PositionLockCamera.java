@@ -29,7 +29,13 @@ public class PositionLockCamera extends Camera {
       return null;
     }
 
-
+    // always render the local player at the same location otherwise the
+    // localplayer camera causes flickering and bouncing of the sprite
+    if (entity.equals(this.getLockedEntity()) && entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null) {
+      final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
+      final Point2D location = new Point2D.Double(this.getFocus().getX() - entity.getWidth() / 2 - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, this.getFocus().getY() - entity.getHeight() / 2 - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
+      return this.getViewPortLocation(location);
+    }
 
     return super.getViewPortLocation(entity);
   }
