@@ -71,6 +71,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The text color. */
   private Color textColor;
 
+  private Color hoverTextColor;
+
   /** The visible. */
   private boolean visible;
 
@@ -97,6 +99,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
+    this.setHoverTextColor(DEFAULT_COLOR);
     this.setBackGroundColor(DEFAULT_BG_COLOR);
     this.id = ++componentId;
     this.x = x;
@@ -631,7 +634,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       return;
     }
 
-    g.setColor(this.getTextColor());
+    g.setColor(this.isHovered() ? this.getHoverTextColor() : this.getTextColor());
     g.setFont(this.getFont());
     if (this.getText() != null) {
       final FontMetrics fm = g.getFontMetrics();
@@ -824,5 +827,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void toggleSelection() {
     this.setSelected(!this.isSelected);
 
+  }
+
+  public Color getHoverTextColor() {
+    return hoverTextColor;
+  }
+
+  public void setHoverTextColor(Color hoverTextColor) {
+    this.hoverTextColor = hoverTextColor;
   }
 }
