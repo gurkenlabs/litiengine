@@ -8,9 +8,13 @@ import java.util.List;
 public class MapObjectProperties {
   public static final String TEAM = "team";
   public static final String SPRITESHEETNAME = "spritesheetName";
-  public static final String COLLISIONBOXWIDTHFACTOR = "collisionboxWidthFactor";
-  public static final String COLLISIONBOXHEIGHTFACTOR = "collisionboxHeightFactor";
+  
   public static final String COLLISION = "collision";
+  public static final String COLLISIONBOXWIDTH = "collisionboxWidthFactor";
+  public static final String COLLISIONBOXHEIGHT = "collisionboxHeightFactor";
+  public static final String COLLISIONALGIN = "collisionAlign";
+  public static final String COLLISIONVALGIN = "collisionValign";
+  
   public static final String INDESTRUCTIBLE = "indestructible";
   public static final String MATERIAL = "material";
   public static final String HEALTH = "health";

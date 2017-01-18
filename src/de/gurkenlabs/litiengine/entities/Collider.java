@@ -9,8 +9,6 @@ public class Collider extends CollisionEntity {
 
   public Collider() {
     super();
-    this.setCollisionBoxHeightFactor(1);
-    this.setCollisionBoxWidthFactor(1);
   }
 
   public StaticShadowType getShadowType() {
@@ -23,7 +21,7 @@ public class Collider extends CollisionEntity {
 
   public enum StaticShadowType {
     DOWN, DOWNLEFT, DOWNRIGHT, LEFT, LEFTDOWN, LEFTRIGHT, RIGHTLEFT, RIGHT, RIGHTDOWN, NOOFFSET, NONE;
-    
+
     public static StaticShadowType get(String mapObjectType) {
       if (mapObjectType == null || mapObjectType.isEmpty()) {
         return StaticShadowType.NONE;

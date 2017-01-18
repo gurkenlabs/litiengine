@@ -6,6 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
+import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
@@ -22,12 +25,16 @@ public @interface CollisionInfo {
    *
    * @return the float
    */
-  float collisionBoxHeightFactor() default 0.4f;
+  int collisionBoxHeight() default -1;
 
   /**
    * Collision box width factor.
    *
    * @return the float
    */
-  float collisionBoxWidthFactor() default 0.4f;
+  int collisionBoxWidth() default -1;
+
+  CollisionAlign align() default CollisionAlign.CENTER;
+
+  CollisionValign valign() default CollisionValign.DOWN;
 }

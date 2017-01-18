@@ -72,7 +72,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update(IGameLoop loop) {
-
+    if(Game.getEnvironment() == null){
+      return;
+    }
+    
     if (!Game.getPhysicsEngine().collides(this.getCollisionBox(), IPhysicsEngine.COLLTYPE_ENTITY)) {
       return;
     }

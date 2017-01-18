@@ -32,6 +32,8 @@ import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.Collider.StaticShadowType;
+import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
+import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -230,7 +232,7 @@ public class Environment implements IEnvironment {
     } catch (final NumberFormatException e) {
     }
 
-      this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   protected void addCollisionBox(final IMapObject mapObject) {
@@ -240,6 +242,8 @@ public class Environment implements IEnvironment {
     final Collider col = new Collider();
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    col.setCollisionBoxWidth(col.getWidth());
+    col.setCollisionBoxHeight(col.getHeight());
     col.setMapId(mapObject.getId());
 
     String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
@@ -271,12 +275,15 @@ public class Environment implements IEnvironment {
     }
 
     mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
-      mob.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
+      mob.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
     }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
-      mob.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
+      mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
+    
+    mob.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
 
@@ -403,12 +410,15 @@ public class Environment implements IEnvironment {
       prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR) != null) {
-      prop.setCollisionBoxWidthFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTHFACTOR)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
+      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
     }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR) != null) {
-      prop.setCollisionBoxHeightFactor(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHTFACTOR)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
+      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
+    
+    prop.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    prop.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
 
     if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
@@ -597,8 +607,8 @@ public class Environment implements IEnvironment {
     }
 
     trigger.setMapId(mapObject.getId());
-    trigger.setCollisionBoxHeightFactor(1);
-    trigger.setCollisionBoxWidthFactor(1);
+    trigger.setCollisionBoxHeight(trigger.getHeight());
+    trigger.setCollisionBoxWidth(trigger.getWidth());
     trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
     this.add(trigger);

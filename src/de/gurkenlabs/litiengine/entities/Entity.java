@@ -39,7 +39,8 @@ public abstract class Entity implements IEntity {
   protected Entity() {
     this.mapLocation = new Point(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
-    this.setSize(info.width(), info.height());
+    this.width = info.width();
+    this.height = info.height();
     this.renderType = info.renderType();
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().getEntities().add(this);
@@ -159,8 +160,8 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void setSize(final float width, final float height) {
-    this.width = width;
-    this.height = height;
+    this.setWidth(width);
+    this.setHeight(height);
   }
 
   public RenderType getRenderType() {
