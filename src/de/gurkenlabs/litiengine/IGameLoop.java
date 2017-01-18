@@ -7,6 +7,8 @@ import de.gurkenlabs.core.ILaunchable;
 public interface IGameLoop extends ILaunchable {
   public long convertToMs(final long ticks);
 
+  public long convertToTicks(final int ms);
+
   /**
    * Gets the time passed since the last tick.
    *
@@ -32,6 +34,8 @@ public interface IGameLoop extends ILaunchable {
   public int getUpdatablesCount();
 
   public int getUpdateRate();
+
+  public void execute(int delay, Consumer<Long> action);
 
   public void onUpsTracked(final Consumer<Integer> upsConsumer);
 

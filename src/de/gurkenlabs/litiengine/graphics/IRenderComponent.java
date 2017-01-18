@@ -15,6 +15,8 @@ public interface IRenderComponent extends IInitializable{
   public void setCursor(Image image);
   
   public void setCursor(Image image, int offsetX, int offsetY);
+  
+  public Image getCursorImage();
 
   public void setCursorOffsetX(int cursorOffsetX);
 
@@ -25,4 +27,8 @@ public interface IRenderComponent extends IInitializable{
   public void render(IRenderable screen);
   
   public void takeScreenshot();
+  
+  public void fadeOut(int ms);
+  
+  public void fadeIn(int ms);
 }

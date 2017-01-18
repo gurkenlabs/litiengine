@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -12,10 +14,11 @@ public class GameLoop extends Thread implements IGameLoop {
   private final List<IUpdateable> updatables;
   private final List<Consumer<Integer>> upsTrackedConsumer;
 
+  private final Map<Long, Consumer<Long>> actions;
   private final int updateRate;
   private final GameTime gameTime;
   private float timeScale;
-  private int totalTicks;
+  private long totalTicks;
 
   private int updateCount;
   private long lastUpsTime;
@@ -26,6 +29,7 @@ public class GameLoop extends Thread implements IGameLoop {
   public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
+    this.actions = new ConcurrentHashMap<>();
     this.updateRate = updateRate;
     this.gameTime = new GameTime(this);
     this.setTimeScale(1.0F);
@@ -34,6 +38,11 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public long convertToMs(final long ticks) {
     return (long) (ticks / (this.updateRate / 1000.0));
+  }
+
+  @Override
+  public long convertToTicks(int ms) {
+    return (long) (this.updateRate / 1000.0 * ms);
   }
 
   @Override
@@ -109,6 +118,11 @@ public class GameLoop extends Thread implements IGameLoop {
             log.severe(stacktrace);
           }
         });
+        
+        if(this.actions.containsKey(this.totalTicks)){
+          this.actions.get(this.totalTicks).accept(this.totalTicks);
+          this.actions.remove(this.totalTicks);
+        }
       }
 
       ++this.updateCount;
@@ -145,5 +159,10 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void unregisterFromUpdate(final IUpdateable updatable) {
     this.updatables.remove(updatable);
+  }
+
+  @Override
+  public void execute(int delay, Consumer<Long> action) {
+    this.actions.put(this.getTicks() + convertToTicks(delay), action);
   }
 }

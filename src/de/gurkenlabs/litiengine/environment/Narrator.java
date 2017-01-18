@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.font.FontRenderContext;
@@ -225,6 +226,7 @@ public class Narrator implements IUpdateable, IRenderable {
     if (this.displayedText == null || this.displayedText.isEmpty() || !this.isNarrating()) {
       return;
     }
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     g.drawImage(this.getBackgroundImage(), (int) this.getRenderLocation().getX(), (int) this.getRenderLocation().getY(), null);
     RenderEngine.renderImage(g, this.getBackgroundImage(), this.getRenderLocation());
     BufferedImage img = this.getAnimationController().getCurrentSprite();
@@ -254,6 +256,8 @@ public class Narrator implements IUpdateable, IRenderable {
       layout.draw(g, textBoxX + dx, textY);
       textY += layout.getDescent() + layout.getLeading();
     }
+    
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
   public void setEmotion(Emotion emotion) {

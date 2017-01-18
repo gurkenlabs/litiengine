@@ -73,4 +73,16 @@ public class MathUtilities {
 
     return value;
   }
+  
+  public static long clamp(long value, long min, long max) {
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
+  }
 }
