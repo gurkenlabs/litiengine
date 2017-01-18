@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Stroke;
+import java.awt.event.KeyEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
@@ -18,6 +19,7 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -26,8 +28,10 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.animation.NarratorPortraitAnimationController;
 import de.gurkenlabs.litiengine.gui.FontLoader;
+import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.image.ImageProcessing;
+import net.java.games.input.Keyboard;
 
 public class Narrator implements IUpdateable, IRenderable {
   public static final int LAYOUT_LEFT = 0;
@@ -47,6 +51,7 @@ public class Narrator implements IUpdateable, IRenderable {
 
   private double boxWidth, boxHeight;
   private String currentText;
+  private Consumer<String> doneCallback;
   private long currentTextDisplayTime;
   private Queue<Character> currentTextQueue;
   private String displayedText;
@@ -63,6 +68,8 @@ public class Narrator implements IUpdateable, IRenderable {
   private double padding;
   private Point2D renderLocation;
 
+  private boolean interruptable;
+
   private Sound typingSound;
   private float portraitWidth, portraitHeight, textboxWidth, textBoxX, textBoxY, portraitX, portraitY;
   private NarratorPortraitAnimationController animationController;
@@ -76,6 +83,19 @@ public class Narrator implements IUpdateable, IRenderable {
     this.setFont(FontLoader.load("04B_11_.ttf").deriveFont((float) (this.getBoxHeight() / 6)));
     Game.getLoop().registerForUpdate(this);
     this.animationController = new NarratorPortraitAnimationController(this);
+
+    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_SPACE, e -> {
+      if (!this.isInterruptable()) {
+        return;
+      }
+      
+      if (this.currentText != null && !this.currentTextQueue.isEmpty()) {
+        this.displayedText = this.currentText;
+        this.currentTextQueue.clear();
+      } else {
+        this.narrationDone();
+      }
+    });
   }
 
   public Narrator(final IEnvironment environment, final String narratorName) {
@@ -179,6 +199,10 @@ public class Narrator implements IUpdateable, IRenderable {
   }
 
   public void narrate(final String text) {
+    this.narrate(text, null);
+  }
+
+  public void narrate(final String text, Consumer<String> doneCallback) {
     for (final Narrator otherNarrator : Game.getEnvironment().getNarrators()) {
       if (otherNarrator != this && otherNarrator.isNarrating()) {
         otherNarrator.cancel();
@@ -193,6 +217,7 @@ public class Narrator implements IUpdateable, IRenderable {
       this.currentTextQueue.add(this.currentText.charAt(i));
     }
     this.lastTextDispay = Game.getLoop().getTicks();
+    this.doneCallback = doneCallback;
   }
 
   @Override
@@ -299,9 +324,7 @@ public class Narrator implements IUpdateable, IRenderable {
 
     // old text was displayed long enough
     if (this.lastTextDispay != 0 && loop.getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
-      this.currentText = null;
-      this.displayedText = null;
-      this.lastTextDispay = 0;
+      this.narrationDone();
       return;
     }
 
@@ -317,6 +340,16 @@ public class Narrator implements IUpdateable, IRenderable {
     }
 
     // continue displaying currently displayed text
+  }
+
+  private void narrationDone() {
+    if (this.doneCallback != null) {
+      this.doneCallback.accept(this.currentText);
+    }
+
+    this.currentText = null;
+    this.displayedText = null;
+    this.lastTextDispay = 0;
   }
 
   private void setupLayout() {
@@ -335,5 +368,13 @@ public class Narrator implements IUpdateable, IRenderable {
       this.portraitX = (float) (this.getRenderLocation().getX() + this.getBoxWidth() - this.getPadding() / 2 - this.portraitWidth);
       break;
     }
+  }
+
+  public boolean isInterruptable() {
+    return interruptable;
+  }
+
+  public void setInterruptable(boolean interruptable) {
+    this.interruptable = interruptable;
   }
 }

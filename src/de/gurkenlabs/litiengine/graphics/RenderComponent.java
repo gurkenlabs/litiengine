@@ -127,6 +127,9 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     if (this.cursorImage != null) {
       this.setCursorOffsetX(-(this.cursorImage.getWidth(null) / 2));
       this.setCursorOffsetY(-(this.cursorImage.getHeight(null) / 2));
+    }else{
+      this.setCursorOffsetX(0);
+      this.setCursorOffsetY(0);
     }
   }
 
