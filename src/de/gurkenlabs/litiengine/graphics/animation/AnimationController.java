@@ -60,12 +60,15 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   protected String buildCurrentCacheKey() {
+    if (this.getCurrentAnimation().getCurrentKeyFrame() == null) {
+      return null;
+    }
     final StringBuilder cacheKey = new StringBuilder();
     cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
     cacheKey.append('_');
     cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
     cacheKey.append('_');
-    
+
     StringBuilder imageEffects = new StringBuilder();
     this.getImageEffects().forEach(x -> imageEffects.append(x.getName()));
     cacheKey.append(imageEffects.toString().hashCode());
