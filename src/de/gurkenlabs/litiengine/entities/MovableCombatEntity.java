@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.physics.IEntityMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -16,7 +17,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   private short velocity;
   private int acceleration;
   private int deceleration;
-  
+
   private boolean turnOnMove;
   private Point2D moveDestination;
 
@@ -67,7 +68,7 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   public int getAcceleration() {
     return this.acceleration;
   }
-  
+
   /**
    * Checks if is idle.
    *
@@ -132,6 +133,9 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   @Override
   public void setMovementController(final IEntityMovementController movementController) {
+    if (this.getMovementController() != null) {
+      Game.getLoop().unregisterFromUpdate(this.getMovementController());
+    }
     this.movementController = movementController;
   }
 
