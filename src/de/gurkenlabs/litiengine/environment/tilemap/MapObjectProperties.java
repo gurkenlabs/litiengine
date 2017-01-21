@@ -27,7 +27,9 @@ public class MapObjectProperties {
   public static final String LIGHTCOLOR = "lightColor";
   public static final String LIGHTSHAPE = "lightShape";
 
+  // collision box
   public static final String SHADOWTYPE = "shadowType";
+  public static final String OBSTACLE = "isObstacle";
 
   // trigger
   public static final String TRIGGERMESSAGE = "triggermessage";

@@ -6,9 +6,11 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class Collider extends CollisionEntity {
   private StaticShadowType shadowType;
+  private final boolean obstacle;
 
-  public Collider() {
+  public Collider(boolean isObstacle) {
     super();
+    this.obstacle = isObstacle;
   }
 
   public StaticShadowType getShadowType() {
@@ -17,6 +19,10 @@ public class Collider extends CollisionEntity {
 
   public void setShadowType(StaticShadowType shadowType) {
     this.shadowType = shadowType;
+  }
+
+  public boolean isObstacle() {
+    return obstacle;
   }
 
   public enum StaticShadowType {

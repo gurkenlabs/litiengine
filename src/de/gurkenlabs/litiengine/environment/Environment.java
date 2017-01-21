@@ -166,14 +166,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof IMovableEntity) {
       this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
     }
-
-    if (entity instanceof ICollisionEntity) {
-      final ICollisionEntity coll = (ICollisionEntity) entity;
-      if (coll.hasCollision()) {
-        Game.getPhysicsEngine().add(coll);
-      }
-    }
-
+    
     if (entity instanceof Collider) {
       this.colliders.add((Collider) entity);
     }
@@ -233,8 +226,15 @@ public class Environment implements IEnvironment {
   protected void addCollisionBox(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
       return;
+    }   
+    
+    String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    boolean isObstacle = true;
+    if(obstacle != null && !obstacle.isEmpty()){
+      isObstacle = Boolean.valueOf(obstacle);
     }
-    final Collider col = new Collider();
+    
+    final Collider col = new Collider(isObstacle);
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     col.setCollisionBoxWidth(col.getWidth());
@@ -247,7 +247,6 @@ public class Environment implements IEnvironment {
     }
 
     this.add(col);
-    Game.getPhysicsEngine().add(col.getBoundingBox());
   }
 
   protected void addDecorMob(final IMapObject mapObject) {
@@ -276,7 +275,7 @@ public class Environment implements IEnvironment {
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
       mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
-    
+
     mob.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
     mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
@@ -411,7 +410,7 @@ public class Environment implements IEnvironment {
     if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
       prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
-    
+
     prop.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
     prop.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);

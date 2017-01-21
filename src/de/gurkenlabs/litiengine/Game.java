@@ -134,13 +134,22 @@ public abstract class Game {
     if (getEnvironment() != null) {
       getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, getEnvironment().getMap().getSizeInPixels().getWidth(), getEnvironment().getMap().getSizeInPixels().getHeight()));
       for (IEntity entity : getEnvironment().getEntities()) {
-        if (entity instanceof ICollisionEntity) {
+        if (entity instanceof Collider) {
+          Collider coll = (Collider) entity;
+          if (coll.isObstacle()) {
+            Game.getPhysicsEngine().add(coll.getBoundingBox());
+          } else {
+            Game.getPhysicsEngine().add(coll);
+          }
+        } else if (entity instanceof ICollisionEntity) {
           final ICollisionEntity coll = (ICollisionEntity) entity;
-          Game.getPhysicsEngine().add(coll);
+          if (coll.hasCollision()) {
+            Game.getPhysicsEngine().add(coll);
+          }
         }
       }
-      
-      for(Collider coll : getEnvironment().getColliders()){
+
+      for (Collider coll : getEnvironment().getColliders()) {
         Game.getPhysicsEngine().add(coll.getBoundingBox());
       }
     }
