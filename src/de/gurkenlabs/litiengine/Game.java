@@ -148,10 +148,6 @@ public abstract class Game {
           }
         }
       }
-
-      for (Collider coll : getEnvironment().getColliders()) {
-        Game.getPhysicsEngine().add(coll.getBoundingBox());
-      }
     }
 
     for (Consumer<IEnvironment> cons : environmentLoadedConsumer) {
