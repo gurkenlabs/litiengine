@@ -601,9 +601,9 @@ public class Environment implements IEnvironment {
     }
 
     trigger.setMapId(mapObject.getId());
+    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setCollisionBoxHeight(trigger.getHeight());
     trigger.setCollisionBoxWidth(trigger.getWidth());
-    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
     this.add(trigger);
   }
