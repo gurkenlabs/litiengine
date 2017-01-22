@@ -166,7 +166,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof IMovableEntity) {
       this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
     }
-    
+
     if (entity instanceof Collider) {
       this.colliders.add((Collider) entity);
     }
@@ -226,14 +226,14 @@ public class Environment implements IEnvironment {
   protected void addCollisionBox(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
       return;
-    }   
-    
+    }
+
     String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
     boolean isObstacle = true;
-    if(obstacle != null && !obstacle.isEmpty()){
+    if (obstacle != null && !obstacle.isEmpty()) {
       isObstacle = Boolean.valueOf(obstacle);
     }
-    
+
     final Collider col = new Collider(isObstacle);
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
@@ -1101,7 +1101,6 @@ public class Environment implements IEnvironment {
 
   @Override
   public void onInitialized(Consumer<IEnvironment> consumer) {
-    // TODO Auto-generated method stub
-
+    this.initializedConsumer.add(consumer);
   }
 }

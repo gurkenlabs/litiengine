@@ -9,9 +9,8 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AttackSpeedEffect.
+ * This effect allows to modify the entitie's attack speed.
  */
 public class AttackSpeedEffect extends AttributeStateEffect<Float> {
 

@@ -13,9 +13,8 @@ import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Attributes.
+ * The Class CombatAttributes contains attributes for an ICombatEntity that have impact on the combat behaviour.
  */
 public class CombatAttributes {
   private final List<Consumer<CombatAttributes>> levelUpConsumer;

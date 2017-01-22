@@ -10,9 +10,8 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AttributeEffect.
+ * An attribute effect appies an attribute modifier to the affected entity when applied and removes it when ceased.
  *
  * @param <T>
  *          the generic type

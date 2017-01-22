@@ -15,9 +15,8 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.util.io.FileUtilities;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class FontLoader.
+ * The Class FontLoader loads custom fonts to the java environment.
  */
 public class FontLoader {
   private static final Logger log = Logger.getLogger(FontLoader.class.getName());

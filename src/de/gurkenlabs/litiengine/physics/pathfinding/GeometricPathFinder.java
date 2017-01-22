@@ -16,9 +16,8 @@ import de.gurkenlabs.litiengine.physics.Path;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.PointDistanceComparator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PathFinder.
+ * A custom tolllolo gurkenlabs pathfinding algorithm that sometimes actually works.
  */
 public class GeometricPathFinder extends PathFinder {
 

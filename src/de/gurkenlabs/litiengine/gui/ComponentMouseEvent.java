@@ -5,9 +5,8 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.event.MouseEvent;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class ComponentMouseEvent.
+ * A ComponentMouseEvent contains the original MouseEvent and the GuiComponent that sent the event as sender.
  */
 public class ComponentMouseEvent {
 

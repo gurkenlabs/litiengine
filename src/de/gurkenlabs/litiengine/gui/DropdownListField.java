@@ -217,8 +217,6 @@ public class DropdownListField extends GuiComponent {
 
   @Override
   protected void initializeComponents() {
-    // TODO Auto-generated method stub
 
   }
-
 }

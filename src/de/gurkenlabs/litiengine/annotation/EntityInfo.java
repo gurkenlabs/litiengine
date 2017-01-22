@@ -11,9 +11,8 @@ import java.lang.annotation.Target;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface EntityInfo.
+ * This annotation contains default values for an entity implementation.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

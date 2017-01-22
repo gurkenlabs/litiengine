@@ -6,9 +6,8 @@ package de.gurkenlabs.litiengine.configuration;
 import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.ConfigurationGroup;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class ClientConfiguration.
+ * The client configuration contains client specific configuration elements.
  */
 @ConfigurationGroupInfo(prefix = "CLIENT_")
 public class ClientConfiguration extends ConfigurationGroup {

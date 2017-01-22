@@ -3,9 +3,8 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.attributes;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AttributeModifier.
+ * An attribute modifier allows to modify a specific CombatAttribute by the specified Modification and the specified modifyValue.
  *
  * @param <T>
  *          the generic type

@@ -53,14 +53,10 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
   @Override
   public void handlePressedKey(final KeyEvent keyCode) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public void handleReleasedKey(final KeyEvent keyCode) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override

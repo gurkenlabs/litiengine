@@ -114,7 +114,6 @@ public abstract class Slider extends GuiComponent {
 
   @Override
   protected void initializeComponents() {
-    // TODO Auto-generated method stub
 
   }
 
