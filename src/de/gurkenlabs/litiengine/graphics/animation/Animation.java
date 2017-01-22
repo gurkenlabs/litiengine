@@ -11,13 +11,13 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class Animation implements IUpdateable, ILaunchable {
-  private final int DEFAULT_FRAME_DURATION = 120;
+  private static final int DEFAULT_FRAME_DURATION = 120;
   private final String name;
   private final Spritesheet spritesheet;
   private final List<KeyFrame> keyframes;
   private final boolean loop;
 
-  private int frameDuration = this.DEFAULT_FRAME_DURATION;
+  private int frameDuration = DEFAULT_FRAME_DURATION;
   private boolean playing;
   private KeyFrame currentFrame;
   private KeyFrame firstFrame;
@@ -122,10 +122,16 @@ public class Animation implements IUpdateable, ILaunchable {
     this.paused = true;
   }
 
+  /**
+   * Sets the frame duration for all keyframes in this animation to the specified value.
+   * @param frameDuration
+   */
   public void setFrameDuration(final int frameDuration) {
     this.frameDuration = frameDuration;
 
-    // TODO: update frame durations
+    for (KeyFrame keyFrame : this.getKeyframes()) {
+      keyFrame.setDuration(this.frameDuration);
+    }
   }
 
   @Override
