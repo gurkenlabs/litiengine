@@ -970,10 +970,12 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Collider) {
       this.colliders.remove(entity);
+      this.addStaticShadows();
     }
 
     if (entity instanceof LightSource) {
       this.lightSources.remove(entity);
+      this.addStaticShadows();
     }
 
     if (entity instanceof Trigger) {
