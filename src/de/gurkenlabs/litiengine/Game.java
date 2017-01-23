@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.ai.EntityManager;
+import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
@@ -129,6 +130,19 @@ public abstract class Game {
   }
 
   public static void loadEnvironment(final IEnvironment env) {
+    if (getEnvironment() != null) {
+      for (IEntity entity : getEnvironment().getEntities()) {
+        if (entity instanceof IUpdateable) {
+          Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+        }
+
+        IEntityController<? extends IEntity> controller = Game.getEntityManager().getController(entity);
+        if (controller != null) {
+          Game.getLoop().unregisterFromUpdate(controller);
+        }
+      }
+    }
+
     environment = env;
     Game.getPhysicsEngine().clear();
     if (getEnvironment() != null) {
@@ -146,6 +160,15 @@ public abstract class Game {
           if (coll.hasCollision()) {
             Game.getPhysicsEngine().add(coll);
           }
+        }
+
+        if (entity instanceof IUpdateable) {
+          Game.getLoop().registerForUpdate((IUpdateable) entity);
+        }
+
+        IEntityController<? extends IEntity> controller = Game.getEntityManager().getController(entity);
+        if (controller != null) {
+          Game.getLoop().registerForUpdate(controller);
         }
       }
     }

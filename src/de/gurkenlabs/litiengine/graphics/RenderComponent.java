@@ -118,8 +118,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
       final Graphics2D imgGraphics = img.createGraphics();
       screen.render(imgGraphics);
 
-      final Point2D cursorlocation = new Point2D.Double(Input.MOUSE.getLocation().getX() + this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() + this.getCursorOffsetY());
-      RenderEngine.renderImage(imgGraphics, this.cursorImage, cursorlocation);
       imgGraphics.dispose();
       this.saveScreenShot(img);
     }
