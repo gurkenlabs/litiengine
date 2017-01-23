@@ -427,7 +427,9 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    this.getSpawnPoints().add(new MapLocation(mapObject.getId(), new Point(mapObject.getLocation())));
+    MapLocation spawn = new MapLocation(mapObject.getId(), new Point(mapObject.getLocation()));
+    spawn.setName(mapObject.getName());
+    this.getSpawnPoints().add(spawn);
   }
 
   private void addStaticShadows() {
@@ -751,6 +753,31 @@ public class Environment implements IEnvironment {
         return t;
       }
     }
+    return null;
+  }
+
+  @Override
+  public MapLocation getSpawnpoint(String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    for (MapLocation m : this.getSpawnPoints()) {
+      if (m.getName() != null && m.getName().equals(name)) {
+        return m;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public MapLocation getSpawnpoint(int mapId) {
+    for (MapLocation m : this.getSpawnPoints()) {
+      if (m.getMapId() == mapId) {
+        return m;
+      }
+    }
+    
     return null;
   }
 

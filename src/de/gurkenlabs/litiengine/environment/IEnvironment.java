@@ -73,11 +73,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<LightSource> getLightSources();
 
   public Collection<Trigger> getTriggers();
-  
+
   public Trigger getTrigger(int mapId);
-  
+
   public Trigger getTrigger(String name);
-  
+
   public LightSource getLightSource(int mapId);
 
   /**
@@ -101,6 +101,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<MapLocation> getSpawnPoints();
 
+  public MapLocation getSpawnpoint(String name);
+
+  public MapLocation getSpawnpoint(int mapId);
 
   public AmbientLight getAmbientLight();
 

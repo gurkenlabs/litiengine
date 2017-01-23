@@ -8,6 +8,7 @@ public class MapLocation implements Serializable {
 
   private final int mapId;
   private final Point2D point;
+  private String name;
 
   public MapLocation(final int mapId, final Point2D point) {
     this.mapId = mapId;
@@ -20,5 +21,13 @@ public class MapLocation implements Serializable {
 
   public Point2D getPoint() {
     return this.point;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }
