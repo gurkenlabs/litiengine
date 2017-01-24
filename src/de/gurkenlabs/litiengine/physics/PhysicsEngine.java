@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -162,7 +164,7 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, final float angle, final float delta) {
+  public boolean move(final IMovableEntity entity, final double angle, final double delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
   }
@@ -343,5 +345,17 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return resolvedPosition;
+  }
+
+  @Override
+  public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect) {
+    List<ICollisionEntity> collEntities = new CopyOnWriteArrayList<>();
+    for (ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
+      if (coll.getCollisionBox().intersects(rect)) {
+        collEntities.add(coll);
+      }
+    }
+
+    return collEntities;
   }
 }

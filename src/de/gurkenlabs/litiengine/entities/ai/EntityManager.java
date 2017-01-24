@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.entities.ai;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class EntityManager {
@@ -22,5 +23,14 @@ public class EntityManager {
     }
 
     return null;
+  }
+
+  public void disposeController(IEntity entity) {
+    if (this.entityControllers.containsKey(entity)) {
+      IEntityController<? extends IEntity> controller = this.entityControllers.get(entity);
+
+      Game.getLoop().unregisterFromUpdate(controller);
+      this.entityControllers.remove(controller);
+    }
   }
 }

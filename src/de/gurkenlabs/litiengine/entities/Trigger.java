@@ -72,10 +72,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update(IGameLoop loop) {
-    if(Game.getEnvironment() == null){
+    if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION) {
       return;
     }
-    
+
     if (!Game.getPhysicsEngine().collides(this.getCollisionBox(), IPhysicsEngine.COLLTYPE_ENTITY)) {
       return;
     }
@@ -149,14 +149,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     if (targets.size() == 0) {
       // as a fallback send the message to the tar
       targets = new ArrayList<>();
-      if(tar > 0){
-      targets.add(tar);
+      if (tar > 0) {
+        targets.add(tar);
       }
     }
-    
+
     // if we actually have a trigger target, we send the message to the target
     if (targets.size() > 0) {
-      for(int target : targets){
+      for (int target : targets) {
         IEntity entity = Game.getEnvironment().get(target);
         if (entity == null) {
           System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + target + "' could not be found on the environment");

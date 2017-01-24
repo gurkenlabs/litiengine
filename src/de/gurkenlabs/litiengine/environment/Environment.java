@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -632,6 +633,8 @@ public class Environment implements IEnvironment {
       if (entity instanceof IUpdateable) {
         Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
       }
+      
+      Game.getEntityManager().disposeController(entity);
 
       if (entity.getAnimationController() != null) {
         entity.getAnimationController().dispose();
@@ -777,7 +780,7 @@ public class Environment implements IEnvironment {
         return m;
       }
     }
-    
+
     return null;
   }
 
