@@ -4,7 +4,10 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -16,6 +19,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
@@ -193,6 +197,23 @@ public class PhysicsEngine implements IPhysicsEngine {
       Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
       entity.setLocation(resolvedPosition);
       return false;
+    } else {
+      
+      // special case to prevent entities to glitch through collision boxes if
+      // they have a large enough stepsize
+      // TODO: this does not entirely fix the issue...
+      Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
+      for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
+        if (collisionBox.equals(entity.getCollisionBox())) {
+          continue;
+        }
+
+        // there was a collision inbetween
+        Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox);
+        if (intersection != null) {
+          newPosition = entity.getLocation();
+        }
+      }
     }
 
     // set new map location
@@ -284,6 +305,10 @@ public class PhysicsEngine implements IPhysicsEngine {
         continue;
       }
 
+      if (collisionBox.contains(entityCollisionBox)) {
+        return collisionBox;
+      }
+
       if (GeometricUtilities.intersects(collisionBox, entityCollisionBox)) {
         return collisionBox.createIntersection(entityCollisionBox);
       }
@@ -323,7 +348,9 @@ public class PhysicsEngine implements IPhysicsEngine {
     // resolve static collision boxes first
     Rectangle2D intersectionX = this.collidesWithAnything(entity, entity.getCollisionBox(resolvedPosition));
     if (intersectionX != null) {
-      if (entity.getCollisionBox().getX() < intersectionX.getMaxX()) {
+      if (intersectionX.getWidth() > entity.getCollisionBox().getWidth() || intersectionX.getHeight() > entity.getCollisionBox().getHeight()) {
+        resolvedPosition = findLocationWithoutCollision(entity, resolvedPosition);
+      } else if (entity.getCollisionBox().getX() < intersectionX.getMaxX()) {
         // new position is closer to the left side, so push out to the left
         resolvedPosition.setLocation(Math.max(entity.getLocation().getX(), resolvedPosition.getX() - intersectionX.getWidth()), resolvedPosition.getY());
       } else {
@@ -335,8 +362,11 @@ public class PhysicsEngine implements IPhysicsEngine {
     // then resolve y-axis movement
     resolvedPosition.setLocation(resolvedPosition.getX(), newPosition.getY());
     Rectangle2D intersectionY = this.collidesWithAnything(entity, entity.getCollisionBox(resolvedPosition));
+
     if (intersectionY != null) {
-      if (entity.getCollisionBox().getCenterY() - intersectionY.getCenterY() < 0) {
+      if (intersectionY.getWidth() > entity.getCollisionBox().getWidth() || intersectionY.getHeight() > entity.getCollisionBox().getHeight()) {
+        resolvedPosition = findLocationWithoutCollision(entity, resolvedPosition);
+      } else if (entity.getCollisionBox().getCenterY() - intersectionY.getCenterY() < 0) {
         // new position is closer to the top
         resolvedPosition.setLocation(resolvedPosition.getX(), Math.max(entity.getLocation().getY(), resolvedPosition.getY() - intersectionY.getHeight()));
       } else {
@@ -345,6 +375,26 @@ public class PhysicsEngine implements IPhysicsEngine {
     }
 
     return resolvedPosition;
+  }
+
+  /**
+   * Find location without collision.
+   *
+   * @param mob
+   *          the mob
+   * @param newPosition
+   *          the new position
+   * @return the point2 d
+   */
+  private Point2D findLocationWithoutCollision(final ICollisionEntity mob, final Point2D newPosition) {
+    for (final Point2D pointBetween : GeometricUtilities.getPointsBetweenPoints(newPosition, mob.getLocation())) {
+      final Rectangle2D newCollisionBox = mob.getCollisionBox(pointBetween);
+      if (this.collidesWithAnyEntity(mob, newCollisionBox) == null && this.collidesWithAnyStaticCollisionBox(newCollisionBox) == null) {
+        return pointBetween;
+      }
+    }
+
+    return mob.getLocation();
   }
 
   @Override

@@ -74,7 +74,7 @@ public class DecorMob extends MovableCombatEntity {
     @Override
     public void update(final IGameLoop gameLoop) {
       super.update(gameLoop);
-      if (Game.getEnvironment() == null) {
+      if (Game.getEnvironment() == null || isDead()) {
         return;
       }
       final long currentTick = gameLoop.getTicks();
