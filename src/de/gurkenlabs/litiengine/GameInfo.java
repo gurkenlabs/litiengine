@@ -136,7 +136,7 @@ public class GameInfo {
   }
   
   public String toString(){
-    return !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle() : this.getName() + " - " + this.getVersion();
+    return this.getSubTitle() != null && !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle() : this.getName() + " " + this.getVersion();
   }
 
   public String getEmitterDirectory() {

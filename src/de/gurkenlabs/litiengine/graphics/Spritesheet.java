@@ -26,7 +26,7 @@ import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
-
+  public static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private final String name;
 
@@ -70,7 +70,12 @@ public class Spritesheet {
           continue;
         }
 
-        List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
+        String[] parts = line.split(";");
+        if (parts.length == 0) {
+          continue;
+        }
+
+        List<String> items = Arrays.asList(parts[0].split("\\s*,\\s*"));
         if (items.size() < 3) {
           continue;
         }
@@ -82,7 +87,20 @@ public class Spritesheet {
           int width = Integer.parseInt(items.get(1));
           int height = Integer.parseInt(items.get(2));
 
-          sprites.add(load(name, width, height));
+          Spritesheet sprite = load(name, width, height);
+          sprites.add(sprite);
+          if (parts.length >= 2) {
+            List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
+            if (keyFrameStrings.size() > 0) {
+              int[] keyFrames = new int[keyFrameStrings.size()];
+              for (int i = 0; i < keyFrameStrings.size(); i++) {
+                int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
+                keyFrames[i] = keyFrame;
+              }
+
+              customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
+            }
+          }
         } catch (NumberFormatException nfe) {
           nfe.printStackTrace();
           continue;
@@ -123,6 +141,14 @@ public class Spritesheet {
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
     return sprite;
+  }
+
+  public static int[] getCustomKeyFrameDurations(String name) {
+    if (customKeyFrameDurations.containsKey(FileUtilities.getFileName(name).toLowerCase())) {
+      return customKeyFrameDurations.get(FileUtilities.getFileName(name).toLowerCase());
+    }
+
+    return new int[0];
   }
 
   public static Spritesheet find(final String path) {

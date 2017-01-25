@@ -123,7 +123,9 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   /**
-   * Sets the frame duration for all keyframes in this animation to the specified value.
+   * Sets the frame duration for all keyframes in this animation to the
+   * specified value.
+   * 
    * @param frameDuration
    */
   public void setFrameDuration(final int frameDuration) {
@@ -131,6 +133,16 @@ public class Animation implements IUpdateable, ILaunchable {
 
     for (KeyFrame keyFrame : this.getKeyframes()) {
       keyFrame.setDuration(this.frameDuration);
+    }
+  }
+
+  public void setkeyFrameDurations(int... keyFrameDurations) {
+    if (keyFrameDurations.length == 0) {
+      return;
+    }
+
+    for (int i = 0; i < this.getKeyframes().size(); i++) {
+      this.getKeyframes().get(i).setDuration(keyFrameDurations[i]);
     }
   }
 
