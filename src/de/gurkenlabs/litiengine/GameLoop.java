@@ -2,6 +2,9 @@ package de.gurkenlabs.litiengine;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +17,7 @@ public class GameLoop extends Thread implements IGameLoop {
   private final List<IUpdateable> updatables;
   private final List<Consumer<Integer>> upsTrackedConsumer;
 
-  private final Map<Long, Consumer<Long>> actions;
+  private final List<TimedAction> actions;
   private final int updateRate;
   private final GameTime gameTime;
   private float timeScale;
@@ -29,7 +32,7 @@ public class GameLoop extends Thread implements IGameLoop {
   public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
-    this.actions = new ConcurrentHashMap<>();
+    this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
     this.gameTime = new GameTime(this);
     this.setTimeScale(1.0F);
@@ -118,11 +121,16 @@ public class GameLoop extends Thread implements IGameLoop {
             log.severe(stacktrace);
           }
         });
-        
-        if(this.actions.containsKey(this.totalTicks)){
-          this.actions.get(this.totalTicks).accept(this.totalTicks);
-          this.actions.remove(this.totalTicks);
+
+        List<TimedAction> executed = new ArrayList<>();
+        for (TimedAction action : this.actions) {
+          if (action.getExecutionTick() <= this.totalTicks) {
+            action.getAction().accept(this.totalTicks);
+            executed.add(action);
+          }
         }
+        
+        this.actions.removeAll(executed);
       }
 
       ++this.updateCount;
@@ -144,6 +152,7 @@ public class GameLoop extends Thread implements IGameLoop {
         break;
       }
     }
+
   }
 
   @Override
@@ -163,6 +172,25 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void execute(int delay, Consumer<Long> action) {
-    this.actions.put(this.getTicks() + convertToTicks(delay), action);
+    long d = convertToTicks(delay);
+    this.actions.add(new TimedAction(this.getTicks() + d, action));
+  }
+
+  private class TimedAction {
+    private final long execution;
+    private final Consumer<Long> action;
+
+    private TimedAction(long execution, Consumer<Long> action) {
+      this.execution = execution;
+      this.action = action;
+    }
+
+    public long getExecutionTick() {
+      return execution;
+    }
+
+    public Consumer<Long> getAction() {
+      return action;
+    }
   }
 }
