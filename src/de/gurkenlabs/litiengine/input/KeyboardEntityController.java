@@ -63,11 +63,19 @@ public class KeyboardEntityController<T extends IMovableEntity> extends ClientEn
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
-    double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate() * loop.getTimeScale();
-    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getEntity().getAcceleration() * maxPixelsPerTick;
-    double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getEntity().getDeceleration() * maxPixelsPerTick;
+    final long deltaTime = loop.getDeltaTime();
+    double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
+
+    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getAcceleration() * maxPixelsPerTick;
+    double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;
 
+    if (this.movedX && this.movedY) {
+      // we don't want the entity to move faster when moving diagonally
+      // calculate a new x by dissolding the formula for diagonals of squares sqrt(2 * x^2)
+      inc /= Math.sqrt(2);
+    }
+    
     if (this.movedX) {
       this.velocityX += this.dx * inc;
       this.velocityX = MathUtilities.clamp(this.velocityX, -maxPixelsPerTick, maxPixelsPerTick);

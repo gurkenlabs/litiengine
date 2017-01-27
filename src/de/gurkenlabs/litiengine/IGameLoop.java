@@ -10,7 +10,7 @@ public interface IGameLoop extends ILaunchable {
   public long convertToTicks(final int ms);
 
   /**
-   * Gets the time passed since the last tick.
+   * Gets the time passed since the last tick in ms.
    *
    * @return
    */

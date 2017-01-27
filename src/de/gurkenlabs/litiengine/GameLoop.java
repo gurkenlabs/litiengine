@@ -26,7 +26,7 @@ public class GameLoop extends Thread implements IGameLoop {
   private int updateCount;
   private long lastUpsTime;
   private long lastUpdateTime;
-
+  private long deltaTime;
   private boolean gameIsRunning = true;
 
   public GameLoop(final int updateRate) {
@@ -50,7 +50,7 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public long getDeltaTime() {
-    return System.currentTimeMillis() - this.lastUpdateTime;
+    return this.deltaTime;
   }
 
   @Override
@@ -96,7 +96,7 @@ public class GameLoop extends Thread implements IGameLoop {
       System.out.println("Updatable " + updatable + " already registered for update!");
       return;
     }
-    
+
     this.updatables.add(updatable);
   }
 
@@ -156,8 +156,9 @@ public class GameLoop extends Thread implements IGameLoop {
         Thread.interrupted();
         break;
       }
+      
+      this.deltaTime = System.currentTimeMillis() - this.lastUpdateTime;
     }
-
   }
 
   @Override
