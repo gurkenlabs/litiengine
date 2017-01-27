@@ -12,18 +12,18 @@ import de.gurkenlabs.util.MathUtilities;
  * TODO: Apply friction to terrain in order to slow down acceleration and speed
  * up deceleration.
  */
-public class KeyboardEntityController extends ClientEntityMovementController implements IKeyObserver {
+public class KeyboardEntityController<T extends IMovableEntity> extends ClientEntityMovementController<T> implements IKeyObserver {
   private double velocityX, velocityY;
   private final int up, down, left, right;
   private boolean movedX, movedY;
   private float dx;
   private float dy;
 
-  public KeyboardEntityController(final IMovableEntity entity) {
+  public KeyboardEntityController(final T entity) {
     this(entity, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
   }
 
-  public KeyboardEntityController(final IMovableEntity entity, final int up, final int down, final int left, final int right) {
+  public KeyboardEntityController(final T entity, final int up, final int down, final int left, final int right) {
     super(entity);
     this.up = up;
     this.down = down;
@@ -63,9 +63,9 @@ public class KeyboardEntityController extends ClientEntityMovementController imp
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
-    double maxPixelsPerTick = this.getControlledEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate() * loop.getTimeScale();
-    double inc = this.getControlledEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getAcceleration() * maxPixelsPerTick;
-    double dec = this.getControlledEntity().getDeceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getControlledEntity().getDeceleration() * maxPixelsPerTick;
+    double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * Game.getConfiguration().CLIENT.getUpdaterate() * loop.getTimeScale();
+    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getEntity().getAcceleration() * maxPixelsPerTick;
+    double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : Game.getConfiguration().CLIENT.getUpdaterate() * 1.0 / this.getEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;
 
     if (this.movedX) {
@@ -122,7 +122,7 @@ public class KeyboardEntityController extends ClientEntityMovementController imp
       return;
     }
 
-    final Point2D newLocation = new Point2D.Double(this.getControlledEntity().getLocation().getX() + this.velocityX, this.getControlledEntity().getLocation().getY() + this.velocityY);
-    Game.getPhysicsEngine().move(this.getControlledEntity(), newLocation);
+    final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + this.velocityX, this.getEntity().getLocation().getY() + this.velocityY);
+    Game.getPhysicsEngine().move(this.getEntity(), newLocation);
   }
 }

@@ -30,6 +30,13 @@ import de.gurkenlabs.tilemap.IMapObject;
 public interface IEnvironment extends IInitializable, IRenderable {
   public void clear();
 
+  /**
+   * Adds the specified entity to the environment container. This also loads the
+   * entity (register entity and controllers for update) if the environment has
+   * already been loaded.
+   * 
+   * @param entity
+   */
   public void add(IEntity entity);
 
   public void add(IRenderable renderable, RenderType type);
@@ -73,6 +80,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<LightSource> getLightSources();
 
   public Collection<Trigger> getTriggers();
+
   public Collection<Trigger> getTriggers(String name);
 
   public Trigger getTrigger(int mapId);
@@ -126,5 +134,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void removeRenderable(IRenderable renderable);
 
-  public void addMapObject(final IMapObject mapObject);
+  public void load();
+
+  public void unload();
 }

@@ -24,5 +24,4 @@ public interface IAnimationController extends IUpdateable {
   public List<IImageEffect> getImageEffects();
 
   public void playAnimation(final String animationName);
-
 }

@@ -9,17 +9,15 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 
-public class MousePathCombatEntityController extends ClientEntityMovementController implements MouseListener {
+public class MousePathCombatEntityController extends ClientEntityMovementController<IMovableCombatEntity> implements MouseListener {
   private final IEntityNavigator navigator;
 
-  private final IMovableCombatEntity entity;
   /** The player is navigating. */
   private boolean navigating;
 
   public MousePathCombatEntityController(final IEntityNavigator navigator, final IMovableCombatEntity movableEntity) {
     super(movableEntity);
     this.navigator = navigator;
-    this.entity = movableEntity;
     Input.MOUSE.registerMouseListener(this);
   }
 
@@ -62,7 +60,7 @@ public class MousePathCombatEntityController extends ClientEntityMovementControl
       return;
     }
 
-    if (this.navigating && !this.entity.isDead()) {
+    if (this.navigating && !this.getEntity().isDead()) {
       this.navigator.navigate(Input.MOUSE.getMapLocation());
     }
   }

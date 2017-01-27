@@ -18,11 +18,12 @@ public class DecorMob extends MovableCombatEntity {
     super();
     this.mobType = mobType;
     this.setLocation(location);
-    this.setAnimationController(new DecorMobAnimationController(this));
+    
+    Game.getEntityControllerManager().addController(this, new DecorMobAnimationController(this));
     this.behaviour = behaviour;
     switch (this.behaviour) {
     case SHY:
-      this.setMovementController(new ShyDecorMobMovementController(this));
+      Game.getEntityControllerManager().addController(this, new ShyDecorMobMovementController(this));
       break;
     case RANDOM:
       break;
@@ -59,7 +60,7 @@ public class DecorMob extends MovableCombatEntity {
     }
   }
 
-  private class ShyDecorMobMovementController extends ClientEntityMovementController {
+  private class ShyDecorMobMovementController extends ClientEntityMovementController<DecorMob> {
     private static final int DETECTION_RADIUS = 48;
 
     private long lastAngleChange;
@@ -86,8 +87,8 @@ public class DecorMob extends MovableCombatEntity {
         this.calculateNextAngleChange();
       }
 
-      final float pixelsPerTick = gameLoop.getDeltaTime() * 0.001F * this.getControlledEntity().getVelocity();
-      this.getPhysicsEngine().move(this.getControlledEntity(), this.angle, pixelsPerTick);
+      final float pixelsPerTick = gameLoop.getDeltaTime() * 0.001F * this.getEntity().getVelocity();
+      this.getPhysicsEngine().move(this.getEntity(), this.angle, pixelsPerTick);
       /*
        * for (final IMovableEntity mob :
        * Game.getEnvironment().getMovableEntities()) { if (!mob.equals(this) &&

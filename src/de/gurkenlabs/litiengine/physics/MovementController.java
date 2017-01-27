@@ -9,18 +9,17 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-public class EntityMovementController implements IEntityMovementController {
-  private final List<Predicate<IEntityMovementController>> movementPredicates;
+public class MovementController<T extends IMovableEntity> implements IMovementController<T> {
+  private final List<Predicate<T>> movementPredicates;
   private final List<Force> activeForces;
-  private final IMovableEntity movableEntity;
+  private final T movableEntity;
   private final IPhysicsEngine engine;
 
-  public EntityMovementController(final IGameLoop gameLoop, final IPhysicsEngine engine, final IMovableEntity movableEntity) {
+  public MovementController(final IPhysicsEngine engine, final T movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
     this.movableEntity = movableEntity;
     this.engine = engine;
-    gameLoop.registerForUpdate(this);
   }
 
   @Override
@@ -36,7 +35,7 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   @Override
-  public IMovableEntity getControlledEntity() {
+  public T getEntity() {
     return this.movableEntity;
   }
 
@@ -57,19 +56,19 @@ public class EntityMovementController implements IEntityMovementController {
     // TODO: calculate the diff of all forces combined and only move the entity
     // once
     for (final Force force : this.activeForces) {
-      if (force.cancelOnReached() && force.hasReached(this.getControlledEntity())) {
+      if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
         force.end();
         continue;
       }
 
-      final Point2D collisionBoxCenter = new Point2D.Double(this.getControlledEntity().getCollisionBox().getCenterX(), this.getControlledEntity().getCollisionBox().getCenterY());
+      final Point2D collisionBoxCenter = new Point2D.Double(this.getEntity().getCollisionBox().getCenterX(), this.getEntity().getCollisionBox().getCenterY());
       if (collisionBoxCenter.distance(force.getLocation()) < ACCEPTABLE_DIST) {
-        final double yDelta = this.getControlledEntity().getHeight() - this.getControlledEntity().getCollisionBox().getHeight() + this.getControlledEntity().getCollisionBox().getHeight() / 2;
-        final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getControlledEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
-        this.getControlledEntity().setLocation(entityLocation);
+        final double yDelta = this.getEntity().getHeight() - this.getEntity().getCollisionBox().getHeight() + this.getEntity().getCollisionBox().getHeight() / 2;
+        final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
+        this.getEntity().setLocation(entityLocation);
       } else {
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final boolean success = this.getPhysicsEngine().move(this.getControlledEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
+        final boolean success = this.getPhysicsEngine().move(this.getEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
         if (force.cancelOnCollision() && !success) {
           force.end();
         }
@@ -78,8 +77,8 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   protected boolean isMovementAllowed() {
-    for (final Predicate<IEntityMovementController> predicate : this.movementPredicates) {
-      if (!predicate.test(this)) {
+    for (final Predicate<T> predicate : this.movementPredicates) {
+      if (!predicate.test(this.getEntity())) {
         return false;
       }
     }
@@ -88,7 +87,7 @@ public class EntityMovementController implements IEntityMovementController {
   }
 
   @Override
-  public void onMovementCheck(final Predicate<IEntityMovementController> predicate) {
+  public void onMovementCheck(final Predicate<T> predicate) {
     if (!this.movementPredicates.contains(predicate)) {
       this.movementPredicates.add(predicate);
     }

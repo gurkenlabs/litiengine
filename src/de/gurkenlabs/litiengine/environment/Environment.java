@@ -54,10 +54,12 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.IMapLoader;
 import de.gurkenlabs.tilemap.IMapObject;
@@ -98,9 +100,10 @@ public class Environment implements IEnvironment {
   private final List<MapLocation> spawnPoints;
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
-  private CopyOnWriteArrayList<Narrator> narrators;
+  private final CopyOnWriteArrayList<Narrator> narrators;
 
   private boolean initialized;
+  private boolean loaded;
 
   private Environment() {
     this.entities = new ConcurrentHashMap<>();
@@ -114,6 +117,7 @@ public class Environment implements IEnvironment {
     this.lightSources = new CopyOnWriteArrayList<>();
     this.colliders = new CopyOnWriteArrayList<>();
     this.triggers = new CopyOnWriteArrayList<>();
+    this.narrators = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -180,11 +184,10 @@ public class Environment implements IEnvironment {
       this.triggers.add((Trigger) entity);
     }
 
-    if (entity instanceof Emitter) {
-      Emitter emitter = (Emitter) entity;
-      if (emitter.isActivateOnInit()) {
-        emitter.activate(Game.getLoop());
-      }
+    // if the environment has already been loaded,
+    // we need to load the new entity manually
+    if (this.loaded) {
+      this.load(entity);
     }
 
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
@@ -205,171 +208,6 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
-    int ambientAlpha = 0;
-    Color ambientColor = Color.WHITE;
-    try {
-      if (alphaProp != null && !alphaProp.isEmpty()) {
-        ambientAlpha = (int) Double.parseDouble(alphaProp);
-      }
-
-      if (colorProp != null && !colorProp.isEmpty()) {
-        ambientColor = Color.decode(colorProp);
-      }
-    } catch (final NumberFormatException e) {
-    }
-
-    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
-  }
-
-  protected void addCollisionBox(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
-      return;
-    }
-
-    String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
-    boolean isObstacle = true;
-    if (obstacle != null && !obstacle.isEmpty()) {
-      isObstacle = Boolean.valueOf(obstacle);
-    }
-
-    final Collider col = new Collider(isObstacle);
-    col.setLocation(mapObject.getLocation());
-    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    col.setCollisionBoxWidth(col.getWidth());
-    col.setCollisionBoxHeight(col.getHeight());
-    col.setMapId(mapObject.getId());
-
-    String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
-    if (shadowType != null && !shadowType.isEmpty()) {
-      col.setShadowType(Collider.StaticShadowType.valueOf(shadowType));
-    }
-
-    this.add(col);
-  }
-
-  protected void addDecorMob(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
-      return;
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) == null) {
-      return;
-    }
-
-    short velocity = (short) (100 / Game.getInfo().getRenderScale());
-    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
-      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));
-    }
-
-    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)), velocity);
-
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      mob.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
-    }
-
-    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
-      mob.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
-      mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
-    }
-
-    mob.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
-    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    mob.setMapId(mapObject.getId());
-
-    this.add(mob);
-  }
-
-  protected void addEmitter(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
-      return;
-    }
-
-    Emitter emitter = null;
-    String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
-    if (emitterType == null || emitterType.isEmpty()) {
-      return;
-    }
-
-    switch (emitterType) {
-    case "fire":
-      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    case "shimmer":
-      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    }
-
-    // try to load custom emitter
-    if (emitter == null && emitterType.endsWith(".xml")) {
-      emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y, emitterType);
-    }
-
-    if (emitter != null) {
-      emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-      emitter.setMapId(mapObject.getId());
-      this.add(emitter);
-    }
-  }
-
-  protected void addLightSource(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
-      return;
-    }
-    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
-    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
-      return;
-    }
-
-    final int brightness = Integer.parseInt(mapObjectBrightness);
-    final Color color = Color.decode(mapObjectColor);
-
-    int intensity = brightness;
-    if (mapObjectIntensity != null && !mapObjectIntensity.isEmpty()) {
-      intensity = Integer.parseInt(mapObjectIntensity);
-    }
-
-    String lightType;
-    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
-    case LightSource.ELLIPSE:
-      lightType = LightSource.ELLIPSE;
-      break;
-    case LightSource.RECTANGLE:
-      lightType = LightSource.RECTANGLE;
-      break;
-    default:
-      lightType = LightSource.ELLIPSE;
-    }
-    final LightSource light = new LightSource(this, brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
-    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    light.setLocation(mapObject.getLocation());
-    light.setMapId(mapObject.getId());
-    this.add(light);
-  }
-
-  @Override
-  public void addMapObject(final IMapObject mapObject) {
-    this.addCollisionBox(mapObject);
-    this.addLightSource(mapObject);
-    this.addSpawnpoint(mapObject);
-    this.addProp(mapObject);
-    this.addEmitter(mapObject);
-    this.addDecorMob(mapObject);
-    this.addMob(mapObject);
-    this.addTrigger(mapObject);
-  }
-
-  protected void addMob(final IMapObject mapObject) {
-
-  }
-
   @Override
   public void addNarrator(final String name) {
     this.addNarrator(name, Narrator.LAYOUT_LEFT);
@@ -377,238 +215,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public void addNarrator(final String name, final int layout) {
-    if (this.getNarrators() == null) {
-      this.narrators = new CopyOnWriteArrayList<>();
-    }
     Narrator newNarrator = new Narrator(this, name, layout);
     this.getNarrators().add(newNarrator);
-  }
-
-  protected void addProp(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
-      return;
-    }
-
-    // set map properties by map object
-    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
-    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
-    prop.setMapId(mapObject.getId());
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
-      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
-      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
-      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
-    }
-
-    prop.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    prop.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
-    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-
-    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
-      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
-    }
-    prop.setMapId(mapObject.getId());
-    this.add(prop);
-  }
-
-  protected void addSpawnpoint(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
-      return;
-    }
-
-    MapLocation spawn = new MapLocation(mapObject.getId(), new Point(mapObject.getLocation()));
-    spawn.setName(mapObject.getName());
-    this.getSpawnPoints().add(spawn);
-  }
-
-  private void addStaticShadows() {
-    final int shadowOffset = 10;
-    final List<Path2D> staticShadows = new ArrayList<>();
-    // check if the collision boxes have shadows. if so, determine which
-    // shadow is needed, create the shape and add it to the
-    // list of static shadows.
-    for (final IMapObject col : this.getCollisionBoxMapObjects()) {
-      final double shadowX = col.getBoundingBox().getX();
-      final double shadowY = col.getBoundingBox().getY();
-      final double shadowWidth = col.getBoundingBox().getWidth();
-      final double shadowHeight = col.getBoundingBox().getHeight();
-
-      final Collider.StaticShadowType shadowType = StaticShadowType.get(col.getCustomProperty(MapObjectProperties.SHADOWTYPE));
-      if (shadowType == StaticShadowType.NONE) {
-        continue;
-      }
-
-      final Path2D parallelogram = new Path2D.Double();
-      if (shadowType.equals(Collider.StaticShadowType.DOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.DOWNLEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.DOWNRIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFTDOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFTRIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTLEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTDOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.NOOFFSET)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      }
-
-      if (parallelogram.getWindingRule() != 0) {
-        staticShadows.add(parallelogram);
-      }
-    }
-
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
-    g.setColor(new Color(0, 0, 0, 75));
-
-    final Area ar = new Area();
-    for (final Path2D staticShadow : staticShadows) {
-      final Area staticShadowArea = new Area(staticShadow);
-      for (final LightSource light : this.getLightSources()) {
-        if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
-          staticShadowArea.subtract(new Area(light.getLightShape()));
-        }
-      }
-
-      ar.add(staticShadowArea);
-    }
-
-    g.fill(ar);
-    g.dispose();
-
-    this.staticShadowImage = img;
-  }
-
-  protected void addTrigger(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
-      return;
-    }
-
-    final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
-
-    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
-    final String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
-    final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
-    final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
-    final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
-
-    Map<String, String> triggerArguments = new HashMap<>();
-    for (Property prop : mapObject.getAllCustomProperties()) {
-      if (MapObjectProperties.isCustom(prop.getName())) {
-        triggerArguments.put(prop.getName(), prop.getValue());
-      }
-    }
-
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
-    if (targets != null && !targets.isEmpty()) {
-      String[] split = targets.split(",");
-      for (String s : split) {
-        if (s == null || s.isEmpty()) {
-          continue;
-        }
-        try {
-          trigger.addTarget(Integer.parseInt(s));
-        } catch (NumberFormatException ne) {
-          ne.printStackTrace();
-        }
-      }
-    }
-
-    if (activators != null && !activators.isEmpty()) {
-      String[] split = activators.split(",");
-      for (String s : split) {
-        if (s == null || s.isEmpty()) {
-          continue;
-        }
-        try {
-          trigger.addActivator(Integer.parseInt(s));
-        } catch (NumberFormatException ne) {
-          ne.printStackTrace();
-        }
-      }
-    }
-
-    trigger.setMapId(mapObject.getId());
-    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    trigger.setCollisionBoxHeight(trigger.getHeight());
-    trigger.setCollisionBoxWidth(trigger.getWidth());
-    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
-    this.add(trigger);
+    Game.getLoop().registerForUpdate(newNarrator);
+    Game.getLoop().registerForUpdate(newNarrator.getAnimationController());
   }
 
   @Override
@@ -622,30 +232,16 @@ public class Environment implements IEnvironment {
     this.getColliders().clear();
     this.getSpawnPoints().clear();
     this.getTriggers().clear();
+    for (Narrator narrator : this.getNarrators()) {
+      Game.getLoop().unregisterFromUpdate(narrator);
+      Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());
+    }
+    
+    this.getNarrators().clear();
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
     this.initialized = false;
-  }
-
-  private void dispose(final Collection<? extends IEntity> entities) {
-    for (final IEntity entity : entities) {
-      if (entity instanceof IUpdateable) {
-        Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
-      }
-
-      Game.getEntityManager().disposeController(entity);
-
-      if (entity.getAnimationController() != null) {
-        entity.getAnimationController().dispose();
-      }
-
-      if (entity instanceof IMovableEntity) {
-        if (((IMovableEntity) entity).getMovementController() != null) {
-          Game.getLoop().unregisterFromUpdate(((IMovableEntity) entity).getMovementController());
-        }
-      }
-    }
   }
 
   @Override
@@ -811,23 +407,6 @@ public class Environment implements IEnvironment {
 
   }
 
-  private List<IMapObject> getCollisionBoxMapObjects() {
-    final List<IMapObject> collisionBoxes = new ArrayList<>();
-    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject obj : shapeLayer.getMapObjects()) {
-        if (obj.getType() == null || obj.getType().isEmpty()) {
-          continue;
-        }
-
-        if (MapObjectType.get(obj.getType()) == MapObjectType.COLLISIONBOX) {
-          collisionBoxes.add(obj);
-        }
-      }
-    }
-
-    return collisionBoxes;
-  }
-
   @Override
   public Collection<ICombatEntity> getCombatEntities() {
     return this.combatEntities.values();
@@ -951,12 +530,6 @@ public class Environment implements IEnvironment {
     return this.triggers;
   }
 
-  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
-    for (final Consumer<Graphics2D> consumer : consumers) {
-      consumer.accept(g);
-    }
-  }
-
   @Override
   public final void init() {
     if (this.initialized) {
@@ -972,18 +545,6 @@ public class Environment implements IEnvironment {
     }
 
     this.initialized = true;
-  }
-
-  private void loadMapObjects() {
-    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-          continue;
-        }
-
-        this.addMapObject(mapObject);
-      }
-    }
   }
 
   @Override
@@ -1009,11 +570,6 @@ public class Environment implements IEnvironment {
 
     this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
 
-    if (entity instanceof ICollisionEntity) {
-      final ICollisionEntity coll = (ICollisionEntity) entity;
-      Game.getPhysicsEngine().remove(coll);
-    }
-
     if (entity instanceof Collider) {
       this.colliders.remove(entity);
       this.addStaticShadows();
@@ -1035,6 +591,8 @@ public class Environment implements IEnvironment {
     if (entity instanceof ICombatEntity) {
       this.combatEntities.values().remove(entity);
     }
+
+    this.unload(entity);
   }
 
   @Override
@@ -1150,5 +708,590 @@ public class Environment implements IEnvironment {
   @Override
   public void onInitialized(Consumer<IEnvironment> consumer) {
     this.initializedConsumer.add(consumer);
+  }
+
+  protected void addMapObject(final IMapObject mapObject) {
+    this.addCollisionBox(mapObject);
+    this.addLightSource(mapObject);
+    this.addSpawnpoint(mapObject);
+    this.addProp(mapObject);
+    this.addEmitter(mapObject);
+    this.addDecorMob(mapObject);
+    this.addMob(mapObject);
+    this.addTrigger(mapObject);
+  }
+
+  protected void addCollisionBox(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
+      return;
+    }
+
+    String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    boolean isObstacle = true;
+    if (obstacle != null && !obstacle.isEmpty()) {
+      isObstacle = Boolean.valueOf(obstacle);
+    }
+
+    final Collider col = new Collider(isObstacle);
+    col.setLocation(mapObject.getLocation());
+    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    col.setCollisionBoxWidth(col.getWidth());
+    col.setCollisionBoxHeight(col.getHeight());
+    col.setMapId(mapObject.getId());
+
+    String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
+    if (shadowType != null && !shadowType.isEmpty()) {
+      col.setShadowType(Collider.StaticShadowType.valueOf(shadowType));
+    }
+
+    this.add(col);
+  }
+
+  protected void addDecorMob(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
+      return;
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) == null) {
+      return;
+    }
+
+    short velocity = (short) (100 / Game.getInfo().getRenderScale());
+    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
+      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));
+    }
+
+    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)), velocity);
+
+    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+      mob.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    }
+
+    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
+      mob.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
+      mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
+    }
+
+    mob.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    mob.setMapId(mapObject.getId());
+
+    this.add(mob);
+  }
+
+  protected void addEmitter(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
+      return;
+    }
+
+    Emitter emitter = null;
+    String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
+    if (emitterType == null || emitterType.isEmpty()) {
+      return;
+    }
+
+    switch (emitterType) {
+    case "fire":
+      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      break;
+    case "shimmer":
+      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      break;
+    }
+
+    // try to load custom emitter
+    if (emitter == null && emitterType.endsWith(".xml")) {
+      emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y, emitterType);
+    }
+
+    if (emitter != null) {
+      emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+      emitter.setMapId(mapObject.getId());
+      this.add(emitter);
+    }
+  }
+
+  protected void addLightSource(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
+      return;
+    }
+    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
+    final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
+    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
+      return;
+    }
+
+    final int brightness = Integer.parseInt(mapObjectBrightness);
+    final Color color = Color.decode(mapObjectColor);
+
+    int intensity = brightness;
+    if (mapObjectIntensity != null && !mapObjectIntensity.isEmpty()) {
+      intensity = Integer.parseInt(mapObjectIntensity);
+    }
+
+    String lightType;
+    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
+    case LightSource.ELLIPSE:
+      lightType = LightSource.ELLIPSE;
+      break;
+    case LightSource.RECTANGLE:
+      lightType = LightSource.RECTANGLE;
+      break;
+    default:
+      lightType = LightSource.ELLIPSE;
+    }
+    final LightSource light = new LightSource(this, brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
+    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+    light.setLocation(mapObject.getLocation());
+    light.setMapId(mapObject.getId());
+    this.add(light);
+  }
+
+  protected void addMob(final IMapObject mapObject) {
+
+  }
+
+  protected void addProp(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
+      return;
+    }
+
+    // set map properties by map object
+    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    final Prop prop = new Prop(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
+    prop.setMapId(mapObject.getId());
+    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
+      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
+      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
+      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    }
+
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
+      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
+    }
+    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
+      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
+    }
+
+    prop.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    prop.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+
+    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
+      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
+    }
+    prop.setMapId(mapObject.getId());
+    this.add(prop);
+  }
+
+  protected void addSpawnpoint(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
+      return;
+    }
+
+    MapLocation spawn = new MapLocation(mapObject.getId(), new Point(mapObject.getLocation()));
+    spawn.setName(mapObject.getName());
+    this.getSpawnPoints().add(spawn);
+  }
+
+  protected void addTrigger(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
+      return;
+    }
+
+    final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
+
+    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
+    final String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
+    final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
+    final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
+    final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
+
+    Map<String, String> triggerArguments = new HashMap<>();
+    for (Property prop : mapObject.getAllCustomProperties()) {
+      if (MapObjectProperties.isCustom(prop.getName())) {
+        triggerArguments.put(prop.getName(), prop.getValue());
+      }
+    }
+
+    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
+    if (targets != null && !targets.isEmpty()) {
+      String[] split = targets.split(",");
+      for (String s : split) {
+        if (s == null || s.isEmpty()) {
+          continue;
+        }
+        try {
+          trigger.addTarget(Integer.parseInt(s));
+        } catch (NumberFormatException ne) {
+          ne.printStackTrace();
+        }
+      }
+    }
+
+    if (activators != null && !activators.isEmpty()) {
+      String[] split = activators.split(",");
+      for (String s : split) {
+        if (s == null || s.isEmpty()) {
+          continue;
+        }
+        try {
+          trigger.addActivator(Integer.parseInt(s));
+        } catch (NumberFormatException ne) {
+          ne.printStackTrace();
+        }
+      }
+    }
+
+    trigger.setMapId(mapObject.getId());
+    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+    trigger.setCollisionBoxHeight(trigger.getHeight());
+    trigger.setCollisionBoxWidth(trigger.getWidth());
+    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
+    this.add(trigger);
+  }
+
+  private void addAmbientLight() {
+    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
+    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
+    int ambientAlpha = 0;
+    Color ambientColor = Color.WHITE;
+    try {
+      if (alphaProp != null && !alphaProp.isEmpty()) {
+        ambientAlpha = (int) Double.parseDouble(alphaProp);
+      }
+
+      if (colorProp != null && !colorProp.isEmpty()) {
+        ambientColor = Color.decode(colorProp);
+      }
+    } catch (final NumberFormatException e) {
+    }
+
+    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+  }
+
+  private void addStaticShadows() {
+    final int shadowOffset = 10;
+    final List<Path2D> staticShadows = new ArrayList<>();
+    // check if the collision boxes have shadows. if so, determine which
+    // shadow is needed, create the shape and add it to the
+    // list of static shadows.
+    for (final IMapObject col : this.getCollisionBoxMapObjects()) {
+      final double shadowX = col.getBoundingBox().getX();
+      final double shadowY = col.getBoundingBox().getY();
+      final double shadowWidth = col.getBoundingBox().getWidth();
+      final double shadowHeight = col.getBoundingBox().getHeight();
+
+      final Collider.StaticShadowType shadowType = StaticShadowType.get(col.getCustomProperty(MapObjectProperties.SHADOWTYPE));
+      if (shadowType == StaticShadowType.NONE) {
+        continue;
+      }
+
+      final Path2D parallelogram = new Path2D.Double();
+      if (shadowType.equals(Collider.StaticShadowType.DOWN)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.DOWNLEFT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.DOWNRIGHT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFTDOWN)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.LEFTRIGHT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTLEFT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHT)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTDOWN)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      } else if (shadowType.equals(Collider.StaticShadowType.NOOFFSET)) {
+        parallelogram.moveTo(shadowX, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
+        parallelogram.closePath();
+      }
+
+      if (parallelogram.getWindingRule() != 0) {
+        staticShadows.add(parallelogram);
+      }
+    }
+
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
+    final Graphics2D g = img.createGraphics();
+    g.setColor(new Color(0, 0, 0, 75));
+
+    final Area ar = new Area();
+    for (final Path2D staticShadow : staticShadows) {
+      final Area staticShadowArea = new Area(staticShadow);
+      for (final LightSource light : this.getLightSources()) {
+        if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
+          staticShadowArea.subtract(new Area(light.getLightShape()));
+        }
+      }
+
+      ar.add(staticShadowArea);
+    }
+
+    g.fill(ar);
+    g.dispose();
+
+    this.staticShadowImage = img;
+  }
+
+  private void dispose(final Collection<? extends IEntity> entities) {
+    for (final IEntity entity : entities) {
+      if (entity instanceof IUpdateable) {
+        Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+      }
+
+      Game.getEntityControllerManager().disposeControllers(entity);
+    }
+  }
+
+  private List<IMapObject> getCollisionBoxMapObjects() {
+    final List<IMapObject> collisionBoxes = new ArrayList<>();
+    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject obj : shapeLayer.getMapObjects()) {
+        if (obj.getType() == null || obj.getType().isEmpty()) {
+          continue;
+        }
+
+        if (MapObjectType.get(obj.getType()) == MapObjectType.COLLISIONBOX) {
+          collisionBoxes.add(obj);
+        }
+      }
+    }
+
+    return collisionBoxes;
+  }
+
+  private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {
+    for (final Consumer<Graphics2D> consumer : consumers) {
+      consumer.accept(g);
+    }
+  }
+
+  private void loadMapObjects() {
+    for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
+      for (final IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+          continue;
+        }
+
+        this.addMapObject(mapObject);
+      }
+    }
+  }
+
+  @Override
+  public void load() {
+    if (this.loaded) {
+      return;
+    }
+
+    Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+    for (IEntity entity : this.getEntities()) {
+      this.load(entity);
+    }
+    
+    for (Narrator narrator : this.getNarrators()) {
+      Game.getLoop().registerForUpdate(narrator);
+      Game.getLoop().registerForUpdate(narrator.getAnimationController());
+    }
+
+    this.loaded = true;
+  }
+
+  @Override
+  public void unload() {
+    if (!this.loaded) {
+      return;
+    }
+
+    // unregister all updatable entities from the current environment
+    for (IEntity entity : this.getEntities()) {
+      this.unload(entity);
+    }
+    
+    for (Narrator narrator : this.getNarrators()) {
+      Game.getLoop().unregisterFromUpdate(narrator);
+      Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());
+    }
+
+    this.loaded = false;
+  }
+
+  /**
+   * Loads the specified entiy by performing the following steps:
+   * <ol>
+   * <li>add to physics engine</li>
+   * <li>register entity for update</li>
+   * <li>register animation controller for update</li>
+   * <li>register movement controller for update</li>
+   * <li>register AI controller for update</li>
+   * </ol>
+   * 
+   * @param entity
+   */
+  private void load(IEntity entity) {
+    // 1. add to physics engins
+    if (entity instanceof Collider) {
+      Collider coll = (Collider) entity;
+      if (coll.isObstacle()) {
+        Game.getPhysicsEngine().add(coll.getBoundingBox());
+      } else {
+        Game.getPhysicsEngine().add(coll);
+      }
+    } else if (entity instanceof ICollisionEntity) {
+      final ICollisionEntity coll = (ICollisionEntity) entity;
+      if (coll.hasCollision()) {
+        Game.getPhysicsEngine().add(coll);
+      }
+    }
+
+    // 2. register for update or activate
+    if (entity instanceof Emitter) {
+      Emitter emitter = (Emitter) entity;
+      if (emitter.isActivateOnInit()) {
+        emitter.activate(Game.getLoop());
+      }
+    } else if (entity instanceof IUpdateable) {
+      Game.getLoop().registerForUpdate((IUpdateable) entity);
+    }
+
+    // 3. register animation controller for update
+    IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
+    if (animation != null) {
+      Game.getLoop().registerForUpdate(animation);
+    }
+
+    // 4. register movement controller for update
+    if (entity instanceof IMovableEntity) {
+      IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+      if (movementController != null) {
+        Game.getLoop().registerForUpdate(movementController);
+      }
+    }
+
+    // 5. register ai controller for update
+    IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
+    if (controller != null) {
+      Game.getLoop().registerForUpdate(controller);
+    }
+  }
+
+  /**
+   * Unload the specified entity by performing the following steps:
+   * <ol>
+   * <li>remove entities from physics engine</li>
+   * <li>unregister units from update</li>
+   * <li>unregister ai controller from update</li>
+   * <li>unregister animation controller from update</li>
+   * <li>unregister movement controller from update</li>
+   * </ol>
+   * 
+   * @param entity
+   */
+  private void unload(IEntity entity) {
+    // 1. remove from physics enginse
+    if (entity instanceof Collider) {
+      Collider coll = (Collider) entity;
+      if (coll.isObstacle()) {
+        Game.getPhysicsEngine().remove(coll.getBoundingBox());
+      } else {
+        Game.getPhysicsEngine().remove(coll);
+      }
+    } else if (entity instanceof ICollisionEntity) {
+      final ICollisionEntity coll = (ICollisionEntity) entity;
+      Game.getPhysicsEngine().remove(coll);
+    }
+
+    // 2. unregister from update
+    if (entity instanceof IUpdateable) {
+      Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+    }
+
+    // 3. unregister ai controller from update
+    IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
+    if (controller != null) {
+      Game.getLoop().unregisterFromUpdate(controller);
+    }
+
+    // 4. unregister animation controller from update
+    IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
+    if (animation != null) {
+      Game.getLoop().unregisterFromUpdate(animation);
+    }
+
+    // 5. unregister movement controller from update
+    if (entity instanceof IMovableEntity) {
+      IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+      if (movementController != null) {
+        Game.getLoop().unregisterFromUpdate(movementController);
+      }
+    }
   }
 }

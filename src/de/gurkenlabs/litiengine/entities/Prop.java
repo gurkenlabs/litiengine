@@ -5,6 +5,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
 // TODO: Auto-generated Javadoc
@@ -23,7 +24,7 @@ public class Prop extends CombatEntity {
     this.spritePath = spritesheetName;
     this.material = mat;
     this.setLocation(location);
-    this.setAnimationController(new PropAnimationController(this));
+    Game.getEntityControllerManager().addController(this, new PropAnimationController(this));
   }
 
   public Material getMaterial() {

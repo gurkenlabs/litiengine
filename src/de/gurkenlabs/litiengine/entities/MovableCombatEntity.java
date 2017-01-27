@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
-import de.gurkenlabs.litiengine.physics.IEntityMovementController;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
@@ -23,8 +23,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
 
   /** The last moved. */
   private long lastMoved;
-
-  private IEntityMovementController movementController;
 
   public MovableCombatEntity() {
     super();
@@ -52,11 +50,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
-  }
-
-  @Override
-  public IEntityMovementController getMovementController() {
-    return this.movementController;
   }
 
   @Override
@@ -129,14 +122,6 @@ public abstract class MovableCombatEntity extends CombatEntity implements IMovab
   public void setMoveDestination(final Point2D dest) {
     this.moveDestination = dest;
     this.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(this.getLocation(), this.getMoveDestination()));
-  }
-
-  @Override
-  public void setMovementController(final IEntityMovementController movementController) {
-    if (this.getMovementController() != null) {
-      Game.getLoop().unregisterFromUpdate(this.getMovementController());
-    }
-    this.movementController = movementController;
   }
 
   @Override

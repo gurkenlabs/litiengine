@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -381,8 +382,9 @@ public class RenderEngine implements IRenderEngine {
       }
     }
 
-    if (entity.getAnimationController() != null) {
-      final BufferedImage img = entity.getAnimationController().getCurrentSprite();
+    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    if (animationController != null) {
+      final BufferedImage img = animationController.getCurrentSprite();
       renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
     }
 

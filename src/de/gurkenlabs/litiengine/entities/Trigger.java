@@ -53,9 +53,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
-    if (activation == TriggerActivation.COLLISION) {
-      Game.getLoop().registerForUpdate(this);
-    }
   }
 
   public void addActivator(int mapId) {

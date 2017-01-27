@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
-import de.gurkenlabs.litiengine.physics.IEntityMovementController;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
@@ -19,7 +19,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
 
   private boolean turnOnMove;
 
-  private IEntityMovementController movementController;
 
   public MovableEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -35,10 +34,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     return this.moveDestination;
   }
 
-  @Override
-  public IEntityMovementController getMovementController() {
-    return this.movementController;
-  }
 
   @Override
   public float getVelocity() {
@@ -89,11 +84,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   @Override
   public void setMoveDestination(final Point2D dest) {
     this.moveDestination = dest;
-  }
-
-  @Override
-  public void setMovementController(final IEntityMovementController movementController) {
-    this.movementController = movementController;
   }
 
   @Override

@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.util.MathUtilities;
 
 /**
@@ -67,7 +68,7 @@ public class Camera implements ICamera {
         for (Consumer<Float> cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
-        
+
         this.zoom = 0;
         this.zoomDelay = 0;
         this.zoomTick = 0;
@@ -136,11 +137,13 @@ public class Camera implements ICamera {
   @Override
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
-    if (entity.getAnimationController() == null || entity.getAnimationController().getCurrentAnimation() == null) {
+
+    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    if (animationController == null || animationController.getCurrentAnimation() == null) {
       return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
-    final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
+    final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
@@ -154,8 +157,9 @@ public class Camera implements ICamera {
   @Override
   public Point2D getViewPortLocation(final IEntity entity) {
     // localplayer camera causes flickering and bouncing of the sprite
-    if (entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null && entity.getAnimationController().getCurrentAnimation().getSpritesheet() != null) {
-      final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
+    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    if (animationController != null && animationController.getCurrentAnimation() != null && animationController.getCurrentAnimation().getSpritesheet() != null) {
+      final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
       final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
       return this.getViewPortLocation(location);
     }
@@ -186,15 +190,20 @@ public class Camera implements ICamera {
 
   @Override
   public void setFocus(final Point2D focus) {
-    // dunno why but without the factor of 0.01 sometimes everything starts to get wavy while rendering ...
-    // it seems to be an issue with the focus location being exactly dividable by up to 4?? (maybe even more for higher renderscales)
-    // this is somehow related to the rendering scale: if the rendering scale is lower this will only be affected by lower dividable numbers (e.g. renderscale of 6 only has an issue with 1 and 0.5)
-    // seems like java cannot place certain images onto their exact pixel location with an AffineTransform...
+    // dunno why but without the factor of 0.01 sometimes everything starts to
+    // get wavy while rendering ...
+    // it seems to be an issue with the focus location being exactly dividable
+    // by up to 4?? (maybe even more for higher renderscales)
+    // this is somehow related to the rendering scale: if the rendering scale is
+    // lower this will only be affected by lower dividable numbers (e.g.
+    // renderscale of 6 only has an issue with 1 and 0.5)
+    // seems like java cannot place certain images onto their exact pixel
+    // location with an AffineTransform...
     double fraction = focus.getY() - Math.floor(focus.getY());
-    if(MathUtilities.isInt(fraction * 4)){
+    if (MathUtilities.isInt(fraction * 4)) {
       focus.setLocation(focus.getX(), focus.getY() + 0.01);
     }
-    
+
     this.focus = focus;
   }
 
@@ -218,7 +227,7 @@ public class Camera implements ICamera {
       for (Consumer<Float> cons : this.zoomChangedConsumer) {
         cons.accept(zoom);
       }
-      
+
       this.zoom = 0;
       this.zoomDelay = 0;
       this.zoomTick = 0;

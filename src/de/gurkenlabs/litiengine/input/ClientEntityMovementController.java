@@ -2,11 +2,11 @@ package de.gurkenlabs.litiengine.input;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.litiengine.physics.EntityMovementController;
+import de.gurkenlabs.litiengine.physics.MovementController;
 
-public class ClientEntityMovementController extends EntityMovementController {
+public class ClientEntityMovementController<T extends IMovableEntity> extends MovementController<T> {
 
-  public ClientEntityMovementController(final IMovableEntity movableEntity) {
-    super(Game.getLoop(), Game.getPhysicsEngine(), movableEntity);
+  public ClientEntityMovementController(final T movableEntity) {
+    super(Game.getPhysicsEngine(), movableEntity);
   }
 }

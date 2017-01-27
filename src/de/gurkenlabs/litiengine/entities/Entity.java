@@ -21,6 +21,8 @@ public abstract class Entity implements IEntity {
 
   private int mapId;
 
+  private String name;
+
   /** The map location. */
   private Point2D mapLocation;
 
@@ -29,9 +31,9 @@ public abstract class Entity implements IEntity {
 
   private float width;
 
-  private IAnimationController animationController;
-
   private RenderType renderType;
+
+  private Rectangle2D boundingBox;
 
   /**
    * Instantiates a new entity.
@@ -48,33 +50,17 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setRenderType(RenderType renderType) {
-    this.renderType = renderType;
-  }
-
-  @Override
-  public void setHeight(float height) {
-    this.height = height;
-  }
-
-  @Override
-  public void setWidth(float width) {
-    this.width = width;
-  }
-
-  @Override
   public float getAngle() {
     return this.angle;
   }
 
   @Override
-  public IAnimationController getAnimationController() {
-    return this.animationController;
-  }
-
-  @Override
   public Rectangle2D getBoundingBox() {
-    return new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    if (boundingBox != null) {
+      return this.boundingBox;
+    }
+
+    return this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
   }
 
   /**
@@ -113,22 +99,12 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public int hashCode() {
-    return this.mapId;
-  }
-
-  @Override
   public String sendMessage(Object sender, final String message) {
     return null;
   }
 
   protected void setAngle(final float angle) {
     this.angle = angle;
-  }
-
-  @Override
-  public void setAnimationController(final IAnimationController animationController) {
-    this.animationController = animationController;
   }
 
   /**
@@ -140,11 +116,12 @@ public abstract class Entity implements IEntity {
   @Override
   public void setLocation(final Point2D location) {
     this.mapLocation = location;
+    this.boundingBox = null;
   }
 
   @Override
   public void setLocation(double x, double y) {
-    this.mapLocation = new Point2D.Double(x, y);
+    this.setLocation(new Point2D.Double(x, y));
   }
 
   /**
@@ -163,8 +140,35 @@ public abstract class Entity implements IEntity {
     this.setWidth(width);
     this.setHeight(height);
   }
+  
+  @Override
+  public void setRenderType(RenderType renderType) {
+    this.renderType = renderType;
+  }
+
+  @Override
+  public void setHeight(float height) {
+    this.height = height;
+    this.boundingBox = null;
+  }
+
+  @Override
+  public void setWidth(float width) {
+    this.width = width;
+    this.boundingBox = null;
+  }
 
   public RenderType getRenderType() {
     return renderType;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 }

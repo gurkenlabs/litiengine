@@ -32,8 +32,6 @@ public abstract class AnimationController implements IAnimationController {
         }
       }
     }
-
-    Game.getLoop().registerForUpdate(this);
   }
 
   @Override
