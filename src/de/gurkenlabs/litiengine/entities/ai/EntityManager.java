@@ -29,8 +29,10 @@ public class EntityManager {
     if (this.entityControllers.containsKey(entity)) {
       IEntityController<? extends IEntity> controller = this.entityControllers.get(entity);
 
+      System.out.println(Game.getLoop().getUpdatablesCount());
       Game.getLoop().unregisterFromUpdate(controller);
-      this.entityControllers.remove(controller);
+      System.out.println(Game.getLoop().getUpdatablesCount());
+      this.entityControllers.remove(entity);
     }
   }
 }

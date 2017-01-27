@@ -8,8 +8,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 public class StateMachine implements IStateMachine {
   private IState currentState;
 
-  protected StateMachine(final IGameLoop loop) {
-    loop.registerForUpdate(this);
+  protected StateMachine() {
   }
 
   @Override

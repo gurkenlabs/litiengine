@@ -7,8 +7,8 @@ import de.gurkenlabs.util.states.StateMachine;
 public class EntityController<T extends Entity> extends StateMachine implements IEntityController<T> {
   private final T entity;
 
-  protected EntityController(final IGameLoop loop, final T entity) {
-    super(loop);
+  protected EntityController(final T entity) {
+    super();
     this.entity = entity;
   }
 

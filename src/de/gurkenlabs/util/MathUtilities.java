@@ -46,6 +46,18 @@ public class MathUtilities {
     return min + RANDOM.nextDouble() * (max - min);
   }
 
+  public static int randomInRange(final int min, final int max) {
+    if (min == max) {
+      return min;
+    }
+
+    if (min > max) {
+      throw new IllegalArgumentException("min value is > than max value");
+    }
+
+    return (int) (min + RANDOM.nextDouble() * (max - min));
+  }
+
   public static int randomSign() {
     return randomBoolean() ? 1 : -1;
   }
@@ -73,7 +85,7 @@ public class MathUtilities {
 
     return value;
   }
-  
+
   public static long clamp(long value, long min, long max) {
     if (value < min) {
       return min;
