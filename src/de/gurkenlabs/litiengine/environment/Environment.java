@@ -179,15 +179,15 @@ public class Environment implements IEnvironment {
     if (entity instanceof Trigger) {
       this.triggers.add((Trigger) entity);
     }
-
-    this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
-
+    
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
       if (emitter.isActivateOnInit()) {
         emitter.activate(Game.getLoop());
       }
     }
+    
+    this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
   }
 
   @Override
@@ -633,7 +633,7 @@ public class Environment implements IEnvironment {
       if (entity instanceof IUpdateable) {
         Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
       }
-      
+
       Game.getEntityManager().disposeController(entity);
 
       if (entity.getAnimationController() != null) {

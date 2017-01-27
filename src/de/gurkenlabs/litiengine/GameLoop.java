@@ -93,8 +93,10 @@ public class GameLoop extends Thread implements IGameLoop {
   @Override
   public void registerForUpdate(final IUpdateable updatable) {
     if (this.updatables.contains(updatable)) {
-      throw new IllegalArgumentException("Updatable " + updatable + " already registered for update!");
+      System.out.println("Updatable " + updatable + " already registered for update!");
+      return;
     }
+    
     this.updatables.add(updatable);
   }
 

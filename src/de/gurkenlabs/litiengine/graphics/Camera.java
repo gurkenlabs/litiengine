@@ -154,7 +154,7 @@ public class Camera implements ICamera {
   @Override
   public Point2D getViewPortLocation(final IEntity entity) {
     // localplayer camera causes flickering and bouncing of the sprite
-    if (entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null) {
+    if (entity.getAnimationController() != null && entity.getAnimationController().getCurrentAnimation() != null && entity.getAnimationController().getCurrentAnimation().getSpritesheet() != null) {
       final Spritesheet spriteSheet = entity.getAnimationController().getCurrentAnimation().getSpritesheet();
       final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
       return this.getViewPortLocation(location);
