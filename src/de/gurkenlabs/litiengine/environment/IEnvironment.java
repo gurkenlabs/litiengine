@@ -73,6 +73,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<LightSource> getLightSources();
 
   public Collection<Trigger> getTriggers();
+  public Collection<Trigger> getTriggers(String name);
 
   public Trigger getTrigger(int mapId);
 

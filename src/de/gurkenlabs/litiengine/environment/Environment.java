@@ -179,14 +179,14 @@ public class Environment implements IEnvironment {
     if (entity instanceof Trigger) {
       this.triggers.add((Trigger) entity);
     }
-    
+
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
       if (emitter.isActivateOnInit()) {
         emitter.activate(Game.getLoop());
       }
     }
-    
+
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
   }
 
@@ -757,6 +757,22 @@ public class Environment implements IEnvironment {
       }
     }
     return null;
+  }
+
+  @Override
+  public Collection<Trigger> getTriggers(String name) {
+    List<Trigger> triggers = new ArrayList<>();
+    if (name == null || name.isEmpty()) {
+      return triggers;
+    }
+
+    for (Trigger t : this.getTriggers()) {
+      if (t.getName() != null && t.getName().equals(name)) {
+        triggers.add(t);
+      }
+    }
+
+    return triggers;
   }
 
   @Override
