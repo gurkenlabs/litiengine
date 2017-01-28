@@ -152,6 +152,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final FontRenderContext frc = g.getFontRenderContext();
 
     final String text = this.displayedText;
+    if(text == null){
+      return;
+    }
+    
     final AttributedString styledText = new AttributedString(text);
     styledText.addAttribute(TextAttribute.FONT, this.font);
     final AttributedCharacterIterator iterator = styledText.getIterator();

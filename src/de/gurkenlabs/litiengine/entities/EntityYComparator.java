@@ -6,12 +6,12 @@ public class EntityYComparator implements Comparator<IEntity> {
 
   @Override
   public int compare(final IEntity m1, final IEntity m2) {
-    if (m1 instanceof ICombatEntity && m2 instanceof ICombatEntity) {
-      if (((ICombatEntity) m1).isDead() && !((ICombatEntity) m2).isDead()) {
+    if (m1 instanceof IMovableCombatEntity && m2 instanceof IMovableCombatEntity) {
+      if (((IMovableCombatEntity) m1).isDead() && !((IMovableCombatEntity) m2).isDead()) {
         return -1;
       }
 
-      if (!((ICombatEntity) m1).isDead() && ((ICombatEntity) m2).isDead()) {
+      if (!((IMovableCombatEntity) m1).isDead() && ((IMovableCombatEntity) m2).isDead()) {
         return 1;
       }
     }

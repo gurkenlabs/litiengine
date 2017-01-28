@@ -31,9 +31,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   private static final Random RANDOM = new Random();
   private final List<Color> colors;
-  
+
   private final boolean activateOnInit;
-  
+
   private IGameLoop gameLoop;
 
   /** The activated. */
@@ -69,7 +69,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /** The time to live. */
   private int timeToLive;
 
-
   private Rectangle2D boundingBox;
 
   /**
@@ -100,7 +99,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.setLocation(origin);
     this.activateOnInit = info.activateOnInit();
   }
-  
+
   /**
    * Activate.
    */
@@ -165,8 +164,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     if (this.gameLoop != null) {
       this.gameLoop.unregisterFromUpdate(this);
     }
-    
-    Game.getEnvironment().remove(this);
+
+    if (Game.getEnvironment() != null) {
+      Game.getEnvironment().remove(this);
+    }
   }
 
   /**
