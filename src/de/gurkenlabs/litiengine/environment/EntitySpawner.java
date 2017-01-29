@@ -22,7 +22,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       for (int i = 0; i < this.amount; i++) {
         final T newEntity = EntitySpawner.this.createNew();
         newEntity.setLocation(this.point.getPoint());
-        newEntity.setMapId(EntitySpawner.this.environment.getMapId());
+        newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
         EntitySpawner.this.addToEnvironment(EntitySpawner.this.environment, newEntity);
 
         try {

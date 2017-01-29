@@ -236,7 +236,7 @@ public class Environment implements IEnvironment {
       Game.getLoop().unregisterFromUpdate(narrator);
       Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());
     }
-    
+
     this.getNarrators().clear();
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
@@ -325,6 +325,33 @@ public class Environment implements IEnvironment {
     entity = this.entities.get(RenderType.OVERLAY).get(mapId);
     if (entity != null) {
       return entity;
+    }
+
+    return null;
+  }
+
+  @Override
+  public IEntity get(String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    for (IEntity entity : this.entities.get(RenderType.GROUND).values()) {
+      if (entity.getName() != null && entity.getName().equals(name)) {
+        return entity;
+      }
+    }
+    
+    for (IEntity entity : this.entities.get(RenderType.NORMAL).values()) {
+      if (entity.getName() != null && entity.getName().equals(name)) {
+        return entity;
+      }
+    }
+    
+    for (IEntity entity : this.entities.get(RenderType.OVERLAY).values()) {
+      if (entity.getName() != null && entity.getName().equals(name)) {
+        return entity;
+      }
     }
 
     return null;
@@ -474,7 +501,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public synchronized int getMapId() {
+  public synchronized int getNextMapId() {
     return ++mapIdSequence;
   }
 
@@ -738,6 +765,7 @@ public class Environment implements IEnvironment {
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
     col.setMapId(mapObject.getId());
+    col.setName(mapObject.getName());
 
     String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
     if (shadowType != null && !shadowType.isEmpty()) {
@@ -778,6 +806,7 @@ public class Environment implements IEnvironment {
     mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
+    mob.setName(mapObject.getName());
 
     this.add(mob);
   }
@@ -810,6 +839,8 @@ public class Environment implements IEnvironment {
     if (emitter != null) {
       emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
       emitter.setMapId(mapObject.getId());
+      emitter.setName(mapObject.getName());
+
       this.add(emitter);
     }
   }
@@ -848,6 +879,7 @@ public class Environment implements IEnvironment {
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());
+    light.setName(mapObject.getName());
     this.add(light);
   }
 
@@ -891,6 +923,7 @@ public class Environment implements IEnvironment {
       prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
     }
     prop.setMapId(mapObject.getId());
+    prop.setName(mapObject.getName());
     this.add(prop);
   }
 
@@ -1156,7 +1189,7 @@ public class Environment implements IEnvironment {
     for (IEntity entity : this.getEntities()) {
       this.load(entity);
     }
-    
+
     for (Narrator narrator : this.getNarrators()) {
       Game.getLoop().registerForUpdate(narrator);
       Game.getLoop().registerForUpdate(narrator.getAnimationController());
@@ -1175,7 +1208,7 @@ public class Environment implements IEnvironment {
     for (IEntity entity : this.getEntities()) {
       this.unload(entity);
     }
-    
+
     for (Narrator narrator : this.getNarrators()) {
       Game.getLoop().unregisterFromUpdate(narrator);
       Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());

@@ -49,6 +49,12 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void loadFromMap(final int mapId);
 
+  public List<ICombatEntity> findCombatEntities(Shape shape);
+
+  public List<IEntity> findEntities(Shape shape);
+
+  public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
+
   public Collection<ICombatEntity> getCombatEntities();
 
   public Collection<IMovableEntity> getMovableEntities();
@@ -56,12 +62,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IEntity> getEntities();
 
   public Collection<IEntity> getEntities(RenderType renderType);
-
-  public List<ICombatEntity> findCombatEntities(Shape shape);
-
-  public List<IEntity> findEntities(Shape shape);
-
-  public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
   public Collection<Collider> getColliders();
 
@@ -76,6 +76,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<Narrator> getNarrators();
 
   public IEntity get(final int mapId);
+
+  public IEntity get(final String name);
 
   public Collection<LightSource> getLightSources();
 
@@ -106,7 +108,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
    *
    * @return
    */
-  public int getMapId();
+  public int getNextMapId();
 
   public List<MapLocation> getSpawnPoints();
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -14,6 +15,8 @@ import de.gurkenlabs.util.image.ImageProcessing;
 
 public abstract class AnimationController implements IAnimationController {
   private static int MAX_IMAGE_EFFECTS = 20;
+  private final List<Consumer<Animation>> playbackFinishedConsumer;
+  private final List<Consumer<Animation>> playbackConsumer;
   private final List<Animation> animations;
   private final List<IImageEffect> imageEffects;
   private final Animation defaultAnimation;
@@ -22,6 +25,8 @@ public abstract class AnimationController implements IAnimationController {
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this.animations = new CopyOnWriteArrayList<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
+    this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
+    this.playbackConsumer = new CopyOnWriteArrayList<>();
     this.defaultAnimation = defaultAnimation;
     this.animations.add(this.defaultAnimation);
 
@@ -139,6 +144,10 @@ public abstract class AnimationController implements IAnimationController {
 
     this.currentAnimation = anim;
     this.currentAnimation.start();
+
+    for (Consumer<Animation> cons : this.playbackConsumer) {
+      cons.accept(this.getCurrentAnimation());
+    }
   }
 
   private void removeFinishedImageEffects() {
@@ -162,13 +171,28 @@ public abstract class AnimationController implements IAnimationController {
     if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
       return;
     }
-
-    if (this.getCurrentAnimation() == null || this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying()) {
-      this.currentAnimation = this.defaultAnimation;
-
-      if (this.currentAnimation != null) {
-        this.currentAnimation.start();
+    final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
+    if (playbackFinished) {
+      for (Consumer<Animation> cons : this.playbackFinishedConsumer) {
+        cons.accept(this.getCurrentAnimation());
       }
     }
+
+    if (this.getCurrentAnimation() == null || playbackFinished) {
+      this.currentAnimation = null;
+      if (this.defaultAnimation != null) {
+        this.playAnimation(this.defaultAnimation.getName());
+      }
+    }
+  }
+
+  @Override
+  public void onPlaybackEnded(Consumer<Animation> cons) {
+    this.playbackFinishedConsumer.add(cons);
+  }
+
+  @Override
+  public void onPlayback(Consumer<Animation> cons) {
+    this.playbackConsumer.add(cons);
   }
 }

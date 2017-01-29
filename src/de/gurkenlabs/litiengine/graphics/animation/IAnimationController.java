@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
@@ -24,4 +25,8 @@ public interface IAnimationController extends IUpdateable {
   public List<IImageEffect> getImageEffects();
 
   public void playAnimation(final String animationName);
+
+  public void onPlaybackEnded(Consumer<Animation> cons);
+  
+  public void onPlayback(Consumer<Animation> cons);
 }
