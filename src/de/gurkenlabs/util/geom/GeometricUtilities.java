@@ -13,21 +13,34 @@ import java.util.Collections;
 import java.util.List;
 
 public class GeometricUtilities {
-  public static List<Point2D> getPoints(final Path2D path){
+
+  public static Point2D getRandomLocation(double x, double y, double width, double height) {
+    final double xOffset = Math.random() * width;
+    final double yOffset = Math.random() * height;
+
+    return new Point2D.Double(x + xOffset, y + yOffset);
+  }
+
+  public static Point2D getRandomLocation(Rectangle2D rect) {
+    return getRandomLocation(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+
+  }
+
+  public static List<Point2D> getPoints(final Path2D path) {
     PathIterator pi = path.getPathIterator(null);
     final double[] coordinates = new double[22];
     List<Point2D> points = new ArrayList<>();
-    while(!pi.isDone()){
+    while (!pi.isDone()) {
       pi.next();
-      
+
       pi.currentSegment(coordinates);
       Point2D currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
       points.add(currentPoint);
     }
-    
+
     return points;
   }
-  
+
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
     if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
       if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
@@ -37,7 +50,7 @@ public class GeometricUtilities {
 
     return false;
   }
-  
+
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])
@@ -518,7 +531,8 @@ public class GeometricUtilities {
     final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
   }
-  public static Shape scaleRect(final Rectangle2D shape, final int max){
+
+  public static Shape scaleRect(final Rectangle2D shape, final int max) {
     double width = shape.getWidth();
     double height = shape.getHeight();
 

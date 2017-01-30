@@ -45,6 +45,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
+import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -98,6 +99,7 @@ public class Environment implements IEnvironment {
   private final List<IRenderable> overlayRenderable;
 
   private final List<MapLocation> spawnPoints;
+  private final List<MapArea> mapAreas;
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
   private final CopyOnWriteArrayList<Narrator> narrators;
@@ -118,6 +120,7 @@ public class Environment implements IEnvironment {
     this.colliders = new CopyOnWriteArrayList<>();
     this.triggers = new CopyOnWriteArrayList<>();
     this.narrators = new CopyOnWriteArrayList<>();
+    this.mapAreas = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -231,6 +234,7 @@ public class Environment implements IEnvironment {
     this.getLightSources().clear();
     this.getColliders().clear();
     this.getSpawnPoints().clear();
+    this.getAreas().clear();
     this.getTriggers().clear();
     for (Narrator narrator : this.getNarrators()) {
       Game.getLoop().unregisterFromUpdate(narrator);
@@ -341,13 +345,13 @@ public class Environment implements IEnvironment {
         return entity;
       }
     }
-    
+
     for (IEntity entity : this.entities.get(RenderType.NORMAL).values()) {
       if (entity.getName() != null && entity.getName().equals(name)) {
         return entity;
       }
     }
-    
+
     for (IEntity entity : this.entities.get(RenderType.OVERLAY).values()) {
       if (entity.getName() != null && entity.getName().equals(name)) {
         return entity;
@@ -415,6 +419,36 @@ public class Environment implements IEnvironment {
   @Override
   public MapLocation getSpawnpoint(int mapId) {
     for (MapLocation m : this.getSpawnPoints()) {
+      if (m.getMapId() == mapId) {
+        return m;
+      }
+    }
+
+    return null;
+  }
+
+  @Override
+  public List<MapArea> getAreas() {
+    return this.mapAreas;
+  }
+
+  @Override
+  public MapArea getArea(String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    for (MapArea m : this.getAreas()) {
+      if (m.getName() != null && m.getName().equals(name)) {
+        return m;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public MapArea getArea(int mapId) {
+    for (MapArea m : this.getAreas()) {
       if (m.getMapId() == mapId) {
         return m;
       }
@@ -741,6 +775,7 @@ public class Environment implements IEnvironment {
     this.addCollisionBox(mapObject);
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
+    this.addMapArea(mapObject);
     this.addProp(mapObject);
     this.addEmitter(mapObject);
     this.addDecorMob(mapObject);
@@ -935,6 +970,15 @@ public class Environment implements IEnvironment {
     MapLocation spawn = new MapLocation(mapObject.getId(), new Point(mapObject.getLocation()));
     spawn.setName(mapObject.getName());
     this.getSpawnPoints().add(spawn);
+  }
+
+  private void addMapArea(IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.AREA) {
+      return;
+    }
+
+    MapArea area = new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight());
+    this.getAreas().add(area);
   }
 
   protected void addTrigger(final IMapObject mapObject) {
