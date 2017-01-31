@@ -102,7 +102,6 @@ public class Environment implements IEnvironment {
   private final List<MapArea> mapAreas;
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
-  private final CopyOnWriteArrayList<Narrator> narrators;
 
   private boolean initialized;
   private boolean loaded;
@@ -119,7 +118,6 @@ public class Environment implements IEnvironment {
     this.lightSources = new CopyOnWriteArrayList<>();
     this.colliders = new CopyOnWriteArrayList<>();
     this.triggers = new CopyOnWriteArrayList<>();
-    this.narrators = new CopyOnWriteArrayList<>();
     this.mapAreas = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -212,19 +210,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void addNarrator(final String name) {
-    this.addNarrator(name, Narrator.LAYOUT_LEFT);
-  }
-
-  @Override
-  public void addNarrator(final String name, final int layout) {
-    Narrator newNarrator = new Narrator(this, name, layout);
-    this.getNarrators().add(newNarrator);
-    Game.getLoop().registerForUpdate(newNarrator);
-    Game.getLoop().registerForUpdate(newNarrator.getAnimationController());
-  }
-
-  @Override
   public void clear() {
     Game.getPhysicsEngine().clear();
     this.dispose(this.getEntities());
@@ -236,12 +221,7 @@ public class Environment implements IEnvironment {
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
-    for (Narrator narrator : this.getNarrators()) {
-      Game.getLoop().unregisterFromUpdate(narrator);
-      Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());
-    }
 
-    this.getNarrators().clear();
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
@@ -553,26 +533,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  @Override
-  public Narrator getNarrator(final int index) {
-    return this.getNarrators().get(index);
-  }
-
-  @Override
-  public Narrator getNarrator(final String name) {
-    for (Narrator narrator : this.getNarrators()) {
-      if (narrator.getName() == name) {
-        return narrator;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public CopyOnWriteArrayList<Narrator> getNarrators() {
-    return this.narrators;
-  }
-
   public List<IRenderable> getOverlayRenderable() {
     return this.overlayRenderable;
   }
@@ -693,23 +653,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void removeNarrator(final String name) {
-    if (this.getNarrators() == null || name == null || name.isEmpty()) {
-      return;
-    }
-
-    this.getNarrators().removeIf(n -> n.getName().equals(name));
-  }
-
-  @Override
-  public void removeNarrator(final int index) {
-    if (this.getNarrators() == null || this.getNarrators().size() <= index) {
-      return;
-    }
-    this.getNarrators().remove(index);
-  }
-
-  @Override
   public void removeRenderable(final IRenderable renderable) {
     if (this.getGroundRenderable().contains(renderable)) {
       this.getGroundRenderable().remove(renderable);
@@ -757,13 +700,6 @@ public class Environment implements IEnvironment {
 
     this.informConsumers(g, this.overlayRenderedConsumer);
     g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
-    if (this.getNarrators() == null || this.getNarrators().isEmpty()) {
-      return;
-    }
-    for (final Narrator narr : this.getNarrators()) {
-      narr.render(g);
-    }
-
   }
 
   @Override
@@ -1234,11 +1170,6 @@ public class Environment implements IEnvironment {
       this.load(entity);
     }
 
-    for (Narrator narrator : this.getNarrators()) {
-      Game.getLoop().registerForUpdate(narrator);
-      Game.getLoop().registerForUpdate(narrator.getAnimationController());
-    }
-
     this.loaded = true;
   }
 
@@ -1251,11 +1182,6 @@ public class Environment implements IEnvironment {
     // unregister all updatable entities from the current environment
     for (IEntity entity : this.getEntities()) {
       this.unload(entity);
-    }
-
-    for (Narrator narrator : this.getNarrators()) {
-      Game.getLoop().unregisterFromUpdate(narrator);
-      Game.getLoop().unregisterFromUpdate(narrator.getAnimationController());
     }
 
     this.loaded = false;

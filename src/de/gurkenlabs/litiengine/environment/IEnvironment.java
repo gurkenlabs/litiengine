@@ -42,10 +42,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void add(IRenderable renderable, RenderType type);
 
-  public void addNarrator(final String name, final int layout);
-
-  public void addNarrator(final String name);
-
   public void reloadFromMap(final int mapId);
 
   public void loadFromMap(final int mapId);
@@ -69,12 +65,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public ICombatEntity getCombatEntity(final int mapId);
 
   public IMovableEntity getMovableEntity(final int mapId);
-
-  public Narrator getNarrator(final int index);
-
-  public Narrator getNarrator(final String name);
-
-  public Collection<Narrator> getNarrators();
 
   public IEntity get(final int mapId);
 
@@ -134,10 +124,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onInitialized(final Consumer<IEnvironment> consumer);
 
   public void remove(final int mapId);
-
-  public void removeNarrator(final String name);
-
-  public void removeNarrator(final int index);
 
   public void remove(final IEntity entity);
 
