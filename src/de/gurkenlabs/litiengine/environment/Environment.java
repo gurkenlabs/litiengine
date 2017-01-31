@@ -160,6 +160,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public void add(final IEntity entity) {
+    if (entity == null) {
+      return;
+    }
+
     // set local map id if none is set for the entity
     if (entity.getMapId() == 0) {
       entity.setMapId(this.getLocalMapId());
