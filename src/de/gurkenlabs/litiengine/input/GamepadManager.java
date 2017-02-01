@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
-import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Controller.Type;
@@ -135,7 +134,6 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       ctor.setAccessible(true);
       env.set(null, ctor.newInstance());
     } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }

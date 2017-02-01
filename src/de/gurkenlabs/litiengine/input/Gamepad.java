@@ -82,6 +82,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   private void dispose() {
     Game.getLoop().unregisterFromUpdate(this);
     this.pollConsumer.clear();
+    this.pressedConsumer.clear();
     Input.GAMEPADMANAGER.remove(this);
   }
 
