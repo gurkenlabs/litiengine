@@ -3,30 +3,77 @@ package de.gurkenlabs.litiengine.input;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
+import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Controller.Type;
 
 public class GamepadManager implements IGamepadManager, IUpdateable {
+  private static final int GAMEPAD_UPDATE_DELAY = 150;
+  private final Map<String, List<Consumer<Float>>> pollConsumer;
   private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
+
+  private int defaultgamePadIndex = -1;
 
   public GamepadManager() {
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
+    this.pollConsumer = new ConcurrentHashMap<>();
     Game.getLoop().registerForUpdate(this);
+
+    this.onGamepadAdded(pad -> {
+      if (defaultgamePadIndex == -1) {
+        this.defaultgamePadIndex = pad.getIndex();
+        this.hookupToGamepad(pad);
+      }
+    });
+
+    this.onGamepadRemoved(pad -> {
+      if (defaultgamePadIndex == pad.getIndex()) {
+        this.defaultgamePadIndex = -1;
+        IGamepad newGamePad = Input.getGamepad();
+        if (newGamePad != null) {
+          this.defaultgamePadIndex = newGamePad.getIndex();
+          this.hookupToGamepad(newGamePad);
+        }
+      }
+    });
+  }
+
+  private void hookupToGamepad(IGamepad pad) {
+    for (String ident : this.pollConsumer.keySet()) {
+      for (Consumer<Float> cons : this.pollConsumer.get(ident)) {
+        pad.onPoll(ident, cons);
+      }
+    }
   }
 
   @Override
   public void update(IGameLoop loop) {
     updateGamepads();
+  }
+
+  @Override
+  public void remove(IGamepad gamepad) {
+    if (gamepad == null) {
+      return;
+    }
+
+    Input.GAMEPADS.remove(gamepad);
+    for (Consumer<IGamepad> cons : this.gamepadRemovedConsumer) {
+      cons.accept(gamepad);
+    }
   }
 
   public void onGamepadRemoved(Consumer<IGamepad> cons) {
@@ -38,7 +85,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   private void updateGamepads() {
-    if (Game.getLoop().getTicks() % 150 == 0) {
+    if (Game.getLoop().getTicks() % GAMEPAD_UPDATE_DELAY == 0) {
       this.hackTheShitOutOfJInputBecauseItSucks_HARD();
     }
 
@@ -66,8 +113,10 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   /**
-   * In JInput it is not possible to get newly added controllers or detached controllers because it will never update its controllers.
-   * If you would restart the application it would work... so we just reset the environment via reflection and it'll do it ;).
+   * In JInput it is not possible to get newly added controllers or detached
+   * controllers because it will never update its controllers. If you would
+   * restart the application it would work... so we just reset the environment
+   * via reflection and it'll do it ;).
    */
   private void hackTheShitOutOfJInputBecauseItSucks_HARD() {
     try {
@@ -81,5 +130,22 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void onPoll(String identifier, Consumer<Float> consumer) {
+    String contains = null;
+    for (String id : this.pollConsumer.keySet()) {
+      if (id.equals(identifier)) {
+        contains = id;
+        break;
+      }
+    }
+
+    if (contains == null) {
+      this.pollConsumer.put(identifier, new ArrayList<>());
+    }
+
+    this.pollConsumer.get(contains != null ? contains : identifier).add(consumer);
   }
 }

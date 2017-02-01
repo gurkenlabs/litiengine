@@ -63,6 +63,10 @@ public class KeyboardEntityController<T extends IMovableEntity> extends ClientEn
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
+    if(!this.isMovementAllowed()){
+      return;
+    }
+    
     final long deltaTime = loop.getDeltaTime();
     double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
 

@@ -22,12 +22,34 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
   private float dx;
   private float dy;
 
+  private int gamePadIndex = -1;
+
   public GamepadEntityController(final T entity) {
     super(entity);
+
+    Input.GAMEPADMANAGER.onGamepadAdded(pad -> {
+      if (gamePadIndex == -1) {
+        this.gamePadIndex = pad.getIndex();
+      }
+    });
+
+    Input.GAMEPADMANAGER.onGamepadRemoved(pad -> {
+      if (gamePadIndex == pad.getIndex()) {
+        this.gamePadIndex = -1;
+        IGamepad newGamePad = Input.getGamepad();
+        if (newGamePad != null) {
+          this.gamePadIndex = newGamePad.getIndex();
+        }
+      }
+    });
   }
 
   @Override
   public void update(final IGameLoop loop) {
+    if(!this.isMovementAllowed()){
+      return;
+    }
+    
     this.retrieveGamepadValues();
     super.update(loop);
     final long deltaTime = loop.getDeltaTime();
@@ -103,13 +125,12 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
   }
 
   private void retrieveGamepadValues() {
-
-    if (Input.getGamepad() == null) {
+    if (this.gamePadIndex == -1 || (this.gamePadIndex != -1 && Input.getGamepad(this.gamePadIndex) == null)) {
       return;
     }
 
-    float x = Input.getGamepad().getPollData(Identifier.Axis.X);
-    float y = Input.getGamepad().getPollData(Identifier.Axis.Y);
+    float x = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.X);
+    float y = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.Y);
 
     if (Math.abs(x) > 0.15) {
       this.dx = x;
@@ -121,13 +142,13 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
       this.movedY = true;
     }
 
-    float rightX = Input.getGamepad().getPollData(Identifier.Axis.RX);
-    float rightY = Input.getGamepad().getPollData(Identifier.Axis.RY);
+    float rightX = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RX);
+    float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
     float targetX = 0, targetY = 0;
-    if (Math.abs(rightX) > 0.05) {
+    if (Math.abs(rightX) > 0.08) {
       targetX = rightX;
     }
-    if (Math.abs(rightY) > 0.05) {
+    if (Math.abs(rightY) > 0.08) {
       targetY = rightY;
     }
 

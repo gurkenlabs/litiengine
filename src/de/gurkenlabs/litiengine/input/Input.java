@@ -30,6 +30,11 @@ public class Input {
 
   public static final List<IGamepad> GAMEPADS = new CopyOnWriteArrayList<>();
 
+  /**
+   * Gets the first gamepad that is currently available.
+   * 
+   * @return
+   */
   public static IGamepad getGamepad() {
     if (GAMEPADS.size() == 0) {
       return null;
@@ -38,6 +43,12 @@ public class Input {
     return GAMEPADS.get(0);
   }
 
+  /**
+   * Gets the gamepad with the specified index if it is still plugged in.
+   * After replugging a controller while the game is running, its index might change.
+   * @param index
+   * @return
+   */
   public static IGamepad getGamepad(int index) {
     if (GAMEPADS.size() == 0) {
       return null;

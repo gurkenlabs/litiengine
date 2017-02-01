@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.input;
 
-import net.java.games.input.Component;
+import java.util.function.Consumer;
+
 import net.java.games.input.Component.Identifier;
 
 public interface IGamepad {
@@ -10,5 +11,5 @@ public interface IGamepad {
 
   public float getPollData(Identifier identifier);
 
-  public void dispose();
+  public void onPoll(String identifier, Consumer<Float> consumer);
 }
