@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -231,6 +232,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.colors.get(RANDOM.nextInt(this.colors.size()));
   }
 
+  public List<Color> getColors() {
+    return this.colors;
+  }
+
   protected int getRandomParticleTTL() {
     final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
     if (ttlDiff <= 0) {
@@ -318,6 +323,11 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void setMaxParticles(final int maxPart) {
     this.maxParticles = maxPart;
+  }
+
+  public void setColors(Color... colors) {
+    this.colors.clear();
+    this.colors.addAll(Arrays.asList(colors));
   }
 
   public void setOrigin(final Point2D location) {
