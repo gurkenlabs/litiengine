@@ -22,22 +22,8 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
   private float dx;
   private float dy;
 
-  private Controller gamepad;
-
   public GamepadEntityController(final T entity) {
     super(entity);
-    for (Controller controller : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
-      Type type = controller.getType();
-
-      if (type.equals(Type.GAMEPAD)) {
-        this.gamepad = controller;
-        break;
-      }
-    }
-
-    if (gamepad == null) {
-      throw new IllegalArgumentException("NO GAMEPAD FOUND!");
-    }
   }
 
   @Override
@@ -117,23 +103,26 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
   }
 
   private void retrieveGamepadValues() {
-    this.gamepad.poll();
-    
-    float x = this.gamepad.getComponent(Identifier.Axis.X).getPollData();
-    float y = this.gamepad.getComponent(Identifier.Axis.Y).getPollData();
+
+    if (Input.getGamepad() == null) {
+      return;
+    }
+
+    float x = Input.getGamepad().getPollData(Identifier.Axis.X);
+    float y = Input.getGamepad().getPollData(Identifier.Axis.Y);
 
     if (Math.abs(x) > 0.15) {
       this.dx = x;
       this.movedX = true;
     }
-    
+
     if (Math.abs(y) > 0.15) {
       this.dy = y;
       this.movedY = true;
     }
 
-    float rightX = this.gamepad.getComponent(Identifier.Axis.RX).getPollData();
-    float rightY = this.gamepad.getComponent(Identifier.Axis.RY).getPollData();
+    float rightX = Input.getGamepad().getPollData(Identifier.Axis.RX);
+    float rightY = Input.getGamepad().getPollData(Identifier.Axis.RY);
     float targetX = 0, targetY = 0;
     if (Math.abs(rightX) > 0.05) {
       targetX = rightX;
@@ -141,8 +130,8 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
     if (Math.abs(rightY) > 0.05) {
       targetY = rightY;
     }
-    
-    if(targetX != 0 || targetY != 0){
+
+    if (targetX != 0 || targetY != 0) {
       Point2D target = new Point2D.Double(this.getEntity().getDimensionCenter().getX() + targetX, this.getEntity().getDimensionCenter().getY() + targetY);
       double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getDimensionCenter(), target);
       this.getEntity().setAngle((float) angle);
