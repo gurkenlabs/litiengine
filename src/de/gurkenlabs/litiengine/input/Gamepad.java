@@ -28,7 +28,7 @@ public class Gamepad implements IGamepad, IUpdateable {
     this.pressedConsumer = new ConcurrentHashMap<>();
     this.index = index;
     this.controller = controller;
-    Game.getLoop().registerForUpdate(this);
+    Input.INPUT_LOOP.registerForUpdate(this);
   }
 
   public int getIndex() {
@@ -80,7 +80,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   private void dispose() {
-    Game.getLoop().unregisterFromUpdate(this);
+    Input.INPUT_LOOP.unregisterFromUpdate(this);
     this.pollConsumer.clear();
     this.pressedConsumer.clear();
     Input.GAMEPADMANAGER.remove(this);

@@ -31,7 +31,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();
     this.pressedConsumer = new ConcurrentHashMap<>();
-    Game.getLoop().registerForUpdate(this);
+    Input.INPUT_LOOP.registerForUpdate(this);
 
     this.onGamepadAdded(pad -> {
       if (defaultgamePadIndex == -1) {
@@ -92,7 +92,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   private void updateGamepads() {
-    if (Game.getLoop().getTicks() % GAMEPAD_UPDATE_DELAY == 0) {
+    if (Input.INPUT_LOOP.getTicks() % GAMEPAD_UPDATE_DELAY == 0) {
       this.hackTheShitOutOfJInputBecauseItSucks_HARD();
     }
 

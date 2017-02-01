@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Controller;
@@ -21,14 +22,27 @@ import net.java.games.input.Controller.Type;
 public class Input {
 
   /** The keyboard. */
-  public static IKeyboard KEYBOARD = new KeyBoard();
+  public static IKeyboard KEYBOARD;
 
   /** The mouse. */
-  public static IMouse MOUSE = new Mouse();
+  public static IMouse MOUSE;
 
-  public static IGamepadManager GAMEPADMANAGER = new GamepadManager();
+  public static IGamepadManager GAMEPADMANAGER;
 
-  public static final List<IGamepad> GAMEPADS = new CopyOnWriteArrayList<>();
+  public static final List<IGamepad> GAMEPADS;
+
+  // we need an own gameloop because otherwise input won't work if the game has
+  // been paused
+  protected static final GameLoop INPUT_LOOP;
+
+  static {
+    GAMEPADS = new CopyOnWriteArrayList<>();
+    INPUT_LOOP = new GameLoop(30);
+    INPUT_LOOP.start();
+    KEYBOARD = new KeyBoard();
+    MOUSE = new Mouse();
+    GAMEPADMANAGER = new GamepadManager();
+  }
 
   /**
    * Gets the first gamepad that is currently available.
@@ -44,8 +58,9 @@ public class Input {
   }
 
   /**
-   * Gets the gamepad with the specified index if it is still plugged in.
-   * After replugging a controller while the game is running, its index might change.
+   * Gets the gamepad with the specified index if it is still plugged in. After
+   * replugging a controller while the game is running, its index might change.
+   * 
    * @param index
    * @return
    */

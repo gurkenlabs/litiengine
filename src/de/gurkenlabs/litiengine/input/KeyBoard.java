@@ -43,6 +43,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   /** The typed keys. */
   private final List<KeyEvent> typedKeys;
 
+ 
   private boolean consumeAlt;
 
   /**
@@ -57,7 +58,8 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.typedKeys = new CopyOnWriteArrayList<>();
     this.keyObservers = new CopyOnWriteArrayList<>();
 
-    Game.getLoop().registerForUpdate(this);
+    // needs own loop, otherwise it won't work when the game is paused
+    Input.INPUT_LOOP.registerForUpdate(this);
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }
