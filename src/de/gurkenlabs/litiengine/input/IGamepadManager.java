@@ -15,6 +15,7 @@ public interface IGamepadManager {
    * @param consumer
    */
   public void onPoll(String identifier, Consumer<Float> consumer);
+  public void onPressed(String identifier, Consumer<Float> consumer);
   
   public void remove(IGamepad gamepad);
 

@@ -21,6 +21,7 @@ import net.java.games.input.Controller.Type;
 public class GamepadManager implements IGamepadManager, IUpdateable {
   private static final int GAMEPAD_UPDATE_DELAY = 150;
   private final Map<String, List<Consumer<Float>>> pollConsumer;
+  private final Map<String, List<Consumer<Float>>> pressedConsumer;
   private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
 
@@ -30,6 +31,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();
+    this.pressedConsumer = new ConcurrentHashMap<>();
     Game.getLoop().registerForUpdate(this);
 
     this.onGamepadAdded(pad -> {
@@ -55,6 +57,12 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     for (String ident : this.pollConsumer.keySet()) {
       for (Consumer<Float> cons : this.pollConsumer.get(ident)) {
         pad.onPoll(ident, cons);
+      }
+    }
+
+    for (String ident : this.pressedConsumer.keySet()) {
+      for (Consumer<Float> cons : this.pressedConsumer.get(ident)) {
+        pad.onPressed(ident, cons);
       }
     }
   }
@@ -147,5 +155,22 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     }
 
     this.pollConsumer.get(contains != null ? contains : identifier).add(consumer);
+  }
+
+  @Override
+  public void onPressed(String identifier, Consumer<Float> consumer) {
+    String contains = null;
+    for (String id : this.pressedConsumer.keySet()) {
+      if (id.equals(identifier)) {
+        contains = id;
+        break;
+      }
+    }
+
+    if (contains == null) {
+      this.pressedConsumer.put(identifier, new ArrayList<>());
+    }
+
+    this.pressedConsumer.get(contains != null ? contains : identifier).add(consumer);
   }
 }
