@@ -200,20 +200,16 @@ public class ImageProcessing {
    * @return the buffered image
    */
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor) {
-    final BufferedImage bimage = getCompatibleImage(image.getWidth(null), image.getHeight(null));
-
+    final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
+    final BufferedImage strokeImg = flashVisiblePixels(image, strokeColor);
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(image, 0, 0, null);
+    bGr.drawImage(strokeImg, 0, 1, null);
+    bGr.drawImage(strokeImg, 2, 1, null);
+    bGr.drawImage(strokeImg, 1, 0, null);
+    bGr.drawImage(strokeImg, 1, 2, null);
+    bGr.drawImage(image, 1, 1, null);
     bGr.dispose();
-
-    for (int y = 0; y < bimage.getHeight(); y++) {
-      for (int x = 0; x < bimage.getWidth(); x++) {
-        if (needsBorder(image, x, y)) {
-          bimage.setRGB(x, y, strokeColor.getRGB());
-        }
-      }
-    }
 
     return bimage;
   }
