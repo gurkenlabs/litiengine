@@ -119,6 +119,10 @@ public class RenderEngine implements IRenderEngine {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
+  public static void drawMapText(final Graphics2D g, final String text, Point2D location) {
+    drawMapText(g, text, location.getX(), location.getY());
+  }
+
   /**
    * Draws the given string to the specified map location.
    * 

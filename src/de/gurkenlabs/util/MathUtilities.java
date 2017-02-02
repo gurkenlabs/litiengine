@@ -26,6 +26,39 @@ public class MathUtilities {
     return 0;
   }
 
+  public static double getAverage(double[] numbers) {
+    double sum = 0;
+    for (double number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
+  public static float getAverage(float[] numbers) {
+    float sum = 0;
+    for (float number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
+  public static int getAverage(int[] numbers) {
+    int sum = 0;
+    for (int number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
   public static boolean probabilityIsTrue(final double probability) {
     return RANDOM.nextDouble() < probability;
   }
