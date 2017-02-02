@@ -3,6 +3,8 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.configuration;
 
+import java.util.Locale;
+
 import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.ConfigurationGroup;
 
@@ -20,6 +22,12 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   private boolean showGameMetrics;
 
+  private String language;
+
+  private String country;
+
+  private Locale locale;
+
   /**
    * Instantiates a new client configuration.
    */
@@ -28,6 +36,8 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.setUpdaterate(23);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
+    this.setLanguage("en");
+    this.setCountry("US");
   }
 
   /**
@@ -83,5 +93,31 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public boolean showGameMetrics() {
     return this.showGameMetrics;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+    this.locale = null;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public void setLanguage(String language) {
+    this.language = language;
+    this.locale = null;
+  }
+
+  public Locale getLocale() {
+    if (locale == null) {
+      locale = new Locale(this.getLanguage(), this.getCountry());
+    }
+
+    return locale;
   }
 }
