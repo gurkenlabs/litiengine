@@ -23,6 +23,8 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+
 public class ImageProcessing {
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
@@ -34,7 +36,7 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_BOTTOM = 3;
 
   public static String encodeToString(final BufferedImage image) {
-    if(image == null){
+    if (image == null) {
       return null;
     }
     String imageString = null;
@@ -54,10 +56,10 @@ public class ImageProcessing {
   }
 
   public static BufferedImage decodeToImage(String imageString) {
-    if(imageString == null){
+    if (imageString == null) {
       return null;
     }
-    
+
     BufferedImage image = null;
     byte[] imageByte;
     try {
@@ -516,6 +518,17 @@ public class ImageProcessing {
     g.drawImage(img, 0, 0 + h, w, -h, null);
     g.dispose();
     return dimg;
+  }
+
+  public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
+    BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
+    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
+      g.drawImage(ImageProcessing.horizontalflip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+    }
+    g.dispose();
+
+    return flippedSprite;
   }
 
   public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
