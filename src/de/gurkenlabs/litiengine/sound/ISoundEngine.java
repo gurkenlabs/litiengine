@@ -7,15 +7,8 @@ import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public interface ISoundEngine extends ILaunchable {
-  public void addEntityPlayCondition(Predicate<IEntity> predicate);
 
-  public void addPlayCondition(Predicate<Point2D> predicate);
-
-  public float getGain();
-
-  public void init(float soundVolume);
-
-  public boolean isPlaying(String identifier);
+  public void init(final float soundVolume);
 
   public void load(Sound sound);
 
@@ -29,13 +22,9 @@ public interface ISoundEngine extends ILaunchable {
 
   public void rewind(Sound s);
 
-  public void setGain(float volume);
+  public void setMaxDistance(float distance);
 
-  public void setMaxRadius(float radius);
+  public float getMaxDistance();
 
   public void stopMusic(Sound s);
-
-  public void updateListenerPosition(Point2D location);
-
-  public void updatePosition(String identifier, Point2D location);
 }

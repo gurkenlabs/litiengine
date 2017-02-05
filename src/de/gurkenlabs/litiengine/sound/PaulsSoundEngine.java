@@ -139,4 +139,10 @@ public class PaulsSoundEngine extends SoundEngine {
     this.soundSystem.setPosition(identifier, (float) location.getX(), (float) location.getY(), 0);
   }
 
+  @Override
+  public float getMaxDistance() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
 }

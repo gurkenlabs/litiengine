@@ -23,10 +23,6 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   private final List<Playback> playbacks;
-  private final List<Predicate<IEntity>> entityPlayConditions;
-  private final List<Predicate<Point2D>> playConditions;
-
-  private float gain;
   private Point2D listenerPosition;
 
   private float maxListenerRadius;
@@ -35,8 +31,6 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
   public SoundEngine() {
     this.playbacks = new CopyOnWriteArrayList<>();
-    this.entityPlayConditions = new CopyOnWriteArrayList<>();
-    this.playConditions = new CopyOnWriteArrayList<>();
   }
 
   protected void add(final Playback playBack) {
@@ -47,41 +41,14 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
     this.playbacks.add(playBack);
   }
 
-  @Override
-  public void addEntityPlayCondition(final Predicate<IEntity> predicate) {
-    this.entityPlayConditions.add(predicate);
-  }
-
-  @Override
-  public void addPlayCondition(final Predicate<Point2D> predicate) {
-    this.playConditions.add(predicate);
-  }
-
   protected boolean canPlay(final IEntity entity) {
-    for (final Predicate<IEntity> condition : this.entityPlayConditions) {
-      if (!condition.test(entity)) {
-        return false;
-      }
-    }
-
     return true;
   }
 
   protected boolean canPlay(final Point2D location) {
-    for (final Predicate<Point2D> condition : this.playConditions) {
-      if (!condition.test(location)) {
-        return false;
-      }
-    }
 
     return true;
   }
-
-  @Override
-  public float getGain() {
-    return this.gain;
-  }
-
   public Point2D getListenerPosition() {
     return this.listenerPosition;
   }
@@ -91,18 +58,12 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void init(final float gain) {
+  public void init(final float soundVolume) {
     this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
-    this.setGain(gain);
   }
 
   @Override
-  public void setGain(final float volume) {
-    this.gain = volume;
-  }
-
-  @Override
-  public void setMaxRadius(final float radius) {
+  public void setMaxDistance(final float radius) {
     this.maxListenerRadius = radius;
   }
 
@@ -148,4 +109,11 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
 
     this.lastUpdate = gameLoop.getTicks();
   }
+  
+  public abstract void updateListenerPosition(Point2D location);
+
+  public abstract void updatePosition(String identifier, Point2D location);
+  
+  public abstract boolean isPlaying(String identifier);
+
 }
