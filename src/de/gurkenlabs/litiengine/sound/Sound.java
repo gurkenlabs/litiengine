@@ -1,15 +1,13 @@
 package de.gurkenlabs.litiengine.sound;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -20,19 +18,25 @@ import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 
 public class Sound {
-  private static final List<Sound> sounds = new CopyOnWriteArrayList<>();
+  private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
 
   public static Sound find(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
     }
 
-    final Optional<Sound> sound = sounds.stream().filter(x -> x.getName().equalsIgnoreCase(FileUtilities.getFileName(name))).findFirst();
-    if (!sound.isPresent()) {
-      return null;
+    return sounds.get(FileUtilities.getFileName(name));
+  }
+
+  public static Sound load(final String path) {
+    Sound sound = sounds.get(FileUtilities.getFileName(path));
+    if (sound != null) {
+      return sound;
     }
 
-    return sound.get();
+    sound = new Sound(path);
+    sounds.put(FileUtilities.getFileName(path), sound);
+    return sound;
   }
 
   private final String name;
@@ -45,7 +49,7 @@ public class Sound {
 
   private AudioInputStream stream;
 
-  public Sound(final String path) {
+  private Sound(final String path) {
     this.name = FileUtilities.getFileName(path);
     this.path = path;
 
@@ -64,7 +68,6 @@ public class Sound {
       e.printStackTrace();
     }
 
-    sounds.add(this);
   }
 
   public String getName() {
@@ -100,5 +103,10 @@ public class Sound {
 
   public AudioFormat getFormat() {
     return this.format;
+  }
+
+  public byte[] getStreamData() {
+    byte[] data = this.streamData.clone();
+    return data;
   }
 }

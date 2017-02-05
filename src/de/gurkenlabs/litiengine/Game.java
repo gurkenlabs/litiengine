@@ -30,9 +30,8 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
-import de.gurkenlabs.litiengine.sound.CustomSoundEngine;
+import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
-import de.gurkenlabs.litiengine.sound.PaulsSoundEngine;
 import de.gurkenlabs.tilemap.IMap;
 
 public abstract class Game {
@@ -60,7 +59,7 @@ public abstract class Game {
     environmentLoadedConsumer = new CopyOnWriteArrayList<>();
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
-    soundEngine = new CustomSoundEngine();
+    soundEngine = new SoundEngine();
     metrics = new GameMetrics();
     entityControllerManager = new EntityControllerManager();
     info = new GameInfo();

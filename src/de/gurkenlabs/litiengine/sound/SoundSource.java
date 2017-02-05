@@ -1,41 +1,38 @@
 package de.gurkenlabs.litiengine.sound;
 
 import java.awt.geom.Point2D;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Consumer;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
+import javax.sound.sampled.SourceDataLine;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.logging.Stopwatch;
 
 public class SoundSource {
-  private static final Mixer mixer;
   private static final ClipCloseQueue closeQueue;
-  
+
   private Point2D location;
   private IEntity entity;
   private Point2D initialListenerLocation;
   private final Sound sound;
 
-  private Clip clip;
+  private SourceDataLine dataLine;
   private FloatControl panControl;
   private FloatControl gainControl;
 
+  private boolean played;
   static {
-    Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
-    mixer = AudioSystem.getMixer(mixerInfos[0]);
     closeQueue = new ClipCloseQueue();
     closeQueue.start();
   }
@@ -61,40 +58,13 @@ public class SoundSource {
 
   public void play(boolean loop, Point2D location) {
     // clip must be disposed
-    if (clip != null) {
+    if (dataLine != null) {
       return;
     }
 
-    DataLine.Info dataInfo = new DataLine.Info(Clip.class, this.sound.getFormat());
-
-    try {
-      this.clip = (Clip) mixer.getLine(dataInfo);
-    } catch (LineUnavailableException e) {
-      e.printStackTrace();
-    }
-
-    AudioInputStream stream = this.sound.getStream();
-    if (stream == null) {
-      return;
-    }
-
-    try {
-      this.clip.open(stream);
-    } catch (LineUnavailableException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    this.initControls();
-    
-    this.location = location;
-    this.updateControls(this.initialListenerLocation);
-    if (loop) {
-      this.clip.loop(Clip.LOOP_CONTINUOUSLY);
-    } else {
-      this.clip.start();
-    }
+    PlayThread thread = new PlayThread();
+    thread.start();
+    this.played = true;
   }
 
   public void play() {
@@ -106,7 +76,7 @@ public class SoundSource {
   }
 
   public boolean isPlaying() {
-    return this.clip != null && this.clip.isActive();
+    return this.played || this.dataLine != null && this.dataLine.isActive();
   }
 
   public Sound getSound() {
@@ -114,9 +84,9 @@ public class SoundSource {
   }
 
   public void dispose() {
-    if (clip != null) {
-      closeQueue.enqueue(clip);
-      this.clip = null;
+    if (dataLine != null) {
+      closeQueue.enqueue(dataLine);
+      this.dataLine = null;
       this.gainControl = null;
       this.panControl = null;
     }
@@ -162,13 +132,17 @@ public class SoundSource {
   }
 
   private void initControls() {
+    if (this.dataLine == null) {
+      return;
+    }
+
     // Check if panning is supported:
     try {
-      if (!clip.isControlSupported(FloatControl.Type.PAN)) {
+      if (!dataLine.isControlSupported(FloatControl.Type.PAN)) {
         panControl = null;
       } else {
         // Create a new pan Control:
-        panControl = (FloatControl) clip.getControl(FloatControl.Type.PAN);
+        panControl = (FloatControl) dataLine.getControl(FloatControl.Type.PAN);
       }
     } catch (IllegalArgumentException iae) {
       panControl = null;
@@ -176,11 +150,11 @@ public class SoundSource {
 
     // Check if changing the volume is supported:
     try {
-      if (!clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+      if (!dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
         gainControl = null;
       } else {
         // Create a new gain control:
-        gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl = (FloatControl) dataLine.getControl(FloatControl.Type.MASTER_GAIN);
         // Store it's initial gain to use as "maximum volume" later:
       }
     } catch (IllegalArgumentException iae) {
@@ -219,9 +193,62 @@ public class SoundSource {
     panControl.setValue(pan);
   }
 
+  public class PlayThread extends Thread {
+    @Override
+    public void run() {
+      DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, sound.getFormat());
+
+      try {
+        dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
+        dataLine.open();
+      } catch (LineUnavailableException e) {
+        e.printStackTrace();
+      }
+
+      if (dataLine == null) {
+        return;
+      }
+
+      AudioInputStream stream = sound.getStream();
+      if (stream == null) {
+        return;
+      }
+
+      initControls();
+      setGain(Game.getConfiguration().SOUND.getSoundVolume());
+
+      SoundSource.this.location = location;
+      updateControls(initialListenerLocation);
+
+      
+      dataLine.start();
+      played = false;
+      final byte[] buffer = new byte[1024];
+      ByteArrayInputStream str = new ByteArrayInputStream(sound.getStreamData());
+      while (true) {
+        int readCount;
+        try {
+          readCount = str.read(buffer);
+
+          if (readCount < 0) {
+            break;
+          }
+
+          if (dataLine == null) {
+            break;
+          }
+
+          dataLine.write(buffer, 0, readCount);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
   public static class ClipCloseQueue extends Thread {
     private boolean isRunning = true;
-    private final Queue<Clip> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<SourceDataLine> queue = new ConcurrentLinkedQueue<>();
 
     public boolean isRunning() {
       return this.isRunning;
@@ -231,7 +258,7 @@ public class SoundSource {
     public void run() {
       while (this.isRunning) {
         while (this.queue.peek() != null) {
-          final Clip clip = this.queue.poll();
+          final SourceDataLine clip = this.queue.poll();
           clip.stop();
           clip.flush();
           clip.close();
@@ -248,7 +275,7 @@ public class SoundSource {
       this.isRunning = isRunning;
     }
 
-    public void enqueue(Clip clip) {
+    public void enqueue(SourceDataLine clip) {
       this.queue.add(clip);
     }
   }

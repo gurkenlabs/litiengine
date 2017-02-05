@@ -4,72 +4,28 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
-public abstract class SoundEngine implements ISoundEngine, IUpdateable {
-  private static final int UPDATE_RATE = 200;
-
-  protected static String getIdentifier(final IEntity entity, final Sound sound) {
-    return "entity-" + entity.getMapId() + "-" + sound.getName();
-  }
-
-  protected static String getIdentifier(final Point2D location, final Sound sound) {
-    return "location-" + location.getX() + ", " + location.getY() + "-" + sound.getName();
-  }
-
-  private final List<Playback> playbacks;
-  private Point2D listenerPosition;
-
-  private float maxListenerRadius;
-
-  private long lastUpdate;
+public class SoundEngine implements ISoundEngine, IUpdateable {
+  private static final int DEFAULT_MAX_DISTANCE = 250;
+  private final List<SoundSource> sounds;
+  private SoundSource music;
+  private Point2D listenerLocation;
+  private float maxDist;
 
   public SoundEngine() {
-    this.playbacks = new CopyOnWriteArrayList<>();
-  }
-
-  protected void add(final Playback playBack) {
-    if (this.playbacks.contains(playBack)) {
-      return;
-    }
-
-    this.playbacks.add(playBack);
-  }
-
-  protected boolean canPlay(final IEntity entity) {
-    return true;
-  }
-
-  protected boolean canPlay(final Point2D location) {
-
-    return true;
-  }
-  public Point2D getListenerPosition() {
-    return this.listenerPosition;
-  }
-
-  public float getMaxListenerRadius() {
-    return this.maxListenerRadius;
-  }
-
-  @Override
-  public void init(final float soundVolume) {
-    this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
-  }
-
-  @Override
-  public void setMaxDistance(final float radius) {
-    this.maxListenerRadius = radius;
+    this.sounds = new CopyOnWriteArrayList<>();
+    this.maxDist = DEFAULT_MAX_DISTANCE;
   }
 
   @Override
   public void start() {
     Game.getLoop().registerForUpdate(this);
+    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
   }
 
   @Override
@@ -78,42 +34,99 @@ public abstract class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop gameLoop) {
-    if (gameLoop.getDeltaTime(this.lastUpdate) < UPDATE_RATE) {
+  public void update(IGameLoop loop) {
+    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
+
+    List<SoundSource> remove = new ArrayList<>();
+    for (SoundSource s : this.sounds) {
+      if (s != null && !s.isPlaying()) {
+        s.dispose();
+        remove.add(s);
+      }
+    }
+
+    this.sounds.removeAll(remove);
+    for (SoundSource s : this.sounds) {
+      s.updateControls(this.listenerLocation);
+    }
+
+    // music is looped by default
+    if (this.music != null && !this.music.isPlaying()) {
+      this.playMusic(this.music.getSound());
+    }
+  }
+
+  @Override
+  public void init(final float soundVolume) {
+
+  }
+
+  public boolean isPlaying(String identifier) {
+    for (SoundSource s : this.sounds) {
+      if (s.getSound().getName().equals(identifier)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @Override
+  public void playMusic(Sound sound) {
+    if (this.music != null) {
+      this.music.dispose();
+    }
+
+    this.music = new SoundSource(sound);
+    this.music.play(true);
+  }
+
+  @Override
+  public void playSound(IEntity entity, Sound sound) {
+    if (sound == null) {
       return;
     }
 
-    SoundController.callIgnoreTimeout(engine -> {
-      // update listener
-      this.listenerPosition = Game.getScreenManager().getCamera().getFocus();
-      this.updateListenerPosition(this.getListenerPosition());
-      // update playing sounds position
-      final List<Playback> finished = new ArrayList<>();
-      for (final Playback playback : this.playbacks) {
-        if (this.isPlaying(playback.getName())) {
-          if (this.maxListenerRadius != 0 && playback.getEntity() != null && playback.getEntity().getLocation().distance(this.getListenerPosition()) > this.maxListenerRadius) {
-            this.updatePosition(playback.getName(), new Point2D.Double(10000, 10000));
-          } else if (playback.getEntity() != null && playback.getEntity().getLocation().distance(this.getListenerPosition()) > 5) {
-            this.updatePosition(playback.getName(), playback.getEntity().getDimensionCenter());
-          } else {
-            this.updatePosition(playback.getName(), this.getListenerPosition());
-          }
-        } else {
-          finished.add(playback);
-        }
-      }
-
-      // clean up finished playbacks
-      finished.forEach(x -> this.playbacks.remove(x));
-    }, true);
-
-    this.lastUpdate = gameLoop.getTicks();
+    SoundSource source = new SoundSource(sound, this.listenerLocation, entity);
+    source.play();
+    this.sounds.add(source);
   }
-  
-  public abstract void updateListenerPosition(Point2D location);
 
-  public abstract void updatePosition(String identifier, Point2D location);
-  
-  public abstract boolean isPlaying(String identifier);
+  @Override
+  public void playSound(Point2D location, Sound sound) {
+    if (sound == null) {
+      return;
+    }
 
+    SoundSource source = new SoundSource(sound, this.listenerLocation);
+    source.play();
+    this.sounds.add(source);
+  }
+
+  @Override
+  public void playSound(Sound sound) {
+    if (sound == null) {
+      return;
+    }
+
+    SoundSource source = new SoundSource(sound);
+    source.play();
+    this.sounds.add(source);
+  }
+
+  @Override
+  public void setMaxDistance(float radius) {
+    this.maxDist = radius;
+  }
+
+  @Override
+  public void stopMusic(Sound s) {
+    this.music.dispose();
+    this.music = null;
+  }
+
+  @Override
+  public float getMaxDistance() {
+    return this.maxDist;
+  }
 }

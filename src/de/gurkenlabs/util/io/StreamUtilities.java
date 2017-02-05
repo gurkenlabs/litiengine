@@ -30,7 +30,7 @@ public class StreamUtilities {
   }
 
   public static void copy(final InputStream in, final OutputStream out) throws IOException {
-    final byte[] buffer = new byte[1024 * 4];
+    final byte[] buffer = new byte[1024];
     int read = 0;
     while (true) {
       final int readCount = in.read(buffer);
