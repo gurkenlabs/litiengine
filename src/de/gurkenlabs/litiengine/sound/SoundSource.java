@@ -32,6 +32,7 @@ public class SoundSource {
   private FloatControl gainControl;
 
   private boolean played;
+  private boolean playing;
   static {
     closeQueue = new ClipCloseQueue();
     closeQueue.start();
@@ -76,7 +77,7 @@ public class SoundSource {
   }
 
   public boolean isPlaying() {
-    return this.played || this.dataLine != null && this.dataLine.isActive();
+    return this.played || this.playing;
   }
 
   public Sound getSound() {
@@ -223,6 +224,7 @@ public class SoundSource {
       
       dataLine.start();
       played = false;
+      playing = true;
       final byte[] buffer = new byte[1024];
       ByteArrayInputStream str = new ByteArrayInputStream(sound.getStreamData());
       while (true) {
@@ -243,6 +245,8 @@ public class SoundSource {
           e.printStackTrace();
         }
       }
+      dataLine.drain();
+      playing = false;
     }
   }
 

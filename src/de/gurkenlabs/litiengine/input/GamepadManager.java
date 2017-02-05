@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -130,6 +131,23 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       Field env = ControllerEnvironment.class.getDeclaredField("defaultEnvironment");
       env.setAccessible(true);
       Class<?> clazz = Class.forName("net.java.games.input.DefaultControllerEnvironment");
+      
+      // kill threads that might still be running.
+      // otherwise we would spawn a new thread every time this method is called without killing the last one
+      Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+      for (Thread thread : threadSet) {
+        String name = thread.getClass().getName();
+        if (name.equals("net.java.games.input.RawInputEventQueue$QueueThread")) {
+          thread.interrupt();
+          try {
+            thread.join();
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          
+        }
+      }
+
       Constructor<?> ctor = clazz.getConstructor();
       ctor.setAccessible(true);
       env.set(null, ctor.newInstance());
