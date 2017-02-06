@@ -7,19 +7,49 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 
 public interface ISoundEngine extends ILaunchable {
 
-  public void init(final float soundVolume);
+  /**
+   * Loops the specified sound file as background music.
+   * If another music was specified beforehand, its playback will get interrupted and the new one will be played.
+   * @param sound
+   */
+  public void playMusic(Sound sound);
 
-  public void playMusic(Sound s);
+  /**
+   * Stops the playback of the current background music.
+   * @param sound
+   */
+  public void stopMusic();
 
-  public void stopMusic(Sound s);
+  /**
+   * Plays the specified sound and updates its volume and pan by the current entity location in relation to the listener location.
+   * @param entity
+   * @param sound
+   */
+  public void playSound(IEntity entity, Sound sound);
 
-  public void playSound(IEntity entity, Sound s);
+  /**
+   * Plays the specified sound at the specified location and updates the volume and pan in relation to the listener location.
+   * @param location
+   * @param sound
+   */
+  public void playSound(Point2D location, Sound sound);
 
-  public void playSound(Point2D location, Sound s);
+  /**
+   * Plays the specified sound with the volume configured in the SOUND config with a center pan.
+   * @param sound
+   */
+  public void playSound(Sound sound);
 
-  public void playSound(Sound s);
-
+  /**
+   * Sets the maximum distance from the listener at which a sound source can still be heared.
+   * If the distance between the sound source and the listener is greater than the specified value, the volume is set to 0.
+   * @param distance
+   */
   public void setMaxDistance(float distance);
 
+  /**
+   * Gets the maximum distance from the listener at which a sound source can still be heared.
+   * @return
+   */
   public float getMaxDistance();
 }

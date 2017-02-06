@@ -1,11 +1,7 @@
 package de.gurkenlabs.litiengine.sound;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,7 +15,33 @@ import de.gurkenlabs.util.io.StreamUtilities;
 
 public class Sound {
   private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
+  private final String name;
 
+  private byte[] streamData;
+
+  private AudioFormat format;
+
+  private AudioInputStream stream;
+
+  private Sound(final String path) {
+    this.name = FileUtilities.getFileName(path);
+
+    InputStream is = FileUtilities.getGameResource(path);
+
+    try {
+      this.stream = AudioSystem.getAudioInputStream(is);
+      if (this.stream != null) {
+        this.streamData = StreamUtilities.getBytes(this.stream);
+      }
+      this.format = stream.getFormat();
+    } catch (UnsupportedAudioFileException e) {
+      System.out.println("could not load '" + path + "'");
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
   public static Sound find(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -38,67 +60,9 @@ public class Sound {
     sounds.put(FileUtilities.getFileName(path), sound);
     return sound;
   }
-
-  private final String name;
-
-  private final String path;
-
-  private byte[] streamData;
-
-  private AudioFormat format;
-
-  private AudioInputStream stream;
-
-  private Sound(final String path) {
-    this.name = FileUtilities.getFileName(path);
-    this.path = path;
-
-    InputStream is = FileUtilities.getGameResource(path);
-
-    try {
-      this.stream = AudioSystem.getAudioInputStream(is);
-      if (this.stream != null) {
-        this.streamData = StreamUtilities.getBytes(this.stream);
-      }
-      this.format = stream.getFormat();
-    } catch (UnsupportedAudioFileException e) {
-      System.out.println("could not load '" + path + "'");
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-  }
-
+  
   public String getName() {
     return this.name;
-  }
-
-  public String getPath() {
-    return this.path;
-  }
-
-  public URL getUrl() {
-    try {
-      final File file = new File(this.getPath());
-      if (file.exists()) {
-        return file.toURI().toURL();
-      }
-
-      return this.getClass().getClassLoader().getResource(this.getPath());
-    } catch (final MalformedURLException e) {
-      e.printStackTrace();
-    }
-
-    return null;
-  }
-
-  public AudioInputStream getStream() {
-    if (this.format == null) {
-      return null;
-    }
-
-    return new AudioInputStream(new ByteArrayInputStream(this.streamData), this.getFormat(), this.streamData.length);
   }
 
   public AudioFormat getFormat() {

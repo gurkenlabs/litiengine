@@ -199,9 +199,6 @@ public abstract class Game {
       getMetrics().setFramesPerSecond(fps);
     });
 
-    // init sounds
-    soundEngine.init(getConfiguration().SOUND.getSoundVolume());
-
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);

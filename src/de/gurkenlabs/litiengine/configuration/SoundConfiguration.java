@@ -15,12 +15,15 @@ public class SoundConfiguration extends ConfigurationGroup {
 
   /** The sound volume. */
   private float soundVolume;
+  
+  private float musicVolume;
 
   /**
    * Instantiates a new sound configuration.
    */
   public SoundConfiguration() {
     this.soundVolume = 0.5F;
+    this.setMusicVolume(0.5f);
   }
 
   /**
@@ -40,5 +43,13 @@ public class SoundConfiguration extends ConfigurationGroup {
    */
   public void setSoundVolume(final float soundVolume) {
     this.soundVolume = soundVolume;
+  }
+
+  public float getMusicVolume() {
+    return musicVolume;
+  }
+
+  public void setMusicVolume(float musicVolume) {
+    this.musicVolume = musicVolume;
   }
 }

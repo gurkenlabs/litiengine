@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
 import de.gurkenlabs.litiengine.Game;
@@ -19,8 +17,13 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
+/**
+ * This class is responsible for the playback of all sounds in the engine. If
+ * specified, it calculates the sound volume and pan depending to the assigned
+ * entity or location.
+ */
 public class SoundSource {
-  private static final ClipCloseQueue closeQueue;
+  protected static final SourceDataLineCloseQueue closeQueue;
 
   private Point2D location;
   private IEntity entity;
@@ -33,55 +36,34 @@ public class SoundSource {
 
   private boolean played;
   private boolean playing;
+  private float gain;
+
   static {
-    closeQueue = new ClipCloseQueue();
+    closeQueue = new SourceDataLineCloseQueue();
     closeQueue.start();
   }
 
-  public SoundSource(Sound sound, Point2D listenerLocation) {
+  protected static void terminate() {
+    closeQueue.terminate();
+  }
+
+  protected SoundSource(Sound sound, Point2D listenerLocation) {
     this.sound = sound;
     this.initialListenerLocation = listenerLocation;
   }
 
-  public SoundSource(Sound sound) {
+  protected SoundSource(Sound sound) {
     this(sound, null);
   }
 
-  public SoundSource(Sound sound, Point2D listenerLocation, Point2D location) {
+  protected SoundSource(Sound sound, Point2D listenerLocation, Point2D location) {
     this(sound, listenerLocation);
     this.location = location;
   }
 
-  public SoundSource(Sound sound, Point2D listenerLocation, IEntity sourceEntity) {
+  protected SoundSource(Sound sound, Point2D listenerLocation, IEntity sourceEntity) {
     this(sound, listenerLocation);
     this.entity = sourceEntity;
-  }
-
-  public void play(boolean loop, Point2D location) {
-    // clip must be disposed
-    if (dataLine != null) {
-      return;
-    }
-
-    PlayThread thread = new PlayThread();
-    thread.start();
-    this.played = true;
-  }
-
-  public void play() {
-    this.play(false, null);
-  }
-
-  public void play(boolean loop) {
-    this.play(loop, null);
-  }
-
-  public boolean isPlaying() {
-    return this.played || this.playing;
-  }
-
-  public Sound getSound() {
-    return this.sound;
   }
 
   public void dispose() {
@@ -91,6 +73,42 @@ public class SoundSource {
       this.gainControl = null;
       this.panControl = null;
     }
+  }
+
+  public void play(boolean loop, Point2D location, float gain) {
+    // clip must be disposed
+    if (dataLine != null) {
+      return;
+    }
+
+    this.gain = gain;
+    PlayThread thread = new PlayThread();
+    thread.start();
+    this.played = true;
+  }
+
+  /**
+   * Plays the sound without any volume or pan adjustments.
+   */
+  public void play() {
+    this.play(false, null, -1);
+  }
+
+  /**
+   * Loops the sound with the specified volume.
+   * @param loop
+   * @param volume
+   */
+  public void play(boolean loop, float volume) {
+    this.play(loop, null, volume);
+  }
+
+  public boolean isPlaying() {
+    return this.played || this.playing;
+  }
+
+  public Sound getSound() {
+    return this.sound;
   }
 
   protected void updateControls(Point2D listenerLocation) {
@@ -194,7 +212,7 @@ public class SoundSource {
     panControl.setValue(pan);
   }
 
-  public class PlayThread extends Thread {
+  private class PlayThread extends Thread {
     @Override
     public void run() {
       DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, sound.getFormat());
@@ -210,18 +228,13 @@ public class SoundSource {
         return;
       }
 
-      AudioInputStream stream = sound.getStream();
-      if (stream == null) {
-        return;
-      }
-
       initControls();
-      setGain(Game.getConfiguration().SOUND.getSoundVolume());
+      float initialGain = gain > 0 ? gain : Game.getConfiguration().SOUND.getSoundVolume();
+      setGain(initialGain);
 
       SoundSource.this.location = location;
       updateControls(initialListenerLocation);
 
-      
       dataLine.start();
       played = false;
       playing = true;
@@ -250,13 +263,9 @@ public class SoundSource {
     }
   }
 
-  public static class ClipCloseQueue extends Thread {
+  private static class SourceDataLineCloseQueue extends Thread {
     private boolean isRunning = true;
     private final Queue<SourceDataLine> queue = new ConcurrentLinkedQueue<>();
-
-    public boolean isRunning() {
-      return this.isRunning;
-    }
 
     @Override
     public void run() {
@@ -267,16 +276,25 @@ public class SoundSource {
           clip.flush();
           clip.close();
         }
+
         try {
-          Thread.sleep(20);
+          Thread.sleep(50);
         } catch (final InterruptedException e) {
           e.printStackTrace();
         }
       }
+
+      if (this.queue.size() > 0) {
+        for (SourceDataLine line : queue) {
+          line.stop();
+          line.flush();
+          line.close();
+        }
+      }
     }
 
-    public void setRunning(final boolean isRunning) {
-      this.isRunning = isRunning;
+    public void terminate() {
+      this.isRunning = false;
     }
 
     public void enqueue(SourceDataLine clip) {

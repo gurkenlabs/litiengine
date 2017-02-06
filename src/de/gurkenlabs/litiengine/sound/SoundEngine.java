@@ -31,6 +31,7 @@ public class SoundEngine implements ISoundEngine, IUpdateable {
   @Override
   public void terminate() {
     Game.getLoop().unregisterFromUpdate(this);
+    SoundSource.terminate();
   }
 
   @Override
@@ -57,28 +58,13 @@ public class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void init(final float soundVolume) {
-
-  }
-
-  public boolean isPlaying(String identifier) {
-    for (SoundSource s : this.sounds) {
-      if (s.getSound().getName().equals(identifier)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
   public void playMusic(Sound sound) {
     if (this.music != null) {
       this.music.dispose();
     }
 
     this.music = new SoundSource(sound);
-    this.music.play(true);
+    this.music.play(true, Game.getConfiguration().SOUND.getMusicVolume());
   }
 
   @Override
@@ -120,7 +106,7 @@ public class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void stopMusic(Sound s) {
+  public void stopMusic() {
     this.music.dispose();
     this.music = null;
   }
