@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
 /**

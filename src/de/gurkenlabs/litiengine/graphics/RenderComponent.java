@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -13,7 +12,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;

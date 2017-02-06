@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.Direction;

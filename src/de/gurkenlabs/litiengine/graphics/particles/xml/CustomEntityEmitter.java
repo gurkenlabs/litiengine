@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.awt.geom.Point2D;
-import java.net.URL;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;

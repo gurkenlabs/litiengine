@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.input;
 
 import java.util.function.Consumer;
 
-import net.java.games.input.Component.Identifier;
-
 public interface IGamepadManager {
   public void onGamepadAdded(Consumer<IGamepad> cons);
 

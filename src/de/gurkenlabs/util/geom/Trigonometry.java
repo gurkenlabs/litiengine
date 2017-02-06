@@ -13,8 +13,6 @@ public class Trigonometry {
 
   private static final float[] atan2 = new float[ATAN2_COUNT];
 
-  private static final float RAD = (float) Math.PI / 180.0F;
-
   private static final int SIN_BITS = 12;
   private static final int SIN_MASK = ~(-1 << SIN_BITS);
   private static final int SIN_COUNT = SIN_MASK + 1;

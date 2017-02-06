@@ -1,7 +1,6 @@
 package de.gurkenlabs.util.zip;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,11 +89,8 @@ public class CompressionUtilities {
     final URI base = directory.toURI();
     final Deque<File> queue = new LinkedList<>();
     queue.push(directory);
-    final OutputStream out = new FileOutputStream(zipfile);
-    Closeable res = out;
-    try {
+    try (final OutputStream out = new FileOutputStream(zipfile)) {
       final ZipOutputStream zout = new ZipOutputStream(out);
-      res = zout;
       while (!queue.isEmpty()) {
         directory = queue.pop();
         for (final File kid : directory.listFiles()) {
@@ -111,7 +107,6 @@ public class CompressionUtilities {
         }
       }
     } finally {
-      res.close();
     }
   }
 }

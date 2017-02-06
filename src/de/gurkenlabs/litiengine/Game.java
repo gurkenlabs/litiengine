@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,26 +11,19 @@ import java.util.logging.LogManager;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
-import de.gurkenlabs.litiengine.entities.Collider;
-import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
-import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
-import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
+import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.tilemap.IMap;
 
 public abstract class Game {

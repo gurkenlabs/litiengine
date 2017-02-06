@@ -16,7 +16,6 @@ public class DropdownListField extends GuiComponent {
   private boolean isDroppedDown;
   private ListField contentList;
   private final List<Consumer<Integer>> changeConsumer;
-  private float standardFontSize;
 
   private Object[] content;
   private int numberOfShownElements;
@@ -173,7 +172,6 @@ public class DropdownListField extends GuiComponent {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
     this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
-    this.standardFontSize = this.chosenElementComponent.getFont().getSize2D();
     double buttonHeight = this.getHeight() / this.getNumberOfShownElements(), buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());

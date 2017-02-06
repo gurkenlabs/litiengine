@@ -31,17 +31,16 @@ public class StreamUtilities {
 
   public static void copy(final InputStream in, final OutputStream out) throws IOException {
     final byte[] buffer = new byte[1024];
-    int read = 0;
+
     while (true) {
       final int readCount = in.read(buffer);
       if (readCount < 0) {
         break;
       }
       out.write(buffer, 0, readCount);
-      read +=readCount;
     }
   }
-  
+
   public static byte[] getByte(InputStream is) throws IOException {
 
     int len;
@@ -61,8 +60,6 @@ public class StreamUtilities {
     }
     return buf;
   }
-
-
 
   public static byte[] getBytes(final InputStream in) {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();

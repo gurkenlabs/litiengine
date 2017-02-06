@@ -11,12 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Controller.Type;
+import net.java.games.input.ControllerEnvironment;
 
 public class GamepadManager implements IGamepadManager, IUpdateable {
   private static final int GAMEPAD_UPDATE_DELAY = 150;

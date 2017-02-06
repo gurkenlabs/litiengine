@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.tilemap.IMapObject;
 
 /**
  * The Interface IMapContainer.

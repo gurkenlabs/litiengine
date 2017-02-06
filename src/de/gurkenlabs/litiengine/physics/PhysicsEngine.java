@@ -4,10 +4,7 @@
 package de.gurkenlabs.litiengine.physics;
 
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -17,9 +14,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**

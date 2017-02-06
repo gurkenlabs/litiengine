@@ -3,19 +3,11 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.GameLoop;
-import de.gurkenlabs.litiengine.IGameLoop;
-import de.gurkenlabs.litiengine.IUpdateable;
-import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
-import net.java.games.input.Controller.Type;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Input.
  */

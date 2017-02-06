@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {

@@ -8,9 +8,6 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
-import net.java.games.input.Controller;
-import net.java.games.input.Controller.Type;
-import net.java.games.input.ControllerEnvironment;
 
 /**
  * TODO: Apply friction to terrain in order to slow down acceleration and speed

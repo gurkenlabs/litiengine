@@ -60,7 +60,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private final int id;
 
   /** The is hovered. */
-  private boolean isHovered, isPressed, isSelected, isDragged;
+  private boolean isHovered, isPressed, isSelected;
 
   /** The suspended. */
   private boolean suspended;
@@ -419,10 +419,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public void mouseDragged(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {
-      this.isDragged = false;
       return;
     }
-    this.isDragged = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }

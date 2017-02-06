@@ -10,7 +10,6 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
 /**
  * The Class Entity.

@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
 public interface IEntity {
   public float getAngle();

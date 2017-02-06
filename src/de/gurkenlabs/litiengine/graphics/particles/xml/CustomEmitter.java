@@ -3,12 +3,9 @@ package de.gurkenlabs.litiengine.graphics.particles.xml;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

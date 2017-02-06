@@ -61,8 +61,6 @@ public class DecorMob extends MovableCombatEntity {
   }
 
   private class ShyDecorMobMovementController extends ClientEntityMovementController<DecorMob> {
-    private static final int DETECTION_RADIUS = 48;
-
     private long lastAngleChange;
     private long nextAngleChange;
     private int angle;
