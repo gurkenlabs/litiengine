@@ -94,7 +94,7 @@ public abstract class Effect implements IEffect {
 
     // if it is the first appliance -> register for update
     if (this.appliances.size() == 1) {
-      loop.registerForUpdate(this);
+      loop.attach(this);
     }
   }
 
@@ -339,7 +339,7 @@ public abstract class Effect implements IEffect {
 
     // 4. unregister if all appliances are finished
     if (this.getActiveAppliances().size() == 0) {
-      loop.unregisterFromUpdate(this);
+      loop.detach(this);
     }
   }
 

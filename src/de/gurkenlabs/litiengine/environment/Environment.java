@@ -1121,7 +1121,7 @@ public class Environment implements IEnvironment {
   private void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
-        Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+        Game.getLoop().detach((IUpdateable) entity);
       }
 
       Game.getEntityControllerManager().disposeControllers(entity);
@@ -1226,27 +1226,27 @@ public class Environment implements IEnvironment {
         emitter.activate(Game.getLoop());
       }
     } else if (entity instanceof IUpdateable) {
-      Game.getLoop().registerForUpdate((IUpdateable) entity);
+      Game.getLoop().attach((IUpdateable) entity);
     }
 
     // 3. register animation controller for update
     IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
     if (animation != null) {
-      Game.getLoop().registerForUpdate(animation);
+      Game.getLoop().attach(animation);
     }
 
     // 4. register movement controller for update
     if (entity instanceof IMovableEntity) {
       IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
       if (movementController != null) {
-        Game.getLoop().registerForUpdate(movementController);
+        Game.getLoop().attach(movementController);
       }
     }
 
     // 5. register ai controller for update
     IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
     if (controller != null) {
-      Game.getLoop().registerForUpdate(controller);
+      Game.getLoop().attach(controller);
     }
   }
 
@@ -1278,26 +1278,26 @@ public class Environment implements IEnvironment {
 
     // 2. unregister from update
     if (entity instanceof IUpdateable) {
-      Game.getLoop().unregisterFromUpdate((IUpdateable) entity);
+      Game.getLoop().detach((IUpdateable) entity);
     }
 
     // 3. unregister ai controller from update
     IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
     if (controller != null) {
-      Game.getLoop().unregisterFromUpdate(controller);
+      Game.getLoop().detach(controller);
     }
 
     // 4. unregister animation controller from update
     IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
     if (animation != null) {
-      Game.getLoop().unregisterFromUpdate(animation);
+      Game.getLoop().detach(animation);
     }
 
     // 5. unregister movement controller from update
     if (entity instanceof IMovableEntity) {
       IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
       if (movementController != null) {
-        Game.getLoop().unregisterFromUpdate(movementController);
+        Game.getLoop().detach(movementController);
       }
     }
   }

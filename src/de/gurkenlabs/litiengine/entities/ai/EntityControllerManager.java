@@ -26,7 +26,7 @@ public class EntityControllerManager {
     }
 
     if (this.aiControllers.containsKey(entity)) {
-      Game.getLoop().unregisterFromUpdate(this.getAIController(entity));
+      Game.getLoop().detach(this.getAIController(entity));
     }
 
     this.aiControllers.put(entity, controller);
@@ -38,7 +38,7 @@ public class EntityControllerManager {
     }
 
     if (this.movementControllers.containsKey(entity)) {
-      Game.getLoop().unregisterFromUpdate(this.getMovementController(entity));
+      Game.getLoop().detach(this.getMovementController(entity));
     }
 
     this.movementControllers.put(entity, controller);
@@ -50,7 +50,7 @@ public class EntityControllerManager {
     }
 
     if (this.animationControllers.containsKey(entity)) {
-      Game.getLoop().unregisterFromUpdate(this.getAnimationController(entity));
+      Game.getLoop().detach(this.getAnimationController(entity));
     }
 
     this.animationControllers.put(entity, controller);
@@ -84,7 +84,7 @@ public class EntityControllerManager {
     IEntityController<? extends IEntity> aiController = this.getAIController(entity);
     if (aiController != null) {
 
-      Game.getLoop().unregisterFromUpdate(aiController);
+      Game.getLoop().detach(aiController);
       this.aiControllers.remove(entity);
     }
 
@@ -92,7 +92,7 @@ public class EntityControllerManager {
       IMovementController<? extends IMovableEntity> controller = this.getMovementController((IMovableEntity) entity);
       if (controller != null) {
 
-        Game.getLoop().unregisterFromUpdate(controller);
+        Game.getLoop().detach(controller);
         this.movementControllers.remove(entity);
       }
     }

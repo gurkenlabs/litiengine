@@ -31,17 +31,24 @@ public interface IGameLoop extends ILaunchable {
 
   public float getTimeScale();
 
-  public int getUpdatablesCount();
-
   public int getUpdateRate();
-
-  public void execute(int delay, Consumer<Long> action);
 
   public void onUpsTracked(final Consumer<Integer> upsConsumer);
 
-  public void registerForUpdate(final IUpdateable updatable);
-
+  /**
+   * Attaches the update method of the specified {@link de.gurkenlabs.litiengine.IUpdatable IUpdatable} instance to be called every tick.
+   * The tick rate can be configured in the client configuration and is independant from rendering.
+   * @param updatable
+   */
+  public void attach(final IUpdateable updatable);
+  
+  /**
+   * Detaches the specified instance from the game loop.
+   * @param updatable
+   */
+  public void detach(final IUpdateable updatable);
+  
+  public void execute(int delay, Consumer<Long> action);
+  
   public void setTimeScale(float timeScale);
-
-  public void unregisterFromUpdate(final IUpdateable updatable);
 }

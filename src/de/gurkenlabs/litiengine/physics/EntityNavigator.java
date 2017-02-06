@@ -41,7 +41,7 @@ public class EntityNavigator implements IEntityNavigator {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
     this.entity = entity;
     this.pathFinder = pathFinder;
-    Game.getLoop().registerForUpdate(this);
+    Game.getLoop().attach(this);
   }
 
   @Override

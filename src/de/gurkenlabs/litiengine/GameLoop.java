@@ -70,11 +70,6 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
-  public int getUpdatablesCount() {
-    return this.updatables.size();
-  }
-
-  @Override
   public int getUpdateRate() {
     return this.updateRate;
   }
@@ -87,7 +82,7 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
-  public void registerForUpdate(final IUpdateable updatable) {
+  public void attach(final IUpdateable updatable) {
     if (this.updatables.contains(updatable)) {
       System.out.println("Updatable " + updatable + " already registered for update!");
       return;
@@ -168,7 +163,7 @@ public class GameLoop extends Thread implements IGameLoop {
   }
 
   @Override
-  public void unregisterFromUpdate(final IUpdateable updatable) {
+  public void detach(final IUpdateable updatable) {
     this.updatables.remove(updatable);
   }
 

@@ -47,7 +47,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<MapLocation> spawnpoints, final int interval, final int amount) {
     this(environment, interval, amount);
     this.spawnpoints = spawnpoints;
-    loop.registerForUpdate(this);
+    loop.attach(this);
   }
 
   private EntitySpawner(final IEnvironment environment, final int interval, final int amount) {

@@ -31,7 +31,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();
     this.pressedConsumer = new ConcurrentHashMap<>();
-    Input.INPUT_LOOP.registerForUpdate(this);
+    Input.INPUT_LOOP.attach(this);
 
     this.onGamepadAdded(pad -> {
       if (defaultgamePadIndex == -1) {

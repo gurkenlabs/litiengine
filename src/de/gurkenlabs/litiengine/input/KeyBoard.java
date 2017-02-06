@@ -57,7 +57,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers = new CopyOnWriteArrayList<>();
 
     // needs own loop, otherwise it won't work when the game is paused
-    Input.INPUT_LOOP.registerForUpdate(this);
+    Input.INPUT_LOOP.attach(this);
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }

@@ -40,7 +40,7 @@ public class AbilityExecution implements IUpdateable {
     this.executionTicks = gameLoop.getTicks();
     this.impactArea = ability.calculateImpactArea();
     this.castLocation = ability.getExecutor().getDimensionCenter();
-    gameLoop.registerForUpdate(this);
+    gameLoop.attach(this);
   }
 
   /**
@@ -89,7 +89,7 @@ public class AbilityExecution implements IUpdateable {
   public void update(final IGameLoop loop) {
     // if there a no effects to apply -> unregister this instance and we're done
     if (this.getAbility().getEffects().size() == 0 || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
-      loop.unregisterFromUpdate(this);
+      loop.detach(this);
       return;
     }
 

@@ -80,9 +80,9 @@ public abstract class AnimationController implements IAnimationController {
 
   @Override
   public void dispose() {
-    Game.getLoop().unregisterFromUpdate(this);
+    Game.getLoop().detach(this);
     for (final Animation animation : this.getAnimations()) {
-      Game.getLoop().unregisterFromUpdate(animation);
+      Game.getLoop().detach(animation);
     }
     this.getAnimations().clear();
     this.getImageEffects().clear();

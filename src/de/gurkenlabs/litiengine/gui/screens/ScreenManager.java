@@ -176,10 +176,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
   @Override
   public void setCamera(final ICamera camera) {
     if (this.getCamera() != null) {
-      Game.getLoop().unregisterFromUpdate(this.camera);
+      Game.getLoop().detach(this.camera);
     }
     
-    Game.getLoop().registerForUpdate(camera);
+    Game.getLoop().attach(camera);
     this.camera = camera;
 
     this.getCamera().updateFocus();

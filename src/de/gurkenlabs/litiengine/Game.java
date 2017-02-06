@@ -152,7 +152,7 @@ public abstract class Game {
     renderLoop = new RenderLoop(scrMgr.getRenderComponent(), scrMgr);
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
-    getLoop().registerForUpdate(getPhysicsEngine());
+    getLoop().attach(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());

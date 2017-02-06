@@ -133,7 +133,7 @@ public class GameMetrics implements IUpdateable, IRenderable {
   }
 
   public void recordNetworkTraffic() {
-    Game.getLoop().registerForUpdate(this);
+    Game.getLoop().attach(this);
   }
 
   @Override

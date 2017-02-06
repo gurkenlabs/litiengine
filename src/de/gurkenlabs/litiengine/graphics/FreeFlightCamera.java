@@ -13,7 +13,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable{
 
   public FreeFlightCamera(final Point2D location) {
     this.location = location;
-    Game.getLoop().registerForUpdate(this);
+    Game.getLoop().attach(this);
   }
   
   @Override

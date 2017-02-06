@@ -24,13 +24,13 @@ public class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void start() {
-    Game.getLoop().registerForUpdate(this);
+    Game.getLoop().attach(this);
     this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
   }
 
   @Override
   public void terminate() {
-    Game.getLoop().unregisterFromUpdate(this);
+    Game.getLoop().detach(this);
     SoundSource.terminate();
   }
 
