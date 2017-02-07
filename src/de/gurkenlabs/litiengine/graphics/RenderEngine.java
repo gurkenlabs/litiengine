@@ -45,7 +45,7 @@ import de.gurkenlabs.util.io.FileUtilities;
 /**
  * The Class GraphicsEngine.
  */
-public class RenderEngine implements IRenderEngine {
+public final class RenderEngine implements IRenderEngine {
 
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
 

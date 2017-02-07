@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class GameLoop extends Thread implements IGameLoop {
+public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private final List<IUpdateable> updatables;
   private final List<Consumer<Integer>> upsTrackedConsumer;
@@ -83,10 +83,10 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void attach(final IUpdateable updatable) {
-    if(updatable == null){
+    if (updatable == null) {
       return;
     }
-    
+
     if (this.updatables.contains(updatable)) {
       System.out.println("Updatable " + updatable + " already registered for update!");
       return;
@@ -151,7 +151,7 @@ public class GameLoop extends Thread implements IGameLoop {
         Thread.interrupted();
         break;
       }
-      
+
       this.deltaTime = System.currentTimeMillis() - this.lastUpdateTime;
     }
   }
@@ -193,5 +193,10 @@ public class GameLoop extends Thread implements IGameLoop {
     public Consumer<Long> getAction() {
       return action;
     }
+  }
+
+  @Override
+  public void close() {
+    this.gameIsRunning = false;
   }
 }

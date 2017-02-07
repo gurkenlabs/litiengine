@@ -28,18 +28,10 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public Point2D collides(Line2D rayCast);
 
-  /**
-   *
-   * @param rect
-   * @return true if there is any collision; otherwise false.
-   */
   public boolean collides(Point2D point);
 
-  /**
-   *
-   * @param rect
-   * @return true if there is any collision; otherwise false.
-   */
+  public boolean collides(double x, double y);
+
   public boolean collides(Rectangle2D rect);
 
   public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect);

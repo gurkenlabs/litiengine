@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
-public class SoundEngine implements ISoundEngine, IUpdateable {
+public final class SoundEngine implements ISoundEngine, IUpdateable {
   private static final int DEFAULT_MAX_DISTANCE = 250;
   private final List<SoundSource> sounds;
   private SoundSource music;

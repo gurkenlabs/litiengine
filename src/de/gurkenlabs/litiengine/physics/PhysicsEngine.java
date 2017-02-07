@@ -20,7 +20,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 /**
  * The Class PhysicsEngine.
  */
-public class PhysicsEngine implements IPhysicsEngine {
+public final class PhysicsEngine implements IPhysicsEngine {
   private final List<ICollisionEntity> collisionEntities;
 
   private final List<Rectangle2D> staticCollisionBoxes;
@@ -110,6 +110,11 @@ public class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
+  public boolean collides(double x, double y) {
+    return this.collides(new Point2D.Double(x, y));
+  }
+
+  @Override
   public boolean collides(final Rectangle2D rect) {
     for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (GeometricUtilities.intersects(rect, collisionBox)) {
@@ -181,11 +186,11 @@ public class PhysicsEngine implements IPhysicsEngine {
       return false;
     }
 
-    if(!entity.hasCollision()){
+    if (!entity.hasCollision()) {
       entity.setLocation(newPosition);
       return true;
     }
-    
+
     // resolve collision for current location
     if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
       Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
@@ -199,7 +204,7 @@ public class PhysicsEngine implements IPhysicsEngine {
       entity.setLocation(resolvedPosition);
       return false;
     } else {
-      
+
       // special case to prevent entities to glitch through collision boxes if
       // they have a large enough stepsize
       // TODO: this does not entirely fix the issue...

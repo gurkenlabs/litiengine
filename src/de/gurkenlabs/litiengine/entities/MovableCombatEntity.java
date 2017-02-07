@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
-public abstract class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
+public class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
 
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private short velocity;
