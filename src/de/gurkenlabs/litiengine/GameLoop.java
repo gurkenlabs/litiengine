@@ -83,6 +83,10 @@ public class GameLoop extends Thread implements IGameLoop {
 
   @Override
   public void attach(final IUpdateable updatable) {
+    if(updatable == null){
+      return;
+    }
+    
     if (this.updatables.contains(updatable)) {
       System.out.println("Updatable " + updatable + " already registered for update!");
       return;
