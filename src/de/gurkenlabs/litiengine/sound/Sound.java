@@ -41,7 +41,7 @@ public class Sound {
       e.printStackTrace();
     }
   }
-  
+
   public static Sound find(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -60,7 +60,7 @@ public class Sound {
     sounds.put(FileUtilities.getFileName(path), sound);
     return sound;
   }
-  
+
   public String getName() {
     return this.name;
   }
@@ -70,6 +70,10 @@ public class Sound {
   }
 
   public byte[] getStreamData() {
+    if (this.streamData == null) {
+      return new byte[0];
+    }
+
     byte[] data = this.streamData.clone();
     return data;
   }

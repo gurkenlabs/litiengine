@@ -16,26 +16,6 @@ import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class AStarPathFinder extends PathFinder {
-  /**
-   * TODO: Improve this optimization.
-   *
-   * @param path
-   * @return
-   */
-  private static List<AStarNode> optimizePath(final List<AStarNode> path) {
-    final List<AStarNode> optPath = new ArrayList<>();
-    double oldAngle = 0;
-    for (int i = 1; i < path.size(); i++) {
-
-      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
-      if (angle != oldAngle) {
-        optPath.add(path.get(i));
-      }
-
-      oldAngle = angle;
-    }
-    return optPath;
-  }
 
   private final AStarGrid grid;
 
@@ -118,6 +98,27 @@ public class AStarPathFinder extends PathFinder {
 
   public AStarGrid getGrid() {
     return this.grid;
+  }
+
+  /**
+   * TODO: Improve this optimization.
+   *
+   * @param path
+   * @return
+   */
+  private static List<AStarNode> optimizePath(final List<AStarNode> path) {
+    final List<AStarNode> optPath = new ArrayList<>();
+    double oldAngle = 0;
+    for (int i = 1; i < path.size(); i++) {
+
+      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
+      if (angle != oldAngle) {
+        optPath.add(path.get(i));
+      }
+
+      oldAngle = angle;
+    }
+    return optPath;
   }
 
   private Path retracePath(final AStarNode startNode, final AStarNode targetNode) {

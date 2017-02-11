@@ -28,7 +28,9 @@ public abstract class AnimationController implements IAnimationController {
     this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
     this.playbackConsumer = new CopyOnWriteArrayList<>();
     this.defaultAnimation = defaultAnimation;
-    this.animations.add(this.defaultAnimation);
+    if (this.defaultAnimation != null) {
+      this.animations.add(this.defaultAnimation);
+    }
 
     if (animations != null && animations.length > 0) {
       for (final Animation anim : animations) {
