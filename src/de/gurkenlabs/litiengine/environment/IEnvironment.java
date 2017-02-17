@@ -122,6 +122,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void onInitialized(final Consumer<IEnvironment> consumer);
 
+  public void onLoaded(final Consumer<IEnvironment> consumer);
+
   public void remove(final int mapId);
 
   public void remove(final IEntity entity);

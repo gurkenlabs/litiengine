@@ -87,7 +87,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
-  private final List<Consumer<IEnvironment>> initializedConsumer;
+  private final List<Consumer<IEnvironment>> initializedConsumer, loadedConsumer;
 
   private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
@@ -124,6 +124,7 @@ public class Environment implements IEnvironment {
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
     this.initializedConsumer = new CopyOnWriteArrayList<>();
+    this.loadedConsumer = new CopyOnWriteArrayList<>();
 
     this.spawnPoints = new CopyOnWriteArrayList<>();
 
@@ -711,6 +712,11 @@ public class Environment implements IEnvironment {
     this.initializedConsumer.add(consumer);
   }
 
+  @Override
+  public void onLoaded(Consumer<IEnvironment> consumer) {
+    this.loadedConsumer.add(consumer);
+  }
+
   protected void addMapObject(final IMapObject mapObject) {
     this.addCollisionBox(mapObject);
     this.addLightSource(mapObject);
@@ -1175,6 +1181,9 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = true;
+    for (Consumer<IEnvironment> cons : this.loadedConsumer) {
+      cons.accept(this);
+    }
   }
 
   @Override
