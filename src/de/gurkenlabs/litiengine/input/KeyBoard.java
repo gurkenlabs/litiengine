@@ -67,6 +67,8 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       return true;
     });
 
+    this.loop.start();
+
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }
 

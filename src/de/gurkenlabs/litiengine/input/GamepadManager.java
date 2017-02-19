@@ -41,6 +41,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       return true;
     });
 
+    this.loop.start();
+
     this.onGamepadAdded(pad -> {
       if (defaultgamePadIndex == -1) {
         this.defaultgamePadIndex = pad.getIndex();
