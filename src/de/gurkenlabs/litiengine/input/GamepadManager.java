@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Controller;
@@ -25,13 +27,19 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
 
   private int defaultgamePadIndex = -1;
+  private final IGameLoop loop;
 
   public GamepadManager() {
+    this.loop = new GameLoop(30);
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();
     this.pressedConsumer = new ConcurrentHashMap<>();
-    Input.INPUT_LOOP.attach(this);
+    this.loop.attach(this);
+    Game.onTerminating(s -> {
+      this.loop.terminate();
+      return true;
+    });
 
     this.onGamepadAdded(pad -> {
       if (defaultgamePadIndex == -1) {
@@ -68,7 +76,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
   @Override
   public void update(IGameLoop loop) {
-    updateGamepads();
+    updateGamepads(loop);
   }
 
   @Override
@@ -83,19 +91,22 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     }
   }
 
+  @Override
   public void onGamepadRemoved(Consumer<IGamepad> cons) {
     this.gamepadRemovedConsumer.add(cons);
   }
 
+  @Override
   public void onGamepadAdded(Consumer<IGamepad> cons) {
     this.gamepadAddedConsumer.add(cons);
   }
 
-  private void updateGamepads() {
-    if (Input.INPUT_LOOP.getTicks() % GAMEPAD_UPDATE_DELAY == 0) {
-      this.hackTheShitOutOfJInputBecauseItSucks_HARD();
+  private void updateGamepads(IGameLoop loop) {
+    if (loop.getTicks() % GAMEPAD_UPDATE_DELAY != 0) {
+      return;
     }
 
+    this.hackTheShitOutOfJInputBecauseItSucks_HARD();
     // update plugged in gamepads
     for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
       Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
@@ -130,9 +141,10 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       Field env = ControllerEnvironment.class.getDeclaredField("defaultEnvironment");
       env.setAccessible(true);
       Class<?> clazz = Class.forName("net.java.games.input.DefaultControllerEnvironment");
-      
+
       // kill threads that might still be running.
-      // otherwise we would spawn a new thread every time this method is called without killing the last one
+      // otherwise we would spawn a new thread every time this method is called
+      // without killing the last one
       Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
       for (Thread thread : threadSet) {
         String name = thread.getClass().getName();
@@ -143,7 +155,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          
+
         }
       }
 

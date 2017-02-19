@@ -25,12 +25,12 @@ public class Input {
 
   // we need an own gameloop because otherwise input won't work if the game has
   // been paused
-  protected static final GameLoop INPUT_LOOP;
+  protected static final GameLoop GameadLoop;
 
   static {
     GAMEPADS = new CopyOnWriteArrayList<>();
-    INPUT_LOOP = new GameLoop(30);
-    INPUT_LOOP.start();
+    GameadLoop = new GameLoop(30);
+    GameadLoop.start();
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
     GAMEPADMANAGER = new GamepadManager();

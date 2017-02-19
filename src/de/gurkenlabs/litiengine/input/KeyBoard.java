@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
 /**
@@ -41,7 +43,8 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   /** The typed keys. */
   private final List<KeyEvent> typedKeys;
 
- 
+  private final IGameLoop loop;
+
   private boolean consumeAlt;
 
   /**
@@ -57,7 +60,12 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers = new CopyOnWriteArrayList<>();
 
     // needs own loop, otherwise it won't work when the game is paused
-    Input.INPUT_LOOP.attach(this);
+    this.loop = new GameLoop(30);
+    this.loop.attach(this);
+    Game.onTerminating(s -> {
+      this.loop.terminate();
+      return true;
+    });
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
   }
@@ -270,7 +278,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   @Override
   public String getText(KeyEvent e) {
     if (this.isPressed(KeyEvent.VK_SHIFT) || Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
         return "?";
       }
 
@@ -282,7 +290,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       case KeyEvent.VK_2:
         return "\"";
       case KeyEvent.VK_3:
-        return "§";
+        return "ï¿½";
       case KeyEvent.VK_4:
         return "$";
       case KeyEvent.VK_5:
@@ -314,16 +322,16 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
         return "";
       }
     } else if (this.isPressed(KeyEvent.VK_ALT_GRAPH)) {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
         return "\\";
       }
       switch (e.getKeyCode()) {
       case KeyEvent.VK_0:
         return "}";
       case KeyEvent.VK_2:
-        return "²";
+        return "ï¿½";
       case KeyEvent.VK_3:
-        return "³";
+        return "ï¿½";
       case KeyEvent.VK_7:
         return "{";
       case KeyEvent.VK_8:
@@ -331,19 +339,19 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       case KeyEvent.VK_9:
         return "]";
       case KeyEvent.VK_E:
-        return "€";
+        return "ï¿½";
       case KeyEvent.VK_Q:
         return "@";
       case KeyEvent.VK_M:
-        return "µ";
+        return "ï¿½";
       case KeyEvent.VK_PLUS:
         return "~";
       default:
         return "";
       }
     } else {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
-        return "ß";
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
+        return "ï¿½";
       }
 
       switch (e.getKeyCode()) {
