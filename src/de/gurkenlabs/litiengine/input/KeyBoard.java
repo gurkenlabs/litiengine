@@ -278,7 +278,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   @Override
   public String getText(KeyEvent e) {
     if (this.isPressed(KeyEvent.VK_SHIFT) || Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
         return "?";
       }
 
@@ -290,7 +290,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       case KeyEvent.VK_2:
         return "\"";
       case KeyEvent.VK_3:
-        return "ï¿½";
+        return "§";
       case KeyEvent.VK_4:
         return "$";
       case KeyEvent.VK_5:
@@ -322,16 +322,16 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
         return "";
       }
     } else if (this.isPressed(KeyEvent.VK_ALT_GRAPH)) {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
         return "\\";
       }
       switch (e.getKeyCode()) {
       case KeyEvent.VK_0:
         return "}";
       case KeyEvent.VK_2:
-        return "ï¿½";
+        return "²";
       case KeyEvent.VK_3:
-        return "ï¿½";
+        return "³";
       case KeyEvent.VK_7:
         return "{";
       case KeyEvent.VK_8:
@@ -339,19 +339,19 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       case KeyEvent.VK_9:
         return "]";
       case KeyEvent.VK_E:
-        return "ï¿½";
+        return "€";
       case KeyEvent.VK_Q:
         return "@";
       case KeyEvent.VK_M:
-        return "ï¿½";
+        return "µ";
       case KeyEvent.VK_PLUS:
         return "~";
       default:
         return "";
       }
     } else {
-      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ï¿½')) {
-        return "ï¿½";
+      if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
+        return "ß";
       }
 
       switch (e.getKeyCode()) {

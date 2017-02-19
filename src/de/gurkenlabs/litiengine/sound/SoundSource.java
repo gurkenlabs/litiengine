@@ -96,6 +96,7 @@ public class SoundSource {
 
   /**
    * Loops the sound with the specified volume.
+   * 
    * @param loop
    * @param volume
    */
@@ -258,7 +259,9 @@ public class SoundSource {
           e.printStackTrace();
         }
       }
-      dataLine.drain();
+      if (dataLine != null) {
+        dataLine.drain();
+      }
       playing = false;
     }
   }
