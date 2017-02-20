@@ -427,7 +427,7 @@ public class ImageProcessing {
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, boolean keepRatio) {
-    if (width == 0 || height == 0) {
+    if (width == 0 || height == 0 || image == null) {
       return null;
     }
 

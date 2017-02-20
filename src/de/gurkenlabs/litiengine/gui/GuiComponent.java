@@ -40,9 +40,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The component id. */
   private static int componentId = 0;
 
-  /** The Constant DEFAULT_BG_COLOR. */
-  private static final Color DEFAULT_BG_COLOR = Color.DARK_GRAY;
-
   /** The Constant DEFAULT_COLOR. */
   private static final Color DEFAULT_COLOR = Color.WHITE;
 
@@ -78,6 +75,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   /** The width. */
   private double width, height, x, y, defaultTextX, defaultTextY, x_Padding, textX, textY;
+  private int textAngle = 0;
 
   private Sound hoverSound;
 
@@ -100,7 +98,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
     this.setTextColor(DEFAULT_COLOR);
     this.setHoverTextColor(DEFAULT_COLOR);
-    this.setBackGroundColor(DEFAULT_BG_COLOR);
     this.id = ++componentId;
     this.x = x;
     this.y = y;
@@ -139,7 +136,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseMovedConsumer = new CopyOnWriteArrayList<>();
 
     this.setTextColor(DEFAULT_COLOR);
-    this.setBackGroundColor(DEFAULT_BG_COLOR);
     this.id = ++componentId;
     this.x = x;
     this.y = y;
@@ -311,6 +307,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public Color getTextColor() {
     return this.textColor;
+  }
+
+  public void setTextAngle(int textAngle) {
+    this.textAngle = textAngle;
   }
 
   /**
@@ -595,9 +595,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void prepare() {
-    for (final GuiComponent component : this.getComponents()) {
-      component.prepare();
-    }
     this.onHovered(e -> {
       if (this.getHoverSound() != null) {
         Game.getSoundEngine().playSound(this.getHoverSound());
@@ -609,6 +606,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     Input.MOUSE.registerMouseListener(this);
     Input.MOUSE.registerMouseWheelListener(this);
     Input.MOUSE.registerMouseMotionListener(this);
+    for (final GuiComponent component : this.getComponents()) {
+      component.prepare();
+    }
   }
 
   /**
@@ -631,7 +631,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     if (this.isSuspended() || !this.isVisible()) {
       return;
     }
-
+    if (this.getBackGroundColor() != null) {
+      g.setColor(this.getBackGroundColor());
+      g.fill(this.getBoundingBox());
+    }
     g.setColor(this.isHovered() ? this.getHoverTextColor() : this.getTextColor());
     g.setFont(this.getFont());
     if (this.getText() != null) {
@@ -651,14 +654,21 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
         break;
       }
 
-      if (this.getTextY() < 0) {
+      if (this.getTextY() != 0) {
         this.setTextY(this.defaultTextY);
       }
 
-      if (this.getTextX() < 0) {
+      if (this.getTextX() != 0) {
         this.setTextX(this.defaultTextX);
       }
-      RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+      if (this.getTextAngle() == 0) {
+        RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+      } else if (this.getTextAngle() == 90) {
+        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)) , this.getTextAngle(), this.getTextToRender(g));
+      } else {
+        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
+      }
+
     }
 
     for (final GuiComponent component : this.getComponents()) {
@@ -682,6 +692,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (Consumer<String> cons : this.textChangedConsumer) {
       cons.accept(this.getText());
     }
+  }
+
+  public int getTextAngle() {
+    return this.textAngle;
   }
 
   public void setFontSize(final int size) {

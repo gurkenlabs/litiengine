@@ -29,11 +29,17 @@ public class Sound {
     InputStream is = FileUtilities.getGameResource(path);
 
     try {
-      this.stream = AudioSystem.getAudioInputStream(is);
-      if (this.stream != null) {
+      AudioInputStream in = AudioSystem.getAudioInputStream(is);
+      if (in != null) {
+        AudioFormat baseFormat = in.getFormat();
+        AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
+        // Get AudioInputStream that will be decoded by underlying VorbisSPI
+        in = AudioSystem.getAudioInputStream(decodedFormat, in);
+        // Play now !
+        this.stream = in;
         this.streamData = StreamUtilities.getBytes(this.stream);
       }
-      this.format = stream.getFormat();
+      this.format = this.stream.getFormat();
     } catch (UnsupportedAudioFileException e) {
       System.out.println("could not load '" + path + "'");
       e.printStackTrace();

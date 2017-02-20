@@ -3,8 +3,10 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -121,6 +123,14 @@ public final class RenderEngine implements IRenderEngine {
 
   public static void drawMapText(final Graphics2D g, final String text, Point2D location) {
     drawMapText(g, text, location.getX(), location.getY());
+  }
+
+  public static void drawRotatedText(Graphics2D g, double x, double y, int angle, String text) {
+    Graphics2D g2 = (Graphics2D) g.create();
+    g2.rotate(Math.toRadians(angle), x, y);
+    RenderEngine.drawText(g2, text, x, y);
+    g2.dispose();
+
   }
 
   /**
