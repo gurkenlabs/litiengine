@@ -32,10 +32,9 @@ public class Sound {
       AudioInputStream in = AudioSystem.getAudioInputStream(is);
       if (in != null) {
         AudioFormat baseFormat = in.getFormat();
-        AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
+        AudioFormat decodedFormat = this.getOutFormat(baseFormat);
         // Get AudioInputStream that will be decoded by underlying VorbisSPI
         in = AudioSystem.getAudioInputStream(decodedFormat, in);
-        // Play now !
         this.stream = in;
         this.streamData = StreamUtilities.getBytes(this.stream);
       }
@@ -73,6 +72,12 @@ public class Sound {
 
   public AudioFormat getFormat() {
     return this.format;
+  }
+
+  private AudioFormat getOutFormat(AudioFormat inFormat) {
+    final int ch = inFormat.getChannels();
+    final float rate = inFormat.getSampleRate();
+    return new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, rate, 16, ch, ch * 2, rate, false);
   }
 
   public byte[] getStreamData() {
