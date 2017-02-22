@@ -9,15 +9,18 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
 public abstract class Slider extends GuiComponent {
-  private float minValue, maxValue, currentValue, stepSize;
   private ImageComponent button1, button2, slider;
   private final Spritesheet buttonSprite, sliderSprite;
-  private boolean showArrowButtons, isDragging;
   private final List<Consumer<Float>> changeConsumer;
+  private float currentValue;
+  private boolean isDragging;
+  private final float minValue, maxValue;
+  private final boolean showArrowButtons;
+  private float stepSize;
 
-  public Slider(double x, double y, double width, double height, float minValue, float maxValue, float stepSize, Spritesheet buttonSprite, Spritesheet sliderSprite, boolean showArrowButtons) {
+  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final boolean showArrowButtons) {
     super(x, y, width, height);
-    this.changeConsumer = new CopyOnWriteArrayList<Consumer<Float>>();
+    this.changeConsumer = new CopyOnWriteArrayList<>();
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.stepSize = stepSize;
@@ -26,44 +29,8 @@ public abstract class Slider extends GuiComponent {
     this.showArrowButtons = showArrowButtons;
   }
 
-  public boolean isDragging() {
-    return this.isDragging;
-  }
-
   public boolean arrowButtonsShown() {
     return this.showArrowButtons;
-  }
-
-  public Spritesheet getButtonSprite() {
-    return this.buttonSprite;
-  }
-
-  public List<Consumer<Float>> getChangeConsumer() {
-    return this.changeConsumer;
-  }
-
-  public abstract Point2D getRelativeSliderPosition();
-
-  public abstract void setValueRelativeToMousePosition();
-
-  public Spritesheet getSliderSprite() {
-    return this.sliderSprite;
-  }
-
-  public float getMinValue() {
-    return this.minValue;
-  }
-
-  public float getMaxValue() {
-    return this.maxValue;
-  }
-
-  public float getCurrentValue() {
-    return this.currentValue;
-  }
-
-  public float getStepSize() {
-    return this.stepSize;
   }
 
   public ImageComponent getButton1() {
@@ -74,47 +41,46 @@ public abstract class Slider extends GuiComponent {
     return this.button2;
   }
 
+  public Spritesheet getButtonSprite() {
+    return this.buttonSprite;
+  }
+
+  public List<Consumer<Float>> getChangeConsumer() {
+    return this.changeConsumer;
+  }
+
+  public float getCurrentValue() {
+    return this.currentValue;
+  }
+
+  public float getMaxValue() {
+    return this.maxValue;
+  }
+
+  public float getMinValue() {
+    return this.minValue;
+  }
+
+  public abstract Point2D getRelativeSliderPosition();
+
   public ImageComponent getSliderComponent() {
     return this.slider;
   }
 
-  public void setCurrentValue(float newValue) {
-    if (newValue >= this.getMinValue() && newValue <= this.getMaxValue()) {
-      this.currentValue = newValue;
-    } else if (newValue < this.getMinValue()) {
-      this.currentValue = this.getMinValue();
-    } else if (newValue > this.getMaxValue()) {
-      this.currentValue = this.getMaxValue();
-    }
+  public Spritesheet getSliderSprite() {
+    return this.sliderSprite;
   }
 
-  public void setStepSize(float stepSize) {
-    this.stepSize = stepSize;
+  public float getStepSize() {
+    return this.stepSize;
   }
 
-  protected void setButton1(ImageComponent button1) {
-    this.button1 = button1;
-    this.button1.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
-    });
-    this.getComponents().add(button1);
+  public boolean isDragging() {
+    return this.isDragging;
   }
 
-  protected void setButton2(ImageComponent button2) {
-    this.button2 = button2;
-    this.button2.onClicked(e -> {
-      this.setCurrentValue(this.getCurrentValue() + this.getStepSize());
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
-
-    });
-    this.getComponents().add(button2);
-
-  }
-
-  @Override
-  protected void initializeComponents() {
-
+  public void onChange(final Consumer<Float> c) {
+    this.getChangeConsumer().add(c);
   }
 
   @Override
@@ -126,7 +92,48 @@ public abstract class Slider extends GuiComponent {
     });
   }
 
-  protected void setSlider(ImageComponent slider) {
+  public void setCurrentValue(final float newValue) {
+    if (newValue >= this.getMinValue() && newValue <= this.getMaxValue()) {
+      this.currentValue = newValue;
+    } else if (newValue < this.getMinValue()) {
+      this.currentValue = this.getMinValue();
+    } else if (newValue > this.getMaxValue()) {
+      this.currentValue = this.getMaxValue();
+    }
+  }
+
+  public void setStepSize(final float stepSize) {
+    this.stepSize = stepSize;
+  }
+
+  public abstract void setValueRelativeToMousePosition();
+
+  @Override
+  protected void initializeComponents() {
+
+  }
+
+  protected void setButton1(final ImageComponent button1) {
+    this.button1 = button1;
+    this.button1.onClicked(e -> {
+      this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+    });
+    this.getComponents().add(button1);
+  }
+
+  protected void setButton2(final ImageComponent button2) {
+    this.button2 = button2;
+    this.button2.onClicked(e -> {
+      this.setCurrentValue(this.getCurrentValue() + this.getStepSize());
+      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
+
+    });
+    this.getComponents().add(button2);
+
+  }
+
+  protected void setSlider(final ImageComponent slider) {
     this.slider = slider;
     this.slider.onMousePressed(e -> {
       this.isDragging = true;
@@ -144,9 +151,5 @@ public abstract class Slider extends GuiComponent {
       }
     });
     this.getComponents().add(slider);
-  }
-
-  public void onChange(final Consumer<Float> c) {
-    this.getChangeConsumer().add(c);
   }
 }

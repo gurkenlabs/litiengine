@@ -21,22 +21,22 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 @CombatAttributesInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
-  private final List<Consumer<ICombatEntity>> entityDeathConsumer;
-  private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
-  private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
-
   private final List<IEffect> appliedEffects;
-
   /** The attributes. */
   private final CombatAttributes attributes;
+  private final List<Consumer<ICombatEntity>> entityDeathConsumer;
 
-  /** The team. */
-  private int team;
+  private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
 
-  private ICombatEntity target;
+  private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
 
   /** The is indestructible. */
   private boolean isIndestructible;
+
+  private ICombatEntity target;
+
+  /** The team. */
+  private int team;
 
   /**
    * Instantiates a new attackable entity.

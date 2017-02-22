@@ -29,30 +29,13 @@ import de.gurkenlabs.util.image.ImageProcessing;
 
 public class SpeechBubble implements IUpdateable, IRenderable {
   private static final Map<IEntity, SpeechBubble> activeSpeechBubbles = new ConcurrentHashMap<>();
-  private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int DISPLAYTIME_MIN = 2000;
+  private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int LETTER_WRITE_DELAY = 30;
   private static final int PADDING = 4;
-  private static final Color SPEAK_FONT_COLOR = Color.WHITE;
   private static final Color SPEAK_BACKGROUNDCOLOR = new Color(0, 0, 0, 80);
   private static final Color SPEAK_BORDERCOLOR = new Color(0, 0, 0, 160);
-
-  private int textBoxWidth;
-  private final IEntity entity;
-  private final Font font;
-  private Image bubble;
-  private Sound typeSound;
-  private int width;
-  private int height;
-
-  private long lastTextDispay;
-  private final long currentTextDisplayTime;
-  private String currentText;
-  private String displayedText;
-  private final Queue<Character> currentTextQueue;
-  private long lastCharPoll;
-  
-  private boolean cancelled;
+  private static final Color SPEAK_FONT_COLOR = Color.WHITE;
 
   public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text) {
     return new SpeechBubble(entity, font, text);
@@ -62,17 +45,31 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     return new SpeechBubble(entity, font, text, typeSound);
   }
 
-  private SpeechBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
-    this(entity, font, text);
-    this.typeSound = typeSound;
-  }
+  private Image bubble;
+  private boolean cancelled;
+  private String currentText;
+  private final long currentTextDisplayTime;
+  private final Queue<Character> currentTextQueue;
+
+  private String displayedText;
+  private final IEntity entity;
+  private final Font font;
+  private int height;
+  private long lastCharPoll;
+  private long lastTextDispay;
+
+  private int textBoxWidth;
+
+  private Sound typeSound;
+
+  private int width;
 
   private SpeechBubble(final IEntity entity, final Font font, final String text) {
-    SpeechBubble active = activeSpeechBubbles.get(entity);
-    if(active != null){
+    final SpeechBubble active = activeSpeechBubbles.get(entity);
+    if (active != null) {
       active.cancel();
     }
-    
+
     this.textBoxWidth = (int) (entity.getWidth() * 4);
     this.entity = entity;
     this.font = font;
@@ -92,51 +89,9 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     activeSpeechBubbles.put(entity, this);
   }
 
-  private void createBubbleImage() {
-    final int TRIANGLE_SIZE = 6;
-
-    BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
-    Graphics2D g = img.createGraphics();
-    g.setFont(this.font);
-    int stringWidth = g.getFontMetrics().stringWidth(this.currentText);
-    if (stringWidth < this.textBoxWidth) {
-      this.textBoxWidth = stringWidth;
-    }
-
-    final FontRenderContext frc = g.getFontRenderContext();
-    final AttributedString styledText = new AttributedString(this.currentText);
-    styledText.addAttribute(TextAttribute.FONT, this.font);
-    final AttributedCharacterIterator iterator = styledText.getIterator();
-    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
-    measurer.setPosition(0);
-    float y = 0;
-    while (measurer.getPosition() < this.currentText.length()) {
-      final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
-      y += layout.getAscent() + layout.getLeading() + 0.2;
-    }
-
-    final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, PADDING, PADDING);
-
-    // Build a path
-    GeneralPath path = new GeneralPath();
-    path.moveTo(bounds.getWidth() / 2.0 - TRIANGLE_SIZE / 2.0, bounds.getHeight());
-    path.lineTo(bounds.getWidth() / 2.0, bounds.getHeight() + TRIANGLE_SIZE);
-    path.lineTo(bounds.getWidth() / 2.0 + TRIANGLE_SIZE / 2.0, bounds.getHeight());
-    path.closePath();
-
-    Area ar = new Area(bounds);
-    ar.add(new Area(path));
-
-    this.width = ar.getBounds().width;
-    this.height = ar.getBounds().height;
-    g.setColor(SPEAK_BACKGROUNDCOLOR);
-    g.fill(ar);
-
-    g.setColor(SPEAK_BORDERCOLOR);
-    g.draw(ar);
-    g.dispose();
-
-    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, height + 1);
+  private SpeechBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
+    this(entity, font, text);
+    this.typeSound = typeSound;
   }
 
   @Override
@@ -145,17 +100,17 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       return;
     }
 
-    Point2D location = Game.getScreenManager().getCamera().getViewPortLocation(this.entity);
+    final Point2D location = Game.getScreenManager().getCamera().getViewPortLocation(this.entity);
     RenderEngine.renderImage(g, this.bubble, new Point2D.Double(location.getX() + this.entity.getWidth() / 2.0 - this.textBoxWidth / 2.0 - PADDING, location.getY() - this.height - PADDING));
 
     g.setColor(SPEAK_FONT_COLOR);
     final FontRenderContext frc = g.getFontRenderContext();
 
     final String text = this.displayedText;
-    if(text == null){
+    if (text == null) {
       return;
     }
-    
+
     final AttributedString styledText = new AttributedString(text);
     styledText.addAttribute(TextAttribute.FONT, this.font);
     final AttributedCharacterIterator iterator = styledText.getIterator();
@@ -202,8 +157,55 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     // continue displaying currently displayed text
   }
-  
-  private void cancel(){
+
+  private void cancel() {
     this.cancelled = true;
+  }
+
+  private void createBubbleImage() {
+    final int TRIANGLE_SIZE = 6;
+
+    final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
+    final Graphics2D g = img.createGraphics();
+    g.setFont(this.font);
+    final int stringWidth = g.getFontMetrics().stringWidth(this.currentText);
+    if (stringWidth < this.textBoxWidth) {
+      this.textBoxWidth = stringWidth;
+    }
+
+    final FontRenderContext frc = g.getFontRenderContext();
+    final AttributedString styledText = new AttributedString(this.currentText);
+    styledText.addAttribute(TextAttribute.FONT, this.font);
+    final AttributedCharacterIterator iterator = styledText.getIterator();
+    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
+    measurer.setPosition(0);
+    float y = 0;
+    while (measurer.getPosition() < this.currentText.length()) {
+      final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
+      y += layout.getAscent() + layout.getLeading() + 0.2;
+    }
+
+    final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, PADDING, PADDING);
+
+    // Build a path
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(bounds.getWidth() / 2.0 - TRIANGLE_SIZE / 2.0, bounds.getHeight());
+    path.lineTo(bounds.getWidth() / 2.0, bounds.getHeight() + TRIANGLE_SIZE);
+    path.lineTo(bounds.getWidth() / 2.0 + TRIANGLE_SIZE / 2.0, bounds.getHeight());
+    path.closePath();
+
+    final Area ar = new Area(bounds);
+    ar.add(new Area(path));
+
+    this.width = ar.getBounds().width;
+    this.height = ar.getBounds().height;
+    g.setColor(SPEAK_BACKGROUNDCOLOR);
+    g.fill(ar);
+
+    g.setColor(SPEAK_BORDERCOLOR);
+    g.draw(ar);
+    g.dispose();
+
+    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, this.width + 1, this.height + 1);
   }
 }

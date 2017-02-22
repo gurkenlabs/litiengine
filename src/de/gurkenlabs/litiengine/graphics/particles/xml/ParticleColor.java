@@ -9,14 +9,14 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "color")
 public class ParticleColor {
   @XmlAttribute
-  private int red;
+  private int alpha;
 
-  @XmlAttribute
-  private int green;
   @XmlAttribute
   private int blue;
   @XmlAttribute
-  private int alpha;
+  private int green;
+  @XmlAttribute
+  private int red;
 
   public ParticleColor() {
   }

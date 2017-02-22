@@ -17,7 +17,8 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.PointDistanceComparator;
 
 /**
- * A custom tolllolo gurkenlabs pathfinding algorithm that sometimes actually works.
+ * A custom tolllolo gurkenlabs pathfinding algorithm that sometimes actually
+ * works.
  */
 public class GeometricPathFinder extends PathFinder {
 

@@ -16,21 +16,24 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
  */
 public class Menu extends ImageComponentList {
 
+  private int currentSelection;
   /** The menu buttons. */
   private final String[] items;
   private final List<Consumer<Integer>> selectionChangeConsumers;
-  private int currentSelection;
 
-  public Menu(final double x, final double y, final double width, final double height, int rows, int columns, final String[] items, final Spritesheet background) {
+  public Menu(final double x, final double y, final double width, final double height, final int rows, final int columns, final String[] items, final Spritesheet background) {
     super(x, y, width, height, rows, columns, null, background);
     this.items = items;
     this.selectionChangeConsumers = new CopyOnWriteArrayList<>();
 
   }
 
-  @Override
-  public void render(final Graphics2D g) {
-    super.render(g);
+  public int getCurrentSelection() {
+    return this.currentSelection;
+  }
+
+  public void onChange(final Consumer<Integer> cons) {
+    this.selectionChangeConsumers.add(cons);
   }
 
   @Override
@@ -39,12 +42,12 @@ public class Menu extends ImageComponentList {
     super.prepare();
     for (int i = 0; i < this.items.length; i++) {
       final ImageComponent menuButton = this.getCellComponents().get(i);
-      menuButton.setText(items[i]);
+      menuButton.setText(this.items[i]);
       this.getCellComponents().add(menuButton);
       menuButton.onClicked(c -> this.setCurrentSelection(this.getCellComponents().indexOf(menuButton)));
 
     }
-    for (ImageComponent comp : this.getCellComponents()) {
+    for (final ImageComponent comp : this.getCellComponents()) {
       if (this.getCellComponents().indexOf(comp) >= this.items.length) {
         this.getCellComponents().remove(comp);
         this.getComponents().remove(comp);
@@ -54,20 +57,17 @@ public class Menu extends ImageComponentList {
   }
 
   @Override
-  protected void initializeComponents() {
-
+  public void render(final Graphics2D g) {
+    super.render(g);
   }
 
-  public int getCurrentSelection() {
-    return this.currentSelection;
-  }
-
-  public void setCurrentSelection(int currentSelection) {
+  public void setCurrentSelection(final int currentSelection) {
     this.currentSelection = currentSelection;
     this.selectionChangeConsumers.forEach(c -> c.accept(this.getCurrentSelection()));
   }
 
-  public void onChange(Consumer<Integer> cons) {
-    this.selectionChangeConsumers.add(cons);
+  @Override
+  protected void initializeComponents() {
+
   }
 }

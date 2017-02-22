@@ -2,28 +2,27 @@ package de.gurkenlabs.util.geom;
 
 public class Trigonometry {
   private static final int ATAN2_BITS = 7;
-
   private static final int ATAN2_BITS2 = ATAN2_BITS << 1;
   private static final int ATAN2_MASK = ~(-1 << ATAN2_BITS2);
   private static final int ATAN2_COUNT = ATAN2_MASK + 1;
-  private static final int ATAN2_DIM = (int) Math.sqrt(ATAN2_COUNT);
-
-  private static final float INV_ATAN2_DIM_MINUS_1 = 1.0f / (ATAN2_DIM - 1);
-  private static final float DEG = 180.0f / (float) Math.PI;
-
   private static final float[] atan2 = new float[ATAN2_COUNT];
-
+  private static final int ATAN2_DIM = (int) Math.sqrt(ATAN2_COUNT);
+  
   private static final int SIN_BITS = 12;
   private static final int SIN_MASK = ~(-1 << SIN_BITS);
   private static final int SIN_COUNT = SIN_MASK + 1;
 
-  private static final float radFull = (float) (Math.PI * 2.0);
-  private static final float degFull = (float) 360.0;
-  private static final float radToIndex = SIN_COUNT / radFull;
-  private static final float degToIndex = SIN_COUNT / degFull;
-
-  private static final float[] sin = new float[SIN_COUNT];
   private static final float[] cos = new float[SIN_COUNT];
+
+  private static final float DEG = 180.0f / (float) Math.PI;
+
+  private static final float degFull = (float) 360.0;
+  private static final float degToIndex = SIN_COUNT / degFull;
+  private static final float INV_ATAN2_DIM_MINUS_1 = 1.0f / (ATAN2_DIM - 1);
+
+  private static final float radFull = (float) (Math.PI * 2.0);
+  private static final float radToIndex = SIN_COUNT / radFull;
+  private static final float[] sin = new float[SIN_COUNT];
 
   static {
     for (int i = 0; i < ATAN2_DIM; i++) {

@@ -25,39 +25,62 @@ import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Spritesheet {
-  public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   public static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
+  public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
-  private final String name;
 
-  /** The rows. */
-  private int rows;
+  public static Spritesheet find(final String path) {
+    if (path == null || path.isEmpty()) {
+      return null;
+    }
 
-  /** The sprite height. */
-  private int spriteHeight;
+    final String name = FileUtilities.getFileName(path);
 
-  /** The sprites per row. */
-  private int columns;
+    return spritesheets.get(name.toLowerCase());
+  }
 
-  /** The sprite width. */
-  private int spriteWidth;
+  public static int[] getCustomKeyFrameDurations(final String name) {
+    if (customKeyFrameDurations.containsKey(FileUtilities.getFileName(name).toLowerCase())) {
+      return customKeyFrameDurations.get(FileUtilities.getFileName(name).toLowerCase());
+    }
 
-  private final int hashCode;
+    return new int[0];
+  }
 
-  private BufferedImage image;
+  public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+    final Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
+    return sprite;
+  }
+
+  public static Spritesheet load(final ITileset tileset) {
+    if (tileset == null || tileset.getImage() == null) {
+      return null;
+    }
+
+    if (tileset.getImage().getAbsoluteSourcePath() == null) {
+      return null;
+    }
+
+    final Spritesheet sprite = new Spritesheet(tileset);
+    return sprite;
+  }
+
+  public static Spritesheet load(final SpriteSheetInfo info) {
+    return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
+  }
 
   /**
    * The sprite info file must be located under the
    * {@link de.gurkenlags.litiengine.GameInfo#getSpritesDirectory()}. directory.
-   * 
+   *
    * @param spriteInfoFile
    * @return
    */
   public static List<Spritesheet> load(final String spriteInfoFile) {
     final String COMMENT_CHAR = "#";
 
-    ArrayList<Spritesheet> sprites = new ArrayList<>();
-    InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
+    final ArrayList<Spritesheet> sprites = new ArrayList<>();
+    final InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
     if (fileStream == null) {
       return sprites;
     }
@@ -70,100 +93,78 @@ public class Spritesheet {
           continue;
         }
 
-        String[] parts = line.split(";");
+        final String[] parts = line.split(";");
         if (parts.length == 0) {
           continue;
         }
 
-        List<String> items = Arrays.asList(parts[0].split("\\s*,\\s*"));
+        final List<String> items = Arrays.asList(parts[0].split("\\s*,\\s*"));
         if (items.size() < 3) {
           continue;
         }
 
         try {
-          String dir = FileUtilities.getParentDirPath(spriteInfoFile);
-          String name = Paths.get(dir, items.get(0)).toString();
+          final String dir = FileUtilities.getParentDirPath(spriteInfoFile);
+          final String name = Paths.get(dir, items.get(0)).toString();
 
-          int width = Integer.parseInt(items.get(1));
-          int height = Integer.parseInt(items.get(2));
+          final int width = Integer.parseInt(items.get(1));
+          final int height = Integer.parseInt(items.get(2));
 
-          Spritesheet sprite = load(name, width, height);
+          final Spritesheet sprite = load(name, width, height);
           sprites.add(sprite);
           if (parts.length >= 2) {
-            List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
+            final List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
             if (keyFrameStrings.size() > 0) {
-              int[] keyFrames = new int[keyFrameStrings.size()];
+              final int[] keyFrames = new int[keyFrameStrings.size()];
               for (int i = 0; i < keyFrameStrings.size(); i++) {
-                int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
+                final int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
                 keyFrames[i] = keyFrame;
               }
 
               customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
             }
           }
-        } catch (NumberFormatException nfe) {
+        } catch (final NumberFormatException nfe) {
           nfe.printStackTrace();
           continue;
         }
       }
 
       System.out.println(sprites.size() + " spritesheets loaded from '" + spriteInfoFile + "'");
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 
     return sprites;
   }
 
-  public static Spritesheet load(final ITileset tileset) {
-    if (tileset == null || tileset.getImage() == null) {
-      return null;
-    }
-
-    if (tileset.getImage().getAbsoluteSourcePath() == null) {
-      return null;
-    }
-
-    Spritesheet sprite = new Spritesheet(tileset);
-    return sprite;
-  }
-
   public static Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {
-    Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
+    final Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
 
     return sprite;
-  }
-
-  public static Spritesheet load(final SpriteSheetInfo info) {
-    return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
-  }
-
-  public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
-    return sprite;
-  }
-
-  public static int[] getCustomKeyFrameDurations(String name) {
-    if (customKeyFrameDurations.containsKey(FileUtilities.getFileName(name).toLowerCase())) {
-      return customKeyFrameDurations.get(FileUtilities.getFileName(name).toLowerCase());
-    }
-
-    return new int[0];
-  }
-
-  public static Spritesheet find(final String path) {
-    if (path == null || path.isEmpty()) {
-      return null;
-    }
-
-    String name = FileUtilities.getFileName(path);
-
-    return spritesheets.get(name.toLowerCase());
   }
 
   public static void remove(final String path) {
     spritesheets.values().removeIf(x -> x.getName().equals(path));
   }
+
+  /** The sprites per row. */
+  private int columns;
+
+  private final int hashCode;
+
+  private final BufferedImage image;
+
+  private final String name;
+
+  /** The rows. */
+  private int rows;
+
+  /** The sprite height. */
+  private int spriteHeight;
+
+  /** The sprite width. */
+  private int spriteWidth;
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     this.image = image;
@@ -186,10 +187,6 @@ public class Spritesheet {
     this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
   }
 
-  public BufferedImage getImage() {
-    return this.image;
-  }
-
   /**
    * Gets the sprites per row.
    *
@@ -199,10 +196,14 @@ public class Spritesheet {
     return this.columns;
   }
 
+  public BufferedImage getImage() {
+    return this.image;
+  }
+
   /**
    * The unique name of this spritesheet. A spritesheet can always be identified
    * by this name within a game project.
-   * 
+   *
    * @return The name of the spritesheet.
    */
   public String getName() {
@@ -229,7 +230,7 @@ public class Spritesheet {
       final BufferedImage smallImage = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
       ImageCache.SPRITES.put(imageCacheKey, smallImage);
       return smallImage;
-    } catch (RasterFormatException rfe) {
+    } catch (final RasterFormatException rfe) {
       log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" + position.x + "," + position.y + "] from sprite'" + this.getName() + "'");
       return null;
     }
@@ -267,12 +268,12 @@ public class Spritesheet {
     return this.hashCode;
   }
 
-  public void setSpriteHeight(int spriteHeight) {
+  public void setSpriteHeight(final int spriteHeight) {
     this.spriteHeight = spriteHeight;
     this.updateRowsAndCols();
   }
 
-  public void setSpriteWidth(int spriteWidth) {
+  public void setSpriteWidth(final int spriteWidth) {
     this.spriteWidth = spriteWidth;
     this.updateRowsAndCols();
   }
@@ -285,7 +286,7 @@ public class Spritesheet {
   }
 
   private void updateRowsAndCols() {
-    BufferedImage sprite = this.getImage();
+    final BufferedImage sprite = this.getImage();
     if (sprite != null && sprite.getWidth() != 0 && sprite.getHeight() != 0 && this.spriteWidth != 0 && this.spriteHeight != 0) {
       this.columns = sprite.getWidth() / this.spriteWidth;
       this.rows = sprite.getHeight() / this.spriteHeight;

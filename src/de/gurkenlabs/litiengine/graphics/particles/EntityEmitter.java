@@ -27,6 +27,7 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
     this.entity = entity;
   }
 
+  @Override
   public IEntity getEntity() {
     return this.entity;
   }
@@ -39,7 +40,6 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
 
     return this.getEntity().getDimensionCenter();
   }
-
 
   @Override
   public void setLocation(final Point2D location) {

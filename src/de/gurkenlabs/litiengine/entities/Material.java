@@ -1,5 +1,5 @@
 package de.gurkenlabs.litiengine.entities;
 
 public enum Material {
-  UNDEFINED, WOOD, STEEL, STONE, FLESH, FOLIAGE, CERAMIC, PLASTIC;
+  CERAMIC, FLESH, FOLIAGE, PLASTIC, STEEL, STONE, UNDEFINED, WOOD;
 }

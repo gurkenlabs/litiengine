@@ -15,17 +15,17 @@ import de.gurkenlabs.util.image.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
 
+  private Sound hoverSound;
+
   private Image image;
 
   private double imageX, imageY, imageWidth, imageHeight;
 
   private Spritesheet spritesheet;
 
-  private Sound hoverSound;
-
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     super(x, y, width, height);
-    this.spritesheet = spritesheet;     
+    this.spritesheet = spritesheet;
     this.setFont(TEXT_FONT.deriveFont((float) (this.getHeight() * 3 / 6f)));
     this.setTextColor(Color.BLACK);
 
@@ -34,111 +34,6 @@ public class ImageComponent extends GuiComponent {
     if (image != null) {
       this.image = image;
     }
-  }
-
-  @Override
-  public void setHeight(double height) {
-    super.setHeight(height);
-    this.imageHeight = this.getHeight() * 0.9;
-    this.imageY = this.getY() + this.getHeight() * 0.05;
-
-  }
-
-  @Override
-  public void setWidth(double width) {
-    super.setWidth(width);
-    this.imageWidth = this.getWidth() * 0.9;
-    this.imageX = this.getX() + this.getWidth() * 0.05;
-
-  }
-
-  public Sound getHoverSound() {
-    return hoverSound;
-  }
-
-  public void setHoverSound(Sound hoverSound) {
-    this.hoverSound = hoverSound;
-  }
-
-  public Image getImage() {
-    return this.image;
-  }
-
-  public double getImageHeight() {
-    return this.imageHeight;
-  }
-
-  public double getImageWidth() {
-    return this.imageWidth;
-  }
-
-  public double getImageX() {
-    return this.imageX;
-  }
-
-  public double getImageY() {
-    return this.imageY;
-  }
-
-  public void setImageX(double newX) {
-    this.imageX = newX;
-  }
-
-  public void setImageY(double newY) {
-    this.imageY = newY;
-  }
-
-  public void setImageWidth(double newWidth) {
-    this.imageWidth = newWidth;
-  }
-
-  public void setImageHeight(double newHeight) {
-    this.imageHeight = newHeight;
-  }
-
-  public Spritesheet getSpritesheet() {
-    return this.spritesheet;
-  }
-
-  public void setSpriteSheet(Spritesheet spr) {
-    this.spritesheet = spr;
-  }
-
-  /**
-   * Gets the text.
-   *
-   * @return the text
-   */
-
-  public void relocateImage(final int x, final int y, final int width, final int height) {
-    this.imageX = x;
-    this.imageY = y;
-    this.imageWidth = width;
-    this.imageHeight = height;
-  }
-
-  public Point2D getImageLocation() {
-    return new Point2D.Double(this.getImageX(), this.getImageY());
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    if (this.isSuspended() || !this.isVisible()) {
-      return;
-    }
-    final Image bg = this.getBackground();
-
-    RenderEngine.renderImage(g, bg, this.getPosition());
-    final Image img = this.getImage();
-    if (img != null) {
-      RenderEngine.renderImage(g, img, this.getImageLocation());
-    }
-
-    super.render(g);
-  }
-
-  public void setImage(final Image image) {
-    this.image = image;
   }
 
   public Image getBackground() {
@@ -166,6 +61,125 @@ public class ImageComponent extends GuiComponent {
     }
 
     return img;
+  }
+
+  @Override
+  public Sound getHoverSound() {
+    return this.hoverSound;
+  }
+
+  public Image getImage() {
+    return this.image;
+  }
+
+  public double getImageHeight() {
+    return this.imageHeight;
+  }
+
+  public Point2D getImageLocation() {
+    return new Point2D.Double(this.getImageX(), this.getImageY());
+  }
+
+  public double getImageWidth() {
+    return this.imageWidth;
+  }
+
+  public double getImageX() {
+    return this.imageX;
+  }
+
+  public double getImageY() {
+    return this.imageY;
+  }
+
+  public Spritesheet getSpritesheet() {
+    return this.spritesheet;
+  }
+
+  /**
+   * Gets the text.
+   *
+   * @return the text
+   */
+
+  public void relocateImage(final double x, final double y, final double width, final double height) {
+    this.imageX = x;
+    this.imageY = y;
+    this.imageWidth = width;
+    this.imageHeight = height;
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    if (this.isSuspended() || !this.isVisible()) {
+      return;
+    }
+    final Image bg = this.getBackground();
+
+    RenderEngine.renderImage(g, bg, this.getPosition());
+    final Image img = this.getImage();
+    if (img != null) {
+      RenderEngine.renderImage(g, img, this.getImageLocation());
+    }
+
+    super.render(g);
+  }
+
+  @Override
+  public void setHeight(final double height) {
+    super.setHeight(height);
+    this.imageHeight = this.getHeight() * 0.9;
+    this.imageY = this.getY() + this.getHeight() * 0.05;
+
+  }
+
+  @Override
+  public void setHoverSound(final Sound hoverSound) {
+    this.hoverSound = hoverSound;
+  }
+
+  public void setImage(final Image image) {
+    if (this == null || image == null) {
+      return;
+    }
+    BufferedImage scaledImage = ImageProcessing.scaleImage((BufferedImage) image, (int) (this.getWidth() * 9 / 10), (int) (this.getHeight() * 9 / 10), true);
+    if (scaledImage == null) {
+      return;
+    }
+    this.image = scaledImage;
+
+    final double x = this.getBoundingBox().getCenterX() - this.image.getWidth(null) / 2;
+    final double y = this.getBoundingBox().getCenterY() - this.image.getHeight(null) / 2;
+    this.relocateImage(x, y, image.getWidth(null), image.getHeight(null));
+
+  }
+
+  public void setImageHeight(final double newHeight) {
+    this.imageHeight = newHeight;
+  }
+
+  public void setImageWidth(final double newWidth) {
+    this.imageWidth = newWidth;
+  }
+
+  public void setImageX(final double newX) {
+    this.imageX = newX;
+  }
+
+  public void setImageY(final double newY) {
+    this.imageY = newY;
+  }
+
+  public void setSpriteSheet(final Spritesheet spr) {
+    this.spritesheet = spr;
+  }
+
+  @Override
+  public void setWidth(final double width) {
+    super.setWidth(width);
+    this.imageWidth = this.getWidth() * 0.9;
+    this.imageX = this.getX() + this.getWidth() * 0.05;
+
   }
 
   @Override

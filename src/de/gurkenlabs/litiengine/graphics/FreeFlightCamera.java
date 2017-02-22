@@ -8,19 +8,14 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.input.Input;
 
-public class FreeFlightCamera extends Camera implements IUpdateable{
+public class FreeFlightCamera extends Camera implements IUpdateable {
   private Point2D location;
 
   public FreeFlightCamera(final Point2D location) {
     this.location = location;
     Game.getLoop().attach(this);
   }
-  
-  @Override
-  public void update(IGameLoop loop) {
-    this.handleFreeFlightCamera(loop);
-  }
-  
+
   public Point2D getLocation() {
     return this.location;
   }
@@ -30,11 +25,16 @@ public class FreeFlightCamera extends Camera implements IUpdateable{
   }
 
   @Override
+  public void update(final IGameLoop loop) {
+    this.handleFreeFlightCamera(loop);
+  }
+
+  @Override
   public void updateFocus() {
     this.setFocus(this.location);
     super.updateFocus();
   }
-  
+
   private void handleFreeFlightCamera(final IGameLoop gameLoop) {
     final int SCROLL_PIXELS_PER_SECOND = 400;
     final int SCROLL_PADDING = 20;

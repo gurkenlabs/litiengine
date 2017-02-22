@@ -11,16 +11,16 @@ public class ParticleParameter {
   }
 
   @XmlAttribute
-  private float value;
-
-  @XmlAttribute
-  private boolean randomValue;
+  private float maxValue;
 
   @XmlAttribute
   private float minValue;
 
   @XmlAttribute
-  private float maxValue;
+  private boolean randomValue;
+
+  @XmlAttribute
+  private float value;
 
   public ParticleParameter() {
   }

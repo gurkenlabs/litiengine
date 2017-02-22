@@ -13,15 +13,15 @@ import de.gurkenlabs.litiengine.GameLoop;
  */
 public class Input {
 
+  public static IGamepadManager GAMEPADMANAGER;
+
+  public static final List<IGamepad> GAMEPADS;
+
   /** The keyboard. */
   public static IKeyboard KEYBOARD;
 
   /** The mouse. */
   public static IMouse MOUSE;
-
-  public static IGamepadManager GAMEPADMANAGER;
-
-  public static final List<IGamepad> GAMEPADS;
 
   // we need an own gameloop because otherwise input won't work if the game has
   // been paused
@@ -38,7 +38,7 @@ public class Input {
 
   /**
    * Gets the first gamepad that is currently available.
-   * 
+   *
    * @return
    */
   public static IGamepad getGamepad() {
@@ -52,16 +52,16 @@ public class Input {
   /**
    * Gets the gamepad with the specified index if it is still plugged in. After
    * replugging a controller while the game is running, its index might change.
-   * 
+   *
    * @param index
    * @return
    */
-  public static IGamepad getGamepad(int index) {
+  public static IGamepad getGamepad(final int index) {
     if (GAMEPADS.size() == 0) {
       return null;
     }
 
-    for (IGamepad gamepad : GAMEPADS) {
+    for (final IGamepad gamepad : GAMEPADS) {
       if (gamepad.getIndex() == index) {
         return gamepad;
       }

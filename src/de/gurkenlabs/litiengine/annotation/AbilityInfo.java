@@ -22,8 +22,6 @@ public @interface AbilityInfo {
 
   CastType castType() default CastType.INSTANT;
 
-  AbilityOrigin origin() default AbilityOrigin.COLLISIONBOX_CENTER;
-
   int cooldown() default 0;
 
   String description() default "";
@@ -37,6 +35,8 @@ public @interface AbilityInfo {
   boolean multiTarget() default false;
 
   String name() default "";
+
+  AbilityOrigin origin() default AbilityOrigin.COLLISIONBOX_CENTER;
 
   int range() default 0;
 

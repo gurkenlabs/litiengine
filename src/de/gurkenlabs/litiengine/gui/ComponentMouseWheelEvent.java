@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.event.MouseWheelEvent;
 
-public class ComponentMouseWheelEvent{
+public class ComponentMouseWheelEvent {
 
   private final MouseWheelEvent event;
 

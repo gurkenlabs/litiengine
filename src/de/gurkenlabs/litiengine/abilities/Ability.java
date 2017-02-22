@@ -28,19 +28,18 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class Ability.
  */
 @AbilityInfo
-public abstract class Ability implements IRenderable{
+public abstract class Ability implements IRenderable {
   private final List<Consumer<AbilityExecution>> abilityCastConsumer;
-
-  /** The ability type. */
-  private final String name;
-  /** The tooltip. */
-  private final String description;
 
   /** The attributes. */
   private final AbilityAttributes attributes;
+  private final CastType castType;
 
   /** The current execution. */
   private AbilityExecution currentExecution;
+
+  /** The tooltip. */
+  private final String description;
 
   /** The effects. */
   private final List<IEffect> effects;
@@ -51,11 +50,12 @@ public abstract class Ability implements IRenderable{
   /** The multi target. */
   private final boolean multiTarget;
 
-  private final CastType castType;
-  
-  private final AbilityOrigin originType;
+  /** The ability type. */
+  private final String name;
 
   private Point2D origin;
+
+  private final AbilityOrigin originType;
 
   /**
    * Instantiates a new ability.
@@ -159,15 +159,6 @@ public abstract class Ability implements IRenderable{
   }
 
   /**
-   * Gets the effects.
-   *
-   * @return the effects
-   */
-  protected List<IEffect> getEffects() {
-    return this.effects;
-  }
-
-  /**
    * Gets the executing mob.
    *
    * @return the executing mob
@@ -181,28 +172,21 @@ public abstract class Ability implements IRenderable{
   }
 
   public Point2D getOrigin() {
-    switch (this.originType){
+    switch (this.originType) {
     case COLLISIONBOX_CENTER:
-      return new Point2D.Double(executor.getCollisionBox().getCenterX(), executor.getCollisionBox().getCenterY());
+      return new Point2D.Double(this.executor.getCollisionBox().getCenterX(), this.executor.getCollisionBox().getCenterY());
     case DIMENSION_CENTER:
-      return executor.getDimensionCenter();
+      return this.executor.getDimensionCenter();
     case CUSTOM:
-      if(this.origin != null){
+      if (this.origin != null) {
         return new Point2D.Double(this.executor.getLocation().getX() + this.origin.getX(), this.executor.getLocation().getY() + this.origin.getY());
       }
     case LOCATION:
     default:
-      return executor.getLocation();
+      return this.executor.getLocation();
     }
   }
 
-  /**
-   * Sets a custom offset from the executors map location as origion of this ability.
-   * @param origin
-   */
-  public void setOrigin(Point2D origin) {
-    this.origin = origin;
-  }
   /**
    * Gets the remaining cooldown in seconds.
    *
@@ -215,22 +199,6 @@ public abstract class Ability implements IRenderable{
 
     // calculate cooldown in seconds
     return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
-  }
-
-  protected Shape internalCalculateImpactArea(final float angle) {
-    final int impact = this.getAttributes().getImpact().getCurrentValue();
-    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
-    final double arcX = this.getOrigin().getX() - impact * 0.5;
-    final double arcY = this.getOrigin().getY() - impact * 0.5;
-
-    // project
-    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
-    final double start = (angle) - 90;
-    if (impactAngle % 360 == 0) {
-      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
-    }
-
-    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
   public boolean isCasting(final IGameLoop gameLoop) {
@@ -259,18 +227,64 @@ public abstract class Ability implements IRenderable{
     }
   }
 
+  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
+    for (final IEffect effect : this.getEffects()) {
+      // registers to all effects and their follow up effects recursively
+      this.onEffectCeased(effect, consumer);
+    }
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    g.setColor(new Color(255, 255, 0, 100));
+    RenderEngine.fillShape(g, this.calculateImpactArea());
+    final Stroke oldStroke = g.getStroke();
+    g.setStroke(new BasicStroke(2f));
+    g.setColor(new Color(255, 255, 0, 200));
+    RenderEngine.drawShape(g, this.calculateImpactArea());
+    g.setStroke(oldStroke);
+  }
+
+  /**
+   * Sets a custom offset from the executors map location as origion of this
+   * ability.
+   * 
+   * @param origin
+   */
+  public void setOrigin(final Point2D origin) {
+    this.origin = origin;
+  }
+
+  /**
+   * Gets the effects.
+   *
+   * @return the effects
+   */
+  protected List<IEffect> getEffects() {
+    return this.effects;
+  }
+
+  protected Shape internalCalculateImpactArea(final float angle) {
+    final int impact = this.getAttributes().getImpact().getCurrentValue();
+    final int impactAngle = this.getAttributes().getImpactAngle().getCurrentValue();
+    final double arcX = this.getOrigin().getX() - impact * 0.5;
+    final double arcY = this.getOrigin().getY() - impact * 0.5;
+
+    // project
+    final Point2D appliedRange = GeometricUtilities.project(new Point2D.Double(arcX, arcY), angle, this.getAttributes().getRange().getCurrentValue() * 0.5);
+    final double start = angle - 90;
+    if (impactAngle % 360 == 0) {
+      return new Ellipse2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact);
+    }
+
+    return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
+  }
+
   private void onEffectApplied(final IEffect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectApplied(consumer);
 
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       this.onEffectApplied(followUp, consumer);
-    }
-  }
-
-  public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    for (final IEffect effect : this.getEffects()) {
-      // registers to all effects and their follow up effects recursively
-      this.onEffectCeased(effect, consumer);
     }
   }
 
@@ -280,16 +294,5 @@ public abstract class Ability implements IRenderable{
     for (final IEffect followUp : effect.getFollowUpEffects()) {
       this.onEffectCeased(followUp, consumer);
     }
-  }
-
-  @Override
-  public void render(Graphics2D g) {
-    g.setColor(new Color(255, 255, 0, 100));
-    RenderEngine.fillShape(g, this.calculateImpactArea());
-    Stroke oldStroke = g.getStroke();
-    g.setStroke(new BasicStroke(2f));
-    g.setColor(new Color(255, 255, 0, 200));
-    RenderEngine.drawShape(g, this.calculateImpactArea());
-    g.setStroke(oldStroke);
   }
 }

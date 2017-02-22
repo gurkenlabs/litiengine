@@ -8,13 +8,12 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.particles.IEntityEmitter;
 
-
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class CustomEntityEmitter extends CustomEmitter implements IEntityEmitter {
   private final IEntity entity;
 
-  public CustomEntityEmitter(IEntity entity, final String emitterXml) {
+  public CustomEntityEmitter(final IEntity entity, final String emitterXml) {
     super(entity.getLocation().getX(), entity.getLocation().getY(), emitterXml);
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
@@ -25,16 +24,16 @@ public class CustomEntityEmitter extends CustomEmitter implements IEntityEmitter
   }
 
   @Override
+  public IEntity getEntity() {
+    return this.entity;
+  }
+
+  @Override
   public Point2D getLocation() {
     if (this.getEntity() == null) {
       return null;
     }
 
     return new Point2D.Double(this.getEntity().getLocation().getX(), this.getEntity().getLocation().getY());
-  }
-
-  @Override
-  public IEntity getEntity() {
-    return this.entity;
   }
 }

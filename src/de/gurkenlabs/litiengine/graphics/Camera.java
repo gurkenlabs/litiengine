@@ -19,11 +19,13 @@ import de.gurkenlabs.util.MathUtilities;
  * The Class Camera.
  */
 public class Camera implements ICamera {
-  private final List<Consumer<Float>> zoomChangedConsumer;
   /**
    * Provides the center location for the viewport.
    */
   private Point2D focus;
+  private long lastShake;
+
+  private int shakeDelay;
 
   /** The shake duration. */
   private int shakeDuration = 2;
@@ -31,21 +33,19 @@ public class Camera implements ICamera {
   /** The shake intensity. */
   private double shakeIntensity = 1;
 
-  /** The shake tick. */
-  private long shakeTick;
-
-  private int shakeDelay;
-  private long lastShake;
-
   private double shakeOffsetX;
   private double shakeOffsetY;
 
+  /** The shake tick. */
+  private long shakeTick;
+  private Rectangle2D viewPort;
+
   private float zoom;
+  private final List<Consumer<Float>> zoomChangedConsumer;
   private int zoomDelay;
-  private long zoomTick;
   private float zoomStep;
 
-  private Rectangle2D viewPort;
+  private long zoomTick;
 
   /**
    * Instantiates a new camera.
@@ -54,46 +54,6 @@ public class Camera implements ICamera {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
     this.zoom = Game.getInfo().getRenderScale();
-  }
-
-  @Override
-  public void update(IGameLoop loop) {
-    if (Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().equals(this)) {
-      return;
-    }
-
-    if (this.zoom > 0 && Game.getInfo().getRenderScale() != this.zoom) {
-      if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
-        Game.getInfo().setRenderScale(this.zoom);
-        for (Consumer<Float> cons : this.zoomChangedConsumer) {
-          cons.accept(this.zoom);
-        }
-
-        this.zoom = 0;
-        this.zoomDelay = 0;
-        this.zoomTick = 0;
-        this.zoomStep = 0;
-      } else {
-
-        float newRenderScale = Game.getInfo().getRenderScale() + this.zoomStep;
-        Game.getInfo().setRenderScale(newRenderScale);
-        for (Consumer<Float> cons : this.zoomChangedConsumer) {
-          cons.accept(newRenderScale);
-        }
-      }
-    }
-
-    if (!this.isShakeEffectActive()) {
-      this.shakeOffsetX = 0;
-      this.shakeOffsetY = 0;
-      return;
-    }
-
-    if (loop.getDeltaTime(this.lastShake) > shakeDelay) {
-      this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.lastShake = loop.getTicks();
-    }
   }
 
   @Override
@@ -134,17 +94,37 @@ public class Camera implements ICamera {
     return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
   }
 
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.ICamera#getCameraRegion()
+   */
+  @Override
+  public Rectangle2D getViewPort() {
+    return this.viewPort;
+  }
+
   @Override
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
 
-    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (animationController == null || animationController.getCurrentAnimation() == null) {
       return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
 
     final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(double, double)
+   */
+  @Override
+  public Point2D getViewPortLocation(final double x, final double y) {
+    return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
 
   /*
@@ -157,7 +137,7 @@ public class Camera implements ICamera {
   @Override
   public Point2D getViewPortLocation(final IEntity entity) {
     // localplayer camera causes flickering and bouncing of the sprite
-    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (animationController != null && animationController.getCurrentAnimation() != null && animationController.getCurrentAnimation().getSpritesheet() != null) {
       final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
       final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
@@ -178,14 +158,14 @@ public class Camera implements ICamera {
     return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(double, double)
-   */
   @Override
-  public Point2D getViewPortLocation(final double x, final double y) {
-    return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
+  public float getZoom() {
+    return this.zoom;
+  }
+
+  @Override
+  public void onZoomChanged(final Consumer<Float> zoomCons) {
+    this.zoomChangedConsumer.add(zoomCons);
   }
 
   @Override
@@ -199,12 +179,36 @@ public class Camera implements ICamera {
     // renderscale of 6 only has an issue with 1 and 0.5)
     // seems like java cannot place certain images onto their exact pixel
     // location with an AffineTransform...
-    double fraction = focus.getY() - Math.floor(focus.getY());
+    final double fraction = focus.getY() - Math.floor(focus.getY());
     if (MathUtilities.isInt(fraction * 4)) {
       focus.setLocation(focus.getX(), focus.getY() + 0.01);
     }
 
     this.focus = focus;
+  }
+
+  @Override
+  public void setZoom(final float zoom, final int delay) {
+    if (delay == 0) {
+      Game.getInfo().setRenderScale(zoom);
+      for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+        cons.accept(zoom);
+      }
+
+      this.zoom = 0;
+      this.zoomDelay = 0;
+      this.zoomTick = 0;
+      this.zoomStep = 0;
+    } else {
+      this.zoomTick = Game.getLoop().getTicks();
+      this.zoom = zoom;
+      this.zoomDelay = delay;
+
+      final double tickduration = 1000 / Game.getLoop().getUpdateRate();
+      final double tickAmount = delay / tickduration;
+      final float totalDelta = zoom - Game.getInfo().getRenderScale();
+      this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
+    }
   }
 
   /*
@@ -221,54 +225,65 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void setZoom(float zoom, int delay) {
-    if (delay == 0) {
-      Game.getInfo().setRenderScale(zoom);
-      for (Consumer<Float> cons : this.zoomChangedConsumer) {
-        cons.accept(zoom);
-      }
-
-      this.zoom = 0;
-      this.zoomDelay = 0;
-      this.zoomTick = 0;
-      this.zoomStep = 0;
-    } else {
-      this.zoomTick = Game.getLoop().getTicks();
-      this.zoom = zoom;
-      this.zoomDelay = delay;
-
-      double tickduration = 1000 / Game.getLoop().getUpdateRate();
-      double tickAmount = delay / tickduration;
-      float totalDelta = zoom - Game.getInfo().getRenderScale();
-      this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
+  public void update(final IGameLoop loop) {
+    if (Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().equals(this)) {
+      return;
     }
-  }
 
-  @Override
-  public float getZoom() {
-    return this.zoom;
-  }
+    if (this.zoom > 0 && Game.getInfo().getRenderScale() != this.zoom) {
+      if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
+        Game.getInfo().setRenderScale(this.zoom);
+        for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+          cons.accept(this.zoom);
+        }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getCameraRegion()
-   */
-  @Override
-  public Rectangle2D getViewPort() {
-    return this.viewPort;
+        this.zoom = 0;
+        this.zoomDelay = 0;
+        this.zoomTick = 0;
+        this.zoomStep = 0;
+      } else {
+
+        final float newRenderScale = Game.getInfo().getRenderScale() + this.zoomStep;
+        Game.getInfo().setRenderScale(newRenderScale);
+        for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+          cons.accept(newRenderScale);
+        }
+      }
+    }
+
+    if (!this.isShakeEffectActive()) {
+      this.shakeOffsetX = 0;
+      this.shakeOffsetY = 0;
+      return;
+    }
+
+    if (loop.getDeltaTime(this.lastShake) > this.shakeDelay) {
+      this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
+      this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
+      this.lastShake = loop.getTicks();
+    }
   }
 
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
-    double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
+    final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
 
-  @Override
-  public void onZoomChanged(Consumer<Float> zoomCons) {
-    this.zoomChangedConsumer.add(zoomCons);
+  /**
+   * Apply shake effect.
+   *
+   * @param cameraLocation
+   *          the camera location
+   * @return the point2 d
+   */
+  private Point2D applyShakeEffect(final Point2D cameraLocation) {
+    if (this.isShakeEffectActive()) {
+      return new Point2D.Double(cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
+    }
+
+    return cameraLocation;
   }
 
   /**
@@ -298,30 +313,15 @@ public class Camera implements ICamera {
     return this.shakeTick;
   }
 
-  /**
-   * Apply shake effect.
-   *
-   * @param cameraLocation
-   *          the camera location
-   * @return the point2 d
-   */
-  private Point2D applyShakeEffect(final Point2D cameraLocation) {
-    if (this.isShakeEffectActive()) {
-      return new Point2D.Double(cameraLocation.getX() + this.shakeOffsetX, cameraLocation.getY() + this.shakeOffsetY);
-    }
-
-    return cameraLocation;
-  }
-
-  private boolean isShakeEffectActive() {
-    return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
-  }
-
   private double getViewPortCenterX() {
     return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().getRenderScale();
   }
 
   private double getViewPortCenterY() {
     return Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().getRenderScale();
+  }
+
+  private boolean isShakeEffectActive() {
+    return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
   }
 }

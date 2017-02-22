@@ -10,10 +10,10 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class MovementController<T extends IMovableEntity> implements IMovementController<T> {
-  private final List<Predicate<T>> movementPredicates;
   private final List<Force> activeForces;
-  private final T movableEntity;
   private final IPhysicsEngine engine;
+  private final T movableEntity;
+  private final List<Predicate<T>> movementPredicates;
 
   public MovementController(final IPhysicsEngine engine, final T movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
@@ -39,8 +39,30 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
     return this.movableEntity;
   }
 
+  @Override
+  public void onMovementCheck(final Predicate<T> predicate) {
+    if (!this.movementPredicates.contains(predicate)) {
+      this.movementPredicates.add(predicate);
+    }
+  }
+
+  @Override
+  public void update(final IGameLoop gameLoop) {
+    this.handleForces(gameLoop);
+  }
+
   protected IPhysicsEngine getPhysicsEngine() {
     return this.engine;
+  }
+
+  protected boolean isMovementAllowed() {
+    for (final Predicate<T> predicate : this.movementPredicates) {
+      if (!predicate.test(this.getEntity())) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private void handleForces(final IGameLoop gameLoop) {
@@ -74,27 +96,5 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
         }
       }
     }
-  }
-
-  protected boolean isMovementAllowed() {
-    for (final Predicate<T> predicate : this.movementPredicates) {
-      if (!predicate.test(this.getEntity())) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  @Override
-  public void onMovementCheck(final Predicate<T> predicate) {
-    if (!this.movementPredicates.contains(predicate)) {
-      this.movementPredicates.add(predicate);
-    }
-  }
-
-  @Override
-  public void update(final IGameLoop gameLoop) {
-    this.handleForces(gameLoop);
   }
 }

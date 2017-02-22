@@ -14,19 +14,19 @@ import de.gurkenlabs.configuration.ConfigurationGroup;
 @ConfigurationGroupInfo(prefix = "CLIENT_")
 public class ClientConfiguration extends ConfigurationGroup {
 
-  /** The max fps. */
-  private int maxFps;
-
-  /** The updaterate. */
-  private int updaterate;
-
-  private boolean showGameMetrics;
+  private String country;
 
   private String language;
 
-  private String country;
-
   private Locale locale;
+
+  /** The max fps. */
+  private int maxFps;
+
+  private boolean showGameMetrics;
+
+  /** The updaterate. */
+  private int updaterate;
 
   /**
    * Instantiates a new client configuration.
@@ -38,6 +38,22 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.setShowGameMetrics(false);
     this.setLanguage("en");
     this.setCountry("US");
+  }
+
+  public String getCountry() {
+    return this.country;
+  }
+
+  public String getLanguage() {
+    return this.language;
+  }
+
+  public Locale getLocale() {
+    if (this.locale == null) {
+      this.locale = new Locale(this.getLanguage(), this.getCountry());
+    }
+
+    return this.locale;
   }
 
   /**
@@ -56,6 +72,16 @@ public class ClientConfiguration extends ConfigurationGroup {
    */
   public int getUpdaterate() {
     return this.updaterate;
+  }
+
+  public void setCountry(final String country) {
+    this.country = country;
+    this.locale = null;
+  }
+
+  public void setLanguage(final String language) {
+    this.language = language;
+    this.locale = null;
   }
 
   /**
@@ -93,31 +119,5 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public boolean showGameMetrics() {
     return this.showGameMetrics;
-  }
-
-  public String getCountry() {
-    return country;
-  }
-
-  public void setCountry(String country) {
-    this.country = country;
-    this.locale = null;
-  }
-
-  public String getLanguage() {
-    return language;
-  }
-
-  public void setLanguage(String language) {
-    this.language = language;
-    this.locale = null;
-  }
-
-  public Locale getLocale() {
-    if (locale == null) {
-      locale = new Locale(this.getLanguage(), this.getCountry());
-    }
-
-    return locale;
   }
 }

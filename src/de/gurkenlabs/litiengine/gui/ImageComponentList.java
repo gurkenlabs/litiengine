@@ -11,8 +11,8 @@ public class ImageComponentList extends GuiComponent {
   private final Spritesheet background;
   private final CopyOnWriteArrayList<ImageComponent> cells;
   private CopyOnWriteArrayList<Image> images;
-  private final int rows, columns;
   private final double rowHeight, columnWidth;
+  private final int rows, columns;
   private double xOffset, yOffset;
 
   public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
@@ -20,7 +20,7 @@ public class ImageComponentList extends GuiComponent {
     if (images != null) {
       this.images = images;
     } else {
-      this.images = new CopyOnWriteArrayList<Image>();
+      this.images = new CopyOnWriteArrayList<>();
       this.images.add(null);
     }
 
@@ -33,15 +33,15 @@ public class ImageComponentList extends GuiComponent {
       this.rowHeight = this.getHeight();
       this.yOffset = 0;
     } else {
-      this.rowHeight = (this.getHeight() / this.getRows()) * 9 / 10;
-      this.yOffset = (this.getHeight() / (this.getRows() - 1)) * 1 / 10;
+      this.rowHeight = this.getHeight() / this.getRows() * 9 / 10;
+      this.yOffset = this.getHeight() / (this.getRows() - 1) * 1 / 10;
     }
     if (this.getColumns() == 1) {
       this.columnWidth = this.getWidth();
       this.xOffset = 0;
     } else {
-      this.columnWidth = (this.getWidth() / this.getColumns()) * 9 / 10;
-      this.xOffset = (this.getWidth() / (this.getColumns() - 1)) * 1 / 10;
+      this.columnWidth = this.getWidth() / this.getColumns() * 9 / 10;
+      this.xOffset = this.getWidth() / (this.getColumns() - 1) * 1 / 10;
 
     }
 
@@ -67,25 +67,6 @@ public class ImageComponentList extends GuiComponent {
     return this.rows;
   }
 
-  public void setXOffset(double xOffset) {
-    this.xOffset = xOffset;
-    this.suspend();
-    this.prepare();
-  }
-
-  public void setYOffset(double yOffset) {
-    this.yOffset = yOffset;
-    this.suspend();
-    this.prepare();
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    for (final ImageComponent bg : this.getCellComponents()) {
-      bg.render(g);
-    }
-  }
-
   @Override
   public void prepare() {
 
@@ -107,6 +88,25 @@ public class ImageComponentList extends GuiComponent {
 
     this.getComponents().addAll(0, this.cells);
     super.prepare();
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    for (final ImageComponent bg : this.getCellComponents()) {
+      bg.render(g);
+    }
+  }
+
+  public void setXOffset(final double xOffset) {
+    this.xOffset = xOffset;
+    this.suspend();
+    this.prepare();
+  }
+
+  public void setYOffset(final double yOffset) {
+    this.yOffset = yOffset;
+    this.suspend();
+    this.prepare();
   }
 
   @Override

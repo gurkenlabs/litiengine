@@ -5,10 +5,27 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class Collider extends CollisionEntity {
-  private StaticShadowType shadowType;
+  public enum StaticShadowType {
+    DOWN, DOWNLEFT, DOWNRIGHT, LEFT, LEFTDOWN, LEFTRIGHT, NONE, NOOFFSET, RIGHT, RIGHTDOWN, RIGHTLEFT;
+
+    public static StaticShadowType get(final String mapObjectType) {
+      if (mapObjectType == null || mapObjectType.isEmpty()) {
+        return StaticShadowType.NONE;
+      }
+
+      try {
+        return StaticShadowType.valueOf(mapObjectType);
+      } catch (final IllegalArgumentException iae) {
+        return StaticShadowType.NONE;
+      }
+    }
+  }
+
   private final boolean obstacle;
 
-  public Collider(boolean isObstacle) {
+  private StaticShadowType shadowType;
+
+  public Collider(final boolean isObstacle) {
     super();
     this.obstacle = isObstacle;
   }
@@ -17,27 +34,11 @@ public class Collider extends CollisionEntity {
     return this.shadowType;
   }
 
-  public void setShadowType(StaticShadowType shadowType) {
-    this.shadowType = shadowType;
-  }
-
   public boolean isObstacle() {
-    return obstacle;
+    return this.obstacle;
   }
 
-  public enum StaticShadowType {
-    DOWN, DOWNLEFT, DOWNRIGHT, LEFT, LEFTDOWN, LEFTRIGHT, RIGHTLEFT, RIGHT, RIGHTDOWN, NOOFFSET, NONE;
-
-    public static StaticShadowType get(String mapObjectType) {
-      if (mapObjectType == null || mapObjectType.isEmpty()) {
-        return StaticShadowType.NONE;
-      }
-
-      try {
-        return StaticShadowType.valueOf(mapObjectType);
-      } catch (IllegalArgumentException iae) {
-        return StaticShadowType.NONE;
-      }
-    }
+  public void setShadowType(final StaticShadowType shadowType) {
+    this.shadowType = shadowType;
   }
 }

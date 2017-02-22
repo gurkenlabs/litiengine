@@ -21,6 +21,8 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 public interface IScreenManager extends ICameraProvider {
   public void addScreen(final IScreen screen);
 
+  public void displayScreen(IScreen screen);
+
   /**
    * Change screen.
    *
@@ -28,8 +30,8 @@ public interface IScreenManager extends ICameraProvider {
    *          the type
    */
   public void displayScreen(String screenName);
-  
-  public void displayScreen(IScreen screen);
+
+  public Rectangle getBounds();
 
   /**
    * Gets the current screen.
@@ -48,8 +50,8 @@ public interface IScreenManager extends ICameraProvider {
   public Dimension getResolution();
 
   public Point getScreenLocation();
-  
-  public Rectangle getBounds();
+
+  public String getTitle();
 
   public void init(int width, int height, boolean fullscreen);
 
@@ -60,8 +62,6 @@ public interface IScreenManager extends ICameraProvider {
   public void onScreenChanged(Consumer<IScreen> screenConsumer);
 
   public void setIconImage(Image image);
-  
+
   public void setTitle(String string);
-  
-  public String getTitle();
 }

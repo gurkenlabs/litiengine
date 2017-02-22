@@ -18,6 +18,10 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface MovementInfo {
 
+  int acceleration() default 0;
+
+  int deceleration() default 0;
+
   boolean turnOnMove() default true;
 
   /**
@@ -26,8 +30,4 @@ public @interface MovementInfo {
    * @return the velocity
    */
   short velocity() default 100;
-  
-  int acceleration() default 0;
-  
-  int deceleration() default 0;
 }

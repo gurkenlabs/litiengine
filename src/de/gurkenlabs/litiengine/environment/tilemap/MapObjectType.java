@@ -1,19 +1,21 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 public enum MapObjectType {
-  PROP, EMITTER, SPAWNPOINT, LANE, DECORMOB, COLLISIONBOX, LIGHTSOURCE, TRIGGER, AREA, CUSTOM;
+  AREA, COLLISIONBOX, CUSTOM, DECORMOB, EMITTER, LANE, LIGHTSOURCE, PROP, SPAWNPOINT, TRIGGER;
 
-  public static MapObjectType get(String mapObjectType) {
+  public static MapObjectType fromOrdinal(final int n) {
+    return values()[n];
+  }
+
+  public static MapObjectType get(final String mapObjectType) {
     if (mapObjectType == null || mapObjectType.isEmpty()) {
       return MapObjectType.CUSTOM;
     }
 
     try {
       return MapObjectType.valueOf(mapObjectType);
-    } catch (IllegalArgumentException iae) {
+    } catch (final IllegalArgumentException iae) {
       return MapObjectType.CUSTOM;
     }
   }
-  
-  public static MapObjectType fromOrdinal(int n) {return values()[n];}
 }

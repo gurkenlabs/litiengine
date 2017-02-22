@@ -12,20 +12,24 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class Animation implements IUpdateable, ILaunchable {
   private static final int DEFAULT_FRAME_DURATION = 120;
-  private final String name;
-  private final Spritesheet spritesheet;
+  private KeyFrame currentFrame;
+  private long elapsedTicks;
+  private KeyFrame firstFrame;
+  private int frameDuration = DEFAULT_FRAME_DURATION;
+
   private final List<KeyFrame> keyframes;
   private final boolean loop;
-
-  private int frameDuration = DEFAULT_FRAME_DURATION;
-  private boolean playing;
-  private KeyFrame currentFrame;
-  private KeyFrame firstFrame;
-  private long elapsedTicks;
+  private final String name;
   private boolean paused;
+  private boolean playing;
+  private final Spritesheet spritesheet;
 
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);
+  }
+
+  public Animation(final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
+    this(spritesheet.getName(), spritesheet, loop, keyFrameDurations);
   }
 
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
@@ -34,10 +38,6 @@ public class Animation implements IUpdateable, ILaunchable {
     if (randomizeStart && this.keyframes.size() > 0) {
       this.firstFrame = this.getKeyframes().get(new Random().nextInt(this.getKeyframes().size()));
     }
-  }
-
-  public Animation(final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
-    this(spritesheet.getName(), spritesheet, loop, keyFrameDurations);
   }
 
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
@@ -78,34 +78,6 @@ public class Animation implements IUpdateable, ILaunchable {
     return this.spritesheet;
   }
 
-  private void initKeyFrames(final int[] keyFrames) {
-
-    if (this.getSpritesheet() == null) {
-      return;
-    }
-
-    // if no keyframes are specified, the animation takes in the whole
-    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
-    // keyframe
-    if (keyFrames.length == 0) {
-      for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
-        this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
-      }
-    } else {
-      for (int i = 0; i < keyFrames.length; i++) {
-        this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
-      }
-    }
-
-    if (this.keyframes.size() != 0) {
-      this.firstFrame = this.getKeyframes().get(0);
-    }
-  }
-
-  private boolean isLastKeyFrame() {
-    return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
-  }
-
   public boolean isLoop() {
     return this.loop;
   }
@@ -125,18 +97,18 @@ public class Animation implements IUpdateable, ILaunchable {
   /**
    * Sets the frame duration for all keyframes in this animation to the
    * specified value.
-   * 
+   *
    * @param frameDuration
    */
   public void setFrameDuration(final int frameDuration) {
     this.frameDuration = frameDuration;
 
-    for (KeyFrame keyFrame : this.getKeyframes()) {
+    for (final KeyFrame keyFrame : this.getKeyframes()) {
       keyFrame.setDuration(this.frameDuration);
     }
   }
 
-  public void setkeyFrameDurations(int... keyFrameDurations) {
+  public void setkeyFrameDurations(final int... keyFrameDurations) {
     if (keyFrameDurations.length == 0) {
       return;
     }
@@ -191,5 +163,33 @@ public class Animation implements IUpdateable, ILaunchable {
     final int newFrameIndex = (this.getKeyframes().indexOf(this.currentFrame) + 1) % this.getKeyframes().size();
     this.currentFrame = this.getKeyframes().get(newFrameIndex);
     this.elapsedTicks = 0;
+  }
+
+  private void initKeyFrames(final int[] keyFrames) {
+
+    if (this.getSpritesheet() == null) {
+      return;
+    }
+
+    // if no keyframes are specified, the animation takes in the whole
+    // spritesheet as animation and uses the DEFAULT_FRAME_DURATION for each
+    // keyframe
+    if (keyFrames.length == 0) {
+      for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
+        this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
+      }
+    } else {
+      for (int i = 0; i < keyFrames.length; i++) {
+        this.keyframes.add(i, new KeyFrame(keyFrames[i], i));
+      }
+    }
+
+    if (this.keyframes.size() != 0) {
+      this.firstFrame = this.getKeyframes().get(0);
+    }
+  }
+
+  private boolean isLastKeyFrame() {
+    return this.getKeyframes().indexOf(this.currentFrame) == this.getKeyframes().size() - 1;
   }
 }

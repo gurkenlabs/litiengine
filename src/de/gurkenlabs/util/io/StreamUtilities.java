@@ -41,7 +41,7 @@ public class StreamUtilities {
     }
   }
 
-  public static byte[] getByte(InputStream is) throws IOException {
+  public static byte[] getByte(final InputStream is) throws IOException {
 
     int len;
     int size = 1024;
@@ -52,22 +52,23 @@ public class StreamUtilities {
       buf = new byte[size];
       len = is.read(buf, 0, size);
     } else {
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       buf = new byte[size];
-      while ((len = is.read(buf, 0, size)) != -1)
+      while ((len = is.read(buf, 0, size)) != -1) {
         bos.write(buf, 0, len);
+      }
       buf = bos.toByteArray();
     }
     return buf;
   }
 
   public static byte[] getBytes(final InputStream in) {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
     try {
       StreamUtilities.copy(in, buffer);
       return buffer.toByteArray();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 

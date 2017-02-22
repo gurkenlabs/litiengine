@@ -85,15 +85,15 @@ public interface ICamera extends IUpdateable {
    */
   public Point2D getViewPortLocation(Point2D point);
 
-  public void shake(double intensity, final int delay, int duration);
-
-  public void setZoom(float zoom, int delay);
-  
   public float getZoom();
 
-  public void updateFocus();
+  public void onZoomChanged(Consumer<Float> zoomCons);
 
   public void setFocus(Point2D focus);
-  
-  public void onZoomChanged(Consumer<Float> zoomCons);
+
+  public void setZoom(float zoom, int delay);
+
+  public void shake(double intensity, final int delay, int duration);
+
+  public void updateFocus();
 }

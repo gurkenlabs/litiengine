@@ -20,20 +20,31 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 public class ScreenManager extends JFrame implements IScreenManager {
 
-  private static final long serialVersionUID = 7958549828482285935L;
+  /**
+   * The listener interface for receiving resizedEvent events. The class that is
+   * interested in processing a resizedEvent event implements this interface,
+   * and the object created with that class is registered with a component using
+   * the component's <code>addResizedEventListener<code> method. When the
+   * resizedEvent event occurs, that object's appropriate method is invoked.
+   *
+   * @see ResizedEventEvent
+   */
+  private class ResizedEventListener extends ComponentAdapter {
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
+     * ComponentEvent)
+     */
+    @Override
+    public void componentResized(final ComponentEvent evt) {
+      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+    }
+  }
 
   private static final int SCREENCHANGETIMEOUT = 200;
 
-  /** The resolution observers. */
-  private final List<Consumer<Dimension>> resolutionChangedConsumer;
-
-  private final List<Consumer<IScreen>> screenChangedConsumer;
-
-  /** The screens. */
-  private final List<IScreen> screens;
-
-  /** The Render canvas. */
-  private final RenderComponent renderCanvas;
+  private static final long serialVersionUID = 7958549828482285935L;
 
   /** The camera. */
   private ICamera camera;
@@ -43,6 +54,17 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   /** The last screen change. */
   private long lastScreenChange = 0;
+
+  /** The Render canvas. */
+  private final RenderComponent renderCanvas;
+
+  /** The resolution observers. */
+  private final List<Consumer<Dimension>> resolutionChangedConsumer;
+
+  private final List<Consumer<IScreen>> screenChangedConsumer;
+
+  /** The screens. */
+  private final List<IScreen> screens;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -56,7 +78,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.addComponentListener(new ResizedEventListener());
     this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-    RenderComponent comp = new RenderComponent(Game.getConfiguration().GRAPHICS.getResolution());
+    final RenderComponent comp = new RenderComponent(Game.getConfiguration().GRAPHICS.getResolution());
     this.add(comp);
     this.renderCanvas = comp;
   }
@@ -70,7 +92,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
       this.displayScreen(screen);
     }
   }
-  
+
+  @Override
+  public void displayScreen(final IScreen screen) {
+    this.displayScreen(screen.getName());
+  }
+
   @Override
   public void displayScreen(final String screen) {
     // if the scren is already displayed or there is no screen with the
@@ -100,11 +127,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.currentScreen);
     }
-  }
-
-  @Override
-  public void displayScreen(IScreen screen) {
-    this.displayScreen(screen.getName());
   }
 
   @Override
@@ -178,32 +200,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
     if (this.getCamera() != null) {
       Game.getLoop().detach(this.camera);
     }
-    
+
     Game.getLoop().attach(camera);
     this.camera = camera;
 
     this.getCamera().updateFocus();
-  }
-
-  /**
-   * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface,
-   * and the object created with that class is registered with a component using
-   * the component's <code>addResizedEventListener<code> method. When the
-   * resizedEvent event occurs, that object's appropriate method is invoked.
-   *
-   * @see ResizedEventEvent
-   */
-  private class ResizedEventListener extends ComponentAdapter {
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
-     * ComponentEvent)
-     */
-    @Override
-    public void componentResized(final ComponentEvent evt) {
-      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
   }
 }

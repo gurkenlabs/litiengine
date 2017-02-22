@@ -70,15 +70,6 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   /**
-   * Gets the max modifiers.
-   *
-   * @return the max modifiers
-   */
-  protected List<AttributeModifier<T>> getMaxModifiers() {
-    return this.maxModifiers;
-  }
-
-  /**
    * Gets the max value.
    *
    * @return the max value
@@ -116,6 +107,15 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
    */
   public void modifyMaxBaseValue(final AttributeModifier<T> modifier) {
     this.maxBaseValue = modifier.modify(this.maxBaseValue);
+  }
+
+  /**
+   * Gets the max modifiers.
+   *
+   * @return the max modifiers
+   */
+  protected List<AttributeModifier<T>> getMaxModifiers() {
+    return this.maxModifiers;
   }
 
   /**

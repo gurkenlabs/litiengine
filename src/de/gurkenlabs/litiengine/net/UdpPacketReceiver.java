@@ -15,14 +15,14 @@ import java.util.ArrayList;
  */
 public class UdpPacketReceiver extends Thread implements IPacketReceiver {
 
+  /** The incoming packet observers. */
+  ArrayList<IIncomingPacketObserver> incomingPacketObservers;
+
   /** The is terminated. */
   private boolean isTerminated;
 
   /** The socket. */
   private DatagramSocket socket;
-
-  /** The incoming packet observers. */
-  ArrayList<IIncomingPacketObserver> incomingPacketObservers;
 
   /**
    * Instantiates a new udp packet receiver.

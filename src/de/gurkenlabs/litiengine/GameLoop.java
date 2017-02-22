@@ -9,21 +9,40 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
+  private class TimedAction {
+    private final Consumer<Long> action;
+    private final long execution;
+
+    private TimedAction(final long execution, final Consumer<Long> action) {
+      this.execution = execution;
+      this.action = action;
+    }
+
+    public Consumer<Long> getAction() {
+      return this.action;
+    }
+
+    public long getExecutionTick() {
+      return this.execution;
+    }
+  }
+
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
-  private final List<IUpdateable> updatables;
-  private final List<Consumer<Integer>> upsTrackedConsumer;
-
   private final List<TimedAction> actions;
-  private final int updateRate;
-  private final GameTime gameTime;
-  private float timeScale;
-  private long totalTicks;
 
-  private int updateCount;
-  private long lastUpsTime;
-  private long lastUpdateTime;
   private long deltaTime;
   private boolean gameIsRunning = true;
+  private final GameTime gameTime;
+  private long lastUpdateTime;
+  private long lastUpsTime;
+
+  private float timeScale;
+  private long totalTicks;
+  private final List<IUpdateable> updatables;
+  private int updateCount;
+  private final int updateRate;
+
+  private final List<Consumer<Integer>> upsTrackedConsumer;
 
   public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
@@ -35,13 +54,43 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   }
 
   @Override
+  public void attach(final IUpdateable updatable) {
+    if (updatable == null) {
+      return;
+    }
+
+    if (this.updatables.contains(updatable)) {
+      System.out.println("Updatable " + updatable + " already registered for update!");
+      return;
+    }
+
+    this.updatables.add(updatable);
+  }
+
+  @Override
+  public void close() {
+    this.gameIsRunning = false;
+  }
+
+  @Override
   public long convertToMs(final long ticks) {
     return (long) (ticks / (this.updateRate / 1000.0));
   }
 
   @Override
-  public long convertToTicks(int ms) {
+  public long convertToTicks(final int ms) {
     return (long) (this.updateRate / 1000.0 * ms);
+  }
+
+  @Override
+  public void detach(final IUpdateable updatable) {
+    this.updatables.remove(updatable);
+  }
+
+  @Override
+  public void execute(final int delay, final Consumer<Long> action) {
+    final long d = this.convertToTicks(delay);
+    this.actions.add(new TimedAction(this.getTicks() + d, action));
   }
 
   @Override
@@ -81,20 +130,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     }
   }
 
-  @Override
-  public void attach(final IUpdateable updatable) {
-    if (updatable == null) {
-      return;
-    }
-
-    if (this.updatables.contains(updatable)) {
-      System.out.println("Updatable " + updatable + " already registered for update!");
-      return;
-    }
-
-    this.updatables.add(updatable);
-  }
-
   /*
    * (non-Javadoc)
    *
@@ -122,8 +157,8 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
           }
         });
 
-        List<TimedAction> executed = new ArrayList<>();
-        for (TimedAction action : this.actions) {
+        final List<TimedAction> executed = new ArrayList<>();
+        for (final TimedAction action : this.actions) {
           if (action.getExecutionTick() <= this.totalTicks) {
             action.getAction().accept(this.totalTicks);
             executed.add(action);
@@ -163,40 +198,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
 
   @Override
   public void terminate() {
-    this.gameIsRunning = false;
-  }
-
-  @Override
-  public void detach(final IUpdateable updatable) {
-    this.updatables.remove(updatable);
-  }
-
-  @Override
-  public void execute(int delay, Consumer<Long> action) {
-    long d = convertToTicks(delay);
-    this.actions.add(new TimedAction(this.getTicks() + d, action));
-  }
-
-  private class TimedAction {
-    private final long execution;
-    private final Consumer<Long> action;
-
-    private TimedAction(long execution, Consumer<Long> action) {
-      this.execution = execution;
-      this.action = action;
-    }
-
-    public long getExecutionTick() {
-      return execution;
-    }
-
-    public Consumer<Long> getAction() {
-      return action;
-    }
-  }
-
-  @Override
-  public void close() {
     this.gameIsRunning = false;
   }
 }

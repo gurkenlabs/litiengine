@@ -14,19 +14,14 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
 /**
- * The Class CombatAttributes contains attributes for an ICombatEntity that have impact on the combat behaviour.
+ * The Class CombatAttributes contains attributes for an ICombatEntity that have
+ * impact on the combat behaviour.
  */
 public class CombatAttributes {
-  private final List<Consumer<CombatAttributes>> levelUpConsumer;
-  private final CombatAttributesInfo info;
   /** The attack speed. */
   private final Attribute<Float> attackSpeed;
-
   /** The damage multiplier. */
   private final Attribute<Float> damageMultiplier;
-
-  private final Attribute<Integer> vision;
-
   /** The experience. */
   private final RangeAttribute<Integer> experience;
 
@@ -36,14 +31,20 @@ public class CombatAttributes {
   /** The health regeneration. */
   private final Attribute<Byte> healthRegeneration;
 
+  private final CombatAttributesInfo info;
+
   /** The level. */
   private final RangeAttribute<Byte> level;
+
+  private final List<Consumer<CombatAttributes>> levelUpConsumer;
 
   /** The shield. */
   private final RangeAttribute<Short> shield;
 
   /** The velocity. */
   private final Attribute<Float> velocity;
+
+  private final Attribute<Integer> vision;
 
   /**
    * Instantiates a new attributes.
@@ -66,7 +67,7 @@ public class CombatAttributes {
     this.attackSpeed = new Attribute<>(info.attackSpeed());
     this.damageMultiplier = new Attribute<>(info.damageMultiplier());
     this.healthRegeneration = new Attribute<>(info.healthRegenerationPerSecond());
-    this.vision = new Attribute<Integer>(info.vision());
+    this.vision = new Attribute<>(info.vision());
 
   }
 
@@ -151,6 +152,7 @@ public class CombatAttributes {
 
   /**
    * The vision radius of the combat entity.
+   * 
    * @return
    */
   public Attribute<Integer> getVision() {

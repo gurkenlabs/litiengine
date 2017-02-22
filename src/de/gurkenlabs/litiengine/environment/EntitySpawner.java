@@ -9,8 +9,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private class SpawnThread extends Thread {
-    private final MapLocation point;
     private final int amount;
+    private final MapLocation point;
 
     public SpawnThread(final MapLocation point, final int amount) {
       this.point = point;
@@ -34,15 +34,15 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
   }
 
-  private List<MapLocation> spawnpoints;
+  private int amount;
   private IEnvironment environment;
   private int interval;
+  private long lastSpawn;
   private int spawnDelay;
-  private int amount;
 
   private SpawnMode spawnMode;
 
-  private long lastSpawn;
+  private List<MapLocation> spawnpoints;
 
   public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<MapLocation> spawnpoints, final int interval, final int amount) {
     this(environment, interval, amount);
@@ -56,8 +56,6 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnDelay = 1000;
     this.amount = amount;
   }
-
-  protected abstract void addToEnvironment(final IEnvironment env, T newEntity);
 
   @Override
   public int getAmount() {
@@ -104,9 +102,17 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnMode = mode;
   }
 
-  private void spawn(final MapLocation spawnpoint, final int amount) {
-    new SpawnThread(spawnpoint, amount).start();
+  @Override
+  public void update(final IGameLoop loop) {
+    if (loop.getDeltaTime(this.lastSpawn) < this.getInterval()) {
+      return;
+    }
+
+    this.spawnNewEntities();
+    this.lastSpawn = loop.getTicks();
   }
+
+  protected abstract void addToEnvironment(final IEnvironment env, T newEntity);
 
   protected void spawnNewEntities() {
     if (this.getSpawnPoints().size() == 0) {
@@ -133,13 +139,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
   }
 
-  @Override
-  public void update(final IGameLoop loop) {
-    if (loop.getDeltaTime(this.lastSpawn) < this.getInterval()) {
-      return;
-    }
-
-    this.spawnNewEntities();
-    this.lastSpawn = loop.getTicks();
+  private void spawn(final MapLocation spawnpoint, final int amount) {
+    new SpawnThread(spawnpoint, amount).start();
   }
 }

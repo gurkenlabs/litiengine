@@ -5,6 +5,71 @@ import java.util.Random;
 public class MathUtilities {
   private static Random RANDOM = new Random();
 
+  public static double clamp(final double value, final double min, final double max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  public static float clamp(final float value, final float min, final float max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  public static int clamp(final int value, final int min, final int max) {
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
+  }
+
+  public static long clamp(final long value, final long min, final long max) {
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
+  }
+
+  public static double getAverage(final double[] numbers) {
+    double sum = 0;
+    for (final double number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
+  public static float getAverage(final float[] numbers) {
+    float sum = 0;
+    for (final float number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
+  public static int getAverage(final int[] numbers) {
+    int sum = 0;
+    for (final int number : numbers) {
+      if (number != 0) {
+        sum += number;
+      }
+    }
+
+    return sum / numbers.length;
+  }
+
   /**
    * The index probabilities must sum up to 1;
    *
@@ -26,37 +91,8 @@ public class MathUtilities {
     return 0;
   }
 
-  public static double getAverage(double[] numbers) {
-    double sum = 0;
-    for (double number : numbers) {
-      if (number != 0) {
-        sum += number;
-      }
-    }
-
-    return sum / numbers.length;
-  }
-
-  public static float getAverage(float[] numbers) {
-    float sum = 0;
-    for (float number : numbers) {
-      if (number != 0) {
-        sum += number;
-      }
-    }
-
-    return sum / numbers.length;
-  }
-
-  public static int getAverage(int[] numbers) {
-    int sum = 0;
-    for (int number : numbers) {
-      if (number != 0) {
-        sum += number;
-      }
-    }
-
-    return sum / numbers.length;
+  public static boolean isInt(final double value) {
+    return value == Math.floor(value) && !Double.isInfinite(value);
   }
 
   public static boolean probabilityIsTrue(final double probability) {
@@ -93,41 +129,5 @@ public class MathUtilities {
 
   public static int randomSign() {
     return randomBoolean() ? 1 : -1;
-  }
-
-  public static boolean isInt(double value) {
-    return (value == Math.floor(value)) && !Double.isInfinite(value);
-  }
-
-  public static float clamp(float value, float min, float max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  public static double clamp(double value, double min, double max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  public static int clamp(int value, int min, int max) {
-    if (value < min) {
-      return min;
-    }
-
-    if (value > max) {
-      return max;
-    }
-
-    return value;
-  }
-
-  public static long clamp(long value, long min, long max) {
-    if (value < min) {
-      return min;
-    }
-
-    if (value > max) {
-      return max;
-    }
-
-    return value;
   }
 }

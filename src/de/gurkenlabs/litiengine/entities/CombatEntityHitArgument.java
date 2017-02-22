@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import de.gurkenlabs.litiengine.abilities.Ability;
 
 public class CombatEntityHitArgument {
-  private final ICombatEntity entity;
-  private final float damage;
   private final Ability ability;
+  private final float damage;
+  private final ICombatEntity entity;
 
   public CombatEntityHitArgument(final ICombatEntity entity, final float damage, final Ability ability) {
     this.entity = entity;

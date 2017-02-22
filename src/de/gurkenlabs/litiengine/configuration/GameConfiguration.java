@@ -5,10 +5,10 @@ import de.gurkenlabs.configuration.ConfigurationGroup;
 
 public class GameConfiguration extends Configuration {
   public final ClientConfiguration CLIENT;
-  public final SoundConfiguration SOUND;
+  public final DebugConfiguration DEBUG;
   public final GraphicConfiguration GRAPHICS;
   public final InputConfiguration INPUT;
-  public final DebugConfiguration DEBUG;
+  public final SoundConfiguration SOUND;
 
   public GameConfiguration(final ConfigurationGroup... groups) {
     super(groups);

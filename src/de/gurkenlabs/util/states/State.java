@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class State implements IState {
-  private final List<ITransition> transitions;
-
   private final String name;
+
+  private final List<ITransition> transitions;
 
   protected State(final String name) {
     this.transitions = new CopyOnWriteArrayList<>();

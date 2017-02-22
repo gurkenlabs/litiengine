@@ -4,7 +4,8 @@
 package de.gurkenlabs.litiengine.attributes;
 
 /**
- * An attribute modifier allows to modify a specific CombatAttribute by the specified Modification and the specified modifyValue.
+ * An attribute modifier allows to modify a specific CombatAttribute by the
+ * specified Modification and the specified modifyValue.
  *
  * @param <T>
  *          the generic type
@@ -38,34 +39,6 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
   @Override
   public int compareTo(final AttributeModifier<T> otherModifier) {
     return Integer.compare(this.getModification().getApplyOrder(), otherModifier.getModification().getApplyOrder());
-  }
-
-  /**
-   * Ensure type.
-   *
-   * @param modValue
-   *          the mod value
-   * @param originalValue
-   *          the original value
-   * @return the t
-   */
-  @SuppressWarnings("unchecked")
-  private T ensureType(final Double modValue, final T originalValue) {
-    if (originalValue instanceof Double) {
-      return (T) modValue;
-    } else if (originalValue instanceof Float) {
-      return (T) Float.valueOf(modValue.floatValue());
-    } else if (originalValue instanceof Long) {
-      return (T) Long.valueOf(modValue.longValue());
-    } else if (originalValue instanceof Byte) {
-      return (T) Byte.valueOf(modValue.byteValue());
-    } else if (originalValue instanceof Short) {
-      return (T) Short.valueOf(modValue.shortValue());
-    } else if (originalValue instanceof Integer) {
-      return (T) Integer.valueOf(modValue.intValue());
-    }
-
-    return null;
   }
 
   /**
@@ -113,5 +86,33 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     default:
       return modvalue;
     }
+  }
+
+  /**
+   * Ensure type.
+   *
+   * @param modValue
+   *          the mod value
+   * @param originalValue
+   *          the original value
+   * @return the t
+   */
+  @SuppressWarnings("unchecked")
+  private T ensureType(final Double modValue, final T originalValue) {
+    if (originalValue instanceof Double) {
+      return (T) modValue;
+    } else if (originalValue instanceof Float) {
+      return (T) Float.valueOf(modValue.floatValue());
+    } else if (originalValue instanceof Long) {
+      return (T) Long.valueOf(modValue.longValue());
+    } else if (originalValue instanceof Byte) {
+      return (T) Byte.valueOf(modValue.byteValue());
+    } else if (originalValue instanceof Short) {
+      return (T) Short.valueOf(modValue.shortValue());
+    } else if (originalValue instanceof Integer) {
+      return (T) Integer.valueOf(modValue.intValue());
+    }
+
+    return null;
   }
 }

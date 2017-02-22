@@ -11,16 +11,20 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
  * The Class RenderLoop.
  */
 public class RenderLoop extends Thread {
-  private final List<IRenderable> renderables;
-  private final IRenderComponent component;
   private final ICameraProvider cameraProvider;
+  private final IRenderComponent component;
   /** The game is running. */
   private boolean gameIsRunning = true;
+  private final List<IRenderable> renderables;
 
-  public RenderLoop(IRenderComponent component, ICameraProvider provider) {
+  public RenderLoop(final IRenderComponent component, final ICameraProvider provider) {
     this.renderables = new CopyOnWriteArrayList<>();
     this.component = component;
     this.cameraProvider = provider;
+  }
+
+  public void register(final IRenderable render) {
+    this.renderables.add(render);
   }
 
   /*
@@ -34,7 +38,7 @@ public class RenderLoop extends Thread {
     while (this.gameIsRunning) {
       final long renderStart = System.nanoTime();
       this.cameraProvider.getCamera().updateFocus();
-      for (IRenderable render : this.renderables) {
+      for (final IRenderable render : this.renderables) {
         this.component.render(render);
       }
 
@@ -55,11 +59,7 @@ public class RenderLoop extends Thread {
     this.gameIsRunning = false;
   }
 
-  public void register(IRenderable render) {
-    this.renderables.add(render);
-  }
-
-  public void unregister(IRenderable render) {
+  public void unregister(final IRenderable render) {
     this.renderables.remove(render);
   }
 }

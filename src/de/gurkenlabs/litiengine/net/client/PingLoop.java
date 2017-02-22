@@ -29,12 +29,12 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     /** The is terminated. */
     private boolean isTerminated;
 
+    private long lastPing;
+
     /** The ping. */
     private long ping;
 
     private final IPacketSender sender;
-
-    private long lastPing;
 
     private PingThread(final IPacketSender sender, final String serverIpAdress, final int port) {
       this.sender = sender;
@@ -79,16 +79,16 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     }
   }
 
-  private final List<Consumer<Long>> pingRecordConsumer;
   private final int clientId;
+  private PingThread pingLoop;
 
-  private final IPacketSender sender;
+  private final List<Consumer<Long>> pingRecordConsumer;
 
   private final int port;
 
-  private final String serverIpAdress;
+  private final IPacketSender sender;
 
-  private PingThread pingLoop;
+  private final String serverIpAdress;
 
   public PingLoop(final int clientId, final IMessageHandlerProvider provider, final IPacketSender sender, final String serverIpAdress, final int port) {
     this.pingRecordConsumer = new ArrayList<>();
@@ -97,21 +97,6 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     this.serverIpAdress = serverIpAdress;
     this.port = port;
     provider.register(MessageType.PING, this);
-  }
-
-  @Override
-  protected void handle(final PingResponseMessage message, final InetAddress address, final int port) {
-    if (this.pingLoop == null) {
-      return;
-    }
-
-    try {
-      if (address.getHostAddress().equals(InetAddress.getByName(this.serverIpAdress).getHostAddress())) {
-        this.pingLoop.pingAnswerReceived();
-      }
-    } catch (final UnknownHostException e) {
-      e.printStackTrace();
-    }
   }
 
   @Override
@@ -132,5 +117,20 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
   @Override
   public void terminate() {
     this.pingLoop.terminate();
+  }
+
+  @Override
+  protected void handle(final PingResponseMessage message, final InetAddress address, final int port) {
+    if (this.pingLoop == null) {
+      return;
+    }
+
+    try {
+      if (address.getHostAddress().equals(InetAddress.getByName(this.serverIpAdress).getHostAddress())) {
+        this.pingLoop.pingAnswerReceived();
+      }
+    } catch (final UnknownHostException e) {
+      e.printStackTrace();
+    }
   }
 }

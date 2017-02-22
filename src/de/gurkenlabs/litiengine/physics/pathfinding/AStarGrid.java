@@ -11,12 +11,12 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.tilemap.IMap;
 
 public class AStarGrid {
-  private final IPhysicsEngine physicsEngine;
-  private final Dimension size;
-  private final int nodeSize;
-  private final AStarNode[][] grid;
-
   private boolean allowDiagonalMovementOnCorners;
+  private final AStarNode[][] grid;
+  private final int nodeSize;
+  private final IPhysicsEngine physicsEngine;
+
+  private final Dimension size;
 
   public AStarGrid(final IPhysicsEngine physicsEngine, final IMap map, final int nodeSize) {
     this.physicsEngine = physicsEngine;
@@ -109,14 +109,6 @@ public class AStarGrid {
     return neighbors;
   }
 
-  private AStarNode getNode(final int x, final int y) {
-    if (x >= 0 && x < this.getGrid().length && y >= 0 && y < this.getGrid()[0].length) {
-      return this.getGrid()[x][y];
-    }
-
-    return null;
-  }
-
   public AStarNode getNodeFromMapLocation(final Point2D point) {
     float percentX = (float) (point.getX() / this.getSize().getWidth());
     float percentY = (float) (point.getY() / this.getSize().getHeight());
@@ -136,17 +128,6 @@ public class AStarGrid {
     return this.size;
   }
 
-  private void populateGrid(final int gridSizeX, final int gridSizeY) {
-    for (int x = 0; x < gridSizeX; x++) {
-      for (int y = 0; y < gridSizeY; y++) {
-        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
-
-        // TODO: add terrain dependent penalty
-        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
-      }
-    }
-  }
-
   public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
     this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
   }
@@ -160,6 +141,25 @@ public class AStarGrid {
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
       node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
+    }
+  }
+
+  private AStarNode getNode(final int x, final int y) {
+    if (x >= 0 && x < this.getGrid().length && y >= 0 && y < this.getGrid()[0].length) {
+      return this.getGrid()[x][y];
+    }
+
+    return null;
+  }
+
+  private void populateGrid(final int gridSizeX, final int gridSizeY) {
+    for (int x = 0; x < gridSizeX; x++) {
+      for (int y = 0; y < gridSizeY; y++) {
+        final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
+
+        // TODO: add terrain dependent penalty
+        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
+      }
     }
   }
 }

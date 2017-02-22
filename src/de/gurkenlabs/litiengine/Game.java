@@ -27,23 +27,23 @@ import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.tilemap.IMap;
 
 public abstract class Game {
-  private final static List<Consumer<String>> startedConsumer;
-  private final static List<Predicate<String>> terminatingConsumer;
-  private final static List<Consumer<IEnvironment>> environmentLoadedConsumer;
-
   private final static GameConfiguration configuration;
-  private final static IRenderEngine graphicsEngine;
-  private final static IPhysicsEngine physicsEngine;
-  private final static ISoundEngine soundEngine;
-  private static IGameLoop gameLoop;
-  private final static GameMetrics metrics;
   private final static EntityControllerManager entityControllerManager;
-  private static RenderLoop renderLoop;
+  private static IEnvironment environment;
+
+  private final static List<Consumer<IEnvironment>> environmentLoadedConsumer;
+  private static IGameLoop gameLoop;
+  private final static IRenderEngine graphicsEngine;
   private final static GameInfo info;
   private final static List<IMap> maps;
-
+  private final static GameMetrics metrics;
+  private final static IPhysicsEngine physicsEngine;
+  private static RenderLoop renderLoop;
   private static IScreenManager screenManager;
-  private static IEnvironment environment;
+  private final static ISoundEngine soundEngine;
+
+  private final static List<Consumer<String>> startedConsumer;
+  private final static List<Predicate<String>> terminatingConsumer;
 
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
@@ -82,8 +82,22 @@ public abstract class Game {
     return gameLoop;
   }
 
-  public static RenderLoop getRenderLoop() {
-    return renderLoop;
+  public static IMap getMap(final String mapName) {
+    if (mapName == null || mapName.isEmpty() || maps.size() == 0) {
+      return null;
+    }
+
+    for (final IMap map : maps) {
+      if (map.getFileName().equals(mapName)) {
+        return map;
+      }
+    }
+
+    return null;
+  }
+
+  public static List<IMap> getMaps() {
+    return maps;
   }
 
   public static GameMetrics getMetrics() {
@@ -98,45 +112,16 @@ public abstract class Game {
     return graphicsEngine;
   }
 
+  public static RenderLoop getRenderLoop() {
+    return renderLoop;
+  }
+
   public static IScreenManager getScreenManager() {
     return screenManager;
   }
 
   public static ISoundEngine getSoundEngine() {
     return soundEngine;
-  }
-
-  public static List<IMap> getMaps() {
-    return maps;
-  }
-
-  public static IMap getMap(String mapName) {
-    if (mapName == null || mapName.isEmpty() || maps.size() == 0) {
-      return null;
-    }
-
-    for (IMap map : maps) {
-      if (map.getFileName().equals(mapName)) {
-        return map;
-      }
-    }
-
-    return null;
-  }
-
-  public static void loadEnvironment(final IEnvironment env) {
-    if (getEnvironment() != null) {
-      getEnvironment().unload();
-    }
-    
-    environment = env;
-    if (getEnvironment() != null) {
-      getEnvironment().load();
-    }
-
-    for (Consumer<IEnvironment> cons : environmentLoadedConsumer) {
-      cons.accept(getEnvironment());
-    }
   }
 
   public static void init() {
@@ -198,24 +183,14 @@ public abstract class Game {
     Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
   }
 
-  public static void start() {
-    gameLoop.start();
-    soundEngine.start();
-    renderLoop.start();
-
-    for (Consumer<String> cons : startedConsumer) {
-      cons.accept(Game.getInfo().getName());
-    }
-  }
-
-  public static void load(String gameResourceFile) {
-    GameFile file = GameFile.load(gameResourceFile);
+  public static void load(final String gameResourceFile) {
+    final GameFile file = GameFile.load(gameResourceFile);
     if (file == null) {
       return;
     }
 
     int mapCnt = 0;
-    for (IMap m : file.getMaps()) {
+    for (final IMap m : file.getMaps()) {
       if (getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))) {
         continue;
       }
@@ -224,19 +199,19 @@ public abstract class Game {
       mapCnt++;
     }
 
-    List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (String spriteFile : file.getSpriteFiles()) {
-      List<Spritesheet> sprites = Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
+    final List<Spritesheet> loadedSprites = new ArrayList<>();
+    for (final String spriteFile : file.getSpriteFiles()) {
+      final List<Spritesheet> sprites = Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
       loadedSprites.addAll(sprites);
     }
 
-    for (SpriteSheetInfo tileset : file.getTileSets()) {
-      Spritesheet sprite = Spritesheet.load(tileset);
+    for (final SpriteSheetInfo tileset : file.getTileSets()) {
+      final Spritesheet sprite = Spritesheet.load(tileset);
       loadedSprites.add(sprite);
     }
 
     int spriteload = 0;
-    for (Spritesheet s : loadedSprites) {
+    for (final Spritesheet s : loadedSprites) {
       for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
         s.getSprite(i);
         spriteload++;
@@ -247,8 +222,50 @@ public abstract class Game {
     System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
   }
 
+  public static void loadEnvironment(final IEnvironment env) {
+    if (getEnvironment() != null) {
+      getEnvironment().unload();
+    }
+
+    environment = env;
+    if (getEnvironment() != null) {
+      getEnvironment().load();
+    }
+
+    for (final Consumer<IEnvironment> cons : environmentLoadedConsumer) {
+      cons.accept(getEnvironment());
+    }
+  }
+
+  public static void onEnvironmentLoaded(final Consumer<IEnvironment> cons) {
+    environmentLoadedConsumer.add(cons);
+  }
+
+  public static void onStarted(final Consumer<String> cons) {
+    startedConsumer.add(cons);
+  }
+
+  /**
+   * Returning false prevents the terminate event to continue.
+   *
+   * @param cons
+   */
+  public static void onTerminating(final Predicate<String> cons) {
+    terminatingConsumer.add(cons);
+  }
+
+  public static void start() {
+    gameLoop.start();
+    soundEngine.start();
+    renderLoop.start();
+
+    for (final Consumer<String> cons : startedConsumer) {
+      cons.accept(Game.getInfo().getName());
+    }
+  }
+
   public static void terminate() {
-    for (Predicate<String> cons : terminatingConsumer) {
+    for (final Predicate<String> cons : terminatingConsumer) {
       if (!cons.test(Game.getInfo().getName())) {
         return;
       }
@@ -261,22 +278,5 @@ public abstract class Game {
     renderLoop.terminate();
 
     System.exit(0);
-  }
-
-  public static void onStarted(Consumer<String> cons) {
-    startedConsumer.add(cons);
-  }
-
-  /**
-   * Returning false prevents the terminate event to continue.
-   * 
-   * @param cons
-   */
-  public static void onTerminating(Predicate<String> cons) {
-    terminatingConsumer.add(cons);
-  }
-
-  public static void onEnvironmentLoaded(Consumer<IEnvironment> cons) {
-    environmentLoadedConsumer.add(cons);
   }
 }

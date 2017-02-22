@@ -7,8 +7,14 @@ import de.gurkenlabs.configuration.ConfigurationGroup;
 public class DebugConfiguration extends ConfigurationGroup {
   private boolean debugEnabled = false;
 
+  private boolean renderAStarInfo = false;
+
+  private boolean renderBoundingBoxes = false;
+
   /** The render collision boxes. */
   private boolean renderCollisionBoxes = false;
+
+  private boolean renderDebugMouse = false;
 
   /** The render entity names. */
   private boolean renderEntityNames = false;
@@ -16,14 +22,8 @@ public class DebugConfiguration extends ConfigurationGroup {
   /** The render hit boxes. */
   private boolean renderHitBoxes = false;
 
-  private boolean renderBoundingBoxes = false;
-
   /** The render paths. */
   private boolean renderPaths = false;
-
-  private boolean renderAStarInfo = false;
-  
-  private boolean renderDebugMouse = false;
   /** The show mouse target metric. */
   private boolean showMouseTargetMetric = true;
 
@@ -41,6 +41,10 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   public boolean isRenderAStarInfo() {
     return this.renderAStarInfo;
+  }
+
+  public boolean isRenderDebugMouse() {
+    return this.isDebugEnabled() && this.renderDebugMouse;
   }
 
   public boolean renderBoundingBoxes() {
@@ -100,6 +104,10 @@ public class DebugConfiguration extends ConfigurationGroup {
     this.renderCollisionBoxes = renderCollisionBoxes;
   }
 
+  public void setRenderDebugMouse(final boolean renderDebugMouse) {
+    this.renderDebugMouse = renderDebugMouse;
+  }
+
   public void setRenderEntityNames(final boolean renderEntityNames) {
     this.renderEntityNames = renderEntityNames;
   }
@@ -137,13 +145,5 @@ public class DebugConfiguration extends ConfigurationGroup {
   // game metric settings
   public boolean showTilesMetric() {
     return this.isDebugEnabled() && this.showTilesMetric;
-  }
-
-  public boolean isRenderDebugMouse() {
-    return this.isDebugEnabled() && this.renderDebugMouse;
-  }
-
-  public void setRenderDebugMouse(boolean renderDebugMouse) {
-    this.renderDebugMouse = renderDebugMouse;
   }
 }

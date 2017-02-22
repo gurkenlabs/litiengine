@@ -6,29 +6,29 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.core.IInitializable;
 
-public interface IRenderComponent extends IInitializable{
+public interface IRenderComponent extends IInitializable {
+
+  public void fadeIn(int ms);
+
+  public void fadeOut(int ms);
+
+  public Image getCursorImage();
 
   public void onFpsChanged(Consumer<Integer> fpsConsumer);
 
   public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
+  public void render(IRenderable screen);
+
   public void setCursor(Image image);
-  
+
   public void setCursor(Image image, int offsetX, int offsetY);
-  
-  public Image getCursorImage();
+
+  public void setCursorOffset(int x, int y);
 
   public void setCursorOffsetX(int cursorOffsetX);
 
   public void setCursorOffsetY(int cursorOffsetY);
-  
-  public void setCursorOffset(int x, int y);
-  
-  public void render(IRenderable screen);
-  
+
   public void takeScreenshot();
-  
-  public void fadeOut(int ms);
-  
-  public void fadeIn(int ms);
 }

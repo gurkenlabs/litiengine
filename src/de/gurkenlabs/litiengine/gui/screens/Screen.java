@@ -35,7 +35,7 @@ public abstract class Screen extends GuiComponent implements IScreen {
     this.name = info.name();
   }
 
-  protected Screen(String screenName) {
+  protected Screen(final String screenName) {
     super(0, 0);
     this.name = screenName;
   }

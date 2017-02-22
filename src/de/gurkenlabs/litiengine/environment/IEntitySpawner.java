@@ -10,6 +10,11 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
   public enum SpawnMode {
 
     /**
+     * Spawns the amount of mobs for all the spawnpoints available.
+     */
+    ALLSPAWNPOINTS,
+
+    /**
      * Spawns the amount of mobs on one random spawnpoint.
      */
     ONERANDOMSPAWNPOINT,
@@ -17,12 +22,7 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
     /**
      * Spawns the amount of mobs, distributed to random spawnpoints.
      */
-    RANDOMSPAWNPOINTS,
-
-    /**
-     * Spawns the amount of mobs for all the spawnpoints available.
-     */
-    ALLSPAWNPOINTS
+    RANDOMSPAWNPOINTS
   }
 
   public T createNew();

@@ -7,14 +7,14 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class CheckBox extends ImageComponent {
-  private boolean checked;
   public static FontIcon CHECK = new FontIcon(ICON_FONT, "\uE847");
   public static FontIcon CROSS = new FontIcon(ICON_FONT, "\uE843");
   private final List<Consumer<Boolean>> changeConsumer;
+  private boolean checked;
 
-  public CheckBox(double x, double y, double width, double height, Spritesheet spritesheet, boolean checked) {
+  public CheckBox(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final boolean checked) {
     super(x, y, width, height, spritesheet, "", null);
-    this.changeConsumer = new CopyOnWriteArrayList<Consumer<Boolean>>();
+    this.changeConsumer = new CopyOnWriteArrayList<>();
     this.setFont(CHECK.getFont());
     this.setChecked(checked);
     this.refreshText();
@@ -28,16 +28,6 @@ public class CheckBox extends ImageComponent {
     return this.changeConsumer;
   }
 
-  private void toggleChecked() {
-    this.setChecked(!this.checked);
-  }
-
-  public void setChecked(boolean checked) {
-    this.checked = checked;
-    this.getChangeConsumer().forEach(consumer -> consumer.accept(this.isChecked()));
-    this.refreshText();
-  }
-
   public boolean isChecked() {
     return this.checked;
   }
@@ -46,11 +36,21 @@ public class CheckBox extends ImageComponent {
     this.getChangeConsumer().add(c);
   }
 
+  public void setChecked(final boolean checked) {
+    this.checked = checked;
+    this.getChangeConsumer().forEach(consumer -> consumer.accept(this.isChecked()));
+    this.refreshText();
+  }
+
   private void refreshText() {
     if (this.checked) {
       this.setText(CHECK.getText());
     } else {
       this.setText(CROSS.getText());
     }
+  }
+
+  private void toggleChecked() {
+    this.setChecked(!this.checked);
   }
 }

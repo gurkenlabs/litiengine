@@ -16,33 +16,7 @@ import de.gurkenlabs.util.io.FileUtilities;
 public class ImageSerializer {
   public static final String FILE_FORMAT_PNG = "png";
 
-  public static void saveImage(String fileName, BufferedImage image) {
-    try {
-      final File file = new File(fileName);
-      final String extension = FileUtilities.getExtension(fileName);
-      Iterator<ImageWriter> iter = null;
-      if (canWriteFormat(extension)) {
-        iter = ImageIO.getImageWritersByFormatName(extension);
-      } else {
-        iter = ImageIO.getImageWritersByFormatName(FILE_FORMAT_PNG);
-      }
-      
-      final ImageWriter writer = iter.next();
-      final ImageWriteParam iwp = writer.getDefaultWriteParam();
-
-      file.getParentFile().mkdirs();
-      try (final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile())) {
-        writer.setOutput(output);
-        final IIOImage outimage = new IIOImage(image, null, null);
-        writer.write(null, outimage, iwp);
-        writer.dispose();
-      }
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static BufferedImage loadImage(String fileName) {
+  public static BufferedImage loadImage(final String fileName) {
     final File file = new File(fileName);
     if (!file.exists()) {
       return null;
@@ -66,8 +40,34 @@ public class ImageSerializer {
     }
   }
 
-  private static boolean canWriteFormat(String formatName) {
-    Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName(formatName);
+  public static void saveImage(final String fileName, final BufferedImage image) {
+    try {
+      final File file = new File(fileName);
+      final String extension = FileUtilities.getExtension(fileName);
+      Iterator<ImageWriter> iter = null;
+      if (canWriteFormat(extension)) {
+        iter = ImageIO.getImageWritersByFormatName(extension);
+      } else {
+        iter = ImageIO.getImageWritersByFormatName(FILE_FORMAT_PNG);
+      }
+
+      final ImageWriter writer = iter.next();
+      final ImageWriteParam iwp = writer.getDefaultWriteParam();
+
+      file.getParentFile().mkdirs();
+      try (final FileImageOutputStream output = new FileImageOutputStream(file.getAbsoluteFile())) {
+        writer.setOutput(output);
+        final IIOImage outimage = new IIOImage(image, null, null);
+        writer.write(null, outimage, iwp);
+        writer.dispose();
+      }
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static boolean canWriteFormat(final String formatName) {
+    final Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName(formatName);
     return iter.hasNext();
   }
 

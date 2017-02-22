@@ -35,10 +35,6 @@ public class Prop extends CombatEntity {
     return this.spritePath;
   }
 
-  public void setSpritePath(String spritePath) {
-    this.spritePath = spritePath;
-  }
-
   /**
    * Gets the state.
    *
@@ -56,5 +52,9 @@ public class Prop extends CombatEntity {
 
   public void setMaterial(final Material material) {
     this.material = material;
+  }
+
+  public void setSpritePath(final String spritePath) {
+    this.spritePath = spritePath;
   }
 }

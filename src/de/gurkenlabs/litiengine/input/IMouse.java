@@ -25,8 +25,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public Point getLocation();
 
   public Point2D getMapLocation();
-  
-  public void setLocation(Point adjustMouse);
+
+  public boolean isGrabMouse();
 
   public boolean isLeftMouseButtonDown();
 
@@ -39,20 +39,17 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
 
   public boolean isRightMouseButtonDown();
 
-  public void setGrabMouse(boolean grab);
-  
-  public boolean isGrabMouse();
-  public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
-
   public void onClicked(Consumer<MouseEvent> consumer);
-
-  public void onPressed(Consumer<MouseEvent> consumer);
 
   public void onDragged(Consumer<MouseEvent> consumer);
 
+  public void onMoved(Consumer<MouseEvent> consumer);
+
+  public void onPressed(Consumer<MouseEvent> consumer);
+
   public void onReleased(Consumer<MouseEvent> consumer);
 
-  public void onMoved(Consumer<MouseEvent> consumer);
+  public void onWheelMoved(Consumer<MouseWheelEvent> consumer);
 
   /**
    * Register mouse listener.
@@ -77,6 +74,10 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    *          the listener
    */
   public void registerMouseWheelListener(MouseWheelListener listener);
+
+  public void setGrabMouse(boolean grab);
+
+  public void setLocation(Point adjustMouse);
 
   /**
    * Unregister mouse listener.

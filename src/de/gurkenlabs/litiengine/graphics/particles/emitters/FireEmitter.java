@@ -44,16 +44,6 @@ public class FireEmitter extends Emitter {
   /*
    * (non-Javadoc)
    *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
-   */
-  @Override
-  protected Particle createNewParticle() {
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#getOrigin()
    */
   @Override
@@ -82,6 +72,16 @@ public class FireEmitter extends Emitter {
     final float size = (float) (4 + Math.random() * 5);
 
     this.addParticle(new RectangleFillParticle(xCoord, 0, dx, dy, gravityX, gravityY, size, size, life, color));
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
+   */
+  @Override
+  protected Particle createNewParticle() {
+    return null;
   }
 
   /*

@@ -17,11 +17,23 @@ public class Path {
   /** The path. */
   private final Path2D path;
 
+  private final List<Point2D> points;
   private final Point2D start;
+
   /** The target. */
   private final Point2D target;
 
-  private final List<Point2D> points;
+  public Path(final Path2D path) {
+    this.path = path;
+    this.points = GeometricUtilities.getPoints(this.path);
+    if (this.points.size() > 0) {
+      this.start = this.points.get(0);
+      this.target = this.points.get(this.points.size() - 1);
+    } else {
+      this.start = null;
+      this.target = null;
+    }
+  }
 
   /**
    * Instantiates a new path.
@@ -38,18 +50,6 @@ public class Path {
     this.target = target;
     this.path = path;
     this.points = points;
-  }
-
-  public Path(final Path2D path) {
-    this.path = path;
-    this.points = GeometricUtilities.getPoints(this.path);
-    if (this.points.size() > 0) {
-      this.start = this.points.get(0);
-      this.target = this.points.get(this.points.size() - 1);
-    } else {
-      this.start = null;
-      this.target = null;
-    }
   }
 
   /**

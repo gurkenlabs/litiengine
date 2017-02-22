@@ -7,11 +7,11 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 public class LightParticle extends RectangleFillParticle {
-  private final float maxWidth;
   private final float maxHeight;
+  private final float maxWidth;
 
-  private final float minWidth;
   private final float minHeight;
+  private final float minWidth;
 
   public LightParticle(final float maxWidth, final float maxHeight, final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, width, height, life, color);

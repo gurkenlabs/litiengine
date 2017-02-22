@@ -31,24 +31,56 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
 
-  public static final String RECTANGLE = "rectangle";
-
   public static final String ELLIPSE = "ellipse";
+
+  public static final String RECTANGLE = "rectangle";
   public static final String[] SHAPETYPES = { RECTANGLE, ELLIPSE };
 
+  /**
+   * Gets the shadow ellipse.
+   *
+   * @param mob
+   *          the mob
+   * @return the shadow ellipse
+   */
+  private static Ellipse2D getShadowEllipse(final IEntity mob) {
+    final int ShadowHeight = (int) (mob.getHeight() / 4);
+    final int ShadowWidth = (int) (mob.getWidth() / 3);
+
+    final int yOffset = (int) mob.getHeight();
+    final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
+    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2;
+    return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
+  }
+
+  /**
+   * Checks if is in range.
+   *
+   * @param center
+   *          the center
+   * @param radius
+   *          the radius
+   * @return the predicate<? super mob>
+   */
+  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
+    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
+  }
+
+  private boolean activated;
   /** The brightness. */
   private int brightness;
-  private int intensity;
+
   /** The color. */
   private Color color;
   private final IEnvironment environment;
+  private int intensity;
+
+  private Shape lightShape;
+
+  private String lightShapeType;
 
   /** The radius. */
   private int radius;
-  private String lightShapeType;
-  private Shape lightShape;
-
-  private boolean activated;
 
   /**
    * Instantiates a new light source.
@@ -83,66 +115,6 @@ public class LightSource extends Entity implements IRenderable {
     this.activated = false;
   }
 
-  public void toggle() {
-    this.activated = !this.activated;
-  }
-
-  /**
-   * Gets the shadow ellipse.
-   *
-   * @param mob
-   *          the mob
-   * @return the shadow ellipse
-   */
-  private static Ellipse2D getShadowEllipse(final IEntity mob) {
-    final int ShadowHeight = (int) (mob.getHeight() / 4);
-    final int ShadowWidth = (int) (mob.getWidth() / 3);
-
-    final int yOffset = (int) mob.getHeight();
-    final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2;
-    return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
-  }
-
-  /**
-   * Checks if is in range.
-   *
-   * @param center
-   *          the center
-   * @param radius
-   *          the radius
-   * @return the predicate<? super mob>
-   */
-  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
-    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
-  }
-
-  @Override
-  public void setLocation(Point2D location) {
-    super.setLocation(location);
-    switch (this.getLightShapeType()) {
-    case LightSource.ELLIPSE:
-      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    case LightSource.RECTANGLE:
-      this.lightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    default:
-      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    }
-  }
-
-  @Override
-  public void setSize(float width, float height) {
-    super.setSize(width, height);
-    double shorterDimension = width;
-    if (width > height) {
-      shorterDimension = height;
-    }
-    this.setRadius((int) shorterDimension / 2);
-  }
-
   /**
    * Gets the brightness.
    *
@@ -161,6 +133,10 @@ public class LightSource extends Entity implements IRenderable {
     return this.color;
   }
 
+  public int getIntensity() {
+    return this.intensity;
+  }
+
   public Shape getLightShape() {
     return this.lightShape;
   }
@@ -169,8 +145,72 @@ public class LightSource extends Entity implements IRenderable {
     return this.lightShapeType;
   }
 
-  public void setLightShapeType(String shapeType) {
+  /**
+   * Gets the radius.
+   *
+   * @return the radius
+   */
+  public int getRadius() {
+    return this.radius;
+  }
+
+  @Override
+  public void render(final Graphics2D g) {
+    if (Game.getConfiguration().GRAPHICS.renderDynamicShadows()) {
+      this.renderShadows(g);
+    }
+  }
+
+  /**
+   * Sets the brightness.
+   *
+   * @param brightness
+   *          the new brightness
+   */
+  public void setBrightness(final int brightness) {
+    this.brightness = brightness;
+  }
+
+  public void setColor(final Color result) {
+    this.color = result;
+  }
+
+  public void setIntensity(final int intensity) {
+    this.intensity = intensity;
+  }
+
+  public void setLightShapeType(final String shapeType) {
     this.lightShapeType = shapeType;
+  }
+
+  @Override
+  public void setLocation(final Point2D location) {
+    super.setLocation(location);
+    switch (this.getLightShapeType()) {
+    case LightSource.ELLIPSE:
+      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      break;
+    case LightSource.RECTANGLE:
+      this.lightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      break;
+    default:
+      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
+      break;
+    }
+  }
+
+  @Override
+  public void setSize(final float width, final float height) {
+    super.setSize(width, height);
+    double shorterDimension = width;
+    if (width > height) {
+      shorterDimension = height;
+    }
+    this.setRadius((int) shorterDimension / 2);
+  }
+
+  public void toggle() {
+    this.activated = !this.activated;
   }
 
   /**
@@ -245,22 +285,6 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   /**
-   * Gets the radius.
-   *
-   * @return the radius
-   */
-  public int getRadius() {
-    return this.radius;
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    if (Game.getConfiguration().GRAPHICS.renderDynamicShadows()) {
-      this.renderShadows(g);
-    }
-  }
-
-  /**
    * Renders the shadows using simple vector math. The steps are as follows:
    *
    * <pre>
@@ -330,16 +354,6 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   /**
-   * Sets the brightness.
-   *
-   * @param brightness
-   *          the new brightness
-   */
-  public void setBrightness(final int brightness) {
-    this.brightness = brightness;
-  }
-
-  /**
    * Sets the radius.
    *
    * @param radius
@@ -347,17 +361,5 @@ public class LightSource extends Entity implements IRenderable {
    */
   private void setRadius(final int radius) {
     this.radius = radius;
-  }
-
-  public void setColor(Color result) {
-    this.color = result;
-  }
-
-  public int getIntensity() {
-    return intensity;
-  }
-
-  public void setIntensity(int intensity) {
-    this.intensity = intensity;
   }
 }

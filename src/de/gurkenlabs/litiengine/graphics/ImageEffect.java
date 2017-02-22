@@ -3,10 +3,10 @@ package de.gurkenlabs.litiengine.graphics;
 import de.gurkenlabs.litiengine.Game;
 
 public abstract class ImageEffect implements IImageEffect {
-  private final int ttl;
-
   private final long aliveTick;
+
   private final String name;
+  private final int ttl;
 
   protected ImageEffect(final int ttl, final String name) {
     this.ttl = ttl;

@@ -30,92 +30,10 @@ public class ImageProcessing {
   public static final int CROP_ALIGN_LEFT = 1;
   public static final int CROP_ALIGN_RIGHT = 2;
 
+  public static final int CROP_VALIGN_BOTTOM = 3;
   public static final int CROP_VALIGN_CENTER = 0;
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
-  public static final int CROP_VALIGN_BOTTOM = 3;
-
-  public static String encodeToString(final BufferedImage image) {
-    if (image == null) {
-      return null;
-    }
-    String imageString = null;
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-    try {
-      ImageIO.write(image, "png", bos);
-      byte[] imageBytes = bos.toByteArray();
-
-      imageString = Base64.getEncoder().encodeToString(imageBytes);
-
-      bos.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return imageString;
-  }
-
-  public static BufferedImage decodeToImage(String imageString) {
-    if (imageString == null) {
-      return null;
-    }
-
-    BufferedImage image = null;
-    byte[] imageByte;
-    try {
-      imageByte = Base64.getDecoder().decode(imageString);
-      ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-      image = ImageIO.read(bis);
-      bis.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return image;
-  }
-
-  public static BufferedImage rotate(final BufferedImage bufferedImage, double radians) {
-
-    AffineTransform tx = new AffineTransform();
-    tx.rotate(radians, bufferedImage.getWidth() / 2, bufferedImage.getHeight() / 2);
-
-    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-    return op.filter(bufferedImage, null);
-  }
-
-  /**
-   * Removes all pixels that have transparency and a color value between
-   * BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
-   * 
-   * @param image
-   * @return
-   */
-  public static BufferedImage removeShadows(final BufferedImage image) {
-    final Color LIGHT_SHADOW = new Color(100, 100, 100);
-
-    final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
-    // Draw the image on to the buffered image
-    final Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(image, 0, 0, null);
-    bGr.dispose();
-
-    for (int y = 0; y < bimage.getHeight(); y++) {
-      for (int x = 0; x < bimage.getWidth(); x++) {
-        // if the current pixel is not transparent, we cannot stroke it
-        int rgb = bimage.getRGB(x, y);
-        int alpha = (rgb >> 24) & 0xff;
-        int r = (rgb & 0xFF0000) >> 16;
-        int g = (rgb & 0xFF00) >> 8;
-        int b = rgb & 0xFF;
-
-        if (alpha < 255 && r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() && g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() && b >= Color.BLACK.getBlue() && b <= LIGHT_SHADOW.getBlue()) {
-          // Set fully transparent but keep color
-          bimage.setRGB(x, y, rgb & 0xFFFFFF);
-        }
-      }
-    }
-
-    return bimage;
-  }
 
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
@@ -278,6 +196,44 @@ public class ImageProcessing {
     return image.getSubimage(x, y, width, height);
   }
 
+  public static BufferedImage decodeToImage(final String imageString) {
+    if (imageString == null) {
+      return null;
+    }
+
+    BufferedImage image = null;
+    byte[] imageByte;
+    try {
+      imageByte = Base64.getDecoder().decode(imageString);
+      final ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+      image = ImageIO.read(bis);
+      bis.close();
+    } catch (final Exception e) {
+      e.printStackTrace();
+    }
+    return image;
+  }
+
+  public static String encodeToString(final BufferedImage image) {
+    if (image == null) {
+      return null;
+    }
+    String imageString = null;
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+    try {
+      ImageIO.write(image, "png", bos);
+      final byte[] imageBytes = bos.toByteArray();
+
+      imageString = Base64.getEncoder().encodeToString(imageBytes);
+
+      bos.close();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+    return imageString;
+  }
+
   /**
    * All pixels that are not transparent are replaced by a pixel of the
    * specified flashColor.
@@ -306,6 +262,17 @@ public class ImageProcessing {
     }
 
     return bimage;
+  }
+
+  public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
+    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
+    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
+      g.drawImage(ImageProcessing.horizontalflip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+    }
+    g.dispose();
+
+    return flippedSprite;
   }
 
   public static BufferedImage getCompatibleImage(final int width, final int height) {
@@ -410,6 +377,77 @@ public class ImageProcessing {
   }
 
   /**
+   * Removes all pixels that have transparency and a color value between
+   * BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
+   *
+   * @param image
+   * @return
+   */
+  public static BufferedImage removeShadows(final BufferedImage image) {
+    final Color LIGHT_SHADOW = new Color(100, 100, 100);
+
+    final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
+    // Draw the image on to the buffered image
+    final Graphics2D bGr = bimage.createGraphics();
+    bGr.drawImage(image, 0, 0, null);
+    bGr.dispose();
+
+    for (int y = 0; y < bimage.getHeight(); y++) {
+      for (int x = 0; x < bimage.getWidth(); x++) {
+        // if the current pixel is not transparent, we cannot stroke it
+        final int rgb = bimage.getRGB(x, y);
+        final int alpha = rgb >> 24 & 0xff;
+        final int r = (rgb & 0xFF0000) >> 16;
+        final int g = (rgb & 0xFF00) >> 8;
+        final int b = rgb & 0xFF;
+
+        if (alpha < 255 && r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() && g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() && b >= Color.BLACK.getBlue() && b <= LIGHT_SHADOW.getBlue()) {
+          // Set fully transparent but keep color
+          bimage.setRGB(x, y, rgb & 0xFFFFFF);
+        }
+      }
+    }
+
+    return bimage;
+  }
+
+  public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
+
+    final AffineTransform tx = new AffineTransform();
+    tx.rotate(radians, bufferedImage.getWidth() / 2, bufferedImage.getHeight() / 2);
+
+    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+    return op.filter(bufferedImage, null);
+  }
+
+  public static BufferedImage scaleImage(final BufferedImage image, final int max) {
+    final double width = image.getWidth();
+    final double height = image.getHeight();
+
+    if (width == 0 || height == 0) {
+      return null;
+    }
+    double dWidth = 0;
+    double dHeight = 0;
+    final double ratio = width / height;
+    final double newHeight = width / ratio;
+    final double newWidth = height * ratio;
+
+    if (newWidth == newHeight) {
+      dWidth = max;
+      dHeight = max;
+    } else if (newWidth > newHeight) {
+      dWidth = max;
+      dHeight = height / width * max;
+    } else {
+      dHeight = max;
+      dWidth = width / height * max;
+    }
+
+    return scaleImage(image, (int) dWidth, (int) dHeight);
+  }
+
+  /**
    * The specified image is scaled to a new dimension with the specified width
    * and height. This method doesn't use anti aliasing for this process to keep
    * the indy look.
@@ -426,7 +464,7 @@ public class ImageProcessing {
     return scaleImage(image, width, height, false);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, boolean keepRatio) {
+  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -446,56 +484,29 @@ public class ImageProcessing {
       }
     }
 
-    final double scaleX = (double) newWidth / imageWidth;
-    final double scaleY = (double) newHeight / imageHeight;
+    final double scaleX = newWidth / imageWidth;
+    final double scaleY = newHeight / imageHeight;
     final AffineTransform scaleTransform = AffineTransform.getScaleInstance(scaleX, scaleY);
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    BufferedImage scaled = bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
-    BufferedImage newImg = getCompatibleImage(width, height);
-    Graphics2D g = (Graphics2D) newImg.getGraphics();
+    final BufferedImage scaled = bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
+    final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
+    final Graphics2D g = (Graphics2D) newImg.getGraphics();
     g.drawImage(scaled, 0, 0, null);
     g.dispose();
     return newImg;
   }
 
-  public static BufferedImage scaleImage(BufferedImage image, int max) {
-    double width = image.getWidth();
-    double height = image.getHeight();
-
-    if (width == 0 || height == 0) {
-      return null;
-    }
-    double dWidth = 0;
-    double dHeight = 0;
-    double ratio = width / height;
-    double newHeight = width / ratio;
-    double newWidth = height * ratio;
-
-    if (newWidth == newHeight) {
-      dWidth = max;
-      dHeight = max;
-    } else if (newWidth > newHeight) {
-      dWidth = max;
-      dHeight = ((double) height / (double) width) * max;
-    } else {
-      dHeight = max;
-      dWidth = ((double) width / (double) height) * max;
-    }
-
-    return scaleImage(image, (int) dWidth, (int) dHeight);
-  }
-
-  public static BufferedImage scaleImageWidth(BufferedImage image, int newWidth) {
-    double width = image.getWidth();
-    double height = image.getHeight();
+  public static BufferedImage scaleImageWidth(final BufferedImage image, final int newWidth) {
+    final double width = image.getWidth();
+    final double height = image.getHeight();
     if (width == 0 || height == 0) {
       return null;
     }
 
-    double ratio = newWidth / width;
-    double newHeight = height * ratio;
+    final double ratio = newWidth / width;
+    final double newHeight = height * ratio;
 
-    return scaleImage(image, (int) newWidth, (int) newHeight);
+    return scaleImage(image, newWidth, (int) newHeight);
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
@@ -510,6 +521,23 @@ public class ImageProcessing {
     return bimage;
   }
 
+  public static BufferedImage toBufferedImage(final Image img) {
+    if (img instanceof BufferedImage) {
+      return (BufferedImage) img;
+    }
+
+    // Create a buffered image with transparency
+    final BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+    // Draw the image on to the buffered image
+    final Graphics2D bGr = bimage.createGraphics();
+    bGr.drawImage(img, 0, 0, null);
+    bGr.dispose();
+
+    // Return the buffered image
+    return bimage;
+  }
+
   public static BufferedImage verticalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
@@ -518,17 +546,6 @@ public class ImageProcessing {
     g.drawImage(img, 0, 0 + h, w, -h, null);
     g.dispose();
     return dimg;
-  }
-
-  public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
-    BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
-    Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
-    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.horizontalflip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
-    }
-    g.dispose();
-
-    return flippedSprite;
   }
 
   public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
@@ -540,22 +557,5 @@ public class ImageProcessing {
     g.dispose();
 
     return resizedImage;
-  }
-
-  public static BufferedImage toBufferedImage(Image img) {
-    if (img instanceof BufferedImage) {
-      return (BufferedImage) img;
-    }
-
-    // Create a buffered image with transparency
-    BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-    // Draw the image on to the buffered image
-    Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(img, 0, 0, null);
-    bGr.dispose();
-
-    // Return the buffered image
-    return bimage;
   }
 }

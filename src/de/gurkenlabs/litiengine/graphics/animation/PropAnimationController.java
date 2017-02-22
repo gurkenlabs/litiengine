@@ -11,18 +11,9 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class PropAnimationController extends AnimationController {
-  private static final String INTACT = "intact";
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
-
-  private final Prop prop;
-
-  public PropAnimationController(final IEntity prop) {
-    super(createAnimation((Prop) prop, PropState.INTACT));
-    this.prop = (Prop) prop;
-    this.add(createAnimation(this.prop, PropState.DAMAGED));
-    this.add(createAnimation(this.prop, PropState.DESTROYED));
-  }
+  private static final String INTACT = "intact";
 
   public static Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = findSpriteSheet(prop, state);
@@ -38,10 +29,19 @@ public class PropAnimationController extends AnimationController {
       return null;
     }
 
-    String propState = state.name().toLowerCase();
+    final String propState = state.name().toLowerCase();
     final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
     final Spritesheet sheet = Spritesheet.find(name);
     return sheet;
+  }
+
+  private final Prop prop;
+
+  public PropAnimationController(final IEntity prop) {
+    super(createAnimation((Prop) prop, PropState.INTACT));
+    this.prop = (Prop) prop;
+    this.add(createAnimation(this.prop, PropState.DAMAGED));
+    this.add(createAnimation(this.prop, PropState.DESTROYED));
   }
 
   @Override
@@ -61,13 +61,13 @@ public class PropAnimationController extends AnimationController {
       return ImageCache.SPRITES.get(cacheKey);
     }
 
-    BufferedImage currentImage = super.getCurrentSprite();
+    final BufferedImage currentImage = super.getCurrentSprite();
     if (currentImage == null) {
       return null;
     }
 
     // add a shadow at the lower end of the current sprite.
-    final int ShadowYOffset = (int) (currentImage.getHeight());
+    final int ShadowYOffset = currentImage.getHeight();
     final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
     return ImageCache.SPRITES.putPersistent(cacheKey, shadow);
   }

@@ -31,57 +31,16 @@ public class GameFile implements Serializable {
 
   private static final long serialVersionUID = -2101786184799276518L;
 
-  @XmlElementWrapper(name = "maps")
-  @XmlElement(name = "map")
-  private List<Map> maps;
-
-  @XmlElementWrapper(name = "spriteSheets")
-  @XmlElement(name = "sprite")
-  private List<SpriteSheetInfo> spriteSheets;
-
-  @XmlElementWrapper(name = "spriteFiles")
-  @XmlElement(name = "spritefile")
-  private String[] spriteFiles;
-
-  public GameFile() {
-    this.spriteSheets = new ArrayList<>();
-    this.maps = new ArrayList<>();
-    this.spriteFiles = new String[] {};
-  }
-
-  @XmlTransient
-  public List<Map> getMaps() {
-    return this.maps;
-  }
-
-  @XmlTransient
-  public List<SpriteSheetInfo> getTileSets() {
-    return this.spriteSheets;
-  }
-
-  @XmlTransient
-  public String[] getSpriteFiles() {
-    return this.spriteFiles;
-  }
-
-  public void setSpriteSheets(List<SpriteSheetInfo> spriteSheets) {
-    this.spriteSheets = spriteSheets;
-  }
-
-  public void setSpriteFiles(String[] spriteFiles) {
-    this.spriteFiles = spriteFiles;
-  }
-
-  public static GameFile load(String file) {
+  public static GameFile load(final String file) {
     try {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
       GameFile gameFile = null;
       try {
-        GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
+        final GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
         gameFile = (GameFile) um.unmarshal(zipStream);
-      } catch (ZipException e) {
+      } catch (final ZipException e) {
         InputStream stream = null;
         stream = FileUtilities.getGameResource(file);
         if (stream == null) {
@@ -95,40 +54,73 @@ public class GameFile implements Serializable {
         return null;
       }
 
-      for (Map map : gameFile.getMaps()) {
+      for (final Map map : gameFile.getMaps()) {
         map.updateTileTerrain();
       }
 
       return gameFile;
     } catch (final JAXBException jaxe) {
       jaxe.printStackTrace();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 
     return null;
   }
 
-  public String save(String fileName, boolean compress) {
+  @XmlElementWrapper(name = "maps")
+  @XmlElement(name = "map")
+  private final List<Map> maps;
+
+  @XmlElementWrapper(name = "spriteFiles")
+  @XmlElement(name = "spritefile")
+  private String[] spriteFiles;
+
+  @XmlElementWrapper(name = "spriteSheets")
+  @XmlElement(name = "sprite")
+  private List<SpriteSheetInfo> spriteSheets;
+
+  public GameFile() {
+    this.spriteSheets = new ArrayList<>();
+    this.maps = new ArrayList<>();
+    this.spriteFiles = new String[] {};
+  }
+
+  @XmlTransient
+  public List<Map> getMaps() {
+    return this.maps;
+  }
+
+  @XmlTransient
+  public String[] getSpriteFiles() {
+    return this.spriteFiles;
+  }
+
+  @XmlTransient
+  public List<SpriteSheetInfo> getTileSets() {
+    return this.spriteSheets;
+  }
+
+  public String save(String fileName, final boolean compress) {
 
     if (!fileName.endsWith("." + FILE_EXTENSION)) {
       fileName += "." + FILE_EXTENSION;
     }
 
-    File newFile = new File(fileName);
-    if(newFile.exists()){
+    final File newFile = new File(fileName);
+    if (newFile.exists()) {
       newFile.delete();
     }
-    
+
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
-      Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+      final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
+      final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-      OutputStream out = new FileOutputStream(newFile);
+      final OutputStream out = new FileOutputStream(newFile);
       try {
         if (compress) {
-          GZIPOutputStream stream = new GZIPOutputStream(out);
+          final GZIPOutputStream stream = new GZIPOutputStream(out);
           jaxbMarshaller.marshal(this, stream);
           stream.flush();
           stream.close();
@@ -139,12 +131,20 @@ public class GameFile implements Serializable {
         out.flush();
         out.close();
       }
-    } catch (JAXBException ex) {
+    } catch (final JAXBException ex) {
       ex.printStackTrace();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 
     return newFile.toString();
+  }
+
+  public void setSpriteFiles(final String[] spriteFiles) {
+    this.spriteFiles = spriteFiles;
+  }
+
+  public void setSpriteSheets(final List<SpriteSheetInfo> spriteSheets) {
+    this.spriteSheets = spriteSheets;
   }
 }

@@ -10,10 +10,10 @@ import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 
 public class MousePathCombatEntityController extends ClientEntityMovementController<IMovableCombatEntity> implements MouseListener {
-  private final IEntityNavigator navigator;
-
   /** The player is navigating. */
   private boolean navigating;
+
+  private final IEntityNavigator navigator;
 
   public MousePathCombatEntityController(final IEntityNavigator navigator, final IMovableCombatEntity movableEntity) {
     super(movableEntity);

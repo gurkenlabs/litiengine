@@ -17,24 +17,24 @@ import de.gurkenlabs.util.zip.CompressionUtilities;
  * The Class ImageCache.
  */
 public class ImageCache {
-  public static final String CACHE_DUMP_NAME = "imagecache.dump";
-
   /** The Constant CACHE_DIRECTORY. */
   public static final String CACHE_DIRECTORY = "cache/";
 
-  public static final String MAP_DIRECTORY = "map";
-  public static final String SPRITES_DIRECTORY = "sprites";
+  public static final String CACHE_DUMP_NAME = "imagecache.dump";
 
+  public static final ImageCache IMAGES = new ImageCache("images");
   public static final String IMAGES_DIRECTORY = "images";
+
+  public static final String MAP_DIRECTORY = "map";
 
   public static final ImageCache MAPS = new ImageCache("map");
 
   public static final ImageCache SPRITES = new ImageCache("sprites");
 
-  public static final ImageCache IMAGES = new ImageCache("images");
+  public static final String SPRITES_DIRECTORY = "sprites";
 
   public static void loadCache(final String path) {
-    InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME);
+    final InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME);
     final File cacheFile = new File(path, CACHE_DUMP_NAME);
     if (in == null) {
       System.out.println("loading stream from " + cacheFile.toPath() + " failed!");
@@ -68,6 +68,28 @@ public class ImageCache {
 
   /** The sub folder. */
   private final String subFolder;
+
+  /**
+   * Instantiates a new image cache.
+   *
+   * @param subfolder
+   *          the subfolder
+   */
+  private ImageCache(final String subfolder) {
+    this.cache = new ConcurrentHashMap<>();
+    this.subFolder = subfolder;
+  }
+
+  public void clearPersistent() {
+    final File dir = new File(this.getSubFolderName());
+    if (!dir.exists() || !dir.isDirectory()) {
+      return;
+    }
+
+    System.out.println("deleted '" + dir.toString() + "'");
+    FileUtilities.deleteDir(dir);
+    this.cache.clear();
+  }
 
   /**
    * Contains key.
@@ -150,28 +172,6 @@ public class ImageCache {
     this.cache.put(key, value);
     this.saveImage(key, value);
     return value;
-  }
-
-  public void clearPersistent() {
-    final File dir = new File(this.getSubFolderName());
-    if (!dir.exists() || !dir.isDirectory()) {
-      return;
-    }
-
-    System.out.println("deleted '" + dir.toString() + "'");
-    FileUtilities.deleteDir(dir);
-    this.cache.clear();
-  }
-
-  /**
-   * Instantiates a new image cache.
-   *
-   * @param subfolder
-   *          the subfolder
-   */
-  private ImageCache(final String subfolder) {
-    this.cache = new ConcurrentHashMap<>();
-    this.subFolder = subfolder;
   }
 
   /**

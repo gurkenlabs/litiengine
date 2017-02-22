@@ -8,14 +8,14 @@ package de.gurkenlabs.litiengine.net;
  */
 public abstract class Package {
 
+  /** The Type byte count. */
+  protected final int TypeByteCount = 1;
+
   /** The data. */
   private byte[] data;
 
   /** The packet id. */
   private final byte packetId;
-
-  /** The Type byte count. */
-  protected final int TypeByteCount = 1;
 
   /**
    * Instantiates a new package.

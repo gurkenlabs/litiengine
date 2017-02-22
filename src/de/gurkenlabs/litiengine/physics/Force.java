@@ -24,10 +24,10 @@ public class Force {
   /** The location. */
   private Point2D location;
 
+  private final float size;
+
   /** The strength. */
   private final float strength;
-
-  private final float size;
 
   /**
    * Instantiates a new force.

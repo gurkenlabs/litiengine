@@ -26,12 +26,12 @@ public @interface EntityInfo {
    */
   float height() default 32;
 
+  RenderType renderType() default RenderType.NORMAL;
+
   /**
    * Width.
    *
    * @return the int
    */
   float width() default 32;
-  
-  RenderType renderType() default RenderType.NORMAL;
 }

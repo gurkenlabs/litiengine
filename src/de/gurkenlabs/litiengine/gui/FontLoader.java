@@ -19,9 +19,9 @@ import de.gurkenlabs.util.io.FileUtilities;
  * The Class FontLoader loads custom fonts to the java environment.
  */
 public class FontLoader {
-  private static final Logger log = Logger.getLogger(FontLoader.class.getName());
   /** The Constant fonts. */
-  private static final HashMap<String, Font> fonts = new HashMap<String, Font>();
+  private static final HashMap<String, Font> fonts = new HashMap<>();
+  private static final Logger log = Logger.getLogger(FontLoader.class.getName());
 
   /**
    * Gets the font.
@@ -37,9 +37,9 @@ public class FontLoader {
       return fonts.get(fontName);
     }
 
-    String[] f = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-    for (String font : f) {
-      String name = FileUtilities.getFileName(fontName);
+    final String[] f = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    for (final String font : f) {
+      final String name = FileUtilities.getFileName(fontName);
       if (font.equals(name)) {
         return new Font(name, Font.PLAIN, 8);
       }
@@ -47,7 +47,7 @@ public class FontLoader {
     try {
       final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-      InputStream fontStream = FileUtilities.getGameResource(fontName);
+      final InputStream fontStream = FileUtilities.getGameResource(fontName);
       if (fontStream == null) {
         log.severe("font '" + fontName + "' could not be loaded");
       }

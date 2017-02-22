@@ -47,36 +47,6 @@ import de.gurkenlabs.util.io.FileUtilities;
  */
 public final class RenderEngine implements IRenderEngine {
 
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-
-  private final List<Predicate<IEntity>> entityRenderingConditions;
-
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-
-  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
-
-  /** The map renderer. */
-  private final Map<MapOrientation, IMapRenderer> mapRenderer;
-
-  private final EntityYComparator entityComparator;
-
-  /**
-   * Instantiates a new graphics engine.
-   *
-   * @param mapRenderer
-   *          the map renderer
-   */
-  public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new HashMap<>();
-    this.entityComparator = new EntityYComparator();
-
-    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
-  }
-
   public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
@@ -84,6 +54,37 @@ public final class RenderEngine implements IRenderEngine {
     final BufferedImage img = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
     return img;
+  }
+
+  /**
+   * Draws the given string to the specified map location.
+   *
+   * @param g
+   * @param text
+   * @param x
+   * @param y
+   */
+  public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+    final Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x, y);
+    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getRenderScale());
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  public static void drawMapText(final Graphics2D g, final String text, final Point2D location) {
+    drawMapText(g, text, location.getX(), location.getY());
+  }
+
+  public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
+    final Graphics2D g2 = (Graphics2D) g.create();
+    g2.rotate(Math.toRadians(angle), x, y);
+    RenderEngine.drawText(g2, text, x, y);
+    g2.dispose();
+
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape) {
@@ -116,37 +117,6 @@ public final class RenderEngine implements IRenderEngine {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
     g.drawString(text, (int) x, (int) y);
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-  }
-
-  public static void drawMapText(final Graphics2D g, final String text, Point2D location) {
-    drawMapText(g, text, location.getX(), location.getY());
-  }
-
-  public static void drawRotatedText(Graphics2D g, double x, double y, int angle, String text) {
-    Graphics2D g2 = (Graphics2D) g.create();
-    g2.rotate(Math.toRadians(angle), x, y);
-    RenderEngine.drawText(g2, text, x, y);
-    g2.dispose();
-
-  }
-
-  /**
-   * Draws the given string to the specified map location.
-   * 
-   * @param g
-   * @param text
-   * @param x
-   * @param y
-   */
-  public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
-    if (text == null || text.isEmpty()) {
-      return;
-    }
-
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x, y);
-    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
@@ -199,7 +169,7 @@ public final class RenderEngine implements IRenderEngine {
    *          the image
    * @return the image
    */
-  public static BufferedImage getImage(final String absolutPath, boolean forceLoad) {
+  public static BufferedImage getImage(final String absolutPath, final boolean forceLoad) {
     if (absolutPath == null || absolutPath.isEmpty()) {
       return null;
     }
@@ -233,7 +203,7 @@ public final class RenderEngine implements IRenderEngine {
     return compatibleImg;
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, double x, double y) {
+  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y) {
     if (image == null) {
       return;
     }
@@ -243,11 +213,7 @@ public final class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
-    renderImage(g, image, renderLocation.getX(), renderLocation.getY());
-  }
-
-  public static void renderImage(final Graphics2D g, final Image image, double x, double y, final float angle) {
+  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y, final float angle) {
     if (image == null) {
       return;
     }
@@ -260,8 +226,55 @@ public final class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
+    renderImage(g, image, renderLocation.getX(), renderLocation.getY());
+  }
+
   public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
+  }
+
+  private final EntityYComparator entityComparator;
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
+
+  private final List<Predicate<IEntity>> entityRenderingConditions;
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+
+  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
+
+  /** The map renderer. */
+  private final Map<MapOrientation, IMapRenderer> mapRenderer;
+
+  /**
+   * Instantiates a new graphics engine.
+   *
+   * @param mapRenderer
+   *          the map renderer
+   */
+  public RenderEngine() {
+    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
+    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.mapRenderer = new HashMap<>();
+    this.entityComparator = new EntityYComparator();
+
+    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+  }
+
+  @Override
+  public boolean canRender(final IEntity entity) {
+    if (this.entityRenderingConditions.size() > 0) {
+      for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
+        if (!consumer.test(entity)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   @Override
@@ -302,15 +315,6 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics2D g, final IRenderable renderable) {
-    if (renderable == null) {
-      return;
-    }
-
-    renderable.render(g);
-  }
-
-  @Override
   public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
@@ -328,12 +332,21 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void render(final Graphics2D g, final IRenderable renderable) {
+    if (renderable == null) {
+      return;
+    }
+
+    renderable.render(g);
+  }
+
+  @Override
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
     this.renderEntities(g, entities, true);
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, boolean sort) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
@@ -360,12 +373,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final IVision vision) {
-    this.renderEntities(g, entities, true, vision);
-  }
-
-  @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, boolean sort, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final IVision vision) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -379,6 +387,11 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final IVision vision) {
+    this.renderEntities(g, entities, true, vision);
+  }
+
+  @Override
   public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
       return;
@@ -387,14 +400,14 @@ public final class RenderEngine implements IRenderEngine {
     if (!this.canRender(entity)) {
       return;
     }
-    RenderEvent<IEntity> renderEvent = new RenderEvent<IEntity>(g, entity);
+    final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
     if (this.entityRenderingConsumer.size() > 0) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
         consumer.accept(renderEvent);
       }
     }
 
-    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
       renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
@@ -441,18 +454,5 @@ public final class RenderEngine implements IRenderEngine {
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));
     }
-  }
-
-  @Override
-  public boolean canRender(IEntity entity) {
-    if (this.entityRenderingConditions.size() > 0) {
-      for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
-        if (!consumer.test(entity)) {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 }

@@ -16,17 +16,17 @@ import de.gurkenlabs.litiengine.abilities.effects.IEffect;
  * The Class AbilityExecution.
  */
 public class AbilityExecution implements IUpdateable {
-  private final List<IEffect> appliedEffects;
   /** The executed ability. */
   private final Ability ability;
+  private final List<IEffect> appliedEffects;
+
+  private final Point2D castLocation;
 
   /** The execution ticks. */
   private final long executionTicks;
 
   /** The impact area. */
   private final Shape impactArea;
-
-  private final Point2D castLocation;
 
   /**
    * Instantiates a new ability execution.

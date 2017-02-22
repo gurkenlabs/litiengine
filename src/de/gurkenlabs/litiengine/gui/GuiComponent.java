@@ -29,29 +29,31 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * The Class GuiComponent.
  */
 public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, MouseWheelListener {
-  protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
-  protected static final Font TEXT_FONT = FontLoader.load("Arial").deriveFont(8f);
-  private final List<Consumer<String>> textChangedConsumer;
-  private int textAlignment = TEXT_ALIGN_CENTER;
+  public static final int TEXT_ALIGN_CENTER = 3;
   public static final int TEXT_ALIGN_LEFT = 1;
   public static final int TEXT_ALIGN_RIGHT = 2;
-  public static final int TEXT_ALIGN_CENTER = 3;
-
+  protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
+  protected static final Font TEXT_FONT = FontLoader.load("Arial").deriveFont(8f);
   /** The component id. */
   private static int componentId = 0;
-
   /** The Constant DEFAULT_COLOR. */
   private static final Color DEFAULT_COLOR = Color.WHITE;
 
   /** The back ground color. */
-  private Color backGroundColor;
+  private Color backGroundColor, textShadowColor;
 
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer, mouseReleasedConsumer, mouseMovedConsumer;
-  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
 
   /** The components. */
   private final CopyOnWriteArrayList<GuiComponent> components;
+
+  private Boolean drawTextShadow = false;
+  private Font font;
+
+  private Sound hoverSound;
+
+  private Color hoverTextColor;
 
   /** The id. */
   private final int id;
@@ -59,29 +61,31 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The is hovered. */
   private boolean isHovered, isPressed, isSelected;
 
+  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
+
   /** The suspended. */
   private boolean suspended;
 
   /** The tag. */
   private Object tag;
 
+  private String text;
+
+  private int textAlignment = TEXT_ALIGN_CENTER;
+
+  private int textAngle = 0;
+  private final List<Consumer<String>> textChangedConsumer;
   /** The text color. */
   private Color textColor;
-
-  private Color hoverTextColor;
+  private double textX;
+  private double textY;
 
   /** The visible. */
   private boolean visible;
 
   /** The width. */
-  private double width, height, x, y, defaultTextX, defaultTextY, x_Padding, textX, textY;
-  private int textAngle = 0;
-
-  private Sound hoverSound;
-
-  private Font font;
-  private String text;
-  private float xMargin;
+  private double width, height, x, y, defaultTextX, defaultTextY;
+  private double xMargin;
 
   protected GuiComponent(final double x, final double y) {
     this.components = new CopyOnWriteArrayList<>();
@@ -101,9 +105,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.id = ++componentId;
     this.x = x;
     this.y = y;
-    this.x_Padding = this.getWidth() / 16;
-    this.textX = -1;
-    this.textY = -1;
+    this.setTextXMargin(this.getWidth() / 16);
     this.setSelected(false);
     this.initializeComponents();
   }
@@ -121,74 +123,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the height
    */
   protected GuiComponent(final double x, final double y, final double width, final double height) {
+    this(x, y);
     this.setWidth(width);
     this.setHeight(height);
-    this.components = new CopyOnWriteArrayList<>();
-    this.clickConsumer = new CopyOnWriteArrayList<>();
-    this.hoverConsumer = new CopyOnWriteArrayList<>();
-    this.mousePressedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseReleasedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseEnterConsumer = new CopyOnWriteArrayList<>();
-    this.mouseLeaveConsumer = new CopyOnWriteArrayList<>();
-    this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseWheelConsumer = new CopyOnWriteArrayList<>();
-    this.textChangedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseMovedConsumer = new CopyOnWriteArrayList<>();
-
-    this.setTextColor(DEFAULT_COLOR);
-    this.id = ++componentId;
-    this.x = x;
-    this.y = y;
-    this.textX = -1;
-    this.textY = -1;
-    this.x_Padding = this.getWidth() / 16;
-    this.setSelected(false);
-    this.initializeComponents();
   }
 
-  public Sound getHoverSound() {
-    return hoverSound;
-  }
-
-  public void setHoverSound(Sound hoverSound) {
-    this.hoverSound = hoverSound;
-    for (final GuiComponent component : this.getComponents()) {
-      component.setHoverSound(hoverSound);
-    }
-  }
-
-  public Font getFont() {
-    return this.font;
-  }
-
-  public String getText() {
-    return this.text;
-  }
-
-  public String getTextToRender(Graphics2D g) {
-    if (this.getText() == null) {
-      return "";
-    }
-    FontMetrics fm = g.getFontMetrics();
-    String newText = this.getText();
-
-    while (this.getText().length() > 1 && fm.stringWidth(newText) >= this.getWidth() - this.getTextXMargin()) {
-      newText = newText.substring(1, newText.length());
-    }
-    return newText;
-
-  }
-
-  public double getTextX() {
-    return this.textX;
-  }
-
-  public float getTextXMargin() {
-    return this.xMargin;
-  }
-
-  public double getTextY() {
-    return this.textY;
+  public Boolean drawTextShadow() {
+    return this.drawTextShadow;
   }
 
   /**
@@ -210,15 +151,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   /**
-   * Gets the click consumer.
-   *
-   * @return the click consumer
-   */
-  protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
-    return this.clickConsumer;
-  }
-
-  /**
    * Gets the component id.
    *
    * @return the component id
@@ -234,6 +166,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public CopyOnWriteArrayList<GuiComponent> getComponents() {
     return this.components;
+  }
+
+  public Font getFont() {
+    return this.font;
   }
 
   /**
@@ -259,6 +195,18 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.hoverConsumer;
   }
 
+  public Sound getHoverSound() {
+    return this.hoverSound;
+  }
+
+  public Color getHoverTextColor() {
+    return this.hoverTextColor;
+  }
+
+  public List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
+    return this.mouseDraggedConsumer;
+  }
+
   public List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
     return this.mouseEnterConsumer;
   }
@@ -267,20 +215,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.mouseLeaveConsumer;
   }
 
+  public List<Consumer<ComponentMouseEvent>> getMouseMovedConsumer() {
+    return this.mouseMovedConsumer;
+  }
+
   public List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
     return this.mousePressedConsumer;
   }
 
   public List<Consumer<ComponentMouseEvent>> getMouseReleasedConsumer() {
     return this.mouseReleasedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
-    return this.mouseDraggedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseMovedConsumer() {
-    return this.mouseMovedConsumer;
   }
 
   public List<Consumer<ComponentMouseWheelEvent>> getMouseWheelConsumer() {
@@ -300,6 +244,18 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.tag;
   }
 
+  public String getText() {
+    return this.text;
+  }
+
+  public int getTextAlignment() {
+    return this.textAlignment;
+  }
+
+  public int getTextAngle() {
+    return this.textAngle;
+  }
+
   /**
    * Gets the text color.
    *
@@ -309,8 +265,34 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.textColor;
   }
 
-  public void setTextAngle(int textAngle) {
-    this.textAngle = textAngle;
+  public Color getTextShadowColor() {
+    return this.textShadowColor;
+  }
+
+  public String getTextToRender(final Graphics2D g) {
+    if (this.getText() == null) {
+      return "";
+    }
+    final FontMetrics fm = g.getFontMetrics();
+    String newText = this.getText();
+
+    while (newText.length() > 1 && fm.stringWidth(newText) >= this.getWidth() - this.getTextXMargin()) {
+      newText = newText.substring(1, newText.length());
+    }
+    return newText;
+
+  }
+
+  public double getTextX() {
+    return this.textX;
+  }
+
+  public double getTextXMargin() {
+    return this.xMargin;
+  }
+
+  public double getTextY() {
+    return this.textY;
   }
 
   /**
@@ -343,10 +325,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.y;
   }
 
-  /**
-   * Initialize components.
-   */
-  protected abstract void initializeComponents();
+  public boolean isDragged() {
+    return this.isDragged();
+  }
 
   /**
    * Checks if is hovered.
@@ -355,10 +336,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public boolean isHovered() {
     return this.isHovered;
-  }
-
-  public boolean isDragged() {
-    return this.isDragged();
   }
 
   /**
@@ -443,17 +420,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /**
-   * Mouse event should be forwarded.
-   *
-   * @param e
-   *          the e
-   * @return true, if successful
-   */
-  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
-  }
-
   /*
    * (non-Javadoc)
    *
@@ -465,12 +431,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.isPressed = false;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getMouseLeaveConsumer().forEach(consumer -> consumer.accept(event));
-  }
-
-  @Override
-  public void mouseWheelMoved(MouseWheelEvent e) {
-    this.getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
-
   }
 
   /*
@@ -530,6 +490,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.getClickConsumer().forEach(consumer -> consumer.accept(event));
   }
 
+  @Override
+  public void mouseWheelMoved(final MouseWheelEvent e) {
+    this.getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
+
+  }
+
   /**
    * On clicked.
    *
@@ -548,6 +514,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
+  public void onMouseDragged(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMouseDraggedConsumer().contains(callback)) {
+      this.getMouseDraggedConsumer().add(callback);
+    }
+  }
+
   public void onMouseEnter(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseEnterConsumer().contains(callback)) {
       this.getMouseEnterConsumer().add(callback);
@@ -557,6 +529,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void onMouseLeave(final Consumer<ComponentMouseEvent> callback) {
     if (!this.getMouseLeaveConsumer().contains(callback)) {
       this.getMouseLeaveConsumer().add(callback);
+    }
+  }
+
+  public void onMouseMoved(final Consumer<ComponentMouseEvent> callback) {
+    if (!this.getMouseMovedConsumer().contains(callback)) {
+      this.getMouseMovedConsumer().add(callback);
     }
   }
 
@@ -572,23 +550,24 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  public void onMouseDragged(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseDraggedConsumer().contains(callback)) {
-      this.getMouseDraggedConsumer().add(callback);
-    }
-  }
-
-  public void onMouseMoved(final Consumer<ComponentMouseEvent> callback) {
-    if (!this.getMouseMovedConsumer().contains(callback)) {
-      this.getMouseMovedConsumer().add(callback);
-    }
-  }
-
   public void onMouseWheelScrolled(final Consumer<ComponentMouseWheelEvent> callback) {
     if (!this.getMouseWheelConsumer().contains(callback)) {
       this.getMouseWheelConsumer().add(callback);
     }
   }
+
+  public void onTextChanged(final Consumer<String> cons) {
+    this.textChangedConsumer.add(cons);
+  }
+
+  /**
+   * Sets the location.
+   *
+   * @param newX
+   *          the new x
+   * @param newY
+   *          the new y
+   */
 
   /**
    * Prepare.
@@ -610,15 +589,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       component.prepare();
     }
   }
-
-  /**
-   * Sets the location.
-   *
-   * @param newX
-   *          the new x
-   * @param newY
-   *          the new y
-   */
 
   /**
    * Render.
@@ -643,28 +613,31 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       this.defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
       switch (this.getTextAlignment()) {
       case TEXT_ALIGN_LEFT:
-        this.defaultTextX = this.x_Padding;
+        this.defaultTextX = this.getTextXMargin();
         break;
       case TEXT_ALIGN_RIGHT:
-        this.defaultTextX = this.getWidth() - this.x_Padding - fm.stringWidth(this.getTextToRender(g));
+        this.defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
         break;
       default:
       case TEXT_ALIGN_CENTER:
         this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2;
         break;
       }
-
-      if (this.getTextY() != 0) {
+      if (this.getTextY() == 0) {
         this.setTextY(this.defaultTextY);
       }
 
-      if (this.getTextX() != 0) {
+      if (this.getTextX() == 0) {
         this.setTextX(this.defaultTextX);
       }
       if (this.getTextAngle() == 0) {
-        RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+        if (this.drawTextShadow()) {
+          RenderEngine.drawTextWithShadow(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
+        } else {
+          RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+        }
       } else if (this.getTextAngle() == 90) {
-        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)) , this.getTextAngle(), this.getTextToRender(g));
+        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
       } else {
         RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
       }
@@ -680,64 +653,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  public void setFont(final Font font) {
-    this.font = font;
-    for (GuiComponent comp : this.getComponents()) {
-      comp.setFont(font);
-    }
-  }
-
-  public void setText(final String text) {
-    this.text = text;
-    for (Consumer<String> cons : this.textChangedConsumer) {
-      cons.accept(this.getText());
-    }
-  }
-
-  public int getTextAngle() {
-    return this.textAngle;
-  }
-
-  public void setFontSize(final int size) {
-    this.font = new Font(this.getFont().getName(), Font.PLAIN, size);
-  }
-
-  public void setTextX(final double x) {
-    this.textX = x;
-    switch (this.getTextAlignment()) {
-    case TEXT_ALIGN_LEFT:
-      this.setTextXMargin((float) (2 * this.getTextX()));
-      break;
-    case TEXT_ALIGN_CENTER:
-      this.setTextXMargin((float) (this.getWidth() * 1 / 16));
-      break;
-    case TEXT_ALIGN_RIGHT:
-      this.setTextXMargin((float) this.getTextX());
-      break;
-    default:
-      this.setTextXMargin((float) (2 * this.getTextX()));
-      break;
-    }
-  }
-
-  public void setTextY(final double y) {
-    this.textY = y;
-  }
-
   public void setBackGroundColor(final Color backGroundColor) {
     this.backGroundColor = backGroundColor;
-  }
-
-  public int getTextAlignment() {
-    return textAlignment;
-  }
-
-  public void setTextAlignment(int textAlignment) {
-    this.textAlignment = textAlignment;
-  }
-
-  public void onTextChanged(final Consumer<String> cons) {
-    this.textChangedConsumer.add(cons);
   }
 
   @Override
@@ -746,9 +663,31 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.height = height;
   }
 
+  public void setFont(final Font font) {
+    this.font = font;
+    for (final GuiComponent comp : this.getComponents()) {
+      comp.setFont(font);
+    }
+  }
+
+  public void setFontSize(final float size) {
+    this.font = this.getFont().deriveFont(size);
+  }
+
   @Override
   public void setHeight(final double height) {
     this.height = height;
+  }
+
+  public void setHoverSound(final Sound hoverSound) {
+    this.hoverSound = hoverSound;
+    for (final GuiComponent component : this.getComponents()) {
+      component.setHoverSound(hoverSound);
+    }
+  }
+
+  public void setHoverTextColor(final Color hoverTextColor) {
+    this.hoverTextColor = hoverTextColor;
   }
 
   @Override
@@ -761,14 +700,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public void setPosition(final Point2D newPosition) {
     this.x = newPosition.getX();
     this.y = newPosition.getY();
-  }
-
-  public void setX(double x) {
-    this.x = x;
-  }
-
-  public void setY(double y) {
-    this.y = y;
   }
 
   public void setSelected(final boolean bool) {
@@ -785,6 +716,22 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.tag = tag;
   }
 
+  public void setText(final String text) {
+    this.text = text;
+    for (final Consumer<String> cons : this.textChangedConsumer) {
+      cons.accept(this.getText());
+    }
+    this.setTextX(0);
+  }
+
+  public void setTextAlignment(final int textAlignment) {
+    this.textAlignment = textAlignment;
+  }
+
+  public void setTextAngle(final int textAngle) {
+    this.textAngle = textAngle;
+  }
+
   /**
    * Sets the text color.
    *
@@ -793,13 +740,43 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   public void setTextColor(final Color color) {
     this.textColor = color;
-    for (GuiComponent comp : this.getComponents()) {
+    for (final GuiComponent comp : this.getComponents()) {
       comp.setTextColor(color);
     }
   }
 
-  public void setTextXMargin(float xMargin) {
+  public void setTextShadow(final Boolean drawTextShadow) {
+    this.drawTextShadow = drawTextShadow;
+  }
+
+  public void setTextShadowColor(final Color textShadowColor) {
+    this.textShadowColor = textShadowColor;
+  }
+
+  public void setTextX(final double x) {
+    this.textX = x;
+    // switch (this.getTextAlignment()) {
+    // case TEXT_ALIGN_LEFT:
+    // this.setTextXMargin((float) (2 * this.getTextX()));
+    // break;
+    // case TEXT_ALIGN_CENTER:
+    // this.setTextXMargin((float) (this.getWidth() * 1 / 16));
+    // break;
+    // case TEXT_ALIGN_RIGHT:
+    // this.setTextXMargin((float) this.getTextX());
+    // break;
+    // default:
+    // this.setTextXMargin((float) (2 * this.getTextX()));
+    // break;
+    // }
+  }
+
+  public void setTextXMargin(final double xMargin) {
     this.xMargin = xMargin;
+  }
+
+  public void setTextY(final double y) {
+    this.textY = y;
   }
 
   /**
@@ -820,6 +797,14 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.width = width;
   }
 
+  public void setX(final double x) {
+    this.x = x;
+  }
+
+  public void setY(final double y) {
+    this.y = y;
+  }
+
   /**
    * Suspend.
    */
@@ -830,7 +815,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     Input.MOUSE.unregisterMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
-    for (IGuiComponent childComp : this.getComponents()) {
+    for (final IGuiComponent childComp : this.getComponents()) {
       childComp.suspend();
       this.getComponents().remove(childComp);
     }
@@ -841,11 +826,28 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   }
 
-  public Color getHoverTextColor() {
-    return hoverTextColor;
+  /**
+   * Gets the click consumer.
+   *
+   * @return the click consumer
+   */
+  protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
+    return this.clickConsumer;
   }
 
-  public void setHoverTextColor(Color hoverTextColor) {
-    this.hoverTextColor = hoverTextColor;
+  /**
+   * Initialize components.
+   */
+  protected abstract void initializeComponents();
+
+  /**
+   * Mouse event should be forwarded.
+   *
+   * @param e
+   *          the e
+   * @return true, if successful
+   */
+  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
   }
 }

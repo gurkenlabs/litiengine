@@ -16,6 +16,17 @@ import de.gurkenlabs.litiengine.physics.Path;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public abstract class PathFinder implements IPathFinder {
+  public Path findDirectPath(final Point2D start, final Point2D target) {
+    final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
+    path2D.moveTo(start.getX(), start.getY());
+    path2D.lineTo(target.getX(), target.getY());
+
+    final List<Point2D> points = new ArrayList<>();
+    points.add(start);
+    points.add(target);
+    return new Path(start, target, path2D, points);
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -31,17 +42,6 @@ public abstract class PathFinder implements IPathFinder {
     final double newWidth = rectangle.getWidth() + entity.getCollisionBox().getWidth() + Margin * 2;
     final double newHeight = rectangle.getHeight() + entity.getCollisionBox().getHeight() + Margin * 2;
     return new Rectangle2D.Double(newX, newY, newWidth, newHeight);
-  }
-
-  public Path findDirectPath(final Point2D start, final Point2D target) {
-    final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
-    path2D.moveTo(start.getX(), start.getY());
-    path2D.lineTo(target.getX(), target.getY());
-
-    final List<Point2D> points = new ArrayList<>();
-    points.add(start);
-    points.add(target);
-    return new Path(start, target, path2D, points);
   }
 
   /*

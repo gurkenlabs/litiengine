@@ -43,6 +43,19 @@ public class MessageHandlerProvider implements IMessageHandlerProvider {
     return null;
   }
 
+  @Override
+  public void register(final MessageType messageType, final IMessageHandler messageHandler) {
+    if (!this.getMessageHandlers().containsKey(messageType)) {
+      this.getMessageHandlers().put(messageType, new ArrayList<IMessageHandler>());
+    }
+
+    if (this.getMessageHandlers().get(messageType).contains(messageHandler)) {
+      return;
+    }
+
+    this.getMessageHandlers().get(messageType).add(messageHandler);
+  }
+
   /**
    * Gets the message handlers.
    *
@@ -57,18 +70,5 @@ public class MessageHandlerProvider implements IMessageHandlerProvider {
    */
   protected void initializeHandlers() {
 
-  }
-
-  @Override
-  public void register(final MessageType messageType, final IMessageHandler messageHandler) {
-    if (!this.getMessageHandlers().containsKey(messageType)) {
-      this.getMessageHandlers().put(messageType, new ArrayList<IMessageHandler>());
-    }
-
-    if (this.getMessageHandlers().get(messageType).contains(messageHandler)) {
-      return;
-    }
-
-    this.getMessageHandlers().get(messageType).add(messageHandler);
   }
 }

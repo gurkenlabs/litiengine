@@ -5,9 +5,28 @@ import java.util.function.Consumer;
 import de.gurkenlabs.core.ILaunchable;
 
 public interface IGameLoop extends ILaunchable {
+  /**
+   * Attaches the update method of the specified
+   * {@link de.gurkenlabs.litiengine.IUpdatable IUpdatable} instance to be
+   * called every tick. The tick rate can be configured in the client
+   * configuration and is independant from rendering.
+   * 
+   * @param updatable
+   */
+  public void attach(final IUpdateable updatable);
+
   public long convertToMs(final long ticks);
 
   public long convertToTicks(final int ms);
+
+  /**
+   * Detaches the specified instance from the game loop.
+   * 
+   * @param updatable
+   */
+  public void detach(final IUpdateable updatable);
+
+  public void execute(int delay, Consumer<Long> action);
 
   /**
    * Gets the time passed since the last tick in ms.
@@ -35,20 +54,5 @@ public interface IGameLoop extends ILaunchable {
 
   public void onUpsTracked(final Consumer<Integer> upsConsumer);
 
-  /**
-   * Attaches the update method of the specified {@link de.gurkenlabs.litiengine.IUpdatable IUpdatable} instance to be called every tick.
-   * The tick rate can be configured in the client configuration and is independant from rendering.
-   * @param updatable
-   */
-  public void attach(final IUpdateable updatable);
-  
-  /**
-   * Detaches the specified instance from the game loop.
-   * @param updatable
-   */
-  public void detach(final IUpdateable updatable);
-  
-  public void execute(int delay, Consumer<Long> action);
-  
   public void setTimeScale(float timeScale);
 }

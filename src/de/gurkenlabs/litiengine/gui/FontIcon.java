@@ -31,8 +31,8 @@ public class FontIcon {
     this.font = font;
     this.text = String.valueOf(text);
   }
-  
-  public FontIcon(final Font font, final String unicode){
+
+  public FontIcon(final Font font, final String unicode) {
     this.font = font;
     this.text = unicode;
   }

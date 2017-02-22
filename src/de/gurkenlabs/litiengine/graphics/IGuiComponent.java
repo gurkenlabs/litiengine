@@ -37,13 +37,7 @@ public interface IGuiComponent extends IRenderable {
    */
   public void prepare();
 
-  void setDimension(double width, double height);
-
   public void setHeight(double height);
-
-  void setPosition(double x, double y);
-
-  void setPosition(Point2D newPosition);
 
   public void setWidth(double width);
 
@@ -51,4 +45,10 @@ public interface IGuiComponent extends IRenderable {
    * Suspend.
    */
   public void suspend();
+
+  void setDimension(double width, double height);
+
+  void setPosition(double x, double y);
+
+  void setPosition(Point2D newPosition);
 }

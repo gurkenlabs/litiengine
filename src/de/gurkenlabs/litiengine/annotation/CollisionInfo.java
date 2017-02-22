@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface CollisionInfo {
+  CollisionAlign align() default CollisionAlign.CENTER;
+
   /**
    * Collision.
    *
@@ -33,8 +35,6 @@ public @interface CollisionInfo {
    * @return the float
    */
   int collisionBoxWidth() default -1;
-
-  CollisionAlign align() default CollisionAlign.CENTER;
 
   CollisionValign valign() default CollisionValign.DOWN;
 }

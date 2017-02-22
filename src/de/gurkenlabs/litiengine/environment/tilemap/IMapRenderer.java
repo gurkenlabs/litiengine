@@ -31,7 +31,8 @@ public interface IMapRenderer {
   public MapOrientation getSupportedOrientation();
 
   /**
-   * Renders the entire map (without overlay layers) onto the specified graphics object.
+   * Renders the entire map (without overlay layers) onto the specified graphics
+   * object.
    *
    * @param g
    *          the g
@@ -39,12 +40,12 @@ public interface IMapRenderer {
    *          the map
    */
   public void render(Graphics2D g, IMap map);
-  
+
   public void render(Graphics2D g, IMap map, double offsetX, double offsetY);
-  
+
   /*
-   * Renders all layers (without the overlay layers) of the specified map.
-   * The viewport defines the region of the map that is about to be rendered.
+   * Renders all layers (without the overlay layers) of the specified map. The
+   * viewport defines the region of the map that is about to be rendered.
    */
   public void render(Graphics2D g, IMap map, Rectangle2D viewport);
 

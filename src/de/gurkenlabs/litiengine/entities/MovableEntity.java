@@ -10,14 +10,13 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MovableEntity extends CollisionEntity implements IMovableEntity {
-  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
-  private short velocity;
   private int acceleration;
   private int deceleration;
+  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   private Point2D moveDestination;
-
   private boolean turnOnMove;
 
+  private short velocity;
 
   public MovableEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -29,22 +28,23 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
+  public int getAcceleration() {
+    return this.acceleration;
+  }
+
+  @Override
+  public int getDeceleration() {
+    return this.deceleration;
+  }
+
+  @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
   }
 
-
   @Override
   public float getVelocity() {
     return this.velocity;
-  }
-
-  public void setVelocity(short velocity) {
-    this.velocity = velocity;
-  }
-
-  public void setAcceleration(int acceleration) {
-    this.acceleration = acceleration;
   }
 
   @Override
@@ -57,8 +57,18 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
+  public void setAcceleration(final int acceleration) {
+    this.acceleration = acceleration;
+  }
+
+  @Override
   public void setAngle(final float angle) {
     super.setAngle(angle);
+  }
+
+  @Override
+  public void setDeceleration(final int deceleration) {
+    this.deceleration = deceleration;
   }
 
   /*
@@ -91,22 +101,13 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
+  public void setVelocity(final short velocity) {
+    this.velocity = velocity;
+  }
+
+  @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
   }
 
-  @Override
-  public int getAcceleration() {
-    return this.acceleration;
-  }
-
-  public int getDeceleration() {
-    return this.deceleration;
-  }
-
-  public void setDeceleration(int deceleration) {
-    this.deceleration = deceleration;
-  }
-  
-  
 }

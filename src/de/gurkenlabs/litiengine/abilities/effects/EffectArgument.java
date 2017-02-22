@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.abilities.effects;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 public class EffectArgument {
-  private final IEffect effect;
   private final ICombatEntity combatEntity;
+  private final IEffect effect;
 
   public EffectArgument(final IEffect effect, final ICombatEntity combatEntity) {
     this.effect = effect;

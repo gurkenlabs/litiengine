@@ -19,6 +19,17 @@ public class Configuration {
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
+  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
+    try {
+      final Properties groupProperties = new Properties();
+      group.storeProperties(groupProperties);
+      groupProperties.store(out, group.getPrefix() + "SETTINGS");
+      out.flush();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   private final List<ConfigurationGroup> configurationGroups;
 
   private final String fileName;
@@ -37,10 +48,6 @@ public class Configuration {
     }
   }
 
-  public void load() {
-    this.loadFromFile();
-  }
-
   @SuppressWarnings("unchecked")
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
@@ -53,10 +60,10 @@ public class Configuration {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends ConfigurationGroup> T getConfigurationGroup(String prefix) {
+  public <T extends ConfigurationGroup> T getConfigurationGroup(final String prefix) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
 
-      ConfigurationGroupInfo info = group.getClass().getAnnotation(ConfigurationGroupInfo.class);
+      final ConfigurationGroupInfo info = group.getClass().getAnnotation(ConfigurationGroupInfo.class);
       if (info == null) {
         continue;
       }
@@ -77,6 +84,10 @@ public class Configuration {
     return this.fileName;
   }
 
+  public void load() {
+    this.loadFromFile();
+  }
+
   public void save() {
     final File settingsFile = new File(this.getFileName());
     try {
@@ -91,14 +102,9 @@ public class Configuration {
     }
   }
 
-  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
-    try {
-      final Properties groupProperties = new Properties();
-      group.storeProperties(groupProperties);
-      groupProperties.store(out, group.getPrefix() + "SETTINGS");
-      out.flush();
-    } catch (final IOException e) {
-      e.printStackTrace();
+  private void createDefaultSettingsFile(final OutputStream out) {
+    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+      storeConfigurationGroup(out, group);
     }
   }
 
@@ -109,12 +115,6 @@ public class Configuration {
           group.initializeByProperty(key, properties.getProperty(key));
         }
       }
-    }
-  }
-
-  private void createDefaultSettingsFile(final OutputStream out) {
-    for (final ConfigurationGroup group : this.getConfigurationGroups()) {
-      storeConfigurationGroup(out, group);
     }
   }
 

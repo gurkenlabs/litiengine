@@ -18,17 +18,17 @@ import de.gurkenlabs.litiengine.input.IKeyObserver;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class TextFieldComponent extends ImageComponent implements IKeyObserver {
-  public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
+  public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
   private final List<Consumer<String>> changeConfirmedConsumers;
   private boolean cursorVisible;
-  private long lastToggled;
   private final int flickerDelay;
+  private String format;
 
   private String fullText;
+  private long lastToggled;
   private int maxLength = 0;
-  private String format;
 
   public TextFieldComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text) {
     super(x, y, width, height, spritesheet, text, null);
@@ -49,6 +49,19 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     });
 
     this.setTextAlignment(GuiComponent.TEXT_ALIGN_LEFT);
+  }
+
+  public String getFormat() {
+    return this.format;
+  }
+
+  public int getMaxLength() {
+    return this.maxLength;
+  }
+
+  @Override
+  public String getText() {
+    return this.fullText;
   }
 
   @Override
@@ -88,7 +101,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       break;
     case KeyEvent.VK_SPACE:
       if (this.getText() != "") {
-        this.setText(getText() + " ");
+        this.setText(this.getText() + " ");
       }
       break;
     case KeyEvent.VK_ENTER:
@@ -102,15 +115,15 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
         break;
       }
 
-      String text = Input.KEYBOARD.getText(event);
+      final String text = Input.KEYBOARD.getText(event);
       if (text == null || text.isEmpty()) {
         break;
       }
 
       // regex check to ensure certain formats
       if (this.getFormat() != null && !this.getFormat().isEmpty()) {
-        Pattern pat = Pattern.compile(this.getFormat());
-        Matcher mat = pat.matcher(this.getText() + text);
+        final Pattern pat = Pattern.compile(this.getFormat());
+        final Matcher mat = pat.matcher(this.getText() + text);
         if (!mat.matches()) {
           break;
         }
@@ -126,14 +139,8 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     }
   }
 
-  @Override
-  public String getText() {
-    return this.fullText;
-  }
-
-  @Override
-  public void setText(String text) {
-    this.fullText = text;
+  public void onChangeConfirmed(final Consumer<String> cons) {
+    this.changeConfirmedConsumers.add(cons);
   }
 
   @Override
@@ -153,24 +160,17 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     }
   }
 
-  public int getMaxLength() {
-    return maxLength;
-  }
-
-  public void setMaxLength(int maxLength) {
-    this.maxLength = maxLength;
-  }
-
-  public String getFormat() {
-    return format;
-  }
-
-  public void setFormat(String format) {
+  public void setFormat(final String format) {
     this.format = format;
   }
 
-  public void onChangeConfirmed(Consumer<String> cons) {
-    this.changeConfirmedConsumers.add(cons);
+  public void setMaxLength(final int maxLength) {
+    this.maxLength = maxLength;
+  }
+
+  @Override
+  public void setText(final String text) {
+    this.fullText = text;
   }
 
 }

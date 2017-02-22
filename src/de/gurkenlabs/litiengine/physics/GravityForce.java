@@ -7,10 +7,10 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class GravityForce extends Force {
+  private final Direction direction;
+
   /** The force entiy. */
   private final IEntity forceEntiy;
-
-  private final Direction direction;
 
   public GravityForce(final IEntity forceEntity, final float strength, final Direction dir) {
     super(forceEntity.getDimensionCenter(), strength, 0);

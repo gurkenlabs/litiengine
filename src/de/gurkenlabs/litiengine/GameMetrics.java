@@ -20,13 +20,11 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
   private final List<Long> bytesSent;
 
-  /** The fps. */
-  private final List<Long> fps;
-
-  private final List<Long> ups;
-
   /** The down stream in bytes. */
   private long downStreamInBytes;
+
+  /** The fps. */
+  private final List<Long> fps;
 
   /** The frames per second. */
   private long framesPerSecond;
@@ -41,6 +39,8 @@ public class GameMetrics implements IUpdateable, IRenderable {
   private long ping;
 
   private long updatesPerSecond;
+
+  private final List<Long> ups;
 
   /** The up stream in bytes. */
   private long upStreamInBytes;

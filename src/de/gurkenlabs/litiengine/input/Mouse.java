@@ -27,39 +27,39 @@ import de.gurkenlabs.util.MathUtilities;
  */
 public class Mouse implements IMouse {
 
+  private boolean grabMouse;
+
+  private boolean isLeftMouseButtonDown;
+
+  private boolean isRightMouseButtonDown;
+
+  private Point lastLocation;
+
+  /** The position. */
+  private Point location;
+  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
+  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
   /** The mouse listeners. */
   private final List<MouseListener> mouseListeners;
-
   /** The mouse motion listeners. */
   private final List<MouseMotionListener> mouseMotionListeners;
+
+  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
+
+  private final List<Consumer<MouseEvent>> mousePressedConsumer;
+
+  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
 
   /** The mouse wheel listeners. */
   private final List<MouseWheelListener> mouseWheelListeners;
 
-  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
-
-  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
-  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
-  private final List<Consumer<MouseEvent>> mousePressedConsumer;
-  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
-  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
+  /** The pressed. */
+  private boolean pressed;
+  private Robot robot;
 
   private final float sensitivity;
 
-  private Robot robot;
-
-  /** The position. */
-  private Point location;
-
-  /** The pressed. */
-  private boolean pressed;
-
-  private boolean isLeftMouseButtonDown;
-  private boolean isRightMouseButtonDown;
-
-  private boolean grabMouse;
-
-  private Point lastLocation;
+  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
 
   /**
    * Instantiates a new mouse.
@@ -104,6 +104,11 @@ public class Mouse implements IMouse {
   }
 
   @Override
+  public boolean isGrabMouse() {
+    return this.grabMouse;
+  }
+
+  @Override
   public boolean isLeftMouseButtonDown() {
     return this.isLeftMouseButtonDown;
   }
@@ -133,7 +138,7 @@ public class Mouse implements IMouse {
     this.setLocation(e);
     this.mouseListeners.forEach(listener -> listener.mouseClicked(this.createEvent(e)));
 
-    for (Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
+    for (final Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
       cons.accept(e);
     }
   }
@@ -149,7 +154,7 @@ public class Mouse implements IMouse {
     this.setLocation(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(this.createEvent(e)));
 
-    for (Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
+    for (final Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
       cons.accept(e);
     }
   }
@@ -193,7 +198,7 @@ public class Mouse implements IMouse {
     this.setLocation(e);
     this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(this.createEvent(e)));
 
-    for (Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
+    for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
       cons.accept(e);
     }
   }
@@ -217,7 +222,7 @@ public class Mouse implements IMouse {
       this.isRightMouseButtonDown = true;
     }
 
-    for (Consumer<MouseEvent> cons : this.mousePressedConsumer) {
+    for (final Consumer<MouseEvent> cons : this.mousePressedConsumer) {
       cons.accept(e);
     }
   }
@@ -241,7 +246,7 @@ public class Mouse implements IMouse {
       this.isRightMouseButtonDown = false;
     }
 
-    for (Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
+    for (final Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
       cons.accept(e);
     }
   }
@@ -256,6 +261,31 @@ public class Mouse implements IMouse {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
     this.wheelMovedConsumer.forEach(cons -> cons.accept(e));
+  }
+
+  @Override
+  public void onClicked(final Consumer<MouseEvent> consumer) {
+    this.mouseClickedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onDragged(final Consumer<MouseEvent> consumer) {
+    this.mouseDraggedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onMoved(final Consumer<MouseEvent> consumer) {
+    this.mouseMovedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onPressed(final Consumer<MouseEvent> consumer) {
+    this.mousePressedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onReleased(final Consumer<MouseEvent> consumer) {
+    this.mouseReleasedConsumer.add(consumer);
   }
 
   @Override
@@ -311,13 +341,14 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void setGrabMouse(boolean grab) {
+  public void setGrabMouse(final boolean grab) {
     this.grabMouse = grab;
   }
 
   @Override
-  public boolean isGrabMouse() {
-    return this.grabMouse;
+  public void setLocation(final Point adjustMouse) {
+    this.location = adjustMouse;
+    this.lastLocation = adjustMouse;
   }
 
   /*
@@ -368,37 +399,12 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.remove(listener);
   }
 
-  @Override
-  public void onClicked(Consumer<MouseEvent> consumer) {
-    this.mouseClickedConsumer.add(consumer);
+  private MouseEvent createEvent(final MouseEvent original) {
+    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+        original.getButton());
+    return event;
   }
 
-  @Override
-  public void onPressed(Consumer<MouseEvent> consumer) {
-    this.mousePressedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onDragged(Consumer<MouseEvent> consumer) {
-    this.mouseDraggedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onReleased(Consumer<MouseEvent> consumer) {
-    this.mouseReleasedConsumer.add(consumer);
-  }
-
-  @Override
-  public void onMoved(Consumer<MouseEvent> consumer) {
-    this.mouseMovedConsumer.add(consumer);
-  }
-
-  @Override
-  public void setLocation(Point adjustMouse) {
-    this.location = adjustMouse;
-    this.lastLocation = adjustMouse;
-  }
-  
   /**
    * Calculates the location of the ingame mouse by the position diff and locks
    * the original mouse to the center of the screen.
@@ -406,7 +412,7 @@ public class Mouse implements IMouse {
    * @param mouseLocation
    *          The location of the original mouse.
    */
-  private void setLocation(MouseEvent e) {
+  private void setLocation(final MouseEvent e) {
     if (this.grabMouse && !Game.getScreenManager().isFocusOwner()) {
       return;
     }
@@ -440,12 +446,6 @@ public class Mouse implements IMouse {
     newY = MathUtilities.clamp(newY, 0, (int) Game.getScreenManager().getResolution().getHeight());
 
     this.location = new Point(newX, newY);
-  }
-
-  private MouseEvent createEvent(final MouseEvent original) {
-    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
-        original.getButton());
-    return event;
   }
 
   /**

@@ -19,6 +19,8 @@ public class UdpServer implements IServer {
   /** The client connection manager. */
   private final IClientConnectionManager clientConnectionManager;
 
+  private final ICommandManager commandManager;
+
   /** The message handler provider. */
   private final IMessageHandlerProvider messageHandlerProvider;
 
@@ -27,8 +29,6 @@ public class UdpServer implements IServer {
 
   /** The sender. */
   private final IPacketSender sender;
-
-  private final ICommandManager commandManager;
 
   public UdpServer(final int listenPort, final IMessageHandlerProvider provider) {
     this.receiver = new UdpPacketReceiver(listenPort);
@@ -62,12 +62,6 @@ public class UdpServer implements IServer {
     return this.sender;
   }
 
-  protected boolean handleShutdownCommand(final String[] command) {
-    System.out.println("Shutting down server...");
-    this.terminate();
-    return true;
-  }
-
   @Override
   public void packetReceived(final byte[] data, final InetAddress address, final int port) {
     if (data.length == 0) {
@@ -97,5 +91,11 @@ public class UdpServer implements IServer {
     this.receiver.terminate();
     this.getCommandManager().terminate();
     System.exit(-1);
+  }
+
+  protected boolean handleShutdownCommand(final String[] command) {
+    System.out.println("Shutting down server...");
+    this.terminate();
+    return true;
   }
 }

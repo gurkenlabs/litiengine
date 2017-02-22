@@ -31,39 +31,32 @@ import de.gurkenlabs.util.MathUtilities;
 public class RenderComponent extends Canvas implements IRenderComponent {
   private static final long serialVersionUID = 5092360478850476013L;
 
-  private final List<Consumer<Graphics2D>> renderedConsumer;
-
-  private final List<Consumer<Integer>> fpsChangedConsumer;
-
   private BufferStrategy bufferStrategy;
 
-  /** The last fps time. */
-  private long lastFpsTime = System.currentTimeMillis();
-
-  /** The frame count. */
-  private int frameCount = 0;
-
-  private boolean takeScreenShot;
+  private float currentAlpha;
 
   private Image cursorImage;
+
   private int cursorOffsetX;
 
   private int cursorOffsetY;
 
-  private int fadeInTime;
   private long fadeInStart;
-  private int fadeOutTime;
+
+  private int fadeInTime;
   private long fadeOutStart;
-  private float currentAlpha;
 
-  @Override
-  public void init() {
-    this.createBufferStrategy(3);
-    this.bufferStrategy = this.getBufferStrategy();
-    this.currentAlpha = 1.1f;
-  }
+  private int fadeOutTime;
 
-  public RenderComponent(Dimension size) {
+  private final List<Consumer<Integer>> fpsChangedConsumer;
+  /** The frame count. */
+  private int frameCount = 0;
+  /** The last fps time. */
+  private long lastFpsTime = System.currentTimeMillis();
+  private final List<Consumer<Graphics2D>> renderedConsumer;
+  private boolean takeScreenShot;
+
+  public RenderComponent(final Dimension size) {
     this.renderedConsumer = new CopyOnWriteArrayList<>();
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
 
@@ -77,7 +70,60 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.setPreferredSize(size);
   }
 
-  public void render(IRenderable screen) {
+  @Override
+  public void fadeIn(final int ms) {
+    this.fadeOutStart = -1;
+    this.fadeOutTime = -1;
+    this.fadeInStart = Game.getLoop().getTicks();
+    this.fadeInTime = ms;
+  }
+
+  @Override
+  public void fadeOut(final int ms) {
+    this.fadeInStart = -1;
+    this.fadeInTime = -1;
+    this.fadeOutStart = Game.getLoop().getTicks();
+    this.fadeOutTime = ms;
+  }
+
+  @Override
+  public Image getCursorImage() {
+    return this.cursorImage;
+  }
+
+  public int getCursorOffsetX() {
+    return this.cursorOffsetX;
+  }
+
+  public int getCursorOffsetY() {
+    return this.cursorOffsetY;
+  }
+
+  @Override
+  public void init() {
+    this.createBufferStrategy(3);
+    this.bufferStrategy = this.getBufferStrategy();
+    this.currentAlpha = 1.1f;
+  }
+
+  @Override
+  public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
+    if (this.fpsChangedConsumer.contains(fpsConsumer)) {
+      return;
+    }
+
+    this.fpsChangedConsumer.add(fpsConsumer);
+  }
+
+  @Override
+  public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
+    if (!this.renderedConsumer.contains(renderedConsumer)) {
+      this.renderedConsumer.add(renderedConsumer);
+    }
+  }
+
+  @Override
+  public void render(final IRenderable screen) {
     final long currentMillis = System.currentTimeMillis();
     final Graphics2D g = (Graphics2D) this.bufferStrategy.getDrawGraphics();
 
@@ -86,12 +132,12 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-    g.setClip(new Rectangle(0, 0, (int) this.getWidth(), (int) this.getHeight()));
+    g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
 
     screen.render(g);
-    Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
+    final Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
     if (this.cursorImage != null && (Input.MOUSE.isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
-      Point2D locationWithOffset = new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY());
+      final Point2D locationWithOffset = new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY());
       RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
     }
 
@@ -134,6 +180,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   }
 
+  @Override
   public void setCursor(final Image image) {
     this.cursorImage = image;
     if (this.cursorImage != null) {
@@ -146,14 +193,15 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   }
 
   @Override
-  public void setCursor(Image image, int offsetX, int offsetY) {
+  public void setCursor(final Image image, final int offsetX, final int offsetY) {
     this.setCursor(image);
     this.setCursorOffset(offsetX, offsetY);
   }
 
   @Override
-  public Image getCursorImage() {
-    return this.cursorImage;
+  public void setCursorOffset(final int x, final int y) {
+    this.setCursorOffsetX(x);
+    this.setCursorOffsetY(y);
   }
 
   @Override
@@ -167,31 +215,31 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   }
 
   @Override
-  public void setCursorOffset(int x, int y) {
-    this.setCursorOffsetX(x);
-    this.setCursorOffsetY(y);
+  public void takeScreenshot() {
+    this.takeScreenShot = true;
   }
 
-  public int getCursorOffsetX() {
-    return this.cursorOffsetX;
-  }
+  private void handleFade() {
+    if (this.fadeOutStart != -1) {
+      final long timePassed = Game.getLoop().getDeltaTime(this.fadeOutStart);
+      this.currentAlpha = MathUtilities.clamp(1 - timePassed / (float) this.fadeOutTime, 0, 1);
+      if (this.currentAlpha == 0) {
+        this.fadeOutStart = -1;
+        this.fadeOutTime = -1;
+      }
 
-  public int getCursorOffsetY() {
-    return this.cursorOffsetY;
-  }
-
-  public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
-    if (!this.renderedConsumer.contains(renderedConsumer)) {
-      this.renderedConsumer.add(renderedConsumer);
-    }
-  }
-
-  public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
-    if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
     }
 
-    this.fpsChangedConsumer.add(fpsConsumer);
+    if (this.fadeInStart != -1) {
+      final long timePassed = Game.getLoop().getDeltaTime(this.fadeInStart);
+      this.currentAlpha = MathUtilities.clamp(timePassed / (float) this.fadeInTime, 0, 1);
+      if (this.currentAlpha == 1) {
+        this.fadeInStart = -1;
+        this.fadeInTime = -1;
+        this.currentAlpha = -1;
+      }
+    }
   }
 
   private void saveScreenShot(final BufferedImage img) {
@@ -209,50 +257,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
       }
     } finally {
       this.takeScreenShot = false;
-    }
-  }
-
-  @Override
-  public void takeScreenshot() {
-    this.takeScreenShot = true;
-  }
-
-  @Override
-  public void fadeOut(int ms) {
-    this.fadeInStart = -1;
-    this.fadeInTime = -1;
-    this.fadeOutStart = Game.getLoop().getTicks();
-    this.fadeOutTime = ms;
-  }
-
-  @Override
-  public void fadeIn(int ms) {
-    this.fadeOutStart = -1;
-    this.fadeOutTime = -1;
-    this.fadeInStart = Game.getLoop().getTicks();
-    this.fadeInTime = ms;
-  }
-
-  private void handleFade() {
-    if (this.fadeOutStart != -1) {
-      long timePassed = Game.getLoop().getDeltaTime(this.fadeOutStart);
-      this.currentAlpha = MathUtilities.clamp(1 - timePassed / (float) this.fadeOutTime, 0, 1);
-      if (this.currentAlpha == 0) {
-        this.fadeOutStart = -1;
-        this.fadeOutTime = -1;
-      }
-
-      return;
-    }
-
-    if (this.fadeInStart != -1) {
-      long timePassed = Game.getLoop().getDeltaTime(this.fadeInStart);
-      this.currentAlpha = MathUtilities.clamp(timePassed / (float) this.fadeInTime, 0, 1);
-      if (this.currentAlpha == 1) {
-        this.fadeInStart = -1;
-        this.fadeInTime = -1;
-        this.currentAlpha = -1;
-      }
     }
   }
 }

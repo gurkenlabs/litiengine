@@ -48,35 +48,6 @@ public class Attribute<T extends Number> {
   }
 
   /**
-   * Apply modifiers.
-   *
-   * @param baseValue
-   *          the base value
-   * @return the t
-   */
-  protected T applyModifiers(final T baseValue) {
-    if (this.getModifiers().size() == 0) {
-      return baseValue;
-    }
-
-    T currentValue = baseValue;
-    for (final AttributeModifier<T> modifier : this.getModifiers()) {
-      currentValue = modifier.modify(currentValue);
-    }
-
-    return currentValue;
-  }
-
-  /**
-   * Gets the base value.
-   *
-   * @return the base value
-   */
-  protected T getBaseValue() {
-    return this.baseValue;
-  }
-
-  /**
    * Gets the current value.
    *
    * @return the current value
@@ -121,6 +92,35 @@ public class Attribute<T extends Number> {
 
     this.getModifiers().remove(modifier);
     Collections.sort(this.getModifiers());
+  }
+
+  /**
+   * Apply modifiers.
+   *
+   * @param baseValue
+   *          the base value
+   * @return the t
+   */
+  protected T applyModifiers(final T baseValue) {
+    if (this.getModifiers().size() == 0) {
+      return baseValue;
+    }
+
+    T currentValue = baseValue;
+    for (final AttributeModifier<T> modifier : this.getModifiers()) {
+      currentValue = modifier.modify(currentValue);
+    }
+
+    return currentValue;
+  }
+
+  /**
+   * Gets the base value.
+   *
+   * @return the base value
+   */
+  protected T getBaseValue() {
+    return this.baseValue;
   }
 
   /**

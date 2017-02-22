@@ -29,16 +29,6 @@ public abstract class ConfigurationGroup {
     this.prefix = info.prefix();
   }
 
-  private Field getField(final String fieldName) {
-    for (final Field field : this.getClass().getDeclaredFields()) {
-      if (field.getName().equalsIgnoreCase(fieldName)) {
-        return field;
-      }
-    }
-
-    return null;
-  }
-
   /**
    * Gets the prefix.
    *
@@ -46,22 +36,6 @@ public abstract class ConfigurationGroup {
    */
   public String getPrefix() {
     return this.prefix != null ? this.prefix : "";
-  }
-
-  private Method getSetter(final String fieldName, final Class<?> fieldType) {
-    for (final Method method : this.getClass().getMethods()) {
-      // method must start with "set" and have only one parameter, mathich the
-      // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
-        if (!method.isAccessible()) {
-          method.setAccessible(true);
-        }
-
-        return method;
-      }
-    }
-
-    return null;
   }
 
   /**
@@ -110,10 +84,9 @@ public abstract class ConfigurationGroup {
         this.setPropertyValue(propertyName, Long.parseLong(value));
       } else if (field.getType().equals(String.class)) {
         this.setPropertyValue(propertyName, value);
-      } else if(field.getType().equals(String[].class)){
+      } else if (field.getType().equals(String[].class)) {
         this.setPropertyValue(propertyName, value.split(","));
-      }
-        else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+      } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
         final Object[] enumArray = field.getType().getEnumConstants();
 
         for (final Object enumConst : enumArray) {
@@ -123,35 +96,6 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final NumberFormatException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private <T> void setPropertyValue(final String propertyName, final T value) {
-    try {
-      final Method method = this.getSetter(propertyName, value.getClass());
-      if (method != null) {
-        // set the new value with the setter
-        method.invoke(this, value);
-      } else {
-        // if no setter is present, try to set the field directly
-        for (final Field field : this.getClass().getDeclaredFields()) {
-          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
-            if (!field.isAccessible()) {
-              field.setAccessible(true);
-            }
-
-            field.set(this, value);
-          }
-        }
-      }
-    } catch (final SecurityException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final InvocationTargetException e) {
       e.printStackTrace();
     }
   }
@@ -189,9 +133,9 @@ public abstract class ConfigurationGroup {
           properties.setProperty(this.getPrefix() + field.getName(), Long.toString(field.getLong(this)));
         } else if (field.getType().equals(String.class)) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
-        } else if (field.getType().equals(String[].class)) {   
-          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[])field.get(this)) : "");
-        }else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+        } else if (field.getType().equals(String[].class)) {
+          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
+        } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
           final String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
           properties.setProperty(this.getPrefix() + field.getName(), value);
         }
@@ -199,6 +143,61 @@ public abstract class ConfigurationGroup {
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
     } catch (final IllegalAccessException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private Field getField(final String fieldName) {
+    for (final Field field : this.getClass().getDeclaredFields()) {
+      if (field.getName().equalsIgnoreCase(fieldName)) {
+        return field;
+      }
+    }
+
+    return null;
+  }
+
+  private Method getSetter(final String fieldName, final Class<?> fieldType) {
+    for (final Method method : this.getClass().getMethods()) {
+      // method must start with "set" and have only one parameter, mathich the
+      // specified fieldType
+      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
+        if (!method.isAccessible()) {
+          method.setAccessible(true);
+        }
+
+        return method;
+      }
+    }
+
+    return null;
+  }
+
+  private <T> void setPropertyValue(final String propertyName, final T value) {
+    try {
+      final Method method = this.getSetter(propertyName, value.getClass());
+      if (method != null) {
+        // set the new value with the setter
+        method.invoke(this, value);
+      } else {
+        // if no setter is present, try to set the field directly
+        for (final Field field : this.getClass().getDeclaredFields()) {
+          if (field.getName().equals(propertyName) && field.getType().equals(value.getClass())) {
+            if (!field.isAccessible()) {
+              field.setAccessible(true);
+            }
+
+            field.set(this, value);
+          }
+        }
+      }
+    } catch (final SecurityException e) {
+      e.printStackTrace();
+    } catch (final IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (final IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (final InvocationTargetException e) {
       e.printStackTrace();
     }
   }

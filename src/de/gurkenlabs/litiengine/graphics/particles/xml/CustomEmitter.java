@@ -29,20 +29,50 @@ import de.gurkenlabs.util.io.FileUtilities;
 public class CustomEmitter extends Emitter {
   public static Map<String, CustomEmitterData> loadedCustomEmitters;
 
-  private CustomEmitterData emitterData;
   static {
     loadedCustomEmitters = new ConcurrentHashMap<>();
   }
 
+  public static CustomEmitterData load(String emitterXml) {
+    final String name = FileUtilities.getFileName(emitterXml);
+    if (loadedCustomEmitters.containsKey(name)) {
+      return loadedCustomEmitters.get(name);
+    }
+
+    try {
+      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
+      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+      if (!new File(emitterXml).exists()) {
+        emitterXml = Paths.get(Game.getInfo().getEmitterDirectory(), emitterXml).toString();
+      }
+
+      final InputStream xml = FileUtilities.getGameResource(emitterXml);
+      if (xml == null) {
+        return null;
+      }
+
+      final CustomEmitterData loaded = (CustomEmitterData) jaxbUnmarshaller.unmarshal(xml);
+      loadedCustomEmitters.put(name, loaded);
+      return loaded;
+    } catch (final JAXBException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
+  private CustomEmitterData emitterData;
+
   public CustomEmitter(final double originX, final double originY, final String emitterXml) {
     super(originX, originY);
-    
+
     this.emitterData = load(emitterXml);
-    if(this.emitterData == null){
+    if (this.emitterData == null) {
       this.deactivate();
       return;
     }
-    
+
     // set emitter parameters
     this.setMaxParticles(this.getEmitterData().getMaxParticles());
     this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
@@ -56,36 +86,6 @@ public class CustomEmitter extends Emitter {
     for (final ParticleColor color : this.getEmitterData().getColors()) {
       this.addParticleColor(color.toColor());
     }
-  }
-
-  public static CustomEmitterData load(String emitterXml) {
-    String name = FileUtilities.getFileName(emitterXml);
-    if (loadedCustomEmitters.containsKey(name)) {
-      return loadedCustomEmitters.get(name);
-    }
-
-    try {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
-      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      
-      
-      if(!new File(emitterXml).exists()){
-        emitterXml = Paths.get(Game.getInfo().getEmitterDirectory(), emitterXml).toString();
-      }
-      
-      InputStream xml = FileUtilities.getGameResource(emitterXml);
-      if(xml == null){
-        return null;
-      }
-      
-      CustomEmitterData loaded = (CustomEmitterData) jaxbUnmarshaller.unmarshal(xml);
-      loadedCustomEmitters.put(name, loaded);
-      return loaded;
-    } catch (final JAXBException e) {
-      e.printStackTrace();
-    }
-
-    return null;
   }
 
   public CustomEmitterData getEmitterData() {

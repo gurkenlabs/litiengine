@@ -22,12 +22,12 @@ import de.gurkenlabs.util.geom.Vector2D;
 import de.gurkenlabs.util.image.ImageProcessing;
 
 public class AmbientLight {
+  private int alpha;
+  private Color color;
   private final IEnvironment environment;
   private Image image;
-  private Color color;
-  private int alpha;
 
-  public AmbientLight(IEnvironment env, final Color ambientColor, final int ambientAlpha) {
+  public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
     this.environment = env;
     this.color = ambientColor;
     this.alpha = ambientAlpha;
@@ -35,7 +35,7 @@ public class AmbientLight {
   }
 
   public void createImage() {
-    String cacheKey = this.getCacheKey();
+    final String cacheKey = this.getCacheKey();
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       this.image = ImageCache.IMAGES.get(cacheKey);
       return;
@@ -55,11 +55,11 @@ public class AmbientLight {
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
 
     for (final LightSource light : this.environment.getLightSources()) {
-      renderLightSource(g, light, longerDimension);
+      this.renderLightSource(g, light, longerDimension);
     }
 
     g.setColor(color);
-    Composite comp = g.getComposite();
+    final Composite comp = g.getComposite();
 
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 1.0f));
     g.fill(darkArea);
@@ -69,9 +69,9 @@ public class AmbientLight {
         continue;
       }
 
-      float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
+      final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
-      renderLightSource(g, light, longerDimension);
+      this.renderLightSource(g, light, longerDimension);
     }
 
     // TODO: cut out regions on map where no layer has a tile
@@ -82,12 +82,39 @@ public class AmbientLight {
     ImageCache.IMAGES.put(cacheKey, img);
   }
 
+  public int getAlpha() {
+    return this.alpha;
+  }
+
+  public Color getColor() {
+    return this.color;
+  }
+
+  public Image getImage() {
+    this.createImage();
+    return this.image;
+  }
+
+  public void setAlpha(int ambientAlpha) {
+    if (ambientAlpha < 0) {
+      ambientAlpha = 0;
+    }
+
+    this.alpha = Math.min(ambientAlpha, 255);
+    this.createImage();
+  }
+
+  public void setColor(final Color color) {
+    this.color = color;
+    this.createImage();
+  }
+
   private String getCacheKey() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(this.getColor());
     sb.append(this.getAlpha());
 
-    for (LightSource light : this.environment.getLightSources()) {
+    for (final LightSource light : this.environment.getLightSources()) {
       sb.append(light.getBrightness());
       sb.append(light.getIntensity());
       sb.append(light.getColor());
@@ -100,11 +127,11 @@ public class AmbientLight {
 
     sb.append(this.environment.getMap().getSizeInPixels());
 
-    int key = sb.toString().hashCode();
+    final int key = sb.toString().hashCode();
     return "ambientlight-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
   }
 
-  private void renderLightSource(Graphics2D g, LightSource light, double longerDimension) {
+  private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {
     final Point2D lightCenter = light.getDimensionCenter();
 
     final Area lightArea = new Area(light.getLightShape());
@@ -156,45 +183,18 @@ public class AmbientLight {
     }
     // darkArea.subtract(lightArea);
 
-    Paint oldPaint = g.getPaint();
+    final Paint oldPaint = g.getPaint();
 
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
     final Area lightRadiusArea = new Area(light.getLightShape());
-    Color[] transColors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
+    final Color[] transColors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
     try {
       g.setPaint(new RadialGradientPaint(new Point2D.Double(lightRadiusArea.getBounds2D().getCenterX(), lightRadiusArea.getBounds2D().getCenterY()), (float) (lightRadiusArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       g.setColor(light.getColor());
     }
     g.fill(lightArea);
     g.setPaint(oldPaint);
-  }
-
-  public int getAlpha() {
-    return this.alpha;
-  }
-
-  public Color getColor() {
-    return this.color;
-  }
-
-  public Image getImage() {
-    this.createImage();
-    return this.image;
-  }
-
-  public void setAlpha(int ambientAlpha) {
-    if (ambientAlpha < 0) {
-      ambientAlpha = 0;
-    }
-
-    this.alpha = Math.min(ambientAlpha, 255);
-    this.createImage();
-  }
-
-  public void setColor(final Color color) {
-    this.color = color;
-    this.createImage();
   }
 }

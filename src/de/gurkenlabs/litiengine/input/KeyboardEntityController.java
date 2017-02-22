@@ -13,11 +13,11 @@ import de.gurkenlabs.util.MathUtilities;
  * up deceleration.
  */
 public class KeyboardEntityController<T extends IMovableEntity> extends ClientEntityMovementController<T> implements IKeyObserver {
-  private double velocityX, velocityY;
-  private final int up, down, left, right;
-  private boolean movedX, movedY;
   private float dx;
   private float dy;
+  private boolean movedX, movedY;
+  private final int up, down, left, right;
+  private double velocityX, velocityY;
 
   public KeyboardEntityController(final T entity) {
     this(entity, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
@@ -63,23 +63,24 @@ public class KeyboardEntityController<T extends IMovableEntity> extends ClientEn
   @Override
   public void update(final IGameLoop loop) {
     super.update(loop);
-    if(!this.isMovementAllowed()){
+    if (!this.isMovementAllowed()) {
       return;
     }
-    
+
     final long deltaTime = loop.getDeltaTime();
-    double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
+    final double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
 
     double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getAcceleration() * maxPixelsPerTick;
-    double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
+    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;
 
     if (this.movedX && this.movedY) {
       // we don't want the entity to move faster when moving diagonally
-      // calculate a new x by dissolding the formula for diagonals of squares sqrt(2 * x^2)
+      // calculate a new x by dissolding the formula for diagonals of squares
+      // sqrt(2 * x^2)
       inc /= Math.sqrt(2);
     }
-    
+
     if (this.movedX) {
       this.velocityX += this.dx * inc;
       this.velocityX = MathUtilities.clamp(this.velocityX, -maxPixelsPerTick, maxPixelsPerTick);

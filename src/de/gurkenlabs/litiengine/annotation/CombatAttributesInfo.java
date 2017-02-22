@@ -86,6 +86,6 @@ public @interface CombatAttributesInfo {
    * @return the float
    */
   float velocityFactor() default 1.0f;
-  
+
   int vision() default 100;
 }

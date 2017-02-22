@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 
 public class MapArea extends Rectangle2D.Double {
   private static final long serialVersionUID = -1620359172839104835L;
-  
+
   private final int id;
   private final String name;
 

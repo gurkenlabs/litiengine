@@ -25,12 +25,12 @@ public class GraphicConfiguration extends ConfigurationGroup {
   /** The graphic quality. */
   private Quality graphicQuality;
 
+  private boolean renderDynamicShadows;
+
   /** The resolution. */
   private int resolutionHeight;
 
   private int resolutionWidth;
-  
-  private boolean renderDynamicShadows;
 
   /**
    * Instantiates a new graphic configuration.
@@ -85,6 +85,10 @@ public class GraphicConfiguration extends ConfigurationGroup {
     return this.fullscreen;
   }
 
+  public boolean renderDynamicShadows() {
+    return this.renderDynamicShadows;
+  }
+
   /**
    * Sets the fullscreen.
    *
@@ -109,19 +113,15 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.graphicQuality = graphicQuality;
   }
 
+  public void setRenderDynamicShadows(final boolean renderDynamicShadows) {
+    this.renderDynamicShadows = renderDynamicShadows;
+  }
+
   public void setResolutionHeight(final int resolutionHeight) {
     this.resolutionHeight = resolutionHeight;
   }
 
   public void setResolutionWidth(final int resolutionWidth) {
     this.resolutionWidth = resolutionWidth;
-  }
-
-  public boolean renderDynamicShadows() {
-    return this.renderDynamicShadows;
-  }
-
-  public void setRenderDynamicShadows(boolean renderDynamicShadows) {
-    this.renderDynamicShadows = renderDynamicShadows;
   }
 }

@@ -21,8 +21,7 @@ public class WindowHandler implements WindowListener {
   /*
    * (non-Javadoc)
    *
-   * @see
-   * java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+   * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
    */
   @Override
   public void windowClosed(final WindowEvent event) {
@@ -72,8 +71,7 @@ public class WindowHandler implements WindowListener {
   /*
    * (non-Javadoc)
    *
-   * @see
-   * java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+   * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
    */
   @Override
   public void windowOpened(final WindowEvent event) {

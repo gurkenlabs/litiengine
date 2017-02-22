@@ -11,7 +11,8 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
- * An attribute effect appies an attribute modifier to the affected entity when applied and removes it when ceased.
+ * An attribute effect appies an attribute modifier to the affected entity when
+ * applied and removes it when ceased.
  *
  * @param <T>
  *          the generic type
@@ -39,18 +40,10 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   }
 
   @Override
-  protected void apply(final ICombatEntity affectedEntity) {
-    super.apply(affectedEntity);
-    this.getAttribute(affectedEntity).addModifier(this.getModifier());
-  }
-
-  @Override
   public void cease(final ICombatEntity affectedEntity) {
     super.cease(affectedEntity);
     this.getAttribute(affectedEntity).removeModifier(this.getModifier());
   }
-
-  protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
 
   /**
    * Gets the modifier.
@@ -60,4 +53,12 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   public AttributeModifier<T> getModifier() {
     return this.modifier;
   }
+
+  @Override
+  protected void apply(final ICombatEntity affectedEntity) {
+    super.apply(affectedEntity);
+    this.getAttribute(affectedEntity).addModifier(this.getModifier());
+  }
+
+  protected abstract Attribute<T> getAttribute(final ICombatEntity entity);
 }

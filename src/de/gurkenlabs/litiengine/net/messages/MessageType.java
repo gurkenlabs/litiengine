@@ -14,13 +14,13 @@ import java.util.Optional;
  * range between 20 and 127; Also see TODO(wiki) for more details.
  */
 public class MessageType {
-  private static List<MessageType> messageTypes = new ArrayList<>();
   public static MessageType INVALID = new MessageType("INVALID", (byte) -1);
   public static MessageType INVALIDVERSION = new MessageType("INVALIDVERSION", (byte) 18);
   public static MessageType LOGIN = new MessageType("LOGIN", (byte) 0);
   public static MessageType LOGINRESPONSE = new MessageType("LOGINRESPONSE", (byte) 5);
   public static MessageType LOGOUT = new MessageType("LOGOUT", (byte) 1);
   public static MessageType PING = new MessageType("PING", (byte) 4);
+  private static List<MessageType> messageTypes = new ArrayList<>();
 
   /**
    * Gets the.

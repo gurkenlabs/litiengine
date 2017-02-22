@@ -21,6 +21,47 @@ import de.gurkenlabs.tilemap.utilities.MapUtilities;
 
 public class DebugRenderer {
 
+  public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
+    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
+      return;
+    }
+
+    if (Game.getConfiguration().DEBUG.renderEntityNames()) {
+      drawMapId(g, entity);
+    }
+
+    if (Game.getConfiguration().DEBUG.renderHitBoxes() && entity instanceof ICombatEntity) {
+      g.setColor(Color.RED);
+      RenderEngine.drawShape(g, ((ICombatEntity) entity).getHitBox());
+    }
+
+    if (Game.getConfiguration().DEBUG.renderBoundingBoxes()) {
+      g.setColor(Color.RED);
+      RenderEngine.drawShape(g, entity.getBoundingBox());
+    }
+
+    if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
+      final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
+      g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
+      RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
+    }
+  }
+
+  public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
+    // draw collision boxes from shape layer
+    if (Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
+      for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
+        g.setColor(Color.RED);
+        RenderEngine.drawShape(g, shape);
+      }
+    }
+
+    if (Game.getConfiguration().DEBUG.showTilesMetric()) {
+      // draw mouse tile info
+      drawTileBoundingBox(g, map, Input.MOUSE.getMapLocation());
+    }
+  }
+
   /**
    * Draw name.
    *
@@ -61,46 +102,5 @@ public class DebugRenderer {
     }
 
     RenderEngine.drawText(g, sb.toString(), (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight() * 2 + 2));
-  }
-
-  public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
-    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
-      return;
-    }
-
-    if (Game.getConfiguration().DEBUG.renderEntityNames()) {
-      drawMapId(g, entity);
-    }
-
-    if (Game.getConfiguration().DEBUG.renderHitBoxes() && entity instanceof ICombatEntity) {
-      g.setColor(Color.RED);
-      RenderEngine.drawShape(g, ((ICombatEntity) entity).getHitBox());
-    }
-
-    if (Game.getConfiguration().DEBUG.renderBoundingBoxes()) {
-      g.setColor(Color.RED);
-      RenderEngine.drawShape(g, entity.getBoundingBox());
-    }
-
-    if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
-      final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
-      g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
-      RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
-    }
-  }
-
-  public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
-    // draw collision boxes from shape layer
-    if (Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
-      for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
-        g.setColor(Color.RED);
-        RenderEngine.drawShape(g, shape);
-      }
-    }
-
-    if (Game.getConfiguration().DEBUG.showTilesMetric()) {
-      // draw mouse tile info
-      drawTileBoundingBox(g, map, Input.MOUSE.getMapLocation());
-    }
   }
 }

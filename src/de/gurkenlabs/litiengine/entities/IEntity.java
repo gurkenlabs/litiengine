@@ -4,11 +4,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
 public interface IEntity {
   public float getAngle();
 
-  public RenderType getRenderType();
+  public IAnimationController getAnimationController();
 
   public Rectangle2D getBoundingBox();
 
@@ -22,9 +23,15 @@ public interface IEntity {
 
   public String getName();
 
+  public RenderType getRenderType();
+
   public float getWidth();
 
   public String sendMessage(Object sender, String message);
+
+  public void setHeight(float height);
+
+  public void setLocation(double x, double y);
 
   /**
    * Sets the map location.
@@ -34,8 +41,6 @@ public interface IEntity {
    */
   public void setLocation(Point2D location);
 
-  public void setLocation(double x, double y);
-
   /**
    * Sets an id which should only be filled when an entity gets added due to map
    * information.
@@ -44,13 +49,11 @@ public interface IEntity {
    */
   public void setMapId(int mapId);
 
-  public void setSize(float width, float height);
+  public void setName(String name);
 
   public void setRenderType(RenderType renderType);
 
-  public void setHeight(float height);
+  public void setSize(float width, float height);
 
   public void setWidth(float width);
-
-  public void setName(String name);
 }

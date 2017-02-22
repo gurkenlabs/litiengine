@@ -8,27 +8,25 @@ import javax.xml.bind.annotation.XmlTransient;
 public class GameInfo {
   @XmlElement
   private String cooperation;
-  
+
   @XmlElement
   private String description;
-  
 
+  private String[] developers;
+
+  private String emitterDirectory;
+
+  private String icon;
+
+  private String logo;
   @XmlElement
   private String name;
-
-  
+  private float renderScale;
+  private String spritesDirectory;
   @XmlElement
   private String subTitle;
-
   @XmlElement
   private float version;
-  
-  private float renderScale;  
-  private String spritesDirectory;  
-  private String emitterDirectory;
-  private String[] developers;
-  private String icon;
-  private String logo;
 
   public GameInfo() {
     this.cooperation = "gurkenlabs";
@@ -50,17 +48,9 @@ public class GameInfo {
     return this.cooperation;
   }
 
-  public void setCooperation(String cooperation) {
-    this.cooperation = cooperation;
-  }
-
   @XmlTransient
   public String getDescription() {
     return this.description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   @XmlTransient
@@ -68,8 +58,8 @@ public class GameInfo {
     return this.developers;
   }
 
-  public void setDevelopers(String[] developers) {
-    this.developers = developers;
+  public String getEmitterDirectory() {
+    return this.emitterDirectory;
   }
 
   @XmlTransient
@@ -77,17 +67,9 @@ public class GameInfo {
     return this.icon;
   }
 
-  public void setIcon(String icon) {
-    this.icon = icon;
-  }
-
   @XmlTransient
   public String getLogo() {
     return this.logo;
-  }
-
-  public void setLogo(String logo) {
-    this.logo = logo;
   }
 
   @XmlTransient
@@ -95,8 +77,9 @@ public class GameInfo {
     return this.name;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  @XmlTransient
+  public float getRenderScale() {
+    return this.renderScale;
   }
 
   @XmlTransient
@@ -104,17 +87,9 @@ public class GameInfo {
     return this.spritesDirectory;
   }
 
-  public void setSpritesDirectory(String spritesDirectory) {
-    this.spritesDirectory = spritesDirectory;
-  }
-
   @XmlTransient
   public String getSubTitle() {
     return this.subTitle;
-  }
-
-  public void setSubTitle(String subTitle) {
-    this.subTitle = subTitle;
   }
 
   @XmlTransient
@@ -122,28 +97,52 @@ public class GameInfo {
     return this.version;
   }
 
-  public void setVersion(float version) {
+  public void setCooperation(final String cooperation) {
+    this.cooperation = cooperation;
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
+  }
+
+  public void setDevelopers(final String[] developers) {
+    this.developers = developers;
+  }
+
+  public void setEmitterDirectory(final String emitterDirectory) {
+    this.emitterDirectory = emitterDirectory;
+  }
+
+  public void setIcon(final String icon) {
+    this.icon = icon;
+  }
+
+  public void setLogo(final String logo) {
+    this.logo = logo;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public void setRenderScale(final float renderScale) {
+    this.renderScale = renderScale;
+  }
+
+  public void setSpritesDirectory(final String spritesDirectory) {
+    this.spritesDirectory = spritesDirectory;
+  }
+
+  public void setSubTitle(final String subTitle) {
+    this.subTitle = subTitle;
+  }
+
+  public void setVersion(final float version) {
     this.version = version;
   }
 
-  @XmlTransient
-  public float getRenderScale() {
-    return this.renderScale;
-  }
-
-  public void setRenderScale(float renderScale) {
-    this.renderScale = renderScale;
-  }
-  
-  public String toString(){
+  @Override
+  public String toString() {
     return this.getSubTitle() != null && !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle() : this.getName() + " " + this.getVersion();
-  }
-
-  public String getEmitterDirectory() {
-    return emitterDirectory;
-  }
-
-  public void setEmitterDirectory(String emitterDirectory) {
-    this.emitterDirectory = emitterDirectory;
   }
 }

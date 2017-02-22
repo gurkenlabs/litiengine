@@ -14,6 +14,15 @@ public class SoundEffect extends Effect {
     this.sounds = sounds;
   }
 
+  public Sound getRandomSound() {
+    if (this.sounds.length == 0) {
+      return null;
+    }
+
+    final int randomIndex = (int) (Math.random() * this.sounds.length);
+    return this.sounds[randomIndex];
+  }
+
   @Override
   protected void apply(final ICombatEntity entity) {
     super.apply(entity);
@@ -22,14 +31,5 @@ public class SoundEffect extends Effect {
     }
 
     Game.getSoundEngine().playSound(entity, this.getRandomSound());
-  }
-
-  public Sound getRandomSound() {
-    if (this.sounds.length == 0) {
-      return null;
-    }
-
-    final int randomIndex = (int) (Math.random() * this.sounds.length);
-    return this.sounds[randomIndex];
   }
 }

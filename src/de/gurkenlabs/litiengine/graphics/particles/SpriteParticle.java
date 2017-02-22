@@ -8,8 +8,8 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 public class SpriteParticle extends Particle {
-  private final Image image;
   private float angle;
+  private final Image image;
 
   public SpriteParticle(final Image sprite, final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final int life) {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, (byte) 0, (byte) 0, life, Color.WHITE);

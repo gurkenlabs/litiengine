@@ -16,8 +16,11 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
  * The Interface IPhysicsEngine.
  */
 public interface IPhysicsEngine extends IUpdateable {
+
   public static final int COLLTYPE_ENTITY = 1;
+
   public static final int COLLTYPE_STATIC = 2;
+
   public static final int COLLTYPE_ALL = COLLTYPE_ENTITY | COLLTYPE_STATIC;
 
   public void add(ICollisionEntity entity);
@@ -26,15 +29,13 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public void clear();
 
+  public boolean collides(double x, double y);
+
   public Point2D collides(Line2D rayCast);
 
   public boolean collides(Point2D point);
 
-  public boolean collides(double x, double y);
-
   public boolean collides(Rectangle2D rect);
-
-  public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect);
 
   /**
    *
@@ -50,15 +51,13 @@ public interface IPhysicsEngine extends IUpdateable {
    */
   public boolean collides(Rectangle2D rect, int collisionType);
 
-  public List<Rectangle2D> getAllCollisionBoxes();
+  public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect);
 
-  public List<Rectangle2D> getStaticCollisionBoxes();
+  public List<Rectangle2D> getAllCollisionBoxes();
 
   public List<ICollisionEntity> getCollisionEntities();
 
-  public boolean move(IMovableEntity entity, double x, double y, float delta);
-
-  public boolean move(IMovableEntity entity, float delta);
+  public List<Rectangle2D> getStaticCollisionBoxes();
 
   /**
    * Moves the specified entity by the delta in the direction of the angle.
@@ -73,6 +72,10 @@ public interface IPhysicsEngine extends IUpdateable {
    *         collision.
    */
   public boolean move(IMovableEntity entity, double angle, double delta);
+
+  public boolean move(IMovableEntity entity, double x, double y, float delta);
+
+  public boolean move(IMovableEntity entity, float delta);
 
   public boolean move(final IMovableEntity entity, Point2D newPosition);
 

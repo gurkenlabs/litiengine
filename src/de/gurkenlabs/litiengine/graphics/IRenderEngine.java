@@ -18,9 +18,10 @@ import de.gurkenlabs.tilemap.MapOrientation;
  */
 public interface IRenderEngine {
 
+  public boolean canRender(IEntity entity);
+
   public void entityRenderingCondition(Predicate<IEntity> predicate);
 
-  public boolean canRender(IEntity entity);
   public IMapRenderer getMapRenderer(MapOrientation orientation);
 
   public void onEntityRendered(Consumer<RenderEvent<IEntity>> entity);
@@ -29,19 +30,19 @@ public interface IRenderEngine {
 
   public void onMapRendered(Consumer<RenderEvent<IMap>> map);
 
-  public void render(Graphics2D g, IRenderable renderable);
-
   public void render(Graphics2D g, Collection<? extends IRenderable> renderables);
 
   public void render(Graphics2D g, Collection<? extends IRenderable> renderables, IVision vision);
-  
+
+  public void render(Graphics2D g, IRenderable renderable);
+
   public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities);
 
   public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, boolean sort);
 
-  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, IVision vision);
-  
   public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, boolean sort, IVision vision);
+
+  public void renderEntities(Graphics2D g, Collection<? extends IEntity> entities, IVision vision);
 
   public void renderEntity(Graphics2D g, IEntity entity);
 

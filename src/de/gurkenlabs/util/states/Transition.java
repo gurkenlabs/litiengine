@@ -10,7 +10,7 @@ public abstract class Transition implements ITransition {
     this.priority = priority;
   }
 
-  protected Transition(final int priority, IState state) {
+  protected Transition(final int priority, final IState state) {
     this(priority);
     this.state = state;
   }

@@ -11,16 +11,16 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 @MovementInfo
 public class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
 
-  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
-  private short velocity;
   private int acceleration;
   private int deceleration;
-
-  private boolean turnOnMove;
-  private Point2D moveDestination;
-
+  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
   /** The last moved. */
   private long lastMoved;
+
+  private Point2D moveDestination;
+  private boolean turnOnMove;
+
+  private short velocity;
 
   public MovableCombatEntity() {
     super();
@@ -32,12 +32,14 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     this.setTurnOnMove(info.turnOnMove());
   }
 
-  public void setVelocity(short velocity) {
-    this.velocity = velocity;
+  @Override
+  public int getAcceleration() {
+    return this.acceleration;
   }
 
-  public void setAcceleration(int acceleration) {
-    this.acceleration = acceleration;
+  @Override
+  public int getDeceleration() {
+    return this.deceleration;
   }
 
   @Override
@@ -53,11 +55,6 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
   @Override
   public float getVelocity() {
     return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
-  }
-
-  @Override
-  public int getAcceleration() {
-    return this.acceleration;
   }
 
   /**
@@ -80,6 +77,11 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     this.entityMovedConsumer.add(consumer);
   }
 
+  @Override
+  public void setAcceleration(final int acceleration) {
+    this.acceleration = acceleration;
+  }
+
   /**
    * Sets the facing direction.
    *
@@ -89,6 +91,11 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
   @Override
   public void setAngle(final float angle) {
     super.setAngle(angle);
+  }
+
+  @Override
+  public void setDeceleration(final int deceleration) {
+    this.deceleration = deceleration;
   }
 
   @Override
@@ -128,15 +135,12 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
   }
 
   @Override
+  public void setVelocity(final short velocity) {
+    this.velocity = velocity;
+  }
+
+  @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
-  }
-
-  public int getDeceleration() {
-    return this.deceleration;
-  }
-
-  public void setDeceleration(int deceleration) {
-    this.deceleration = deceleration;
   }
 }

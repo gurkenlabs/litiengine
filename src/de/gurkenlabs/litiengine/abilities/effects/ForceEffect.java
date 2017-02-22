@@ -7,10 +7,10 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.physics.Force;
 
 public abstract class ForceEffect extends Effect {
+  private Force appliedForce;
+
   /** The strength. */
   private final float strength;
-
-  private Force appliedForce;
 
   protected ForceEffect(final IEnvironment environment, final Ability ability, final float strength, final EffectTarget... targets) {
     super(environment, ability, targets);
@@ -32,6 +32,10 @@ public abstract class ForceEffect extends Effect {
     }
   }
 
+  public float getStrength() {
+    return this.strength;
+  }
+
   protected abstract Force applyForce(final ICombatEntity affectedEntity);
 
   @Override
@@ -45,10 +49,6 @@ public abstract class ForceEffect extends Effect {
 
   protected Force getAppliedForce() {
     return this.appliedForce;
-  }
-
-  public float getStrength() {
-    return this.strength;
   }
 
   @Override

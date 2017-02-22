@@ -5,14 +5,14 @@ import java.awt.Rectangle;
 
 public class AStarNode {
   private final Rectangle bound;
+  private int gCost;
   private final int gridX;
   private final int gridY;
-  private boolean walkable;
-  private final int penalty;
-
-  private int gCost;
   private int hCost;
+
+  private final int penalty;
   private AStarNode predecessor;
+  private boolean walkable;
 
   public AStarNode(final boolean walkable, final Rectangle bound, final int gridX, final int gridY, final int penalty) {
     this.bound = bound;

@@ -16,7 +16,7 @@ public class GameScreen extends Screen {
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().render(g);
     }
-    
+
     super.render(g);
   }
 

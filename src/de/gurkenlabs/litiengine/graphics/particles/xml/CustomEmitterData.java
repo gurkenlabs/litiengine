@@ -14,14 +14,60 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CustomEmitterData {
+  @XmlElement
+  private boolean applyStaticPhysics;
+
+  @XmlElementWrapper(name = "colors")
+  @XmlElement(name = "color")
+  private List<ParticleColor> colors;
+
+  @XmlElement
+  private ParticleParameter deltaHeight;
+
+  @XmlElement
+  private ParticleParameter deltaWidth;
+
+  @XmlElement
+  private ParticleParameter deltaX;
+
+  @XmlElement
+  private ParticleParameter deltaY;
+
+  @XmlAttribute
+  private int emitterTTL;
+
+  @XmlElement
+  private ParticleParameter gravityX;
+
+  @XmlElement
+  private ParticleParameter gravityY;
+
+  @XmlAttribute
+  private int height;
+
+  @XmlAttribute
+  private int maxParticles;
+
   @XmlAttribute
   private String name;
+
+  @XmlElement
+  private ParticleParameter particleHeight;
+
+  @XmlAttribute
+  private int particleMaxTTL;
 
   @XmlAttribute
   private int particleMinTTL;
 
+  @XmlElement
+  private String particleText;
+
   @XmlAttribute
-  private int particleMaxTTL;
+  private ParticleType particleType;
+
+  @XmlElement
+  private ParticleParameter particleWidth;
 
   @XmlAttribute
   private int spawnAmount;
@@ -30,62 +76,16 @@ public class CustomEmitterData {
   private int spawnRate;
 
   @XmlAttribute
-  private int maxParticles;
-
-  @XmlAttribute
-  private int emitterTTL;
-
-  @XmlAttribute
-  private int width;
-
-  @XmlAttribute
-  private int height;
-
-  @XmlAttribute
   private int updateRate;
 
   @XmlAttribute
-  private ParticleType particleType;
+  private int width;
 
   @XmlElement
   private ParticleParameter x;
 
   @XmlElement
   private ParticleParameter y;
-
-  @XmlElement
-  private ParticleParameter deltaX;
-
-  @XmlElement
-  private ParticleParameter deltaY;
-
-  @XmlElement
-  private ParticleParameter gravityX;
-
-  @XmlElement
-  private ParticleParameter gravityY;
-
-  @XmlElement
-  private ParticleParameter particleWidth;
-
-  @XmlElement
-  private ParticleParameter particleHeight;
-
-  @XmlElement
-  private ParticleParameter deltaWidth;
-
-  @XmlElement
-  private ParticleParameter deltaHeight;
-
-  @XmlElement
-  private String particleText;
-
-  @XmlElement
-  private boolean applyStaticPhysics;
-
-  @XmlElementWrapper(name = "colors")
-  @XmlElement(name = "color")
-  private List<ParticleColor> colors;
 
   public CustomEmitterData() {
     this.colors = new ArrayList<>();

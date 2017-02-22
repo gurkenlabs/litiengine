@@ -4,6 +4,21 @@ import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 public interface IMovableEntity extends ICollisionEntity {
+  /**
+   * Gets a value that defines how long it takes the entity to reach the full
+   * velocity (in ms).
+   * 
+   * @return
+   */
+  public int getAcceleration();
+
+  /**
+   * Gets a value that defines how long it takes the entity to stop (in ms).
+   * 
+   * @return
+   */
+  public int getDeceleration();
+
   public Point2D getMoveDestination();
 
   /**
@@ -12,21 +27,10 @@ public interface IMovableEntity extends ICollisionEntity {
    * @return
    */
   public float getVelocity();
-  
-  /**
-   * Gets a value that defines how long it takes the entity to reach the full velocity (in ms).
-   * @return
-   */
-  public int getAcceleration();
-  
-  /**
-   * Gets a value that defines how long it takes the entity to stop (in ms).
-   * @return
-   */
-  public int getDeceleration();
-  
 
   public void onMoved(Consumer<IMovableEntity> consumer);
+
+  public void setAcceleration(int acceleration);
 
   /**
    * Sets the facing direction.
@@ -36,15 +40,13 @@ public interface IMovableEntity extends ICollisionEntity {
    */
   public void setAngle(float angle);
 
+  public void setDeceleration(int deceleration);
+
   public void setMoveDestination(Point2D dest);
 
   public void setTurnOnMove(boolean turn);
-  
-  public void setVelocity(short velocity);
 
-  public void setAcceleration(int acceleration);
-  
-  public void setDeceleration(int deceleration);
+  public void setVelocity(short velocity);
 
   public boolean turnOnMove();
 }

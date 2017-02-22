@@ -25,26 +25,26 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
  * The Class Effect.
  */
 public abstract class Effect implements IEffect {
+  private final Ability ability;
+  private final List<EffectAppliance> appliances;
+
   private final List<Consumer<EffectArgument>> appliedConsumer;
   private final List<Consumer<EffectArgument>> ceasedConsumer;
-
-  private final List<EffectAppliance> appliances;
-  private final List<IEffect> followUpEffects;
-
-  private final IEnvironment environment;
-
-  private final Ability ability;
-
-  /** The effect targets. */
-  private final EffectTarget[] effectTargets;
-
-  private EntityComparator targetPriorityComparator;
 
   /** The delay. */
   private int delay;
 
   /** The duration. */
   private int duration;
+
+  /** The effect targets. */
+  private final EffectTarget[] effectTargets;
+
+  private final IEnvironment environment;
+
+  private final List<IEffect> followUpEffects;
+
+  private EntityComparator targetPriorityComparator;
 
   /**
    * Instantiates a new effect.
@@ -72,14 +72,6 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  protected void apply(final ICombatEntity entity) {
-    entity.getAppliedEffects().add(this);
-    final EffectArgument arg = new EffectArgument(this, entity);
-    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
-      consumer.accept(arg);
-    }
-  }
-
   /**
    * Apply.
    */
@@ -98,15 +90,6 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  /**
-   * Can attack entity.
-   *
-   * @return the predicate<? super attackable entity>
-   */
-  private Predicate<? super ICombatEntity> canAttackEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
-  }
-
   @Override
   public void cease(final ICombatEntity entity) {
     entity.getAppliedEffects().remove(this);
@@ -114,18 +97,6 @@ public abstract class Effect implements IEffect {
     for (final Consumer<EffectArgument> consumer : this.ceasedConsumer) {
       consumer.accept(arg);
     }
-  }
-
-  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
-    // 1. cease the effect for all affected entities
-    for (final ICombatEntity entity : appliance.getAffectedEntities()) {
-      this.cease(entity);
-    }
-
-    // 2. apply follow up effects
-    this.getFollowUpEffects().forEach(followUp -> {
-      followUp.apply(loop, appliance.getImpactArea());
-    });
   }
 
   /**
@@ -172,10 +143,6 @@ public abstract class Effect implements IEffect {
     return this.effectTargets;
   }
 
-  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return this.getEnvironment().findCombatEntities(impactArea);
-  }
-
   public IEnvironment getEnvironment() {
     return this.environment;
   }
@@ -194,20 +161,6 @@ public abstract class Effect implements IEffect {
     return this.targetPriorityComparator;
   }
 
-  /**
-   * Gets the total duration.
-   *
-   * @return the total duration
-   */
-  protected long getTotalDuration() {
-    return this.getDuration() + this.getDelay();
-  }
-
-  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
-    final long effectDuration = loop.getDeltaTime(appliance.getAppliedTicks());
-    return effectDuration > this.getDuration();
-  }
-
   @Override
   public boolean isActive(final ICombatEntity entity) {
     for (final EffectAppliance app : this.getActiveAppliances()) {
@@ -219,67 +172,6 @@ public abstract class Effect implements IEffect {
     }
 
     return false;
-  }
-
-  /**
-   * Checks if is alive friendly entity.
-   *
-   * @return the predicate<? super attackable entity>
-   */
-  private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
-  }
-
-  private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
-    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
-  }
-
-  /**
-   * Look for affected entities.
-   *
-   * @return the list
-   */
-  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
-    List<ICombatEntity> affectedEntities = new ArrayList<>();
-
-    for (final EffectTarget target : this.effectTargets) {
-      switch (target) {
-      case EXECUTINGENTITY:
-        affectedEntities.add(this.getAbility().getExecutor());
-        return affectedEntities;
-      case ENEMY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
-        break;
-      case FRIENDLY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
-        break;
-      case FRIENDLYDEAD:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
-        affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
-        break;
-      default:
-        break;
-      }
-    }
-
-    affectedEntities.removeAll(Collections.singleton(null));
-
-    if (!this.getAbility().isMultiTarget() && affectedEntities.size() > 0) {
-      affectedEntities.sort(this.targetPriorityComparator);
-      final ICombatEntity target;
-      if (this.getAbility().getExecutor().getTarget() != null) {
-        target = this.getAbility().getExecutor().getTarget();
-      } else {
-        target = affectedEntities.get(0);
-      }
-      affectedEntities = new ArrayList<>();
-      affectedEntities.add(target);
-
-    }
-
-    return affectedEntities;
   }
 
   @Override
@@ -341,6 +233,114 @@ public abstract class Effect implements IEffect {
     if (this.getActiveAppliances().size() == 0) {
       loop.detach(this);
     }
+  }
+
+  protected void apply(final ICombatEntity entity) {
+    entity.getAppliedEffects().add(this);
+    final EffectArgument arg = new EffectArgument(this, entity);
+    for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
+      consumer.accept(arg);
+    }
+  }
+
+  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
+    // 1. cease the effect for all affected entities
+    for (final ICombatEntity entity : appliance.getAffectedEntities()) {
+      this.cease(entity);
+    }
+
+    // 2. apply follow up effects
+    this.getFollowUpEffects().forEach(followUp -> {
+      followUp.apply(loop, appliance.getImpactArea());
+    });
+  }
+
+  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
+    return this.getEnvironment().findCombatEntities(impactArea);
+  }
+
+  /**
+   * Gets the total duration.
+   *
+   * @return the total duration
+   */
+  protected long getTotalDuration() {
+    return this.getDuration() + this.getDelay();
+  }
+
+  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
+    final long effectDuration = loop.getDeltaTime(appliance.getAppliedTicks());
+    return effectDuration > this.getDuration();
+  }
+
+  /**
+   * Look for affected entities.
+   *
+   * @return the list
+   */
+  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
+    List<ICombatEntity> affectedEntities = new ArrayList<>();
+
+    for (final EffectTarget target : this.effectTargets) {
+      switch (target) {
+      case EXECUTINGENTITY:
+        affectedEntities.add(this.getAbility().getExecutor());
+        return affectedEntities;
+      case ENEMY:
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
+        break;
+      case FRIENDLY:
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
+        break;
+      case FRIENDLYDEAD:
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
+        break;
+      default:
+        break;
+      }
+    }
+
+    affectedEntities.removeAll(Collections.singleton(null));
+
+    if (!this.getAbility().isMultiTarget() && affectedEntities.size() > 0) {
+      affectedEntities.sort(this.targetPriorityComparator);
+      final ICombatEntity target;
+      if (this.getAbility().getExecutor().getTarget() != null) {
+        target = this.getAbility().getExecutor().getTarget();
+      } else {
+        target = affectedEntities.get(0);
+      }
+      affectedEntities = new ArrayList<>();
+      affectedEntities.add(target);
+
+    }
+
+    return affectedEntities;
+  }
+
+  /**
+   * Can attack entity.
+   *
+   * @return the predicate<? super attackable entity>
+   */
+  private Predicate<? super ICombatEntity> canAttackEntity() {
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  }
+
+  /**
+   * Checks if is alive friendly entity.
+   *
+   * @return the predicate<? super attackable entity>
+   */
+  private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
+  }
+
+  private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
+    return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
   }
 
 }

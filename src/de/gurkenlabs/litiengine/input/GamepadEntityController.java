@@ -14,26 +14,26 @@ import net.java.games.input.Component.Identifier;
  * up deceleration.
  */
 public class GamepadEntityController<T extends IMovableEntity> extends ClientEntityMovementController<T> {
-  private double velocityX, velocityY;
-  private boolean movedX, movedY;
   private float dx;
   private float dy;
-
   private int gamePadIndex = -1;
+  private boolean movedX, movedY;
+
+  private double velocityX, velocityY;
 
   public GamepadEntityController(final T entity) {
     super(entity);
 
     Input.GAMEPADMANAGER.onGamepadAdded(pad -> {
-      if (gamePadIndex == -1) {
+      if (this.gamePadIndex == -1) {
         this.gamePadIndex = pad.getIndex();
       }
     });
 
     Input.GAMEPADMANAGER.onGamepadRemoved(pad -> {
-      if (gamePadIndex == pad.getIndex()) {
+      if (this.gamePadIndex == pad.getIndex()) {
         this.gamePadIndex = -1;
-        IGamepad newGamePad = Input.getGamepad();
+        final IGamepad newGamePad = Input.getGamepad();
         if (newGamePad != null) {
           this.gamePadIndex = newGamePad.getIndex();
         }
@@ -43,17 +43,17 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
 
   @Override
   public void update(final IGameLoop loop) {
-    if(!this.isMovementAllowed()){
+    if (!this.isMovementAllowed()) {
       return;
     }
-    
+
     this.retrieveGamepadValues();
     super.update(loop);
     final long deltaTime = loop.getDeltaTime();
-    double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
+    final double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
 
     double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getAcceleration() * maxPixelsPerTick;
-    double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
+    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
     final double STOP_THRESHOLD = 0.1;
 
     if (this.movedX && this.movedY) {
@@ -122,12 +122,12 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
   }
 
   private void retrieveGamepadValues() {
-    if (this.gamePadIndex == -1 || (this.gamePadIndex != -1 && Input.getGamepad(this.gamePadIndex) == null)) {
+    if (this.gamePadIndex == -1 || this.gamePadIndex != -1 && Input.getGamepad(this.gamePadIndex) == null) {
       return;
     }
 
-    float x = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.X);
-    float y = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.Y);
+    final float x = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.X);
+    final float y = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.Y);
 
     if (Math.abs(x) > 0.15) {
       this.dx = x;
@@ -139,8 +139,8 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
       this.movedY = true;
     }
 
-    float rightX = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RX);
-    float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
+    final float rightX = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RX);
+    final float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
     float targetX = 0, targetY = 0;
     if (Math.abs(rightX) > 0.08) {
       targetX = rightX;
@@ -150,8 +150,8 @@ public class GamepadEntityController<T extends IMovableEntity> extends ClientEnt
     }
 
     if (targetX != 0 || targetY != 0) {
-      Point2D target = new Point2D.Double(this.getEntity().getDimensionCenter().getX() + targetX, this.getEntity().getDimensionCenter().getY() + targetY);
-      double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getDimensionCenter(), target);
+      final Point2D target = new Point2D.Double(this.getEntity().getDimensionCenter().getX() + targetX, this.getEntity().getDimensionCenter().getY() + targetY);
+      final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getDimensionCenter(), target);
       this.getEntity().setAngle((float) angle);
     }
   }

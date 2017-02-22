@@ -30,20 +30,20 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   private static final Random RANDOM = new Random();
-  private final List<Color> colors;
-
-  private final boolean activateOnInit;
-
-  private IGameLoop gameLoop;
-
   /** The activated. */
   private boolean activated;
+
+  private final boolean activateOnInit;
 
   /** The activation tick. */
   private long activationTick;
 
   /** The alive time. */
   private long aliveTime;
+
+  private final List<Color> colors;
+
+  private IGameLoop gameLoop;
 
   /** The last spawn. */
   private long lastSpawn;
@@ -122,30 +122,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.particles.add(particle);
   }
 
-  protected void addParticleColor(final Color... colors) {
-    for (final Color color : colors) {
-      if (!this.colors.contains(color)) {
-        this.colors.add(color);
-      }
-    }
-  }
-
-  /**
-   * Can take new particles.
-   *
-   * @return Whether-or-not the effect can hold any more particles.
-   */
-  protected boolean canTakeNewParticles() {
-    return this.particles.size() < this.maxParticles;
-  }
-
-  /**
-   * Creates the new particle.
-   *
-   * @return the particle
-   */
-  protected abstract Particle createNewParticle();
-
   /**
    * Deactivate.
    */
@@ -176,6 +152,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   @Override
   public long getAliveTime() {
     return this.aliveTime;
+  }
+
+  public List<Color> getColors() {
+    return this.colors;
   }
 
   /**
@@ -221,36 +201,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.particleUpdateDelay;
   }
 
-  protected Color getRandomParticleColor() {
-    if (this.colors.size() == 0) {
-      return DEFAULT_PARTICLE_COLOR;
-    }
-
-    return this.colors.get(RANDOM.nextInt(this.colors.size()));
-  }
-
-  public List<Color> getColors() {
-    return this.colors;
-  }
-
-  protected int getRandomParticleTTL() {
-    final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
-    if (ttlDiff <= 0) {
-      return this.getParticleMaxTTL();
-    }
-
-    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
-    return ttl;
-  }
-
-  protected int getRandomParticleX() {
-    return RANDOM.nextInt((int) this.getWidth());
-  }
-
-  protected int getRandomParticleY() {
-    return RANDOM.nextInt((int) this.getHeight());
-  }
-
   public int getSpawnAmount() {
     return this.spawnAmount;
   }
@@ -274,6 +224,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.timeToLive;
   }
 
+  public boolean isActivateOnInit() {
+    return this.activateOnInit;
+  }
+
   /**
    * Checks if is finished.
    *
@@ -294,17 +248,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.paused;
   }
 
-  /**
-   * Particle can be removed.
-   *
-   * @param particle
-   *          the particle
-   * @return true, if successful
-   */
-  protected boolean particleCanBeRemoved(final Particle particle) {
-    return particle.timeToLiveReached();
-  }
-
   @Override
   public void render(final Graphics2D g) {
     if (Game.getScreenManager() != null && Game.getScreenManager().getCamera() != null && !Game.getScreenManager().getCamera().getViewPort().intersects(this.getBoundingBox())) {
@@ -318,13 +261,13 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
-  public void setMaxParticles(final int maxPart) {
-    this.maxParticles = maxPart;
-  }
-
-  public void setColors(Color... colors) {
+  public void setColors(final Color... colors) {
     this.colors.clear();
     this.colors.addAll(Arrays.asList(colors));
+  }
+
+  public void setMaxParticles(final int maxPart) {
+    this.maxParticles = maxPart;
   }
 
   public void setOrigin(final Point2D location) {
@@ -363,29 +306,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void setTimeToLive(final int ttl) {
     this.timeToLive = ttl;
-  }
-
-  /**
-   * Render particles of this effect. The particles are always rendered
-   * relatively to this effects render location. A particle doesn't have an own
-   * map location. It is always relative to the effect it is assigned to.
-   *
-   * @param g
-   *          the g
-   * @param p
-   *          the p
-   */
-  /**
-   * Spawn particle.
-   */
-  protected void spawnParticle() {
-    for (short i = 0; i < this.getSpawnAmount(); i++) {
-      if (!this.canTakeNewParticles()) {
-        return;
-      }
-
-      this.addParticle(this.createNewParticle());
-    }
   }
 
   /**
@@ -437,8 +357,88 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
-  public boolean isActivateOnInit() {
-    return activateOnInit;
+  protected void addParticleColor(final Color... colors) {
+    for (final Color color : colors) {
+      if (!this.colors.contains(color)) {
+        this.colors.add(color);
+      }
+    }
+  }
+
+  /**
+   * Can take new particles.
+   *
+   * @return Whether-or-not the effect can hold any more particles.
+   */
+  protected boolean canTakeNewParticles() {
+    return this.particles.size() < this.maxParticles;
+  }
+
+  /**
+   * Creates the new particle.
+   *
+   * @return the particle
+   */
+  protected abstract Particle createNewParticle();
+
+  protected Color getRandomParticleColor() {
+    if (this.colors.size() == 0) {
+      return DEFAULT_PARTICLE_COLOR;
+    }
+
+    return this.colors.get(RANDOM.nextInt(this.colors.size()));
+  }
+
+  protected int getRandomParticleTTL() {
+    final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
+    if (ttlDiff <= 0) {
+      return this.getParticleMaxTTL();
+    }
+
+    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
+    return ttl;
+  }
+
+  protected int getRandomParticleX() {
+    return RANDOM.nextInt((int) this.getWidth());
+  }
+
+  protected int getRandomParticleY() {
+    return RANDOM.nextInt((int) this.getHeight());
+  }
+
+  /**
+   * Particle can be removed.
+   *
+   * @param particle
+   *          the particle
+   * @return true, if successful
+   */
+  protected boolean particleCanBeRemoved(final Particle particle) {
+    return particle.timeToLiveReached();
+  }
+
+  /**
+   * Render particles of this effect. The particles are always rendered
+   * relatively to this effects render location. A particle doesn't have an own
+   * map location. It is always relative to the effect it is assigned to.
+   *
+   * @param g
+   *          the g
+   * @param p
+   *          the p
+   */
+  /**
+   * Spawn particle.
+   */
+  protected void spawnParticle() {
+    for (short i = 0; i < this.getSpawnAmount(); i++) {
+      if (!this.canTakeNewParticles()) {
+        return;
+      }
+
+      this.addParticle(this.createNewParticle());
+    }
   }
 
 }

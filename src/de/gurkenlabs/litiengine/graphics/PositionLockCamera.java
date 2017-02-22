@@ -33,7 +33,7 @@ public class PositionLockCamera extends Camera {
 
     // always render the local player at the same location otherwise the
     // localplayer camera causes flickering and bouncing of the sprite
-    IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (entity.equals(this.getLockedEntity()) && animationController != null && animationController.getCurrentAnimation() != null && animationController.getCurrentAnimation().getSpritesheet() != null) {
       final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
       final Point2D location = new Point2D.Double(this.getFocus().getX() - entity.getWidth() / 2 - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, this.getFocus().getY() - entity.getHeight() / 2 - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);

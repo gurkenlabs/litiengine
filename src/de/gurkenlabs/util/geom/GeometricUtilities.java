@@ -14,43 +14,6 @@ import java.util.List;
 
 public class GeometricUtilities {
 
-  public static Point2D getRandomLocation(double x, double y, double width, double height) {
-    final double xOffset = Math.random() * width;
-    final double yOffset = Math.random() * height;
-
-    return new Point2D.Double(x + xOffset, y + yOffset);
-  }
-
-  public static Point2D getRandomLocation(Rectangle2D rect) {
-    return getRandomLocation(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-
-  }
-
-  public static List<Point2D> getPoints(final Path2D path) {
-    PathIterator pi = path.getPathIterator(null);
-    final double[] coordinates = new double[22];
-    List<Point2D> points = new ArrayList<>();
-    while (!pi.isDone()) {
-      pi.next();
-
-      pi.currentSegment(coordinates);
-      Point2D currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
-      points.add(currentPoint);
-    }
-
-    return points;
-  }
-
-  public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
-    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
-      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values
     // (atan2 returns radians values from [-PI,PI])
@@ -156,8 +119,8 @@ public class GeometricUtilities {
   }
 
   public static ArrayList<Line2D.Double> getConstrainingLines(final Area area) {
-    final ArrayList<double[]> areaPoints = new ArrayList<double[]>();
-    final ArrayList<Line2D.Double> areaSegments = new ArrayList<Line2D.Double>();
+    final ArrayList<double[]> areaPoints = new ArrayList<>();
+    final ArrayList<Line2D.Double> areaSegments = new ArrayList<>();
     final double[] coords = new double[6];
 
     for (final PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
@@ -253,6 +216,25 @@ public class GeometricUtilities {
     }
 
     return p;
+  }
+
+  /**
+   * Intersects.
+   *
+   * @param line
+   *          the line
+   * @param rectangle
+   *          the rectangle
+   * @return the point2 d
+   */
+  public static Point2D getIntersectionPoint(final Line2D line, final Rectangle2D rectangle) {
+    final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(line, rectangle);
+    for (final Point2D p : intersectionPoints) {
+      if (p != null && !p.equals(line.getP1()) && contains(rectangle, p)) {
+        return p;
+      }
+    }
+    return null;
   }
 
   /**
@@ -357,6 +339,21 @@ public class GeometricUtilities {
     return new Point2D.Double(x, y);
   }
 
+  public static List<Point2D> getPoints(final Path2D path) {
+    final PathIterator pi = path.getPathIterator(null);
+    final double[] coordinates = new double[22];
+    final List<Point2D> points = new ArrayList<>();
+    while (!pi.isDone()) {
+      pi.next();
+
+      pi.currentSegment(coordinates);
+      final Point2D currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
+      points.add(currentPoint);
+    }
+
+    return points;
+  }
+
   /**
    * Gets the points.
    *
@@ -420,31 +417,26 @@ public class GeometricUtilities {
     return line;
   }
 
-  private static double getXDelta(final double angle, final double delta) {
-    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  public static Point2D getRandomLocation(final double x, final double y, final double width, final double height) {
+    final double xOffset = Math.random() * width;
+    final double yOffset = Math.random() * height;
+
+    return new Point2D.Double(x + xOffset, y + yOffset);
   }
 
-  private static double getYDelta(final double angle, final double delta) {
-    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  public static Point2D getRandomLocation(final Rectangle2D rect) {
+    return getRandomLocation(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+
   }
 
-  /**
-   * Intersects.
-   *
-   * @param line
-   *          the line
-   * @param rectangle
-   *          the rectangle
-   * @return the point2 d
-   */
-  public static Point2D getIntersectionPoint(final Line2D line, final Rectangle2D rectangle) {
-    final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(line, rectangle);
-    for (final Point2D p : intersectionPoints) {
-      if (p != null && !p.equals(line.getP1()) && contains(rectangle, p)) {
-        return p;
+  public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
+    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
+      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
+        return true;
       }
     }
-    return null;
+
+    return false;
   }
 
   /**
@@ -527,35 +519,35 @@ public class GeometricUtilities {
     return resultPoints.toArray(new Point2D[resultPoints.size()]);
   }
 
-  public static Shape scaleShape(final Shape shape, final double scale) {
-    final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
-    return transform.createTransformedShape(shape);
-  }
-
   public static Shape scaleRect(final Rectangle2D shape, final int max) {
-    double width = shape.getWidth();
-    double height = shape.getHeight();
+    final double width = shape.getWidth();
+    final double height = shape.getHeight();
 
     if (width == 0 || height == 0) {
       return null;
     }
     double dWidth = 0;
     double dHeight = 0;
-    double ratio = width / height;
-    double newHeight = width / ratio;
-    double newWidth = height * ratio;
+    final double ratio = width / height;
+    final double newHeight = width / ratio;
+    final double newWidth = height * ratio;
 
     if (newWidth == newHeight) {
       dWidth = max;
       dHeight = max;
     } else if (newWidth > newHeight) {
       dWidth = max;
-      dHeight = ((double) height / (double) width) * max;
+      dHeight = height / width * max;
     } else {
       dHeight = max;
-      dWidth = ((double) width / (double) height) * max;
+      dWidth = width / height * max;
     }
     final AffineTransform transform = AffineTransform.getScaleInstance(dWidth, dHeight);
+    return transform.createTransformedShape(shape);
+  }
+
+  public static Shape scaleShape(final Shape shape, final double scale) {
+    final AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
     return transform.createTransformedShape(shape);
   }
 
@@ -580,5 +572,13 @@ public class GeometricUtilities {
     t.translate(renderLocation.getX(), renderLocation.getY());
     return shape;
 
+  }
+
+  private static double getXDelta(final double angle, final double delta) {
+    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
+  private static double getYDelta(final double angle, final double delta) {
+    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }

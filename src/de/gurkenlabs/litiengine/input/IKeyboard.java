@@ -13,13 +13,17 @@ import de.gurkenlabs.litiengine.IUpdateable;
  */
 public interface IKeyboard extends IUpdateable {
 
+  public void consumeAlt(boolean consume);
+
+  public String getText(KeyEvent e);
+
+  public boolean isPressed(int keyCode);
+
   public void onKeyPressed(int keyCode, Consumer<KeyEvent> consumer);
 
   public void onKeyReleased(int keyCode, Consumer<KeyEvent> consumer);
 
   public void onKeyTyped(int keyCode, Consumer<KeyEvent> consumer);
-
-  public boolean isPressed(int keyCode);
 
   /**
    * Register for key down events.
@@ -36,8 +40,4 @@ public interface IKeyboard extends IUpdateable {
    *          the observer
    */
   public void unregisterFromKeyDownEvents(IKeyObserver observer);
-
-  public String getText(KeyEvent e);
-  
-  public void consumeAlt(boolean consume);
 }

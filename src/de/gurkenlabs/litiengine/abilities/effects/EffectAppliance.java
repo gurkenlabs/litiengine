@@ -6,8 +6,8 @@ import java.util.List;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 public class EffectAppliance {
-  public final long applied;
   public final List<ICombatEntity> affectedEntities;
+  public final long applied;
   public final Shape impactArea;
 
   protected EffectAppliance(final long applied, final List<ICombatEntity> affectedEntities, final Shape impactArea) {

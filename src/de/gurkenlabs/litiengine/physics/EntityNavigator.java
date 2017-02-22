@@ -25,14 +25,14 @@ public class EntityNavigator implements IEntityNavigator {
   private static final float ACCEPTABLE_ERROR = 0.3f;
 
   private final List<Predicate<IMovableEntity>> cancelNavigationConditions;
-  private final IMovableEntity entity;
-  private final IPathFinder pathFinder;
-
   /** The current segments. */
   private int currentSegment;
+  private final IMovableEntity entity;
 
   /** The navigations. */
   private Path path;
+
+  private final IPathFinder pathFinder;
 
   /**
    * Instantiates a new entity navigator.
@@ -72,15 +72,15 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public void navigate(final Path2D path) {
+    this.path = new Path(path);
+  }
+
+  @Override
   public void navigate(final Point2D target) {
     if (this.getPathFinder() != null) {
       this.path = this.getPathFinder().findPath(this.entity, target);
     }
-  }
-
-  @Override
-  public void navigate(Path2D path) {
-    this.path = new Path(path);
   }
 
   @Override

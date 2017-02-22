@@ -15,12 +15,12 @@ import de.gurkenlabs.util.image.ImageProcessing;
 
 public abstract class AnimationController implements IAnimationController {
   private static int MAX_IMAGE_EFFECTS = 20;
-  private final List<Consumer<Animation>> playbackFinishedConsumer;
-  private final List<Consumer<Animation>> playbackConsumer;
   private final List<Animation> animations;
-  private final List<IImageEffect> imageEffects;
-  private final Animation defaultAnimation;
   private Animation currentAnimation;
+  private final Animation defaultAnimation;
+  private final List<IImageEffect> imageEffects;
+  private final List<Consumer<Animation>> playbackConsumer;
+  private final List<Consumer<Animation>> playbackFinishedConsumer;
 
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {
     this.animations = new CopyOnWriteArrayList<>();
@@ -62,22 +62,6 @@ public abstract class AnimationController implements IAnimationController {
     }
 
     this.getImageEffects().add(effect);
-  }
-
-  protected String buildCurrentCacheKey() {
-    if (this.getCurrentAnimation().getCurrentKeyFrame() == null) {
-      return null;
-    }
-    final StringBuilder cacheKey = new StringBuilder();
-    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
-    cacheKey.append('_');
-    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
-    cacheKey.append('_');
-
-    StringBuilder imageEffects = new StringBuilder();
-    this.getImageEffects().forEach(x -> imageEffects.append(x.getName()));
-    cacheKey.append(imageEffects.toString().hashCode());
-    return cacheKey.toString();
   }
 
   @Override
@@ -124,9 +108,24 @@ public abstract class AnimationController implements IAnimationController {
   }
 
   @Override
+  public Animation getDefaultAnimation() {
+    return this.defaultAnimation;
+  }
+
+  @Override
   public List<IImageEffect> getImageEffects() {
     this.removeFinishedImageEffects();
     return this.imageEffects;
+  }
+
+  @Override
+  public void onPlayback(final Consumer<Animation> cons) {
+    this.playbackConsumer.add(cons);
+  }
+
+  @Override
+  public void onPlaybackEnded(final Consumer<Animation> cons) {
+    this.playbackFinishedConsumer.add(cons);
   }
 
   @Override
@@ -134,7 +133,7 @@ public abstract class AnimationController implements IAnimationController {
     // if we have no animation with the name or it is already playing, do
     // nothing
     if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
-        || (this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName))) {
+        || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       return;
     }
 
@@ -151,9 +150,46 @@ public abstract class AnimationController implements IAnimationController {
     this.currentAnimation = anim;
     this.currentAnimation.start();
 
-    for (Consumer<Animation> cons : this.playbackConsumer) {
+    for (final Consumer<Animation> cons : this.playbackConsumer) {
       cons.accept(this.getCurrentAnimation());
     }
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
+    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
+      return;
+    }
+    final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
+    if (playbackFinished) {
+      for (final Consumer<Animation> cons : this.playbackFinishedConsumer) {
+        cons.accept(this.getCurrentAnimation());
+      }
+    }
+
+    if (this.getCurrentAnimation() == null || playbackFinished) {
+      this.currentAnimation = null;
+      if (this.defaultAnimation != null) {
+        this.playAnimation(this.defaultAnimation.getName());
+      }
+    }
+
+  }
+
+  protected String buildCurrentCacheKey() {
+    if (this.getCurrentAnimation().getCurrentKeyFrame() == null) {
+      return null;
+    }
+    final StringBuilder cacheKey = new StringBuilder();
+    cacheKey.append(this.getCurrentAnimation().getSpritesheet().hashCode());
+    cacheKey.append('_');
+    cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
+    cacheKey.append('_');
+
+    final StringBuilder imageEffects = new StringBuilder();
+    this.getImageEffects().forEach(x -> imageEffects.append(x.getName()));
+    cacheKey.append(imageEffects.toString().hashCode());
+    return cacheKey.toString();
   }
 
   private void removeFinishedImageEffects() {
@@ -170,35 +206,5 @@ public abstract class AnimationController implements IAnimationController {
 
     this.imageEffects.removeAll(effectsToRemove);
     this.imageEffects.removeAll(Collections.singleton(null));
-  }
-
-  @Override
-  public void update(final IGameLoop loop) {
-    if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
-      return;
-    }
-    final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
-    if (playbackFinished) {
-      for (Consumer<Animation> cons : this.playbackFinishedConsumer) {
-        cons.accept(this.getCurrentAnimation());
-      }
-    }
-
-    if (this.getCurrentAnimation() == null || playbackFinished) {
-      this.currentAnimation = null;
-      if (this.defaultAnimation != null) {
-        this.playAnimation(this.defaultAnimation.getName());
-      }
-    }
-  }
-
-  @Override
-  public void onPlaybackEnded(Consumer<Animation> cons) {
-    this.playbackFinishedConsumer.add(cons);
-  }
-
-  @Override
-  public void onPlayback(Consumer<Animation> cons) {
-    this.playbackConsumer.add(cons);
   }
 }

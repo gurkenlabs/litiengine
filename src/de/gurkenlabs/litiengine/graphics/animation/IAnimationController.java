@@ -22,11 +22,13 @@ public interface IAnimationController extends IUpdateable {
 
   public BufferedImage getCurrentSprite(int width, int height);
 
+  public Animation getDefaultAnimation();
+
   public List<IImageEffect> getImageEffects();
 
-  public void playAnimation(final String animationName);
+  public void onPlayback(Consumer<Animation> cons);
 
   public void onPlaybackEnded(Consumer<Animation> cons);
-  
-  public void onPlayback(Consumer<Animation> cons);
+
+  public void playAnimation(final String animationName);
 }

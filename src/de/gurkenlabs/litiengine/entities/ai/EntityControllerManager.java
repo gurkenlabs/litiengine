@@ -20,6 +20,18 @@ public class EntityControllerManager {
     this.movementControllers = new ConcurrentHashMap<>();
   }
 
+  public void addController(final IEntity entity, final IAnimationController controller) {
+    if (entity == null || controller == null) {
+      return;
+    }
+
+    if (this.animationControllers.containsKey(entity)) {
+      Game.getLoop().detach(this.getAnimationController(entity));
+    }
+
+    this.animationControllers.put(entity, controller);
+  }
+
   public <T extends IEntity> void addController(final T entity, final IEntityController<T> controller) {
     if (entity == null || controller == null) {
       return;
@@ -44,29 +56,33 @@ public class EntityControllerManager {
     this.movementControllers.put(entity, controller);
   }
 
-  public void addController(final IEntity entity, final IAnimationController controller) {
-    if (entity == null || controller == null) {
-      return;
+  public void disposeControllers(final IEntity entity) {
+    final IEntityController<? extends IEntity> aiController = this.getAIController(entity);
+    if (aiController != null) {
+
+      Game.getLoop().detach(aiController);
+      this.aiControllers.remove(entity);
     }
 
-    if (this.animationControllers.containsKey(entity)) {
-      Game.getLoop().detach(this.getAnimationController(entity));
+    if (entity instanceof IMovableEntity) {
+      final IMovementController<? extends IMovableEntity> controller = this.getMovementController((IMovableEntity) entity);
+      if (controller != null) {
+
+        Game.getLoop().detach(controller);
+        this.movementControllers.remove(entity);
+      }
     }
 
-    this.animationControllers.put(entity, controller);
+    final IAnimationController animationController = this.getAnimationController(entity);
+    if (animationController != null) {
+      animationController.dispose();
+      this.animationControllers.remove(entity);
+    }
   }
 
   public IEntityController<? extends IEntity> getAIController(final IEntity entity) {
     if (this.aiControllers.containsKey(entity)) {
       return this.aiControllers.get(entity);
-    }
-
-    return null;
-  }
-
-  public IMovementController<? extends IMovableEntity> getMovementController(final IMovableEntity entity) {
-    if (this.movementControllers.containsKey(entity)) {
-      return this.movementControllers.get(entity);
     }
 
     return null;
@@ -80,27 +96,11 @@ public class EntityControllerManager {
     return null;
   }
 
-  public void disposeControllers(IEntity entity) {
-    IEntityController<? extends IEntity> aiController = this.getAIController(entity);
-    if (aiController != null) {
-
-      Game.getLoop().detach(aiController);
-      this.aiControllers.remove(entity);
+  public IMovementController<? extends IMovableEntity> getMovementController(final IMovableEntity entity) {
+    if (this.movementControllers.containsKey(entity)) {
+      return this.movementControllers.get(entity);
     }
 
-    if (entity instanceof IMovableEntity) {
-      IMovementController<? extends IMovableEntity> controller = this.getMovementController((IMovableEntity) entity);
-      if (controller != null) {
-
-        Game.getLoop().detach(controller);
-        this.movementControllers.remove(entity);
-      }
-    }
-
-    IAnimationController animationController = this.getAnimationController(entity);
-    if (animationController != null) {
-      animationController.dispose();
-      this.animationControllers.remove(entity);
-    }
+    return null;
   }
 }

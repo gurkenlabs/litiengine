@@ -36,9 +36,6 @@ import de.gurkenlabs.util.image.ImageProcessing;
 public class OrthogonalMapRenderer implements IMapRenderer {
   private static final String LAYER_RENDER_TYPE = "RENDERTYPE";
 
-  public OrthogonalMapRenderer() {
-  }
-
   /**
    * Gets the cache key.
    *
@@ -48,6 +45,56 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    */
   public static String getCacheKey(final IMap map) {
     return MessageFormat.format("map_{0}_version_{1}", map.getFileName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
+  }
+
+  private static Image getTileImage(final IMap map, final ITile tile) {
+    if (tile == null) {
+      return null;
+    }
+
+    final ITileset tileset = MapUtilities.findTileSet(map, tile);
+    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
+      return null;
+    }
+
+    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    if (sprite == null) {
+      sprite = Spritesheet.load(tileset);
+      if (sprite == null) {
+        return null;
+      }
+    }
+
+    // get the grid id relative to the sprite sheet since we use a 0 based
+    // approach to calculate the position
+    int index = tile.getGridId() - tileset.getFirstGridId();
+
+    // support for animated tiles
+    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
+    if (animation != null && animation.getFrames().size() > 0) {
+      final long playedMs = Game.getLoop().getTime().getMilliseconds();
+
+      final int totalDuration = animation.getTotalDuration();
+      final long animationsPlayed = playedMs / totalDuration;
+
+      final long deltaTicks = playedMs - animationsPlayed * totalDuration;
+      int currentPlayTime = 0;
+      for (final ITileAnimationFrame frame : animation.getFrames()) {
+        currentPlayTime += frame.getDuration();
+        if (deltaTicks < currentPlayTime) {
+          // found the current animation frame
+          index = frame.getTileId();
+          break;
+        }
+      }
+
+    }
+
+    final Image img = sprite.getSprite(index);
+    return img;
+  }
+
+  public OrthogonalMapRenderer() {
   }
 
   @Override
@@ -92,13 +139,13 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void render(Graphics2D g, IMap map, double offsetX, double offsetY) {
+  public void render(final Graphics2D g, final IMap map, final double offsetX, final double offsetY) {
     final BufferedImage mapImage = this.getMapImage(map);
     RenderEngine.renderImage(g, mapImage, offsetX, offsetY);
   }
 
   @Override
-  public void render(Graphics2D g, IMap map, Rectangle2D viewport) {
+  public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
     for (final ITileLayer layer : map.getTileLayers()) {
       if (layer == null) {
         continue;
@@ -112,12 +159,12 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         }
       }
 
-      renderLayerImage(g, layer, map, viewport);
+      this.renderLayerImage(g, layer, map, viewport);
     }
   }
 
   @Override
-  public void renderOverlay(final Graphics2D g, final IMap map, Rectangle2D viewport) {
+  public void renderOverlay(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
     for (final ITileLayer layer : map.getTileLayers()) {
       if (layer == null) {
         continue;
@@ -133,55 +180,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      renderLayerImage(g, layer, map, viewport);
+      this.renderLayerImage(g, layer, map, viewport);
     }
-  }
-
-  private static Image getTileImage(final IMap map, final ITile tile) {
-    if (tile == null) {
-      return null;
-    }
-
-    final ITileset tileset = MapUtilities.findTileSet(map, tile);
-    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
-      return null;
-    }
-
-    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
-    if (sprite == null) {
-      sprite = Spritesheet.load(tileset);
-      if (sprite == null) {
-        return null;
-      }
-    }
-
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    int index = tile.getGridId() - tileset.getFirstGridId();
-
-    // support for animated tiles
-    ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    if (animation != null && animation.getFrames().size() > 0) {
-      long playedMs = Game.getLoop().getTime().getMilliseconds();
-
-      int totalDuration = animation.getTotalDuration();
-      long animationsPlayed = playedMs / totalDuration;
-
-      long deltaTicks = playedMs - animationsPlayed * totalDuration;
-      int currentPlayTime = 0;
-      for (ITileAnimationFrame frame : animation.getFrames()) {
-        currentPlayTime += frame.getDuration();
-        if (deltaTicks < currentPlayTime) {
-          // found the current animation frame
-          index = frame.getTileId();
-          break;
-        }
-      }
-
-    }
-
-    final Image img = sprite.getSprite(index);
-    return img;
   }
 
   /**
@@ -234,27 +234,27 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * Renders the tiles from the specified layer that lie within the bounds of
    * the viewport. This layer rendering is not cached and renders all tiles
    * directly onto the graphics object.
-   * 
+   *
    * @param g
    * @param layer
    * @param map
    * @param viewport
    */
-  private void renderLayerImage(Graphics2D g, final ITileLayer layer, final IMap map, Rectangle2D viewport) {
-    Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
-    Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
-    double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
-    double viewportOffsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
+  private void renderLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
+    final Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
+    final Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
+    final double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
+    final double viewportOffsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
 
     // set alpha value of the tiles by the layers value
     final Composite oldComp = g.getComposite();
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
-    int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
-    int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
-    int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
-    int endY = MathUtilities.clamp(endTile.y, 0, layer.getSizeInTiles().height);
+    final int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
+    final int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
+    final int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
+    final int endY = MathUtilities.clamp(endTile.y, 0, layer.getSizeInTiles().height);
 
     final double offsetX = viewportOffsetX + (startX - startTile.x) * map.getTileSize().width;
     final double offsetY = viewportOffsetY + (startY - startTile.y) * map.getTileSize().height;

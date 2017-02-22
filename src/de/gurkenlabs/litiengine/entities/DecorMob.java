@@ -11,69 +11,46 @@ import de.gurkenlabs.litiengine.input.ClientEntityMovementController;
 
 @CombatAttributesInfo(health = 1)
 public class DecorMob extends MovableCombatEntity {
-  private final String mobType;
-  private final MovementBehaviour behaviour;
-
-  public DecorMob(final Point2D location, final String mobType, final MovementBehaviour behaviour, final short velocity) {
-    super();
-    this.mobType = mobType;
-    this.setLocation(location);
-    
-    Game.getEntityControllerManager().addController(this, new DecorMobAnimationController(this));
-    this.behaviour = behaviour;
-    switch (this.behaviour) {
-    case SHY:
-      Game.getEntityControllerManager().addController(this, new ShyDecorMobMovementController(this));
-      break;
-    case RANDOM:
-      break;
-    default:
-      break;
-    }
-
-    this.setVelocity(velocity);
-  }
-
-  public String getMobType() {
-    return this.mobType;
-  }
-
   public enum MovementBehaviour {
     IDLE,
 
-    // butterfly
-    SHY,
-
     // rabbit
-    RANDOM;
+    RANDOM,
 
-    public static MovementBehaviour get(String behaviour) {
+    // butterfly
+    SHY;
+
+    public static MovementBehaviour get(final String behaviour) {
       if (behaviour == null || behaviour.isEmpty()) {
         return MovementBehaviour.IDLE;
       }
 
       try {
         return MovementBehaviour.valueOf(behaviour);
-      } catch (IllegalArgumentException iae) {
+      } catch (final IllegalArgumentException iae) {
         return MovementBehaviour.IDLE;
       }
     }
   }
 
   private class ShyDecorMobMovementController extends ClientEntityMovementController<DecorMob> {
+    private int angle;
     private long lastAngleChange;
     private long nextAngleChange;
-    private int angle;
 
     public ShyDecorMobMovementController(final DecorMob movableEntity) {
       super(movableEntity);
       this.calculateNextAngleChange();
     }
 
+    public void calculateNextAngleChange() {
+      this.nextAngleChange = new Random().nextInt(3000) + 2000;
+    }
+
     @Override
     public void update(final IGameLoop gameLoop) {
       super.update(gameLoop);
-      if (Game.getEnvironment() == null || isDead()) {
+      if (Game.getEnvironment() == null || DecorMob.this.isDead()) {
         return;
       }
       final long currentTick = gameLoop.getTicks();
@@ -99,9 +76,33 @@ public class DecorMob extends MovableCombatEntity {
        */
     }
 
-    public void calculateNextAngleChange() {
-      this.nextAngleChange = new Random().nextInt(3000) + 2000;
+  }
+
+  private final MovementBehaviour behaviour;
+
+  private final String mobType;
+
+  public DecorMob(final Point2D location, final String mobType, final MovementBehaviour behaviour, final short velocity) {
+    super();
+    this.mobType = mobType;
+    this.setLocation(location);
+
+    Game.getEntityControllerManager().addController(this, new DecorMobAnimationController(this));
+    this.behaviour = behaviour;
+    switch (this.behaviour) {
+    case SHY:
+      Game.getEntityControllerManager().addController(this, new ShyDecorMobMovementController(this));
+      break;
+    case RANDOM:
+      break;
+    default:
+      break;
     }
 
+    this.setVelocity(velocity);
+  }
+
+  public String getMobType() {
+    return this.mobType;
   }
 }

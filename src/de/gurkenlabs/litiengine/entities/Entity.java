@@ -10,29 +10,30 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
 /**
  * The Class Entity.
  */
 @EntityInfo
 public abstract class Entity implements IEntity {
+  /** The direction. */
+  private float angle;
+
+  private Rectangle2D boundingBox;
+
   private float height;
 
   private int mapId;
 
-  private String name;
-
   /** The map location. */
   private Point2D mapLocation;
 
-  /** The direction. */
-  private float angle;
-
-  private float width;
+  private String name;
 
   private RenderType renderType;
 
-  private Rectangle2D boundingBox;
+  private float width;
 
   /**
    * Instantiates a new entity.
@@ -54,8 +55,13 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public IAnimationController getAnimationController() {
+    return Game.getEntityControllerManager().getAnimationController(this);
+  }
+
+  @Override
   public Rectangle2D getBoundingBox() {
-    if (boundingBox != null) {
+    if (this.boundingBox != null) {
       return this.boundingBox;
     }
 
@@ -93,17 +99,34 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public RenderType getRenderType() {
+    return this.renderType;
+  }
+
+  @Override
   public float getWidth() {
     return this.width;
   }
 
   @Override
-  public String sendMessage(Object sender, final String message) {
+  public String sendMessage(final Object sender, final String message) {
     return null;
   }
 
-  protected void setAngle(final float angle) {
-    this.angle = angle;
+  @Override
+  public void setHeight(final float height) {
+    this.height = height;
+    this.boundingBox = null;
+  }
+
+  @Override
+  public void setLocation(final double x, final double y) {
+    this.setLocation(new Point2D.Double(x, y));
   }
 
   /**
@@ -118,11 +141,6 @@ public abstract class Entity implements IEntity {
     this.boundingBox = null;
   }
 
-  @Override
-  public void setLocation(double x, double y) {
-    this.setLocation(new Point2D.Double(x, y));
-  }
-
   /**
    * Sets an id which should only be filled when an entity gets added due to map
    * information.
@@ -135,39 +153,28 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void setSize(final float width, final float height) {
-    this.setWidth(width);
-    this.setHeight(height);
+  public void setName(final String name) {
+    this.name = name;
   }
-  
+
   @Override
-  public void setRenderType(RenderType renderType) {
+  public void setRenderType(final RenderType renderType) {
     this.renderType = renderType;
   }
 
   @Override
-  public void setHeight(float height) {
-    this.height = height;
-    this.boundingBox = null;
+  public void setSize(final float width, final float height) {
+    this.setWidth(width);
+    this.setHeight(height);
   }
 
   @Override
-  public void setWidth(float width) {
+  public void setWidth(final float width) {
     this.width = width;
     this.boundingBox = null;
   }
 
-  public RenderType getRenderType() {
-    return renderType;
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
+  protected void setAngle(final float angle) {
+    this.angle = angle;
   }
 }

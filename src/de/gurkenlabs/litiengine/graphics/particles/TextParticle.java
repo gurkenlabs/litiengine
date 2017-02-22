@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 
 public class TextParticle extends Particle {
-  private final String text;
   private Font font;
+  private final String text;
 
   public TextParticle(final String text, final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, 0, 0, life, color);

@@ -12,10 +12,10 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 
 public final class SoundEngine implements ISoundEngine, IUpdateable {
   private static final int DEFAULT_MAX_DISTANCE = 250;
-  private final List<SoundSource> sounds;
-  private SoundSource music;
   private Point2D listenerLocation;
   private float maxDist;
+  private SoundSource music;
+  private final List<SoundSource> sounds;
 
   public SoundEngine() {
     this.sounds = new CopyOnWriteArrayList<>();
@@ -23,42 +23,12 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void start() {
-    Game.getLoop().attach(this);
-    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
+  public float getMaxDistance() {
+    return this.maxDist;
   }
 
   @Override
-  public void terminate() {
-    Game.getLoop().detach(this);
-    SoundSource.terminate();
-  }
-
-  @Override
-  public void update(IGameLoop loop) {
-    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
-
-    List<SoundSource> remove = new ArrayList<>();
-    for (SoundSource s : this.sounds) {
-      if (s != null && !s.isPlaying()) {
-        s.dispose();
-        remove.add(s);
-      }
-    }
-
-    this.sounds.removeAll(remove);
-    for (SoundSource s : this.sounds) {
-      s.updateControls(this.listenerLocation);
-    }
-
-    // music is looped by default
-    if (this.music != null && !this.music.isPlaying()) {
-      this.playMusic(this.music.getSound());
-    }
-  }
-
-  @Override
-  public void playMusic(Sound sound) {
+  public void playMusic(final Sound sound) {
     if (this.music != null) {
       this.music.dispose();
     }
@@ -68,41 +38,47 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void playSound(IEntity entity, Sound sound) {
+  public void playSound(final IEntity entity, final Sound sound) {
     if (sound == null) {
       return;
     }
 
-    SoundSource source = new SoundSource(sound, this.listenerLocation, entity);
+    final SoundSource source = new SoundSource(sound, this.listenerLocation, entity);
     source.play();
     this.sounds.add(source);
   }
 
   @Override
-  public void playSound(Point2D location, Sound sound) {
+  public void playSound(final Point2D location, final Sound sound) {
     if (sound == null) {
       return;
     }
 
-    SoundSource source = new SoundSource(sound, this.listenerLocation);
+    final SoundSource source = new SoundSource(sound, this.listenerLocation);
     source.play();
     this.sounds.add(source);
   }
 
   @Override
-  public void playSound(Sound sound) {
+  public void playSound(final Sound sound) {
     if (sound == null) {
       return;
     }
 
-    SoundSource source = new SoundSource(sound);
+    final SoundSource source = new SoundSource(sound);
     source.play();
     this.sounds.add(source);
   }
 
   @Override
-  public void setMaxDistance(float radius) {
+  public void setMaxDistance(final float radius) {
     this.maxDist = radius;
+  }
+
+  @Override
+  public void start() {
+    Game.getLoop().attach(this);
+    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
   }
 
   @Override
@@ -112,7 +88,31 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public float getMaxDistance() {
-    return this.maxDist;
+  public void terminate() {
+    Game.getLoop().detach(this);
+    SoundSource.terminate();
+  }
+
+  @Override
+  public void update(final IGameLoop loop) {
+    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
+
+    final List<SoundSource> remove = new ArrayList<>();
+    for (final SoundSource s : this.sounds) {
+      if (s != null && !s.isPlaying()) {
+        s.dispose();
+        remove.add(s);
+      }
+    }
+
+    this.sounds.removeAll(remove);
+    for (final SoundSource s : this.sounds) {
+      s.updateControls(this.listenerLocation);
+    }
+
+    // music is looped by default
+    if (this.music != null && !this.music.isPlaying()) {
+      this.playMusic(this.music.getSound());
+    }
   }
 }
