@@ -13,27 +13,12 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 
+/**
+ * This class implements all required functionality to load sounds from the file
+ * system and provide a stream that can later on be used for the sound playback.
+ */
 public class Sound {
   private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
-
-  public static Sound find(final String name) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-
-    return sounds.get(FileUtilities.getFileName(name));
-  }
-
-  public static Sound load(final String path) {
-    Sound sound = sounds.get(FileUtilities.getFileName(path));
-    if (sound != null) {
-      return sound;
-    }
-
-    sound = new Sound(path);
-    sounds.put(FileUtilities.getFileName(path), sound);
-    return sound;
-  }
 
   private AudioFormat format;
 
@@ -43,6 +28,18 @@ public class Sound {
 
   private byte[] streamData;
 
+  /**
+   * Creates a new Sound instance by the specified file path. Loads the sound
+   * data into a byte array and also retrieves information about the format of
+   * the sound file.
+   * 
+   * Note that the constructor is private. In order to load files use the static
+   * methods {@link #find(String)} or {@link #load(String)} methods depending on
+   * whether you already loaded the sound or not.
+   * 
+   * @param path
+   *          The path to load the sound from.
+   */
   private Sound(final String path) {
     this.name = FileUtilities.getFileName(path);
 
@@ -65,6 +62,43 @@ public class Sound {
     } catch (final IOException e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Finds and returns a sound previously loaded by calling the
+   * {@link #load(String)} function.
+   * 
+   * @param name
+   *          The name of the sound to find (no extension needed).
+   * @return The sound that is identified by the specified name, if it was
+   *         previously loaded or null.
+   */
+  public static Sound find(final String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    return sounds.get(FileUtilities.getFileName(name));
+  }
+
+  /**
+   * Loads the sound from the specified path and makes it accessible via
+   * {@link #find(String)} method.
+   * 
+   * @param path
+   *          The path of the file to be loaded.(Can be relative or absolute)
+   * @return The loaded Sound from the specified path.
+   */
+  public static Sound load(final String path) {
+    String fileName = FileUtilities.getFileName(path);
+    Sound sound = sounds.get(fileName);
+    if (sound != null) {
+      return sound;
+    }
+
+    sound = new Sound(path);
+    sounds.put(fileName, sound);
+    return sound;
   }
 
   public AudioFormat getFormat() {

@@ -5,6 +5,14 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
+/**
+ * This interface provides all methods to playback sounds and music in your
+ * game. It allows to define the 2D coordinates of the sound or even pass in the
+ * source entity of the sound which will adjust the position accoring to the
+ * position of the entity. The LILI Engine Sound Engine supports .wav, .mp3 and
+ * .ogg by default. If you need other file extensions, you have to write an own
+ * SPI implementation and inject it in your project.
+ */
 public interface ISoundEngine extends ILaunchable {
 
   /**
