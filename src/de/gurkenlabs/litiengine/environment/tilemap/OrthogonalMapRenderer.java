@@ -12,6 +12,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import de.gurkenlabs.litiengine.Game;
@@ -19,6 +22,8 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.tilemap.IImageLayer;
+import de.gurkenlabs.tilemap.ILayer;
 import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.tilemap.ITile;
 import de.gurkenlabs.tilemap.ITileAnimation;
@@ -146,7 +151,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   @Override
   public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
-    for (final ITileLayer layer : map.getTileLayers()) {
+
+    for (final ILayer layer : this.getAllRenderLayers(map)) {
       if (layer == null) {
         continue;
       }
@@ -159,7 +165,13 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         }
       }
 
-      this.renderLayerImage(g, layer, map, viewport);
+      if (layer instanceof ITileLayer) {
+        this.renderTileLayerImage(g, (ITileLayer) layer, map, viewport);
+      }
+
+      if (layer instanceof IImageLayer) {
+        this.renderImageLayer(g, (IImageLayer) layer, map, viewport);
+      }
     }
   }
 
@@ -180,8 +192,22 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      this.renderLayerImage(g, layer, map, viewport);
+      this.renderTileLayerImage(g, layer, map, viewport);
     }
+  }
+
+  private List<ILayer> getAllRenderLayers(IMap map) {
+    ArrayList<ILayer> layers = new ArrayList<>();
+    for (ITileLayer tileLayer : map.getTileLayers()) {
+      layers.add(tileLayer);
+    }
+
+    for (IImageLayer imageLayer : map.getImageLayers()) {
+      layers.add(imageLayer);
+    }
+    layers.sort(Comparator.comparing(ILayer::getOrder));
+
+    return layers;
   }
 
   /**
@@ -240,7 +266,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @param map
    * @param viewport
    */
-  private void renderLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
+  private void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
     final Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
     final Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
     final double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
@@ -266,6 +292,25 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       }
     });
 
+    g.setComposite(oldComp);
+  }
+
+  // TODO: load images of all image layers to the gamefile in order to be able
+  // to render the image
+  private void renderImageLayer(Graphics2D g, IImageLayer layer, IMap map, Rectangle2D viewport) {
+    final Composite oldComp = g.getComposite();
+    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    g.setComposite(ac);
+
+    final double viewportOffsetX = -viewport.getX() + layer.getPosition().x;
+    final double viewportOffsetY = -viewport.getY() + layer.getPosition().y;
+
+    Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
+    if (sprite == null) {
+      return;
+    }
+
+    RenderEngine.renderImage(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
   }
 }
