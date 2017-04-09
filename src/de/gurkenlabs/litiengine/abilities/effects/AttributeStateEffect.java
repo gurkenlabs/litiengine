@@ -34,8 +34,8 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
    * @param targtes
    *          the targtes
    */
-  protected AttributeStateEffect(final IEnvironment environment, final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
-    super(environment, ability, targtes);
+  protected AttributeStateEffect(final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
+    super(ability, targtes);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
 
@@ -55,8 +55,8 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   }
 
   @Override
-  protected void apply(final ICombatEntity affectedEntity) {
-    super.apply(affectedEntity);
+  protected void apply(final ICombatEntity affectedEntity, final IEnvironment environment) {
+    super.apply(affectedEntity, environment);
     this.getAttribute(affectedEntity).addModifier(this.getModifier());
   }
 

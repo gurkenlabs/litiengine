@@ -7,7 +7,6 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * This effect allows to modify the entitie's attack speed.
@@ -24,8 +23,8 @@ public class AttackSpeedEffect extends AttributeStateEffect<Float> {
    * @param targtes
    *          the targtes
    */
-  public AttackSpeedEffect(final IEnvironment environment, final Ability ability, final float delta, final Modification modifictaion, final EffectTarget... targtes) {
-    super(environment, ability, Modification.Multiply, delta, targtes);
+  public AttackSpeedEffect(final Ability ability, final float delta, final Modification modifictaion, final EffectTarget... targtes) {
+    super(ability, Modification.Multiply, delta, targtes);
   }
 
   @Override

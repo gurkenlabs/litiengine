@@ -25,8 +25,8 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
    * @param targtes
    *          the targtes
    */
-  public ShieldEffect(final IEnvironment environment, final Ability ability, final short shieldDelta, final Modification modifictaion, final EffectTarget... targtes) {
-    super(environment, ability, modifictaion, shieldDelta, targtes);
+  public ShieldEffect(final Ability ability, final short shieldDelta, final Modification modifictaion, final EffectTarget... targtes) {
+    super(ability, modifictaion, shieldDelta, targtes);
   }
 
   @Override
@@ -36,7 +36,8 @@ public class ShieldEffect extends AttributeStateEffect<Short> {
   }
 
   @Override
-  protected void apply(final ICombatEntity affectedEntity) {
+  protected void apply(final ICombatEntity affectedEntity, final IEnvironment environment) {
+    super.apply(affectedEntity, environment);
     this.getAttribute(affectedEntity).modifyBaseValue(this.getModifier());
   }
 

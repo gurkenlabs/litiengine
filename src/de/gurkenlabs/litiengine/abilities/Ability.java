@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -108,13 +109,16 @@ public abstract class Ability implements IRenderable {
   }
 
   /**
-   * Cast.
+   * Casts the ability by the temporal conditions of the specified game loop and
+   * the spatial circumstances of the specified environment. An ability
+   * execution will be taken out that start applying all the effects of this
+   * ability.
    */
-  public AbilityExecution cast(final IGameLoop gameLoop) {
+  public AbilityExecution cast(final IGameLoop gameLoop, final IEnvironment environment) {
     if (!this.canCast(gameLoop)) {
       return null;
     }
-    this.currentExecution = new AbilityExecution(gameLoop, this);
+    this.currentExecution = new AbilityExecution(gameLoop, environment, this);
 
     for (final Consumer<AbilityExecution> castConsumer : this.abilityCastConsumer) {
       castConsumer.accept(this.currentExecution);

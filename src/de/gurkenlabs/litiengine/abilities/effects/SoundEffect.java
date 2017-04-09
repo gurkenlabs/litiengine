@@ -9,8 +9,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
 public class SoundEffect extends Effect {
   private final Sound[] sounds;
 
-  public SoundEffect(final IEnvironment environment, final Ability ability, final Sound... sounds) {
-    super(environment, ability, EffectTarget.EXECUTINGENTITY);
+  public SoundEffect(final Ability ability, final Sound... sounds) {
+    super(ability, EffectTarget.EXECUTINGENTITY);
     this.sounds = sounds;
   }
 
@@ -24,8 +24,8 @@ public class SoundEffect extends Effect {
   }
 
   @Override
-  protected void apply(final ICombatEntity entity) {
-    super.apply(entity);
+  protected void apply(final ICombatEntity entity, final IEnvironment environment) {
+    super.apply(entity, environment);
     if (this.sounds.length == 0) {
       return;
     }

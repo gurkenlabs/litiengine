@@ -22,11 +22,13 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
- * The Class Effect.
+ * The Class Effect seeks for affected entities in the game's current
+ * environment to apply certain effects to them defined by the overwritten
+ * implementation of apply/cease.
  */
 public abstract class Effect implements IEffect {
   private final Ability ability;
-  private final List<EffectAppliance> appliances;
+  private final List<EffectApplication> appliances;
 
   private final List<Consumer<EffectArgument>> appliedConsumer;
   private final List<Consumer<EffectArgument>> ceasedConsumer;
@@ -40,8 +42,6 @@ public abstract class Effect implements IEffect {
   /** The effect targets. */
   private final EffectTarget[] effectTargets;
 
-  private final IEnvironment environment;
-
   private final List<IEffect> followUpEffects;
 
   private EntityComparator targetPriorityComparator;
@@ -54,13 +54,12 @@ public abstract class Effect implements IEffect {
    * @param targets
    *          the targets
    */
-  protected Effect(final IEnvironment environment, final Ability ability, final EffectTarget... targets) {
+  protected Effect(final Ability ability, final EffectTarget... targets) {
     this.appliedConsumer = new CopyOnWriteArrayList<>();
     this.ceasedConsumer = new CopyOnWriteArrayList<>();
     this.appliances = new ArrayList<>();
     this.followUpEffects = new CopyOnWriteArrayList<>();
 
-    this.environment = environment;
     this.ability = ability;
     this.targetPriorityComparator = new EntityDistanceComparator(this.getAbility().getExecutor());
 
@@ -76,13 +75,13 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply(final IGameLoop loop, final Shape impactArea) {
-    final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
-    for (final ICombatEntity affectedEntity : this.lookForAffectedEntities(impactArea)) {
-      this.apply(affectedEntity);
+  public void apply(final IGameLoop loop, final IEnvironment environment, final Shape impactArea) {
+    final List<ICombatEntity> affected = this.lookForAffectedEntities(environment, impactArea);
+    for (final ICombatEntity affectedEntity : affected) {
+      this.apply(affectedEntity, environment);
     }
 
-    this.appliances.add(new EffectAppliance(loop.getTicks(), affected, impactArea));
+    this.appliances.add(new EffectApplication(environment, loop.getTicks(), affected, impactArea));
 
     // if it is the first appliance -> register for update
     if (this.appliances.size() == 1) {
@@ -109,7 +108,7 @@ public abstract class Effect implements IEffect {
   }
 
   @Override
-  public List<EffectAppliance> getActiveAppliances() {
+  public List<EffectApplication> getActiveAppliances() {
     return this.appliances;
   }
 
@@ -143,10 +142,6 @@ public abstract class Effect implements IEffect {
     return this.effectTargets;
   }
 
-  public IEnvironment getEnvironment() {
-    return this.environment;
-  }
-
   /**
    * Gets the follow up effects.
    *
@@ -163,7 +158,7 @@ public abstract class Effect implements IEffect {
 
   @Override
   public boolean isActive(final ICombatEntity entity) {
-    for (final EffectAppliance app : this.getActiveAppliances()) {
+    for (final EffectApplication app : this.getActiveAppliances()) {
       for (final ICombatEntity affected : app.getAffectedEntities()) {
         if (affected.equals(entity)) {
           return true;
@@ -219,8 +214,8 @@ public abstract class Effect implements IEffect {
   @Override
   public void update(final IGameLoop loop) {
 
-    for (final Iterator<EffectAppliance> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
-      final EffectAppliance appliance = iterator.next();
+    for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
+      final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
       if (this.hasEnded(loop, appliance)) {
 
@@ -235,7 +230,7 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  protected void apply(final ICombatEntity entity) {
+  protected void apply(final ICombatEntity entity, final IEnvironment env) {
     entity.getAppliedEffects().add(this);
     final EffectArgument arg = new EffectArgument(this, entity);
     for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
@@ -243,7 +238,7 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
+  protected void cease(final IGameLoop loop, final EffectApplication appliance) {
     // 1. cease the effect for all affected entities
     for (final ICombatEntity entity : appliance.getAffectedEntities()) {
       this.cease(entity);
@@ -251,12 +246,12 @@ public abstract class Effect implements IEffect {
 
     // 2. apply follow up effects
     this.getFollowUpEffects().forEach(followUp -> {
-      followUp.apply(loop, appliance.getImpactArea());
+      followUp.apply(loop, appliance.getEnvironment(), appliance.getImpactArea());
     });
   }
 
-  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return this.getEnvironment().findCombatEntities(impactArea);
+  protected Collection<ICombatEntity> getEntitiesInImpactArea(IEnvironment environment, final Shape impactArea) {
+    return environment.findCombatEntities(impactArea);
   }
 
   /**
@@ -268,7 +263,7 @@ public abstract class Effect implements IEffect {
     return this.getDuration() + this.getDelay();
   }
 
-  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
+  protected boolean hasEnded(final IGameLoop loop, final EffectApplication appliance) {
     final long effectDuration = loop.getDeltaTime(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }
@@ -278,7 +273,7 @@ public abstract class Effect implements IEffect {
    *
    * @return the list
    */
-  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
+  protected List<ICombatEntity> lookForAffectedEntities(final IEnvironment environment, final Shape impactArea) {
     List<ICombatEntity> affectedEntities = new ArrayList<>();
 
     for (final EffectTarget target : this.effectTargets) {
@@ -287,15 +282,15 @@ public abstract class Effect implements IEffect {
         affectedEntities.add(this.getAbility().getExecutor());
         return affectedEntities;
       case ENEMY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
         affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
         break;
       case FRIENDLY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
         break;
       case FRIENDLYDEAD:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
         break;
       default:

@@ -12,21 +12,21 @@ public abstract class ForceEffect extends Effect {
   /** The strength. */
   private final float strength;
 
-  protected ForceEffect(final IEnvironment environment, final Ability ability, final float strength, final EffectTarget... targets) {
-    super(environment, ability, targets);
+  protected ForceEffect(final Ability ability, final float strength, final EffectTarget... targets) {
+    super(ability, targets);
     this.strength = strength;
     this.setDuration(-1);
   }
 
   @Override
-  public void apply(final ICombatEntity affectedEntity) {
-    super.apply(affectedEntity);
+  public void apply(final ICombatEntity affectedEntity, final IEnvironment environment) {
+    super.apply(affectedEntity, environment);
     // only apply one force per effect
     if (this.getAppliedForce() != null) {
       return;
     }
 
-    final Force force = this.applyForce(affectedEntity);
+    final Force force = this.applyForce(affectedEntity, environment);
     if (force != null) {
       this.appliedForce = force;
     }
@@ -36,10 +36,10 @@ public abstract class ForceEffect extends Effect {
     return this.strength;
   }
 
-  protected abstract Force applyForce(final ICombatEntity affectedEntity);
+  protected abstract Force applyForce(final ICombatEntity affectedEntity, final IEnvironment environment);
 
   @Override
-  protected void cease(final IGameLoop loop, final EffectAppliance appliance) {
+  protected void cease(final IGameLoop loop, final EffectApplication appliance) {
     super.cease(loop, appliance);
     if (this.getAppliedForce() != null) {
       this.getAppliedForce().end();
@@ -52,7 +52,7 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  protected boolean hasEnded(final IGameLoop loop, final EffectAppliance appliance) {
+  protected boolean hasEnded(final IGameLoop loop, final EffectApplication appliance) {
     return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
   }
 }

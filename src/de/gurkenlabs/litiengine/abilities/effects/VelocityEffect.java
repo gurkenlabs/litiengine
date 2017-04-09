@@ -7,7 +7,6 @@ import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,8 +24,8 @@ public class VelocityEffect extends AttributeStateEffect<Float> {
    * @param targtes
    *          the targtes
    */
-  public VelocityEffect(final IEnvironment environment, final Ability ability, final float velocityDelta, final Modification modification, final EffectTarget... targtes) {
-    super(environment, ability, modification, velocityDelta, targtes);
+  public VelocityEffect(final Ability ability, final float velocityDelta, final Modification modification, final EffectTarget... targtes) {
+    super(ability, modification, velocityDelta, targtes);
   }
 
   @Override

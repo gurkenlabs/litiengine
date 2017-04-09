@@ -7,15 +7,24 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public interface IEffect extends IUpdateable {
   public static final int NO_DURATION = -1;
 
-  public void apply(IGameLoop loop, Shape impactArea);
+  /**
+   * Applies the effect in the specified impact area on the specified
+   * environment.
+   * 
+   * @param loop
+   * @param environment
+   * @param impactArea
+   */
+  public void apply(IGameLoop loop, IEnvironment environment, Shape impactArea);
 
   public void cease(final ICombatEntity affectedEntity);
 
-  public List<EffectAppliance> getActiveAppliances();
+  public List<EffectApplication> getActiveAppliances();
 
   public int getDelay();
 

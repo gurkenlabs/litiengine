@@ -4,9 +4,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class StateEffect.
  */
@@ -19,7 +17,7 @@ public abstract class StateEffect extends Effect {
    * @param targtes
    *          the targtes
    */
-  protected StateEffect(final IEnvironment environment, final Ability ability, final EffectTarget... targtes) {
-    super(environment, ability, targtes);
+  protected StateEffect(final Ability ability, final EffectTarget... targtes) {
+    super(ability, targtes);
   }
 }

@@ -75,6 +75,12 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    */
   public void registerMouseWheelListener(MouseWheelListener listener);
 
+  /**
+   * If set to true, the mouse will be locked to the render component of the
+   * game.
+   * 
+   * @param grab
+   */
   public void setGrabMouse(boolean grab);
 
   public void setLocation(Point adjustMouse);

@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * The Class AbilityExecution.
@@ -28,18 +29,21 @@ public class AbilityExecution implements IUpdateable {
   /** The impact area. */
   private final Shape impactArea;
 
+  private final IEnvironment environment;
+
   /**
    * Instantiates a new ability execution.
    *
    * @param ability
    *          the ability
    */
-  public AbilityExecution(final IGameLoop gameLoop, final Ability ability) {
+  public AbilityExecution(final IGameLoop gameLoop, final IEnvironment environment, final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;
     this.executionTicks = gameLoop.getTicks();
     this.impactArea = ability.calculateImpactArea();
     this.castLocation = ability.getExecutor().getDimensionCenter();
+    this.environment = environment;
     gameLoop.attach(this);
   }
 
@@ -105,7 +109,7 @@ public class AbilityExecution implements IUpdateable {
         continue;
       }
 
-      effect.apply(loop, this.getExecutionImpactArea());
+      effect.apply(loop, this.environment, this.getExecutionImpactArea());
       this.getAppliedEffects().add(effect);
     }
   }
