@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.tilemap.IMap;
 
-public abstract class Game {
+public final class Game {
   private final static GameConfiguration configuration;
   private final static EntityControllerManager entityControllerManager;
   private static IEnvironment environment;
