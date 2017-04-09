@@ -9,6 +9,10 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 
+/**
+ * This class holds all controllers for the entities in the game. It is used as
+ * a single hub to access and manage all the controllers.
+ */
 public class EntityControllerManager {
   private final Map<IEntity, IEntityController<? extends IEntity>> aiControllers;
   private final Map<IEntity, IAnimationController> animationControllers;
@@ -20,6 +24,13 @@ public class EntityControllerManager {
     this.movementControllers = new ConcurrentHashMap<>();
   }
 
+  /**
+   * Adds the animation controller for the specified entity and detaches
+   * previously added controllers from the game loop.
+   * 
+   * @param entity
+   * @param controller
+   */
   public void addController(final IEntity entity, final IAnimationController controller) {
     if (entity == null || controller == null) {
       return;
