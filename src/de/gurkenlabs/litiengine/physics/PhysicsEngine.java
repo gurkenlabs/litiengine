@@ -21,7 +21,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class PhysicsEngine.
  */
 public final class PhysicsEngine implements IPhysicsEngine {
-  private final List<Rectangle2D> allCollisionBoxes;
+  private final List<CollisionBox> allCollisionBoxes;
 
   private final List<ICollisionEntity> collisionEntities;
 
@@ -156,7 +156,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.allCollisionBoxes;
+    return this.allCollisionBoxes.stream().map(s -> s.getCollisionBox()).collect(Collectors.toList());
   }
 
   @Override
@@ -267,8 +267,8 @@ public final class PhysicsEngine implements IPhysicsEngine {
   @Override
   public void update(final IGameLoop loop) {
     this.allCollisionBoxes.clear();
-    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> x.getCollisionBox()).collect(Collectors.toList()));
-    this.allCollisionBoxes.addAll(this.staticCollisionBoxes);
+    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> new CollisionBox(x)).collect(Collectors.toList()));
+    this.allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(x -> new CollisionBox(x)).collect(Collectors.toList()));
   }
 
   /**
@@ -318,17 +318,20 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   private Rectangle2D collidesWithAnything(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
-    for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
-      if (collisionBox.equals(entity.getCollisionBox())) {
+    for (final CollisionBox collisionBox : this.allCollisionBoxes) {
+
+      // an entity cannot collide with itself or other entities that are
+      // excluded from collision by the canCollideWith method
+      if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
         continue;
       }
 
-      if (collisionBox.contains(entityCollisionBox)) {
-        return collisionBox;
+      if (collisionBox.getCollisionBox().contains(entityCollisionBox)) {
+        return collisionBox.getCollisionBox();
       }
 
-      if (GeometricUtilities.intersects(collisionBox, entityCollisionBox)) {
-        return collisionBox.createIntersection(entityCollisionBox);
+      if (GeometricUtilities.intersects(collisionBox.getCollisionBox(), entityCollisionBox)) {
+        return collisionBox.getCollisionBox().createIntersection(entityCollisionBox);
       }
     }
 
@@ -413,5 +416,29 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
 
     return resolvedPosition;
+  }
+
+  private class CollisionBox {
+    private final Rectangle2D box;
+
+    private final ICollisionEntity entity;
+
+    private CollisionBox(Rectangle2D box) {
+      this.box = box;
+      this.entity = null;
+    }
+
+    private CollisionBox(ICollisionEntity entity) {
+      this.box = entity.getCollisionBox();
+      this.entity = entity;
+    }
+
+    public Rectangle2D getCollisionBox() {
+      return this.box;
+    }
+
+    public ICollisionEntity getEntity() {
+      return this.entity;
+    }
   }
 }
