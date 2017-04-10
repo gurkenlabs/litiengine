@@ -8,8 +8,9 @@ import javax.swing.SwingUtilities;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
+import de.gurkenlabs.litiengine.physics.MovementController;
 
-public class MousePathCombatEntityController extends ClientEntityMovementController<IMovableCombatEntity> implements MouseListener {
+public class MousePathCombatEntityController extends MovementController<IMovableCombatEntity> implements MouseListener {
   /** The player is navigating. */
   private boolean navigating;
 

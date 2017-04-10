@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
-import de.gurkenlabs.litiengine.input.ClientEntityMovementController;
+import de.gurkenlabs.litiengine.physics.MovementController;
 
 @CombatAttributesInfo(health = 1)
 public class DecorMob extends MovableCombatEntity {
@@ -33,7 +33,7 @@ public class DecorMob extends MovableCombatEntity {
     }
   }
 
-  private class ShyDecorMobMovementController extends ClientEntityMovementController<DecorMob> {
+  private class ShyDecorMobMovementController extends MovementController<DecorMob> {
     private int angle;
     private long lastAngleChange;
     private long nextAngleChange;

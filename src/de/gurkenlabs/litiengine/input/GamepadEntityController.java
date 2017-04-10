@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
@@ -13,7 +14,7 @@ import net.java.games.input.Component.Identifier;
  * TODO: Apply friction to terrain in order to slow down acceleration and speed
  * up deceleration.
  */
-public class GamepadEntityController<T extends IMovableEntity> extends ClientEntityMovementController<T> {
+public class GamepadEntityController<T extends IMovableEntity> extends MovementController<T> {
   private float dx;
   private float dy;
   private int gamePadIndex = -1;

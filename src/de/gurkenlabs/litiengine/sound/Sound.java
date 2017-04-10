@@ -54,8 +54,8 @@ public class Sound {
         in = AudioSystem.getAudioInputStream(decodedFormat, in);
         this.stream = in;
         this.streamData = StreamUtilities.getBytes(this.stream);
+        this.format = this.stream.getFormat();
       }
-      this.format = this.stream.getFormat();
     } catch (final UnsupportedAudioFileException e) {
       System.out.println("could not load '" + path + "'");
       e.printStackTrace();

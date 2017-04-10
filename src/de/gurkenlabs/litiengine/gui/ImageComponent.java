@@ -57,7 +57,7 @@ public class ImageComponent extends GuiComponent {
     }
 
     if (img != null) {
-      ImageCache.SPRITES.putPersistent(cacheKey, img);
+      ImageCache.SPRITES.put(cacheKey, img);
     }
 
     return img;

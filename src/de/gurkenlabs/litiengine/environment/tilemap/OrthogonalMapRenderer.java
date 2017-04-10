@@ -250,9 +250,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       RenderEngine.renderImage(imageGraphics, tileTexture, x, y);
     });
 
-    ImageCache.MAPS.putPersistent(
-
-        getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+    ImageCache.MAPS.put(getCacheKey(map) + "_" + layer.getName(), bufferedImage);
     return bufferedImage;
   }
 

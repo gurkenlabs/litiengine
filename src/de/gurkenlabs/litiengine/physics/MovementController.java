@@ -5,21 +5,20 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class MovementController<T extends IMovableEntity> implements IMovementController<T> {
   private final List<Force> activeForces;
-  private final IPhysicsEngine engine;
   private final T movableEntity;
   private final List<Predicate<T>> movementPredicates;
 
-  public MovementController(final IPhysicsEngine engine, final T movableEntity) {
+  public MovementController(final T movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
     this.movableEntity = movableEntity;
-    this.engine = engine;
   }
 
   @Override
@@ -52,7 +51,7 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
   }
 
   protected IPhysicsEngine getPhysicsEngine() {
-    return this.engine;
+    return Game.getPhysicsEngine();
   }
 
   protected boolean isMovementAllowed() {

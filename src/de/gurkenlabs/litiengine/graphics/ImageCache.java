@@ -33,17 +33,38 @@ public class ImageCache {
 
   public static final String SPRITES_DIRECTORY = "sprites";
 
-  public static void loadCache(final String path) {
+  /** The cache. */
+  private final ConcurrentHashMap<String, BufferedImage> cache;
+
+  /** The sub folder. */
+  private final String subFolder;
+
+  /**
+   * Instantiates a new image cache.
+   *
+   * @param subfolder
+   *          the subfolder
+   */
+  private ImageCache(final String subfolder) {
+    this.cache = new ConcurrentHashMap<>();
+    this.subFolder = subfolder;
+  }
+
+  public static void loadCache() {
+    if (new File(CACHE_DIRECTORY).exists()) {
+      System.out.println("Cache dump '" + CACHE_DUMP_NAME + "' was not loaded because the cache folder'" + CACHE_DIRECTORY + "' already exists.");
+      return;
+    }
+
     final InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME);
-    final File cacheFile = new File(path, CACHE_DUMP_NAME);
     if (in == null) {
-      System.out.println("loading stream from " + cacheFile.toPath() + " failed!");
+      System.out.println("loading cache dump from '" + CACHE_DUMP_NAME + "' failed!");
       return;
     }
 
     try {
       CompressionUtilities.unzip(in, new File(CACHE_DIRECTORY));
-      System.out.println("cache loaded from " + cacheFile.toPath());
+      System.out.println("cache loaded from '" + CACHE_DUMP_NAME + "'");
     } catch (final IOException e) {
       e.printStackTrace();
     }
@@ -61,23 +82,6 @@ public class ImageCache {
     } catch (final IOException e) {
       e.printStackTrace();
     }
-  }
-
-  /** The cache. */
-  private final ConcurrentHashMap<String, BufferedImage> cache;
-
-  /** The sub folder. */
-  private final String subFolder;
-
-  /**
-   * Instantiates a new image cache.
-   *
-   * @param subfolder
-   *          the subfolder
-   */
-  private ImageCache(final String subfolder) {
-    this.cache = new ConcurrentHashMap<>();
-    this.subFolder = subfolder;
   }
 
   public void clearPersistent() {

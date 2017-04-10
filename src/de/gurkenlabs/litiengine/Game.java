@@ -198,6 +198,8 @@ public final class Game {
       getMaps().add(m);
       mapCnt++;
     }
+    
+    System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {
@@ -219,7 +221,6 @@ public final class Game {
     }
 
     System.out.println(spriteload + " sprites loaded to memory");
-    System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
   }
 
   public static void loadEnvironment(final IEnvironment env) {
