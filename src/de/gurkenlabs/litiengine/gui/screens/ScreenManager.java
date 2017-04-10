@@ -102,7 +102,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   public void displayScreen(final String screen) {
     // if the scren is already displayed or there is no screen with the
     // specified name
-    if (this.currentScreen != null && this.currentScreen.getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
+    if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
       return;
     }
     if (System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
@@ -114,18 +114,18 @@ public class ScreenManager extends JFrame implements IScreenManager {
       return;
     }
 
-    if (this.currentScreen != null) {
-      this.currentScreen.suspend();
-      Game.getRenderLoop().unregister(this.currentScreen);
+    if (this.getCurrentScreen() != null) {
+      this.getCurrentScreen().suspend();
+      Game.getRenderLoop().unregister(this.getCurrentScreen());
     }
 
     this.currentScreen = targetScreen;
-    this.currentScreen.prepare();
+    this.getCurrentScreen().prepare();
     this.setVisible(true);
-    Game.getRenderLoop().register(this.currentScreen);
+    Game.getRenderLoop().register(this.getCurrentScreen());
     this.lastScreenChange = System.currentTimeMillis();
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
-      consumer.accept(this.currentScreen);
+      consumer.accept(this.getCurrentScreen());
     }
   }
 

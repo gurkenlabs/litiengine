@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.util.image.ImageProcessing;
 
-public abstract class AnimationController implements IAnimationController {
+public class AnimationController implements IAnimationController {
   private static int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
   private Animation currentAnimation;
