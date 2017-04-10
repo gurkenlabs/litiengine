@@ -148,7 +148,6 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
           } catch (final InterruptedException e) {
             e.printStackTrace();
           }
-
         }
       }
 
@@ -178,28 +177,32 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     if (loop.getTicks() % GAMEPAD_UPDATE_DELAY != 0) {
       return;
     }
+    try {
 
-    this.hackTheShitOutOfJInputBecauseItSucks_HARD();
-    // update plugged in gamepads
-    for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
-      final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
-      final Type type = controller.getType();
-      if (!type.equals(Type.GAMEPAD)) {
-        continue;
+      this.hackTheShitOutOfJInputBecauseItSucks_HARD();
+      // update plugged in gamepads
+      for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
+        final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];
+        final Type type = controller.getType();
+        if (!type.equals(Type.GAMEPAD)) {
+          continue;
+        }
+
+        final IGamepad existing = Input.getGamepad(i);
+        if (existing != null && existing.getName().equals(controller.getName())) {
+          // already added
+          continue;
+        }
+
+        // add new gamepads
+        final IGamepad newGamepad = new Gamepad(i, controller);
+        Input.GAMEPADS.add(newGamepad);
+        for (final Consumer<IGamepad> cons : this.gamepadAddedConsumer) {
+          cons.accept(newGamepad);
+        }
       }
 
-      final IGamepad existing = Input.getGamepad(i);
-      if (existing != null && existing.getName().equals(controller.getName())) {
-        // already added
-        continue;
-      }
-
-      // add new gamepads
-      final IGamepad newGamepad = new Gamepad(i, controller);
-      Input.GAMEPADS.add(newGamepad);
-      for (final Consumer<IGamepad> cons : this.gamepadAddedConsumer) {
-        cons.accept(newGamepad);
-      }
+    } catch (IllegalStateException e) {
     }
   }
 }
