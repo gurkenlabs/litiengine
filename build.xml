@@ -13,7 +13,6 @@
 	<target name="create_run_jar">
 		<jar destfile="${dir.jar}/${ant.project.name}.jar">
 			<fileset dir="${dir.buildfile}/bin" />
-			<fileset dir="${dir.tmxbuildfile}/bin" />
 		</jar>
 	</target>
 </project>
