@@ -10,6 +10,11 @@
 		<mkdir dir="${dir.jar}" />
 	</target>
 
+    <target name="compile">
+        <mkdir dir="bin"/>
+        <javac srcdir="src" destdir="bin"/>
+    </target>
+        	
 	<target name="create_run_jar">
 		<jar destfile="${dir.jar}/${ant.project.name}.jar">
 			<fileset dir="${dir.buildfile}/bin" />
