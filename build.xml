@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="litiengine">
-	<!--ANT 1.7 is required-->
-	<!--define folder properties-->
-	<property name="dir.buildfile" value="." />
-	<property name="dir.bin" value="bin" />
-	<property name="dir.jar" value="dist" />
+<project name="litiengine">
+  <!--ANT 1.7 is required-->
+  <!--define folder properties-->
+  <property name="dir.buildfile" value="." />
+  <property name="dir.bin" value="bin" />
+  <property name="dir.jar" value="dist" />
+  <property name="dir.lib" value="lib" />
+  <path id="litiengine.classpath">
+    <pathelement location="bin" />
+    <pathelement location="lib/jinput.jar" />
+    <pathelement location="lib/jogg-0.0.7.jar" />
+    <pathelement location="lib/jorbis-0.0.15.jar" />
+    <pathelement location="lib/tritonus_share.jar" />
+    <pathelement location="lib/vorbisspi1.0.3.jar" />
+    <pathelement location="lib/jl1.0.1.jar" />
+    <pathelement location="lib/mp3spi1.9.5.jar" />
+  </path>
 
-	<target name="clean">
-		<delete dir="${dir.jar}" />
-		<mkdir dir="${dir.jar}" />
-		
-		<delete dir="${dir.bin}" />
-        <mkdir dir="${dir.bin}"/>
-	</target>
+  <target name="clean">
+    <delete dir="${dir.jar}" />
+    <mkdir dir="${dir.jar}" />
 
-    <target name="compile">
-        <javac srcdir="src" destdir="${dir.bin}"/>
-    </target>
-        	
-	<target name="create_run_jar">
-		<jar destfile="${dir.jar}/${ant.project.name}.jar">
-			<fileset dir="${dir.buildfile}/${dir.bin}" />
-		</jar>
-	</target>
+    <delete dir="${dir.bin}" />
+    <mkdir dir="${dir.bin}" />
+  </target>
+
+  <target depends="clean" name="compile">
+    <javac destdir="${dir.bin}">
+      <src path="src" />
+      <classpath refid="litiengine.classpath" />
+    </javac>
+  </target>
+
+  <target depends="compile" name="create_jar">
+    <jar destfile="${dir.jar}/${ant.project.name}.jar">
+      <fileset dir="${dir.buildfile}/${dir.bin}" />
+      <zipgroupfileset dir="lib" includes="*.jar" />
+      <fileset dir="resources" />
+    </jar>
+  </target>
 </project>
