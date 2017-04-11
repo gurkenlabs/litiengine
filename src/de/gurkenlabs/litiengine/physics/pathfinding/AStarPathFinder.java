@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.Path;
-import de.gurkenlabs.tilemap.IMap;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class AStarPathFinder extends PathFinder {

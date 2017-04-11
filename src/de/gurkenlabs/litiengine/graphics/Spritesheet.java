@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
-import de.gurkenlabs.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 

@@ -7,8 +7,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
-import de.gurkenlabs.tilemap.IMap;
 
 public class AStarGrid {
   private boolean allowDiagonalMovementOnCorners;

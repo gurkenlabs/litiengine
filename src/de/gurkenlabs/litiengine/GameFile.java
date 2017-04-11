@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "game")

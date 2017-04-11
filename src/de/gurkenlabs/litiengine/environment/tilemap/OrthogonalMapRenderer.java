@@ -22,16 +22,6 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.tilemap.IImageLayer;
-import de.gurkenlabs.tilemap.ILayer;
-import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.tilemap.ITile;
-import de.gurkenlabs.tilemap.ITileAnimation;
-import de.gurkenlabs.tilemap.ITileAnimationFrame;
-import de.gurkenlabs.tilemap.ITileLayer;
-import de.gurkenlabs.tilemap.ITileset;
-import de.gurkenlabs.tilemap.MapOrientation;
-import de.gurkenlabs.tilemap.utilities.MapUtilities;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.image.ImageProcessing;
 

@@ -7,9 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.tilemap.MapOrientation;
-
 /**
  * The Interface IMapRenderer.
  */

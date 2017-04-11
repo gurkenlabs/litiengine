@@ -13,6 +13,7 @@ import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -24,7 +25,6 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
-import de.gurkenlabs.tilemap.IMap;
 
 public final class Game {
   private final static GameConfiguration configuration;

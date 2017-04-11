@@ -34,11 +34,11 @@ import javax.imageio.ImageIO;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
-import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.tilemap.MapOrientation;
 import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 

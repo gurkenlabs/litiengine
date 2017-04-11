@@ -14,10 +14,10 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.tilemap.IMap;
-import de.gurkenlabs.tilemap.ITile;
-import de.gurkenlabs.tilemap.utilities.MapUtilities;
 
 public class DebugRenderer {
 
