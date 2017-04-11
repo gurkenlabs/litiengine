@@ -3,7 +3,6 @@
 	<!--ANT 1.7 is required-->
 	<!--define folder properties-->
 	<property name="dir.buildfile" value="." />
-	<property name="dir.tmxbuildfile" value="../tmx-deserializer" />
 	<property name="dir.jar" value="dist" />
 
 	<target name="clean">
