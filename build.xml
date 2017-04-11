@@ -3,21 +3,24 @@
 	<!--ANT 1.7 is required-->
 	<!--define folder properties-->
 	<property name="dir.buildfile" value="." />
+	<property name="dir.bin" value="bin" />
 	<property name="dir.jar" value="dist" />
 
 	<target name="clean">
 		<delete dir="${dir.jar}" />
 		<mkdir dir="${dir.jar}" />
+		
+		<delete dir="${dir.bin}" />
+        <mkdir dir="${dir.bin}"/>
 	</target>
 
     <target name="compile">
-        <mkdir dir="bin"/>
-        <javac srcdir="src" destdir="bin"/>
+        <javac srcdir="src" destdir="${dir.bin}"/>
     </target>
         	
 	<target name="create_run_jar">
 		<jar destfile="${dir.jar}/${ant.project.name}.jar">
-			<fileset dir="${dir.buildfile}/bin" />
+			<fileset dir="${dir.buildfile}/${dir.bin}" />
 		</jar>
 	</target>
 </project>
