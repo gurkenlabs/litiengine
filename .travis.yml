@@ -1,2 +1,2 @@
 language: java
-script: ant main
+script: ant create_run_jar
