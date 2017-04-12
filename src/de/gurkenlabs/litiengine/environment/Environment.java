@@ -575,6 +575,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void load() {
+    this.init();
     if (this.loaded) {
       return;
     }
