@@ -8,7 +8,10 @@ LITIengine is the ultimate 2D java game engine. Written in plain Java 8 it provi
 
 ## Getting Started
 
+* [Setup Eclipse project](https://github.com/gurkenlabs/litiengine/wiki/Setup-Eclipse-Project)
+
 ## Features
+
 * Basic Game Infrastructure (GameLoop, GUI Components, Configuration, Resource Management, Logging, ...)
 * 2D Physics Engine
 * 2D Render Engine (plain Java - no OpenGL fancyness)
