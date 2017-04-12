@@ -4,7 +4,7 @@
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
-LITIengine is the ultimate 2D java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
+LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
 
 ## Getting Started
 
@@ -15,10 +15,17 @@ LITIengine is the ultimate 2D java game engine. Written in plain Java 8 it provi
 * Basic Game Infrastructure (GameLoop, GUI Components, Configuration, Resource Management, Logging, ...)
 * 2D Physics Engine
 * 2D Render Engine (plain Java - no OpenGL fancyness)
-* 2D Sound Engine (support for .wav and .ogg)
+* 2D Sound Engine (support for .wav, .mp3 and .ogg)
 * Entity Framework
 * Support for Tile Maps in .tmx format (e.g. made with [Tiled](http://www.mapeditor.org/))
 * Message Based Networking Framework 
+
+## Libraries Used
+
+* [JInput](https://github.com/jinput/jinput) for Gamepad support
+* [MP3 SPI](http://www.javazoom.net/mp3spi/mp3spi.html) for .mp3 support
+* [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
+
 
 ## Games made with LITIengine
 
