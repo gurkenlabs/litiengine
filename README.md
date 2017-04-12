@@ -4,7 +4,7 @@
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
-LITIengine is the ultimate 2D java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
+LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
 
 ## Getting Started
 
