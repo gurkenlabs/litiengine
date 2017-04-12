@@ -176,6 +176,8 @@ public final class Game {
       getMetrics().setFramesPerSecond(fps);
     });
 
+    getScreenManager().setIconImage(RenderEngine.getImage("icon.png"));
+
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
@@ -198,7 +200,7 @@ public final class Game {
       getMaps().add(m);
       mapCnt++;
     }
-    
+
     System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
