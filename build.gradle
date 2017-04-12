@@ -1,0 +1,42 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceSets {
+  main.java.srcDir "src"
+  main.java.srcDir "resources"
+}
+
+repositories {
+   flatDir {
+      dirs 'lib'
+   }
+}
+
+dependencies {
+  compile name: 'jinput'
+  compile name: 'jogg-0.0.7'
+  compile name: 'jorbis-0.0.15'
+  compile name: 'tritonus_share'
+  compile name: 'vorbisspi1.0.3'
+  compile name: 'jl1.0.1'
+  compile name: 'mp3spi1.9.5'
+}
+
+jar {
+  from configurations.compile.collect { zipTree it }
+  
+  from('resources') { include '**/*' }
+}
+
+task copyNativeLibs(type: Copy) {
+  from(new File('lib')) { exclude '**/*.jar' }
+  into new File(buildDir, 'libs')
+  
+  from(new File('.')) { include 'LICENSE' }
+  into new File(buildDir, 'libs')
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    dependsOn copyNativeLibs
+}

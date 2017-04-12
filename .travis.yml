@@ -8,4 +8,4 @@ addons:
     packages:
       - oracle-java8-installer
       
-script: ant create_jar
+script: gradle check
