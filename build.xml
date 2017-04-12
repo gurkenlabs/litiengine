@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="litiengine">
+<project name="litiengine" default="create_jar">
   <!--ANT 1.7 is required-->
   <!--define folder properties-->
   <property name="dir.buildfile" value="." />
@@ -18,11 +18,19 @@
   </path>
 
   <target name="clean">
-    <delete dir="${dir.jar}" />
-    <mkdir dir="${dir.jar}" />
+    <delete>
+       <fileset dir="${dir.jar}">
+          <include name="**/*"/>
+          <exclude name=".gitignore"/>
+       </fileset>
+    </delete>
 
-    <delete dir="${dir.bin}" />
-    <mkdir dir="${dir.bin}" />
+    <delete>
+       <fileset dir="${dir.bin}">
+          <include name="**/*"/>
+         <exclude name=".gitignore"/>
+       </fileset>
+    </delete>
   </target>
 
   <target depends="clean" name="compile">
@@ -38,5 +46,17 @@
       <zipgroupfileset dir="lib" includes="*.jar" />
       <fileset dir="resources" />
     </jar>
+    
+    <copy todir="${dir.jar}" flatten="true">
+        <fileset dir="${dir.lib}">
+             <exclude name="*.jar"/>
+             <type type="file"/>
+          </fileset>
+    </copy>
+  </target>
+  
+  <target depends="create_jar" name="create_zip">
+    <zip destfile="${dir.jar}/${ant.project.name}.zip" basedir="${dir.jar}" excludes=".gitignore" >
+    </zip>
   </target>
 </project>
