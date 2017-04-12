@@ -2,10 +2,10 @@ language: java
 jdk:
   - oraclejdk8
 
-before_install:
-  - sudo add-apt-repository ppa:openjdk-r/ppa
-  - sudo apt-get -qq update
-  - sudo apt-get install -y openjdk-8-jdk
-  - sudo update-java-alternatives -s java-1.8.0-openjdk-amd64
-sudo: required
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+      
 script: ant create_jar
