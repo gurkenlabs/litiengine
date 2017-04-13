@@ -12,13 +12,20 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 
 ## Features
 
-* Basic Game Infrastructure (GameLoop, GUI Components, Configuration, Resource Management, Logging, ...)
+* Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
 * 2D Physics Engine
 * 2D Render Engine (plain Java - no OpenGL fancyness)
+  * GUI Components
+  * Static and Dynamic Shadows
+  * Dynamic Lighting
+  * ...
 * 2D Sound Engine (support for .wav, .mp3 and .ogg)
+* Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
+* Message Based Networking Framework
+* Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
-* Support for Tile Maps in .tmx format (e.g. made with [Tiled](http://www.mapeditor.org/))
-* Message Based Networking Framework 
+* Ability Framework
+* Particle System
 
 ## Libraries Used
 
