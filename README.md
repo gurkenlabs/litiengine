@@ -25,6 +25,7 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 * Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
 * Ability Framework
+* Particle System
 
 ## Libraries Used
 
