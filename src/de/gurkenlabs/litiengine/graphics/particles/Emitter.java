@@ -138,7 +138,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     if (this.gameLoop != null) {
       this.gameLoop.detach(this);
     }
+  }
 
+  public void delete() {
+    this.deactivate();
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().remove(this);
     }
@@ -335,7 +338,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     // clear particles if the effect time to life is reached
     if (this.isFinished()) {
-      this.deactivate();
+      this.delete();
       return;
     }
 

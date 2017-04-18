@@ -69,7 +69,7 @@ public class CustomEmitter extends Emitter {
 
     this.emitterData = load(emitterXml);
     if (this.emitterData == null) {
-      this.deactivate();
+      this.delete();
       return;
     }
 

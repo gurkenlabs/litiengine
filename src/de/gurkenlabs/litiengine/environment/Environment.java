@@ -1273,7 +1273,7 @@ public class Environment implements IEnvironment {
    * @param entity
    */
   private void unload(final IEntity entity) {
-    // 1. remove from physics enginse
+    // 1. remove from physics engine
     if (entity instanceof Collider) {
       final Collider coll = (Collider) entity;
       if (coll.isObstacle()) {
@@ -1309,6 +1309,11 @@ public class Environment implements IEnvironment {
       if (movementController != null) {
         Game.getLoop().detach(movementController);
       }
+    }
+
+    if (entity instanceof Emitter) {
+      Emitter em = (Emitter) entity;
+      em.deactivate();
     }
   }
 }
