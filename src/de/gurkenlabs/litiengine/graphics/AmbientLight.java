@@ -81,9 +81,7 @@ public class AmbientLight {
     g.setComposite(comp);
     g.dispose();
     this.image = img;
-    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
-      ImageCache.IMAGES.put(cacheKey, img);
-    }
+    ImageCache.IMAGES.put(cacheKey, img);
   }
 
   public int getAlpha() {
