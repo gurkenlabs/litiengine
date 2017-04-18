@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -60,6 +61,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public List<MapArea> getAreas();
 
   public Collection<Collider> getColliders();
+
+  public  Collection<StaticShadow> getStaticShadows();
 
   public Collection<ICombatEntity> getCombatEntities();
 

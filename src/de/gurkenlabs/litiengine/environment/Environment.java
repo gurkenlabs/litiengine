@@ -31,7 +31,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.Collider;
-import de.gurkenlabs.litiengine.entities.Collider.StaticShadowType;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob;
@@ -55,6 +54,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
@@ -90,6 +91,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<IEnvironment>> initializedConsumer, loadedConsumer;
 
   private final Collection<LightSource> lightSources;
+  private final Collection<StaticShadow> staticShadows;
   private boolean loaded;
 
   private IMap map;
@@ -146,6 +148,7 @@ public class Environment implements IEnvironment {
     this.colliders = new CopyOnWriteArrayList<>();
     this.triggers = new CopyOnWriteArrayList<>();
     this.mapAreas = new CopyOnWriteArrayList<>();
+    this.staticShadows = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -511,6 +514,19 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Collection<StaticShadow> getStaticShadows() {
+    return this.staticShadows;
+  }
+
+  public StaticShadow getStaticShadow(int mapID) {
+    StaticShadow shadow = null;
+    for (StaticShadow sh : this.getStaticShadows()) {
+      shadow = (sh.getMapId() == mapID) ? sh : null;
+    }
+    return shadow;
+  }
+
+  @Override
   public Trigger getTrigger(final int mapId) {
     for (final Trigger t : this.getTriggers()) {
       if (t.getMapId() == mapId) {
@@ -600,10 +616,9 @@ public class Environment implements IEnvironment {
         }
 
         this.addMapObject(mapObject);
-        if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX || MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
+        if (MapObjectType.get(mapObject.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
           this.addStaticShadows();
         }
-
         break;
       }
     }
@@ -650,7 +665,6 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Collider) {
       this.colliders.remove(entity);
-      this.addStaticShadows();
     }
 
     if (entity instanceof LightSource) {
@@ -676,12 +690,16 @@ public class Environment implements IEnvironment {
   @Override
   public void remove(final int mapId) {
     this.getSpawnPoints().removeIf(x -> x.getMapId() == mapId);
+    if (this.getStaticShadow(mapId) != null) {
+      this.getStaticShadows().remove(this.getStaticShadow(mapId));
+      this.addStaticShadows();
+      return;
+    }
     final IEntity ent = this.get(mapId);
     if (ent == null) {
       System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
       return;
     }
-
     this.remove(ent);
   }
 
@@ -749,6 +767,18 @@ public class Environment implements IEnvironment {
     this.loaded = false;
   }
 
+  protected void addStaticShadow(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.STATICSHADOW) {
+      return;
+    }
+    double x = mapObject.getX();
+    double y = mapObject.getY();
+    double width = mapObject.getDimension().getWidth();
+    double height = mapObject.getDimension().getHeight();
+    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
+    this.getStaticShadows().add(shadow);
+  }
+
   protected void addCollisionBox(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
       return;
@@ -767,12 +797,6 @@ public class Environment implements IEnvironment {
     col.setCollisionBoxHeight(col.getHeight());
     col.setMapId(mapObject.getId());
     col.setName(mapObject.getName());
-
-    final String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
-    if (shadowType != null && !shadowType.isEmpty()) {
-      col.setShadowType(Collider.StaticShadowType.valueOf(shadowType));
-    }
-
     this.add(col);
   }
 
@@ -886,6 +910,7 @@ public class Environment implements IEnvironment {
 
   protected void addMapObject(final IMapObject mapObject) {
     this.addCollisionBox(mapObject);
+    this.addStaticShadow(mapObject);
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
@@ -1041,39 +1066,36 @@ public class Environment implements IEnvironment {
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
-    for (final IMapObject col : this.getCollisionBoxMapObjects()) {
-      final double shadowX = col.getBoundingBox().getX();
-      final double shadowY = col.getBoundingBox().getY();
-      final double shadowWidth = col.getBoundingBox().getWidth();
-      final double shadowHeight = col.getBoundingBox().getHeight();
+    for (final StaticShadow col : this.getStaticShadows()) {
+      final double shadowX = col.getX();
+      final double shadowY = col.getY();
+      final double shadowWidth = col.getWidth();
+      final double shadowHeight = col.getHeight();
 
-      final Collider.StaticShadowType shadowType = StaticShadowType.get(col.getCustomProperty(MapObjectProperties.SHADOWTYPE));
-      if (shadowType == StaticShadowType.NONE) {
-        continue;
-      }
+      final StaticShadowType shadowType = col.getShadowType();
 
       final Path2D parallelogram = new Path2D.Double();
-      if (shadowType.equals(Collider.StaticShadowType.DOWN)) {
+      if (shadowType.equals(StaticShadowType.DOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.DOWNLEFT)) {
+      } else if (shadowType.equals(StaticShadowType.DOWNLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.DOWNRIGHT)) {
+      } else if (shadowType.equals(StaticShadowType.DOWNRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFT)) {
+      } else if (shadowType.equals(StaticShadowType.LEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1081,7 +1103,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFTDOWN)) {
+      } else if (shadowType.equals(StaticShadowType.LEFTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1089,7 +1111,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.LEFTRIGHT)) {
+      } else if (shadowType.equals(StaticShadowType.LEFTRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1097,7 +1119,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTLEFT)) {
+      } else if (shadowType.equals(StaticShadowType.RIGHTLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1105,7 +1127,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHT)) {
+      } else if (shadowType.equals(StaticShadowType.RIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1113,7 +1135,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.RIGHTDOWN)) {
+      } else if (shadowType.equals(StaticShadowType.RIGHTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1121,7 +1143,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
-      } else if (shadowType.equals(Collider.StaticShadowType.NOOFFSET)) {
+      } else if (shadowType.equals(StaticShadowType.NOOFFSET)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
@@ -1164,23 +1186,6 @@ public class Environment implements IEnvironment {
 
       Game.getEntityControllerManager().disposeControllers(entity);
     }
-  }
-
-  private List<IMapObject> getCollisionBoxMapObjects() {
-    final List<IMapObject> collisionBoxes = new ArrayList<>();
-    for (final IMapObjectLayer shapeLayer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject obj : shapeLayer.getMapObjects()) {
-        if (obj.getType() == null || obj.getType().isEmpty()) {
-          continue;
-        }
-
-        if (MapObjectType.get(obj.getType()) == MapObjectType.COLLISIONBOX) {
-          collisionBoxes.add(obj);
-        }
-      }
-    }
-
-    return collisionBoxes;
   }
 
   private void informConsumers(final Graphics2D g, final List<Consumer<Graphics2D>> consumers) {

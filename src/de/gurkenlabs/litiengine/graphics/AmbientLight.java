@@ -14,8 +14,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
@@ -79,7 +81,9 @@ public class AmbientLight {
     g.setComposite(comp);
     g.dispose();
     this.image = img;
-    ImageCache.IMAGES.put(cacheKey, img);
+    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
+      ImageCache.IMAGES.put(cacheKey, img);
+    }
   }
 
   public int getAlpha() {
@@ -143,16 +147,16 @@ public class AmbientLight {
 
     // cut the light area where shadow Boxes are (this simulates light falling
     // into and out of rooms)
-    for (final Collider col : this.environment.getColliders()) {
-      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
+    for (final StaticShadow col : this.environment.getStaticShadows()) {
+      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBounds2D())) {
         continue;
       }
-      final Area boxInLight = new Area(col.getCollisionBox());
+      final Area boxInLight = new Area(col.getBounds2D());
       boxInLight.intersect(lightArea);
 
-      final Line2D[] bounds = GeometricUtilities.getLines(col.getCollisionBox());
+      final Line2D[] bounds = GeometricUtilities.getLines(col.getBounds2D());
       for (final Line2D line : bounds) {
-        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getCollisionBox().contains(light.getDimensionCenter())) {
+        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBounds2D().contains(light.getDimensionCenter())) {
           continue;
         }
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
@@ -174,7 +178,7 @@ public class AmbientLight {
         shadowParallelogram.closePath();
 
         final Area shadowArea = new Area(shadowParallelogram);
-        if (light.getDimensionCenter().getY() < col.getCollisionBox().getMaxY() && !col.getCollisionBox().contains(light.getDimensionCenter())) {
+        if (light.getDimensionCenter().getY() < col.getBounds2D().getMaxY() && !col.getBounds2D().contains(light.getDimensionCenter())) {
           shadowArea.add(boxInLight);
         }
         shadowArea.intersect(lightArea);
