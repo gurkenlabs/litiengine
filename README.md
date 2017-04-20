@@ -53,7 +53,7 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
 * Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
 * Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
-* E-Mail [email us](mailto:info@gurkenlabs.de)
+* E-Mail mailto:info@gurkenlabs.de
 
 ## Authors
 
