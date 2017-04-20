@@ -57,3 +57,8 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 
 * Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
 * Matthias Wilke ([nightm4re94](https://github.com/nightm4re94))
+
+## Support the devs
+
+* ([Paypal.me](https://www.paypal.me/gurkenlabsmatthias))
+* ([Paypal.me](https://www.patreon.com/gurkenlabs))
