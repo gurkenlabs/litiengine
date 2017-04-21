@@ -38,7 +38,7 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 
 ### DR.LEPUS
 
-![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/01/dr-lepus-titel.png "DR.LEPUS")
+![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/04/page-title.png "DR.LEPUS")
 
 ### DR.LEPUS - The Last Rabbit on Earth ([Ludum Dare 35](http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=67508))
 
