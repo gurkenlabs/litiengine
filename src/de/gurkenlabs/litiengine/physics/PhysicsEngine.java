@@ -266,6 +266,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void update(final IGameLoop loop) {
+
+  }
+
+  private void updateAllCollisionBoxes() {
     this.allCollisionBoxes.clear();
     this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> new CollisionBox(x)).collect(Collectors.toList()));
     this.allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(x -> new CollisionBox(x)).collect(Collectors.toList()));
@@ -282,7 +286,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
    */
   private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Rectangle2D collisionBox) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
-      if (entity != null && otherEntity.equals(entity)) {
+      if (entity != null && (otherEntity.equals(entity) || !entity.canCollideWith(otherEntity))) {
         continue;
       }
 

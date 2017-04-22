@@ -13,7 +13,7 @@ public class MapUtilities {
   private static Map<String, ITileAnimation> animations;
   private static Map<String, Boolean> hasAnimation;
   private static Map<String, ITileset> tilesets = new ConcurrentHashMap<String, ITileset>();
-  
+
   static {
     animations = new ConcurrentHashMap<>();
     hasAnimation = new ConcurrentHashMap<>();
@@ -48,6 +48,10 @@ public class MapUtilities {
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
     Point location = getTileLocation(map, mapLocation);
     return new Rectangle2D.Double(location.x * map.getTileSize().getWidth(), location.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
+  }
+
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
+    return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
   public static Point getTileLocation(final IMap map, final Point2D mapLocation) {
@@ -95,7 +99,6 @@ public class MapUtilities {
     return new ITerrain[4];
   }
 
-
   public static ITileAnimation getAnimation(final IMap map, final int gId) {
 
     String cacheKey = map.getFileName() + "[" + gId + "]";
@@ -122,7 +125,7 @@ public class MapUtilities {
       if (anim != null) {
         animations.put(cacheKey, anim);
         animation = true;
-      } 
+      }
 
       hasAnimation.put(cacheKey, animation);
 
