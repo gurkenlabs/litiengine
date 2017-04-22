@@ -61,6 +61,10 @@ public class MapUtilities {
     return new Point((int) (mapLocation.getX() / map.getTileSize().getWidth()), (int) (mapLocation.getY() / map.getTileSize().getHeight()));
   }
 
+  public static Point2D getMapLocation(final IMap map, final Point tileLocation) {
+    return new Point2D.Double(tileLocation.x * map.getTileSize().getWidth(), tileLocation.y * map.getTileSize().getHeight());
+  }
+
   /**
    * Gets the tiles by pixel location.
    *
