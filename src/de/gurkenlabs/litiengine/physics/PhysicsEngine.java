@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -21,8 +22,6 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * The Class PhysicsEngine.
  */
 public final class PhysicsEngine implements IPhysicsEngine {
-  private final List<CollisionBox> allCollisionBoxes;
-
   private final List<ICollisionEntity> collisionEntities;
 
   private Rectangle2D environmentBounds;
@@ -35,7 +34,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
   public PhysicsEngine() {
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
-    this.allCollisionBoxes = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -156,7 +154,16 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.allCollisionBoxes.stream().map(s -> s.getCollisionBox()).collect(Collectors.toList());
+    return this.getCollisionBoxes().stream().map(s -> s.getCollisionBox()).collect(Collectors.toList());
+  }
+
+  private List<CollisionBox> getCollisionBoxes() {
+    List<CollisionBox> allCollisionBoxes = new ArrayList<>();
+    allCollisionBoxes.clear();
+    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> new CollisionBox(x)).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(x -> new CollisionBox(x)).collect(Collectors.toList()));
+
+    return allCollisionBoxes;
   }
 
   @Override
@@ -221,13 +228,13 @@ public final class PhysicsEngine implements IPhysicsEngine {
       // they have a large enough stepsize
       // TODO: this does not entirely fix the issue...
       final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
-      for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
-        if (collisionBox.equals(entity.getCollisionBox())) {
+      for (final CollisionBox collisionBox : this.getCollisionBoxes()) {
+        if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
           continue;
         }
 
         // there was a collision inbetween
-        final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox);
+        final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
         if (intersection != null) {
           newPosition = entity.getLocation();
         }
@@ -266,13 +273,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void update(final IGameLoop loop) {
-
-  }
-
-  private void updateAllCollisionBoxes() {
-    this.allCollisionBoxes.clear();
-    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> new CollisionBox(x)).collect(Collectors.toList()));
-    this.allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(x -> new CollisionBox(x)).collect(Collectors.toList()));
   }
 
   /**
@@ -322,7 +322,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   private Rectangle2D collidesWithAnything(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
-    for (final CollisionBox collisionBox : this.allCollisionBoxes) {
+    for (final CollisionBox collisionBox : this.getCollisionBoxes()) {
 
       // an entity cannot collide with itself or other entities that are
       // excluded from collision by the canCollideWith method
