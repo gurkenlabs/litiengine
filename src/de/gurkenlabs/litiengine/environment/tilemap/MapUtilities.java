@@ -22,7 +22,7 @@ public class MapUtilities {
 
   public static int getMaxMapId(final IMap map) {
     int maxId = 0;
-    if (map.getMapObjectLayers() == null) {
+    if (map == null || map.getMapObjectLayers() == null) {
       return maxId;
     }
 
