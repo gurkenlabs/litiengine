@@ -51,6 +51,9 @@ public class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
+    if (map == null || tile == null) {
+      return null;
+    }
     return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
