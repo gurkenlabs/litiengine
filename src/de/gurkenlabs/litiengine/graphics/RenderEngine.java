@@ -146,6 +146,10 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   public static void fillShape(final Graphics2D g, final Shape shape) {
+    if (shape == null) {
+      return;
+    }
+
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
     t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
