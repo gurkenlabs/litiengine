@@ -8,11 +8,11 @@ public class GameTime {
   }
 
   public long getDays() {
-    return this.getMilliseconds() / 1000 / 60 / 60 / 24 % 365;
+    return getDays(this.getMilliseconds());
   }
 
   public long getHours() {
-    return this.getMilliseconds() / 1000 / 60 / 60 % 24;
+    return getHours(this.getMilliseconds());
   }
 
   public long getMilliseconds() {
@@ -20,14 +20,38 @@ public class GameTime {
   }
 
   public long getMinutes() {
-    return this.getMilliseconds() / 1000 / 60 % 60;
+    return getMinutes(this.getMilliseconds());
   }
 
   public long getSeconds() {
-    return this.getMilliseconds() / 1000 % 60;
+    return getSeconds(this.getMilliseconds());
   }
 
   public long getYears() {
-    return this.getMilliseconds() / 1000 / 60 / 60 / 24 / 365;
+    return getYears(this.getMilliseconds());
+  }
+
+  public static long getDays(long ms) {
+    return ms / 1000 / 60 / 60 / 24 % 365;
+  }
+
+  public static long getHours(long ms) {
+    return ms / 1000 / 60 / 60 % 24;
+  }
+
+  public static long getMinutes(long ms) {
+    return ms / 1000 / 60 % 60;
+  }
+
+  public static long getSeconds(long ms) {
+    return ms / 1000 % 60;
+  }
+
+  public static long getMilliSeconds(long ms) {
+    return ms % 1000;
+  }
+
+  public static long getYears(long ms) {
+    return ms / 1000 / 60 / 60 / 24 / 365;
   }
 }
