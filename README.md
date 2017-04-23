@@ -38,7 +38,7 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 
 ### DR.LEPUS
 
-![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/01/dr-lepus-titel.png "DR.LEPUS")
+![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/04/page-title.png "DR.LEPUS")
 
 ### DR.LEPUS - The Last Rabbit on Earth ([Ludum Dare 35](http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=67508))
 
@@ -51,9 +51,16 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
+* Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
 * Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
+* E-Mail info@gurkenlabs.de
 
 ## Authors
 
 * Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
 * Matthias Wilke ([nightm4re94](https://github.com/nightm4re94))
+
+## Support the devs
+
+* [PayPal.me](https://www.paypal.me/gurkenlabsmatthias)
+* [Patreon](https://www.patreon.com/gurkenlabs)

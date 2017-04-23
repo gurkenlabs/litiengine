@@ -5,7 +5,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
   private final T entity;
 
-  public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation[] animations) {
+  public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
     this.entity = entity;
   }
@@ -20,5 +20,5 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     // TODO Auto-generated method stub
     super.playAnimation(animationName);
   }
-  
+
 }

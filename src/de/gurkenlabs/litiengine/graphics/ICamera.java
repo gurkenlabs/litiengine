@@ -91,6 +91,8 @@ public interface ICamera extends IUpdateable {
 
   public void setFocus(Point2D focus);
 
+  public void setFocus(double x, double y);
+
   public void setZoom(float zoom, int delay);
 
   public void shake(double intensity, final int delay, int duration);

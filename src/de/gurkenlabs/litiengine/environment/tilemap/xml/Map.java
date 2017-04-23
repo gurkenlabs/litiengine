@@ -262,6 +262,11 @@ public class Map extends CustomPropertyProvider implements IMap {
   }
 
   @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
   public void setFileName(final String name) {
     this.name = name;
   }

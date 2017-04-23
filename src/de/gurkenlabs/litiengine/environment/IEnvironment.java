@@ -62,7 +62,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Collider> getColliders();
 
-  public  Collection<StaticShadow> getStaticShadows();
+  public Collection<StaticShadow> getStaticShadows();
 
   public Collection<ICombatEntity> getCombatEntities();
 
@@ -71,6 +71,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IEntity> getEntities();
 
   public Collection<IEntity> getEntities(RenderType renderType);
+
+  public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
 
@@ -130,6 +132,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void reloadFromMap(final int mapId);
 
   public void remove(final IEntity entity);
+
+  public <T extends IEntity> void remove(final Collection<T> entities);
 
   public void remove(final int mapId);
 

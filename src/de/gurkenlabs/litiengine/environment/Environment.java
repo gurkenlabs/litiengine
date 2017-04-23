@@ -418,6 +418,18 @@ public class Environment implements IEnvironment {
     return this.entities.get(renderType).values();
   }
 
+  @Override
+  public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> cls) {
+    List<T> entities = new ArrayList<>();
+    for (IEntity ent : this.getEntities()) {
+      if (cls.isInstance(ent)) {
+        entities.add((T) ent);
+      }
+    }
+
+    return entities;
+  }
+
   public Collection<IRenderable> getGroundRenderable() {
     return this.groundRenderable;
   }
@@ -1319,6 +1331,13 @@ public class Environment implements IEnvironment {
     if (entity instanceof Emitter) {
       Emitter em = (Emitter) entity;
       em.deactivate();
+    }
+  }
+
+  @Override
+  public <T extends IEntity> void remove(Collection<T> entities) {
+    for (T ent : entities) {
+      this.remove(ent);
     }
   }
 }

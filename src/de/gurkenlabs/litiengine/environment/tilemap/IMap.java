@@ -55,12 +55,15 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the shape layers
    */
   public List<IMapObjectLayer> getMapObjectLayers();
-  
+
   public void addMapObjectLayer(IMapObjectLayer layer);
+
   public void removeMapObjectLayer(IMapObjectLayer layer);
+
   public void removeMapObjectLayer(int index);
 
-  public List<IMapObject> getMapObjects(String...type);
+  public List<IMapObject> getMapObjects(String... type);
+
   public void removeMapObject(int mapId);
 
   /**
@@ -105,4 +108,6 @@ public interface IMap extends ICustomPropertyProvider {
    *          the new name
    */
   public void setFileName(String name);
+
+  public String getName();
 }
