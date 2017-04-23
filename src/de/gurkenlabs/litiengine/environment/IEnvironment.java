@@ -133,6 +133,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void remove(final IEntity entity);
 
+  public <T extends IEntity> void remove(final Collection<T> entities);
+
   public void remove(final int mapId);
 
   public void removeRenderable(IRenderable renderable);
