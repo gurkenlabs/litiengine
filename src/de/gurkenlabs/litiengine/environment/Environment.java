@@ -1333,4 +1333,11 @@ public class Environment implements IEnvironment {
       em.deactivate();
     }
   }
+
+  @Override
+  public <T extends IEntity> void remove(Collection<T> entities) {
+    for (T ent : entities) {
+      this.remove(ent);
+    }
+  }
 }
