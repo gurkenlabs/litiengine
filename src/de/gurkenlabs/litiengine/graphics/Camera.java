@@ -188,6 +188,11 @@ public class Camera implements ICamera {
   }
 
   @Override
+  public void setFocus(double x, double y) {
+    this.setFocus(new Point2D.Double(x, y));
+  }
+
+  @Override
   public void setZoom(final float zoom, final int delay) {
     if (delay == 0) {
       Game.getInfo().setRenderScale(zoom);

@@ -440,7 +440,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         return;
       }
 
-      this.addParticle(this.createNewParticle());
+      Particle part = this.createNewParticle();
+      if (part != null) {
+        this.addParticle(part);
+      }
     }
   }
 
