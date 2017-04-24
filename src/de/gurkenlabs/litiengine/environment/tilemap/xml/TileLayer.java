@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -61,7 +62,7 @@ public class TileLayer extends Layer implements ITileLayer {
   @Override
   public ITile getTile(int x, int y) {
     this.getTiles();
-    
+
     if (this.tiles == null || this.tiles.length == 0) {
       return null;
     }
@@ -84,7 +85,7 @@ public class TileLayer extends Layer implements ITileLayer {
       return this.tileList;
     }
 
-    this.tileList = new ArrayList<ITile>();
+    this.tileList = new CopyOnWriteArrayList<ITile>();
     if (this.data == null) {
       return this.tileList;
     }
