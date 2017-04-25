@@ -129,6 +129,11 @@ public class FileUtilities {
         return resourceStream;
       }
 
+      final InputStream resourceStream2 = FileUtilities.class.getResourceAsStream(file);
+      if (resourceStream2 != null) {
+        return resourceStream2;
+      }
+
       final InputStream fileStream = new FileInputStream(file);
       return fileStream;
     } catch (final IOException e) {

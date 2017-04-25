@@ -38,7 +38,7 @@ public class GameFile implements Serializable {
 
       GameFile gameFile = null;
       try {
-        final GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
+        final GZIPInputStream zipStream = new GZIPInputStream(FileUtilities.getGameResource(file));
         gameFile = (GameFile) um.unmarshal(zipStream);
       } catch (final ZipException e) {
         InputStream stream = null;
