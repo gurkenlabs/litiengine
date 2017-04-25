@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.util.image.ImageProcessing;
@@ -104,8 +105,7 @@ public class Spritesheet {
         }
 
         try {
-          final String dir = FileUtilities.getParentDirPath(spriteInfoFile);
-          final String name = Paths.get(dir, items.get(0)).toString();
+          final String name = Game.getInfo().getSpritesDirectory() + items.get(0).toString();
 
           final int width = Integer.parseInt(items.get(1));
           final int height = Integer.parseInt(items.get(2));
