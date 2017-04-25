@@ -48,6 +48,9 @@ LITIengine is the ultimate 2D free java game engine. Written in plain Java 8 it 
 
 ![LITI - Stoneage Brawl](https://gurkenlabs.de/wp-content/uploads/2017/01/liti-stoneage-brawl-banner.png "LITI - Stoneage Brawl")
 
+### Naughty Gnomes
+![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
+
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
