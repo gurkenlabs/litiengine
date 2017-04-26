@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -17,7 +19,7 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
   private float dx;
   private float dy;
   private boolean movedX, movedY;
-  private final int up, down, left, right;
+  private final List<Integer> up, down, left, right;
   private double velocityX, velocityY;
 
   public KeyboardEntityController(final T entity) {
@@ -26,29 +28,50 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
 
   public KeyboardEntityController(final T entity, final int up, final int down, final int left, final int right) {
     super(entity);
-    this.up = up;
-    this.down = down;
-    this.left = left;
-    this.right = right;
+    this.up = new ArrayList<>();
+    this.down = new ArrayList<>();
+    this.left = new ArrayList<>();
+    this.right = new ArrayList<>();
+
+    this.up.add(up);
+    this.down.add(down);
+    this.left.add(left);
+    this.right.add(right);
     Input.KEYBOARD.registerForKeyDownEvents(this);
   }
 
   @Override
   public void handlePressedKey(final KeyEvent keyCode) {
 
-    if (keyCode.getKeyCode() == this.up) {
+    if (this.up.contains(keyCode.getKeyCode())) {
       this.dy--;
       this.movedY = true;
-    } else if (keyCode.getKeyCode() == this.down) {
+    } else if (this.down.contains(keyCode.getKeyCode())) {
       this.movedY = true;
       this.dy++;
-    } else if (keyCode.getKeyCode() == this.left) {
+    } else if (this.left.contains(keyCode.getKeyCode())) {
       this.dx--;
       this.movedX = true;
-    } else if (keyCode.getKeyCode() == this.right) {
+    } else if (this.right.contains(keyCode.getKeyCode())) {
       this.dx++;
       this.movedX = true;
     }
+  }
+
+  public void addUpKey(int keyCode) {
+    this.up.add(keyCode);
+  }
+
+  public void addDownKey(int keyCode) {
+    this.down.add(keyCode);
+  }
+
+  public void addLeftKey(int keyCode) {
+    this.left.add(keyCode);
+  }
+
+  public void addRightKey(int keyCode) {
+    this.right.add(keyCode);
   }
 
   @Override
