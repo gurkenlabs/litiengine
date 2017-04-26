@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.LogManager;
 
+import de.gurkenlabs.configuration.Configuration;
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
@@ -44,11 +45,13 @@ public final class Game {
 
   private final static List<Consumer<String>> startedConsumer;
   private final static List<Predicate<String>> terminatingConsumer;
+  private final static List<Consumer<GameConfiguration>> configLoadedConsumer;
 
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
     terminatingConsumer = new CopyOnWriteArrayList<>();
     environmentLoadedConsumer = new CopyOnWriteArrayList<>();
+    configLoadedConsumer = new CopyOnWriteArrayList<>();
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new SoundEngine();
@@ -126,6 +129,9 @@ public final class Game {
 
   public static void init() {
     getConfiguration().load();
+    for (Consumer<GameConfiguration> cons : configLoadedConsumer) {
+      cons.accept(getConfiguration());
+    }
 
     final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -178,6 +184,7 @@ public final class Game {
 
     getScreenManager().setIconImage(RenderEngine.getImage("icon.png"));
 
+    Input.init();
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
     getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
@@ -255,6 +262,10 @@ public final class Game {
    */
   public static void onTerminating(final Predicate<String> cons) {
     terminatingConsumer.add(cons);
+  }
+
+  public static void onConfigurationLoaded(final Consumer<GameConfiguration> conf) {
+
   }
 
   public static void start() {

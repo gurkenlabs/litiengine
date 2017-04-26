@@ -6,6 +6,7 @@ package de.gurkenlabs.litiengine.input;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 
 /**
@@ -15,7 +16,7 @@ public class Input {
 
   public static IGamepadManager GAMEPADMANAGER;
 
-  public static final List<IGamepad> GAMEPADS;
+  public static List<IGamepad> GAMEPADS;
 
   /** The keyboard. */
   public static IKeyboard KEYBOARD;
@@ -25,15 +26,18 @@ public class Input {
 
   // we need an own gameloop because otherwise input won't work if the game has
   // been paused
-  protected static final GameLoop GameadLoop;
+  protected static GameLoop GameadLoop;
 
-  static {
-    GAMEPADS = new CopyOnWriteArrayList<>();
-    GameadLoop = new GameLoop(30);
-    GameadLoop.start();
+  public static void init() {
+
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
-    GAMEPADMANAGER = new GamepadManager();
+    if (Game.getConfiguration().INPUT.isGamepadSupport()) {
+      GAMEPADS = new CopyOnWriteArrayList<>();
+      GameadLoop = new GameLoop(30);
+      GameadLoop.start();
+      GAMEPADMANAGER = new GamepadManager();
+    }
   }
 
   /**
