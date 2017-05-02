@@ -10,25 +10,36 @@ import java.util.logging.Logger;
 
 public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   private class TimedAction {
-    private final Consumer<Long> action;
-    private final long execution;
+    private final Consumer<Integer> action;
+    private long execution;
+    private final int index;
 
-    private TimedAction(final long execution, final Consumer<Long> action) {
+    private TimedAction(final long execution, final Consumer<Integer> action) {
       this.execution = execution;
       this.action = action;
+      this.index = ++executionIndex;
     }
 
-    public Consumer<Long> getAction() {
+    public Consumer<Integer> getAction() {
       return this.action;
     }
 
     public long getExecutionTick() {
       return this.execution;
     }
+
+    public void setExecutionTicks(long ticks) {
+      this.execution = ticks;
+    }
+
+    public int getIndex() {
+      return index;
+    }
   }
 
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private final List<TimedAction> actions;
+  private static int executionIndex = -1;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
@@ -88,9 +99,13 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   }
 
   @Override
-  public void execute(final int delay, final Consumer<Long> action) {
+  public int execute(final int delay, final Consumer<Integer> action) {
     final long d = this.convertToTicks(delay);
-    this.actions.add(new TimedAction(this.getTicks() + d, action));
+
+    TimedAction a = new TimedAction(this.getTicks() + d, action);
+    this.actions.add(a);
+
+    return a.getIndex();
   }
 
   @Override
@@ -160,7 +175,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
         final List<TimedAction> executed = new ArrayList<>();
         for (final TimedAction action : this.actions) {
           if (action.getExecutionTick() <= this.totalTicks) {
-            action.getAction().accept(this.totalTicks);
+            action.getAction().accept(action.getIndex());
             executed.add(action);
           }
         }
@@ -199,5 +214,14 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   @Override
   public void terminate() {
     this.gameIsRunning = false;
+  }
+
+  @Override
+  public void updateExecutionTime(int index, long ticks) {
+    for (TimedAction action : this.actions) {
+      if (action.getIndex() == index) {
+        action.setExecutionTicks(ticks);
+      }
+    }
   }
 }

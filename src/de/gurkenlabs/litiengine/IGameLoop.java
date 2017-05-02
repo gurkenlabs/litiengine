@@ -26,7 +26,9 @@ public interface IGameLoop extends ILaunchable {
    */
   public void detach(final IUpdateable updatable);
 
-  public void execute(int delay, Consumer<Long> action);
+  public int execute(int delay, Consumer<Integer> action);
+
+  public void updateExecutionTime(int index, long ticks);
 
   /**
    * Gets the time passed since the last tick in ms.
