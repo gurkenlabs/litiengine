@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import javax.swing.JLabel;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IGuiComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -33,7 +35,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public static final int TEXT_ALIGN_LEFT = 1;
   public static final int TEXT_ALIGN_RIGHT = 2;
   protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
-  protected static final Font TEXT_FONT = FontLoader.load("Arial").deriveFont(8f);
+
   /** The component id. */
   private static int componentId = 0;
   /** The Constant DEFAULT_COLOR. */

@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 
+import javax.swing.JLabel;
+
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -26,7 +28,7 @@ public class ImageComponent extends GuiComponent {
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     super(x, y, width, height);
     this.spritesheet = spritesheet;
-    this.setFont(TEXT_FONT.deriveFont((float) (this.getHeight() * 3 / 6f)));
+    this.setFont(new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f)));
     this.setTextColor(Color.BLACK);
 
     this.setText(text);
