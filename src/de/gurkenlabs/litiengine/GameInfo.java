@@ -26,17 +26,17 @@ public class GameInfo {
   @XmlElement
   private String subTitle;
   @XmlElement
-  private float version;
+  private String version;
 
   public GameInfo() {
     this.cooperation = "gurkenlabs";
     this.name = "LITIengine Game";
-    this.subTitle = "The ultimate java game engine";
+    this.subTitle = "The pure 2D java game engine";
     this.description = "A game, created with the allmighty LITIengine.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
     this.icon = "";
     this.logo = "";
-    this.version = 1.0f;
+    this.version = "v1.0";
 
     this.renderScale = 3.0f;
     this.spritesDirectory = "sprites/";
@@ -93,7 +93,7 @@ public class GameInfo {
   }
 
   @XmlTransient
-  public float getVersion() {
+  public String getVersion() {
     return this.version;
   }
 
@@ -137,7 +137,7 @@ public class GameInfo {
     this.subTitle = subTitle;
   }
 
-  public void setVersion(final float version) {
+  public void setVersion(final String version) {
     this.version = version;
   }
 
