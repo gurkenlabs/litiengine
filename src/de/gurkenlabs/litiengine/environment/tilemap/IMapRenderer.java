@@ -29,16 +29,33 @@ public interface IMapRenderer {
 
   /**
    * Renders the entire map (without overlay layers) onto the specified graphics
-   * object.
+   * object. The resulting map image of this method is cached and therefore
+   * animation of tiles is not supported, using this method.
    *
    * @param g
-   *          the g
+   *          the graphics object
    * @param map
    *          the map
    */
-  public void render(Graphics2D g, IMap map);
+  public void renderImage(Graphics2D g, IMap map);
 
-  public void render(Graphics2D g, IMap map, double offsetX, double offsetY);
+  /**
+   * Renders the entire map (without overlay layers) onto the specified graphics
+   * object. The resulting map image of this method is cached and therefore
+   * animation of tiles is not supported, using this method.
+   *
+   * @param g
+   *          the graphics object
+   * @param map
+   *          the map
+   * @param offsetX
+   *          The horizontal offset in pixels for the map image that is applied
+   *          when rendering on the graphics object.
+   * @param offsetY
+   *          The vertical offset in pixels for the map image that is applied
+   *          when rendering on the graphics object.
+   */
+  public void renderImage(Graphics2D g, IMap map, double offsetX, double offsetY);
 
   /*
    * Renders all layers (without the overlay layers) of the specified map. The

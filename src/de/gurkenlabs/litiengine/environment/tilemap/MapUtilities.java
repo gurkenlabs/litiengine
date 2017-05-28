@@ -106,6 +106,21 @@ public class MapUtilities {
     return new ITerrain[4];
   }
 
+  public static boolean hasAnimation(final IMap map, final ITile tile) {
+
+    final ITileset tileset = MapUtilities.findTileSet(map, tile);
+    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
+      return false;
+    }
+
+    // get the grid id relative to the sprite sheet since we use a 0 based
+    // approach to calculate the position
+    int index = tile.getGridId() - tileset.getFirstGridId();
+
+    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
+    return animation != null && animation.getFrames().size() > 0;
+  }
+
   public static ITileAnimation getAnimation(final IMap map, final int gId) {
 
     String cacheKey = map.getFileName() + "[" + gId + "]";

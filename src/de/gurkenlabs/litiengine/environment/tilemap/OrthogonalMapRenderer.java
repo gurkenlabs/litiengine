@@ -52,14 +52,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       return null;
     }
 
-    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
-    if (sprite == null) {
-      sprite = Spritesheet.load(tileset);
-      if (sprite == null) {
-        return null;
-      }
-    }
-
     // get the grid id relative to the sprite sheet since we use a 0 based
     // approach to calculate the position
     int index = tile.getGridId() - tileset.getFirstGridId();
@@ -83,6 +75,14 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         }
       }
 
+    }
+
+    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    if (sprite == null) {
+      sprite = Spritesheet.load(tileset);
+      if (sprite == null) {
+        return null;
+      }
     }
 
     final Image img = sprite.getSprite(index);
@@ -114,7 +114,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         }
       }
 
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map), layer.getPosition());
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map, true), layer.getPosition());
     }
 
     g.dispose();
@@ -129,12 +129,12 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void render(final Graphics2D g, final IMap map) {
-    this.render(g, map, 0, 0);
+  public void renderImage(final Graphics2D g, final IMap map) {
+    this.renderImage(g, map, 0, 0);
   }
 
   @Override
-  public void render(final Graphics2D g, final IMap map, final double offsetX, final double offsetY) {
+  public void renderImage(final Graphics2D g, final IMap map, final double offsetX, final double offsetY) {
     final BufferedImage mapImage = this.getMapImage(map);
     RenderEngine.renderImage(g, mapImage, offsetX, offsetY);
   }
@@ -209,7 +209,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    *          the map
    * @return the layer image
    */
-  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
+  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map, boolean includeAnimationTiles) {
     // if we have already retrived the image, use the one from the cache to
     // draw the layer
     final String cacheKey = MessageFormat.format("{0}_{1}", getCacheKey(map), layer.getName());
@@ -232,6 +232,10 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         return;
       }
 
+      if (!includeAnimationTiles && MapUtilities.hasAnimation(map, tile)) {
+        return;
+      }
+
       final Image tileTexture = getTileImage(map, tile);
 
       // draw the tile on the layer image
@@ -246,8 +250,9 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   /**
    * Renders the tiles from the specified layer that lie within the bounds of
-   * the viewport. This layer rendering is not cached and renders all tiles
-   * directly onto the graphics object.
+   * the viewport. This rendering of static tiles is cached when when the
+   * related graphics setting is enabled, which tremendously improves the
+   * rendering performance.
    *
    * @param g
    * @param layer
@@ -265,6 +270,23 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
+    if (Game.getConfiguration().GRAPHICS.enableCacheStaticTiles()) {
+      // render all static tiles first because we're able to cache them because
+      // they're never supposed to be change during runtime
+      final String cacheKey = MessageFormat.format("{0}_{1}_static", getCacheKey(map), layer.getName());
+      BufferedImage staticTileImage = null;
+      if (ImageCache.MAPS.containsKey(cacheKey)) {
+        staticTileImage = ImageCache.MAPS.get(cacheKey);
+      } else {
+        staticTileImage = this.getLayerImage(layer, map, false);
+        ImageCache.MAPS.put(cacheKey, staticTileImage);
+      }
+
+      double staticX = layer.getPosition().x - viewport.getX();
+      double staticY = layer.getPosition().x - viewport.getY();
+      RenderEngine.renderImage(g, staticTileImage, staticX, staticY);
+    }
+
     final int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
     final int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
     final int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
@@ -275,8 +297,14 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     IntStream.range(startX, endX + 1).parallel().forEach(x -> {
       for (int y = startY; y <= endY; y++) {
-        final Image tileTexture = getTileImage(map, layer.getTile(x, y));
-        RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
+        ITile tile = layer.getTile(x, y);
+
+        // always render tiles if the cache for static tiles is disabled or, in
+        // case it is enabled: only render animation tiles here
+        if (!Game.getConfiguration().GRAPHICS.enableCacheStaticTiles() || MapUtilities.hasAnimation(map, tile)) {
+          final Image tileTexture = getTileImage(map, tile);
+          RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
+        }
       }
     });
 

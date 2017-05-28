@@ -27,6 +27,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean renderDynamicShadows;
 
+  private boolean cacheStaticTiles;
+
   /** The resolution. */
   private int resolutionHeight;
 
@@ -41,6 +43,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.renderDynamicShadows = false;
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
+    this.setCacheStaticTiles(true);
   }
 
   /**
@@ -123,5 +126,13 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setResolutionWidth(final int resolutionWidth) {
     this.resolutionWidth = resolutionWidth;
+  }
+
+  public boolean enableCacheStaticTiles() {
+    return cacheStaticTiles;
+  }
+
+  public void setCacheStaticTiles(boolean cacheStaticTiles) {
+    this.cacheStaticTiles = cacheStaticTiles;
   }
 }
