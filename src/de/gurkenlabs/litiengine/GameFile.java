@@ -31,6 +31,24 @@ public class GameFile implements Serializable {
 
   private static final long serialVersionUID = -2101786184799276518L;
 
+  @XmlElementWrapper(name = "maps")
+  @XmlElement(name = "map")
+  private final List<Map> maps;
+
+  @XmlElementWrapper(name = "spriteFiles")
+  @XmlElement(name = "spritefile")
+  private String[] spriteFiles;
+
+  @XmlElementWrapper(name = "spriteSheets")
+  @XmlElement(name = "sprite")
+  private List<SpriteSheetInfo> spriteSheets;
+
+  public GameFile() {
+    this.spriteSheets = new ArrayList<>();
+    this.maps = new ArrayList<>();
+    this.spriteFiles = new String[] {};
+  }
+
   public static GameFile load(final String file) {
     try {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
@@ -66,24 +84,6 @@ public class GameFile implements Serializable {
     }
 
     return null;
-  }
-
-  @XmlElementWrapper(name = "maps")
-  @XmlElement(name = "map")
-  private final List<Map> maps;
-
-  @XmlElementWrapper(name = "spriteFiles")
-  @XmlElement(name = "spritefile")
-  private String[] spriteFiles;
-
-  @XmlElementWrapper(name = "spriteSheets")
-  @XmlElement(name = "sprite")
-  private List<SpriteSheetInfo> spriteSheets;
-
-  public GameFile() {
-    this.spriteSheets = new ArrayList<>();
-    this.maps = new ArrayList<>();
-    this.spriteFiles = new String[] {};
   }
 
   @XmlTransient

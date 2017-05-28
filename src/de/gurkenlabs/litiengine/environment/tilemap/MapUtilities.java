@@ -168,6 +168,9 @@ public class MapUtilities {
    * @return the tileset
    */
   public static ITileset findTileSet(final IMap map, final ITile tile) {
+    if (map == null || tile == null) {
+      return null;
+    }
 
     String cacheKey = map.getFileName() + "[" + tile.getGridId() + "]";
     if (tilesets.containsKey(cacheKey)) {

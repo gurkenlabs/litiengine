@@ -70,6 +70,10 @@ public class Spritesheet {
     return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
   }
 
+  public static List<Spritesheet> load(final String spriteInfoFile) {
+    return load(spriteInfoFile, "");
+  }
+
   /**
    * The sprite info file must be located under the
    * {@link de.gurkenlags.litiengine.GameInfo#getSpritesDirectory()}. directory.
@@ -77,7 +81,7 @@ public class Spritesheet {
    * @param spriteInfoFile
    * @return
    */
-  public static List<Spritesheet> load(final String spriteInfoFile) {
+  public static List<Spritesheet> load(final String spriteInfoFile, final String gameDirectory) {
     final String COMMENT_CHAR = "#";
 
     final ArrayList<Spritesheet> sprites = new ArrayList<>();
@@ -105,7 +109,7 @@ public class Spritesheet {
         }
 
         try {
-          final String name = Game.getInfo().getSpritesDirectory() + items.get(0).toString();
+          final String name = gameDirectory + Game.getInfo().getSpritesDirectory() + items.get(0).toString();
 
           final int width = Integer.parseInt(items.get(1));
           final int height = Integer.parseInt(items.get(2));
