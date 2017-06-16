@@ -119,7 +119,7 @@ public class ImageProcessing {
    *          the stroke color
    * @return the buffered image
    */
-  public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor) {
+  public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
     final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
     final BufferedImage strokeImg = flashVisiblePixels(image, strokeColor);
     // Draw the image on to the buffered image
@@ -128,7 +128,10 @@ public class ImageProcessing {
     bGr.drawImage(strokeImg, 2, 1, null);
     bGr.drawImage(strokeImg, 1, 0, null);
     bGr.drawImage(strokeImg, 1, 2, null);
-    bGr.drawImage(image, 1, 1, null);
+    if (!borderOnly) {
+      bGr.drawImage(image, 1, 1, null);
+    }
+
     bGr.dispose();
 
     return bimage;
