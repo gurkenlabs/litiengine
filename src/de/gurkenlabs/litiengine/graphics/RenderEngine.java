@@ -401,7 +401,7 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
 
-    if (!this.canRender(entity)) {
+    if (entity.getRenderType() == RenderType.NONE || !this.canRender(entity)) {
       return;
     }
     final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);

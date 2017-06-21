@@ -1,5 +1,5 @@
 package de.gurkenlabs.litiengine.graphics;
 
 public enum RenderType {
-  GROUND, NORMAL, OVERLAY
+  GROUND, NORMAL, OVERLAY, NONE
 }
