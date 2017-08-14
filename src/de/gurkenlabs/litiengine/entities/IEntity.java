@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
@@ -32,6 +33,14 @@ public interface IEntity {
   public void setHeight(float height);
 
   public void setLocation(double x, double y);
+
+  public boolean hasTag(String tag);
+
+  public List<String> getTags();
+
+  public void addTag(String tag);
+
+  public void removeTag(String tag);
 
   /**
    * Sets the map location.

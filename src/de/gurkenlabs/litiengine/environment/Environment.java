@@ -85,6 +85,8 @@ public class Environment implements IEnvironment {
   private final Map<Integer, ICombatEntity> combatEntities;
 
   private final Map<RenderType, Map<Integer, IEntity>> entities;
+  private final Map<String, List<IEntity>> entitiesByTag;
+
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<IRenderable> groundRenderable;
   private boolean initialized;
@@ -136,6 +138,7 @@ public class Environment implements IEnvironment {
   }
 
   private Environment() {
+    this.entitiesByTag = new ConcurrentHashMap<>();
     this.entities = new ConcurrentHashMap<>();
     this.entities.put(RenderType.GROUND, new ConcurrentHashMap<>());
     this.entities.put(RenderType.NORMAL, new ConcurrentHashMap<>());
@@ -191,6 +194,16 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Trigger) {
       this.triggers.add((Trigger) entity);
+    }
+
+    for (String tag : entity.getTags()) {
+      if (this.entitiesByTag.containsKey(tag)) {
+        this.entitiesByTag.get(tag).add(entity);
+        continue;
+      }
+
+      this.entitiesByTag.put(tag, new CopyOnWriteArrayList<>());
+      this.entitiesByTag.get(tag).add(entity);
     }
 
     // if the environment has already been loaded,
@@ -347,6 +360,15 @@ public class Environment implements IEnvironment {
     }
 
     return null;
+  }
+
+  @Override
+  public List<IEntity> getByTag(String tag) {
+    if (this.entitiesByTag.containsKey(tag)) {
+      return this.entitiesByTag.get(tag);
+    }
+
+    return new ArrayList<>();
   }
 
   @Override
@@ -674,6 +696,11 @@ public class Environment implements IEnvironment {
     }
 
     this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
+    for (String tag : entity.getTags()) {
+      if (this.entitiesByTag.containsKey(tag)) {
+        this.entitiesByTag.get(tag).remove(entity);
+      }
+    }
 
     if (entity instanceof Collider) {
       this.colliders.remove(entity);

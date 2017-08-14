@@ -6,6 +6,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -17,6 +19,8 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  */
 @EntityInfo
 public abstract class Entity implements IEntity {
+  private final List<String> tags;
+
   /** The direction. */
   private float angle;
 
@@ -39,6 +43,7 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
+    this.tags = new CopyOnWriteArrayList<>();
     this.mapLocation = new Point(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.width = info.width();
@@ -172,6 +177,26 @@ public abstract class Entity implements IEntity {
   public void setWidth(final float width) {
     this.width = width;
     this.boundingBox = null;
+  }
+
+  public List<String> getTags() {
+    return this.tags;
+  }
+
+  public boolean hasTag(String tag) {
+    return this.tags.contains(tag);
+  }
+
+  public void addTag(String tag) {
+    if (!this.tags.contains(tag)) {
+      this.tags.add(tag);
+    }
+  }
+
+  public void removeTag(String tag) {
+    if (!this.tags.contains(tag)) {
+      this.tags.remove(tag);
+    }
   }
 
   protected void setAngle(final float angle) {

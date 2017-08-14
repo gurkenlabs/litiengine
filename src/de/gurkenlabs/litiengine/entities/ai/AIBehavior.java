@@ -4,10 +4,10 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.util.states.StateMachine;
 
-public class AIController<T extends Entity> extends StateMachine implements IEntityController<T> {
+public class AIBehavior<T extends Entity> extends StateMachine implements IEntityController<T> {
   private final T entity;
 
-  protected AIController(final T entity) {
+  protected AIBehavior(final T entity) {
     super();
     this.entity = entity;
   }

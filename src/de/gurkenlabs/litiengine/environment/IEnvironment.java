@@ -52,6 +52,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IEntity get(final String name);
 
+  public List<IEntity> getByTag(final String tag);
+
   public AmbientLight getAmbientLight();
 
   public MapArea getArea(int mapId);
