@@ -177,7 +177,7 @@ public class AnimationController implements IAnimationController {
   }
 
   protected String buildCurrentCacheKey() {
-    if (this.getCurrentAnimation().getCurrentKeyFrame() == null) {
+    if (this.getCurrentAnimation() ==null || this.getCurrentAnimation().getCurrentKeyFrame() == null) {
       return null;
     }
     final StringBuilder cacheKey = new StringBuilder();
