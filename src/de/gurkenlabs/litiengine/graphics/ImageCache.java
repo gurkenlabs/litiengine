@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.util.image.ImageSerializer;
@@ -93,6 +95,23 @@ public class ImageCache {
     System.out.println("deleted '" + dir.toString() + "'");
     FileUtilities.deleteDir(dir);
     this.cache.clear();
+  }
+
+  public void clear() {
+    this.cache.clear();
+  }
+
+  public void clear(final String regex) {
+    List<String> remove = new ArrayList<>();
+    for (String key : this.cache.keySet()) {
+      if (key.matches(regex)) {
+        remove.add(key);
+      }
+    }
+
+    for (String key : remove) {
+      this.cache.remove(key);
+    }
   }
 
   /**
