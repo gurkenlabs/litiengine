@@ -202,7 +202,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
         break;
       }
 
-      this.deltaTime = System.currentTimeMillis() - this.lastUpdateTime;
+      this.deltaTime = System.currentTimeMillis() - this.lastUpdateTime + updateTime;
     }
   }
 
