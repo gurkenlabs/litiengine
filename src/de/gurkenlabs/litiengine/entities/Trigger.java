@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -26,6 +28,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public static final String USE_MESSAGE = "use";
   private List<IEntity> activated;
   private final Collection<Consumer<TriggerEvent>> activatedConsumer;
+  private final Collection<Function<TriggerEvent, String>> activatingPredicates;
   private final TriggerActivation activationType;
   private final List<Integer> activators;
   private final Map<String, String> arguments;
@@ -42,6 +45,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, final Map<String, String> arguments) {
     super();
+    this.activatingPredicates = new CopyOnWriteArrayList<>();
     this.activatedConsumer = new CopyOnWriteArrayList<>();
     this.deactivatedConsumer = new CopyOnWriteArrayList<>();
     this.arguments = arguments;
@@ -54,9 +58,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.activationType = activation;
   }
 
-  public void activate(final IEntity activator, final int tar) {
+  public boolean activate(final IEntity activator, final int tar) {
     if (this.isOneTimeTrigger && this.triggered || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.activated.contains(activator)) {
-      return;
+      return false;
     }
 
     this.triggered = true;
@@ -67,6 +71,17 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       targets = new ArrayList<>();
       if (tar > 0) {
         targets.add(tar);
+      }
+    }
+
+    final TriggerEvent te = new TriggerEvent(this, activator, targets);
+
+    // check if the trigger is allowed to be activated
+    for (Function<TriggerEvent, String> pred : this.activatingPredicates) {
+      String result = pred.apply(te);
+      if (result != null && !result.isEmpty()) {
+        activator.sendMessage(this, result);
+        return false;
       }
     }
 
@@ -84,7 +99,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       }
     }
 
-    final TriggerEvent te = new TriggerEvent(this.message, activator, targets, this.arguments);
     // also send the trigger event to all registered consumers
     for (final Consumer<TriggerEvent> cons : this.activatedConsumer) {
       cons.accept(te);
@@ -93,6 +107,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     if (this.isOneTimeTrigger && this.triggered) {
       Game.getEnvironment().remove(this);
     }
+
+    return true;
   }
 
   public void addActivator(final int mapId) {
@@ -107,6 +123,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.activationType;
   }
 
+  public Map<String, String> getArguments() {
+    return this.arguments;
+  }
+
   public List<Integer> getActivators() {
     return this.activators;
   }
@@ -117,6 +137,23 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public List<Integer> getTargets() {
     return this.targets;
+  }
+
+  /**
+   * Allows to register functions that contain additional checks for the trigger
+   * activation. The return value of the function is considered the reason why
+   * the trigger cannot be activated. If the function returns anything else than
+   * null, the activation is cancelled and the result of the function is send to
+   * the activator entity.
+   * 
+   * @param func
+   */
+  public void onActivating(final Function<TriggerEvent, String> func) {
+    if (this.activatingPredicates.contains(func)) {
+      return;
+    }
+
+    this.activatingPredicates.add(func);
   }
 
   public void onActivated(final Consumer<TriggerEvent> cons) {
@@ -204,7 +241,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
             targets.add(ent.getMapId());
           }
 
-          cons.accept(new TriggerEvent(this.message, ent, targets, this.arguments));
+          cons.accept(new TriggerEvent(this, ent, targets));
         }
       }
     }

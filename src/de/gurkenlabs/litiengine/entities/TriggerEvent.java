@@ -8,13 +8,15 @@ public class TriggerEvent {
   private final IEntity entity;
   private final String message;
   private final List<Integer> targets;
+  private final Trigger trigger;
 
-  public TriggerEvent(final String message, final IEntity entity, final List<Integer> targets, final Map<String, String> arguments) {
+  public TriggerEvent(final Trigger trigger, final IEntity entity, final List<Integer> targets) {
     super();
-    this.message = message;
+    this.trigger = trigger;
+    this.message = trigger.getMessage();
     this.targets = targets;
     this.entity = entity;
-    this.arguments = arguments;
+    this.arguments = trigger.getArguments();
   }
 
   public String getArgument(final String name) {
@@ -39,5 +41,9 @@ public class TriggerEvent {
 
   public List<Integer> getTargets() {
     return this.targets;
+  }
+
+  public Trigger getTrigger() {
+    return trigger;
   }
 }
