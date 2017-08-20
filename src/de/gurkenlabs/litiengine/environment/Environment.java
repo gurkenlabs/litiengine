@@ -971,7 +971,7 @@ public class Environment implements IEnvironment {
 
     // set map properties by map object
     final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
-    final Prop prop = this.createNewProp(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
+    final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
     if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
@@ -1071,8 +1071,8 @@ public class Environment implements IEnvironment {
     this.add(trigger);
   }
 
-  protected Prop createNewProp(Point2D location, String spriteSheetName, Material material) {
-    return new Prop(location, spriteSheetName, material);
+  protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
+    return new Prop(mapObject.getLocation(), spriteSheetName, material);
   }
 
   private void addAmbientLight() {
