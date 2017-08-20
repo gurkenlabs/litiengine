@@ -36,9 +36,12 @@ public class MapObjectProperties {
   public static final String REFLECTION = "reflection";
   // collision box
   public static final String SHADOWTYPE = "shadowType";
-  public static final String SPAWN_TYPE = "spawnType";
   public static final String SPRITESHEETNAME = "spritesheetName";
 
+  // spawnpoint
+  public static final String SPAWN_TYPE = "spawnType";
+  public static final String SPAWN_DIRECTION = "spawnDirection";
+  
   public static final String TEAM = "team";
   public static final String TRIGGERACTIVATION = "triggerActivation";
 

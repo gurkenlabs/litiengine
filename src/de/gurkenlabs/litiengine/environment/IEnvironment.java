@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
+import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -103,11 +104,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public int getNextMapId();
 
-  public MapLocation getSpawnpoint(int mapId);
+  public Spawnpoint getSpawnpoint(int mapId);
 
-  public MapLocation getSpawnpoint(String name);
+  public Spawnpoint getSpawnpoint(String name);
 
-  public List<MapLocation> getSpawnPoints();
+  public List<Spawnpoint> getSpawnPoints();
 
   public Trigger getTrigger(int mapId);
 

@@ -35,6 +35,7 @@ import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
+import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -54,6 +55,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
@@ -105,7 +107,7 @@ public class Environment implements IEnvironment {
   private final Map<Integer, IMovableEntity> movableEntities;
   private final List<IRenderable> overlayRenderable;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
-  private final List<MapLocation> spawnPoints;
+  private final List<Spawnpoint> spawnPoints;
 
   private Image staticShadowImage;
   private final Collection<Trigger> triggers;
@@ -514,8 +516,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public MapLocation getSpawnpoint(final int mapId) {
-    for (final MapLocation m : this.getSpawnPoints()) {
+  public Spawnpoint getSpawnpoint(final int mapId) {
+    for (final Spawnpoint m : this.getSpawnPoints()) {
       if (m.getMapId() == mapId) {
         return m;
       }
@@ -525,12 +527,12 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public MapLocation getSpawnpoint(final String name) {
+  public Spawnpoint getSpawnpoint(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
     }
 
-    for (final MapLocation m : this.getSpawnPoints()) {
+    for (final Spawnpoint m : this.getSpawnPoints()) {
       if (m.getName() != null && m.getName().equals(name)) {
         return m;
       }
@@ -539,7 +541,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<MapLocation> getSpawnPoints() {
+  public List<Spawnpoint> getSpawnPoints() {
     return this.spawnPoints;
   }
 
@@ -1010,8 +1012,13 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    final MapLocation spawn = new MapLocation(mapObject.getId(), new Point(mapObject.getLocation()));
+    final Direction direction = mapObject.getCustomProperty(MapObjectProperties.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperties.SPAWN_DIRECTION)) : Direction.DOWN;
+    final Spawnpoint spawn = new Spawnpoint(mapObject.getId(), new Point(mapObject.getLocation()), direction);
     spawn.setName(mapObject.getName());
+
+    final String spawnType = mapObject.getCustomProperty(MapObjectProperties.SPAWN_TYPE);
+    spawn.setSpawnType(spawnType);
+
     this.getSpawnPoints().add(spawn);
   }
 
