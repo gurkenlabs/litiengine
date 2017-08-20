@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
@@ -38,6 +39,14 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void add(final ICollisionEntity entity) {
+    if(entity instanceof Prop){
+      Prop prop = (Prop)entity;
+      if(prop.isObstacle()){
+        this.add(prop.getCollisionBox());
+        return;
+      }
+    }
+    
     if (!this.collisionEntities.contains(entity)) {
       this.collisionEntities.add(entity);
     }
@@ -254,6 +263,14 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void remove(final ICollisionEntity entity) {
+    if(entity instanceof Prop){
+      Prop prop = (Prop)entity;
+      if(prop.isObstacle()){
+        this.remove(prop.getCollisionBox());
+        return;
+      }
+    }
+    
     if (this.collisionEntities.contains(entity)) {
       this.collisionEntities.remove(entity);
     }

@@ -973,6 +973,7 @@ public class Environment implements IEnvironment {
     final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
     final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
+
     if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
       prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
     }
@@ -1072,7 +1073,13 @@ public class Environment implements IEnvironment {
   }
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
-    return new Prop(mapObject.getLocation(), spriteSheetName, material);
+    Prop prop = new Prop(mapObject.getLocation(), spriteSheetName, material);
+    final String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    if (obstacle != null && !obstacle.isEmpty()) {
+      prop.setObstacle(Boolean.valueOf(obstacle));
+    }
+
+    return prop;
   }
 
   private void addAmbientLight() {

@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 public class Prop extends CombatEntity {
   private Material material;
   private String spritePath;
+  private boolean isObstacle;
 
   /**
    * Instantiates a new destructible.
@@ -56,5 +57,13 @@ public class Prop extends CombatEntity {
 
   public void setSpritePath(final String spritePath) {
     this.spritePath = spritePath;
+  }
+
+  public boolean isObstacle() {
+    return this.isObstacle;
+  }
+
+  public void setObstacle(boolean isObstacle) {
+    this.isObstacle = isObstacle;
   }
 }
