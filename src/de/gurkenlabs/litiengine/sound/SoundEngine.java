@@ -29,6 +29,10 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void playMusic(final Sound sound) {
+    if (sound == null) {
+      return;
+    }
+
     if (this.music != null) {
       this.music.dispose();
     }
