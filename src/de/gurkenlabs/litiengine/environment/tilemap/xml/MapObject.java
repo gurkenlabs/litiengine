@@ -176,7 +176,6 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public double getX() {
     return this.x;
   }
-  
 
   @Override
   public double getY() {
@@ -186,5 +185,15 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlTransient
   public void setPolyline(Polyline polyline) {
     this.polyline = polyline;
+  }
+
+  @Override
+  public double getWidth() {
+    return this.width;
+  }
+
+  @Override
+  public double getHeight() {
+    return this.height;
   }
 }

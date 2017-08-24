@@ -75,8 +75,13 @@ public interface IMapObject extends ICustomPropertyProvider {
   public void setX(double x);
 
   public void setY(double y);
-  
+
   public double getX();
+
   public double getY();
+
+  public double getWidth();
+
+  public double getHeight();
 
 }
