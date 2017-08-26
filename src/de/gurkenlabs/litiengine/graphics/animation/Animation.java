@@ -45,6 +45,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this.spritesheet = spritesheet;
     this.loop = loop;
     this.keyframes = new ArrayList<>();
+
     if (spritesheet == null) {
       System.out.println("no spritesheet defined for animation " + name);
       return;
@@ -165,10 +166,16 @@ public class Animation implements IUpdateable, ILaunchable {
     this.elapsedTicks = 0;
   }
 
-  private void initKeyFrames(final int[] keyFrames) {
+  private void initKeyFrames(int[] keyFrames) {
 
     if (this.getSpritesheet() == null) {
       return;
+    }
+
+    if (keyFrames.length == 0) {
+      // fallback to use custom keyframe durations if no specific durations are
+      // defined
+      keyFrames = Spritesheet.getCustomKeyFrameDurations(name);
     }
 
     // if no keyframes are specified, the animation takes in the whole

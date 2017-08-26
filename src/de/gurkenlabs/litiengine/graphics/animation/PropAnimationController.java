@@ -21,7 +21,7 @@ public class PropAnimationController extends AnimationController {
       return null;
     }
 
-    return new Animation(state.name(), spritesheet, true, true, Spritesheet.getCustomKeyFrameDurations(spritesheet.getName()));
+    return new Animation(state.name(), spritesheet, true, true);
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
