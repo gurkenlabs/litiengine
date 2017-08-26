@@ -738,9 +738,9 @@ public class Environment implements IEnvironment {
     }
     final IEntity ent = this.get(mapId);
     if (ent == null) {
-      System.out.println("could not remove entity with id '" + mapId + "' from the environment, because there is no entity with such a map ID.");
       return;
     }
+
     this.remove(ent);
   }
 

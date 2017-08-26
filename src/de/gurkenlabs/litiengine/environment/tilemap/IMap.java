@@ -60,6 +60,8 @@ public interface IMap extends ICustomPropertyProvider {
 
   public void removeMapObjectLayer(IMapObjectLayer layer);
 
+  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject);
+
   public void removeMapObjectLayer(int index);
 
   public List<IMapObject> getMapObjects(String... type);

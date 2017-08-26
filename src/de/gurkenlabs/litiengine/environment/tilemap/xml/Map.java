@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
@@ -173,6 +174,18 @@ public class Map extends CustomPropertyProvider implements IMap {
       shapeLayers.addAll(this.getObjectgroups());
     }
     return shapeLayers;
+  }
+
+  @Override
+  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject) {
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      Optional<IMapObject> found = layer.getMapObjects().stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
+      if (found.isPresent()) {
+        return layer;
+      }
+    }
+
+    return null;
   }
 
   @Override
