@@ -197,4 +197,16 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     super.setSize(width, height);
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
+
+  @Override
+  public void setHeight(final float height) {
+    super.setHeight(height);
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
+  @Override
+  public void setWidth(final float width) {
+    super.setWidth(width);
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
 }
