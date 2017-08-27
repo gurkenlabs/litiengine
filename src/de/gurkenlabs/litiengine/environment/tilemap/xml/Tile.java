@@ -4,7 +4,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -26,10 +29,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
 
   /** The gid. */
   @XmlAttribute
-  private int gid;
+  private Integer gid;
 
   @XmlAttribute
-  private int id;
+  private Integer id;
 
   @XmlAttribute
   private String terrain;
@@ -51,6 +54,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
    */
   @Override
   public int getGridId() {
+    if (this.gid == null) {
+      return 0;
+    }
+
     return this.gid;
   }
 
@@ -76,6 +83,10 @@ public class Tile extends CustomPropertyProvider implements ITile {
 
   @Override
   public int getId() {
+    if (this.id == null) {
+      return 0;
+    }
+
     return this.id;
   }
 
@@ -83,7 +94,7 @@ public class Tile extends CustomPropertyProvider implements ITile {
   public ITerrain[] getTerrain() {
     return this.terrains;
   }
-  
+
   public ITileAnimation getAnimation() {
     return this.animation;
   }
@@ -112,5 +123,15 @@ public class Tile extends CustomPropertyProvider implements ITile {
 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
+  }
+
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    if (this.gid != null && this.gid == 0) {
+      this.gid = null;
+    }
+
+    if (this.id != null && this.id == 0) {
+      this.id = null;
+    }
   }
 }

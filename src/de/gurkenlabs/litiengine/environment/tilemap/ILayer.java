@@ -33,6 +33,10 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   public Point getPosition();
 
+  public int getOffsetX();
+
+  public int getOffsetY();
+
   /**
    * Gets the size in tiles.
    *

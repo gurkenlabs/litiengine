@@ -41,10 +41,10 @@ public class GameFile implements Serializable {
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
-  private List<SpriteSheetInfo> spriteSheets;
+  private List<SpriteSheetInfo> tilesets;
 
   public GameFile() {
-    this.spriteSheets = new ArrayList<>();
+    this.tilesets = new ArrayList<>();
     this.maps = new ArrayList<>();
     this.spriteFiles = new String[] {};
   }
@@ -98,7 +98,7 @@ public class GameFile implements Serializable {
 
   @XmlTransient
   public List<SpriteSheetInfo> getTileSets() {
-    return this.spriteSheets;
+    return this.tilesets;
   }
 
   public String save(String fileName, final boolean compress) {
@@ -144,7 +144,18 @@ public class GameFile implements Serializable {
     this.spriteFiles = spriteFiles;
   }
 
-  public void setSpriteSheets(final List<SpriteSheetInfo> spriteSheets) {
-    this.spriteSheets = spriteSheets;
+  public void setTileSets(final List<SpriteSheetInfo> tileSets) {
+    this.tilesets = tileSets;
+  }
+
+  void beforeMarshal(Marshaller m) {
+    List<SpriteSheetInfo> duplicates = new ArrayList<>();
+    for (SpriteSheetInfo sprite : this.getTileSets()) {
+      if (this.getTileSets().stream().anyMatch(x -> !x.equals(sprite) && x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
+        duplicates.add(sprite);
+      }
+    }
+
+    this.tilesets.removeAll(duplicates);
   }
 }

@@ -48,8 +48,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
 
   @Override
   public void setCustomProperties(List<Property> props) {
-
     if (props == null) {
+      this.properties = null;
       return;
     }
     if (this.properties != null) {
@@ -66,12 +66,6 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   void beforeMarshal(Marshaller m) {
     if (this.properties != null && this.properties.isEmpty()) {
       this.properties = null;
-    }
-  }
-
-  void afterMmarshal(Marshaller m) {
-    if (this.properties == null) {
-      this.properties = new ArrayList<>();
     }
   }
 }

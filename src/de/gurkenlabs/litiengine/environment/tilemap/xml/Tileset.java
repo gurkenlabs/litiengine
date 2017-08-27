@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -38,7 +39,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   /** The margin. */
   @XmlAttribute
-  private int margin;
+  private Integer margin;
 
   /** The name. */
   @XmlAttribute
@@ -60,7 +61,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   /** The spacing. */
   @XmlAttribute
-  private int spacing;
+  private Integer spacing;
 
   @XmlElementWrapper(name = "terraintypes")
   @XmlElement(name = "terrain")
@@ -95,6 +96,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the margin
    */
   public int getMargin() {
+    if (this.margin == null) {
+      return 0;
+    }
+
     return this.margin;
   }
 
@@ -114,6 +119,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the spacing
    */
   public int getSpacing() {
+    if (this.spacing == null) {
+      return 0;
+    }
+
     return this.spacing;
   }
 
@@ -216,5 +225,15 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   public int getTilecount() {
     return this.tilecount;
+  }
+
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    if (this.margin != null && this.margin == 0) {
+      this.margin = null;
+    }
+
+    if (this.spacing != null && this.spacing == 0) {
+      this.spacing = null;
+    }
   }
 }

@@ -20,7 +20,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   /** The height. */
   @XmlAttribute
-  private int height;
+  private Integer height;
 
   /** The name. */
   @XmlAttribute
@@ -36,15 +36,15 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   /** The width. */
   @XmlAttribute
-  private int width;
+  private Integer width;
 
   /** The x. */
   @XmlAttribute
-  private int offsetx;
+  private Integer offsetx;
 
   /** The y. */
   @XmlAttribute
-  private int offsety;
+  private Integer offsety;
 
   @XmlAttribute
   private int order = -1;
@@ -55,6 +55,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
    * @return the height
    */
   public int getHeight() {
+    if (this.height == null) {
+      return 0;
+    }
+
     return this.height;
   }
 
@@ -85,7 +89,25 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
    */
   @Override
   public Point getPosition() {
-    return new Point(this.offsetx, this.offsety);
+    return new Point(this.getOffsetX(), this.getOffsetY());
+  }
+
+  @Override
+  public int getOffsetX() {
+    if (this.offsetx == null) {
+      return 0;
+    }
+
+    return this.offsetx;
+  }
+
+  @Override
+  public int getOffsetY() {
+    if (this.offsety == null) {
+      return 0;
+    }
+
+    return offsety;
   }
 
   /*
@@ -104,6 +126,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
    * @return the width
    */
   public int getWidth() {
+    if (this.width == null) {
+      return 0;
+    }
+
     return this.width;
   }
 
@@ -138,6 +164,22 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
         layerCnt += map.getTileLayers().size();
         this.order = layerCnt;
       }
+    }
+
+    if (this.offsetx != null && this.offsetx == 0) {
+      this.offsetx = null;
+    }
+
+    if (this.offsety != null && this.offsety == 0) {
+      this.offsety = null;
+    }
+
+    if (this.width != null && this.width == 0) {
+      this.width = null;
+    }
+
+    if (this.height != null && this.height == 0) {
+      this.height = null;
     }
   }
 }
