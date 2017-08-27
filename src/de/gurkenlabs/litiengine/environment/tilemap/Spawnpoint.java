@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.entities.Direction;
 public class Spawnpoint extends MapLocation {
   private Direction direction;
   private String spawnType;
-  
+
   public Spawnpoint(int mapId, Point2D point) {
     super(mapId, point);
   }
@@ -32,5 +32,4 @@ public class Spawnpoint extends MapLocation {
   public void setSpawnType(String spawnType) {
     this.spawnType = spawnType;
   }
-
 }

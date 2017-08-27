@@ -47,8 +47,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The click consumer. */
   private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer, mouseReleasedConsumer, mouseMovedConsumer;
 
+  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
+
   /** The components. */
-  private final CopyOnWriteArrayList<GuiComponent> components;
+  private final List<GuiComponent> components;
+
+  private final List<Consumer<String>> textChangedConsumer;
 
   private Boolean drawTextShadow = false;
   private Font font;
@@ -63,8 +67,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The is hovered. */
   private boolean isHovered, isPressed, isSelected;
 
-  private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
-
   /** The suspended. */
   private boolean suspended;
 
@@ -76,7 +78,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private int textAlignment = TEXT_ALIGN_CENTER;
 
   private int textAngle = 0;
-  private final List<Consumer<String>> textChangedConsumer;
+
   /** The text color. */
   private Color textColor;
   private double textX;
@@ -166,7 +168,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the components
    */
-  public CopyOnWriteArrayList<GuiComponent> getComponents() {
+  public List<GuiComponent> getComponents() {
     return this.components;
   }
 
@@ -673,7 +675,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   }
 
   public void setFontSize(final float size) {
-    this.font = this.getFont().deriveFont(size);
+    this.setFont(this.getFont().deriveFont(size));
   }
 
   @Override
@@ -747,8 +749,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  public void setTextShadow(final Boolean drawTextShadow) {
+  public void setTextShadow(final boolean drawTextShadow) {
     this.drawTextShadow = drawTextShadow;
+    for (final GuiComponent comp : this.getComponents()) {
+      comp.setTextShadow(drawTextShadow);
+    }
   }
 
   public void setTextShadowColor(final Color textShadowColor) {
@@ -757,20 +762,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public void setTextX(final double x) {
     this.textX = x;
-    // switch (this.getTextAlignment()) {
-    // case TEXT_ALIGN_LEFT:
-    // this.setTextXMargin((float) (2 * this.getTextX()));
-    // break;
-    // case TEXT_ALIGN_CENTER:
-    // this.setTextXMargin((float) (this.getWidth() * 1 / 16));
-    // break;
-    // case TEXT_ALIGN_RIGHT:
-    // this.setTextXMargin((float) this.getTextX());
-    // break;
-    // default:
-    // this.setTextXMargin((float) (2 * this.getTextX()));
-    // break;
-    // }
   }
 
   public void setTextXMargin(final double xMargin) {
@@ -825,7 +816,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public void toggleSelection() {
     this.setSelected(!this.isSelected);
-
   }
 
   /**
