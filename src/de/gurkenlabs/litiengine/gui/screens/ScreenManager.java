@@ -7,6 +7,9 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowStateListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -18,29 +21,7 @@ import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
-public class ScreenManager extends JFrame implements IScreenManager {
-
-  /**
-   * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface,
-   * and the object created with that class is registered with a component using
-   * the component's <code>addResizedEventListener<code> method. When the
-   * resizedEvent event occurs, that object's appropriate method is invoked.
-   *
-   * @see ResizedEventEvent
-   */
-  private class ResizedEventListener extends ComponentAdapter {
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
-     * ComponentEvent)
-     */
-    @Override
-    public void componentResized(final ComponentEvent evt) {
-      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
-  }
+public class ScreenManager extends JFrame implements IScreenManager, WindowStateListener, WindowFocusListener {
 
   private static final int SCREENCHANGETIMEOUT = 200;
 
@@ -81,6 +62,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
     final RenderComponent comp = new RenderComponent(Game.getConfiguration().GRAPHICS.getResolution());
     this.add(comp);
     this.renderCanvas = comp;
+
+    this.addWindowStateListener(this);
+    this.addWindowFocusListener(this);
   }
 
   @Override
@@ -205,5 +189,49 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.camera = camera;
 
     this.getCamera().updateFocus();
+  }
+
+  @Override
+  public void windowStateChanged(WindowEvent e) {
+    final int ICONIFIED_MAX_FPS = 1;
+
+    if (e.getNewState() == JFrame.ICONIFIED) {
+      Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
+    } else {
+      Game.getRenderLoop().setMaxFps(Game.getConfiguration().CLIENT.getMaxFps());
+    }
+  }
+
+  @Override
+  public void windowGainedFocus(WindowEvent e) {
+    Game.getRenderLoop().setMaxFps(Game.getConfiguration().CLIENT.getMaxFps());
+  }
+
+  @Override
+  public void windowLostFocus(WindowEvent e) {
+    final int NONE_FOCUS_MAX_FPS = 10;
+    Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+  }
+
+  /**
+   * The listener interface for receiving resizedEvent events. The class that is
+   * interested in processing a resizedEvent event implements this interface,
+   * and the object created with that class is registered with a component using
+   * the component's <code>addResizedEventListener<code> method. When the
+   * resizedEvent event occurs, that object's appropriate method is invoked.
+   *
+   * @see ResizedEventEvent
+   */
+  private class ResizedEventListener extends ComponentAdapter {
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
+     * ComponentEvent)
+     */
+    @Override
+    public void componentResized(final ComponentEvent evt) {
+      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+    }
   }
 }

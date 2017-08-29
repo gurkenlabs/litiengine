@@ -17,10 +17,13 @@ public class RenderLoop extends Thread {
   private boolean gameIsRunning = true;
   private final List<IRenderable> renderables;
 
+  private int maxFps;
+
   public RenderLoop(final IRenderComponent component, final ICameraProvider provider) {
     this.renderables = new CopyOnWriteArrayList<>();
     this.component = component;
     this.cameraProvider = provider;
+    this.maxFps = Game.getConfiguration().CLIENT.getMaxFps();
   }
 
   public void register(final IRenderable render) {
@@ -34,20 +37,23 @@ public class RenderLoop extends Thread {
    */
   @Override
   public void run() {
-    final long FPS_WAIT = (long) (1.0 / Game.getConfiguration().CLIENT.getMaxFps() * 1000);
     while (this.gameIsRunning) {
+      final long FPS_WAIT = (long) (1.0 / this.maxFps * 1000);
       final long renderStart = System.nanoTime();
-      this.cameraProvider.getCamera().updateFocus();
-      for (final IRenderable render : this.renderables) {
-        this.component.render(render);
-      }
-
-      final long renderTime = (System.nanoTime() - renderStart) / 1000000;
       try {
+        this.cameraProvider.getCamera().updateFocus();
+        for (final IRenderable render : this.renderables) {
+          this.component.render(render);
+        }
+
+        final long renderTime = (System.nanoTime() - renderStart) / 1000000;
+
         Thread.sleep(Math.max(0, FPS_WAIT - renderTime));
       } catch (final InterruptedException e) {
         Thread.interrupted();
         break;
+      } catch (final Exception e) {
+        continue;
       }
     }
   }
@@ -61,5 +67,13 @@ public class RenderLoop extends Thread {
 
   public void unregister(final IRenderable render) {
     this.renderables.remove(render);
+  }
+
+  public int getMaxFps() {
+    return maxFps;
+  }
+
+  public void setMaxFps(int maxFps) {
+    this.maxFps = maxFps;
   }
 }
