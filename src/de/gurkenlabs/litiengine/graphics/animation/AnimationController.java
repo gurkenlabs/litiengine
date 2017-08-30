@@ -168,16 +168,17 @@ public class AnimationController implements IAnimationController {
     }
 
     if (this.getCurrentAnimation() == null || playbackFinished) {
-      this.currentAnimation = null;
       if (this.defaultAnimation != null) {
         this.playAnimation(this.defaultAnimation.getName());
+      } else {
+        this.currentAnimation = null;
       }
     }
 
   }
 
   protected String buildCurrentCacheKey() {
-    if (this.getCurrentAnimation() ==null || this.getCurrentAnimation().getCurrentKeyFrame() == null) {
+    if (this.getCurrentAnimation() == null || this.getCurrentAnimation().getCurrentKeyFrame() == null) {
       return null;
     }
     final StringBuilder cacheKey = new StringBuilder();

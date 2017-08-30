@@ -69,7 +69,8 @@ public class PropAnimationController extends AnimationController {
     // add a shadow at the lower end of the current sprite.
     final int ShadowYOffset = currentImage.getHeight();
     final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
-    return ImageCache.SPRITES.put(cacheKey, shadow);
+    ImageCache.SPRITES.put(cacheKey, shadow);
+    return shadow;
   }
 
   @Override
