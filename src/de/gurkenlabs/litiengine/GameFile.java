@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -111,6 +112,8 @@ public class GameFile implements Serializable {
     if (newFile.exists()) {
       newFile.delete();
     }
+
+    Collections.sort(this.getMaps());
 
     try {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);

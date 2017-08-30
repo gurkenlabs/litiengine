@@ -38,7 +38,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
  */
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Map extends CustomPropertyProvider implements IMap {
+public class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
 
   /** The height. */
@@ -422,5 +422,10 @@ public class Map extends CustomPropertyProvider implements IMap {
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
+  }
+
+  @Override
+  public int compareTo(Map o) {
+    return this.name.compareTo(o.name);
   }
 }
