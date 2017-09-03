@@ -7,8 +7,8 @@ import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.ConfigurationGroup;
+import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.Quality;
 
 // TODO: Auto-generated Javadoc

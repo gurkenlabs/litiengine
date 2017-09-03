@@ -3,8 +3,8 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.configuration;
 
-import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.ConfigurationGroup;
+import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 
 // TODO: Auto-generated Javadoc
 /**

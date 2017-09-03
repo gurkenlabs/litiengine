@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-import de.gurkenlabs.annotation.ConfigurationGroupInfo;
-
 /**
  * This class contains some basic functionality for all setting groups. It gets
  * the SettingsGroupInfo annotation and reads out the prefix that is used when

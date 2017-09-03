@@ -1,7 +1,7 @@
 /***************************************************************
  * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
  ***************************************************************/
-package de.gurkenlabs.annotation;
+package de.gurkenlabs.configuration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

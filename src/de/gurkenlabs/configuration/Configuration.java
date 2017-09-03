@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import de.gurkenlabs.annotation.ConfigurationGroupInfo;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Configuration {
