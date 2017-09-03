@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.states;
+package de.gurkenlabs.states;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 

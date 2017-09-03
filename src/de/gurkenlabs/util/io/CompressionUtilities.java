@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.zip;
+package de.gurkenlabs.util.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,8 +15,6 @@ import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-import de.gurkenlabs.util.io.StreamUtilities;
 
 public class CompressionUtilities {
   public static byte[] compress(final byte[] data) {

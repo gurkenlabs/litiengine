@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "sprite")

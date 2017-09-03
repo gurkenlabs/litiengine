@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.ImageProcessing;
 
 public class PropAnimationController extends AnimationController {
   private static final String DAMAGED = "damaged";

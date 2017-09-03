@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.console;
+package de.gurkenlabs.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

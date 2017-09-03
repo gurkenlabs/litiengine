@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.console;
+package de.gurkenlabs.util;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

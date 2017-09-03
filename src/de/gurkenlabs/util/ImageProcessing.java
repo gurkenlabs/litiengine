@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.image;
+package de.gurkenlabs.util;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

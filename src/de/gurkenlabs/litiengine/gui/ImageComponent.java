@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
 

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.net.server;
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.net.IIncomingPacketObserver;
 import de.gurkenlabs.litiengine.net.IPacketSender;
-import de.gurkenlabs.util.console.ICommandManager;
+import de.gurkenlabs.util.ICommandManager;
 
 public interface IServer extends IIncomingPacketObserver, ILaunchable {
 

@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.gurkenlabs.util.image.ImageSerializer;
+import de.gurkenlabs.util.io.CompressionUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.zip.CompressionUtilities;
+import de.gurkenlabs.util.io.ImageSerializer;
 
 /**
  * The Class ImageCache.

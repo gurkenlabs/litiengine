@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
-import de.gurkenlabs.util.image.ImageProcessing;
+import de.gurkenlabs.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
   private static int MAX_IMAGE_EFFECTS = 20;

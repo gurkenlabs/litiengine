@@ -70,8 +70,8 @@ import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
+import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.image.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 /**

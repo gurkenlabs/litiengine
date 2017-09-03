@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.logging;
+package de.gurkenlabs.util;
 
 import java.util.function.Consumer;
 

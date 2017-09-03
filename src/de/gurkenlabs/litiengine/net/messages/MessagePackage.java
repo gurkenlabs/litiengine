@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import de.gurkenlabs.litiengine.net.Package;
+import de.gurkenlabs.util.io.CompressionUtilities;
 import de.gurkenlabs.util.io.Serializer;
-import de.gurkenlabs.util.zip.CompressionUtilities;
 
 // TODO: Auto-generated Javadoc
 /**

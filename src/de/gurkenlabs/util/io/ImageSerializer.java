@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.image;
+package de.gurkenlabs.util.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,7 +11,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.ImageProcessing;
 
 public class ImageSerializer {
   public static final String FILE_FORMAT_PNG = "png";
