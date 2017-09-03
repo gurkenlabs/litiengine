@@ -1,11 +1,11 @@
 package de.gurkenlabs.litiengine;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.io.XmlUtilities;
 
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {
@@ -119,19 +120,24 @@ public class GameFile implements Serializable {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
-      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-      final OutputStream out = new FileOutputStream(newFile);
-      try {
-        if (compress) {
-          final GZIPOutputStream stream = new GZIPOutputStream(out);
-          jaxbMarshaller.marshal(this, stream);
-          stream.flush();
-          stream.close();
-        } else {
-          jaxbMarshaller.marshal(this, out);
-        }
-      } finally {
+      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+
+      final FileOutputStream fileOut = new FileOutputStream(newFile);
+      if (compress) {
+        final GZIPOutputStream stream = new GZIPOutputStream(fileOut);
+        jaxbMarshaller.marshal(this, stream);
+        stream.flush();
+        stream.close();
+      } else {
+
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        // first: marshal to byte array
+        jaxbMarshaller.marshal(this, out);
         out.flush();
+
+        // second: postprocess xml and then write it to the file
+        XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
         out.close();
       }
     } catch (final JAXBException ex) {

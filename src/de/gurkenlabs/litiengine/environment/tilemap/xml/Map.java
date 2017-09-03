@@ -4,10 +4,11 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.util.io.XmlUtilities;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -357,13 +359,23 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-      OutputStream out = new FileOutputStream(newFile);
+      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+      FileOutputStream fileOut = new FileOutputStream(newFile);
       try {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        // first: marshal to byte array
+        jaxbMarshaller.marshal(this, out);
+        out.flush();
+
+        // second: postprocess xml and then write it to the file
+        XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+        out.close();
+
         jaxbMarshaller.marshal(this, out);
       } finally {
-        out.flush();
-        out.close();
+        fileOut.flush();
+        fileOut.close();
       }
     } catch (JAXBException ex) {
       ex.printStackTrace();
