@@ -62,26 +62,26 @@ public interface IMapObject extends ICustomPropertyProvider {
 
   public void setGid(int gid);
 
-  public void setHeight(double height);
-
   public void setId(int id);
 
   public void setName(String name);
 
   public void setType(String type);
 
-  public void setWidth(double width);
+  public void setX(int x);
 
-  public void setX(double x);
+  public void setY(int y);
 
-  public void setY(double y);
+  public void setWidth(int width);
 
-  public double getX();
+  public void setHeight(int height);
 
-  public double getY();
+  public int getX();
 
-  public double getWidth();
+  public int getY();
 
-  public double getHeight();
+  public int getWidth();
+
+  public int getHeight();
 
 }

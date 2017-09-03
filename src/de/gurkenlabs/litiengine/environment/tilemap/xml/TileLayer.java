@@ -6,7 +6,6 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -29,6 +29,7 @@ public final class XmlUtilities {
   public static void saveWithCustomIndetation(ByteArrayInputStream input, FileOutputStream fos, int indentation) {
     try {
       Transformer transformer = SAXTransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indentation));
       Source xmlSource = new SAXSource(new org.xml.sax.InputSource(input));

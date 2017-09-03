@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,15 +23,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 @XmlRootElement(name = "image")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MapImage extends CustomPropertyProvider implements IMapImage {
-
-  /** The height. */
-  @XmlAttribute
-  private int height;
-
-  /** The id. */
-  @XmlAttribute
-  private int id;
-
   /** The source. */
   @XmlAttribute
   private String source;
@@ -42,6 +34,10 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   /** The width. */
   @XmlAttribute
   private int width;
+
+  /** The height. */
+  @XmlAttribute
+  private int height;
 
   @XmlTransient
   private String absolutPath;
@@ -118,13 +114,12 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     if (lastBackslash != -1) {
       String subPath = mapPath.substring(0, lastBackslash);
       this.absolutPath = subPath + "/" + this.getSource();
-    }else{
+    } else {
       int lastForwardSlash = mapPath.lastIndexOf("\\");
-      if(lastForwardSlash != -1){
+      if (lastForwardSlash != -1) {
         String subPath = mapPath.substring(0, lastForwardSlash);
         this.absolutPath = subPath + "/" + this.getSource();
       }
     }
   }
-
 }

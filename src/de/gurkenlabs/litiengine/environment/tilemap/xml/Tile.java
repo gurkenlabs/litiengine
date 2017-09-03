@@ -4,9 +4,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
-import java.util.ArrayList;
 
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -126,8 +124,16 @@ public class Tile extends CustomPropertyProvider implements ITile {
   }
 
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-    if (this.gid != null && this.gid == 0) {
-      this.gid = null;
+
+    // match xml serialization of mapeditor
+    if (parent instanceof Tileset) {
+      if (this.gid != null && this.gid == 0) {
+        this.gid = null;
+      }
+    } else {
+      if (this.gid == null) {
+        this.gid = 0;
+      }
     }
 
     if (this.id != null && this.id == 0) {

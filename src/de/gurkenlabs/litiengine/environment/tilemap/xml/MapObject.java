@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,15 +22,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
  */
 @XmlRootElement(name = "object")
 public class MapObject extends CustomPropertyProvider implements IMapObject {
-
-  /** The gid. */
-  @XmlAttribute
-  private int gid;
-
-  /** The height. */
-  @XmlAttribute
-  private double height;
-
   /** The id. */
   @XmlAttribute
   private int id;
@@ -42,17 +34,25 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlAttribute
   private String type;
 
-  /** The width. */
-  @XmlAttribute
-  private double width;
-
   /** The x. */
   @XmlAttribute
-  private double x;
+  private int x;
 
   /** The y. */
   @XmlAttribute
-  private double y;
+  private int y;
+
+  /** The width. */
+  @XmlAttribute
+  private int width;
+
+  /** The height. */
+  @XmlAttribute
+  private int height;
+
+  /** The gid. */
+  @XmlAttribute
+  private Integer gid;
 
   @XmlElement(name = "polyline")
   private Polyline polyline;
@@ -74,6 +74,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    */
   @Override
   public int getGridId() {
+    if (this.gid == null) {
+      return 0;
+    }
+
     return this.gid;
   }
 
@@ -138,7 +142,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @XmlTransient
-  public void setHeight(double height) {
+  public void setHeight(int height) {
     this.height = height;
   }
 
@@ -158,27 +162,27 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @XmlTransient
-  public void setWidth(double width) {
+  public void setWidth(int width) {
     this.width = width;
   }
 
   @XmlTransient
-  public void setX(double x) {
+  public void setX(int x) {
     this.x = x;
   }
 
   @XmlTransient
-  public void setY(double y) {
+  public void setY(int y) {
     this.y = y;
   }
 
   @Override
-  public double getX() {
+  public int getX() {
     return this.x;
   }
 
   @Override
-  public double getY() {
+  public int getY() {
     return this.y;
   }
 
@@ -188,12 +192,18 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public double getWidth() {
+  public int getWidth() {
     return this.width;
   }
 
   @Override
-  public double getHeight() {
+  public int getHeight() {
     return this.height;
+  }
+
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    if (this.gid != null && this.gid == 0) {
+      this.gid = null;
+    }
   }
 }

@@ -43,9 +43,40 @@ import de.gurkenlabs.util.io.XmlUtilities;
 public class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
 
+  /** The version. */
+  @XmlAttribute
+  private double version;
+
+  @XmlAttribute
+  private double tiledversion;
+
+  /** The orientation. */
+  @XmlAttribute
+  private String orientation;
+
+  /** The renderorder. */
+  @XmlAttribute
+  private String renderorder;
+
+  /** The width. */
+  @XmlAttribute
+  private int width;
+
   /** The height. */
   @XmlAttribute
   private int height;
+
+  /** The tilewidth. */
+  @XmlAttribute
+  private int tilewidth;
+
+  /** The tileheight. */
+  @XmlAttribute
+  private int tileheight;
+
+  /** The next object id. */
+  @XmlAttribute
+  private int nextObjectId;
 
   /** The tilesets. */
   @XmlElement(name = "tileset")
@@ -63,37 +94,9 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
   @XmlAttribute(required = false)
   private String name;
 
-  /** The next object id. */
-  @XmlAttribute
-  private int nextObjectId;
-
   /** The objectgroups. */
   @XmlElement(name = "objectgroup")
   private List<MapObjectLayer> objectgroups;
-
-  /** The orientation. */
-  @XmlAttribute
-  private String orientation;
-
-  /** The renderorder. */
-  @XmlAttribute
-  private String renderorder;
-
-  /** The tileheight. */
-  @XmlAttribute
-  private int tileheight;
-
-  /** The tilewidth. */
-  @XmlAttribute
-  private int tilewidth;
-
-  /** The version. */
-  @XmlAttribute
-  private double version;
-
-  /** The width. */
-  @XmlAttribute
-  private int width;
 
   @XmlTransient
   private String path;

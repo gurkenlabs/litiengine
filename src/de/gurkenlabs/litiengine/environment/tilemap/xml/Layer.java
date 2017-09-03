@@ -18,25 +18,25 @@ import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
  */
 public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
-  /** The height. */
-  @XmlAttribute
-  private Integer height;
-
   /** The name. */
   @XmlAttribute
   private String name;
 
-  /** The opacity. */
-  @XmlAttribute
-  private final float opacity = 1;
-
-  /** The visible. */
-  @XmlAttribute
-  private int visible = 1;
-
   /** The width. */
   @XmlAttribute
   private Integer width;
+
+  /** The height. */
+  @XmlAttribute
+  private Integer height;
+
+  /** The opacity. */
+  @XmlAttribute
+  private Float opacity;
+
+  /** The visible. */
+  @XmlAttribute
+  private Integer visible;
 
   /** The x. */
   @XmlAttribute
@@ -79,6 +79,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
    */
   @Override
   public float getOpacity() {
+    if (this.opacity == null) {
+      return 1.0f;
+    }
     return this.opacity;
   }
 
@@ -145,6 +148,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
    */
   @Override
   public boolean isVisible() {
+    if (this.visible == null) {
+      return true;
+    }
+
     return this.visible > 0;
   }
 
@@ -154,7 +161,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.name = name;
   }
 
-  @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (order == -1) {
       if (parent instanceof Map) {
@@ -166,20 +172,28 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
       }
     }
 
-    if (this.offsetx != null && this.offsetx == 0) {
+    if (this.offsetx != null && this.offsetx.intValue() == 0) {
       this.offsetx = null;
     }
 
-    if (this.offsety != null && this.offsety == 0) {
+    if (this.offsety != null && this.offsety.intValue() == 0) {
       this.offsety = null;
     }
 
-    if (this.width != null && this.width == 0) {
+    if (this.width != null && this.width.intValue() == 0) {
       this.width = null;
     }
 
-    if (this.height != null && this.height == 0) {
+    if (this.height != null && this.height.intValue() == 0) {
       this.height = null;
+    }
+
+    if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
+      this.opacity = null;
+    }
+
+    if (this.visible != null && this.visible.intValue() == 1) {
+      this.visible = null;
     }
   }
 }
