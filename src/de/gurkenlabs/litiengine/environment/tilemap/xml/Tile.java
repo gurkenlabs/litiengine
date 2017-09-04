@@ -124,16 +124,8 @@ public class Tile extends CustomPropertyProvider implements ITile {
   }
 
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-
-    // match xml serialization of mapeditor
-    if (parent instanceof Tileset) {
-      if (this.gid != null && this.gid == 0) {
-        this.gid = null;
-      }
-    } else {
-      if (this.gid == null) {
-        this.gid = 0;
-      }
+    if (this.gid != null && this.gid == 0) {
+      this.gid = null;
     }
 
     if (this.id != null && this.id == 0) {
