@@ -116,7 +116,7 @@ public final class RenderEngine implements IRenderEngine {
 
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-    g.drawString(text, (int) x, (int) y);
+    g.drawString(text, (float) x, (float) y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
@@ -137,12 +137,12 @@ public final class RenderEngine implements IRenderEngine {
 
     final Color old = g.getColor();
     g.setColor(shadow);
-    g.drawString(text, (int) x + 1, (int) y + 1);
-    g.drawString(text, (int) x + 1, (int) y - 1);
-    g.drawString(text, (int) x - 1, (int) y - 1);
-    g.drawString(text, (int) x - 1, (int) y + 1);
+    g.drawString(text, (float) x + 1, (float) y + 1);
+    g.drawString(text, (float) x + 1, (float) y - 1);
+    g.drawString(text, (float) x - 1, (float) y - 1);
+    g.drawString(text, (float) x - 1, (float) y + 1);
     g.setColor(old);
-    g.drawString(text, (int) x, (int) y);
+    g.drawString(text, (float) x, (float) y);
   }
 
   public static void fillShape(final Graphics2D g, final Shape shape) {

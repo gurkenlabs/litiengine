@@ -773,9 +773,9 @@ public class Environment implements IEnvironment {
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
     this.informConsumers(g, this.entitiesRenderedConsumer);
 
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
-
     Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
+
+    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
 
     // render static shadows
     RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));

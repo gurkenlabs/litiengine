@@ -33,7 +33,7 @@ public class TextParticle extends Particle {
     }
     final FontMetrics fm = g.getFontMetrics();
     final int x = fm.stringWidth(this.getText()) / 2;
-    g.drawString(this.getText(), (int) renderLocation.getX() - x, (int) renderLocation.getY());
+    g.drawString(this.getText(), (float) renderLocation.getX() - x, (float) renderLocation.getY());
     g.setFont(oldFont);
   }
 
