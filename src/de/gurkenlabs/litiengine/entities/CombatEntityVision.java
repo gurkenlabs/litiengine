@@ -5,7 +5,6 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -62,7 +61,7 @@ public class CombatEntityVision implements IVision {
    */
   @Override
   public boolean contains(final int x, final int y) {
-    return this.contains(new Point(x, y));
+    return this.contains(new Point2D.Double(x, y));
   }
 
   /*

@@ -60,7 +60,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers = new CopyOnWriteArrayList<>();
 
     // needs own loop, otherwise it won't work when the game is paused
-    this.loop = new GameLoop(30);
+    this.loop = new GameLoop(Game.getLoop().getUpdateRate());
     this.loop.attach(this);
     Game.onTerminating(s -> {
       this.loop.terminate();

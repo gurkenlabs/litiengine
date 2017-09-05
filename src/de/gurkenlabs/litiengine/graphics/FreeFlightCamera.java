@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
@@ -39,21 +38,21 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
     final int SCROLL_PIXELS_PER_SECOND = 400;
     final int SCROLL_PADDING = 20;
     final int SCROLL_BORDER = 100;
-    final Point mouseLocation = Input.MOUSE.getLocation();
+    final Point2D mouseLocation = Input.MOUSE.getLocation();
 
     final double scrollSpeed = SCROLL_PIXELS_PER_SECOND / gameLoop.getUpdateRate() * Game.getConfiguration().INPUT.getMouseSensitivity();
 
     double x = this.getLocation().getX();
     double y = this.getLocation().getY();
-    if (Math.abs(mouseLocation.x) < SCROLL_PADDING) {
+    if (Math.abs(mouseLocation.getX()) < SCROLL_PADDING) {
       x -= scrollSpeed;
-    } else if (Math.abs(Game.getScreenManager().getResolution().getWidth() - mouseLocation.x) < SCROLL_PADDING) {
+    } else if (Math.abs(Game.getScreenManager().getResolution().getWidth() - mouseLocation.getX()) < SCROLL_PADDING) {
       x += scrollSpeed;
     }
 
-    if (Math.abs(mouseLocation.y) < SCROLL_PADDING) {
+    if (Math.abs(mouseLocation.getY()) < SCROLL_PADDING) {
       y -= scrollSpeed;
-    } else if (Math.abs(Game.getScreenManager().getResolution().getHeight() - mouseLocation.y) < SCROLL_PADDING) {
+    } else if (Math.abs(Game.getScreenManager().getResolution().getHeight() - mouseLocation.getY()) < SCROLL_PADDING) {
       y += scrollSpeed;
     }
 

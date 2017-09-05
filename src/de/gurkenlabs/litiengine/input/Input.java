@@ -34,7 +34,7 @@ public class Input {
     MOUSE = new Mouse();
     if (Game.getConfiguration().INPUT.isGamepadSupport()) {
       GAMEPADS = new CopyOnWriteArrayList<>();
-      GameadLoop = new GameLoop(30);
+      GameadLoop = new GameLoop(Game.getLoop().getUpdateRate());
       GameadLoop.start();
       GAMEPADMANAGER = new GamepadManager();
     }

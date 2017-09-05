@@ -92,21 +92,26 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
     }
 
     final long deltaTime = loop.getDeltaTime();
-    final double maxPixelsPerTick = this.getEntity().getVelocity() * 0.001 * deltaTime;
 
-    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getAcceleration() * maxPixelsPerTick;
-    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
-    final double STOP_THRESHOLD = 0.1;
+    // pixels per ms multiplied by the passed ms
+    final double maxPixelsPerTick = this.getEntity().getVelocity() / 1000.0 * deltaTime;
+
+    double accelerationRatio = (double) deltaTime / (double) this.getEntity().getAcceleration();
+    double decelerationRatio = (double) deltaTime / (double) this.getEntity().getDeceleration();
+
+    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : accelerationRatio * maxPixelsPerTick;
+    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : decelerationRatio * maxPixelsPerTick;
+    final double STOP_THRESHOLD = 0.0025 * deltaTime;
 
     if (this.movedX && this.movedY) {
       // we don't want the entity to move faster when moving diagonally
-      // calculate a new x by dissolding the formula for diagonals of squares
+      // calculate a new x by dissolving the formula for diagonals of squares
       // sqrt(2 * x^2)
       inc /= Math.sqrt(2);
     }
 
     if (this.movedX) {
-      this.velocityX += this.dx * inc;
+      this.velocityX += this.dx > 0 ? inc : -inc;
       this.velocityX = MathUtilities.clamp(this.velocityX, -maxPixelsPerTick, maxPixelsPerTick);
       this.dx = 0;
       this.movedX = false;
@@ -131,7 +136,7 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
     }
 
     if (this.movedY) {
-      this.velocityY += this.dy * inc;
+      this.velocityY += this.dy > 0 ? inc : -inc;
       this.velocityY = MathUtilities.clamp(this.velocityY, -maxPixelsPerTick, maxPixelsPerTick);
       this.dy = 0;
       this.movedY = false;

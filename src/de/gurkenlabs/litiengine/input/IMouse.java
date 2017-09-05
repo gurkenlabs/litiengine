@@ -22,7 +22,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    *
    * @return the render location
    */
-  public Point getLocation();
+  public Point2D getLocation();
 
   public Point2D getMapLocation();
 

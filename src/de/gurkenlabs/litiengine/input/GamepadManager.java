@@ -30,7 +30,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   private final Map<String, List<Consumer<Float>>> pressedConsumer;
 
   public GamepadManager() {
-    this.loop = new GameLoop(30);
+    this.loop = new GameLoop(Game.getLoop().getUpdateRate());
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();

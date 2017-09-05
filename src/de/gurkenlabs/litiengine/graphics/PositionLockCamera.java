@@ -45,10 +45,14 @@ public class PositionLockCamera extends Camera {
 
   @Override
   public void updateFocus() {
-    final Point2D cameraLocation = this.getLockedEntity().getDimensionCenter();
+    final Point2D cameraLocation = this.getLockedCameraLocation();
 
     // TODO: clamp camera so that it doesn't display black space on map edges
     this.setFocus(new Point2D.Double(cameraLocation.getX(), cameraLocation.getY()));
     super.updateFocus();
+  }
+
+  protected Point2D getLockedCameraLocation() {
+    return this.getLockedEntity().getDimensionCenter();
   }
 }

@@ -3,7 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -44,7 +43,7 @@ public abstract class Entity implements IEntity {
    */
   protected Entity() {
     this.tags = new CopyOnWriteArrayList<>();
-    this.mapLocation = new Point(0, 0);
+    this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.width = info.width();
     this.height = info.height();

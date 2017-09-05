@@ -33,10 +33,10 @@ public class Mouse implements IMouse {
 
   private boolean isRightMouseButtonDown;
 
-  private Point lastLocation;
+  private Point2D lastLocation;
 
   /** The position. */
-  private Point location;
+  private Point2D location;
   private final List<Consumer<MouseEvent>> mouseClickedConsumer;
   private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
   /** The mouse listeners. */
@@ -82,7 +82,7 @@ public class Mouse implements IMouse {
       e.printStackTrace();
     }
 
-    this.location = new Point((int) Game.getScreenManager().getCamera().getViewPort().getCenterX(), (int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
+    this.location = new Point2D.Double(Game.getScreenManager().getCamera().getViewPort().getCenterX(), Game.getScreenManager().getCamera().getViewPort().getCenterY());
     this.lastLocation = this.location;
     this.sensitivity = Game.getConfiguration().INPUT.getMouseSensitivity();
     this.grabMouse = true;
@@ -94,7 +94,7 @@ public class Mouse implements IMouse {
    * @see de.gurkenlabs.liti.input.IMouse#getRenderLocation()
    */
   @Override
-  public Point getLocation() {
+  public Point2D getLocation() {
     return this.location;
   }
 
@@ -400,7 +400,7 @@ public class Mouse implements IMouse {
   }
 
   private MouseEvent createEvent(final MouseEvent original) {
-    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), this.getLocation().x, this.getLocation().y, original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), (int) this.getLocation().getX(), (int) this.getLocation().getY(), original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
         original.getButton());
     return event;
   }
@@ -420,8 +420,8 @@ public class Mouse implements IMouse {
     double diffX, diffY;
     if (!this.grabMouse) {
       // get diff relative from last mouse location
-      diffX = e.getX() - this.lastLocation.x;
-      diffY = e.getY() - this.lastLocation.y;
+      diffX = e.getX() - this.lastLocation.getX();
+      diffY = e.getY() - this.lastLocation.getY();
       this.lastLocation = new Point(e.getPoint().x - Game.getScreenManager().getRenderComponent().getCursorOffsetX(), e.getPoint().y - Game.getScreenManager().getRenderComponent().getCursorOffsetY());
     } else {
       // get diff relative from grabbed position
@@ -440,12 +440,12 @@ public class Mouse implements IMouse {
     }
 
     // set new mouse location
-    int newX = (int) (this.getLocation().getX() + diffX * this.sensitivity);
-    int newY = (int) (this.getLocation().getY() + diffY * this.sensitivity);
-    newX = MathUtilities.clamp(newX, 0, (int) Game.getScreenManager().getResolution().getWidth());
-    newY = MathUtilities.clamp(newY, 0, (int) Game.getScreenManager().getResolution().getHeight());
+    double newX = this.getLocation().getX() + diffX * this.sensitivity;
+    double newY = this.getLocation().getY() + diffY * this.sensitivity;
+    newX = MathUtilities.clamp(newX, 0, Game.getScreenManager().getResolution().getWidth());
+    newY = MathUtilities.clamp(newY, 0, Game.getScreenManager().getResolution().getHeight());
 
-    this.location = new Point(newX, newY);
+    this.location = new Point2D.Double(newX, newY);
   }
 
   /**
