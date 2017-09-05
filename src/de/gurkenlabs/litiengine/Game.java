@@ -183,7 +183,7 @@ public final class Game {
       getMetrics().setFramesPerSecond(fps);
     });
 
-    getScreenManager().setIconImage(RenderEngine.getImage("icon.png"));
+    getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));
 
     Input.init();
     getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
