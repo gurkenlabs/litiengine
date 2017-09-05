@@ -26,18 +26,19 @@ public class Input {
 
   // we need an own gameloop because otherwise input won't work if the game has
   // been paused
-  protected static GameLoop GameadLoop;
+  protected static GameLoop InputLoop;
 
   public static void init() {
+    InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
 
     KEYBOARD = new KeyBoard();
     MOUSE = new Mouse();
     if (Game.getConfiguration().INPUT.isGamepadSupport()) {
       GAMEPADS = new CopyOnWriteArrayList<>();
-      GameadLoop = new GameLoop(Game.getLoop().getUpdateRate());
-      GameadLoop.start();
       GAMEPADMANAGER = new GamepadManager();
     }
+
+    InputLoop.start();
   }
 
   /**

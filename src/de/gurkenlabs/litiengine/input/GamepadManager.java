@@ -20,7 +20,7 @@ import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
 public class GamepadManager implements IGamepadManager, IUpdateable {
-  private static final int GAMEPAD_UPDATE_DELAY = 150;
+  private static final int GAMEPAD_UPDATE_DELAY = 1000;
   private int defaultgamePadIndex = -1;
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
   private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
@@ -30,7 +30,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   private final Map<String, List<Consumer<Float>>> pressedConsumer;
 
   public GamepadManager() {
-    this.loop = new GameLoop(Game.getLoop().getUpdateRate());
+    this.loop = new GameLoop(1000 / GAMEPAD_UPDATE_DELAY);
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.pollConsumer = new ConcurrentHashMap<>();
@@ -174,11 +174,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   private void updateGamepads(final IGameLoop loop) {
-    if (loop.getTicks() % GAMEPAD_UPDATE_DELAY != 0) {
-      return;
-    }
     try {
-
       this.hackTheShitOutOfJInputBecauseItSucks_HARD();
       // update plugged in gamepads
       for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {

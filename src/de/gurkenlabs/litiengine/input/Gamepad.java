@@ -208,7 +208,7 @@ public class Gamepad implements IGamepad, IUpdateable {
     this.pressedConsumer = new ConcurrentHashMap<>();
     this.index = index;
     this.controller = controller;
-    Input.GameadLoop.attach(this);
+    Input.InputLoop.attach(this);
   }
 
   @Override
@@ -280,7 +280,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   private void dispose() {
-    Input.GameadLoop.detach(this);
+    Input.InputLoop.detach(this);
     this.pollConsumer.clear();
     this.pressedConsumer.clear();
     Input.GAMEPADMANAGER.remove(this);
