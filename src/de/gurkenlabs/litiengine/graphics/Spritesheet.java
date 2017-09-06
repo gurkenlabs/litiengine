@@ -29,14 +29,25 @@ public class Spritesheet {
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
 
+  /**
+   * Finds Spritesheets that were previously loaded by any load method or by the
+   * sprites.info file.
+   * 
+   * @param path
+   * @return The Spritesheet assotiated with the path or null if not loaded yet
+   */
   public static Spritesheet find(final String path) {
     if (path == null || path.isEmpty()) {
       return null;
     }
 
-    final String name = FileUtilities.getFileName(path);
+    final String name = FileUtilities.getFileName(path).toLowerCase();
 
-    return spritesheets.get(name.toLowerCase());
+    if (!spritesheets.containsKey(name)) {
+      return null;
+    }
+
+    return spritesheets.get(name);
   }
 
   public static int[] getCustomKeyFrameDurations(final String name) {
