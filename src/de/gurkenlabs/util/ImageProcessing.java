@@ -450,6 +450,13 @@ public class ImageProcessing {
     return scaleImage(image, (int) dWidth, (int) dHeight);
   }
 
+  public static BufferedImage scaleImage(final BufferedImage image, final float factor) {
+    final double width = image.getWidth();
+    final double height = image.getHeight();
+
+    return scaleImage(image, (int) (width * factor), (int) (height * factor));
+  }
+
   /**
    * The specified image is scaled to a new dimension with the specified width
    * and height. This method doesn't use anti aliasing for this process to keep
