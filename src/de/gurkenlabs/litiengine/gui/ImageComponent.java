@@ -21,9 +21,12 @@ public class ImageComponent extends GuiComponent {
 
   private Image image;
 
-  private double imageX, imageY, imageWidth, imageHeight;
-
   private Spritesheet spritesheet;
+
+  public ImageComponent(final double x, final double y, final Image image) {
+    super(x, y, image.getWidth(null), image.getHeight(null));
+    this.image = image;
+  }
 
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     super(x, y, width, height);
@@ -74,41 +77,8 @@ public class ImageComponent extends GuiComponent {
     return this.image;
   }
 
-  public double getImageHeight() {
-    return this.imageHeight;
-  }
-
-  public Point2D getImageLocation() {
-    return new Point2D.Double(this.getImageX(), this.getImageY());
-  }
-
-  public double getImageWidth() {
-    return this.imageWidth;
-  }
-
-  public double getImageX() {
-    return this.imageX;
-  }
-
-  public double getImageY() {
-    return this.imageY;
-  }
-
-  public Spritesheet getSpritesheet() {
+  protected Spritesheet getSpritesheet() {
     return this.spritesheet;
-  }
-
-  /**
-   * Gets the text.
-   *
-   * @return the text
-   */
-
-  public void relocateImage(final double x, final double y, final double width, final double height) {
-    this.imageX = x;
-    this.imageY = y;
-    this.imageWidth = width;
-    this.imageHeight = height;
   }
 
   @Override
@@ -117,11 +87,14 @@ public class ImageComponent extends GuiComponent {
       return;
     }
     final Image bg = this.getBackground();
+    if (bg != null) {
+      RenderEngine.renderImage(g, bg, this.getLocation());
+    }
 
-    RenderEngine.renderImage(g, bg, this.getPosition());
     final Image img = this.getImage();
     if (img != null) {
-      RenderEngine.renderImage(g, img, this.getImageLocation());
+      System.out.println(this.getLocation() + " - " + this.getX() + "/" + this.getY());
+      RenderEngine.renderImage(g, img, this.getLocation());
     }
 
     super.render(g);
@@ -130,9 +103,6 @@ public class ImageComponent extends GuiComponent {
   @Override
   public void setHeight(final double height) {
     super.setHeight(height);
-    this.imageHeight = this.getHeight() * 0.9;
-    this.imageY = this.getY() + this.getHeight() * 0.05;
-
   }
 
   @Override
@@ -141,35 +111,7 @@ public class ImageComponent extends GuiComponent {
   }
 
   public void setImage(final Image image) {
-    if (this == null || image == null) {
-      return;
-    }
-    BufferedImage scaledImage = ImageProcessing.scaleImage((BufferedImage) image, (int) (this.getWidth() * 9 / 10), (int) (this.getHeight() * 9 / 10), true);
-    if (scaledImage == null) {
-      return;
-    }
-    this.image = scaledImage;
-
-    final double x = this.getBoundingBox().getCenterX() - this.image.getWidth(null) / 2;
-    final double y = this.getBoundingBox().getCenterY() - this.image.getHeight(null) / 2;
-    this.relocateImage(x, y, image.getWidth(null), image.getHeight(null));
-
-  }
-
-  public void setImageHeight(final double newHeight) {
-    this.imageHeight = newHeight;
-  }
-
-  public void setImageWidth(final double newWidth) {
-    this.imageWidth = newWidth;
-  }
-
-  public void setImageX(final double newX) {
-    this.imageX = newX;
-  }
-
-  public void setImageY(final double newY) {
-    this.imageY = newY;
+    this.image = image;
   }
 
   public void setSpriteSheet(final Spritesheet spr) {
@@ -179,9 +121,6 @@ public class ImageComponent extends GuiComponent {
   @Override
   public void setWidth(final double width) {
     super.setWidth(width);
-    this.imageWidth = this.getWidth() * 0.9;
-    this.imageX = this.getX() + this.getWidth() * 0.05;
-
   }
 
   @Override

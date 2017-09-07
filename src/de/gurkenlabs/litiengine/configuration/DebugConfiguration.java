@@ -19,6 +19,8 @@ public class DebugConfiguration extends ConfigurationGroup {
   /** The render entity names. */
   private boolean renderEntityNames = false;
 
+  private boolean renderGuiComponentBoundingBoxes = false;
+
   /** The render hit boxes. */
   private boolean renderHitBoxes = false;
 
@@ -88,6 +90,10 @@ public class DebugConfiguration extends ConfigurationGroup {
     return this.isDebugEnabled() && this.renderPaths;
   }
 
+  public boolean renderGuiComponentBoundingBoxes() {
+    return renderGuiComponentBoundingBoxes;
+  }
+
   public void setDebugEnabled(final boolean debugEnabled) {
     this.debugEnabled = debugEnabled;
   }
@@ -126,6 +132,10 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   public void setShowTilesMetric(final boolean showTilesMetric) {
     this.showTilesMetric = showTilesMetric;
+  }
+
+  public void setRenderGuiComponentBoundingBoxes(boolean renderGuiComponentBoundingBoxes) {
+    this.renderGuiComponentBoundingBoxes = renderGuiComponentBoundingBoxes;
   }
 
   /**

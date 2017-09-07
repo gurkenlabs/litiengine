@@ -233,7 +233,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.mouseWheelConsumer;
   }
 
-  public Point2D getPosition() {
+  public Point2D getLocation() {
     return new Point2D.Double(this.getX(), this.getY());
   }
 
@@ -652,6 +652,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       }
 
       component.render(g);
+    }
+
+    if (Game.getConfiguration().DEBUG.renderGuiComponentBoundingBoxes()) {
+      g.setColor(Color.RED);
+      g.draw(this.getBoundingBox());
     }
   }
 
