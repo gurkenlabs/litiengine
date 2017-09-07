@@ -35,6 +35,9 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
 
+  private ImageProcessing() {
+  }
+
   /**
    * Adds a shadow effect by executing the following steps: 1. Transform visible
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
@@ -92,7 +95,7 @@ public class ImageProcessing {
     final ImageFilter filter = new RGBImageFilter() {
 
       // the color we are looking for... Alpha bits are set to opaque
-      public int markerRGB = color.getRGB() | 0xFF000000;
+      public final int markerRGB = color.getRGB() | 0xFF000000;
 
       @Override
       public final int filterRGB(final int x, final int y, final int rgb) {
@@ -286,8 +289,7 @@ public class ImageProcessing {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage compatibleImg = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-    return compatibleImg;
+    return config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
@@ -349,31 +351,23 @@ public class ImageProcessing {
     }
 
     // check pixel above the current one
-    if (y > 0) {
-      if (image.getRGB(x, y - 1) >> 24 != 0x00) {
-        return true;
-      }
+    if (y > 0 && image.getRGB(x, y - 1) >> 24 != 0x00) {
+      return true;
     }
 
     // check below pixel
-    if (y < image.getHeight() - 1) {
-      if (image.getRGB(x, y + 1) >> 24 != 0x00) {
-        return true;
-      }
+    if (y < image.getHeight() - 1 && image.getRGB(x, y + 1) >> 24 != 0x00) {
+      return true;
     }
 
     // check left pixel
-    if (x > 0) {
-      if (image.getRGB(x - 1, y) >> 24 != 0x00) {
-        return true;
-      }
+    if (x > 0 && image.getRGB(x - 1, y) >> 24 != 0x00) {
+      return true;
     }
 
     // check right pixel
-    if (x < image.getWidth() - 1) {
-      if (image.getRGB(x + 1, y) >> 24 != 0x00) {
-        return true;
-      }
+    if (x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00) {
+      return true;
     }
 
     return false;

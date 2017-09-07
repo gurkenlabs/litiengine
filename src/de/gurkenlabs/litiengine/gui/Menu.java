@@ -3,14 +3,12 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Graphics2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Menu.
  */
@@ -56,18 +54,8 @@ public class Menu extends ImageComponentList {
 
   }
 
-  @Override
-  public void render(final Graphics2D g) {
-    super.render(g);
-  }
-
   public void setCurrentSelection(final int currentSelection) {
     this.currentSelection = currentSelection;
     this.selectionChangeConsumers.forEach(c -> c.accept(this.getCurrentSelection()));
-  }
-
-  @Override
-  protected void initializeComponents() {
-
   }
 }

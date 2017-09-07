@@ -61,7 +61,7 @@ public class GameMetrics implements IUpdateable, IRenderable {
    * @return the average frames per second
    */
   public float getAverageFramesPerSecond() {
-    if (this.fps.size() == 0) {
+    if (this.fps.isEmpty()) {
       return 0;
     }
 
@@ -69,7 +69,7 @@ public class GameMetrics implements IUpdateable, IRenderable {
   }
 
   public float getAverageUpdatesPerSecond() {
-    if (this.ups.size() == 0) {
+    if (this.ups.isEmpty()) {
       return 0;
     }
 
@@ -138,39 +138,38 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
   @Override
   public void render(final Graphics2D g) {
-    final int OffsetX = 5;
-    final int OffsetY = 12;
-    int currentOffsetY = OffsetY;
+    final int offsetX = 5;
+    final int offsetY = 12;
+    int currentOffsetY = offsetY;
 
     g.setColor(Color.RED);
     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
     final Runtime runtime = Runtime.getRuntime();
-    final float usedMemory = Float.valueOf(Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f);
+    final float usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
     final String memory = "memory: " + usedMemory + "MB";
-    g.drawString(memory, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    g.drawString(memory, offsetX, currentOffsetY);
+    currentOffsetY += offsetY;
 
-    final String ping = "ping: " + this.getPing() + "ms";
-    g.drawString(ping, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    final String pingText = "ping: " + this.getPing() + "ms";
+    g.drawString(pingText, offsetX, currentOffsetY);
+    currentOffsetY += offsetY;
 
-    final float upStream = Float.valueOf(Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f);
-    final float downStream = Float.valueOf(Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f);
+    final float upStream = Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f;
+    final float downStream = Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f;
     final String in = "in: " + this.getPackagesReceived() + " - " + downStream + "kb/s";
-    g.drawString(in, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    g.drawString(in, offsetX, currentOffsetY);
+    currentOffsetY += offsetY;
 
     final String out = "out: " + this.getPackagesSent() + " - " + upStream + "kb/s";
-    g.drawString(out, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    g.drawString(out, offsetX, currentOffsetY);
+    currentOffsetY += offsetY;
 
-    final String fps = "fps: " + this.getFramesPerSecond();
-    g.drawString(fps, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    final String fpsString = "fps: " + this.getFramesPerSecond();
+    g.drawString(fpsString, offsetX, currentOffsetY);
+    currentOffsetY += offsetY;
 
-    final String ups = "ups: " + this.getUpdatesPerSecond();
-    g.drawString(ups, OffsetX, currentOffsetY);
-    currentOffsetY += OffsetY;
+    final String upsString = "ups: " + this.getUpdatesPerSecond();
+    g.drawString(upsString, offsetX, currentOffsetY);
   }
 
   /**
@@ -204,11 +203,11 @@ public class GameMetrics implements IUpdateable, IRenderable {
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;
-      final long sumUp = this.bytesSent.size() > 0 ? this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
+      final long sumUp = !this.bytesSent.isEmpty() ? this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
       this.upStreamInBytes = sumUp;
       this.packagesSent = this.bytesSent.size();
 
-      final long sumDown = this.bytesReceived.size() > 0 ? this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
+      final long sumDown = !this.bytesReceived.isEmpty() ? this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
       this.downStreamInBytes = sumDown;
       this.packagesReceived = this.bytesReceived.size();
 

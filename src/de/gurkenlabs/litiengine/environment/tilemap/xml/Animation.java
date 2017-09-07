@@ -50,7 +50,7 @@ public class Animation implements ITileAnimation {
       return this.totalDuration;
     }
 
-    if (this.getFrames().size() == 0) {
+    if (this.getFrames().isEmpty()) {
       return 0;
     }
 

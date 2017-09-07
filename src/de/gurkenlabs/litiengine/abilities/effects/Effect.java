@@ -27,6 +27,8 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
  * implementation of apply/cease.
  */
 public abstract class Effect implements IEffect {
+  public static final int NO_DURATION = -1;
+
   private final Ability ability;
   private final List<EffectApplication> appliances;
 
@@ -225,7 +227,7 @@ public abstract class Effect implements IEffect {
     }
 
     // 4. unregister if all appliances are finished
-    if (this.getActiveAppliances().size() == 0) {
+    if (this.getActiveAppliances().isEmpty()) {
       loop.detach(this);
     }
   }
@@ -245,9 +247,7 @@ public abstract class Effect implements IEffect {
     }
 
     // 2. apply follow up effects
-    this.getFollowUpEffects().forEach(followUp -> {
-      followUp.apply(loop, appliance.getEnvironment(), appliance.getImpactArea());
-    });
+    this.getFollowUpEffects().forEach(followUp -> followUp.apply(loop, appliance.getEnvironment(), appliance.getImpactArea()));
   }
 
   protected Collection<ICombatEntity> getEntitiesInImpactArea(IEnvironment environment, final Shape impactArea) {
@@ -260,7 +260,7 @@ public abstract class Effect implements IEffect {
    * @return the total duration
    */
   protected long getTotalDuration() {
-    return this.getDuration() + this.getDelay();
+    return this.getDuration() + (long) this.getDelay();
   }
 
   protected boolean hasEnded(final IGameLoop loop, final EffectApplication appliance) {
@@ -300,7 +300,7 @@ public abstract class Effect implements IEffect {
 
     affectedEntities.removeAll(Collections.singleton(null));
 
-    if (!this.getAbility().isMultiTarget() && affectedEntities.size() > 0) {
+    if (!this.getAbility().isMultiTarget() && !affectedEntities.isEmpty()) {
       affectedEntities.sort(this.targetPriorityComparator);
       final ICombatEntity target;
       if (this.getAbility().getExecutor().getTarget() != null) {

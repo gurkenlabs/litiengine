@@ -185,10 +185,13 @@ public abstract class Ability implements IRenderable {
       if (this.origin != null) {
         return new Point2D.Double(this.executor.getLocation().getX() + this.origin.getX(), this.executor.getLocation().getY() + this.origin.getY());
       }
+      break;
     case LOCATION:
     default:
-      return this.executor.getLocation();
+      break;
     }
+
+    return this.executor.getLocation();
   }
 
   /**

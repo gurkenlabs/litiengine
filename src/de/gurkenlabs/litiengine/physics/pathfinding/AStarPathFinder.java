@@ -73,7 +73,7 @@ public class AStarPathFinder extends PathFinder {
     final List<AStarNode> closed = new ArrayList<>();
     opened.add(startNode);
 
-    while (opened.size() > 0) {
+    while (!opened.isEmpty()) {
       AStarNode currentNode = opened.get(0);
 
       // find node with lowest cost
@@ -130,7 +130,6 @@ public class AStarPathFinder extends PathFinder {
       currentNode = currentNode.getPredecessor();
     }
     Collections.reverse(path);
-    // path = optimizePath(path);
 
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(startNode.getLocation().x, startNode.getLocation().y);

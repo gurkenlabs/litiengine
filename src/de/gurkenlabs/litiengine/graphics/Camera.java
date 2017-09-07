@@ -209,7 +209,7 @@ public class Camera implements ICamera {
       this.zoom = zoom;
       this.zoomDelay = delay;
 
-      final double tickduration = 1000 / Game.getLoop().getUpdateRate();
+      final double tickduration = 1000 / (double) Game.getLoop().getUpdateRate();
       final double tickAmount = delay / tickduration;
       final float totalDelta = zoom - Game.getInfo().getRenderScale();
       this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;

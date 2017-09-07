@@ -21,6 +21,9 @@ import de.gurkenlabs.litiengine.input.Input;
 
 public class DebugRenderer {
 
+  private DebugRenderer() {
+  }
+
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
     if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
       return;
@@ -75,7 +78,7 @@ public class DebugRenderer {
     g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
     final int x = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getX() + 10;
     final int y = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getY();
-    RenderEngine.drawText(g, entity.getMapId() + "", x, y);
+    RenderEngine.drawText(g, Integer.toString(entity.getMapId()), x, y);
     final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
     RenderEngine.drawText(g, locationString, x, y + 5);
   }

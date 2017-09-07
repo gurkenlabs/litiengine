@@ -17,6 +17,9 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class CompressionUtilities {
+  private CompressionUtilities() {
+  }
+
   public static byte[] compress(final byte[] data) {
     final Deflater deflater = new Deflater();
     deflater.setInput(data);
@@ -54,9 +57,7 @@ public class CompressionUtilities {
       }
 
       outputStream.close();
-    } catch (final DataFormatException e) {
-      e.printStackTrace();
-    } catch (final IOException e) {
+    } catch (final DataFormatException | IOException e) {
       e.printStackTrace();
     }
 

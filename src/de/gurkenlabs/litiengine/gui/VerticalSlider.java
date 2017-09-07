@@ -10,9 +10,11 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
 public class VerticalSlider extends Slider {
-  public static FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
-  public static FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE807");
-  private double minSliderY, maxSliderY, sliderHeight;
+  public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
+  public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE807");
+  private double minSliderY;
+  private double maxSliderY;
+  private double sliderHeight;
 
   public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final Sound hoverSound, final boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);

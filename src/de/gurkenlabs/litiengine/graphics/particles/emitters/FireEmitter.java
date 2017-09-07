@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
-// TODO: Auto-generated Javadoc
 /**
  * Represents a fire.
  */

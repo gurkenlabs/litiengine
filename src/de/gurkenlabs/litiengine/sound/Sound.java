@@ -56,10 +56,8 @@ public class Sound {
         this.streamData = StreamUtilities.getBytes(this.stream);
         this.format = this.stream.getFormat();
       }
-    } catch (final UnsupportedAudioFileException e) {
+    } catch (final UnsupportedAudioFileException | IOException e) {
       System.out.println("could not load '" + path + "'");
-      e.printStackTrace();
-    } catch (final IOException e) {
       e.printStackTrace();
     }
   }
@@ -114,8 +112,7 @@ public class Sound {
       return new byte[0];
     }
 
-    final byte[] data = this.streamData.clone();
-    return data;
+    return this.streamData.clone();
   }
 
   private AudioFormat getOutFormat(final AudioFormat inFormat) {

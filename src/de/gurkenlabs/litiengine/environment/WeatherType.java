@@ -3,16 +3,15 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.environment;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum Weather.
  */
 public enum WeatherType {
 
   /** The Clear. */
-  Clear,
+  CLEAR,
   /** The Rain. */
-  Rain,
+  RAIN,
   /** The Snow. */
-  Snow
+  SNOW
 }

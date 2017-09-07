@@ -68,21 +68,21 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
    */
   public T modify(final T modvalue) {
     switch (this.getModification()) {
-    case Add:
+    case ADD:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() + this.getModifyValue()), modvalue);
-    case Substract:
+    case SUBSTRACT:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() - this.getModifyValue()), modvalue);
-    case Multiply:
+    case MULTIPLY:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() * this.getModifyValue()), modvalue);
-    case Divide:
+    case DIVIDE:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() / this.getModifyValue()), modvalue);
-    case AddPercent:
+    case ADDPERCENT:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() + modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case SubstractPercent:
+    case SUBSTRACTPERCENT:
       return this.ensureType(Double.valueOf(modvalue.doubleValue() - modvalue.doubleValue() / 100 * this.getModifyValue()), modvalue);
-    case Set:
+    case SET:
       return this.ensureType(Double.valueOf(this.getModifyValue()), modvalue);
-    case Unknown:
+    case UNKNOWN:
     default:
       return modvalue;
     }

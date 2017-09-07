@@ -8,32 +8,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
-  private class SpawnThread extends Thread {
-    private final int amount;
-    private final MapLocation point;
-
-    public SpawnThread(final MapLocation point, final int amount) {
-      this.point = point;
-      this.amount = amount;
-    }
-
-    @Override
-    public void run() {
-      for (int i = 0; i < this.amount; i++) {
-        final T newEntity = EntitySpawner.this.createNew();
-        newEntity.setLocation(this.point.getPoint());
-        newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
-        EntitySpawner.this.addToEnvironment(EntitySpawner.this.environment, newEntity);
-
-        try {
-          Thread.sleep(EntitySpawner.this.getSpawnDelay());
-        } catch (final InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  }
-
   private int amount;
   private IEnvironment environment;
   private int interval;
@@ -115,7 +89,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   protected abstract void addToEnvironment(final IEnvironment env, T newEntity);
 
   protected void spawnNewEntities() {
-    if (this.getSpawnPoints().size() == 0) {
+    if (this.getSpawnPoints().isEmpty()) {
       return;
     }
 
@@ -142,4 +116,31 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private void spawn(final MapLocation spawnpoint, final int amount) {
     new SpawnThread(spawnpoint, amount).start();
   }
+
+  private class SpawnThread extends Thread {
+    private final int amount;
+    private final MapLocation point;
+
+    public SpawnThread(final MapLocation point, final int amount) {
+      this.point = point;
+      this.amount = amount;
+    }
+
+    @Override
+    public void run() {
+      for (int i = 0; i < this.amount; i++) {
+        final T newEntity = EntitySpawner.this.createNew();
+        newEntity.setLocation(this.point.getPoint());
+        newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
+        EntitySpawner.this.addToEnvironment(EntitySpawner.this.environment, newEntity);
+
+        try {
+          Thread.sleep(EntitySpawner.this.getSpawnDelay());
+        } catch (final InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
 }

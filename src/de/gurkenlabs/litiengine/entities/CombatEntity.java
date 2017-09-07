@@ -64,7 +64,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, 0));
+    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, 0));
     for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
       consumer.accept(this);
     }
@@ -130,16 +130,16 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
         shieldDmg = this.getAttributes().getShield().getCurrentValue();
       }
 
-      this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, shieldDmg));
+      this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, shieldDmg));
       damage = damage - shieldDmg;
     }
 
     if (!this.isIndestructible()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Substract, damage));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, damage));
     }
 
     if (this.isDead()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, 0));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, 0));
       for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
         consumer.accept(this);
       }
@@ -228,7 +228,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.Set, this.getAttributes().getHealth().getMaxValue()));
+    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, this.getAttributes().getHealth().getMaxValue()));
     for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
       consumer.accept(this);
     }

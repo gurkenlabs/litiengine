@@ -185,7 +185,6 @@ public class AmbientLight {
         lightArea.subtract(shadowArea);
       }
     }
-    // darkArea.subtract(lightArea);
 
     final Paint oldPaint = g.getPaint();
 

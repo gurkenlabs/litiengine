@@ -5,6 +5,9 @@ import java.util.Random;
 public class MathUtilities {
   private static Random RANDOM = new Random();
 
+  private MathUtilities() {
+  }
+
   public static double clamp(final double value, final double min, final double max) {
     return Math.max(min, Math.min(max, value));
   }

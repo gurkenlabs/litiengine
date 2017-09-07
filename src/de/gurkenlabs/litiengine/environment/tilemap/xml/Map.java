@@ -41,6 +41,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
+
   public static final String FILE_EXTENSION = "tmx";
 
   /** The version. */

@@ -44,7 +44,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   private static final double WIDTH_FACTOR = 0.4;
 
   public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final CollisionAlign align, final CollisionValign valign) {
-    double x, y;
+    double x;
+    double y;
     switch (align) {
     case LEFT:
       x = location.getX();

@@ -64,6 +64,6 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
    *         false.
    */
   protected boolean validate(final T message) {
-    return true;
+    return message != null;
   }
 }

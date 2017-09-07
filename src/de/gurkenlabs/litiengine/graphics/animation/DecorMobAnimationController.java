@@ -57,8 +57,7 @@ public class DecorMobAnimationController extends AnimationController {
     }
 
     final String path = "decormob-" + mob.getMobType().toLowerCase() + ".png";
-    final Spritesheet sheet = Spritesheet.find(path);
-    return sheet;
+    return Spritesheet.find(path);
   }
 
   private final DecorMob mob;

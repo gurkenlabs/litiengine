@@ -38,7 +38,7 @@ public class RenderLoop extends Thread {
   @Override
   public void run() {
     while (this.gameIsRunning) {
-      final long FPS_WAIT = (long) (1.0 / this.maxFps * 1000);
+      final long fpsWait = (long) (1.0 / this.maxFps * 1000);
       final long renderStart = System.nanoTime();
       try {
         this.cameraProvider.getCamera().updateFocus();
@@ -48,7 +48,7 @@ public class RenderLoop extends Thread {
 
         final long renderTime = (System.nanoTime() - renderStart) / 1000000;
 
-        Thread.sleep(Math.max(0, FPS_WAIT - renderTime));
+        Thread.sleep(Math.max(0, fpsWait - renderTime));
       } catch (final InterruptedException e) {
         Thread.interrupted();
         break;

@@ -40,7 +40,7 @@ public class MessageHandlerProvider implements IMessageHandlerProvider {
       return this.getMessageHandlers().get(type);
     }
 
-    return null;
+    return new ArrayList<>();
   }
 
   @Override

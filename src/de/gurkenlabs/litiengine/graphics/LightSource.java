@@ -24,7 +24,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class LightSource.
  */
@@ -49,7 +48,7 @@ public class LightSource extends Entity implements IRenderable {
 
     final int yOffset = (int) mob.getHeight();
     final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2;
+    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2.0;
     return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
   }
 

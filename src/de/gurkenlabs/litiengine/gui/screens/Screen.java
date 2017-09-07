@@ -8,7 +8,6 @@ import java.lang.annotation.AnnotationFormatError;
 import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Screen.
  *
@@ -16,7 +15,7 @@ import de.gurkenlabs.litiengine.gui.GuiComponent;
  *          the generic type
  */
 public abstract class Screen extends GuiComponent implements IScreen {
-  public static Screen GAME_SCREEN = new GameScreen();
+  public static final Screen GAME_SCREEN = new GameScreen();
   private final String name;
 
   /**

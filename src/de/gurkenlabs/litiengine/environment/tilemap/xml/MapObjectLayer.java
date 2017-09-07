@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ShapeLayer.
  */

@@ -134,8 +134,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
         return "_";
       default:
         if (KeyEvent.getKeyText(e.getKeyCode()).length() == 1) {
-          final String text = "" + e.getKeyChar();
-          return text;
+          return Character.toString(e.getKeyChar());
         }
 
         return "";
@@ -213,7 +212,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
         return "/";
       default:
         if (KeyEvent.getKeyText(e.getKeyCode()).length() == 1) {
-          String text = "" + e.getKeyChar();
+          String text = Character.toString(e.getKeyChar());
           text = text.toLowerCase();
           return text;
         }

@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -11,9 +12,12 @@ public class ImageComponentList extends GuiComponent {
   private final Spritesheet background;
   private final CopyOnWriteArrayList<ImageComponent> cells;
   private CopyOnWriteArrayList<Image> images;
-  private final double rowHeight, columnWidth;
-  private final int rows, columns;
-  private double xOffset, yOffset;
+  private final double rowHeight;
+  private final double columnWidth;
+  private final int rows;
+  private final int columns;
+  private double xOffset;
+  private double yOffset;
 
   public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
     super(x, y, width, height);
@@ -51,7 +55,7 @@ public class ImageComponentList extends GuiComponent {
     return this.background;
   }
 
-  public CopyOnWriteArrayList<ImageComponent> getCellComponents() {
+  public List<ImageComponent> getCellComponents() {
     return this.cells;
   }
 
@@ -59,7 +63,7 @@ public class ImageComponentList extends GuiComponent {
     return this.columns;
   }
 
-  public CopyOnWriteArrayList<Image> getImages() {
+  public List<Image> getImages() {
     return this.images;
   }
 
@@ -108,10 +112,4 @@ public class ImageComponentList extends GuiComponent {
     this.suspend();
     this.prepare();
   }
-
-  @Override
-  protected void initializeComponents() {
-
-  }
-
 }

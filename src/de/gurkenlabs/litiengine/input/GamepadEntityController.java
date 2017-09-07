@@ -18,9 +18,11 @@ public class GamepadEntityController<T extends IMovableEntity> extends MovementC
   private float dx;
   private float dy;
   private int gamePadIndex = -1;
-  private boolean movedX, movedY;
+  private boolean movedX;
+  private boolean movedY;
 
-  private double velocityX, velocityY;
+  private double velocityX;
+  private double velocityY;
 
   public GamepadEntityController(final T entity) {
     super(entity);
@@ -142,7 +144,8 @@ public class GamepadEntityController<T extends IMovableEntity> extends MovementC
 
     final float rightX = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RX);
     final float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
-    float targetX = 0, targetY = 0;
+    float targetX = 0;
+    float targetY = 0;
     if (Math.abs(rightX) > 0.08) {
       targetX = rightX;
     }

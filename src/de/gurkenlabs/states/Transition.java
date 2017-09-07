@@ -1,7 +1,5 @@
 package de.gurkenlabs.states;
 
-import de.gurkenlabs.litiengine.IGameLoop;
-
 public abstract class Transition implements ITransition {
   private final int priority;
   private IState state;
@@ -19,9 +17,6 @@ public abstract class Transition implements ITransition {
   public int compareTo(final ITransition other) {
     return Integer.compare(this.getPriority(), other.getPriority());
   }
-
-  @Override
-  public abstract boolean conditionsFullfilled(IGameLoop loop);
 
   @Override
   public IState getNextState() {

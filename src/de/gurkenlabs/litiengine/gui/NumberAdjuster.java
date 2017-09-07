@@ -8,10 +8,12 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class NumberAdjuster extends TextFieldComponent {
-  public static FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
-  public static FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
-  BigDecimal step, lowerBound, upperBound, currentValue;
-  private ImageComponent button1, button2;
+  public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
+  public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
+  private BigDecimal step;
+  private BigDecimal lowerBound;
+  private BigDecimal upperBound;
+  private BigDecimal currentValue;
   private Spritesheet buttonSprite;
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
@@ -61,20 +63,16 @@ public class NumberAdjuster extends TextFieldComponent {
 
   @Override
   public void prepare() {
-    this.button1 = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_UP.getText(), null);
-    this.button2 = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_DOWN.getText(), null);
-    this.button1.setFont(ARROW_UP.getFont());
-    this.button2.setFont(ARROW_UP.getFont());
+    ImageComponent buttonUp = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_UP.getText(), null);
+    ImageComponent buttonDown = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_DOWN.getText(), null);
+    buttonUp.setFont(ARROW_UP.getFont());
+    buttonDown.setFont(ARROW_UP.getFont());
 
-    this.getComponents().add(this.button1);
-    this.getComponents().add(this.button2);
+    this.getComponents().add(buttonUp);
+    this.getComponents().add(buttonDown);
     super.prepare();
-    this.button1.onClicked(c -> {
-      this.increment();
-    });
-    this.button2.onClicked(c -> {
-      this.decrement();
-    });
+    buttonUp.onClicked(c -> this.increment());
+    buttonDown.onClicked(c -> this.decrement());
     this.onChangeConfirmed(e -> {
       try {
         this.setCurrentValue(BigDecimal.valueOf(Double.parseDouble(this.getText())));
@@ -117,10 +115,5 @@ public class NumberAdjuster extends TextFieldComponent {
     if (this.getCurrentValue().compareTo(this.getUpperBound()) > 0) {
       this.setCurrentValue(this.getUpperBound());
     }
-  }
-
-  @Override
-  protected void initializeComponents() {
-
   }
 }

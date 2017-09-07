@@ -10,9 +10,10 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
 public class HorizontalSlider extends Slider {
-  public static FontIcon ARROW_LEFT = new FontIcon(ICON_FONT, "\uE805");
-  public static FontIcon ARROW_RIGHT = new FontIcon(ICON_FONT, "\uE806");
-  private final double minSliderX, maxSliderX;
+  public static final FontIcon ARROW_LEFT = new FontIcon(ICON_FONT, "\uE805");
+  public static final FontIcon ARROW_RIGHT = new FontIcon(ICON_FONT, "\uE806");
+  private final double minSliderX;
+  private final double maxSliderX;
 
   public HorizontalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final Sound hoverSound, final boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);
@@ -61,10 +62,4 @@ public class HorizontalSlider extends Slider {
       this.setCurrentValue((float) (this.getMinValue() + percentage * (this.getMaxValue() - this.getMinValue())));
     }
   }
-
-  @Override
-  protected void initializeComponents() {
-
-  }
-
 }

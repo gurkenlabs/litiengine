@@ -24,7 +24,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class GuiComponent.
  */
@@ -40,10 +39,18 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   private static final Color DEFAULT_COLOR = Color.WHITE;
 
   /** The back ground color. */
-  private Color backGroundColor, textShadowColor;
+  private Color backGroundColor;
+  private Color textShadowColor;
 
   /** The click consumer. */
-  private final List<Consumer<ComponentMouseEvent>> clickConsumer, hoverConsumer, mousePressedConsumer, mouseEnterConsumer, mouseLeaveConsumer, mouseDraggedConsumer, mouseReleasedConsumer, mouseMovedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> clickConsumer;
+  private final List<Consumer<ComponentMouseEvent>> hoverConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mousePressedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseEnterConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseLeaveConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseDraggedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseReleasedConsumer;
+  private final List<Consumer<ComponentMouseEvent>> mouseMovedConsumer;
 
   private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
 
@@ -59,16 +66,14 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private Color hoverTextColor;
 
-  /** The id. */
   private final int id;
 
-  /** The is hovered. */
-  private boolean isHovered, isPressed, isSelected;
+  private boolean isHovered;
+  private boolean isPressed;
+  private boolean isSelected;
 
-  /** The suspended. */
   private boolean suspended;
 
-  /** The tag. */
   private Object tag;
 
   private String text;
@@ -85,8 +90,11 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /** The visible. */
   private boolean visible;
 
-  /** The width. */
-  private double width, height, x, y, defaultTextX, defaultTextY;
+  private double width;
+  private double height;
+  private double x;
+  private double y;
+
   private double xMargin;
 
   protected GuiComponent(final double x, final double y) {
@@ -612,25 +620,26 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     if (this.getText() != null) {
       final FontMetrics fm = g.getFontMetrics();
 
-      this.defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
+      double defaultTextX;
+      double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
       switch (this.getTextAlignment()) {
       case TEXT_ALIGN_LEFT:
-        this.defaultTextX = this.getTextXMargin();
+        defaultTextX = this.getTextXMargin();
         break;
       case TEXT_ALIGN_RIGHT:
-        this.defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
+        defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
         break;
-      default:
       case TEXT_ALIGN_CENTER:
-        this.defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2;
+      default:
+        defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
         break;
       }
       if (this.getTextY() == 0) {
-        this.setTextY(this.defaultTextY);
+        this.setTextY(defaultTextY);
       }
 
       if (this.getTextX() == 0) {
-        this.setTextX(this.defaultTextX);
+        this.setTextX(defaultTextX);
       }
       if (this.getTextAngle() == 0) {
         if (this.drawTextShadow()) {
@@ -833,7 +842,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /**
    * Initialize components.
    */
-  protected abstract void initializeComponents();
+  protected void initializeComponents() {
+  }
 
   /**
    * Mouse event should be forwarded.

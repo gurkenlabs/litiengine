@@ -8,7 +8,6 @@ import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class HealthRegenerationEffect.
  */

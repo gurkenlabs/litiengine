@@ -51,7 +51,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /** The max particles. */
   private int maxParticles;
 
-  private int particleMaxTTL, particleMinTTL;
+  private int particleMaxTTL;
+
+  private int particleMinTTL;
 
   private final CopyOnWriteArrayList<Particle> particles;
 
@@ -239,7 +241,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public boolean isFinished() {
     // if a time to live is set and reached or ir the emitter has been started
     // and no particles are left
-    return this.getTimeToLive() > 0 && this.timeToLiveReached() || this.activated && this.lastSpawn > 0 && this.getParticles().size() == 0;
+    return this.getTimeToLive() > 0 && this.timeToLiveReached() || this.activated && this.lastSpawn > 0 && this.getParticles().isEmpty();
   }
 
   /**
@@ -385,7 +387,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   protected abstract Particle createNewParticle();
 
   protected Color getRandomParticleColor() {
-    if (this.colors.size() == 0) {
+    if (this.colors.isEmpty()) {
       return DEFAULT_PARTICLE_COLOR;
     }
 
@@ -398,8 +400,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return this.getParticleMaxTTL();
     }
 
-    final int ttl = RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
-    return ttl;
+    return RANDOM.nextInt(this.getParticleMaxTTL() - this.getParticleMinTTL()) + this.getParticleMinTTL();
   }
 
   protected int getRandomParticleX() {

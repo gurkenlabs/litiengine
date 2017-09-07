@@ -8,14 +8,13 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 
 /**
  * The Interface IPhysicsEngine.
  */
-public interface IPhysicsEngine extends IUpdateable {
+public interface IPhysicsEngine {
 
   public static final int COLLTYPE_ENTITY = 1;
 

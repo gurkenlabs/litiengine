@@ -11,6 +11,9 @@ import java.io.OutputStream;
 
 public class StreamUtilities {
 
+  private StreamUtilities() {
+  }
+
   public static void copy(final File file, final OutputStream out) throws IOException {
     final InputStream in = new FileInputStream(file);
     try {

@@ -23,6 +23,9 @@ public class FontLoader {
   private static final HashMap<String, Font> fonts = new HashMap<>();
   private static final Logger log = Logger.getLogger(FontLoader.class.getName());
 
+  private FontLoader() {
+  }
+
   /**
    * Gets the font.
    *
@@ -56,13 +59,7 @@ public class FontLoader {
       ge.registerFont(font);
       fonts.put(fontName, font);
       return font;
-    } catch (final FontFormatException e) {
-      final StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      final String stacktrace = sw.toString();
-      log.severe(stacktrace);
-      e.printStackTrace();
-    } catch (final IOException e) {
+    } catch (final FontFormatException | IOException e) {
       final StringWriter sw = new StringWriter();
       e.printStackTrace(new PrintWriter(sw));
       final String stacktrace = sw.toString();

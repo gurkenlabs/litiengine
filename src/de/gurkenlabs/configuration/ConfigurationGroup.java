@@ -84,7 +84,7 @@ public abstract class ConfigurationGroup {
         this.setPropertyValue(propertyName, value);
       } else if (field.getType().equals(String[].class)) {
         this.setPropertyValue(propertyName, value.split(","));
-      } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+      } else if (field.getType() instanceof Class && field.getType().isEnum()) {
         final Object[] enumArray = field.getType().getEnumConstants();
 
         for (final Object enumConst : enumArray) {
@@ -133,14 +133,12 @@ public abstract class ConfigurationGroup {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType().equals(String[].class)) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
-        } else if (field.getType() instanceof Class && ((Class<?>) field.getType()).isEnum()) {
+        } else if (field.getType() instanceof Class && field.getType().isEnum()) {
           final String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
           properties.setProperty(this.getPrefix() + field.getName(), value);
         }
       }
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
+    } catch (final IllegalArgumentException | IllegalAccessException e) {
       e.printStackTrace();
     }
   }
@@ -189,13 +187,7 @@ public abstract class ConfigurationGroup {
           }
         }
       }
-    } catch (final SecurityException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (final IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (final InvocationTargetException e) {
+    } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
     }
   }

@@ -69,7 +69,8 @@ public abstract class Entity implements IEntity {
       return this.boundingBox;
     }
 
-    return this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    return this.boundingBox;
   }
 
   /**

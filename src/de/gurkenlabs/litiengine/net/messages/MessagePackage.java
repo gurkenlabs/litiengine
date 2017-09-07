@@ -10,7 +10,6 @@ import de.gurkenlabs.litiengine.net.Package;
 import de.gurkenlabs.util.io.CompressionUtilities;
 import de.gurkenlabs.util.io.Serializer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ObjectPacket.
  *

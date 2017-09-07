@@ -125,19 +125,17 @@ public class Configuration {
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
     InputStream settingsStream = FileUtilities.getGameResource(this.getFileName());
-    if (!settingsFile.exists() && settingsStream == null) {
-      if (!settingsFile.exists() || !settingsFile.isFile()) {
-        try {
-          final OutputStream out = new FileOutputStream(settingsFile);
-          this.createDefaultSettingsFile(out);
-          out.close();
-        } catch (final IOException e) {
-          e.printStackTrace();
-        }
-
-        System.out.printf("Default configuration %s created \n", this.getFileName());
-        return;
+    if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
+      try {
+        final OutputStream out = new FileOutputStream(settingsFile);
+        this.createDefaultSettingsFile(out);
+        out.close();
+      } catch (final IOException e) {
+        e.printStackTrace();
       }
+
+      System.out.printf("Default configuration %s created %n", this.getFileName());
+      return;
     }
 
     if (settingsFile.exists()) {
@@ -161,6 +159,6 @@ public class Configuration {
     }
 
     this.initializeSettingsByProperties(properties);
-    System.out.printf("Configuration %s loaded \n", this.getFileName());
+    System.out.printf("Configuration %s loaded %n", this.getFileName());
   }
 }

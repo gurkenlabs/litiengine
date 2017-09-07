@@ -35,7 +35,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(name, spritesheet, loop, keyFrameDurations);
 
-    if (randomizeStart && this.keyframes.size() > 0) {
+    if (randomizeStart && !this.keyframes.isEmpty()) {
       this.firstFrame = this.getKeyframes().get(new Random().nextInt(this.getKeyframes().size()));
     }
   }
@@ -52,7 +52,7 @@ public class Animation implements IUpdateable, ILaunchable {
     }
 
     this.initKeyFrames(keyFrameDurations);
-    if (this.getKeyframes().size() == 0) {
+    if (this.getKeyframes().isEmpty()) {
       System.out.println("No keyframes defined for animation " + this.getName() + " (spitesheet: " + spritesheet.getName() + ")");
     }
 
@@ -88,7 +88,7 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   public boolean isPlaying() {
-    return !this.paused && this.keyframes.size() > 0 && this.playing;
+    return !this.paused && !this.keyframes.isEmpty() && this.playing;
   }
 
   public void pause() {
@@ -123,7 +123,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public void start() {
     this.elapsedTicks = 0;
     this.playing = true;
-    if (this.getKeyframes().size() == 0) {
+    if (this.getKeyframes().isEmpty()) {
       return;
     }
 
@@ -134,7 +134,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public void terminate() {
     this.elapsedTicks = 0;
     this.playing = false;
-    if (this.getKeyframes().size() == 0) {
+    if (this.getKeyframes().isEmpty()) {
       return;
     }
 
@@ -191,7 +191,7 @@ public class Animation implements IUpdateable, ILaunchable {
       }
     }
 
-    if (this.keyframes.size() != 0) {
+    if (!this.keyframes.isEmpty()) {
       this.firstFrame = this.getKeyframes().get(0);
     }
   }

@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,8 +17,10 @@ public class DropdownListField extends GuiComponent {
 
   private ListField contentList;
   /** The drop down button. */
-  private ImageComponent dropDownButton, chosenElementComponent;
-  private Spritesheet entrySprite, buttonSprite;
+  private ImageComponent dropDownButton;
+  private ImageComponent chosenElementComponent;
+  private Spritesheet entrySprite;
+  private Spritesheet buttonSprite;
   private boolean isDroppedDown;
 
   private final int numberOfShownElements;
@@ -62,7 +63,7 @@ public class DropdownListField extends GuiComponent {
     return this.entrySprite;
   }
 
-  public CopyOnWriteArrayList<ImageComponent> getListEntries() {
+  public List<ImageComponent> getListEntries() {
     return this.getContentList().getListEntries();
   }
 
@@ -99,7 +100,8 @@ public class DropdownListField extends GuiComponent {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
     this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
-    final double buttonHeight = this.getHeight() / this.getNumberOfShownElements(), buttonWidth = buttonHeight;
+    final double buttonHeight = this.getHeight() / this.getNumberOfShownElements();
+    double buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
     this.dropDownButton.setFont(ARROW_DOWN.getFont());
 
@@ -111,13 +113,11 @@ public class DropdownListField extends GuiComponent {
     this.prepareInput();
     this.getContentList().suspend();
 
-    if (this.getListEntries().size() != 0) {
+    if (!this.getListEntries().isEmpty()) {
       this.chosenElementComponent.setText(this.getListEntries().get(this.getSelectedIndex()).getText());
     }
 
-    this.dropDownButton.onClicked(e -> {
-      this.toggleDropDown();
-    });
+    this.dropDownButton.onClicked(e -> this.toggleDropDown());
 
     this.onChange(c -> {
       this.chosenElementComponent.setText(this.getContentArray()[c].toString());
@@ -127,14 +127,7 @@ public class DropdownListField extends GuiComponent {
       this.toggleDropDown();
     });
 
-    this.getContentList().onChange(c -> {
-      this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelectedIndex()));
-    });
-  }
-
-  @Override
-  public void render(final Graphics2D g) {
-    super.render(g);
+    this.getContentList().onChange(c -> this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getSelectedIndex())));
   }
 
   public void setArrowKeyNavigation(final boolean arrowKeyNavigation) {
@@ -183,11 +176,6 @@ public class DropdownListField extends GuiComponent {
     }
     this.isDroppedDown = !this.isDroppedDown;
     this.getContentList().refresh();
-  }
-
-  @Override
-  protected void initializeComponents() {
-
   }
 
   private void prepareInput() {

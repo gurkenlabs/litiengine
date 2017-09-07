@@ -51,9 +51,7 @@ public final class RenderEngine implements IRenderEngine {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsConfiguration config = device.getDefaultConfiguration();
-    final BufferedImage img = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-
-    return img;
+    return config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
   /**
@@ -178,7 +176,7 @@ public final class RenderEngine implements IRenderEngine {
       return null;
     }
 
-    final String cacheKey = absolutPath.hashCode() + "";
+    final String cacheKey = Integer.toString(absolutPath.hashCode());
     if (!forceLoad && ImageCache.IMAGES.containsKey(cacheKey)) {
       return ImageCache.IMAGES.get(cacheKey);
     }
@@ -270,7 +268,7 @@ public final class RenderEngine implements IRenderEngine {
 
   @Override
   public boolean canRender(final IEntity entity) {
-    if (this.entityRenderingConditions.size() > 0) {
+    if (!this.entityRenderingConditions.isEmpty()) {
       for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
         if (!consumer.test(entity)) {
           return false;
@@ -405,7 +403,7 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
     final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
-    if (this.entityRenderingConsumer.size() > 0) {
+    if (!this.entityRenderingConsumer.isEmpty()) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
         consumer.accept(renderEvent);
       }
@@ -421,7 +419,7 @@ public final class RenderEngine implements IRenderEngine {
       ((IRenderable) entity).render(g);
     }
 
-    if (this.entityRenderedConsumer.size() > 0) {
+    if (!this.entityRenderedConsumer.isEmpty()) {
       for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderedConsumer) {
         consumer.accept(renderEvent);
       }

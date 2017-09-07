@@ -65,7 +65,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.triggered = true;
     // always take local targets if there are any
     List<Integer> targets = this.getTargets();
-    if (targets.size() == 0) {
+    if (targets.isEmpty()) {
       // as a fallback send the message to the tar
       targets = new ArrayList<>();
       if (tar > 0) {
@@ -85,7 +85,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     // if we actually have a trigger target, we send the message to the target
-    if (targets.size() > 0) {
+    if (!targets.isEmpty()) {
       for (final int target : targets) {
         final IEntity entity = Game.getEnvironment().get(target);
         if (entity == null) {
@@ -213,7 +213,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
     final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
     for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
-      if (this.activators.size() > 0 && !this.activators.contains(coll.getMapId())) {
+      if (!this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
         continue;
       }
 
@@ -235,7 +235,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       if (!collEntities.contains(ent)) {
         for (final Consumer<TriggerEvent> cons : this.deactivatedConsumer) {
           List<Integer> targets = this.getTargets();
-          if (targets.size() == 0) {
+          if (targets.isEmpty()) {
             targets = new ArrayList<>();
             targets.add(ent.getMapId());
           }

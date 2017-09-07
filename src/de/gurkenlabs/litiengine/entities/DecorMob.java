@@ -44,7 +44,7 @@ public class DecorMob extends MovableCombatEntity {
     }
 
     public void calculateNextAngleChange() {
-      this.nextAngleChange = new Random().nextInt(3000) + 2000;
+      this.nextAngleChange = new Random().nextInt(3000) + (long) 2000;
     }
 
     @Override
@@ -64,18 +64,7 @@ public class DecorMob extends MovableCombatEntity {
 
       final float pixelsPerTick = gameLoop.getDeltaTime() * 0.001F * this.getEntity().getVelocity();
       this.getPhysicsEngine().move(this.getEntity(), this.angle, pixelsPerTick);
-      /*
-       * for (final IMovableEntity mob :
-       * Game.getEnvironment().getMovableEntities()) { if (!mob.equals(this) &&
-       * mob.getLocation().distance(this.getControlledEntity().getLocation()) <
-       * DETECTION_RADIUS) { final float angle = (float)
-       * (GeometricUtilities.calcRotationAngleInDegrees(this.getControlledEntity
-       * ().getDimensionCenter(), mob.getDimensionCenter()) - 180);
-       * this.getPhysicsEngine().move(this.getControlledEntity(), angle,
-       * pixelsPerTick * 5); } }
-       */
     }
-
   }
 
   private final MovementBehaviour behaviour;

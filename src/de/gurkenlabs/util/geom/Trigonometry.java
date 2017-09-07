@@ -7,7 +7,7 @@ public class Trigonometry {
   private static final int ATAN2_COUNT = ATAN2_MASK + 1;
   private static final float[] atan2 = new float[ATAN2_COUNT];
   private static final int ATAN2_DIM = (int) Math.sqrt(ATAN2_COUNT);
-  
+
   private static final int SIN_BITS = 12;
   private static final int SIN_MASK = ~(-1 << SIN_BITS);
   private static final int SIN_COUNT = SIN_MASK + 1;
@@ -38,6 +38,9 @@ public class Trigonometry {
       sin[i] = (float) Math.sin((i + 0.5f) / SIN_COUNT * radFull);
       cos[i] = (float) Math.cos((i + 0.5f) / SIN_COUNT * radFull);
     }
+  }
+
+  private Trigonometry() {
   }
 
   public static final float atan2(float y, float x) {

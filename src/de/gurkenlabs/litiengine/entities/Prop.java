@@ -8,7 +8,6 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Destructable.
  */

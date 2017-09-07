@@ -3,35 +3,34 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.attributes;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum Modification.
  */
 public enum Modification {
 
   /** The Add. */
-  Add(1),
+  ADD(1),
 
   /** The Add percent. */
-  AddPercent(5),
+  ADDPERCENT(5),
 
   /** The Divide. */
-  Divide(4),
+  DIVIDE(4),
 
   /** The Multiply. */
-  Multiply(3),
+  MULTIPLY(3),
 
   /** The Set. */
-  Set(7),
+  SET(7),
 
   /** The Substract. */
-  Substract(2),
+  SUBSTRACT(2),
 
   /** The Substract percent. */
-  SubstractPercent(6),
+  SUBSTRACTPERCENT(6),
 
   /** The Unknown. */
-  Unknown(-1);
+  UNKNOWN(-1);
 
   /** The apply order. */
   private final int applyOrder;

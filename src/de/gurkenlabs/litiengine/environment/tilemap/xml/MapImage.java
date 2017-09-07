@@ -15,7 +15,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MapImage.
  */

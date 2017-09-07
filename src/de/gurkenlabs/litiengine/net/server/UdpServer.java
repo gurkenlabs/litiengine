@@ -36,7 +36,7 @@ public class UdpServer implements IServer {
     this.sender = new UdpPacketSender();
     this.messageHandlerProvider = provider;
     this.commandManager = new CommandManager();
-    this.commandManager.bind(SHUTDOWN, (args) -> this.handleShutdownCommand(args));
+    this.commandManager.bind(SHUTDOWN, this::handleShutdownCommand);
 
     this.clientConnectionManager = new ClientConnectionManager();
     provider.register(MessageType.PING, new ClientConnectionPingMessageHandler(this.clientConnectionManager));
@@ -71,7 +71,7 @@ public class UdpServer implements IServer {
     final byte[] decompressedData = CompressionUtilities.decompress(data);
     final MessageType type = MessageType.get(decompressedData[0]);
     final List<IMessageHandler> messageHandlers = this.messageHandlerProvider.getMessageHanders(type);
-    if (messageHandlers == null || messageHandlers.size() == 0) {
+    if (messageHandlers == null || messageHandlers.isEmpty()) {
       return;
     }
 

@@ -5,7 +5,6 @@ package de.gurkenlabs.litiengine.net.messages;
 
 import java.io.Serializable;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ClientMessage.
  */

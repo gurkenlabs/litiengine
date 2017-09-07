@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
+import java.util.Random;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -7,7 +9,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement(name = "param")
 public class ParticleParameter {
   public static int randomInRange(final int min, final int max) {
-    return min + (int) (Math.random() * (max - min + 1));
+    return min + new Random().nextInt(max - min + 1);
   }
 
   @XmlAttribute

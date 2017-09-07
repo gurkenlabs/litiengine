@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ShimmerEmitter.
  */
@@ -50,11 +49,11 @@ public class ShimmerEmitter extends Emitter {
     final float gravityY = 0.0f;
     final byte size = (byte) (rand.nextInt(3) + 2);
 
-    Color color = new Color(255, 255, 255, (int) Math.round(Math.random() * 155) + 100);
+    Color color = new Color(255, 255, 255, new Random().nextInt(155) + 100);
     if (rand.nextFloat() > 0.5) {
-      color = new Color(170, 255, 255, (int) Math.round(Math.random() * 155) + 100);
+      color = new Color(170, 255, 255, new Random().nextInt(155) + 100);
     }
-    final Particle p = new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, 0, color);
-    return p;
+
+    return new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, gravityX, gravityY, size, size, 0, color);
   }
 }

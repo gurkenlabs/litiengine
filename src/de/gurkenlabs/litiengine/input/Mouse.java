@@ -400,9 +400,8 @@ public class Mouse implements IMouse {
   }
 
   private MouseEvent createEvent(final MouseEvent original) {
-    final MouseEvent event = new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), (int) this.getLocation().getX(), (int) this.getLocation().getY(), original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
+    return new MouseEvent(original.getComponent(), original.getID(), original.getWhen(), original.getModifiers(), (int) this.getLocation().getX(), (int) this.getLocation().getY(), original.getXOnScreen(), original.getYOnScreen(), original.getClickCount(), original.isPopupTrigger(),
         original.getButton());
-    return event;
   }
 
   /**
@@ -417,7 +416,8 @@ public class Mouse implements IMouse {
       return;
     }
 
-    double diffX, diffY;
+    double diffX;
+    double diffY;
     if (!this.grabMouse) {
       // get diff relative from last mouse location
       diffX = e.getX() - this.lastLocation.getX();

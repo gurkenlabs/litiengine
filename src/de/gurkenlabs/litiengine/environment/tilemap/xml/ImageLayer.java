@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ImageLayer.
  */

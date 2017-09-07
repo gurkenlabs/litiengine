@@ -72,7 +72,7 @@ public class CombatAttributes {
   }
 
   public void addXP(final int deltaXP) {
-    this.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.Add, deltaXP));
+    this.getExperience().modifyBaseValue(new AttributeModifier<Integer>(Modification.ADD, deltaXP));
     if (this.getExperience().getCurrentValue() >= this.getExperience().getMaxValue()) {
       this.levelUp();
     }
@@ -167,8 +167,8 @@ public class CombatAttributes {
       return;
     }
 
-    this.getLevel().modifyBaseValue(new AttributeModifier<>(Modification.Add, 1));
-    this.getExperience().modifyBaseValue(new AttributeModifier<>(Modification.Set, 0));
+    this.getLevel().modifyBaseValue(new AttributeModifier<>(Modification.ADD, 1));
+    this.getExperience().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
     this.updateAttributes();
 
     for (final Consumer<CombatAttributes> consumer : this.levelUpConsumer) {
@@ -191,10 +191,10 @@ public class CombatAttributes {
     final float levelMultiplier = 1.1f;
     final float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
 
-    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.Set, maxXp));
-    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
-    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.Multiply, levelMultiplier));
+    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
+    this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, maxXp));
+    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
+    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
+    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
   }
 }

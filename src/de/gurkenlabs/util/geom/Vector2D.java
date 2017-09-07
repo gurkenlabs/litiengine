@@ -22,8 +22,7 @@ public class Vector2D {
   }
 
   public Vector2D add(final Vector2D v1) {
-    final Vector2D v2 = new Vector2D(this.dX + v1.dX, this.dY + v1.dY);
-    return v2;
+    return new Vector2D(this.dX + v1.dX, this.dY + v1.dY);
   }
 
   public double dotProduct(final Vector2D v1) {
@@ -43,18 +42,15 @@ public class Vector2D {
   }
 
   public Vector2D normalVector() {
-    final Vector2D norm = new Vector2D(this.getY(), -this.getX());
-    return norm;
+    return new Vector2D(this.getY(), -this.getX());
   }
 
   public Vector2D scale(final double scaleFactor) {
-    final Vector2D v2 = new Vector2D(this.dX * scaleFactor, this.dY * scaleFactor);
-    return v2;
+    return new Vector2D(this.dX * scaleFactor, this.dY * scaleFactor);
   }
 
   public Vector2D sub(final Vector2D v1) {
-    final Vector2D v2 = new Vector2D(this.dX - v1.dX, this.dY - v1.dY);
-    return v2;
+    return new Vector2D(this.dX - v1.dX, this.dY - v1.dY);
   }
 
   @Override

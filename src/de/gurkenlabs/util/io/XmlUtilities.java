@@ -15,6 +15,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 public final class XmlUtilities {
+  private XmlUtilities() {
+  }
 
   /**
    * Saves the xml, contained by the specified input with the custom

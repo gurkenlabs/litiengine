@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.IVision;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class LitiVision.
  */

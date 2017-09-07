@@ -9,12 +9,16 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
 public abstract class Slider extends GuiComponent {
-  private ImageComponent button1, button2, slider;
-  private final Spritesheet buttonSprite, sliderSprite;
+  private ImageComponent button1;
+  private ImageComponent button2;
+  private ImageComponent slider;
+  private final Spritesheet buttonSprite;
+  private final Spritesheet sliderSprite;
   private final List<Consumer<Float>> changeConsumer;
   private float currentValue;
   private boolean isDragging;
-  private final float minValue, maxValue;
+  private final float minValue;
+  private final float maxValue;
   private final boolean showArrowButtons;
   private float stepSize;
 
@@ -87,9 +91,7 @@ public abstract class Slider extends GuiComponent {
   public void prepare() {
     super.prepare();
     this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
-    this.onChange(e -> {
-      this.slider.setPosition(this.getRelativeSliderPosition());
-    });
+    this.onChange(e -> this.slider.setPosition(this.getRelativeSliderPosition()));
   }
 
   public void setCurrentValue(final float newValue) {
@@ -135,9 +137,7 @@ public abstract class Slider extends GuiComponent {
 
   protected void setSlider(final ImageComponent slider) {
     this.slider = slider;
-    this.slider.onMousePressed(e -> {
-      this.isDragging = true;
-    });
+    this.slider.onMousePressed(e -> this.isDragging = true);
     Input.MOUSE.onDragged(e -> {
       if (this.isDragging()) {
         this.setValueRelativeToMousePosition();

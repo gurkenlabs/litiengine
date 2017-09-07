@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 public class Polyline implements IPolyline {
   @XmlAttribute(name = "points")
   private String rawPoints;
-  
+
   @XmlTransient
   private final List<Point2D> points;
 
@@ -23,7 +23,7 @@ public class Polyline implements IPolyline {
   }
 
   public List<Point2D> getPoints() {
-    if (this.points.size() == 0) {
+    if (this.points.isEmpty()) {
       this.populateList();
     }
     return points;

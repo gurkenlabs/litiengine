@@ -11,7 +11,6 @@ import de.gurkenlabs.configuration.ConfigurationGroup;
 import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 import de.gurkenlabs.configuration.Quality;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class GraphicSettings contains all settings that allow to influence the
  * appearance of the game.

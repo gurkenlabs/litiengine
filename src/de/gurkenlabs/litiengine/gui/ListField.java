@@ -16,24 +16,23 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ListField.
  */
 public class ListField extends GuiComponent {
   private boolean arrowKeyNavigation;
-  private Spritesheet buttonSprite, entrySprite;
+  private Spritesheet buttonSprite;
+  private Spritesheet entrySprite;
   private final List<Consumer<Integer>> changeConsumer;
 
   private final Object[] contents;
-  /** The list items. */
-  private final CopyOnWriteArrayList<ImageComponent> listEntries;;
+
+  private final CopyOnWriteArrayList<ImageComponent> listEntries;
 
   private int lowerBound = 0;
 
   private ImageComponent selectedComponent;
 
-  /** The locked selection. */
   private int selection;
 
   private final int shownElements;
@@ -85,7 +84,7 @@ public class ListField extends GuiComponent {
    *
    * @return the all list items
    */
-  public CopyOnWriteArrayList<ImageComponent> getListEntries() {
+  public List<ImageComponent> getListEntries() {
     return this.listEntries;
   }
 
@@ -133,11 +132,6 @@ public class ListField extends GuiComponent {
     return this.slider;
   }
 
-  @Override
-  public void initializeComponents() {
-
-  }
-
   public boolean isArrowKeyNavigation() {
     return this.arrowKeyNavigation;
   }
@@ -183,7 +177,7 @@ public class ListField extends GuiComponent {
       });
     }
 
-    this.onChange(selection -> {
+    this.onChange(s -> {
       if (this.getSlider() != null) {
         this.getSlider().setCurrentValue(this.getLowerBound());
         this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());

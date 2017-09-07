@@ -3,7 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.entities;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum DestructableState.
  */

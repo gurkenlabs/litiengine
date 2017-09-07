@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Layer.
  */
@@ -162,14 +161,12 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
   }
 
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-    if (order == -1) {
-      if (parent instanceof Map) {
-        Map map = (Map) parent;
-        int layerCnt = map.getTileLayers().size();
-        layerCnt += map.getImageLayers().size();
-        layerCnt += map.getTileLayers().size();
-        this.order = layerCnt;
-      }
+    if (order == -1 && parent instanceof Map) {
+      Map map = (Map) parent;
+      int layerCnt = map.getTileLayers().size();
+      layerCnt += map.getImageLayers().size();
+      layerCnt += map.getTileLayers().size();
+      this.order = layerCnt;
     }
 
     if (this.offsetx != null && this.offsetx.intValue() == 0) {

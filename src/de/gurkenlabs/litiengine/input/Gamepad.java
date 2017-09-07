@@ -45,6 +45,9 @@ public class Gamepad implements IGamepad, IUpdateable {
     public static final String Z_ACCELERATION = addComponent(Identifier.Axis.Z_ACCELERATION);
     public static final String Z_FORCE = addComponent(Identifier.Axis.Z_FORCE);
     public static final String Z_VELOCITY = addComponent(Identifier.Axis.Z_VELOCITY);
+
+    private Axis() {
+    }
   }
 
   public static class Buttons {
@@ -114,6 +117,8 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     // TODO: incomplete list... right now we don't support stylus / mouse or
     // extra buttons
+    private Buttons() {
+    }
   }
 
   public static class DPad {
@@ -158,6 +163,9 @@ public class Gamepad implements IGamepad, IUpdateable {
      * Standard value for up-right HAT position
      */
     public static final float UP_RIGHT = 0.375f;
+
+    private DPad() {
+    }
   }
 
   public static class Xbox {
@@ -182,6 +190,9 @@ public class Gamepad implements IGamepad, IUpdateable {
     public static final String X = Buttons._2;
 
     public static final String Y = Buttons._3;
+
+    private Xbox() {
+    }
   }
 
   private static final Map<String, Identifier> components = new HashMap<>();

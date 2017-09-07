@@ -28,6 +28,9 @@ public class Input {
   // been paused
   protected static GameLoop InputLoop;
 
+  private Input() {
+  }
+
   public static void init() {
     InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
 
@@ -47,7 +50,7 @@ public class Input {
    * @return
    */
   public static IGamepad getGamepad() {
-    if (GAMEPADS.size() == 0) {
+    if (GAMEPADS.isEmpty()) {
       return null;
     }
 
@@ -62,7 +65,7 @@ public class Input {
    * @return
    */
   public static IGamepad getGamepad(final int index) {
-    if (GAMEPADS.size() == 0) {
+    if (GAMEPADS.isEmpty()) {
       return null;
     }
 

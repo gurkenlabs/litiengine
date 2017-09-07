@@ -9,7 +9,6 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UdpPacketReceiver.
  */

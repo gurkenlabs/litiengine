@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 
@@ -16,6 +15,9 @@ import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
+  public static final int BACKGROUND_INDEX = 0;
+  public static final int BACKGROUND_HOVER_INDEX = 1;
+  public static final int BACKGROUND_PRESSED_INDEX = 2;
 
   private Sound hoverSound;
 
@@ -53,12 +55,12 @@ public class ImageComponent extends GuiComponent {
     BufferedImage img;
     if (this.isHovered() && this.getSpritesheet().getTotalNumberOfSprites() > 1) {
       if (this.isPressed()) {
-        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(2), (int) this.getWidth(), (int) this.getHeight());
+        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_PRESSED_INDEX), (int) this.getWidth(), (int) this.getHeight());
       } else {
-        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(1), (int) this.getWidth(), (int) this.getHeight());
+        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_HOVER_INDEX), (int) this.getWidth(), (int) this.getHeight());
       }
     } else {
-      img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(0), (int) this.getWidth(), (int) this.getHeight());
+      img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_INDEX), (int) this.getWidth(), (int) this.getHeight());
     }
 
     if (img != null) {
@@ -100,11 +102,6 @@ public class ImageComponent extends GuiComponent {
   }
 
   @Override
-  public void setHeight(final double height) {
-    super.setHeight(height);
-  }
-
-  @Override
   public void setHoverSound(final Sound hoverSound) {
     this.hoverSound = hoverSound;
   }
@@ -116,14 +113,4 @@ public class ImageComponent extends GuiComponent {
   public void setSpriteSheet(final Spritesheet spr) {
     this.spritesheet = spr;
   }
-
-  @Override
-  public void setWidth(final double width) {
-    super.setWidth(width);
-  }
-
-  @Override
-  protected void initializeComponents() {
-  }
-
 }

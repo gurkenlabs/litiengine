@@ -19,9 +19,4 @@ public class GameScreen extends Screen {
 
     super.render(g);
   }
-
-  @Override
-  protected void initializeComponents() {
-  }
-
 }

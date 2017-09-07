@@ -16,7 +16,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MapObject.
  */

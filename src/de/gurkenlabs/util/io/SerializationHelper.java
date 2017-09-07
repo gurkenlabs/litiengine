@@ -2,6 +2,9 @@ package de.gurkenlabs.util.io;
 
 public class SerializationHelper {
 
+  private SerializationHelper() {
+  }
+
   /**
    * Decodes a previously encoded angle.
    *

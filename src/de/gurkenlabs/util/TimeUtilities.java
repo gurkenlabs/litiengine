@@ -1,6 +1,9 @@
 package de.gurkenlabs.util;
 
 public class TimeUtilities {
+  private TimeUtilities() {
+  }
+
   public static long getDays(final long ms) {
     return ms / 1000 / 60 / 60 / 24 % 365;
   }

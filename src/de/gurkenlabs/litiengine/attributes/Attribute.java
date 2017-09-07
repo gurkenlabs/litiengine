@@ -102,7 +102,7 @@ public class Attribute<T extends Number> {
    * @return the t
    */
   protected T applyModifiers(final T baseValue) {
-    if (this.getModifiers().size() == 0) {
+    if (this.getModifiers().isEmpty()) {
       return baseValue;
     }
 

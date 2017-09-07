@@ -26,7 +26,7 @@ public class Path {
   public Path(final Path2D path) {
     this.path = path;
     this.points = GeometricUtilities.getPoints(this.path);
-    if (this.points.size() > 0) {
+    if (!this.points.isEmpty()) {
       this.start = this.points.get(0);
       this.target = this.points.get(this.points.size() - 1);
     } else {

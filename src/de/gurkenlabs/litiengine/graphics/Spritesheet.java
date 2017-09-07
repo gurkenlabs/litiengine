@@ -59,8 +59,7 @@ public class Spritesheet {
   }
 
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    final Spritesheet sprite = new Spritesheet(image, path, spriteWidth, spriteHeight);
-    return sprite;
+    return new Spritesheet(image, path, spriteWidth, spriteHeight);
   }
 
   public static Spritesheet load(final ITileset tileset) {
@@ -72,8 +71,7 @@ public class Spritesheet {
       return null;
     }
 
-    final Spritesheet sprite = new Spritesheet(tileset);
-    return sprite;
+    return new Spritesheet(tileset);
   }
 
   public static Spritesheet load(final SpriteSheetInfo info) {
@@ -119,7 +117,7 @@ public class Spritesheet {
         }
 
         try {
-          final String name = gameDirectory + Game.getInfo().getSpritesDirectory() + items.get(0).toString();
+          final String name = gameDirectory + Game.getInfo().getSpritesDirectory() + items.get(0);
 
           final int width = Integer.parseInt(items.get(1));
           final int height = Integer.parseInt(items.get(2));
@@ -128,7 +126,7 @@ public class Spritesheet {
           sprites.add(sprite);
           if (parts.length >= 2) {
             final List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
-            if (keyFrameStrings.size() > 0) {
+            if (!keyFrameStrings.isEmpty()) {
               final int[] keyFrames = new int[keyFrameStrings.size()];
               for (int i = 0; i < keyFrameStrings.size(); i++) {
                 final int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
@@ -153,9 +151,7 @@ public class Spritesheet {
   }
 
   public static Spritesheet load(final String path, final int spriteWidth, final int spriteHeight) {
-    final Spritesheet sprite = new Spritesheet(path, spriteWidth, spriteHeight);
-
-    return sprite;
+    return new Spritesheet(path, spriteWidth, spriteHeight);
   }
 
   public static void remove(final String path) {

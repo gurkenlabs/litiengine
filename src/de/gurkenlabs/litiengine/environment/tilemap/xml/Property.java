@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Property.
  */
@@ -19,10 +18,10 @@ public class Property {
   /** The name. */
   @XmlAttribute
   private String name;
-  
+
   @XmlAttribute(required = false)
   private String type;
-  
+
   /** The value. */
   @XmlAttribute
   private String value;

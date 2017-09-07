@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Serializer.
  */
 public class Serializer {
+
+  private Serializer() {
+  }
 
   /**
    * Deserialize.
@@ -28,9 +30,7 @@ public class Serializer {
     try {
       o = new ObjectInputStream(b);
       return o.readObject();
-    } catch (final IOException e) {
-      e.printStackTrace();
-    } catch (final ClassNotFoundException e) {
+    } catch (final IOException | ClassNotFoundException e) {
       e.printStackTrace();
     }
 

@@ -24,7 +24,7 @@ public class AttackSpeedEffect extends AttributeStateEffect<Float> {
    *          the targtes
    */
   public AttackSpeedEffect(final Ability ability, final float delta, final Modification modifictaion, final EffectTarget... targtes) {
-    super(ability, Modification.Multiply, delta, targtes);
+    super(ability, modifictaion, delta, targtes);
   }
 
   @Override

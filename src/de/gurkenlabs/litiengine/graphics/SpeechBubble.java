@@ -62,8 +62,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   private Sound typeSound;
 
-  private int width;
-
   private SpeechBubble(final IEntity entity, final Font font, final String text) {
     final SpeechBubble active = activeSpeechBubbles.get(entity);
     if (active != null) {
@@ -197,7 +195,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final Area ar = new Area(bounds);
     ar.add(new Area(path));
 
-    this.width = ar.getBounds().width;
+    int width = ar.getBounds().width;
     this.height = ar.getBounds().height;
     g.setColor(SPEAK_BACKGROUNDCOLOR);
     g.fill(ar);
@@ -206,6 +204,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     g.draw(ar);
     g.dispose();
 
-    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, this.width + 1, this.height + 1);
+    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, this.height + 1);
   }
 }

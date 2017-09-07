@@ -18,9 +18,14 @@ import de.gurkenlabs.util.MathUtilities;
 public class KeyboardEntityController<T extends IMovableEntity> extends MovementController<T> implements IKeyObserver {
   private float dx;
   private float dy;
-  private boolean movedX, movedY;
-  private final List<Integer> up, down, left, right;
-  private double velocityX, velocityY;
+  private boolean movedX;
+  private boolean movedY;
+  private final List<Integer> up;
+  private final List<Integer> down;
+  private final List<Integer> left;
+  private final List<Integer> right;
+  private double velocityX;
+  private double velocityY;
 
   public KeyboardEntityController(final T entity) {
     this(entity, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);

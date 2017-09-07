@@ -239,7 +239,6 @@ public class SoundSource {
       final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().SOUND.getSoundVolume();
       SoundSource.this.setGain(initialGain);
 
-      SoundSource.this.location = SoundSource.this.location;
       SoundSource.this.updateControls(SoundSource.this.initialListenerLocation);
 
       SoundSource.this.dataLine.start();
@@ -297,7 +296,7 @@ public class SoundSource {
         }
       }
 
-      if (this.queue.size() > 0) {
+      if (!this.queue.isEmpty()) {
         for (final SourceDataLine line : this.queue) {
           line.stop();
           line.flush();

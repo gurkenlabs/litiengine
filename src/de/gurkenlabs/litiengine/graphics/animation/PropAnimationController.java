@@ -31,8 +31,7 @@ public class PropAnimationController extends AnimationController {
 
     final String propState = state.name().toLowerCase();
     final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
-    final Spritesheet sheet = Spritesheet.find(name);
-    return sheet;
+    return Spritesheet.find(name);
   }
 
   private final Prop prop;

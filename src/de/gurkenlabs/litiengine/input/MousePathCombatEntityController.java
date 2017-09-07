@@ -56,7 +56,7 @@ public class MousePathCombatEntityController extends MovementController<IMovable
   public void update(final IGameLoop gameLoop) {
     super.update(gameLoop);
     // can only walk if no forces are active
-    if (!this.isMovementAllowed() || this.getActiceForces().size() > 0) {
+    if (!this.isMovementAllowed() || !this.getActiceForces().isEmpty()) {
       this.navigator.stop();
       return;
     }

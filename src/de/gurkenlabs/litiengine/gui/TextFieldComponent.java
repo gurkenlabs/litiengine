@@ -92,10 +92,8 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
         this.setText(this.getText().substring(0, this.getText().length() - 1));
       }
 
-      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT)) {
-        if (this.getText() == null || this.getText().isEmpty()) {
-          this.setText("0");
-        }
+      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && (this.getText() == null || this.getText().isEmpty())) {
+        this.setText("0");
       }
 
       break;

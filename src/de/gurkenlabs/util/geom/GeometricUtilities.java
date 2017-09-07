@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class GeometricUtilities {
+  private GeometricUtilities() {
+  }
 
   public static double calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {
     // calculate the angle theta from the deltaY and deltaX values

@@ -10,8 +10,6 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public interface IEffect extends IUpdateable {
-  public static final int NO_DURATION = -1;
-
   /**
    * Applies the effect in the specified impact area on the specified
    * environment.

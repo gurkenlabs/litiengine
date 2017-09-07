@@ -3,7 +3,6 @@
  ***************************************************************/
 package de.gurkenlabs.litiengine.abilities.effects;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum EffectTarget.
  */

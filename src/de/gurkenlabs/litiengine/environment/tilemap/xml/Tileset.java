@@ -21,7 +21,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Tileset.
  */

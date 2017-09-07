@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -39,14 +38,14 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void add(final ICollisionEntity entity) {
-    if(entity instanceof Prop){
-      Prop prop = (Prop)entity;
-      if(prop.isObstacle()){
+    if (entity instanceof Prop) {
+      Prop prop = (Prop) entity;
+      if (prop.isObstacle()) {
         this.add(prop.getCollisionBox());
         return;
       }
     }
-    
+
     if (!this.collisionEntities.contains(entity)) {
       this.collisionEntities.add(entity);
     }
@@ -163,14 +162,14 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.getCollisionBoxes().stream().map(s -> s.getCollisionBox()).collect(Collectors.toList());
+    return this.getCollisionBoxes().stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList());
   }
 
   private List<CollisionBox> getCollisionBoxes() {
     List<CollisionBox> allCollisionBoxes = new ArrayList<>();
     allCollisionBoxes.clear();
-    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(x -> x.hasCollision()).map(x -> new CollisionBox(x)).collect(Collectors.toList()));
-    allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(x -> new CollisionBox(x)).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
+    allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
 
     return allCollisionBoxes;
   }
@@ -226,7 +225,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
       success = false;
     }
 
-    // resolve collision for new location;
+    // resolve collision for new location
     if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
       final Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
       entity.setLocation(resolvedPosition);
@@ -263,14 +262,14 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public void remove(final ICollisionEntity entity) {
-    if(entity instanceof Prop){
-      Prop prop = (Prop)entity;
-      if(prop.isObstacle()){
+    if (entity instanceof Prop) {
+      Prop prop = (Prop) entity;
+      if (prop.isObstacle()) {
         this.remove(prop.getCollisionBox());
         return;
       }
     }
-    
+
     if (this.collisionEntities.contains(entity)) {
       this.collisionEntities.remove(entity);
     }
@@ -286,10 +285,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
   @Override
   public void setBounds(final Rectangle2D environmentBounds) {
     this.environmentBounds = environmentBounds;
-  }
-
-  @Override
-  public void update(final IGameLoop loop) {
   }
 
   /**

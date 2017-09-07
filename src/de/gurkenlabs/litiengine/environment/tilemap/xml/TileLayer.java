@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TileLayer.
  */

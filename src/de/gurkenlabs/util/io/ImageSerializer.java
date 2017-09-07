@@ -16,6 +16,9 @@ import de.gurkenlabs.util.ImageProcessing;
 public class ImageSerializer {
   public static final String FILE_FORMAT_PNG = "png";
 
+  private ImageSerializer() {
+  }
+
   public static BufferedImage loadImage(final String fileName) {
     final File file = new File(fileName);
     if (!file.exists()) {

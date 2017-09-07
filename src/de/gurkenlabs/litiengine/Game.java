@@ -28,24 +28,25 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
-  private final static GameConfiguration configuration;
-  private final static EntityControllerManager entityControllerManager;
+  private static final String LOGGING_CONFIG_FILE = "logging.properties";
+  private static final GameConfiguration configuration;
+  private static final EntityControllerManager entityControllerManager;
   private static IEnvironment environment;
 
-  private final static List<Consumer<IEnvironment>> environmentLoadedConsumer;
+  private static final List<Consumer<IEnvironment>> environmentLoadedConsumer;
   private static IGameLoop gameLoop;
-  private final static IRenderEngine graphicsEngine;
-  private final static GameInfo info;
-  private final static List<IMap> maps;
-  private final static GameMetrics metrics;
-  private final static IPhysicsEngine physicsEngine;
+  private static final IRenderEngine graphicsEngine;
+  private static final GameInfo info;
+  private static final List<IMap> maps;
+  private static final GameMetrics metrics;
+  private static final IPhysicsEngine physicsEngine;
   private static RenderLoop renderLoop;
   private static IScreenManager screenManager;
-  private final static ISoundEngine soundEngine;
+  private static final ISoundEngine soundEngine;
 
-  private final static List<Consumer<String>> startedConsumer;
-  private final static List<Predicate<String>> terminatingConsumer;
-  private final static List<Consumer<GameConfiguration>> configLoadedConsumer;
+  private static final List<Consumer<String>> startedConsumer;
+  private static final List<Predicate<String>> terminatingConsumer;
+  private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
 
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
@@ -63,6 +64,9 @@ public final class Game {
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
+  }
+
+  private Game() {
   }
 
   public static GameConfiguration getConfiguration() {
@@ -86,7 +90,7 @@ public final class Game {
   }
 
   public static IMap getMap(final String mapName) {
-    if (mapName == null || mapName.isEmpty() || maps.size() == 0) {
+    if (mapName == null || mapName.isEmpty() || maps.isEmpty()) {
       return null;
     }
 
@@ -144,7 +148,6 @@ public final class Game {
     renderLoop = new RenderLoop(scrMgr.getRenderComponent(), scrMgr);
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
-    getLoop().attach(getPhysicsEngine());
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -153,7 +156,6 @@ public final class Game {
     scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
 
-    final String LOGGING_CONFIG_FILE = "logging.properties";
     // init logging
     if (new File(LOGGING_CONFIG_FILE).exists()) {
       System.setProperty("java.util.logging.config.file", LOGGING_CONFIG_FILE);
@@ -166,22 +168,18 @@ public final class Game {
     }
 
     if (getConfiguration().CLIENT.showGameMetrics()) {
-      getScreenManager().getRenderComponent().onRendered((g) -> getMetrics().render(g));
+      getScreenManager().getRenderComponent().onRendered(g -> getMetrics().render(g));
     }
 
     if (getConfiguration().DEBUG.isDebugEnabled()) {
       getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
 
-    getRenderEngine().onMapRendered(e -> {
-      DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject());
-    });
+    getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
 
     // init screens
     getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
-    getScreenManager().getRenderComponent().onFpsChanged(fps -> {
-      getMetrics().setFramesPerSecond(fps);
-    });
+    getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
 
     getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));
 

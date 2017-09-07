@@ -14,11 +14,4 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public T getEntity() {
     return this.entity;
   }
-
-  @Override
-  public void playAnimation(String animationName) {
-    // TODO Auto-generated method stub
-    super.playAnimation(animationName);
-  }
-
 }
