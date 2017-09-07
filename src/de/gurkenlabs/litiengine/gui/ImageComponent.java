@@ -93,7 +93,6 @@ public class ImageComponent extends GuiComponent {
 
     final Image img = this.getImage();
     if (img != null) {
-      System.out.println(this.getLocation() + " - " + this.getX() + "/" + this.getY());
       RenderEngine.renderImage(g, img, this.getLocation());
     }
 
