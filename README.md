@@ -1,8 +1,7 @@
 # LITIengine
 
 [![Build Status](https://travis-ci.org/gurkenlabs/litiengine.svg?branch=master)](https://travis-ci.org/gurkenlabs/litiengine)
-
-[![Quality Gate](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)](https://sonarcloud.io/api/badges/gate?key=de.gurkenlabs:litiengine)
+[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=de.gurkenlabs:litiengine)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
