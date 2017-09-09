@@ -294,6 +294,6 @@ public class Gamepad implements IGamepad, IUpdateable {
     Input.InputLoop.detach(this);
     this.pollConsumer.clear();
     this.pressedConsumer.clear();
-    Input.GAMEPADMANAGER.remove(this);
+    Input.gamepadManager().remove(this);
   }
 }

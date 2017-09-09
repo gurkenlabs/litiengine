@@ -19,7 +19,7 @@ public class MousePathCombatEntityController extends MovementController<IMovable
   public MousePathCombatEntityController(final IEntityNavigator navigator, final IMovableCombatEntity movableEntity) {
     super(movableEntity);
     this.navigator = navigator;
-    Input.MOUSE.registerMouseListener(this);
+    Input.mouse().registerMouseListener(this);
   }
 
   public IEntityNavigator getNavigator() {
@@ -62,7 +62,7 @@ public class MousePathCombatEntityController extends MovementController<IMovable
     }
 
     if (this.navigating && !this.getEntity().isDead()) {
-      this.navigator.navigate(Input.MOUSE.getMapLocation());
+      this.navigator.navigate(Input.mouse().getMapLocation());
     }
   }
 }

@@ -9,36 +9,50 @@ import de.gurkenlabs.litiengine.GameLoop;
 /**
  * The Class Input.
  */
-public class Input {
+public final class Input {
 
-  public static IGamepadManager GAMEPADMANAGER;
+  private static IGamepadManager gamePadManager;
 
-  public static List<IGamepad> GAMEPADS;
+  private static List<IGamepad> gamePads;
 
   /** The keyboard. */
-  public static IKeyboard KEYBOARD;
+  private static IKeyboard keyboard;
 
   /** The mouse. */
-  public static IMouse MOUSE;
+  private static IMouse mouse;
 
   // we need an own gameloop because otherwise input won't work if the game has
   // been paused
-  protected static GameLoop InputLoop;
+  protected static final GameLoop InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
 
   private Input() {
   }
 
   public static void init() {
-    InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
-
-    KEYBOARD = new KeyBoard();
-    MOUSE = new Mouse();
+    keyboard = new KeyBoard();
+    mouse = new Mouse();
     if (Game.getConfiguration().INPUT.isGamepadSupport()) {
-      GAMEPADS = new CopyOnWriteArrayList<>();
-      GAMEPADMANAGER = new GamepadManager();
+      gamePads = new CopyOnWriteArrayList<>();
+      gamePadManager = new GamepadManager();
     }
 
     InputLoop.start();
+  }
+
+  public static IGamepadManager gamepadManager() {
+    return gamePadManager;
+  }
+
+  public static IKeyboard keyboard() {
+    return keyboard;
+  }
+
+  public static IMouse mouse() {
+    return mouse;
+  }
+
+  public static List<IGamepad> gamepads() {
+    return gamePads;
   }
 
   /**
@@ -47,11 +61,11 @@ public class Input {
    * @return
    */
   public static IGamepad getGamepad() {
-    if (GAMEPADS.isEmpty()) {
+    if (gamePads.isEmpty()) {
       return null;
     }
 
-    return GAMEPADS.get(0);
+    return gamePads.get(0);
   }
 
   /**
@@ -62,11 +76,11 @@ public class Input {
    * @return
    */
   public static IGamepad getGamepad(final int index) {
-    if (GAMEPADS.isEmpty()) {
+    if (gamePads.isEmpty()) {
       return null;
     }
 
-    for (final IGamepad gamepad : GAMEPADS) {
+    for (final IGamepad gamepad : gamePads) {
       if (gamepad.getIndex() == index) {
         return gamepad;
       }

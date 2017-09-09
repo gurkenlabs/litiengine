@@ -262,14 +262,14 @@ public class ListField extends GuiComponent {
   }
 
   private void prepareInput() {
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_UP, e -> {
+    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }
       this.setSelection(this.getSelection() - 1);
     });
 
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_DOWN, e -> {
+    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation()) {
         return;
       }

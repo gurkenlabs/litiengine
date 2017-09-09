@@ -144,16 +144,16 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
     screen.render(g);
     final Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
-    if (this.cursorImage != null && (Input.MOUSE.isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
-      final Point2D locationWithOffset = new Point2D.Double(Input.MOUSE.getLocation().getX() - this.getCursorOffsetX(), Input.MOUSE.getLocation().getY() - this.getCursorOffsetY());
+    if (this.cursorImage != null && (Input.mouse().isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
+      final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
       RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
     }
 
     if (Game.getConfiguration().DEBUG.isRenderDebugMouse()) {
       g.setColor(Color.RED);
 
-      g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() + DEBUG_MOUSE_SIZE));
-      g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY(), Input.MOUSE.getLocation().getX() + DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY()));
+      g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));
+      g.draw(new Line2D.Double(Input.mouse().getLocation().getX() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY(), Input.mouse().getLocation().getX() + DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY()));
     }
 
     for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {

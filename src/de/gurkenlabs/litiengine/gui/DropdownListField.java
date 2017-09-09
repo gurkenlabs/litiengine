@@ -179,14 +179,14 @@ public class DropdownListField extends GuiComponent {
   }
 
   private void prepareInput() {
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_UP, e -> {
+    Input.keyboard().onKeyTyped(KeyEvent.VK_UP, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }
       this.getContentList().setSelection(this.getSelectedIndex() - 1);
     });
 
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_DOWN, e -> {
+    Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, e -> {
       if (this.isSuspended() || !this.isVisible() || !this.isArrowKeyNavigation() || !this.getChosenElementComponent().isHovered()) {
         return;
       }

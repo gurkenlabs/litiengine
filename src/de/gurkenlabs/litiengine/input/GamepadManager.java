@@ -115,7 +115,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       return;
     }
 
-    Input.GAMEPADS.remove(gamepad);
+    Input.gamepads().remove(gamepad);
     for (final Consumer<IGamepad> cons : this.gamepadRemovedConsumer) {
       cons.accept(gamepad);
     }
@@ -196,7 +196,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
         // add new gamepads
         final IGamepad newGamepad = new Gamepad(i, controller);
-        Input.GAMEPADS.add(newGamepad);
+        Input.gamepads().add(newGamepad);
         for (final Consumer<IGamepad> cons : this.gamepadAddedConsumer) {
           cons.accept(newGamepad);
         }

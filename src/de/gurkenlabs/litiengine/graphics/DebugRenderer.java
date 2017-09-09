@@ -61,7 +61,7 @@ public class DebugRenderer {
 
     if (Game.getConfiguration().DEBUG.showTilesMetric()) {
       // draw mouse tile info
-      drawTileBoundingBox(g, map, Input.MOUSE.getMapLocation());
+      drawTileBoundingBox(g, map, Input.mouse().getMapLocation());
     }
   }
 

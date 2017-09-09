@@ -185,11 +185,11 @@ public final class Game {
     getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));
 
     Input.init();
-    getScreenManager().getRenderComponent().addMouseListener(Input.MOUSE);
-    getScreenManager().getRenderComponent().addMouseMotionListener(Input.MOUSE);
-    getScreenManager().getRenderComponent().addMouseWheelListener(Input.MOUSE);
+    getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
+    getScreenManager().getRenderComponent().addMouseMotionListener(Input.mouse());
+    getScreenManager().getRenderComponent().addMouseWheelListener(Input.mouse());
 
-    Input.KEYBOARD.onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
+    Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
   }
 
   public static void load(final String gameResourceFile) {

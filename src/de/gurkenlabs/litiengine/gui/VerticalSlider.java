@@ -56,7 +56,7 @@ public class VerticalSlider extends Slider {
 
   @Override
   public void setValueRelativeToMousePosition() {
-    final double mouseY = Input.MOUSE.getLocation().getY();
+    final double mouseY = Input.mouse().getLocation().getY();
     if (mouseY >= this.minSliderY && mouseY <= this.maxSliderY) {
       final double relativeMouseX = mouseY - this.minSliderY;
       final double percentage = relativeMouseX / (this.maxSliderY - this.minSliderY);

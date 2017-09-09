@@ -35,15 +35,15 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.setText(text);
     this.flickerDelay = 100;
-    Input.KEYBOARD.registerForKeyDownEvents(this);
+    Input.keyboard().registerForKeyDownEvents(this);
     this.onClicked(e -> {
       if (!this.isSelected()) {
         this.toggleSelection();
       }
     });
 
-    Input.MOUSE.onClicked(e -> {
-      if (!this.getBoundingBox().contains(Input.MOUSE.getLocation())) {
+    Input.mouse().onClicked(e -> {
+      if (!this.getBoundingBox().contains(Input.mouse().getLocation())) {
         this.setSelected(false);
       }
     });
@@ -80,7 +80,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
 
     switch (event.getKeyCode()) {
     case KeyEvent.VK_BACK_SPACE:
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_SHIFT)) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
         while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) == ' ') {
           this.setText(this.getText().substring(0, this.getText().length() - 1));
         }
@@ -113,7 +113,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
         break;
       }
 
-      final String text = Input.KEYBOARD.getText(event);
+      final String text = Input.keyboard().getText(event);
       if (text == null || text.isEmpty()) {
         break;
       }

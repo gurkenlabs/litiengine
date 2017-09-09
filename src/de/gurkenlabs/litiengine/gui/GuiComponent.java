@@ -589,9 +589,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
     this.suspended = false;
     this.visible = true;
-    Input.MOUSE.registerMouseListener(this);
-    Input.MOUSE.registerMouseWheelListener(this);
-    Input.MOUSE.registerMouseMotionListener(this);
+    Input.mouse().registerMouseListener(this);
+    Input.mouse().registerMouseWheelListener(this);
+    Input.mouse().registerMouseMotionListener(this);
     for (final GuiComponent component : this.getComponents()) {
       component.prepare();
     }
@@ -812,9 +812,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   @Override
   public void suspend() {
-    Input.MOUSE.unregisterMouseListener(this);
-    Input.MOUSE.unregisterMouseWheelListener(this);
-    Input.MOUSE.unregisterMouseMotionListener(this);
+    Input.mouse().unregisterMouseListener(this);
+    Input.mouse().unregisterMouseWheelListener(this);
+    Input.mouse().unregisterMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
     for (final IGuiComponent childComp : this.getComponents()) {

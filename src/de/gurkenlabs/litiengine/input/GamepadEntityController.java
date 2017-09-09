@@ -15,6 +15,7 @@ import net.java.games.input.Component.Identifier;
  * up deceleration.
  */
 public class GamepadEntityController<T extends IMovableEntity> extends MovementController<T> {
+  private static final double STOP_THRESHOLD = 0.1;
   private float dx;
   private float dy;
   private int gamePadIndex = -1;
@@ -27,13 +28,13 @@ public class GamepadEntityController<T extends IMovableEntity> extends MovementC
   public GamepadEntityController(final T entity) {
     super(entity);
 
-    Input.GAMEPADMANAGER.onGamepadAdded(pad -> {
+    Input.gamepadManager().onGamepadAdded(pad -> {
       if (this.gamePadIndex == -1) {
         this.gamePadIndex = pad.getIndex();
       }
     });
 
-    Input.GAMEPADMANAGER.onGamepadRemoved(pad -> {
+    Input.gamepadManager().onGamepadRemoved(pad -> {
       if (this.gamePadIndex == pad.getIndex()) {
         this.gamePadIndex = -1;
         final IGamepad newGamePad = Input.getGamepad();
@@ -57,7 +58,6 @@ public class GamepadEntityController<T extends IMovableEntity> extends MovementC
 
     double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getAcceleration() * maxPixelsPerTick;
     final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : deltaTime / (double) this.getEntity().getDeceleration() * maxPixelsPerTick;
-    final double STOP_THRESHOLD = 0.1;
 
     if (this.movedX && this.movedY) {
       // we don't want the entity to move faster when moving diagonally
