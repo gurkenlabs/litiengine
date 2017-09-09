@@ -4,6 +4,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: "jacoco"
 
 sourceSets {
   main.java.srcDir "src"
@@ -41,6 +42,15 @@ jar {
   from('resources') { include '**/*' }
   version = 'v0.4.5-alpha'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 task copyNativeLibs(type: Copy) {
   from(new File('lib')) { exclude '**/*.jar' }
