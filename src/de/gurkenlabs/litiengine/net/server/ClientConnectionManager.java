@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.net.server;
 
 import java.net.InetAddress;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -27,7 +28,8 @@ public class ClientConnectionManager extends CopyOnWriteArrayList<ClientConnecti
       return null;
     }
 
-    return this.stream().filter(connection -> connection.getId() == clientId).findFirst().get();
+    Optional<ClientConnection> opt = this.stream().filter(connection -> connection.getId() == clientId).findFirst();
+    return opt.isPresent() ? opt.get() : null;
   }
 
   /**

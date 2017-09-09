@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class contains some basic functionality for all setting groups. It gets
@@ -12,6 +14,7 @@ import java.util.Properties;
  */
 @ConfigurationGroupInfo
 public abstract class ConfigurationGroup {
+  private static final Logger log = Logger.getLogger(ConfigurationGroup.class.getName());
 
   /** The prefix. */
   private final String prefix;
@@ -91,7 +94,7 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final NumberFormatException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -136,7 +139,7 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final IllegalArgumentException | IllegalAccessException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -154,7 +157,7 @@ public abstract class ConfigurationGroup {
     for (final Method method : this.getClass().getMethods()) {
       // method must start with "set" and have only one parameter, mathich the
       // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
+      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1 && method.getReturnType().equals(fieldType)) {
         if (!method.isAccessible()) {
           method.setAccessible(true);
         }
@@ -185,7 +188,7 @@ public abstract class ConfigurationGroup {
         }
       }
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 }

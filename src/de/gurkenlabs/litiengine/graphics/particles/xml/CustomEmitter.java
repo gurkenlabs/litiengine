@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,7 +29,8 @@ import de.gurkenlabs.util.io.FileUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
-  public static Map<String, CustomEmitterData> loadedCustomEmitters;
+  private static final Logger log = Logger.getLogger(CustomEmitter.class.getName());
+  private static final Map<String, CustomEmitterData> loadedCustomEmitters;
 
   static {
     loadedCustomEmitters = new ConcurrentHashMap<>();
@@ -56,7 +59,7 @@ public class CustomEmitter extends Emitter {
       loadedCustomEmitters.put(name, loaded);
       return loaded;
     } catch (final JAXBException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return null;
@@ -94,7 +97,16 @@ public class CustomEmitter extends Emitter {
 
   @Override
   protected Particle createNewParticle() {
-    float x, y, deltaX, deltaY, gravityX, gravityY, width, height, deltaWidth, deltaHeight;
+    float x;
+    float y;
+    float deltaX;
+    float deltaY;
+    float gravityX;
+    float gravityY;
+    float width;
+    float height;
+    float deltaWidth;
+    float deltaHeight;
 
     x = this.getEmitterData().getX().get();
     y = this.getEmitterData().getY().get();

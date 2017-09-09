@@ -25,6 +25,12 @@ public class FireEmitter extends Emitter {
   /** One of the four colors used by the fire particles. */
   private static final Color YELLOW = new Color(251, 239, 169, 100);
 
+  private static final int REDISH_BROWN_COUNT = 10;
+  private static final int DARK_ORANGE_COUNT = 7;
+  private static final int GOLD_COUNT = 5;
+  private static final int YELLOW_COUNT = 2;
+  private static final int NEW_PARTICLE_COUNT = REDISH_BROWN_COUNT + DARK_ORANGE_COUNT + GOLD_COUNT + YELLOW_COUNT;
+
   /**
    * Constructs a new Snow particle effect.
    *
@@ -87,11 +93,6 @@ public class FireEmitter extends Emitter {
    */
   @Override
   protected void spawnParticle() {
-    final int REDISH_BROWN_COUNT = 10;
-    final int DARK_ORANGE_COUNT = 7;
-    final int GOLD_COUNT = 5;
-    final int YELLOW_COUNT = 2;
-    final int NEW_PARTICLE_COUNT = REDISH_BROWN_COUNT + DARK_ORANGE_COUNT + GOLD_COUNT + YELLOW_COUNT;
 
     // only allow particle spawn if there is enough space to spawn particles in
     // all colors

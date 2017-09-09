@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class DropdownListField extends GuiComponent {
-  public static FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
+  public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE804");
 
   private boolean arrowKeyNavigation;
   private final List<Consumer<Integer>> changeConsumer;

@@ -8,6 +8,10 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class FreeFlightCamera extends Camera implements IUpdateable {
+  private static final int SCROLL_PIXELS_PER_SECOND = 400;
+  private static final int SCROLL_PADDING = 20;
+  private static final int SCROLL_BORDER = 100;
+
   private Point2D location;
 
   public FreeFlightCamera(final Point2D location) {
@@ -35,12 +39,9 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   }
 
   private void handleFreeFlightCamera(final IGameLoop gameLoop) {
-    final int SCROLL_PIXELS_PER_SECOND = 400;
-    final int SCROLL_PADDING = 20;
-    final int SCROLL_BORDER = 100;
     final Point2D mouseLocation = Input.MOUSE.getLocation();
 
-    final double scrollSpeed = SCROLL_PIXELS_PER_SECOND / gameLoop.getUpdateRate() * Game.getConfiguration().INPUT.getMouseSensitivity();
+    final double scrollSpeed = SCROLL_PIXELS_PER_SECOND / (double) gameLoop.getUpdateRate() * Game.getConfiguration().INPUT.getMouseSensitivity();
 
     double x = this.getLocation().getX();
     double y = this.getLocation().getY();

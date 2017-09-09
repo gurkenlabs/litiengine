@@ -1,12 +1,8 @@
 package de.gurkenlabs.litiengine.attributes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import de.gurkenlabs.litiengine.attributes.Attribute;
-import de.gurkenlabs.litiengine.attributes.AttributeModifier;
-import de.gurkenlabs.litiengine.attributes.Modification;
 
 /**
  * The Class AttributeTests.

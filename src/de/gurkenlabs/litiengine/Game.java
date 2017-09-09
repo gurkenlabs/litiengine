@@ -8,7 +8,9 @@ import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
@@ -28,6 +30,7 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
+  private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
   private static final GameConfiguration configuration;
   private static final EntityControllerManager entityControllerManager;
@@ -163,7 +166,7 @@ public final class Game {
       try {
         LogManager.getLogManager().readConfiguration();
       } catch (final Exception e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
 
@@ -207,7 +210,7 @@ public final class Game {
       mapCnt++;
     }
 
-    System.out.println(mapCnt + " maps loaded from '" + gameResourceFile + "'");
+    log.log(Level.INFO, mapCnt + " maps loaded from '" + gameResourceFile + "'");
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {
@@ -228,7 +231,7 @@ public final class Game {
       }
     }
 
-    System.out.println(spriteload + " sprites loaded to memory");
+    log.log(Level.INFO, spriteload + " sprites loaded to memory");
   }
 
   public static void loadEnvironment(final IEnvironment env) {
@@ -261,10 +264,6 @@ public final class Game {
    */
   public static void onTerminating(final Predicate<String> cons) {
     terminatingConsumer.add(cons);
-  }
-
-  public static void onConfigurationLoaded(final Consumer<GameConfiguration> conf) {
-
   }
 
   public static void start() {

@@ -126,10 +126,10 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
    */
   @Override
   public Rectangle2D getCollisionBox(final Point2D location) {
-    final double collisionBoxWidth = this.getCollisionBoxWidth() != -1 ? this.getCollisionBoxWidth() : this.getWidth() * WIDTH_FACTOR;
-    final double collisionBoxHeight = this.getCollisionBoxHeight() != -1 ? this.getCollisionBoxHeight() : this.getHeight() * HEIGHT_FACTOR;
+    final double newCollisionBoxWidth = this.getCollisionBoxWidth() != -1 ? this.getCollisionBoxWidth() : this.getWidth() * WIDTH_FACTOR;
+    final double newCollisionBoxHeight = this.getCollisionBoxHeight() != -1 ? this.getCollisionBoxHeight() : this.getHeight() * HEIGHT_FACTOR;
 
-    return getCollisionBox(location, this.getWidth(), this.getHeight(), collisionBoxWidth, collisionBoxHeight, this.getAlign(), this.getValign());
+    return getCollisionBox(location, this.getWidth(), this.getHeight(), newCollisionBoxWidth, newCollisionBoxHeight, this.getAlign(), this.getValign());
   }
 
   public float getCollisionBoxHeight() {

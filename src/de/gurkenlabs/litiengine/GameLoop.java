@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
@@ -44,7 +45,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   private long deltaTime;
   private boolean gameIsRunning = true;
   private final GameTime gameTime;
-  private long lastUpdateTime;
   private long lastUpsTime;
 
   private float timeScale;
@@ -71,7 +71,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     }
 
     if (this.updatables.contains(updatable)) {
-      System.out.println("Updatable " + updatable + " already registered for update!");
+      log.log(Level.FINE, "Updatable " + updatable + " already registered for update!");
       return;
     }
 
@@ -192,17 +192,18 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
         this.updateCount = 0;
       }
 
-      this.lastUpdateTime = currentMillis;
+      long lastUpdateTime = currentMillis;
 
       final long updateTime = (System.nanoTime() - updateStart) / 1000000;
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
-        Thread.interrupted();
+        log.log(Level.SEVERE, e.getMessage(), e);
+        this.interrupt();
         break;
       }
 
-      this.deltaTime = System.currentTimeMillis() - this.lastUpdateTime + updateTime;
+      this.deltaTime = System.currentTimeMillis() - lastUpdateTime + updateTime;
     }
   }
 

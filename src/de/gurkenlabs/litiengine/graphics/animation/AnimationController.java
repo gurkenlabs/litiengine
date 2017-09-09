@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
-  private static int MAX_IMAGE_EFFECTS = 20;
+  private static final int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
   private Animation currentAnimation;
   private final Animation defaultAnimation;
@@ -142,10 +142,12 @@ public class AnimationController implements IAnimationController {
       this.getCurrentAnimation().terminate();
     }
 
-    final Animation anim = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst().get();
-    if (anim == null) {
+    final Optional<Animation> opt = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst();
+    if (!opt.isPresent()) {
       return;
     }
+
+    final Animation anim = opt.get();
 
     this.currentAnimation = anim;
     this.currentAnimation.start();
@@ -187,9 +189,9 @@ public class AnimationController implements IAnimationController {
     cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
     cacheKey.append('_');
 
-    final StringBuilder imageEffects = new StringBuilder();
-    this.getImageEffects().forEach(x -> imageEffects.append(x.getName()));
-    cacheKey.append(imageEffects.toString().hashCode());
+    final StringBuilder effectsString = new StringBuilder();
+    this.getImageEffects().forEach(x -> effectsString.append(x.getName()));
+    cacheKey.append(effectsString.toString().hashCode());
     return cacheKey.toString();
   }
 

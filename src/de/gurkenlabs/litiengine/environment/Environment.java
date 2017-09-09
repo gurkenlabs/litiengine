@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.configuration.Quality;
@@ -75,6 +77,8 @@ import de.gurkenlabs.util.io.FileUtilities;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
+  private static final Logger log = Logger.getLogger(Environment.class.getName());
+
   private static int localIdSequence = 0;
   private static int mapIdSequence;
 
@@ -88,7 +92,8 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<IRenderable> groundRenderable;
   private boolean initialized;
-  private final List<Consumer<IEnvironment>> initializedConsumer, loadedConsumer;
+  private final List<Consumer<IEnvironment>> initializedConsumer;
+  private final List<Consumer<IEnvironment>> loadedConsumer;
 
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
@@ -249,14 +254,14 @@ public class Environment implements IEnvironment {
 
   @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape) {
-    return this.findCombatEntities(shape, (entity) -> true);
+    return this.findCombatEntities(shape, entity -> true);
   }
 
   @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
-    final ArrayList<ICombatEntity> entities = new ArrayList<>();
+    final ArrayList<ICombatEntity> foundCombatEntities = new ArrayList<>();
     if (shape == null) {
-      return entities;
+      return foundCombatEntities;
     }
 
     // for rectangle we can just use the intersects method
@@ -264,53 +269,49 @@ public class Environment implements IEnvironment {
       final Rectangle2D rect = (Rectangle2D) shape;
       for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
         if (combatEntity.getHitBox().intersects(rect)) {
-          entities.add(combatEntity);
+          foundCombatEntities.add(combatEntity);
         }
       }
 
-      return entities;
+      return foundCombatEntities;
     }
 
     // for other shapes, we check if the shape's bounds intersect the hitbox and
     // if so, we then check if the actual shape intersects the hitbox
     for (final ICombatEntity combatEntity : this.getCombatEntities().stream().filter(condition).collect(Collectors.toList())) {
-      if (combatEntity.getHitBox().intersects(shape.getBounds())) {
-        if (GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
-          entities.add(combatEntity);
-        }
+      if (combatEntity.getHitBox().intersects(shape.getBounds()) && GeometricUtilities.shapeIntersects(combatEntity.getHitBox(), shape)) {
+        foundCombatEntities.add(combatEntity);
       }
     }
 
-    return entities;
+    return foundCombatEntities;
   }
 
   @Override
   public List<IEntity> findEntities(final Shape shape) {
-    final ArrayList<IEntity> entities = new ArrayList<>();
+    final ArrayList<IEntity> foundEntities = new ArrayList<>();
     if (shape == null) {
-      return entities;
+      return foundEntities;
     }
     if (shape instanceof Rectangle2D) {
       final Rectangle2D rect = (Rectangle2D) shape;
       for (final IEntity entity : this.getEntities()) {
         if (entity.getBoundingBox().intersects(rect)) {
-          entities.add(entity);
+          foundEntities.add(entity);
         }
       }
-      return entities;
+      return foundEntities;
     }
     // for other shapes, we check if the shape's bounds intersect the hitbox
     // and
     // if so, we then check if the actual shape intersects the hitbox
     for (final IEntity entity : this.getEntities()) {
-      if (entity.getBoundingBox().intersects(shape.getBounds())) {
-        if (GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
-          entities.add(entity);
-        }
+      if (entity.getBoundingBox().intersects(shape.getBounds()) && GeometricUtilities.shapeIntersects(entity.getBoundingBox(), shape)) {
+        foundEntities.add(entity);
       }
     }
 
-    return entities;
+    return foundEntities;
   }
 
   @Override
@@ -590,18 +591,18 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<Trigger> getTriggers(final String name) {
-    final List<Trigger> triggers = new ArrayList<>();
+    final List<Trigger> foundTriggers = new ArrayList<>();
     if (name == null || name.isEmpty()) {
-      return triggers;
+      return foundTriggers;
     }
 
     for (final Trigger t : this.getTriggers()) {
       if (t.getName() != null && t.getName().equals(name)) {
-        triggers.add(t);
+        foundTriggers.add(t);
       }
     }
 
-    return triggers;
+    return foundTriggers;
   }
 
   @Override
@@ -778,7 +779,6 @@ public class Environment implements IEnvironment {
     RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
 
     if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      // this.getAmbientLight().createImage();
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
     }
 
@@ -878,7 +878,7 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    Emitter emitter = null;
+    Emitter emitter;
     final String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
     if (emitterType == null || emitterType.isEmpty()) {
       return;
@@ -890,6 +890,9 @@ public class Environment implements IEnvironment {
       break;
     case "shimmer":
       emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+      break;
+    default:
+      emitter = null;
       break;
     }
 
@@ -959,7 +962,6 @@ public class Environment implements IEnvironment {
   }
 
   protected void addMob(final IMapObject mapObject) {
-
   }
 
   protected void addProp(final IMapObject mapObject) {
@@ -1047,8 +1049,8 @@ public class Environment implements IEnvironment {
         }
         try {
           trigger.addTarget(Integer.parseInt(s));
-        } catch (final NumberFormatException ne) {
-          ne.printStackTrace();
+        } catch (final NumberFormatException e) {
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
     }
@@ -1061,8 +1063,8 @@ public class Environment implements IEnvironment {
         }
         try {
           trigger.addActivator(Integer.parseInt(s));
-        } catch (final NumberFormatException ne) {
-          ne.printStackTrace();
+        } catch (final NumberFormatException e) {
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
     }
@@ -1115,7 +1117,7 @@ public class Environment implements IEnvironment {
 
   private void addStaticShadows() {
     final int shadowOffset = 10;
-    final List<Path2D> staticShadows = new ArrayList<>();
+    final List<Path2D> newStaticShadows = new ArrayList<>();
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
@@ -1138,22 +1140,22 @@ public class Environment implements IEnvironment {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.DOWNRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFTDOWN)) {
@@ -1161,31 +1163,31 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFTRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHTLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHTDOWN)) {
@@ -1193,7 +1195,7 @@ public class Environment implements IEnvironment {
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.NOOFFSET)) {
@@ -1205,7 +1207,7 @@ public class Environment implements IEnvironment {
       }
 
       if (parallelogram.getWindingRule() != 0) {
-        staticShadows.add(parallelogram);
+        newStaticShadows.add(parallelogram);
       }
     }
 
@@ -1214,7 +1216,7 @@ public class Environment implements IEnvironment {
     g.setColor(new Color(0, 0, 0, 75));
 
     final Area ar = new Area();
-    for (final Path2D staticShadow : staticShadows) {
+    for (final Path2D staticShadow : newStaticShadows) {
       final Area staticShadowArea = new Area(staticShadow);
       for (final LightSource light : this.getLightSources()) {
         if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {

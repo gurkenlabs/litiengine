@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConsoleCommandListener extends Thread implements ICommandListener {
+  private static final Logger log = Logger.getLogger(ConsoleCommandListener.class.getName());
 
   private final List<ICommandManager> commandManagers;
   private boolean gameIsRunning = true;
@@ -42,13 +45,14 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
         this.commandManagers.forEach(manager -> manager.executeCommand(s));
 
       } catch (final IOException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
 
       try {
         Thread.sleep(500);
       } catch (final InterruptedException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
+        this.interrupt();
       }
     }
   }

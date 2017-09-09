@@ -5,8 +5,6 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,11 +56,7 @@ public class FontLoader {
       fonts.put(fontName, font);
       return font;
     } catch (final FontFormatException | IOException e) {
-      final StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      final String stacktrace = sw.toString();
-      log.severe(stacktrace);
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
     return null;
   }

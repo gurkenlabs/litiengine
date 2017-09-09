@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -16,7 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class CompressionUtilities {
+public final class CompressionUtilities {
+  private static final Logger log = Logger.getLogger(CompressionUtilities.class.getName());
+
   private CompressionUtilities() {
   }
 
@@ -35,11 +39,10 @@ public class CompressionUtilities {
       }
       outputStream.close();
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
-    final byte[] output = outputStream.toByteArray();
-    return output;
+    return outputStream.toByteArray();
   }
 
   public static byte[] decompress(final byte[] data) {
@@ -58,11 +61,10 @@ public class CompressionUtilities {
 
       outputStream.close();
     } catch (final DataFormatException | IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
-    final byte[] output = outputStream.toByteArray();
-    return output;
+    return outputStream.toByteArray();
   }
 
   public static void unzip(final InputStream zipfile, final File directory) throws IOException {
@@ -76,7 +78,8 @@ public class CompressionUtilities {
         file.getParentFile().mkdirs();
         try {
           StreamUtilities.copy(zfile, file);
-        } finally {
+        } catch (IOException e) {
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
     }
@@ -105,7 +108,6 @@ public class CompressionUtilities {
           }
         }
       }
-    } finally {
     }
   }
 }

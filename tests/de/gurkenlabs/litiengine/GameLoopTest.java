@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.gurkenlabs.litiengine.GameLoop;
-
 public class GameLoopTest {
   @Test
   public void testTimeCalculation100() {

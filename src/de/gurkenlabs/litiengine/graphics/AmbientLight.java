@@ -42,7 +42,7 @@ public class AmbientLight {
       return;
     }
 
-    final Color color = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
+    final Color colorWithAlpha = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
@@ -59,7 +59,7 @@ public class AmbientLight {
       this.renderLightSource(g, light, longerDimension);
     }
 
-    g.setColor(color);
+    g.setColor(colorWithAlpha);
     final Composite comp = g.getComposite();
 
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 1.0f));
@@ -74,8 +74,6 @@ public class AmbientLight {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       this.renderLightSource(g, light, longerDimension);
     }
-
-    // TODO: cut out regions on map where no layer has a tile
 
     g.setComposite(comp);
     g.dispose();
@@ -100,11 +98,7 @@ public class AmbientLight {
   }
 
   public void setAlpha(int ambientAlpha) {
-    if (ambientAlpha < 0) {
-      ambientAlpha = 0;
-    }
-
-    this.alpha = Math.min(ambientAlpha, 255);
+    this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
     this.createImage();
   }
 
@@ -167,13 +161,13 @@ public class AmbientLight {
         }
 
         final Path2D shadowParallelogram = new Path2D.Double();
-        final Point2D S1 = GeometricUtilities.project(lightCenter, line.getP1(), longerDimension);
-        final Point2D S2 = GeometricUtilities.project(lightCenter, line.getP2(), longerDimension);
+        final Point2D shadowPoint1 = GeometricUtilities.project(lightCenter, line.getP1(), longerDimension);
+        final Point2D shadowPoint2 = GeometricUtilities.project(lightCenter, line.getP2(), longerDimension);
 
         // construct a shape from our points
         shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
-        shadowParallelogram.lineTo(S1.getX(), S1.getY());
-        shadowParallelogram.lineTo(S2.getX(), S2.getY());
+        shadowParallelogram.lineTo(shadowPoint1.getX(), shadowPoint1.getY());
+        shadowParallelogram.lineTo(shadowPoint2.getX(), shadowPoint2.getY());
         shadowParallelogram.lineTo(line.getP2().getX(), line.getP2().getY());
         shadowParallelogram.closePath();
 

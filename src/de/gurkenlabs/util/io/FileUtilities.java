@@ -8,8 +8,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class FileUtilities {
+public final class FileUtilities {
+  private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
   private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
 
   private FileUtilities() {
@@ -43,7 +46,7 @@ public class FileUtilities {
         }
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return fileNames;
@@ -68,7 +71,7 @@ public class FileUtilities {
         }
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return fileNames;
@@ -134,7 +137,7 @@ public class FileUtilities {
 
       return new FileInputStream(file);
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
       return null;
     }
   }

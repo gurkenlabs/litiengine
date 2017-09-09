@@ -3,6 +3,7 @@ package de.gurkenlabs.util;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CommandManager implements ICommandManager {
@@ -30,7 +31,7 @@ public class CommandManager implements ICommandManager {
       return false;
     }
 
-    log.fine("Command received: " + command);
+    log.log(Level.FINE, "Command received: %s", command);
     final String[] arr = command.split(" ");
     if (arr.length == 0) {
       return false;

@@ -3,7 +3,6 @@ package de.gurkenlabs.configuration;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,10 +10,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Configuration {
+  private static final Logger log = Logger.getLogger(Configuration.class.getName());
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
@@ -25,7 +27,7 @@ public class Configuration {
       groupProperties.store(out, group.getPrefix() + "SETTINGS");
       out.flush();
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -95,9 +97,9 @@ public class Configuration {
         storeConfigurationGroup(out, group);
       }
       out.close();
-      System.out.println("Configuration " + this.getFileName() + " saved");
+      log.log(Level.INFO, "Configuration " + this.getFileName() + " saved");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -124,41 +126,34 @@ public class Configuration {
    */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
-    InputStream settingsStream = FileUtilities.getGameResource(this.getFileName());
-    if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
-      try {
+    try (InputStream settingsStream = FileUtilities.getGameResource(this.getFileName())) {
+      if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
         final OutputStream out = new FileOutputStream(settingsFile);
         this.createDefaultSettingsFile(out);
         out.close();
-      } catch (final IOException e) {
-        e.printStackTrace();
-      }
 
-      System.out.printf("Default configuration %s created %n", this.getFileName());
-      return;
+        log.log(Level.INFO, "Default configuration " + this.getFileName() + " created");
+        return;
+      }
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     if (settingsFile.exists()) {
-      try {
-        settingsStream = new FileInputStream(settingsFile);
-      } catch (final FileNotFoundException e) {
-        e.printStackTrace();
+      try (InputStream settingsStream = new FileInputStream(settingsFile)) {
+
+        final Properties properties = new Properties();
+        BufferedInputStream stream;
+
+        stream = new BufferedInputStream(settingsStream);
+        properties.load(stream);
+        stream.close();
+
+        this.initializeSettingsByProperties(properties);
+        log.log(Level.INFO, "Configuration " + this.getFileName() + " loaded");
+      } catch (final IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
-
-    final Properties properties = new Properties();
-    BufferedInputStream stream;
-    try {
-      stream = new BufferedInputStream(settingsStream);
-      properties.load(stream);
-      stream.close();
-    } catch (final FileNotFoundException e1) {
-      e1.printStackTrace();
-    } catch (final IOException e) {
-      e.printStackTrace();
-    }
-
-    this.initializeSettingsByProperties(properties);
-    System.out.printf("Configuration %s loaded %n", this.getFileName());
   }
 }

@@ -116,11 +116,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public boolean hit(int damage, final Ability ability) {
+  public boolean hit(final int damage, final Ability ability) {
     if (this.isDead()) {
       return false;
     }
 
+    int actualDamage = damage;
     if (this.getAttributes().getShield().getCurrentValue() > 0) {
       int shieldDmg = damage;
       if (shieldDmg > this.getAttributes().getShield().getCurrentValue()) {
@@ -128,11 +129,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       }
 
       this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, shieldDmg));
-      damage = damage - shieldDmg;
+      actualDamage = damage - shieldDmg;
     }
 
     if (!this.isIndestructible()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, damage));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, actualDamage));
     }
 
     if (this.isDead()) {
@@ -144,7 +145,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.setCollision(false);
     }
 
-    final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, damage, ability);
+    final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, actualDamage, ability);
     for (final Consumer<CombatEntityHitArgument> consumer : this.entityHitConsumer) {
       consumer.accept(arg);
     }
@@ -267,6 +268,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    *          the new up attributes
    */
   protected void setupAttributes(final CombatAttributes attributes) {
-
+    // do nothing because this method is designed to provide the child classes
+    // the possibility to implement additional functionality upon instantiation
   }
 }

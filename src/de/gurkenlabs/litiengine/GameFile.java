@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
@@ -29,6 +31,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {
+  private static final Logger log = Logger.getLogger(GameFile.class.getName());
   public static final String FILE_EXTENSION = "env";
 
   private static final long serialVersionUID = -2101786184799276518L;
@@ -79,10 +82,8 @@ public class GameFile implements Serializable {
       }
 
       return gameFile;
-    } catch (final JAXBException jaxe) {
-      jaxe.printStackTrace();
-    } catch (final IOException e) {
-      e.printStackTrace();
+    } catch (final JAXBException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return null;
@@ -140,10 +141,8 @@ public class GameFile implements Serializable {
         XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
         out.close();
       }
-    } catch (final JAXBException ex) {
-      ex.printStackTrace();
-    } catch (final IOException e) {
-      e.printStackTrace();
+    } catch (final JAXBException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return newFile.toString();

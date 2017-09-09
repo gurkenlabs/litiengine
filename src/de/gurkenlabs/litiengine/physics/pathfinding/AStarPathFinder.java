@@ -13,30 +13,8 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.Path;
-import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class AStarPathFinder extends PathFinder {
-
-  /**
-   * TODO: Improve this optimization.
-   *
-   * @param path
-   * @return
-   */
-  private static List<AStarNode> optimizePath(final List<AStarNode> path) {
-    final List<AStarNode> optPath = new ArrayList<>();
-    double oldAngle = 0;
-    for (int i = 1; i < path.size(); i++) {
-
-      final double angle = GeometricUtilities.calcRotationAngleInDegrees(path.get(i - 1).getLocation(), path.get(i).getLocation());
-      if (angle != oldAngle) {
-        optPath.add(path.get(i));
-      }
-
-      oldAngle = angle;
-    }
-    return optPath;
-  }
 
   private final AStarGrid grid;
 

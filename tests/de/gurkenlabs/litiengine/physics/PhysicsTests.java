@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine.physics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 
 import org.junit.Test;
@@ -12,8 +12,6 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.MovableCombatEntity;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
-import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 
 public class PhysicsTests {
 

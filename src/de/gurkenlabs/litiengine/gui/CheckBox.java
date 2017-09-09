@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class CheckBox extends ImageComponent {
-  public static FontIcon CHECK = new FontIcon(ICON_FONT, "\uE847");
-  public static FontIcon CROSS = new FontIcon(ICON_FONT, "\uE843");
+  public static final FontIcon CHECK = new FontIcon(ICON_FONT, "\uE847");
+  public static final FontIcon CROSS = new FontIcon(ICON_FONT, "\uE843");
   private final List<Consumer<Boolean>> changeConsumer;
   private boolean checked;
 
@@ -18,10 +18,7 @@ public class CheckBox extends ImageComponent {
     this.setFont(CHECK.getFont());
     this.setChecked(checked);
     this.refreshText();
-    this.onClicked(e -> {
-      this.toggleChecked();
-    });
-
+    this.onClicked(e -> this.toggleChecked());
   }
 
   public List<Consumer<Boolean>> getChangeConsumer() {

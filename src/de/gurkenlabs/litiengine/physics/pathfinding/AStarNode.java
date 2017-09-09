@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 public class AStarNode {
+  private static final int DIAGONAL_COST = 14;
+  private static final int STRAIGHT_COST = 10;
   private final Rectangle bound;
   private int gCost;
   private final int gridX;
@@ -27,8 +29,7 @@ public class AStarNode {
   }
 
   public int getCosts(final AStarNode target) {
-    final int DIAGONAL_COST = 14;
-    final int STRAIGHT_COST = 10;
+
     final int dstX = Math.abs(this.getGridX() - target.getGridX());
     final int dstY = Math.abs(this.getGridY() - target.getGridY());
 

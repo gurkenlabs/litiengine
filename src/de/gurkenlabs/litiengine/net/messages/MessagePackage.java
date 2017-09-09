@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.net.messages;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.net.Package;
 import de.gurkenlabs.util.io.CompressionUtilities;
@@ -14,6 +16,8 @@ import de.gurkenlabs.util.io.Serializer;
  *          the generic type
  */
 public class MessagePackage<T> extends Package {
+
+  private static final Logger log = Logger.getLogger(MessagePackage.class.getName());
   /**
    * The Content length byte count. UDP does only support up to 64k.
    */
@@ -53,14 +57,14 @@ public class MessagePackage<T> extends Package {
   @SuppressWarnings("unchecked")
   public MessagePackage(final byte[] content) {
     super(content);
-    final int headerOffset = this.TYPEBYTECOUNT;
-    final int dataOffset = headerOffset + this.CONTENTLENGTHBYTECOUNT;
+    final int headerOffset = TYPEBYTECOUNT;
+    final int dataOffset = headerOffset + CONTENTLENGTHBYTECOUNT;
 
     // message size
-    final ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(content, headerOffset, headerOffset + this.CONTENTLENGTHBYTECOUNT));
+    final ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(content, headerOffset, headerOffset + CONTENTLENGTHBYTECOUNT));
 
     // header + size info + actual message size
-    this.size = this.CONTENTLENGTHBYTECOUNT + wrapped.getInt();
+    this.size = CONTENTLENGTHBYTECOUNT + wrapped.getInt();
 
     // actual message
     final byte[] objectBytes = Arrays.copyOfRange(content, dataOffset, this.getSize() + dataOffset);
@@ -69,7 +73,7 @@ public class MessagePackage<T> extends Package {
       final Object dataObject = Serializer.deserialize(objectBytes);
       this.object = (T) dataObject;
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
       this.object = null;
     }
   }
@@ -100,7 +104,7 @@ public class MessagePackage<T> extends Package {
 
     final byte[] header = new byte[] { this.getPacketId() };
     final byte[] serializedObject = Serializer.serialize(this.object);
-    final byte[] objectSize = ByteBuffer.allocate(this.CONTENTLENGTHBYTECOUNT).putInt(serializedObject.length).array();
+    final byte[] objectSize = ByteBuffer.allocate(CONTENTLENGTHBYTECOUNT).putInt(serializedObject.length).array();
     byte[] data = arrayconcat(header, arrayconcat(objectSize, serializedObject));
     data = CompressionUtilities.compress(data);
     this.setData(data);

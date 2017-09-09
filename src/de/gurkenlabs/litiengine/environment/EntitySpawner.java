@@ -2,12 +2,15 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
+  private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
   private int amount;
   private IEnvironment environment;
   private int interval;
@@ -137,7 +140,8 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
         try {
           Thread.sleep(EntitySpawner.this.getSpawnDelay());
         } catch (final InterruptedException e) {
-          e.printStackTrace();
+          log.log(Level.SEVERE, e.getMessage(), e);
+          this.interrupt();
         }
       }
     }

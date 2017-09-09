@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlElement;
@@ -20,7 +21,10 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
   @Override
   public String getCustomProperty(final String name) {
     if (this.properties != null && this.properties.stream().anyMatch(x -> x.getName().equals(name))) {
-      return this.properties.stream().filter(x -> x.getName().equals(name)).findFirst().get().getValue();
+      Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
+      if (opt.isPresent()) {
+        return opt.get().getValue();
+      }
     }
 
     return null;
@@ -32,8 +36,9 @@ public class CustomPropertyProvider implements ICustomPropertyProvider {
       return;
     }
 
-    if (this.properties != null && this.properties.stream().anyMatch(x -> x.getName().equals(name))) {
-      this.properties.stream().filter(x -> x.getName().equals(name)).findFirst().get().setValue(value);
+    Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
+    if (opt.isPresent()) {
+      opt.get().setValue(value);
       return;
     }
 
