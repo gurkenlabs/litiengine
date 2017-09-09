@@ -12,5 +12,5 @@ public interface IMapLoader {
    *          the path
    * @return the i map
    */
-  IMap LoadMap(String path);
+  IMap loadMap(String path);
 }

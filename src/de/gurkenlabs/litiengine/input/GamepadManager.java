@@ -132,7 +132,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
    * restart the application it would work... so we just reset the environment
    * via reflection and it'll do it ;).
    */
-  private void hackTheShitOutOfJInputBecauseItSucks_HARD() {
+  private void hackTheShitOutOfJInputBecauseItSucksHard() {
     try {
       final Field env = ControllerEnvironment.class.getDeclaredField("defaultEnvironment");
       env.setAccessible(true);
@@ -164,22 +164,22 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   private void hookupToGamepad(final IGamepad pad) {
-    for (final String ident : this.pollConsumer.keySet()) {
-      for (final Consumer<Float> cons : this.pollConsumer.get(ident)) {
-        pad.onPoll(ident, cons);
+    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.pollConsumer.entrySet()) {
+      for (final Consumer<Float> cons : entry.getValue()) {
+        pad.onPoll(entry.getKey(), cons);
       }
     }
 
-    for (final String ident : this.pressedConsumer.keySet()) {
-      for (final Consumer<Float> cons : this.pressedConsumer.get(ident)) {
-        pad.onPressed(ident, cons);
+    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.pressedConsumer.entrySet()) {
+      for (final Consumer<Float> cons : entry.getValue()) {
+        pad.onPressed(entry.getKey(), cons);
       }
     }
   }
 
   private void updateGamepads() {
     try {
-      this.hackTheShitOutOfJInputBecauseItSucks_HARD();
+      this.hackTheShitOutOfJInputBecauseItSucksHard();
       // update plugged in gamepads
       for (int i = 0; i < ControllerEnvironment.getDefaultEnvironment().getControllers().length; i++) {
         final Controller controller = ControllerEnvironment.getDefaultEnvironment().getControllers()[i];

@@ -131,7 +131,7 @@ public class Environment implements IEnvironment {
     final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
     if (loadedMap == null) {
       final IMapLoader tmxLoader = new TmxMapLoader();
-      this.map = tmxLoader.LoadMap(mapPath);
+      this.map = tmxLoader.loadMap(mapPath);
     } else {
       this.map = loadedMap;
     }

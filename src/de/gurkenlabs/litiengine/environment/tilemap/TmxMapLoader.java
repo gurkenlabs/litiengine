@@ -24,7 +24,7 @@ public final class TmxMapLoader implements IMapLoader {
    * @see liti.level.ITmxParser#ParseMap(java.lang.String)
    */
   @Override
-  public IMap LoadMap(final String path) {
+  public IMap loadMap(final String path) {
     try {
       final JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
       final Unmarshaller um = jaxbContext.createUnmarshaller();
