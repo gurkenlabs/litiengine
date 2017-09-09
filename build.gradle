@@ -5,14 +5,20 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-
-
 sourceSets {
   main.java.srcDir "src"
   main.java.srcDir "resources"
+  
+  test {
+    java {
+      srcDirs = ["tests"] 
+    }
+  }
 }
 
 repositories {
+   mavenCentral()
+   
    flatDir {
       dirs 'lib'
    }
@@ -26,12 +32,16 @@ dependencies {
   compile name: 'vorbisspi1.0.3'
   compile name: 'jl1.0.1'
   compile name: 'mp3spi1.9.5'
+  testCompile(
+    'junit:junit:4.12'
+  )
 }
 
 jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
+  version = 'v0.4.5-alpha'
 }
 
 task copyNativeLibs(type: Copy) {
