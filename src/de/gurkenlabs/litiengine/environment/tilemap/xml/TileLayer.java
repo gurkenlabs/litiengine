@@ -47,11 +47,7 @@ public class TileLayer extends Layer implements ITileLayer {
   @Override
   public ITile getTileByLoctaion(final Point2D location) {
     final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
-    if (tile == null || !tile.isPresent()) {
-      return null;
-    }
-
-    return tile.get();
+    return tile.isPresent() ? tile.get() : null;
   }
 
   @Override

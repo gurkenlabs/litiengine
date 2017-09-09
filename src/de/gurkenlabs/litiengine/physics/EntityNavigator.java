@@ -114,7 +114,6 @@ public class EntityNavigator implements IEntityNavigator {
       }
     }
 
-    final int currentSegment = this.currentSegment;
     final PathIterator pi = this.path.getPath().getPathIterator(null);
     if (pi.isDone()) {
       this.stop();
@@ -126,7 +125,7 @@ public class EntityNavigator implements IEntityNavigator {
     // prevents it
     final double[] startCoordinates = new double[22];
     final double[] coordinates = new double[22];
-    for (int i = 0; i <= currentSegment; i++) {
+    for (int i = 0; i <= this.currentSegment; i++) {
       if (pi.isDone()) {
         this.stop();
         return;

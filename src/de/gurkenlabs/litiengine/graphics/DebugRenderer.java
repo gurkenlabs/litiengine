@@ -80,7 +80,7 @@ public class DebugRenderer {
     final int y = (int) Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity).getY();
     RenderEngine.drawText(g, Integer.toString(entity.getMapId()), x, y);
     final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
-    RenderEngine.drawText(g, locationString, x, y + 5);
+    RenderEngine.drawText(g, locationString, x, y + 5.0);
   }
 
   private static void drawTileBoundingBox(final Graphics2D g, final IMap map, final Point2D location) {

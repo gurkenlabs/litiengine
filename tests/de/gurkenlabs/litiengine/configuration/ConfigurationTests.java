@@ -74,12 +74,12 @@ public class ConfigurationTests {
 
   @Test
   public void testFileName() {
-    final String TEST_FILENAME = UUID.randomUUID().toString() + ".properties";
+    final String testFileName = UUID.randomUUID().toString() + ".properties";
     Configuration config = null;
     try {
-      config = new Configuration(TEST_FILENAME);
+      config = new Configuration(testFileName);
       config.load();
-      Assert.assertTrue(new File(TEST_FILENAME).exists());
+      Assert.assertTrue(new File(testFileName).exists());
     } finally {
       deleteTempConfigFile(config);
     }

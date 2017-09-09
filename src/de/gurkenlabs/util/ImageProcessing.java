@@ -20,12 +20,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class ImageProcessing {
+  private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
   public static final int CROP_ALIGN_RIGHT = 2;
@@ -124,6 +127,10 @@ public class ImageProcessing {
    */
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
     final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
+    if (bimage == null) {
+      return image;
+    }
+
     final BufferedImage strokeImg = flashVisiblePixels(image, strokeColor);
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
@@ -215,7 +222,7 @@ public class ImageProcessing {
       image = ImageIO.read(bis);
       bis.close();
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
     return image;
   }
@@ -235,7 +242,7 @@ public class ImageProcessing {
 
       bos.close();
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
     return imageString;
   }
@@ -244,18 +251,21 @@ public class ImageProcessing {
    * All pixels that are not transparent are replaced by a pixel of the
    * specified flashColor.
    *
-   * @param playerImage
+   * @param image
    *          the player image
    * @param flashColor
    *          the flash color
    * @return the buffered image
    */
-  public static BufferedImage flashVisiblePixels(final Image playerImage, final Color flashColor) {
-    final BufferedImage bimage = getCompatibleImage(playerImage.getWidth(null), playerImage.getHeight(null));
+  public static BufferedImage flashVisiblePixels(final Image image, final Color flashColor) {
+    final BufferedImage bimage = getCompatibleImage(image.getWidth(null), image.getHeight(null));
+    if (bimage == null) {
+      return null;
+    }
 
     // Draw the image on to the buffered image
     final Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(playerImage, 0, 0, null);
+    bGr.drawImage(image, 0, 0, null);
     bGr.dispose();
 
     for (int y = 0; y < bimage.getHeight(); y++) {
@@ -272,6 +282,10 @@ public class ImageProcessing {
 
   public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
     final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    if (flippedSprite == null) {
+      return null;
+    }
+
     final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
     for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
       g.drawImage(ImageProcessing.horizontalflip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
@@ -366,52 +380,13 @@ public class ImageProcessing {
     }
 
     // check right pixel
-    if (x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Removes all pixels that have transparency and a color value between
-   * BLACK(0,0,0) and LIGHT_SHADOW (100,100,100).
-   *
-   * @param image
-   * @return
-   */
-  public static BufferedImage removeShadows(final BufferedImage image) {
-    final Color LIGHT_SHADOW = new Color(100, 100, 100);
-
-    final BufferedImage bimage = ImageProcessing.getCompatibleImage(image.getWidth(null), image.getHeight(null));
-    // Draw the image on to the buffered image
-    final Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(image, 0, 0, null);
-    bGr.dispose();
-
-    for (int y = 0; y < bimage.getHeight(); y++) {
-      for (int x = 0; x < bimage.getWidth(); x++) {
-        // if the current pixel is not transparent, we cannot stroke it
-        final int rgb = bimage.getRGB(x, y);
-        final int alpha = rgb >> 24 & 0xff;
-        final int r = (rgb & 0xFF0000) >> 16;
-        final int g = (rgb & 0xFF00) >> 8;
-        final int b = rgb & 0xFF;
-
-        if (alpha < 255 && r >= Color.BLACK.getRed() && r <= LIGHT_SHADOW.getRed() && g >= Color.BLACK.getGreen() && g <= LIGHT_SHADOW.getGreen() && b >= Color.BLACK.getBlue() && b <= LIGHT_SHADOW.getBlue()) {
-          // Set fully transparent but keep color
-          bimage.setRGB(x, y, rgb & 0xFFFFFF);
-        }
-      }
-    }
-
-    return bimage;
+    return x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00;
   }
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
 
     final AffineTransform tx = new AffineTransform();
-    tx.rotate(radians, bufferedImage.getWidth() / 2, bufferedImage.getHeight() / 2);
+    tx.rotate(radians, bufferedImage.getWidth() / 2.0, bufferedImage.getHeight() / 2.0);
 
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
     return op.filter(bufferedImage, null);
@@ -494,6 +469,10 @@ public class ImageProcessing {
     final AffineTransformOp bilinearScaleOp = new AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage scaled = bilinearScaleOp.filter(image, getCompatibleImage((int) newWidth, (int) newHeight));
     final BufferedImage newImg = getCompatibleImage((int) newWidth, (int) newHeight);
+    if (newImg == null) {
+      return image;
+    }
+
     final Graphics2D g = (Graphics2D) newImg.getGraphics();
     g.drawImage(scaled, 0, 0, null);
     g.dispose();
@@ -515,6 +494,9 @@ public class ImageProcessing {
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
+    if (bimage == null) {
+      return null;
+    }
 
     // Draw the image on to the buffered image
     final Graphics2D g2d = bimage.createGraphics();
@@ -556,6 +538,10 @@ public class ImageProcessing {
     final int newImageWidth = (int) (image.getWidth() * zoomLevel);
     final int newImageHeight = (int) (image.getHeight() * zoomLevel);
     final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
+    if (resizedImage == null) {
+      return image;
+    }
+
     final Graphics2D g = resizedImage.createGraphics();
     g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
     g.dispose();

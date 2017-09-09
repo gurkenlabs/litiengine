@@ -441,14 +441,14 @@ public class Environment implements IEnvironment {
 
   @Override
   public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> cls) {
-    List<T> entities = new ArrayList<>();
+    List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
-        entities.add((T) ent);
+        foundEntities.add((T) ent);
       }
     }
 
-    return entities;
+    return foundEntities;
   }
 
   public Collection<IRenderable> getGroundRenderable() {
@@ -1101,6 +1101,7 @@ public class Environment implements IEnvironment {
         ambientColor = Color.decode(colorProp);
       }
     } catch (final NumberFormatException e) {
+      log.log(Level.WARNING, e.getMessage(), e);
     }
 
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);

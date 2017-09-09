@@ -115,7 +115,7 @@ public class Gamepad implements IGamepad, IUpdateable {
     public static final String Y = addComponent(Identifier.Button.Y);
     public static final String Z = addComponent(Identifier.Button.Z);
 
-    // TODO: incomplete list... right now we don't support stylus / mouse or
+    // incomplete list... right now we don't support stylus / mouse or
     // extra buttons
     private Buttons() {
     }

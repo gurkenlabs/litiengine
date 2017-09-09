@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -62,15 +63,16 @@ public class GameMetrics implements IUpdateable, IRenderable {
       return 0;
     }
 
-    return this.fps.stream().reduce((x, y) -> x + y).get() / (float) this.fps.size();
+    Optional<Long> opt = this.fps.stream().reduce((x, y) -> x + y);
+    return opt.isPresent() ? opt.get() / (float) this.fps.size() : 0;
   }
 
   public float getAverageUpdatesPerSecond() {
     if (this.ups.isEmpty()) {
       return 0;
     }
-
-    return this.ups.stream().reduce((x, y) -> x + y).get() / (float) this.ups.size();
+    Optional<Long> opt = this.ups.stream().reduce((x, y) -> x + y);
+    return opt.isPresent() ? opt.get() / (float) this.ups.size() : 0;
   }
 
   /**
@@ -200,11 +202,14 @@ public class GameMetrics implements IUpdateable, IRenderable {
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;
-      final long sumUp = !this.bytesSent.isEmpty() ? this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
+
+      Optional<Long> sentOpt = this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2);
+      final long sumUp = !this.bytesSent.isEmpty() && sentOpt.isPresent() ? sentOpt.get() : 0;
       this.upStreamInBytes = sumUp;
       this.packagesSent = this.bytesSent.size();
 
-      final long sumDown = !this.bytesReceived.isEmpty() ? this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2).get() : 0;
+      Optional<Long> receivedOpt = this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2);
+      final long sumDown = !this.bytesReceived.isEmpty() && receivedOpt.isPresent() ? receivedOpt.get() : 0;
       this.downStreamInBytes = sumDown;
       this.packagesReceived = this.bytesReceived.size();
 

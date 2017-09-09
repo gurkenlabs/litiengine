@@ -10,6 +10,8 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class DecorMobAnimationController extends AnimationController {
+  private static final String DECORMOBPREFIX = "decormob-";
+
   public static Animation createAnimation(final DecorMob mob) {
     final Spritesheet spritesheet = findSpriteSheet(mob);
     if (spritesheet == null) {
@@ -20,28 +22,29 @@ public class DecorMobAnimationController extends AnimationController {
   }
 
   private static Animation[] createWalkAnimations(final DecorMob mob) {
+
     final List<Animation> anims = new ArrayList<>();
-    final Spritesheet walkUp = Spritesheet.find("decormob-" + mob.getMobType().toLowerCase() + "-walk-up.png");
+    final Spritesheet walkUp = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-up.png");
     if (walkUp != null) {
       anims.add(new Animation(walkUp, true));
     }
 
-    final Spritesheet walkDown = Spritesheet.find("decormob-" + mob.getMobType().toLowerCase() + "-walk-down.png");
+    final Spritesheet walkDown = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-down.png");
     if (walkDown != null) {
       anims.add(new Animation(walkDown, true));
     }
 
-    final Spritesheet walkLeft = Spritesheet.find("decormob-" + mob.getMobType().toLowerCase() + "-walk-left.png");
+    final Spritesheet walkLeft = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-left.png");
     if (walkLeft != null) {
       anims.add(new Animation(walkLeft, true));
     }
 
-    final Spritesheet walkRight = Spritesheet.find("decormob-" + mob.getMobType().toLowerCase() + "-walk-right.png");
+    final Spritesheet walkRight = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-right.png");
     if (walkRight != null) {
       anims.add(new Animation(walkRight, true));
     }
 
-    final Spritesheet dead = Spritesheet.find("decormob-" + mob.getMobType().toLowerCase() + "-dead.png");
+    final Spritesheet dead = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-dead.png");
     if (dead != null) {
       anims.add(new Animation(dead, true));
     }
@@ -56,7 +59,7 @@ public class DecorMobAnimationController extends AnimationController {
       return null;
     }
 
-    final String path = "decormob-" + mob.getMobType().toLowerCase() + ".png";
+    final String path = DECORMOBPREFIX + mob.getMobType().toLowerCase() + ".png";
     return Spritesheet.find(path);
   }
 
@@ -71,14 +74,14 @@ public class DecorMobAnimationController extends AnimationController {
   public void update(final IGameLoop loop) {
     super.update(loop);
     if (this.mob.isDead()) {
-      final String deadAnim = "decormob-" + this.mob.getMobType().toLowerCase() + "-dead";
+      final String deadAnim = DECORMOBPREFIX + this.mob.getMobType().toLowerCase() + "-dead";
       if (this.getAnimations().stream().anyMatch(x -> x != null && x.getName().equals(deadAnim))) {
         this.playAnimation(deadAnim);
         return;
       }
     }
 
-    final String animName = "decormob-" + this.mob.getMobType().toLowerCase() + "-walk-" + Direction.fromAngle(this.mob.getAngle()).toString().toLowerCase();
+    final String animName = DECORMOBPREFIX + this.mob.getMobType().toLowerCase() + "-walk-" + Direction.fromAngle(this.mob.getAngle()).toString().toLowerCase();
     if (this.getAnimations().stream().anyMatch(x -> x != null && x.getName().equals(animName))) {
       this.playAnimation(animName);
       return;

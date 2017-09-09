@@ -33,6 +33,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int LETTER_WRITE_DELAY = 30;
   private static final int PADDING = 4;
+  private static final int TRIANGLE_SIZE = 6;
   private static final Color SPEAK_BACKGROUNDCOLOR = new Color(0, 0, 0, 80);
   private static final Color SPEAK_BORDERCOLOR = new Color(0, 0, 0, 160);
   private static final Color SPEAK_FONT_COLOR = Color.WHITE;
@@ -48,7 +49,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private Image bubble;
   private boolean cancelled;
   private String currentText;
-  private final long currentTextDisplayTime;
+  private final int currentTextDisplayTime;
   private final Queue<Character> currentTextQueue;
 
   private String displayedText;
@@ -105,10 +106,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final FontRenderContext frc = g.getFontRenderContext();
 
     final String text = this.displayedText;
-    if (text == null) {
-      return;
-    }
-
     final AttributedString styledText = new AttributedString(text);
     styledText.addAttribute(TextAttribute.FONT, this.font);
     final AttributedCharacterIterator iterator = styledText.getIterator();
@@ -143,13 +140,11 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     // display new text
-    if (!this.currentTextQueue.isEmpty() && this.currentText != null) {
-      if (loop.getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
-        this.displayedText += this.currentTextQueue.poll();
-        this.lastCharPoll = loop.getTicks();
-        if (this.typeSound != null) {
-          Game.getSoundEngine().playSound(this.entity, this.typeSound);
-        }
+    if (!this.currentTextQueue.isEmpty() && loop.getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
+      this.displayedText += this.currentTextQueue.poll();
+      this.lastCharPoll = loop.getTicks();
+      if (this.typeSound != null) {
+        Game.getSoundEngine().playSound(this.entity, this.typeSound);
       }
     }
 
@@ -161,7 +156,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   }
 
   private void createBubbleImage() {
-    final int TRIANGLE_SIZE = 6;
 
     final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
     final Graphics2D g = img.createGraphics();

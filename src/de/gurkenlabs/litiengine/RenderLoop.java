@@ -50,7 +50,7 @@ public class RenderLoop extends Thread {
 
         Thread.sleep(Math.max(0, fpsWait - renderTime));
       } catch (final InterruptedException e) {
-        Thread.interrupted();
+        this.interrupt();
         break;
       } catch (final Exception e) {
         continue;

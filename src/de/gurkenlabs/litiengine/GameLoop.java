@@ -198,7 +198,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
         this.interrupt();
         break;
       }

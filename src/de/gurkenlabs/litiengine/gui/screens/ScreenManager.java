@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowStateListener;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -24,14 +25,16 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 public class ScreenManager extends JFrame implements IScreenManager, WindowStateListener, WindowFocusListener {
 
   private static final int SCREENCHANGETIMEOUT = 200;
+  private static final int ICONIFIED_MAX_FPS = 1;
+  private static final int NONE_FOCUS_MAX_FPS = 10;
 
   private static final long serialVersionUID = 7958549828482285935L;
 
   /** The camera. */
-  private ICamera camera;
+  private transient ICamera camera;
 
   /** The current screen. */
-  private IScreen currentScreen;
+  private transient IScreen currentScreen;
 
   /** The last screen change. */
   private long lastScreenChange = 0;
@@ -40,12 +43,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   private final RenderComponent renderCanvas;
 
   /** The resolution observers. */
-  private final List<Consumer<Dimension>> resolutionChangedConsumer;
+  private final transient List<Consumer<Dimension>> resolutionChangedConsumer;
 
-  private final List<Consumer<IScreen>> screenChangedConsumer;
+  private final transient List<Consumer<IScreen>> screenChangedConsumer;
 
   /** The screens. */
-  private final List<IScreen> screens;
+  private final transient List<IScreen> screens;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -93,11 +96,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       return;
     }
 
-    final IScreen targetScreen = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst().get();
-    if (targetScreen == null) {
+    Optional<IScreen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
+    if (!opt.isPresent()) {
       return;
     }
 
+    final IScreen targetScreen = opt.get();
     if (this.getCurrentScreen() != null) {
       this.getCurrentScreen().suspend();
       Game.getRenderLoop().unregister(this.getCurrentScreen());
@@ -144,7 +148,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     if (fullscreen) {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
-      // this.device.setFullScreenWindow(this);
     }
 
     this.setSize(Game.getConfiguration().GRAPHICS.getResolution());
@@ -156,7 +159,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public boolean isFocusOwner() {
-    if (this.getRenderComponent() instanceof Component && ((Component) this.getRenderComponent()).isFocusOwner()) {
+    if (this.getRenderComponent() instanceof Component && this.getRenderComponent().isFocusOwner()) {
       return true;
     }
 
@@ -193,8 +196,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void windowStateChanged(WindowEvent e) {
-    final int ICONIFIED_MAX_FPS = 1;
-
     if (e.getNewState() == JFrame.ICONIFIED) {
       Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
     } else {
@@ -209,7 +210,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void windowLostFocus(WindowEvent e) {
-    final int NONE_FOCUS_MAX_FPS = 10;
     Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
   }
 
