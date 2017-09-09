@@ -29,7 +29,14 @@ public final class FileUtilities {
       }
     }
 
-    return dir.delete(); // The directory is empty now and can be deleted.
+    try {
+      Files.delete(dir.toPath().toAbsolutePath());
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+      return false;
+    }
+
+    return true;
   }
 
   public static List<String> findFiles(final List<String> fileNames, final Path dir, final String extension) {

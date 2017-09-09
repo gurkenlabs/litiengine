@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,8 +112,12 @@ public class GameFile implements Serializable {
     }
 
     final File newFile = new File(fileNameWithExtension);
-    if (newFile.exists() && !newFile.delete()) {
-      log.log(Level.WARNING, "could not delete {0}", fileNameWithExtension);
+    if (newFile.exists()) {
+      try {
+        Files.delete(newFile.toPath().toAbsolutePath());
+      } catch (IOException e) {
+        log.log(Level.WARNING, e.getMessage(), e);
+      }
     }
 
     Collections.sort(this.getMaps());

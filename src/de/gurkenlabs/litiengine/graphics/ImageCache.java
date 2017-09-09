@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,8 +76,8 @@ public final class ImageCache {
   public static void saveCache(final String path) {
     final File cacheFile = new File(path, CACHE_DUMP_NAME);
     try {
-      if (cacheFile.exists() && !cacheFile.delete()) {
-        log.log(Level.WARNING, "could not delete file \'{0}\'", new Object[] { path });
+      if (cacheFile.exists()) {
+        Files.delete(cacheFile.toPath().toAbsolutePath());
       }
 
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
@@ -158,9 +159,12 @@ public final class ImageCache {
         final BufferedImage img = this.loadImage(child.getName());
 
         // clean up cached file if the image is null
-        if (img == null && !child.delete()) {
-
-          log.log(Level.WARNING, "could not delete file \'{0}\'", new Object[] { child.getName() });
+        if (img == null) {
+          try {
+            Files.delete(child.toPath().toAbsolutePath());
+          } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+          }
         }
       }
     }
