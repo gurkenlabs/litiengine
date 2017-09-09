@@ -7,6 +7,7 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowStateListener;
@@ -68,6 +69,13 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
     this.addWindowStateListener(this);
     this.addWindowFocusListener(this);
+    this.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(final WindowEvent event) {
+        // ensures that we terminate the game, when the window is being closed
+        Game.terminate();
+      }
+    });
   }
 
   @Override

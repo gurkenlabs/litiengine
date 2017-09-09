@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import de.gurkenlabs.litiengine.input.Mouse;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.StreamUtilities;
 
@@ -19,6 +22,7 @@ import de.gurkenlabs.util.io.StreamUtilities;
  */
 public class Sound {
   private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
+  private static final Logger log = Logger.getLogger(Sound.class.getName());
 
   private AudioFormat format;
 
@@ -57,8 +61,8 @@ public class Sound {
         this.format = this.stream.getFormat();
       }
     } catch (final UnsupportedAudioFileException | IOException e) {
-      System.out.println("could not load '" + path + "'");
-      e.printStackTrace();
+
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 

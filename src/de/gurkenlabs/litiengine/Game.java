@@ -155,8 +155,6 @@ public final class Game {
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
-    // ensures that we terminate the game, when the window is closed
-    scrMgr.addWindowListener(new WindowHandler());
     screenManager = scrMgr;
 
     // init logging

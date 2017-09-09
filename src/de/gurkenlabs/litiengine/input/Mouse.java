@@ -12,10 +12,13 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.net.UdpPacketSender;
 import de.gurkenlabs.util.MathUtilities;
 
 /**
@@ -23,7 +26,7 @@ import de.gurkenlabs.util.MathUtilities;
  * litiengine.
  */
 public class Mouse implements IMouse {
-
+  private static final Logger log = Logger.getLogger(Mouse.class.getName());
   private boolean grabMouse;
 
   private boolean isLeftMouseButtonDown;
@@ -76,7 +79,7 @@ public class Mouse implements IMouse {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);
     } catch (final AWTException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     this.location = new Point2D.Double(Game.getScreenManager().getCamera().getViewPort().getCenterX(), Game.getScreenManager().getCamera().getViewPort().getCenterY());

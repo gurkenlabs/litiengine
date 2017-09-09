@@ -6,11 +6,16 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 /**
  * The Class UdpPacketSender.
  */
 public class UdpPacketSender implements IPacketSender {
+  private static final Logger log = Logger.getLogger(UdpPacketSender.class.getName());
 
   /** The socket. */
   private DatagramSocket socket;
@@ -22,7 +27,7 @@ public class UdpPacketSender implements IPacketSender {
     try {
       this.socket = new DatagramSocket();
     } catch (final SocketException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -47,7 +52,7 @@ public class UdpPacketSender implements IPacketSender {
     try {
       this.socket.send(datagramPacket);
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -62,7 +67,7 @@ public class UdpPacketSender implements IPacketSender {
     try {
       this.sendData(packet, InetAddress.getByName(ipAddress), port);
     } catch (final UnknownHostException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 }

@@ -8,8 +8,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class StreamUtilities {
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
+
+public final class StreamUtilities {
+  private static final Logger log = Logger.getLogger(StreamUtilities.class.getName());
 
   private StreamUtilities() {
   }
@@ -72,7 +77,7 @@ public class StreamUtilities {
       StreamUtilities.copy(in, buffer);
       return buffer.toByteArray();
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return new byte[0];

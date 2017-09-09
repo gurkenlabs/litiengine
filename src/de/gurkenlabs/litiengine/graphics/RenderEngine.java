@@ -18,12 +18,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -43,6 +46,7 @@ import de.gurkenlabs.util.io.FileUtilities;
  * The Class GraphicsEngine.
  */
 public final class RenderEngine implements IRenderEngine {
+  private static final Logger log = Logger.getLogger(RenderEngine.class.getName());
 
   public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -186,7 +190,7 @@ public final class RenderEngine implements IRenderEngine {
       try {
         img = ImageIO.read(imageFile);
       } catch (final IOException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
         return null;
       }
     }
@@ -244,7 +248,7 @@ public final class RenderEngine implements IRenderEngine {
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
 
   /** The map renderer. */
-  private final Map<MapOrientation, IMapRenderer> mapRenderer;
+  private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
   /**
    * Instantiates a new graphics engine.
@@ -257,7 +261,7 @@ public final class RenderEngine implements IRenderEngine {
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConditions = new CopyOnWriteArrayList<>();
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new HashMap<>();
+    this.mapRenderer = new EnumMap<>(MapOrientation.class);
     this.entityComparator = new EntityYComparator();
 
     this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
@@ -352,7 +356,7 @@ public final class RenderEngine implements IRenderEngine {
     final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
-      // TODO: THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
+      // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
       // BETTER DATASTRUCTURE FOR THE (HEAP)
       // AND UPDATE THE HEAP WHENEVER AN ENTITY MOVES.
       try {
