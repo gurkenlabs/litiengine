@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -38,7 +40,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
-
+  private static final Logger log = Logger.getLogger(Map.class.getName());
   public static final String FILE_EXTENSION = "tmx";
 
   /** The version. */
@@ -134,8 +136,9 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
    */
   public List<MapObjectLayer> getObjectgroups() {
     if (this.objectgroups == null) {
-      return this.objectgroups = new ArrayList<>();
+      this.objectgroups = new ArrayList<>();
     }
+
     return this.objectgroups;
   }
 
@@ -290,7 +293,7 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
   @Override
   public List<IMapObject> getMapObjects(String... types) {
     List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().size() == 0) {
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
       return mapObjects;
     }
 
@@ -321,7 +324,7 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
 
   public void setPath(final String path) {
     this.path = path;
-    if (this.imagelayers != null && this.imagelayers.size() > 0) {
+    if (this.imagelayers != null && !this.imagelayers.isEmpty()) {
       for (final ImageLayer imgLayer : this.imagelayers) {
         if (imgLayer == null) {
           continue;
@@ -331,7 +334,7 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
       }
     }
 
-    if (this.tilesets != null && this.tilesets.size() > 0) {
+    if (this.tilesets != null && !this.tilesets.isEmpty()) {
       for (final Tileset tileSet : this.tilesets) {
         if (tileSet == null) {
           continue;
@@ -343,8 +346,8 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
   }
 
   public void updateTileTerrain() {
-    for (TileLayer layers : this.layers) {
-      for (Tile tile : layers.getData()) {
+    for (TileLayer layer : this.layers) {
+      for (Tile tile : layer.getData()) {
         tile.setTerrains(MapUtilities.getTerrain(this, tile.getGridId()));
       }
     }
@@ -357,31 +360,24 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
 
     File newFile = new File(fileName);
 
-    try {
+    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
       JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-      FileOutputStream fileOut = new FileOutputStream(newFile);
-      try {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        // first: marshal to byte array
-        jaxbMarshaller.marshal(this, out);
-        out.flush();
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        // second: postprocess xml and then write it to the file
-        XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
-        out.close();
+      // first: marshal to byte array
+      jaxbMarshaller.marshal(this, out);
+      out.flush();
 
-        jaxbMarshaller.marshal(this, out);
-      } finally {
-        fileOut.flush();
-        fileOut.close();
-      }
-    } catch (JAXBException ex) {
-      ex.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+      // second: postprocess xml and then write it to the file
+      XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+      out.close();
+
+      jaxbMarshaller.marshal(this, out);
+    } catch (JAXBException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return newFile.toString();

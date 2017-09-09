@@ -4,8 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class MapObjectProperties {
+public final class MapObjectProperties {
+  private static final Logger log = Logger.getLogger(MapObjectProperties.class.getName());
   public static final String COLLISION = "collision";
   public static final String COLLISIONALGIN = "collisionAlign";
 
@@ -41,7 +44,7 @@ public class MapObjectProperties {
   // spawnpoint
   public static final String SPAWN_TYPE = "spawnType";
   public static final String SPAWN_DIRECTION = "spawnDirection";
-  
+
   public static final String TEAM = "team";
   public static final String TRIGGERACTIVATION = "triggerActivation";
 
@@ -54,8 +57,11 @@ public class MapObjectProperties {
 
   private static List<Field> availableProperties = new ArrayList<>();
 
+  private MapObjectProperties() {
+  }
+
   public static boolean isCustom(final String name) {
-    if (availableProperties.size() == 0) {
+    if (availableProperties.isEmpty()) {
       for (final Field field : MapObjectProperties.class.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           availableProperties.add(field);
@@ -66,10 +72,8 @@ public class MapObjectProperties {
     return !availableProperties.stream().anyMatch(x -> {
       try {
         return x.get(null).equals(name);
-      } catch (final IllegalArgumentException e) {
-        e.printStackTrace();
-      } catch (final IllegalAccessException e) {
-        e.printStackTrace();
+      } catch (final IllegalArgumentException | IllegalAccessException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
       return false;
     });

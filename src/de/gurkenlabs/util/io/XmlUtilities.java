@@ -3,11 +3,12 @@ package de.gurkenlabs.util.io;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
@@ -15,6 +16,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 public final class XmlUtilities {
+  private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
+
   private XmlUtilities() {
   }
 
@@ -39,14 +42,8 @@ public final class XmlUtilities {
       transformer.transform(xmlSource, res);
       fos.flush();
       fos.close();
-    } catch (TransformerConfigurationException e) {
-      e.printStackTrace();
-    } catch (TransformerFactoryConfigurationError e) {
-      e.printStackTrace();
-    } catch (TransformerException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (TransformerFactoryConfigurationError | TransformerException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 }

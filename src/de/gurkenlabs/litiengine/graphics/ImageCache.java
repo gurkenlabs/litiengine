@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.util.io.CompressionUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
@@ -15,7 +17,7 @@ import de.gurkenlabs.util.io.ImageSerializer;
 /**
  * The Class ImageCache.
  */
-public class ImageCache {
+public final class ImageCache {
   /** The Constant CACHE_DIRECTORY. */
   public static final String CACHE_DIRECTORY = "cache/";
 
@@ -31,6 +33,8 @@ public class ImageCache {
   public static final ImageCache SPRITES = new ImageCache("sprites");
 
   public static final String SPRITES_DIRECTORY = "sprites";
+
+  private static final Logger log = Logger.getLogger(ImageCache.class.getName());
 
   /** The cache. */
   private final ConcurrentHashMap<String, BufferedImage> cache;
@@ -65,7 +69,7 @@ public class ImageCache {
       CompressionUtilities.unzip(in, new File(CACHE_DIRECTORY));
       System.out.println("cache loaded from '" + CACHE_DUMP_NAME + "'");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -79,7 +83,7 @@ public class ImageCache {
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
       System.out.println("cache dumped to " + cacheFile.toPath());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 

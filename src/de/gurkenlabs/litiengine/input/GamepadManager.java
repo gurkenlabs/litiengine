@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
@@ -20,6 +22,7 @@ import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
 public class GamepadManager implements IGamepadManager, IUpdateable {
+  private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
   private static final int GAMEPAD_UPDATE_DELAY = 1000;
   private int defaultgamePadIndex = -1;
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
@@ -120,7 +123,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
   @Override
   public void update(final IGameLoop loop) {
-    this.updateGamepads(loop);
+    this.updateGamepads();
   }
 
   /**
@@ -146,7 +149,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
           try {
             thread.join();
           } catch (final InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, e.getMessage(), e);
+            thread.interrupt();
           }
         }
       }
@@ -155,7 +159,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       ctor.setAccessible(true);
       env.set(null, ctor.newInstance());
     } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -173,7 +177,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     }
   }
 
-  private void updateGamepads(final IGameLoop loop) {
+  private void updateGamepads() {
     try {
       this.hackTheShitOutOfJInputBecauseItSucks_HARD();
       // update plugged in gamepads
@@ -199,6 +203,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       }
 
     } catch (IllegalStateException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 }

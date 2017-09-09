@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
@@ -21,10 +22,49 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
-public class Spritesheet {
+public final class Spritesheet {
   public static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
+  private static final String SPRITE_INFO_COMMENT_CHAR = "#";
+
+  private int columns;
+
+  private final int hashCode;
+
+  private final BufferedImage image;
+
+  private final String name;
+
+  /** The rows. */
+  private int rows;
+
+  /** The sprite height. */
+  private int spriteHeight;
+
+  /** The sprite width. */
+  private int spriteWidth;
+
+  private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+    this.image = image;
+
+    this.name = FileUtilities.getFileName(path);
+    this.spriteWidth = spriteWidth;
+    this.spriteHeight = spriteHeight;
+
+    this.hashCode = this.getName().hashCode();
+    this.updateRowsAndCols();
+
+    spritesheets.put(this.name.toLowerCase(), this);
+  }
+
+  private Spritesheet(final ITileset tileset) {
+    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
+  }
+
+  private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
+    this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
+  }
 
   /**
    * Finds Spritesheets that were previously loaded by any load method or by the
@@ -87,7 +127,6 @@ public class Spritesheet {
    * @return
    */
   public static List<Spritesheet> load(final String spriteInfoFile, final String gameDirectory) {
-    final String COMMENT_CHAR = "#";
 
     final ArrayList<Spritesheet> sprites = new ArrayList<>();
     final InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
@@ -99,7 +138,7 @@ public class Spritesheet {
       String line;
       while ((line = br.readLine()) != null) {
 
-        if (line.isEmpty() || line.startsWith(COMMENT_CHAR)) {
+        if (line.isEmpty() || line.startsWith(SPRITE_INFO_COMMENT_CHAR)) {
           continue;
         }
 
@@ -133,15 +172,15 @@ public class Spritesheet {
               customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
             }
           }
-        } catch (final NumberFormatException nfe) {
-          nfe.printStackTrace();
+        } catch (final NumberFormatException e) {
+          log.log(Level.SEVERE, e.getMessage(), e);
           continue;
         }
       }
 
       System.out.println(sprites.size() + " spritesheets loaded from '" + spriteInfoFile + "'");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return sprites;
@@ -153,45 +192,6 @@ public class Spritesheet {
 
   public static void remove(final String path) {
     spritesheets.values().removeIf(x -> x.getName().equals(path));
-  }
-
-  /** The sprites per row. */
-  private int columns;
-
-  private final int hashCode;
-
-  private final BufferedImage image;
-
-  private final String name;
-
-  /** The rows. */
-  private int rows;
-
-  /** The sprite height. */
-  private int spriteHeight;
-
-  /** The sprite width. */
-  private int spriteWidth;
-
-  private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    this.image = image;
-
-    this.name = FileUtilities.getFileName(path);
-    this.spriteWidth = spriteWidth;
-    this.spriteHeight = spriteHeight;
-
-    this.hashCode = this.getName().hashCode();
-    this.updateRowsAndCols();
-
-    spritesheets.put(this.name.toLowerCase(), this);
-  }
-
-  private Spritesheet(final ITileset tileset) {
-    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
-  }
-
-  private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
-    this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
   }
 
   /**

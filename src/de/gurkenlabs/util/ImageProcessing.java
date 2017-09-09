@@ -63,6 +63,10 @@ public class ImageProcessing {
 
     // Transform visible pixels to a semi-transparent black
     final BufferedImage shadowImage = flashVisiblePixels(image, new Color(0, 0, 0, 30));
+    if (shadowImage == null) {
+      return image;
+    }
+
     final AffineTransform tx = new AffineTransform();
 
     // Flip the image vertically

@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -29,13 +31,17 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.MathUtilities;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
+  private static final Logger log = Logger.getLogger(RenderComponent.class.getName());
+
   private static final long serialVersionUID = 5092360478850476013L;
 
-  private BufferStrategy bufferStrategy;
+  private static final int DEBUG_MOUSE_SIZE = 5;
+
+  private transient BufferStrategy currentBufferStrategy;
 
   private float currentAlpha;
 
-  private Image cursorImage;
+  private transient Image cursorImage;
 
   private int cursorOffsetX;
 
@@ -48,12 +54,14 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   private int fadeOutTime;
 
-  private final List<Consumer<Integer>> fpsChangedConsumer;
+  private final transient List<Consumer<Integer>> fpsChangedConsumer;
+  private final transient List<Consumer<Graphics2D>> renderedConsumer;
+
   /** The frame count. */
   private int frameCount = 0;
   /** The last fps time. */
   private long lastFpsTime = System.currentTimeMillis();
-  private final List<Consumer<Graphics2D>> renderedConsumer;
+
   private boolean takeScreenShot;
 
   public RenderComponent(final Dimension size) {
@@ -102,7 +110,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public void init() {
     this.createBufferStrategy(3);
-    this.bufferStrategy = this.getBufferStrategy();
+    this.currentBufferStrategy = this.getBufferStrategy();
     this.currentAlpha = 1.1f;
   }
 
@@ -125,7 +133,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public void render(final IRenderable screen) {
     final long currentMillis = System.currentTimeMillis();
-    final Graphics2D g = (Graphics2D) this.bufferStrategy.getDrawGraphics();
+    final Graphics2D g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
 
     this.handleFade();
 
@@ -143,7 +151,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
     if (Game.getConfiguration().DEBUG.isRenderDebugMouse()) {
       g.setColor(Color.RED);
-      final int DEBUG_MOUSE_SIZE = 5;
+
       g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getX(), Input.MOUSE.getLocation().getY() + DEBUG_MOUSE_SIZE));
       g.draw(new Line2D.Double(Input.MOUSE.getLocation().getX() - DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY(), Input.MOUSE.getLocation().getX() + DEBUG_MOUSE_SIZE, Input.MOUSE.getLocation().getY()));
     }
@@ -168,7 +176,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
     g.dispose();
 
-    this.bufferStrategy.show();
+    this.currentBufferStrategy.show();
     Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
 
@@ -253,7 +261,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
         ImageIO.write(img, "png", new File("./screenshots/" + timeStamp + ".png"));
       } catch (final IOException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
     } finally {
       this.takeScreenShot = false;

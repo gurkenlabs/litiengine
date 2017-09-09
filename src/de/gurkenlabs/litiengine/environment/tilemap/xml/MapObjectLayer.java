@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,6 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
  */
 @XmlRootElement(name = "objectgroup")
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
+  private static final Logger log = Logger.getLogger(MapObjectLayer.class.getName());
 
   /** The objects. */
   @XmlElement(name = "object")
@@ -91,8 +94,8 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
     try {
       return Color.decode(this.color);
-    } catch (NumberFormatException n) {
-      n.printStackTrace();
+    } catch (NumberFormatException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return null;
@@ -106,11 +109,11 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
     Method m;
     try {
-      m = getClass().getSuperclass().getDeclaredMethod("afterUnmarshal", new Class<?>[] { Unmarshaller.class, Object.class });
+      m = getClass().getSuperclass().getDeclaredMethod("afterUnmarshal", Unmarshaller.class, Object.class);
       m.setAccessible(true);
       m.invoke(this, u, parent);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 

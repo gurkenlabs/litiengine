@@ -425,11 +425,11 @@ public class Mouse implements IMouse {
       final double screenCenterX = Game.getScreenManager().getResolution().getWidth() * 0.5;
       final double screenCenterY = Game.getScreenManager().getResolution().getHeight() * 0.5;
       final Point screenLocation = Game.getScreenManager().getScreenLocation();
-      final int grabX = (int) (screenLocation.x + screenCenterX);
-      final int grabY = (int) (screenLocation.y + screenCenterY);
+      final double grabX = screenLocation.x + screenCenterX;
+      final double grabY = screenLocation.y + screenCenterY;
 
       // lock original mouse back to the center of the screen
-      this.robot.mouseMove(grabX, grabY);
+      this.robot.mouseMove((int) grabX, (int) grabY);
 
       // calculate diffs and new location for the ingame mouse
       diffX = e.getXOnScreen() - grabX;

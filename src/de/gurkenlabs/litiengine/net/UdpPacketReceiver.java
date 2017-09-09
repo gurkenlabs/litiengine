@@ -5,11 +5,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class UdpPacketReceiver.
  */
 public class UdpPacketReceiver extends Thread implements IPacketReceiver {
+  private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
 
   /** The incoming packet observers. */
   ArrayList<IIncomingPacketObserver> incomingPacketObservers;
@@ -42,7 +45,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
     try {
       this.socket = new DatagramSocket(port);
     } catch (final SocketException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -70,7 +73,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
       try {
         this.socket.receive(packet);
       } catch (final IOException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
 
       for (final IIncomingPacketObserver packetObserver : this.incomingPacketObservers) {

@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -11,10 +13,13 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
+import de.gurkenlabs.litiengine.net.UdpPacketReceiver;
 import de.gurkenlabs.util.ImageProcessing;
 
-public class ImageSerializer {
+public final class ImageSerializer {
   public static final String FILE_FORMAT_PNG = "png";
+
+  private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
 
   private ImageSerializer() {
   }
@@ -38,7 +43,7 @@ public class ImageSerializer {
 
       return compatibleImg;
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
       return null;
     }
   }
@@ -65,7 +70,7 @@ public class ImageSerializer {
         writer.dispose();
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -73,5 +78,4 @@ public class ImageSerializer {
     final Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName(formatName);
     return iter.hasNext();
   }
-
 }

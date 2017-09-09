@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -13,7 +15,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 /**
  * This class allows to deserialzie a tmx file into an IMap instance.
  */
-public class TmxMapLoader implements IMapLoader {
+public final class TmxMapLoader implements IMapLoader {
+  private static final Logger log = Logger.getLogger(TmxMapLoader.class.getName());
 
   /*
    * (non-Javadoc)
@@ -34,7 +37,7 @@ public class TmxMapLoader implements IMapLoader {
           stream = new FileInputStream(path);
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
         return null;
       }
 
@@ -42,16 +45,16 @@ public class TmxMapLoader implements IMapLoader {
 
       // by default the map is named by the source file
       String name = path;
-      final int pos = name.lastIndexOf(".");
+      final int pos = name.lastIndexOf('.');
       if (pos > 0) {
         name = name.substring(0, pos);
       }
 
-      int lastBackslash = name.lastIndexOf("/");
+      int lastBackslash = name.lastIndexOf('/');
       if (lastBackslash != -1) {
         name = name.substring(lastBackslash + 1, name.length());
       } else {
-        int lastForwardSlash = name.lastIndexOf("\\");
+        int lastForwardSlash = name.lastIndexOf('\\');
         if (lastForwardSlash != -1) {
           name = name.substring(lastForwardSlash + 1, name.length());
         }
@@ -63,7 +66,7 @@ public class TmxMapLoader implements IMapLoader {
 
       return map;
     } catch (final JAXBException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return null;

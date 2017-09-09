@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.net.IPacketSender;
@@ -19,8 +21,9 @@ import de.gurkenlabs.litiengine.net.messages.handlers.ClientMessageHandler;
  * The Class PingThread.
  */
 public class PingLoop extends ClientMessageHandler<PingResponseMessage> implements IPingLoop {
+  private static final Logger log = Logger.getLogger(PingLoop.class.getName());
   private final int clientId;
-  private PingThread pingLoop;
+  private PingThread pingThread;
 
   private final List<Consumer<Long>> pingRecordConsumer;
 
@@ -50,55 +53,49 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
 
   @Override
   public void start() {
-    this.pingLoop = new PingThread(this.sender, this.serverIpAdress, this.port);
-    this.pingLoop.start();
+    this.pingThread = new PingThread();
+    this.pingThread.start();
   }
 
   @Override
   public void terminate() {
-    this.pingLoop.terminate();
+    this.pingThread.terminate();
   }
 
   @Override
   protected void handle(final PingResponseMessage message, final InetAddress address, final int port) {
-    if (this.pingLoop == null) {
+    if (this.pingThread == null) {
       return;
     }
 
     try {
       if (address.getHostAddress().equals(InetAddress.getByName(this.serverIpAdress).getHostAddress())) {
-        this.pingLoop.pingAnswerReceived();
+        this.pingThread.pingAnswerReceived();
       }
     } catch (final UnknownHostException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
   private class PingThread extends Thread implements ILaunchable {
     /** The Constant TimeBetweenPings. */
-    private static final int TimeBetweenPings = 1000;
+    private static final int TIME_BETWEEN_PINGS = 1000;
 
     /** The is terminated. */
     private boolean isTerminated;
 
     private long lastPing;
 
-    /** The ping. */
-    private long ping;
-
-    private final IPacketSender sender;
-
-    private PingThread(final IPacketSender sender, final String serverIpAdress, final int port) {
-      this.sender = sender;
+    private PingThread() {
     }
 
     public void pingAnswerReceived() {
 
       final long after = System.currentTimeMillis();
-      this.ping = after - this.lastPing;
+      final long ping = after - this.lastPing;
 
       for (final Consumer<Long> consumer : PingLoop.this.pingRecordConsumer) {
-        consumer.accept(this.ping);
+        consumer.accept(ping);
       }
     }
 
@@ -112,12 +109,13 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
       while (!this.isTerminated) {
         this.lastPing = System.currentTimeMillis();
         final MessagePackage<ClientMessage> packet = new MessagePackage<>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
-        this.sender.sendData(packet, PingLoop.this.serverIpAdress, PingLoop.this.port);
+        PingLoop.this.sender.sendData(packet, PingLoop.this.serverIpAdress, PingLoop.this.port);
 
         try {
-          Thread.sleep(TimeBetweenPings);
+          Thread.sleep(TIME_BETWEEN_PINGS);
         } catch (final InterruptedException e) {
-          e.printStackTrace();
+          log.log(Level.WARNING, e.getMessage(), e);
+          this.interrupt();
         }
       }
     }

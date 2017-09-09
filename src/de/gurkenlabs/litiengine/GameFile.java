@@ -60,8 +60,8 @@ public class GameFile implements Serializable {
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
       GameFile gameFile = null;
-      try {
-        final GZIPInputStream zipStream = new GZIPInputStream(FileUtilities.getGameResource(file));
+      try (InputStream inputStream = FileUtilities.getGameResource(file)) {
+        final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
         gameFile = (GameFile) um.unmarshal(zipStream);
       } catch (final ZipException e) {
         InputStream stream = null;
@@ -117,13 +117,12 @@ public class GameFile implements Serializable {
 
     Collections.sort(this.getMaps());
 
-    try {
+    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 
-      final FileOutputStream fileOut = new FileOutputStream(newFile);
       if (compress) {
         final GZIPOutputStream stream = new GZIPOutputStream(fileOut);
         jaxbMarshaller.marshal(this, stream);

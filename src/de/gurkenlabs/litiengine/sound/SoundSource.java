@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -23,6 +25,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  * entity or location.
  */
 public class SoundSource {
+  private static final Logger log = Logger.getLogger(SoundSource.class.getName());
   protected static final SourceDataLineCloseQueue closeQueue;
   static {
     closeQueue = new SourceDataLineCloseQueue();
@@ -151,39 +154,7 @@ public class SoundSource {
 
   private static float calculatePan(final Point2D currentLocation, final Point2D listenerLocation) {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(listenerLocation, currentLocation);
-    final float pan = (float) -Math.sin(angle);
-    return pan;
-  }
-
-  private void initControls() {
-    if (this.dataLine == null) {
-      return;
-    }
-
-    // Check if panning is supported:
-    try {
-      if (!this.dataLine.isControlSupported(FloatControl.Type.PAN)) {
-        this.panControl = null;
-      } else {
-        // Create a new pan Control:
-        this.panControl = (FloatControl) this.dataLine.getControl(FloatControl.Type.PAN);
-      }
-    } catch (final IllegalArgumentException iae) {
-      this.panControl = null;
-    }
-
-    // Check if changing the volume is supported:
-    try {
-      if (!this.dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-        this.gainControl = null;
-      } else {
-        // Create a new gain control:
-        this.gainControl = (FloatControl) this.dataLine.getControl(FloatControl.Type.MASTER_GAIN);
-        // Store it's initial gain to use as "maximum volume" later:
-      }
-    } catch (final IllegalArgumentException iae) {
-      this.gainControl = null;
-    }
+    return (float) -Math.sin(angle);
   }
 
   private void setGain(final float g) {
@@ -193,7 +164,7 @@ public class SoundSource {
     }
 
     // make sure the value is valid (between 0 and 1)
-    final float gain = MathUtilities.clamp(g, 0, 1);
+    final float newGain = MathUtilities.clamp(g, 0, 1);
 
     final double minimumDB = this.gainControl.getMinimum();
     final double maximumDB = 1;
@@ -204,7 +175,7 @@ public class SoundSource {
     // (Number of decibles is a logrithmic function of linear gain)
     final double ampGainDB = 10.0f / 20.0f * maximumDB - minimumDB;
     final double cste = Math.log(10.0) / 20;
-    final float valueDB = (float) (minimumDB + 1 / cste * Math.log(1 + (Math.exp(cste * ampGainDB) - 1) * gain));
+    final float valueDB = (float) (minimumDB + 1 / cste * Math.log(1 + (Math.exp(cste * ampGainDB) - 1) * newGain));
     // Update the gain:
     this.gainControl.setValue(valueDB);
   }
@@ -228,14 +199,14 @@ public class SoundSource {
         SoundSource.this.dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
         SoundSource.this.dataLine.open();
       } catch (final LineUnavailableException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
 
       if (SoundSource.this.dataLine == null) {
         return;
       }
 
-      SoundSource.this.initControls();
+      this.initControls();
       final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().SOUND.getSoundVolume();
       SoundSource.this.setGain(initialGain);
 
@@ -261,13 +232,44 @@ public class SoundSource {
 
           SoundSource.this.dataLine.write(buffer, 0, readCount);
         } catch (final IOException e) {
-          e.printStackTrace();
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
       if (SoundSource.this.dataLine != null) {
         SoundSource.this.dataLine.drain();
       }
       SoundSource.this.playing = false;
+    }
+
+    private void initControls() {
+      if (SoundSource.this.dataLine == null) {
+        return;
+      }
+
+      // Check if panning is supported:
+      try {
+        if (!SoundSource.this.dataLine.isControlSupported(FloatControl.Type.PAN)) {
+          SoundSource.this.panControl = null;
+        } else {
+          // Create a new pan Control:
+          SoundSource.this.panControl = (FloatControl) SoundSource.this.dataLine.getControl(FloatControl.Type.PAN);
+        }
+      } catch (final IllegalArgumentException iae) {
+        SoundSource.this.panControl = null;
+      }
+
+      // Check if changing the volume is supported:
+      try {
+        if (!SoundSource.this.dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+          SoundSource.this.gainControl = null;
+        } else {
+          // Create a new gain control:
+          SoundSource.this.gainControl = (FloatControl) SoundSource.this.dataLine.getControl(FloatControl.Type.MASTER_GAIN);
+          // Store it's initial gain to use as "maximum volume" later:
+        }
+      } catch (final IllegalArgumentException iae) {
+        SoundSource.this.gainControl = null;
+      }
     }
   }
 
@@ -292,7 +294,8 @@ public class SoundSource {
         try {
           Thread.sleep(50);
         } catch (final InterruptedException e) {
-          e.printStackTrace();
+          this.interrupt();
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
 

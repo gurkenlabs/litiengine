@@ -5,11 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class Serializer.
  */
-public class Serializer {
+public final class Serializer {
+  private static final Logger log = Logger.getLogger(Serializer.class.getName());
 
   private Serializer() {
   }
@@ -28,7 +31,7 @@ public class Serializer {
       o = new ObjectInputStream(b);
       return o.readObject();
     } catch (final IOException | ClassNotFoundException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
 
     return null;
@@ -49,7 +52,7 @@ public class Serializer {
       o.writeObject(obj);
 
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
     return b.toByteArray();
   }
