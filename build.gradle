@@ -40,7 +40,7 @@ jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
-  version = 'v0.4.5-alpha'
+  version = 'v0.4.6-alpha'
 }
 
 jacocoTestReport {
