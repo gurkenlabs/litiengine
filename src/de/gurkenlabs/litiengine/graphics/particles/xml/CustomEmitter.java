@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
-import de.gurkenlabs.litiengine.graphics.particles.LowQualityRectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.particles.OvalParticle;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
@@ -129,9 +128,6 @@ public class CustomEmitter extends Emitter {
       break;
     case RectangleFillParticle:
       particle = new RectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
-      break;
-    case LowQualityRectangleFillParticle:
-      particle = new LowQualityRectangleFillParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
       break;
     case RectangleOutlineParticle:
       particle = new RectangleOutlineParticle(x, y, deltaX, deltaY, gravityX, gravityY, width, height, this.getRandomParticleTTL(), this.getRandomParticleColor());
