@@ -32,9 +32,7 @@ dependencies {
   compile name: 'vorbisspi1.0.3'
   compile name: 'jl1.0.1'
   compile name: 'mp3spi1.9.5'
-  testCompile(
-    'junit:junit:4.12'
-  )
+  testCompile 'junit:junit:4.12'
 }
 
 jar {
