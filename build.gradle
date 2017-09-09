@@ -44,10 +44,10 @@ jar {
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled false
-    }
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
 }
 
 check.dependsOn jacocoTestReport
