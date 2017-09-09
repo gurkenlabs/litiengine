@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine;
 
+import de.gurkenlabs.util.TimeUtilities;
+
 public class GameTime {
   private final IGameLoop gameLoop;
 
@@ -8,11 +10,11 @@ public class GameTime {
   }
 
   public long getDays() {
-    return getDays(this.getMilliseconds());
+    return TimeUtilities.getDays(this.getMilliseconds());
   }
 
   public long getHours() {
-    return getHours(this.getMilliseconds());
+    return TimeUtilities.getHours(this.getMilliseconds());
   }
 
   public long getMilliseconds() {
@@ -20,38 +22,14 @@ public class GameTime {
   }
 
   public long getMinutes() {
-    return getMinutes(this.getMilliseconds());
+    return TimeUtilities.getMinutes(this.getMilliseconds());
   }
 
   public long getSeconds() {
-    return getSeconds(this.getMilliseconds());
+    return TimeUtilities.getSeconds(this.getMilliseconds());
   }
 
   public long getYears() {
-    return getYears(this.getMilliseconds());
-  }
-
-  public static long getDays(long ms) {
-    return ms / 1000 / 60 / 60 / 24 % 365;
-  }
-
-  public static long getHours(long ms) {
-    return ms / 1000 / 60 / 60 % 24;
-  }
-
-  public static long getMinutes(long ms) {
-    return ms / 1000 / 60 % 60;
-  }
-
-  public static long getSeconds(long ms) {
-    return ms / 1000 % 60;
-  }
-
-  public static long getMilliSeconds(long ms) {
-    return ms % 1000;
-  }
-
-  public static long getYears(long ms) {
-    return ms / 1000 / 60 / 60 / 24 / 365;
+    return TimeUtilities.getYears(this.getMilliseconds());
   }
 }

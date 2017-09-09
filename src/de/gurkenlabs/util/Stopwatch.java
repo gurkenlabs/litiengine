@@ -2,7 +2,7 @@ package de.gurkenlabs.util;
 
 import java.util.function.Consumer;
 
-public class Stopwatch {
+public final class Stopwatch {
   private Stopwatch() {
   }
 

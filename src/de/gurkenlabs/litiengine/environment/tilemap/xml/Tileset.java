@@ -202,7 +202,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public ITileAnimation getAnimation(int tileId) {
-
     if (this.tiles == null) {
       return null;
     }

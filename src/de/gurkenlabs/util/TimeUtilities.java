@@ -1,6 +1,6 @@
 package de.gurkenlabs.util;
 
-public class TimeUtilities {
+public final class TimeUtilities {
   private TimeUtilities() {
   }
 
@@ -22,6 +22,10 @@ public class TimeUtilities {
 
   public static long getYears(final long ms) {
     return ms / 1000 / 60 / 60 / 24 / 365;
+  }
+
+  public static long getMilliSeconds(long ms) {
+    return ms % 1000;
   }
 
 }

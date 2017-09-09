@@ -8,12 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
@@ -25,6 +28,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   public static final String USE_MESSAGE = "use";
+  private static final Logger log = Logger.getLogger(Trigger.class.getName());
+
   private List<IEntity> activated;
   private final Collection<Consumer<TriggerEvent>> activatedConsumer;
   private final Collection<Function<TriggerEvent, String>> activatingPredicates;
@@ -64,16 +69,16 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
     this.triggered = true;
     // always take local targets if there are any
-    List<Integer> targets = this.getTargets();
-    if (targets.isEmpty()) {
+    List<Integer> localTargets = this.getTargets();
+    if (localTargets.isEmpty()) {
       // as a fallback send the message to the tar
-      targets = new ArrayList<>();
+      localTargets = new ArrayList<>();
       if (tar > 0) {
-        targets.add(tar);
+        localTargets.add(tar);
       }
     }
 
-    final TriggerEvent te = new TriggerEvent(this, activator, targets);
+    final TriggerEvent te = new TriggerEvent(this, activator, localTargets);
 
     // check if the trigger is allowed to be activated
     for (Function<TriggerEvent, String> pred : this.activatingPredicates) {
@@ -85,11 +90,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     // if we actually have a trigger target, we send the message to the target
-    if (!targets.isEmpty()) {
-      for (final int target : targets) {
+    if (!localTargets.isEmpty()) {
+      for (final int target : localTargets) {
         final IEntity entity = Game.getEnvironment().get(target);
         if (entity == null) {
-          System.out.println("trigger '" + this.getName() + "' was activated, but the trigger target '" + target + "' could not be found on the environment");
+          log.log(Level.WARNING, "trigger \'{0}\' was activated, but the trigger target \'{1}\' could not be found on the environment", new Object[] { this.getName(), target });
           continue;
         }
 
@@ -234,13 +239,13 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     for (final IEntity ent : this.activated) {
       if (!collEntities.contains(ent)) {
         for (final Consumer<TriggerEvent> cons : this.deactivatedConsumer) {
-          List<Integer> targets = this.getTargets();
-          if (targets.isEmpty()) {
-            targets = new ArrayList<>();
-            targets.add(ent.getMapId());
+          List<Integer> triggerTargets = this.getTargets();
+          if (triggerTargets.isEmpty()) {
+            triggerTargets = new ArrayList<>();
+            triggerTargets.add(ent.getMapId());
           }
 
-          cons.accept(new TriggerEvent(this, ent, targets));
+          cons.accept(new TriggerEvent(this, ent, triggerTargets));
         }
       }
     }
