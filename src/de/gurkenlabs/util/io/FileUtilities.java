@@ -123,6 +123,12 @@ public final class FileUtilities {
     return name;
   }
 
+  /**
+   * Gets the specified file from either a resource folder or the file system.
+   * 
+   * @param file
+   * @return
+   */
   public static InputStream getGameResource(final String file) {
     try {
       final InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);

@@ -153,11 +153,11 @@ public abstract class ConfigurationGroup {
     return null;
   }
 
-  private Method getSetter(final String fieldName, final Class<?> fieldType) {
+  private Method getSetter(final String fieldName) {
     for (final Method method : this.getClass().getMethods()) {
       // method must start with "set" and have only one parameter, mathich the
       // specified fieldType
-      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1 && method.getReturnType().equals(fieldType)) {
+      if (method.getName().equalsIgnoreCase("set" + fieldName) && method.getParameters().length == 1) {
         if (!method.isAccessible()) {
           method.setAccessible(true);
         }
@@ -171,7 +171,7 @@ public abstract class ConfigurationGroup {
 
   private <T> void setPropertyValue(final String propertyName, final T value) {
     try {
-      final Method method = this.getSetter(propertyName, value.getClass());
+      final Method method = this.getSetter(propertyName);
       if (method != null) {
         // set the new value with the setter
         method.invoke(this, value);
