@@ -173,7 +173,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
 
   private void loadAvailableDecorMobs() {
     Map<String, String> m = new TreeMap<>();
-    for (Spritesheet s : Spritesheet.spritesheets.values()) {
+    for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
       if (spriteName.startsWith("decormob-")) {
         String[] parts = spriteName.split("-");

@@ -53,7 +53,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     textFieldColor.setColumns(10);
 
     comboBoxLightShape = new JComboBox<>();
-    comboBoxLightShape.setModel(new DefaultComboBoxModel(LightSource.SHAPETYPES));
+    comboBoxLightShape.setModel(new DefaultComboBoxModel(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
 
     btnSelectColor = new JButton("...");
 

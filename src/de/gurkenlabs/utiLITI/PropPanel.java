@@ -177,7 +177,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
   private void loadAvailableProps() {
     Map<String, String> m = new TreeMap<>();
-    for (Spritesheet s : Spritesheet.spritesheets.values()) {
+    for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
       if (spriteName.startsWith("prop-")) {
         String[] parts = spriteName.split("-");
