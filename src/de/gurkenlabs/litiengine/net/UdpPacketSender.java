@@ -9,8 +9,6 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-
 /**
  * The Class UdpPacketSender.
  */

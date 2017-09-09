@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.net.UdpPacketSender;
 import de.gurkenlabs.util.MathUtilities;
 
 /**

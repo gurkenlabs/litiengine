@@ -16,6 +16,8 @@ import de.gurkenlabs.litiengine.physics.Path;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public abstract class PathFinder implements IPathFinder {
+  private static final float PATH_MARGIN = 2.0f;
+
   public Path findDirectPath(final Point2D start, final Point2D target) {
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(start.getX(), start.getY());
@@ -35,12 +37,11 @@ public abstract class PathFinder implements IPathFinder {
    * entities.Entity, java.awt.geom.Rectangle2D)
    */
   protected Rectangle2D applyPathMargin(final ICollisionEntity entity, final Rectangle2D rectangle) {
-    final float Margin = 2.0f;
     // calculate offset in order to prevent collision
-    final double newX = rectangle.getX() - (entity.getCollisionBox().getWidth() * 0.5 + Margin);
-    final double newY = rectangle.getY() - (entity.getCollisionBox().getHeight() * 0.5 + Margin);
-    final double newWidth = rectangle.getWidth() + entity.getCollisionBox().getWidth() + Margin * 2;
-    final double newHeight = rectangle.getHeight() + entity.getCollisionBox().getHeight() + Margin * 2;
+    final double newX = rectangle.getX() - (entity.getCollisionBox().getWidth() * 0.5 + PATH_MARGIN);
+    final double newY = rectangle.getY() - (entity.getCollisionBox().getHeight() * 0.5 + PATH_MARGIN);
+    final double newWidth = rectangle.getWidth() + entity.getCollisionBox().getWidth() + PATH_MARGIN * 2;
+    final double newHeight = rectangle.getHeight() + entity.getCollisionBox().getHeight() + PATH_MARGIN * 2;
     return new Rectangle2D.Double(newX, newY, newWidth, newHeight);
   }
 

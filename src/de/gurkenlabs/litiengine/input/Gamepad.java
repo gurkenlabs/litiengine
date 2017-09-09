@@ -51,38 +51,38 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   public static class Buttons {
-    public static final String _0 = addComponent(Identifier.Button._0);
-    public static final String _1 = addComponent(Identifier.Button._1);
-    public static final String _10 = addComponent(Identifier.Button._10);
-    public static final String _11 = addComponent(Identifier.Button._11);
-    public static final String _12 = addComponent(Identifier.Button._12);
-    public static final String _13 = addComponent(Identifier.Button._13);
-    public static final String _14 = addComponent(Identifier.Button._14);
-    public static final String _15 = addComponent(Identifier.Button._15);
-    public static final String _16 = addComponent(Identifier.Button._16);
-    public static final String _17 = addComponent(Identifier.Button._17);
-    public static final String _18 = addComponent(Identifier.Button._18);
-    public static final String _19 = addComponent(Identifier.Button._19);
-    public static final String _2 = addComponent(Identifier.Button._2);
-    public static final String _20 = addComponent(Identifier.Button._20);
-    public static final String _21 = addComponent(Identifier.Button._21);
-    public static final String _22 = addComponent(Identifier.Button._22);
-    public static final String _23 = addComponent(Identifier.Button._23);
-    public static final String _24 = addComponent(Identifier.Button._24);
-    public static final String _25 = addComponent(Identifier.Button._25);
-    public static final String _26 = addComponent(Identifier.Button._26);
-    public static final String _27 = addComponent(Identifier.Button._27);
-    public static final String _28 = addComponent(Identifier.Button._28);
-    public static final String _29 = addComponent(Identifier.Button._29);
-    public static final String _3 = addComponent(Identifier.Button._3);
-    public static final String _30 = addComponent(Identifier.Button._30);
-    public static final String _31 = addComponent(Identifier.Button._31);
-    public static final String _4 = addComponent(Identifier.Button._4);
-    public static final String _5 = addComponent(Identifier.Button._5);
-    public static final String _6 = addComponent(Identifier.Button._6);
-    public static final String _7 = addComponent(Identifier.Button._7);
-    public static final String _8 = addComponent(Identifier.Button._8);
-    public static final String _9 = addComponent(Identifier.Button._9);
+    public static final String BUTTON_0 = addComponent(Identifier.Button._0);
+    public static final String BUTTON_1 = addComponent(Identifier.Button._1);
+    public static final String BUTTON_10 = addComponent(Identifier.Button._10);
+    public static final String BUTTON_11 = addComponent(Identifier.Button._11);
+    public static final String BUTTON_12 = addComponent(Identifier.Button._12);
+    public static final String BUTTON_13 = addComponent(Identifier.Button._13);
+    public static final String BUTTON_14 = addComponent(Identifier.Button._14);
+    public static final String BUTTON_15 = addComponent(Identifier.Button._15);
+    public static final String BUTTON_16 = addComponent(Identifier.Button._16);
+    public static final String BUTTON_17 = addComponent(Identifier.Button._17);
+    public static final String BUTTON_18 = addComponent(Identifier.Button._18);
+    public static final String BUTTON_19 = addComponent(Identifier.Button._19);
+    public static final String BUTTON_2 = addComponent(Identifier.Button._2);
+    public static final String BUTTON_20 = addComponent(Identifier.Button._20);
+    public static final String BUTTON_21 = addComponent(Identifier.Button._21);
+    public static final String BUTTON_22 = addComponent(Identifier.Button._22);
+    public static final String BUTTON_23 = addComponent(Identifier.Button._23);
+    public static final String BUTTON_24 = addComponent(Identifier.Button._24);
+    public static final String BUTTON_25 = addComponent(Identifier.Button._25);
+    public static final String BUTTON_26 = addComponent(Identifier.Button._26);
+    public static final String BUTTON_27 = addComponent(Identifier.Button._27);
+    public static final String BUTTON_28 = addComponent(Identifier.Button._28);
+    public static final String BUTTON_29 = addComponent(Identifier.Button._29);
+    public static final String BUTTON_3 = addComponent(Identifier.Button._3);
+    public static final String BUTTON_30 = addComponent(Identifier.Button._30);
+    public static final String BUTTON_31 = addComponent(Identifier.Button._31);
+    public static final String BUTTON_4 = addComponent(Identifier.Button._4);
+    public static final String BUTTON_5 = addComponent(Identifier.Button._5);
+    public static final String BUTTON_6 = addComponent(Identifier.Button._6);
+    public static final String BUTTON_7 = addComponent(Identifier.Button._7);
+    public static final String BUTTON_8 = addComponent(Identifier.Button._8);
+    public static final String BUTTON_9 = addComponent(Identifier.Button._9);
 
     // gamepad buttons (not for xbox :( )
     public static final String A = addComponent(Identifier.Button.A);
@@ -169,27 +169,27 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   public static class Xbox {
-    public static final String A = Buttons._0;
-    public static final String B = Buttons._1;
+    public static final String A = Buttons.BUTTON_0;
+    public static final String B = Buttons.BUTTON_1;
     public static final String DPAD = Axis.POV;
-    public static final String LB = Buttons._4;
-    public static final String LEFT_STICK_PRESS = Buttons._8;
+    public static final String LB = Buttons.BUTTON_4;
+    public static final String LEFT_STICK_PRESS = Buttons.BUTTON_8;
     public static final String LEFT_STICK_X = Axis.X;
     public static final String LEFT_STICK_Y = Axis.Y;
 
     // range 0 - 1
     public static final String LT = Axis.Z;
-    public static final String RB = Buttons._5;
-    public static final String RIGHT_STICK_PRESS = Buttons._9;
+    public static final String RB = Buttons.BUTTON_5;
+    public static final String RIGHT_STICK_PRESS = Buttons.BUTTON_9;
     public static final String RIGHT_STICK_X = Axis.RX;
     public static final String RIGHT_STICK_Y = Axis.RY;
     // range -1 - 0
     public static final String RT = Axis.Z;
-    public static final String SELECT = Buttons._6;
-    public static final String START = Buttons._7;
-    public static final String X = Buttons._2;
+    public static final String SELECT = Buttons.BUTTON_6;
+    public static final String START = Buttons.BUTTON_7;
+    public static final String X = Buttons.BUTTON_2;
 
-    public static final String Y = Buttons._3;
+    public static final String Y = Buttons.BUTTON_3;
 
     private Xbox() {
     }

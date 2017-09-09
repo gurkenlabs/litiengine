@@ -11,8 +11,6 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-
 public final class StreamUtilities {
   private static final Logger log = Logger.getLogger(StreamUtilities.class.getName());
 

@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.net.messages.handlers;
 
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

@@ -9,7 +9,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 public abstract class Particle implements ITimeToLive {
   /** The activation tick. */

@@ -16,12 +16,12 @@ public class Trigonometry {
 
   private static final float DEG = 180.0f / (float) Math.PI;
 
-  private static final float degFull = (float) 360.0;
-  private static final float degToIndex = SIN_COUNT / degFull;
+  private static final float DEG_FULL = (float) 360.0;
+  private static final float DEG_TO_INDEX = SIN_COUNT / DEG_FULL;
   private static final float INV_ATAN2_DIM_MINUS_1 = 1.0f / (ATAN2_DIM - 1);
 
-  private static final float radFull = (float) (Math.PI * 2.0);
-  private static final float radToIndex = SIN_COUNT / radFull;
+  private static final float RAD_FULL = (float) (Math.PI * 2.0);
+  private static final float RAD_TO_INDEX = SIN_COUNT / RAD_FULL;
   private static final float[] sin = new float[SIN_COUNT];
 
   static {
@@ -35,8 +35,8 @@ public class Trigonometry {
     }
 
     for (int i = 0; i < SIN_COUNT; i++) {
-      sin[i] = (float) Math.sin((i + 0.5f) / SIN_COUNT * radFull);
-      cos[i] = (float) Math.cos((i + 0.5f) / SIN_COUNT * radFull);
+      sin[i] = (float) Math.sin((i + 0.5f) / SIN_COUNT * RAD_FULL);
+      cos[i] = (float) Math.cos((i + 0.5f) / SIN_COUNT * RAD_FULL);
     }
   }
 
@@ -44,7 +44,8 @@ public class Trigonometry {
   }
 
   public static final float atan2(float y, float x) {
-    float add, mul;
+    float add;
+    float mul;
 
     if (x < 0.0f) {
       if (y < 0.0f) {
@@ -89,24 +90,24 @@ public class Trigonometry {
   }
 
   public static final float cos(final float rad) {
-    return cos[(int) (rad * radToIndex) & SIN_MASK];
+    return cos[(int) (rad * RAD_TO_INDEX) & SIN_MASK];
   }
 
   public static final float cosDeg(final float deg) {
-    return cos[(int) (deg * degToIndex) & SIN_MASK];
+    return cos[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }
 
   /**
    * SIN / COS (RAD)
    */
   public static final float sin(final float rad) {
-    return sin[(int) (rad * radToIndex) & SIN_MASK];
+    return sin[(int) (rad * RAD_TO_INDEX) & SIN_MASK];
   }
 
   /**
    * SIN / COS (DEG)
    */
   public static final float sinDeg(final float deg) {
-    return sin[(int) (deg * degToIndex) & SIN_MASK];
+    return sin[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }
 }

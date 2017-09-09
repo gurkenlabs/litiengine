@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.gui.NumberAdjuster;
 import de.gurkenlabs.litiengine.net.IPacketReceiver;
 import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.litiengine.net.UdpPacketReceiver;

@@ -16,10 +16,8 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
