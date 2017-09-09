@@ -9,15 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MapUtilities {
+public final class MapUtilities {
   private static Map<String, ITileAnimation> animations;
   private static Map<String, Boolean> hasAnimation;
-  private static Map<String, ITileset> tilesets = new ConcurrentHashMap<String, ITileset>();
+  private static Map<String, ITileset> tilesets = new ConcurrentHashMap<>();
 
   static {
     animations = new ConcurrentHashMap<>();
     hasAnimation = new ConcurrentHashMap<>();
     tilesets = new ConcurrentHashMap<>();
+  }
+
+  private MapUtilities() {
   }
 
   public static int getMaxMapId(final IMap map) {
@@ -73,8 +76,8 @@ public class MapUtilities {
    * @return the tiles by pixel location
    */
   public static List<ITile> getTilesByPixelLocation(final IMap map, final Point2D location) {
-    final List<ITile> tilesAtLocation = new ArrayList<ITile>();
-    if (map.getTileLayers() == null || map.getTileLayers().size() == 0) {
+    final List<ITile> tilesAtLocation = new ArrayList<>();
+    if (map.getTileLayers() == null || map.getTileLayers().isEmpty()) {
       return tilesAtLocation;
     }
 
@@ -118,7 +121,7 @@ public class MapUtilities {
     int index = tile.getGridId() - tileset.getFirstGridId();
 
     final ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    return animation != null && animation.getFrames().size() > 0;
+    return animation != null && !animation.getFrames().isEmpty();
   }
 
   public static ITileAnimation getAnimation(final IMap map, final int gId) {
@@ -201,7 +204,7 @@ public class MapUtilities {
   }
 
   public static Path2D convertPolylineToPath(final IMapObject mapObject) {
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().size() == 0) {
+    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
       return null;
     }
 
@@ -216,11 +219,11 @@ public class MapUtilities {
   }
 
   public static List<Point2D> convertPolylineToPointList(final IMapObject mapObject) {
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().size() == 0) {
-      return null;
+    List<Point2D> points = new ArrayList<>();
+    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+      return points;
     }
 
-    List<Point2D> points = new ArrayList<>();
     for (int i = 1; i < mapObject.getPolyline().getPoints().size(); i++) {
       Point2D point = mapObject.getPolyline().getPoints().get(i);
       points.add(new Point2D.Double(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY()));

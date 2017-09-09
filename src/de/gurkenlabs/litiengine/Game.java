@@ -208,7 +208,7 @@ public final class Game {
       mapCnt++;
     }
 
-    log.log(Level.INFO, mapCnt + " maps loaded from '" + gameResourceFile + "'");
+    log.log(Level.INFO, "{0} maps loaded from \'{1}\'", new Object[] { mapCnt, gameResourceFile });
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {
@@ -229,7 +229,7 @@ public final class Game {
       }
     }
 
-    log.log(Level.INFO, spriteload + " sprites loaded to memory");
+    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
   public static void loadEnvironment(final IEnvironment env) {

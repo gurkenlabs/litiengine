@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.net.messages.handlers;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.text.MessageFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
@@ -32,7 +33,7 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
     }
 
     if (!this.validate(message)) {
-      log.info(MessageFormat.format("Data from {0}:{1} is not valid for the messagehandler {2}.", address.getHostAddress(), port, this.getClass().getSimpleName()));
+      log.log(Level.INFO, "Data from {0}:{1} is not valid for the messagehandler {2}.", new Object[] { address.getHostAddress(), port, this.getClass().getSimpleName() });
       return;
     }
 

@@ -105,15 +105,15 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   public void setAbsolutPath(final String mapPath) {
-    int lastBackslash = mapPath.lastIndexOf("/");
+    int lastBackslash = mapPath.lastIndexOf('/');
     if (lastBackslash != -1) {
       String subPath = mapPath.substring(0, lastBackslash);
-      this.absolutPath = subPath + "/" + this.getSource();
+      this.absolutPath = subPath + '/' + this.getSource();
     } else {
-      int lastForwardSlash = mapPath.lastIndexOf("\\");
+      int lastForwardSlash = mapPath.lastIndexOf('\\');
       if (lastForwardSlash != -1) {
         String subPath = mapPath.substring(0, lastForwardSlash);
-        this.absolutPath = subPath + "/" + this.getSource();
+        this.absolutPath = subPath + '/' + this.getSource();
       }
     }
   }

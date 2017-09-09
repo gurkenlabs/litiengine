@@ -106,7 +106,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
       this.toggleSelection();
       this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
 
-      log.log(Level.INFO, "\"" + this.getText() + "\"" + " typed into TextField with ComponentID " + this.getComponentId());
+      log.log(Level.INFO, "\'{0}\' typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
       break;
     default:
       if (this.getMaxLength() > 0 && this.getText().length() >= this.getMaxLength()) {

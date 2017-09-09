@@ -4,12 +4,16 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.net.messages.handlers.MessageHandler;
 
 public class NumberAdjuster extends TextFieldComponent {
   public static final FontIcon ARROW_DOWN = new FontIcon(ICON_FONT, "\uE84A");
   public static final FontIcon ARROW_UP = new FontIcon(ICON_FONT, "\uE84B");
+  private static final Logger log = Logger.getLogger(NumberAdjuster.class.getName());
   private BigDecimal step;
   private BigDecimal lowerBound;
   private BigDecimal upperBound;
@@ -18,7 +22,7 @@ public class NumberAdjuster extends TextFieldComponent {
   private final List<Consumer<BigDecimal>> valueChangeConsumers;
 
   public NumberAdjuster(final double x, final double y, final double width, final double height, final Spritesheet textBackground, final Spritesheet buttonBackground, final double lowerBound, final double upperBound, final double startValue, final double stepSize) {
-    super(x, y, width, height, textBackground, startValue + "");
+    super(x, y, width, height, textBackground, Double.toString(startValue));
     this.buttonSprite = buttonBackground;
     this.valueChangeConsumers = new CopyOnWriteArrayList<>();
     this.lowerBound = BigDecimal.valueOf(lowerBound);
@@ -77,7 +81,7 @@ public class NumberAdjuster extends TextFieldComponent {
       try {
         this.setCurrentValue(BigDecimal.valueOf(Double.parseDouble(this.getText())));
       } catch (final Exception ex) {
-        System.out.println("only numerical values allowed!");
+        log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     });
   }

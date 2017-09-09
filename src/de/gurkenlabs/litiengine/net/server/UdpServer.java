@@ -2,7 +2,10 @@ package de.gurkenlabs.litiengine.net.server;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.gui.NumberAdjuster;
 import de.gurkenlabs.litiengine.net.IPacketReceiver;
 import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.litiengine.net.UdpPacketReceiver;
@@ -16,6 +19,9 @@ import de.gurkenlabs.util.io.CompressionUtilities;
 
 public class UdpServer implements IServer {
   private static final String SHUTDOWN = "shutdown";
+
+  private static final Logger log = Logger.getLogger(UdpServer.class.getName());
+
   /** The client connection manager. */
   private final IClientConnectionManager clientConnectionManager;
 
@@ -94,7 +100,7 @@ public class UdpServer implements IServer {
   }
 
   protected boolean handleShutdownCommand(final String[] command) {
-    System.out.println("Shutting down server...");
+    log.log(Level.INFO, "Shutting down server...");
     this.terminate();
     return true;
   }
