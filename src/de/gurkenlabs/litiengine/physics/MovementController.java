@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 public class MovementController<T extends IMovableEntity> implements IMovementController<T> {
+  private static final double FORCE_APPLY_ACCEPTED_ERROR = 0.1;
   private final List<Force> activeForces;
   private final T movableEntity;
   private final List<Predicate<T>> movementPredicates;
@@ -65,7 +66,6 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
   }
 
   private void handleForces(final IGameLoop gameLoop) {
-    final double ACCEPTABLE_DIST = 5;
     // clean up forces
     this.activeForces.forEach(x -> {
       if (x.hasEnded()) {
@@ -73,9 +73,6 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
       }
     });
 
-    // apply all forces
-    // TODO: calculate the diff of all forces combined and only move the entity
-    // once
     for (final Force force : this.activeForces) {
       if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
         force.end();
@@ -83,7 +80,7 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
       }
 
       final Point2D collisionBoxCenter = new Point2D.Double(this.getEntity().getCollisionBox().getCenterX(), this.getEntity().getCollisionBox().getCenterY());
-      if (collisionBoxCenter.distance(force.getLocation()) < ACCEPTABLE_DIST) {
+      if (collisionBoxCenter.distance(force.getLocation()) < FORCE_APPLY_ACCEPTED_ERROR) {
         final double yDelta = this.getEntity().getHeight() - this.getEntity().getCollisionBox().getHeight() + this.getEntity().getCollisionBox().getHeight() / 2;
         final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
         this.getEntity().setLocation(entityLocation);

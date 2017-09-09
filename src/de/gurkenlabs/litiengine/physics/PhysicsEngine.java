@@ -199,7 +199,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean move(final IMovableEntity entity, Point2D newPosition) {
-
     boolean success = true;
     if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
@@ -228,10 +227,8 @@ public final class PhysicsEngine implements IPhysicsEngine {
       entity.setLocation(resolvedPosition);
       return false;
     } else {
-
       // special case to prevent entities to glitch through collision boxes if
       // they have a large enough stepsize
-      // TODO: this does not entirely fix the issue...
       final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
       for (final CollisionBox collisionBox : this.getCollisionBoxes()) {
         if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {

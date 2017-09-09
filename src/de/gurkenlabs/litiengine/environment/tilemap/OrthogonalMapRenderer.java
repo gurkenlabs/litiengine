@@ -304,8 +304,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     g.setComposite(oldComp);
   }
 
-  // TODO: load images of all image layers to the gamefile in order to be able
-  // to render the image
   private void renderImageLayer(Graphics2D g, IImageLayer layer, IMap map, Rectangle2D viewport) {
     final Composite oldComp = g.getComposite();
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());

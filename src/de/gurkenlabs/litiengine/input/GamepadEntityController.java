@@ -10,10 +10,6 @@ import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
 
-/**
- * TODO: Apply friction to terrain in order to slow down acceleration and speed
- * up deceleration.
- */
 public class GamepadEntityController<T extends IMovableEntity> extends MovementController<T> {
   private static final double STOP_THRESHOLD = 0.1;
   private float dx;

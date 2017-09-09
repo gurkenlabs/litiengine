@@ -11,10 +11,6 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.util.MathUtilities;
 
-/**
- * TODO: Apply friction to terrain in order to slow down acceleration and speed
- * up deceleration.
- */
 public class KeyboardEntityController<T extends IMovableEntity> extends MovementController<T> implements IKeyObserver {
   private float dx;
   private float dy;

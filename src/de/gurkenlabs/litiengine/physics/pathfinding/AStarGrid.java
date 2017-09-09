@@ -58,7 +58,6 @@ public class AStarGrid {
   }
 
   public List<AStarNode> getNeighbours(final AStarNode node) {
-
     final List<AStarNode> neighbors = new ArrayList<>();
     final int x = node.getGridX();
     final int y = node.getGridY();
@@ -157,7 +156,6 @@ public class AStarGrid {
       for (int y = 0; y < gridSizeY; y++) {
         final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
 
-        // TODO: add terrain dependent penalty
         this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
       }
     }
