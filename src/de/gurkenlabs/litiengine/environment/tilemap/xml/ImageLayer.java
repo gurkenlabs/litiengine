@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;

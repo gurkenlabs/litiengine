@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.net.messages;
 
 import java.util.ArrayList;
@@ -11,16 +8,16 @@ import java.util.Optional;
  * The Class MessageType defines a static struct which contains all possible
  * message types for network communication. Some types are litiengine default.
  * If you need to create different messages you should use message ids in the
- * range between 20 and 127; Also see TODO(wiki) for more details.
+ * range between 20 and 127.
  */
 public class MessageType {
-  public static MessageType INVALID = new MessageType("INVALID", (byte) -1);
-  public static MessageType INVALIDVERSION = new MessageType("INVALIDVERSION", (byte) 18);
-  public static MessageType LOGIN = new MessageType("LOGIN", (byte) 0);
-  public static MessageType LOGINRESPONSE = new MessageType("LOGINRESPONSE", (byte) 5);
-  public static MessageType LOGOUT = new MessageType("LOGOUT", (byte) 1);
-  public static MessageType PING = new MessageType("PING", (byte) 4);
-  private static List<MessageType> messageTypes = new ArrayList<>();
+  public static final MessageType INVALID = new MessageType("INVALID", (byte) -1);
+  public static final MessageType INVALIDVERSION = new MessageType("INVALIDVERSION", (byte) 18);
+  public static final MessageType LOGIN = new MessageType("LOGIN", (byte) 0);
+  public static final MessageType LOGINRESPONSE = new MessageType("LOGINRESPONSE", (byte) 5);
+  public static final MessageType LOGOUT = new MessageType("LOGOUT", (byte) 1);
+  public static final MessageType PING = new MessageType("PING", (byte) 4);
+  private static final List<MessageType> messageTypes = new ArrayList<>();
 
   /**
    * Gets the.

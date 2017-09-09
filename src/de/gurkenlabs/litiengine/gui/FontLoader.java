@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Font;
@@ -11,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.util.io.FileUtilities;
@@ -52,7 +50,7 @@ public class FontLoader {
 
       final InputStream fontStream = FileUtilities.getGameResource(fontName);
       if (fontStream == null) {
-        log.severe("font '" + fontName + "' could not be loaded");
+        log.log(Level.SEVERE, "font '%s' could not be loaded", fontName);
       }
 
       final Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream);

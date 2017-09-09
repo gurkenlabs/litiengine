@@ -1,11 +1,7 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.event.KeyEvent;
 
-// TODO: Auto-generated Javadoc
 /**
  * An asynchronous update interface for receiving notifications about IKey
  * information as the IKey is constructed.

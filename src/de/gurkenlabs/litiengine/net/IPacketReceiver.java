@@ -1,11 +1,7 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.net;
 
 import de.gurkenlabs.core.ILaunchable;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IPacketReceiver.
  */

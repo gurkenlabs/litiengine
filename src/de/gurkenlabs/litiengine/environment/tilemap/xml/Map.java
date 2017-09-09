@@ -1,6 +1,4 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
+
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
@@ -34,7 +32,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.util.io.XmlUtilities;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Map.
  */

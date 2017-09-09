@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.net.messages;
 
 import java.nio.ByteBuffer;
@@ -17,16 +14,17 @@ import de.gurkenlabs.util.io.Serializer;
  *          the generic type
  */
 public class MessagePackage<T> extends Package {
-
   /**
-   * Arrayconcat.
-   *
-   * @param A
-   *          the a
-   * @param B
-   *          the b
-   * @return the byte[]
+   * The Content length byte count. UDP does only support up to 64k.
    */
+  private static final int CONTENTLENGTHBYTECOUNT = 7;
+
+  /** The object. */
+  private T object;
+
+  /** The size. */
+  private int size;
+
   private static byte[] arrayconcat(final byte[] A, final byte[] B) {
     final int aLen = A.length;
     final int bLen = B.length;
@@ -35,17 +33,6 @@ public class MessagePackage<T> extends Package {
     System.arraycopy(B, 0, C, aLen, bLen);
     return C;
   }
-
-  /**
-   * The Content length byte count. UDP does only support up to 64k.
-   */
-  private final int ContentLengthByteCount = 7;
-
-  /** The object. */
-  private T object;
-
-  /** The size. */
-  private int size;
 
   /**
    * Instantiates a new object packet.
@@ -66,14 +53,14 @@ public class MessagePackage<T> extends Package {
   @SuppressWarnings("unchecked")
   public MessagePackage(final byte[] content) {
     super(content);
-    final int headerOffset = this.TypeByteCount;
-    final int dataOffset = headerOffset + this.ContentLengthByteCount;
+    final int headerOffset = this.TYPEBYTECOUNT;
+    final int dataOffset = headerOffset + this.CONTENTLENGTHBYTECOUNT;
 
     // message size
-    final ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(content, headerOffset, headerOffset + this.ContentLengthByteCount));
+    final ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(content, headerOffset, headerOffset + this.CONTENTLENGTHBYTECOUNT));
 
     // header + size info + actual message size
-    this.size = this.ContentLengthByteCount + wrapped.getInt();
+    this.size = this.CONTENTLENGTHBYTECOUNT + wrapped.getInt();
 
     // actual message
     final byte[] objectBytes = Arrays.copyOfRange(content, dataOffset, this.getSize() + dataOffset);
@@ -113,7 +100,7 @@ public class MessagePackage<T> extends Package {
 
     final byte[] header = new byte[] { this.getPacketId() };
     final byte[] serializedObject = Serializer.serialize(this.object);
-    final byte[] objectSize = ByteBuffer.allocate(this.ContentLengthByteCount).putInt(serializedObject.length).array();
+    final byte[] objectSize = ByteBuffer.allocate(this.CONTENTLENGTHBYTECOUNT).putInt(serializedObject.length).array();
     byte[] data = arrayconcat(header, arrayconcat(objectSize, serializedObject));
     data = CompressionUtilities.compress(data);
     this.setData(data);

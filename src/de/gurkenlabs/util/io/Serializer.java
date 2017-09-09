@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.util.io;
 
 import java.io.ByteArrayInputStream;

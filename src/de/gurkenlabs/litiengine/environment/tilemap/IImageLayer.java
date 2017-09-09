@@ -1,11 +1,7 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IImageLayer.
  */

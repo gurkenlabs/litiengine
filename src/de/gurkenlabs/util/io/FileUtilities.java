@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FileUtilities {
+  private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
+
   private FileUtilities() {
   }
 
@@ -28,22 +30,14 @@ public class FileUtilities {
   }
 
   public static List<String> findFiles(final List<String> fileNames, final Path dir, final String extension) {
-    final String[] blackList = new String[] { "\\bin", "\\screenshots" };
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (path.toFile().isDirectory()) {
-          boolean blacklisted = false;
-          for (final String black : blackList) {
-            if (path.toAbsolutePath().toString().contains(black)) {
-              blacklisted = true;
-              break;
-            }
+          if (isBlackListedDirectory(path)) {
+            continue;
           }
 
-          if (!blacklisted) {
-            findFiles(fileNames, path, extension);
-          }
-
+          findFiles(fileNames, path, extension);
         } else if (path.toAbsolutePath().toString().endsWith(extension)) {
           fileNames.add(path.toAbsolutePath().toString());
         }
@@ -56,22 +50,14 @@ public class FileUtilities {
   }
 
   public static List<String> findFiles(final List<String> fileNames, final Path dir, final String... files) {
-    final String[] blackList = new String[] { "\\bin", "\\screenshots" };
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (path.toFile().isDirectory()) {
-          boolean blacklisted = false;
-          for (final String black : blackList) {
-            if (path.toAbsolutePath().toString().contains(black)) {
-              blacklisted = true;
-              break;
-            }
+          if (isBlackListedDirectory(path)) {
+            continue;
           }
 
-          if (!blacklisted) {
-            findFiles(fileNames, path, files);
-          }
-
+          findFiles(fileNames, path, files);
         } else {
           for (final String file : files) {
             if (path.toAbsolutePath().toString().endsWith(file)) {
@@ -79,7 +65,6 @@ public class FileUtilities {
               fileNames.add(path.toAbsolutePath().toString());
             }
           }
-
         }
       }
     } catch (final IOException e) {
@@ -87,6 +72,16 @@ public class FileUtilities {
     }
 
     return fileNames;
+  }
+
+  private static boolean isBlackListedDirectory(Path path) {
+    for (final String black : DIR_BLACKLIST) {
+      if (path.toAbsolutePath().toString().contains(black)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public static String getExtension(final File file) {
@@ -137,8 +132,7 @@ public class FileUtilities {
         return resourceStream2;
       }
 
-      final InputStream fileStream = new FileInputStream(file);
-      return fileStream;
+      return new FileInputStream(file);
     } catch (final IOException e) {
       e.printStackTrace();
       return null;

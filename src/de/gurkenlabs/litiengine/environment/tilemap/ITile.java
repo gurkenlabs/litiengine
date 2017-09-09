@@ -1,20 +1,16 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Point;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface ITile.
  */
 public interface ITile extends ICustomPropertyProvider {
 
   public int getId();
-  
+
   public ITerrain[] getTerrain();
-  
+
   /**
    * Gets the grid id.
    *
@@ -28,6 +24,6 @@ public interface ITile extends ICustomPropertyProvider {
    * @return the tile coordinate
    */
   public Point getTileCoordinate();
-  
+
   public ITileAnimation getAnimation();
 }

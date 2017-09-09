@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.net;
 
 /**
@@ -9,7 +6,7 @@ package de.gurkenlabs.litiengine.net;
 public abstract class Package {
 
   /** The Type byte count. */
-  protected final int TypeByteCount = 1;
+  protected static final int TYPEBYTECOUNT = 1;
 
   /** The data. */
   private byte[] data;

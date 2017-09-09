@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Graphics2D;
@@ -8,7 +5,6 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IVision.
  */

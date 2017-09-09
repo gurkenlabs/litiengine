@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.graphics.particles;
 
 import java.awt.Color;
@@ -9,7 +6,6 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ShimmerParticle.
  */

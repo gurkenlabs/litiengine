@@ -1,13 +1,9 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IMapImage.
  */

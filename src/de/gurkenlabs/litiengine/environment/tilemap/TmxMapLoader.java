@@ -1,6 +1,3 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.io.FileInputStream;
@@ -13,7 +10,6 @@ import javax.xml.bind.Unmarshaller;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 
-// TODO: Auto-generated Javadoc
 /**
  * This class allows to deserialzie a tmx file into an IMap instance.
  */
