@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.net.Package;
+import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.io.CompressionUtilities;
 import de.gurkenlabs.util.io.Serializer;
 
@@ -28,15 +29,6 @@ public class MessagePackage<T> extends Package {
 
   /** The size. */
   private int size;
-
-  private static byte[] arrayconcat(final byte[] A, final byte[] B) {
-    final int aLen = A.length;
-    final int bLen = B.length;
-    final byte[] C = new byte[aLen + bLen];
-    System.arraycopy(A, 0, C, 0, aLen);
-    System.arraycopy(B, 0, C, aLen, bLen);
-    return C;
-  }
 
   /**
    * Instantiates a new object packet.
@@ -105,7 +97,7 @@ public class MessagePackage<T> extends Package {
     final byte[] header = new byte[] { this.getPacketId() };
     final byte[] serializedObject = Serializer.serialize(this.object);
     final byte[] objectSize = ByteBuffer.allocate(CONTENTLENGTHBYTECOUNT).putInt(serializedObject.length).array();
-    byte[] data = arrayconcat(header, arrayconcat(objectSize, serializedObject));
+    byte[] data = ArrayUtilities.arrayConcat(header, ArrayUtilities.arrayConcat(objectSize, serializedObject));
     data = CompressionUtilities.compress(data);
     this.setData(data);
     return data;
