@@ -1,7 +1,4 @@
-/***************************************************************
- * Copyright (c) 2014 - 2015 , gurkenlabs, All rights reserved *
- ***************************************************************/
-package de.gurkenlabs.tests.litiengine;
+package de.gurkenlabs.litiengine.attributes;
 
 import static org.junit.Assert.*;
 
