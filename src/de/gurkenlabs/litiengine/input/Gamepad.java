@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
-
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Component;
