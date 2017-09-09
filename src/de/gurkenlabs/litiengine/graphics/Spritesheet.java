@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,8 +67,8 @@ public final class Spritesheet {
     this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
   }
 
-  public static Map<String, Spritesheet> getSpritesheets() {
-    return spritesheets;
+  public static Collection<Spritesheet> getSpritesheets() {
+    return spritesheets.values();
   }
 
   /**
