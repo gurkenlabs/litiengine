@@ -10,8 +10,8 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 public class ImageComponentList extends GuiComponent {
 
   private final Spritesheet background;
-  private final CopyOnWriteArrayList<ImageComponent> cells;
-  private CopyOnWriteArrayList<Image> images;
+  private final List<ImageComponent> cells;
+  private List<Image> images;
   private final double rowHeight;
   private final double columnWidth;
   private final int rows;
@@ -19,7 +19,7 @@ public class ImageComponentList extends GuiComponent {
   private double xOffset;
   private double yOffset;
 
-  public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final CopyOnWriteArrayList<Image> images, final Spritesheet background) {
+  public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final List<Image> images, final Spritesheet background) {
     super(x, y, width, height);
     if (images != null) {
       this.images = images;

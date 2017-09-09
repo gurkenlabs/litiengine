@@ -197,6 +197,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.height;
   }
 
+  @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.gid != null && this.gid == 0) {
       this.gid = null;

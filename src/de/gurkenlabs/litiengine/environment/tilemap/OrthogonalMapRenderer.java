@@ -55,7 +55,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     // support for animated tiles
     final ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    if (animation != null && animation.getFrames().size() > 0) {
+    if (animation != null && !animation.getFrames().isEmpty()) {
       final long playedMs = Game.getLoop().getTime().getMilliseconds();
 
       final int totalDuration = animation.getTotalDuration();
@@ -82,11 +82,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       }
     }
 
-    final Image img = sprite.getSprite(index);
-    return img;
-  }
-
-  public OrthogonalMapRenderer() {
+    return sprite.getSprite(index);
   }
 
   @Override
@@ -222,7 +218,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
 
-    layer.getTiles().parallelStream().forEach((tile) -> {
+    layer.getTiles().parallelStream().forEach(tile -> {
       // get the tile from the tileset image
       final int index = layer.getTiles().indexOf(tile);
       if (tile.getGridId() == 0) {

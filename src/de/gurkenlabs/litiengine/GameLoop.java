@@ -71,7 +71,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     }
 
     if (this.updatables.contains(updatable)) {
-      log.log(Level.FINE, "Updatable " + updatable + " already registered for update!");
+      log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] { updatable });
       return;
     }
 

@@ -222,6 +222,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.tilecount;
   }
 
+  @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.margin != null && this.margin == 0) {
       this.margin = null;

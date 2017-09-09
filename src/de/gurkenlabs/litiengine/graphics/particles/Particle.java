@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 public abstract class Particle implements ITimeToLive {
@@ -98,7 +99,7 @@ public abstract class Particle implements ITimeToLive {
     this.timeToLive = life;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
-    this.setCollisionType(IPhysicsEngine.COLLTYPE_ALL);
+    this.setCollisionType(CollisionType.COLLTYPE_ALL);
   }
 
   @Override

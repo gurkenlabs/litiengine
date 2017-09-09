@@ -130,15 +130,15 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean collides(final Rectangle2D rect, final int collisionType) {
-    if ((collisionType & COLLTYPE_ALL) == COLLTYPE_ALL) {
+    if ((collisionType & CollisionType.COLLTYPE_ALL) == CollisionType.COLLTYPE_ALL) {
       return this.collides(rect);
     }
 
-    if ((collisionType & COLLTYPE_ENTITY) == COLLTYPE_ENTITY) {
+    if ((collisionType & CollisionType.COLLTYPE_ENTITY) == CollisionType.COLLTYPE_ENTITY) {
       return this.collidesWithAnyEntity(null, rect) != null;
     }
 
-    if ((collisionType & COLLTYPE_STATIC) == COLLTYPE_STATIC) {
+    if ((collisionType & CollisionType.COLLTYPE_STATIC) == CollisionType.COLLTYPE_STATIC) {
       return this.collidesWithAnyStaticCollisionBox(rect) != null;
     }
 
@@ -238,7 +238,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
           continue;
         }
 
-        // there was a collision inbetween
+        // there was a collision in between
         final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
         if (intersection != null) {
           newPosition = entity.getLocation();

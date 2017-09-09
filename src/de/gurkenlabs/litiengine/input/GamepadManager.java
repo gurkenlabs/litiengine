@@ -201,9 +201,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
           cons.accept(newGamepad);
         }
       }
-
     } catch (IllegalStateException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+      this.loop.terminate();
     }
   }
 }

@@ -157,6 +157,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer {
     this.name = name;
   }
 
+  @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (order == -1 && parent instanceof Map) {
       Map map = (Map) parent;

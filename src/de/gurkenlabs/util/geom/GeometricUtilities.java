@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class GeometricUtilities {
+  private static final double RAYCAST_EPSILON = 0.01;
+
   private GeometricUtilities() {
   }
 
@@ -120,7 +122,7 @@ public class GeometricUtilities {
     return lines;
   }
 
-  public static ArrayList<Line2D.Double> getConstrainingLines(final Area area) {
+  public static List<Line2D.Double> getConstrainingLines(final Area area) {
     final ArrayList<double[]> areaPoints = new ArrayList<>();
     final ArrayList<Line2D.Double> areaSegments = new ArrayList<>();
     final double[] coords = new double[6];
@@ -129,7 +131,8 @@ public class GeometricUtilities {
       // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
       // Because the Area is composed of straight lines
       final int type = pi.currentSegment(coords);
-      // We record a double array of {segment type, x coord, y coord}
+
+      // We record a double array of x coord and y coord
       final double[] pathIteratorCoords = { type, coords[0], coords[1] };
       areaPoints.add(pathIteratorCoords);
     }
@@ -163,25 +166,25 @@ public class GeometricUtilities {
   }
 
   public static float getDeltaX(double angle) {
-    angle = angle - 90;
+    double actualAngle = angle - 90;
 
     if (angle < 0) {
-      angle += 360;
+      actualAngle += 360;
     }
 
-    angle = 360 - angle;
-    return Trigonometry.cosDeg((float) angle);
+    actualAngle = 360 - actualAngle;
+    return Trigonometry.cosDeg((float) actualAngle);
   }
 
   public static float getDeltaY(double angle) {
-    angle = angle - 90;
+    double actualAngle = angle - 90;
 
     if (angle < 0) {
-      angle += 360;
+      actualAngle += 360;
     }
 
-    angle = 360 - angle;
-    return Trigonometry.sinDeg((float) angle);
+    actualAngle = 360 - actualAngle;
+    return Trigonometry.sinDeg((float) actualAngle);
   }
 
   /**
@@ -230,7 +233,7 @@ public class GeometricUtilities {
    * @return the point2 d
    */
   public static Point2D getIntersectionPoint(final Line2D line, final Rectangle2D rectangle) {
-    final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(line, rectangle);
+    final List<Point2D> intersectionPoints = getIntersectionPoints(line, rectangle);
     for (final Point2D p : intersectionPoints) {
       if (p != null && !p.equals(line.getP1()) && contains(rectangle, p)) {
         return p;
@@ -248,7 +251,7 @@ public class GeometricUtilities {
    *          the rectangle
    * @return the intersection points
    */
-  public static ArrayList<Point2D> getIntersectionPoints(final Line2D line, final Rectangle2D rectangle) {
+  public static List<Point2D> getIntersectionPoints(final Line2D line, final Rectangle2D rectangle) {
     final ArrayList<Point2D> intersectionPoints = new ArrayList<>();
     final Line2D[] lines = getLines(rectangle);
     final Line2D topLine = lines[0];
@@ -363,7 +366,7 @@ public class GeometricUtilities {
    *          the rectangle
    * @return the points
    */
-  public static ArrayList<Point2D> getPoints(final Rectangle2D rectangle) {
+  public static List<Point2D> getPoints(final Rectangle2D rectangle) {
 
     final ArrayList<Point2D> points = new ArrayList<>();
     points.add(new Point2D.Double(rectangle.getMinX(), rectangle.getMinY()));
@@ -432,13 +435,7 @@ public class GeometricUtilities {
   }
 
   public static boolean intersects(final Rectangle2D a, final Rectangle2D b) {
-    if (Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5) {
-      if (Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5) {
-        return true;
-      }
-    }
-
-    return false;
+    return Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5 && Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5;
   }
 
   /**
@@ -495,9 +492,8 @@ public class GeometricUtilities {
   }
 
   public static Point2D[] rayCastPoints(final Point2D point, final Rectangle2D rectangle) {
-    final double EPSILON = 0.01;
     // 1. get all rectangle points
-    final ArrayList<Point2D> rectPoints = getPoints(rectangle);
+    final List<Point2D> rectPoints = getPoints(rectangle);
     rectPoints.sort(new PointDistanceComparator(point));
 
     // 2. connect point with all rectangle points
@@ -505,12 +501,12 @@ public class GeometricUtilities {
     final ArrayList<Point2D> resultPoints = new ArrayList<>();
 
     for (int i = 0; i < rectPoints.size(); i++) {
-      final ArrayList<Point2D> intersectionPoints = getIntersectionPoints(connectingLines[i], rectangle);
+      final List<Point2D> intersectionPoints = getIntersectionPoints(connectingLines[i], rectangle);
       // If there is any intersection point which is not a corner point of the
       // rectangle the rectangle point at index i is not visible because the
       // raycast needs to pass the rectangle first.
       // Thus, the rectangle point at index i will not be added to the result.
-      if (intersectionPoints.stream().anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, EPSILON)))) {
+      if (intersectionPoints.stream().anyMatch(intersectionPoint -> rectPoints.stream().noneMatch(rectPoint -> equals(rectPoint, intersectionPoint, RAYCAST_EPSILON)))) {
         continue;
       }
 

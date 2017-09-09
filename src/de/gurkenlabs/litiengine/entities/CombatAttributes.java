@@ -12,9 +12,13 @@ import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
 /**
  * The Class CombatAttributes contains attributes for an ICombatEntity that have
- * impact on the combat behaviour.
+ * impact on the combat behavior.
  */
 public class CombatAttributes {
+
+  // 10% increase per level
+  private static final float LEVEL_MULTIPLIER = 1.1f;
+
   /** The attack speed. */
   private final Attribute<Float> attackSpeed;
   /** The damage multiplier. */
@@ -183,15 +187,12 @@ public class CombatAttributes {
    * Update attributes.
    */
   protected void updateAttributes() {
-
-    // 10% increase per level
-    final float levelMultiplier = 1.1f;
     final float maxXp = (float) (this.info.maxExperience() * Math.sqrt(this.getLevel().getCurrentValue()));
 
-    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
+    this.getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, LEVEL_MULTIPLIER));
     this.getExperience().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, maxXp));
-    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
-    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
-    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, levelMultiplier));
+    this.getShield().modifyMaxBaseValue(new AttributeModifier<>(Modification.MULTIPLY, LEVEL_MULTIPLIER));
+    this.getHealthRegeneration().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, LEVEL_MULTIPLIER));
+    this.getDamageMultiplier().modifyBaseValue(new AttributeModifier<>(Modification.MULTIPLY, LEVEL_MULTIPLIER));
   }
 }

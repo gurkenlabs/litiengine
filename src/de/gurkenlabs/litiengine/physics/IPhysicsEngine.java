@@ -13,12 +13,6 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
  */
 public interface IPhysicsEngine {
 
-  public static final int COLLTYPE_ENTITY = 1;
-
-  public static final int COLLTYPE_STATIC = 2;
-
-  public static final int COLLTYPE_ALL = COLLTYPE_ENTITY | COLLTYPE_STATIC;
-
   public void add(ICollisionEntity entity);
 
   public void add(Rectangle2D staticCollisionBox);

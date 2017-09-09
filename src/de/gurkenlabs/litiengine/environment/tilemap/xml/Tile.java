@@ -94,31 +94,32 @@ public class Tile extends CustomPropertyProvider implements ITile {
   }
 
   protected int[] getTerrainIds() {
-    int[] terrains = new int[] { -1, -1, -1, -1 };
+    int[] terrainIds = new int[] { -1, -1, -1, -1 };
     if (this.terrain == null || this.terrain.isEmpty()) {
-      return terrains;
+      return terrainIds;
     }
 
     String[] split = this.terrain.split(",");
     if (split.length != 4) {
-      return terrains;
+      return terrainIds;
     }
 
     for (int i = 0; i < split.length; i++) {
       try {
-        terrains[i] = Integer.parseInt(split[i]);
+        terrainIds[i] = Integer.parseInt(split[i]);
       } catch (NumberFormatException nfe) {
         continue;
       }
     }
 
-    return terrains;
+    return terrainIds;
   }
 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
   }
 
+  @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.gid != null && this.gid == 0) {
       this.gid = null;
