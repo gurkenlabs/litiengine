@@ -26,11 +26,26 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  */
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
-
   public static final String ELLIPSE = "ellipse";
 
   public static final String RECTANGLE = "rectangle";
-  public static final String[] SHAPETYPES = { RECTANGLE, ELLIPSE };
+
+  /** The gradient radius for our shadow. */
+  private static final float OBSTRUCTED_VISION_RADIUS = 200f;
+
+  /** The gradient radius for our shadow. */
+  private static final float SHADOW_GRADIENT_SIZE = 100f;
+
+  /**
+   * } The fractions for our shadow gradient, going from 0.0 (black) to 1.0
+   * (transparent).
+   */
+  private static final float[] SHADOW_GRADIENT_FRACTIONS = new float[] { 0f, 1f };
+
+  /**
+   * The colors for our shadow, going from opaque black to transparent black.
+   */
+  private static final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
 
   /**
    * Gets the shadow ellipse.
@@ -40,13 +55,13 @@ public class LightSource extends Entity implements IRenderable {
    * @return the shadow ellipse
    */
   private static Ellipse2D getShadowEllipse(final IEntity mob) {
-    final int ShadowHeight = (int) (mob.getHeight() / 4);
-    final int ShadowWidth = (int) (mob.getWidth() / 3);
+    final int shadowHeight = (int) (mob.getHeight() / 4);
+    final int shadowWidth = (int) (mob.getWidth() / 3);
 
     final int yOffset = (int) mob.getHeight();
-    final double x = mob.getLocation().getX() + (mob.getWidth() - ShadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - ShadowHeight / 2.0;
-    return new Ellipse2D.Double(x, y, ShadowWidth, ShadowHeight);
+    final double x = mob.getLocation().getX() + (mob.getWidth() - shadowWidth) / 2;
+    final double y = mob.getLocation().getY() + yOffset - shadowHeight / 2.0;
+    return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
   }
 
   /**
@@ -219,9 +234,7 @@ public class LightSource extends Entity implements IRenderable {
    * @return the obstructed vision area
    */
   private Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
-    /** The gradient radius for our shadow. */
-    final float OBSTRUCTED_VISION_RADIUS = 200f;
-    final Polygon SHADOW_POLYGON = new Polygon();
+    final Polygon shadowPolygon = new Polygon();
 
     final Ellipse2D shadowEllipse = getShadowEllipse(mob);
 
@@ -257,25 +270,25 @@ public class LightSource extends Entity implements IRenderable {
     final double py = nx;
 
     // our perpendicular points in either direction from radius
-    final Point2D.Double A = new Point2D.Double(cx - px * r, cy - py * ry);
-    final Point2D.Double B = new Point2D.Double(cx + px * r, cy + py * ry);
+    final Point2D.Double pointA = new Point2D.Double(cx - px * r, cy - py * ry);
+    final Point2D.Double pointB = new Point2D.Double(cx + px * r, cy + py * ry);
 
     // project the points by our SHADOW_EXTRUDE amount
-    final Point2D C = GeometricUtilities.project(center, A, OBSTRUCTED_VISION_RADIUS);
-    final Point2D D = GeometricUtilities.project(center, B, OBSTRUCTED_VISION_RADIUS);
+    final Point2D pointC = GeometricUtilities.project(center, pointA, OBSTRUCTED_VISION_RADIUS);
+    final Point2D pointD = GeometricUtilities.project(center, pointB, OBSTRUCTED_VISION_RADIUS);
 
     // construct a polygon from our points
-    SHADOW_POLYGON.reset();
-    SHADOW_POLYGON.addPoint((int) A.getX(), (int) A.getY());
-    SHADOW_POLYGON.addPoint((int) B.getX(), (int) B.getY());
-    SHADOW_POLYGON.addPoint((int) D.getX(), (int) D.getY());
-    SHADOW_POLYGON.addPoint((int) C.getX(), (int) C.getY());
+    shadowPolygon.reset();
+    shadowPolygon.addPoint((int) pointA.getX(), (int) pointA.getY());
+    shadowPolygon.addPoint((int) pointB.getX(), (int) pointB.getY());
+    shadowPolygon.addPoint((int) pointD.getX(), (int) pointD.getY());
+    shadowPolygon.addPoint((int) pointC.getX(), (int) pointC.getY());
 
     final Point2D shadowRenderLocation = Game.getScreenManager().getCamera().getViewPortLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
     final Ellipse2D relativeEllipse = new Ellipse2D.Double(shadowRenderLocation.getX(), shadowRenderLocation.getY(), shadowEllipse.getWidth(), shadowEllipse.getHeight());
 
     final Area ellipseArea = new Area(relativeEllipse);
-    final Area shadowArea = new Area(SHADOW_POLYGON);
+    final Area shadowArea = new Area(shadowPolygon);
     shadowArea.add(ellipseArea);
     return shadowArea;
   }
@@ -309,29 +322,16 @@ public class LightSource extends Entity implements IRenderable {
    *          the center
    */
   private void renderShadows(final Graphics2D g) {
-    /** The gradient radius for our shadow. */
-    final float SHADOW_GRADIENT_SIZE = 100f;
-
     if (!this.environment.getCombatEntities().stream().anyMatch(isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE))) {
       return;
     }
 
-    /**
-     * } The fractions for our shadow gradient, going from 0.0 (black) to 1.0
-     * (transparent).
-     */
-    final float[] SHADOW_GRADIENT_FRACTIONS = new float[] { 0f, 1f };
-
-    /**
-     * The colors for our shadow, going from opaque black to transparent black.
-     */
-    final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
     // we'll use a radial gradient
-    final Paint GRADIENT_PAINT = new RadialGradientPaint(Game.getScreenManager().getCamera().getViewPortDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
+    final Paint gradientPaint = new RadialGradientPaint(Game.getScreenManager().getCamera().getViewPortDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
 
     // old Paint object for resetting it later
     final Paint oldPaint = g.getPaint();
-    g.setPaint(GRADIENT_PAINT);
+    g.setPaint(gradientPaint);
 
     // for each entity
     for (final ICombatEntity mob : this.environment.getCombatEntities()) {

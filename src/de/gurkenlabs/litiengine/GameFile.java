@@ -104,20 +104,20 @@ public class GameFile implements Serializable {
     return this.tilesets;
   }
 
-  public String save(String fileName, final boolean compress) {
-
-    if (!fileName.endsWith("." + FILE_EXTENSION)) {
-      fileName += "." + FILE_EXTENSION;
+  public String save(final String fileName, final boolean compress) {
+    String fileNameWithExtension = fileName;
+    if (!fileNameWithExtension.endsWith("." + FILE_EXTENSION)) {
+      fileNameWithExtension += "." + FILE_EXTENSION;
     }
 
-    final File newFile = new File(fileName);
-    if (newFile.exists()) {
-      newFile.delete();
+    final File newFile = new File(fileNameWithExtension);
+    if (newFile.exists() && !newFile.delete()) {
+      log.log(Level.WARNING, "could not delete {0}", fileNameWithExtension);
     }
 
     Collections.sort(this.getMaps());
 
-    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
+    try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
       final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed

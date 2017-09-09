@@ -55,20 +55,19 @@ public final class ImageCache {
 
   public static void loadCache() {
     if (new File(CACHE_DIRECTORY).exists()) {
-      System.out.println("Cache dump '" + CACHE_DUMP_NAME + "' was not loaded because the cache folder'" + CACHE_DIRECTORY + "' already exists.");
+      log.log(Level.INFO, "cache dump \'{0}\' was not loaded because the cache folder \'{1}\' already exists.", new Object[] { CACHE_DUMP_NAME, CACHE_DIRECTORY });
       return;
     }
 
-    final InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME);
-    if (in == null) {
-      System.out.println("loading cache dump from '" + CACHE_DUMP_NAME + "' failed!");
-      return;
-    }
+    try (final InputStream in = FileUtilities.getGameResource(CACHE_DUMP_NAME)) {
+      if (in == null) {
+        log.log(Level.INFO, "loading cache dump from \'{0}\' failed", new Object[] { CACHE_DUMP_NAME });
+        return;
+      }
 
-    try {
       CompressionUtilities.unzip(in, new File(CACHE_DIRECTORY));
-      System.out.println("cache loaded from '" + CACHE_DUMP_NAME + "'");
-    } catch (final IOException e) {
+      log.log(Level.INFO, "cache loaded from \'{0}\'", new Object[] { CACHE_DUMP_NAME });
+    } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
@@ -81,7 +80,7 @@ public final class ImageCache {
       }
 
       CompressionUtilities.zip(new File(CACHE_DIRECTORY), cacheFile);
-      System.out.println("cache dumped to " + cacheFile.toPath());
+      log.log(Level.INFO, "cache dumped to \'{0}\'", new Object[] { cacheFile.toPath() });
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
@@ -93,7 +92,7 @@ public final class ImageCache {
       return;
     }
 
-    System.out.println("deleted '" + dir.toString() + "'");
+    log.log(Level.INFO, "deleted \'{0}\'", new Object[] { dir.toString() });
     FileUtilities.deleteDir(dir);
     this.cache.clear();
   }

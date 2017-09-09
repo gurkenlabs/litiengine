@@ -23,8 +23,8 @@ import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public final class Spritesheet {
-  public static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
-  public static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
+  private static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
+  private static final Map<String, Spritesheet> spritesheets = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
@@ -64,6 +64,10 @@ public final class Spritesheet {
 
   private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
     this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
+  }
+
+  public static Map<String, Spritesheet> getSpritesheets() {
+    return spritesheets;
   }
 
   /**
@@ -178,7 +182,7 @@ public final class Spritesheet {
         }
       }
 
-      System.out.println(sprites.size() + " spritesheets loaded from '" + spriteInfoFile + "'");
+      log.log(Level.INFO, "{0} spritesheets loaded from \'{1}\'", new Object[] { sprites.size(), spriteInfoFile });
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
@@ -273,6 +277,15 @@ public final class Spritesheet {
   @Override
   public int hashCode() {
     return this.hashCode;
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if (object instanceof Spritesheet) {
+      return object.hashCode() == this.hashCode();
+    }
+
+    return super.equals(object);
   }
 
   public void setSpriteHeight(final int spriteHeight) {
