@@ -403,7 +403,7 @@ public class MapComponent extends EditorComponent {
     final List<Map> maps = new ArrayList<>();
     for (final String mapFile : files) {
       final IMapLoader tmxLoader = new TmxMapLoader();
-      Map map = (Map) tmxLoader.LoadMap(mapFile);
+      Map map = (Map) tmxLoader.loadMap(mapFile);
       maps.add(map);
       System.out.println("map found: " + map.getFileName());
     }
@@ -931,7 +931,7 @@ public class MapComponent extends EditorComponent {
       if (result == JFileChooser.APPROVE_OPTION) {
 
         final IMapLoader tmxLoader = new TmxMapLoader();
-        Map map = (Map) tmxLoader.LoadMap(chooser.getSelectedFile().toString());
+        Map map = (Map) tmxLoader.loadMap(chooser.getSelectedFile().toString());
         if (map == null) {
           System.out.println("could not load map from file '" + chooser.getSelectedFile().toString() + "'");
           return;
