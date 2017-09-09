@@ -3,9 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-public class MapLocation implements Serializable {
-  private static final long serialVersionUID = -5179086173322235599L;
-
+public class MapLocation {
   private final int mapId;
   private String name;
   private final Point2D point;

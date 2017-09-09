@@ -113,6 +113,8 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
 
       break;
+    default:
+      break;
     }
   }
 

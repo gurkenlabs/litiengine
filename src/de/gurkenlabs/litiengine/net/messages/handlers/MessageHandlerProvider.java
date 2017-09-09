@@ -66,6 +66,5 @@ public class MessageHandlerProvider implements IMessageHandlerProvider {
    * Initialize handlers.
    */
   protected void initializeHandlers() {
-
   }
 }

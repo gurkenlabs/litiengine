@@ -35,7 +35,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.setText(text);
     this.flickerDelay = 100;
-    Input.keyboard().registerForKeyDownEvents(this);
+    Input.keyboard().registerForKeyEvents(this);
     this.onClicked(e -> {
       if (!this.isSelected()) {
         this.toggleSelection();

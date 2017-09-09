@@ -23,12 +23,12 @@ public interface IKeyboard extends IUpdateable {
   public void onKeyTyped(int keyCode, Consumer<KeyEvent> consumer);
 
   /**
-   * Register for key down events.
+   * Register for key events.
    *
    * @param observer
    *          the observer
    */
-  public void registerForKeyDownEvents(IKeyObserver observer);
+  public void registerForKeyEvents(IKeyObserver observer);
 
   /**
    * Unregister from key down events.
@@ -36,5 +36,5 @@ public interface IKeyboard extends IUpdateable {
    * @param observer
    *          the observer
    */
-  public void unregisterFromKeyDownEvents(IKeyObserver observer);
+  public void unregisterFromKeyEvents(IKeyObserver observer);
 }

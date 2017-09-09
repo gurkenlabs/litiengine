@@ -38,7 +38,7 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
     this.down.add(down);
     this.left.add(left);
     this.right.add(right);
-    Input.keyboard().registerForKeyDownEvents(this);
+    Input.keyboard().registerForKeyEvents(this);
   }
 
   @Override

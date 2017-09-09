@@ -63,9 +63,4 @@ public class VerticalSlider extends Slider {
       this.setCurrentValue((float) (this.getMinValue() + percentage * (this.getMaxValue() - this.getMinValue())));
     }
   }
-
-  @Override
-  protected void initializeComponents() {
-  }
-
 }

@@ -254,7 +254,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * liti.input.IKeyObserver)
    */
   @Override
-  public void registerForKeyDownEvents(final IKeyObserver observer) {
+  public void registerForKeyEvents(final IKeyObserver observer) {
     if (this.keyObservers.contains(observer)) {
       return;
     }
@@ -269,7 +269,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * gurkenlabs.liti.input.IKeyObserver)
    */
   @Override
-  public void unregisterFromKeyDownEvents(final IKeyObserver observer) {
+  public void unregisterFromKeyEvents(final IKeyObserver observer) {
     if (!this.keyObservers.contains(observer)) {
       return;
     }
