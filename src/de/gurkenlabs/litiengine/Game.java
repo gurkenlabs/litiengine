@@ -136,12 +136,12 @@ public final class Game {
 
   public static void init() {
     getConfiguration().load();
-    Locale.setDefault(new Locale(getConfiguration().CLIENT.getCountry(), getConfiguration().CLIENT.getLanguage()));
+    Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
     for (Consumer<GameConfiguration> cons : configLoadedConsumer) {
       cons.accept(getConfiguration());
     }
 
-    final GameLoop updateLoop = new GameLoop(getConfiguration().CLIENT.getUpdaterate());
+    final GameLoop updateLoop = new GameLoop(getConfiguration().client().getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
 
@@ -168,18 +168,18 @@ public final class Game {
       }
     }
 
-    if (getConfiguration().CLIENT.showGameMetrics()) {
+    if (getConfiguration().client().showGameMetrics()) {
       getScreenManager().getRenderComponent().onRendered(g -> getMetrics().render(g));
     }
 
-    if (getConfiguration().DEBUG.isDebugEnabled()) {
+    if (getConfiguration().debug().isDebugEnabled()) {
       getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
     }
 
     getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
 
     // init screens
-    getScreenManager().init(getConfiguration().GRAPHICS.getResolutionWidth(), getConfiguration().GRAPHICS.getResolutionHeight(), getConfiguration().GRAPHICS.isFullscreen());
+    getScreenManager().init(getConfiguration().graphics().getResolutionWidth(), getConfiguration().graphics().getResolutionHeight(), getConfiguration().graphics().isFullscreen());
     getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
 
     getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));

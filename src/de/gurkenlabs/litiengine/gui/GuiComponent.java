@@ -660,7 +660,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       component.render(g);
     }
 
-    if (Game.getConfiguration().DEBUG.renderGuiComponentBoundingBoxes()) {
+    if (Game.getConfiguration().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
       g.draw(this.getBoundingBox());
     }

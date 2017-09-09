@@ -263,7 +263,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
-    if (Game.getConfiguration().GRAPHICS.enableCacheStaticTiles()) {
+    if (Game.getConfiguration().graphics().enableCacheStaticTiles()) {
       // render all static tiles first because we're able to cache them because
       // they're never supposed to be change during runtime
       final String cacheKey = MessageFormat.format("{0}_{1}_static", getCacheKey(map), layer.getName());
@@ -294,7 +294,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
         // always render tiles if the cache for static tiles is disabled or, in
         // case it is enabled: only render animation tiles here
-        if (!Game.getConfiguration().GRAPHICS.enableCacheStaticTiles() || MapUtilities.hasAnimation(map, tile)) {
+        if (!Game.getConfiguration().graphics().enableCacheStaticTiles() || MapUtilities.hasAnimation(map, tile)) {
           final Image tileTexture = getTileImage(map, tile);
           RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
         }

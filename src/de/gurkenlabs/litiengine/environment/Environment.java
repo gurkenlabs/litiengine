@@ -764,7 +764,7 @@ public class Environment implements IEnvironment {
     }
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
-    if (Game.getConfiguration().GRAPHICS.getGraphicQuality() == Quality.VERYHIGH) {
+    if (Game.getConfiguration().graphics().getGraphicQuality() == Quality.VERYHIGH) {
       Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
     }
 

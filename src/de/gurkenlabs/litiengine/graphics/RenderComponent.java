@@ -149,7 +149,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
       RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
     }
 
-    if (Game.getConfiguration().DEBUG.isRenderDebugMouse()) {
+    if (Game.getConfiguration().debug().isRenderDebugMouse()) {
       g.setColor(Color.RED);
 
       g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));

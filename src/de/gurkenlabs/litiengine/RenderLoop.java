@@ -23,7 +23,7 @@ public class RenderLoop extends Thread {
     this.renderables = new CopyOnWriteArrayList<>();
     this.component = component;
     this.cameraProvider = provider;
-    this.maxFps = Game.getConfiguration().CLIENT.getMaxFps();
+    this.maxFps = Game.getConfiguration().client().getMaxFps();
   }
 
   public void register(final IRenderable render) {

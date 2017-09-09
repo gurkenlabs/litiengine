@@ -31,7 +31,7 @@ public final class Input {
   public static void init() {
     keyboard = new KeyBoard();
     mouse = new Mouse();
-    if (Game.getConfiguration().INPUT.isGamepadSupport()) {
+    if (Game.getConfiguration().input().isGamepadSupport()) {
       gamePads = new CopyOnWriteArrayList<>();
       gamePadManager = new GamepadManager();
     }

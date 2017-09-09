@@ -38,7 +38,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
     }
 
     this.music = new SoundSource(sound);
-    this.music.play(true, Game.getConfiguration().SOUND.getMusicVolume());
+    this.music.play(true, Game.getConfiguration().sound().getMusicVolume());
   }
 
   @Override

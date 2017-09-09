@@ -63,7 +63,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.addComponentListener(new ResizedEventListener());
     this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-    final RenderComponent comp = new RenderComponent(Game.getConfiguration().GRAPHICS.getResolution());
+    final RenderComponent comp = new RenderComponent(Game.getConfiguration().graphics().getResolution());
     this.add(comp);
     this.renderCanvas = comp;
 
@@ -158,7 +158,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-    this.setSize(Game.getConfiguration().GRAPHICS.getResolution());
+    this.setSize(Game.getConfiguration().graphics().getResolution());
 
     this.setVisible(true);
     this.getRenderComponent().init();
@@ -207,13 +207,13 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     if (e.getNewState() == JFrame.ICONIFIED) {
       Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
     } else {
-      Game.getRenderLoop().setMaxFps(Game.getConfiguration().CLIENT.getMaxFps());
+      Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
     }
   }
 
   @Override
   public void windowGainedFocus(WindowEvent e) {
-    Game.getRenderLoop().setMaxFps(Game.getConfiguration().CLIENT.getMaxFps());
+    Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
   }
 
   @Override

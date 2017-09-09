@@ -25,25 +25,25 @@ public class DebugRenderer {
   }
 
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
-    if (!Game.getConfiguration().DEBUG.isDebugEnabled()) {
+    if (!Game.getConfiguration().debug().isDebugEnabled()) {
       return;
     }
 
-    if (Game.getConfiguration().DEBUG.renderEntityNames()) {
+    if (Game.getConfiguration().debug().renderEntityNames()) {
       drawMapId(g, entity);
     }
 
-    if (Game.getConfiguration().DEBUG.renderHitBoxes() && entity instanceof ICombatEntity) {
+    if (Game.getConfiguration().debug().renderHitBoxes() && entity instanceof ICombatEntity) {
       g.setColor(Color.RED);
       RenderEngine.drawShape(g, ((ICombatEntity) entity).getHitBox());
     }
 
-    if (Game.getConfiguration().DEBUG.renderBoundingBoxes()) {
+    if (Game.getConfiguration().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
       RenderEngine.drawShape(g, entity.getBoundingBox());
     }
 
-    if (Game.getConfiguration().DEBUG.renderCollisionBoxes() && entity instanceof ICollisionEntity) {
+    if (Game.getConfiguration().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
       g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
       RenderEngine.drawShape(g, collisionEntity.getCollisionBox());
@@ -52,14 +52,14 @@ public class DebugRenderer {
 
   public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
     // draw collision boxes from shape layer
-    if (Game.getConfiguration().DEBUG.renderCollisionBoxes()) {
+    if (Game.getConfiguration().debug().renderCollisionBoxes()) {
       for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
         g.setColor(Color.RED);
         RenderEngine.drawShape(g, shape);
       }
     }
 
-    if (Game.getConfiguration().DEBUG.showTilesMetric()) {
+    if (Game.getConfiguration().debug().showTilesMetric()) {
       // draw mouse tile info
       drawTileBoundingBox(g, map, Input.mouse().getMapLocation());
     }

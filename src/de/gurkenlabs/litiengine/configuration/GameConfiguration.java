@@ -3,24 +3,44 @@ package de.gurkenlabs.litiengine.configuration;
 import de.gurkenlabs.configuration.Configuration;
 import de.gurkenlabs.configuration.ConfigurationGroup;
 
-public class GameConfiguration extends Configuration {
-  public final ClientConfiguration CLIENT;
-  public final DebugConfiguration DEBUG;
-  public final GraphicConfiguration GRAPHICS;
-  public final InputConfiguration INPUT;
-  public final SoundConfiguration SOUND;
+public final class GameConfiguration extends Configuration {
+  private final ClientConfiguration client;
+  private final DebugConfiguration debug;
+  private final GraphicConfiguration graphics;
+  private final InputConfiguration input;
+  private final SoundConfiguration sound;
 
   public GameConfiguration(final ConfigurationGroup... groups) {
     super(groups);
-    this.CLIENT = new ClientConfiguration();
-    this.SOUND = new SoundConfiguration();
-    this.GRAPHICS = new GraphicConfiguration();
-    this.INPUT = new InputConfiguration();
-    this.DEBUG = new DebugConfiguration();
-    this.getConfigurationGroups().add(this.CLIENT);
-    this.getConfigurationGroups().add(this.SOUND);
-    this.getConfigurationGroups().add(this.GRAPHICS);
-    this.getConfigurationGroups().add(this.INPUT);
-    this.getConfigurationGroups().add(this.DEBUG);
+    this.client = new ClientConfiguration();
+    this.sound = new SoundConfiguration();
+    this.graphics = new GraphicConfiguration();
+    this.input = new InputConfiguration();
+    this.debug = new DebugConfiguration();
+    this.getConfigurationGroups().add(this.client);
+    this.getConfigurationGroups().add(this.sound);
+    this.getConfigurationGroups().add(this.graphics);
+    this.getConfigurationGroups().add(this.input);
+    this.getConfigurationGroups().add(this.debug);
+  }
+
+  public ClientConfiguration client() {
+    return this.client;
+  }
+
+  public DebugConfiguration debug() {
+    return this.debug;
+  }
+
+  public GraphicConfiguration graphics() {
+    return this.graphics;
+  }
+
+  public InputConfiguration input() {
+    return this.input;
+  }
+
+  public SoundConfiguration sound() {
+    return this.sound;
   }
 }

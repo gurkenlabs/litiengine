@@ -148,7 +148,7 @@ public class SoundSource {
     }
 
     gain = MathUtilities.clamp(gain, 0, 1);
-    gain *= Game.getConfiguration().SOUND.getSoundVolume();
+    gain *= Game.getConfiguration().sound().getSoundVolume();
     return gain;
   }
 
@@ -207,7 +207,7 @@ public class SoundSource {
       }
 
       this.initControls();
-      final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().SOUND.getSoundVolume();
+      final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().sound().getSoundVolume();
       SoundSource.this.setGain(initialGain);
 
       SoundSource.this.updateControls(SoundSource.this.initialListenerLocation);

@@ -258,7 +258,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> particle.render(g, origin));
-    if (Game.getConfiguration().DEBUG.renderHitBoxes()) {
+    if (Game.getConfiguration().debug().renderHitBoxes()) {
       DebugRenderer.renderEntityDebugInfo(g, this);
     }
   }

@@ -30,7 +30,7 @@ public final class Resources {
       return null;
     }
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().CLIENT.getLocale());
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().client().getLocale());
       return defaultBundle.getString(key);
     } catch (final MissingResourceException me) {
       final StringWriter sw = new StringWriter();
