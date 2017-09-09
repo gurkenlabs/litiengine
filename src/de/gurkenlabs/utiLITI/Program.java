@@ -138,8 +138,8 @@ public class Program {
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
     setupMenu();
     Game.start();
-    Input.MOUSE.setGrabMouse(false);
-    Input.KEYBOARD.consumeAlt(true);
+    Input.mouse().setGrabMouse(false);
+    Input.keyboard().consumeAlt(true);
     handleArgs(args);
 
     if (!EditorScreen.instance().fileLoaded() && USER_PREFERNCES.getLastGameFile() != null) {

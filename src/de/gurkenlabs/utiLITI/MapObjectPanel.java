@@ -324,28 +324,28 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupControls() {
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_RIGHT, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
       if (Game.getScreenManager().getRenderComponent().hasFocus()) {
         this.spinnerX.setValue(this.spinnerX.getNextValue());
         EditorScreen.instance().getMapComponent().updateTransformControls();
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_LEFT, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
       if (Game.getScreenManager().getRenderComponent().hasFocus()) {
         this.spinnerX.setValue(this.spinnerX.getPreviousValue());
         EditorScreen.instance().getMapComponent().updateTransformControls();
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_UP, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
       if (Game.getScreenManager().getRenderComponent().hasFocus()) {
         this.spinnerY.setValue(this.spinnerY.getPreviousValue());
         EditorScreen.instance().getMapComponent().updateTransformControls();
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_DOWN, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
       if (Game.getScreenManager().getRenderComponent().hasFocus()) {
         this.spinnerY.setValue(this.spinnerY.getNextValue());
         EditorScreen.instance().getMapComponent().updateTransformControls();

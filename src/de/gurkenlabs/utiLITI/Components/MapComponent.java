@@ -309,7 +309,7 @@ public class MapComponent extends EditorComponent {
     case EDITMODE_EDIT:
       // draw selection
       final Point2D start = this.startPoint;
-      if (start != null && !Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+      if (start != null && !Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Rectangle2D rect = this.getCurrentMouseSelectionArea();
 
         g.setColor(new Color(0, 130, 152, 30));
@@ -341,7 +341,7 @@ public class MapComponent extends EditorComponent {
       RenderEngine.drawShape(g, focus, stroke);
 
       // render transform rects
-      if (!Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+      if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Stroke transStroke = new BasicStroke(1 / Game.getInfo().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
@@ -489,14 +489,14 @@ public class MapComponent extends EditorComponent {
       }
 
       boolean hovered = false;
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         return;
       }
       for (TransformType type : this.transformRects.keySet()) {
         Rectangle2D rect = this.transformRects.get(type);
         Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4,
             rect.getHeight() * 4);
-        if (hoverrect.contains(Input.MOUSE.getMapLocation())) {
+        if (hoverrect.contains(Input.mouse().getMapLocation())) {
           hovered = true;
           if (type == TransformType.DOWN || type == TransformType.UP) {
             Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
@@ -526,7 +526,7 @@ public class MapComponent extends EditorComponent {
 
       switch (this.currentEditMode) {
       case EDITMODE_CREATE:
-        this.startPoint = Input.MOUSE.getMapLocation();
+        this.startPoint = Input.mouse().getMapLocation();
         break;
       case EDITMODE_MOVE:
         break;
@@ -536,7 +536,7 @@ public class MapComponent extends EditorComponent {
           return;
         }
 
-        final Point2D mouse = Input.MOUSE.getMapLocation();
+        final Point2D mouse = Input.mouse().getMapLocation();
         this.startPoint = mouse;
         boolean somethingIsFocused = false;
         boolean currentObjectFocused = false;
@@ -600,7 +600,7 @@ public class MapComponent extends EditorComponent {
         newObject = this.getCurrentMouseSelectionArea();
         break;
       case EDITMODE_EDIT:
-        if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+        if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
           if (!this.isMoving) {
             this.isMoving = true;
 
@@ -770,8 +770,8 @@ public class MapComponent extends EditorComponent {
 
   public void paste() {
     if (this.copiedMapObject != null) {
-      int x = (int) Input.MOUSE.getMapLocation().getX();
-      int y = (int) Input.MOUSE.getMapLocation().getY();
+      int x = (int) Input.mouse().getMapLocation().getX();
+      int y = (int) Input.mouse().getMapLocation().getY();
 
       this.newObject = new Rectangle(x, y,
           (int) this.copiedMapObject.getDimension().getWidth(),
@@ -1124,7 +1124,7 @@ public class MapComponent extends EditorComponent {
       return null;
     }
 
-    final Point2D endPoint = Input.MOUSE.getMapLocation();
+    final Point2D endPoint = Input.mouse().getMapLocation();
     double minX = this.snapX(Math.min(startPoint.getX(), endPoint.getX()));
     double maxX = this.snapX(Math.max(startPoint.getX(), endPoint.getX()));
     double minY = this.snapY(Math.min(startPoint.getY(), endPoint.getY()));
@@ -1194,14 +1194,14 @@ public class MapComponent extends EditorComponent {
     }
 
     if (this.dragPoint == null) {
-      this.dragPoint = Input.MOUSE.getMapLocation();
+      this.dragPoint = Input.mouse().getMapLocation();
       this.dragLocationMapObject = new Point2D.Double(this.getFocusedMapObject().getX(), this.getFocusedMapObject().getY());
       this.dragSizeMapObject = new Dimension(this.getFocusedMapObject().getDimension());
       return;
     }
 
-    double deltaX = Input.MOUSE.getMapLocation().getX() - this.dragPoint.getX();
-    double deltaY = Input.MOUSE.getMapLocation().getY() - this.dragPoint.getY();
+    double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
+    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newWidth = this.dragSizeMapObject.getWidth();
     double newHeight = this.dragSizeMapObject.getHeight();
     double newX = this.snapX(this.dragLocationMapObject.getX());
@@ -1268,18 +1268,18 @@ public class MapComponent extends EditorComponent {
 
   private void handleEntityDrag() {
     // only handle drag i
-    if (this.getFocusedMapObject() == null || (!Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
+    if (this.getFocusedMapObject() == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
       return;
     }
 
     if (this.dragPoint == null) {
-      this.dragPoint = Input.MOUSE.getMapLocation();
+      this.dragPoint = Input.mouse().getMapLocation();
       this.dragLocationMapObject = new Point2D.Double(this.getFocusedMapObject().getX(), this.getFocusedMapObject().getY());
       return;
     }
 
-    double deltaX = Input.MOUSE.getMapLocation().getX() - this.dragPoint.getX();
-    double deltaY = Input.MOUSE.getMapLocation().getY() - this.dragPoint.getY();
+    double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
+    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newX = this.snapX(this.dragLocationMapObject.getX() + deltaX);
     double newY = this.snapY(this.dragLocationMapObject.getY() + deltaY);
     this.getFocusedMapObject().setX((int) newX);
@@ -1300,50 +1300,50 @@ public class MapComponent extends EditorComponent {
   }
 
   private void setupControls() {
-    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_ADD, e -> {
+    Input.keyboard().onKeyReleased(KeyEvent.VK_ADD, e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
       }
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         this.zoomIn();
       }
     });
 
-    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_SUBTRACT, e -> {
+    Input.keyboard().onKeyReleased(KeyEvent.VK_SUBTRACT, e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
       }
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         this.zoomOut();
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_SPACE, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> {
       if (this.getFocusedMapObject() != null) {
         Game.getScreenManager().getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_CONTROL, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
     });
-    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_CONTROL, e -> {
+    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
     });
 
-    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_Z, e -> {
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+    Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         UndoManager.instance().undo();
       }
     });
 
-    Input.KEYBOARD.onKeyReleased(KeyEvent.VK_Y, e -> {
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL)) {
+    Input.keyboard().onKeyReleased(KeyEvent.VK_Y, e -> {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         UndoManager.instance().redo();
       }
     });
 
-    Input.KEYBOARD.onKeyPressed(KeyEvent.VK_DELETE, e -> {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_DELETE, e -> {
       if (this.isSuspended() || !this.isVisible() || this.getFocusedMapObject() == null) {
         return;
       }
@@ -1355,13 +1355,13 @@ public class MapComponent extends EditorComponent {
       }
     });
 
-    Input.MOUSE.onWheelMoved(e -> {
+    Input.mouse().onWheelMoved(e -> {
       if (!this.hasFocus()) {
         return;
       }
 
       // horizontal scrolling
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
         if (e.getWheelRotation() < 0) {
           Point2D cameraFocus = Game.getScreenManager().getCamera().getFocus();
           Point2D newFocus = new Point2D.Double(cameraFocus.getX() - this.scrollSpeed, cameraFocus.getY());
@@ -1376,7 +1376,7 @@ public class MapComponent extends EditorComponent {
         return;
       }
 
-      if (Input.KEYBOARD.isPressed(KeyEvent.VK_ALT)) {
+      if (Input.keyboard().isPressed(KeyEvent.VK_ALT)) {
         if (e.getWheelRotation() < 0) {
           this.zoomIn();
         } else {
@@ -1400,7 +1400,7 @@ public class MapComponent extends EditorComponent {
       Program.verticalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
     });
 
-    Input.MOUSE.onClicked(e -> {
+    Input.mouse().onClicked(e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
       }
