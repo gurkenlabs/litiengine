@@ -80,7 +80,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    */
   public void setGrabMouse(boolean grab);
 
-  public void setLocation(Point adjustMouse);
+  public void setLocation(Point2D adjustMouse);
 
   /**
    * Unregister mouse listener.

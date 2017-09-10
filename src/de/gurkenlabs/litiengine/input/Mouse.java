@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.input;
 import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -345,9 +346,18 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void setLocation(final Point adjustMouse) {
+  public void setLocation(final Point2D adjustMouse) {
+    if (adjustMouse == null) {
+      return;
+    }
+
     this.location = adjustMouse;
     this.lastLocation = adjustMouse;
+
+    final MouseEvent mouseEvent = new MouseEvent(Game.getScreenManager().getRenderComponent(), MouseEvent.MOUSE_MOVED, 0, 0, (int) this.getLocation().getX(), (int) this.getLocation().getY(), 0, false, MouseEvent.NOBUTTON);
+    for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
+      cons.accept(this.createEvent(mouseEvent));
+    }
   }
 
   /*
