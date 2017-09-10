@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
+import java.util.Random;
+
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -29,7 +31,7 @@ public class SoundEffect extends Effect {
       return null;
     }
 
-    final int randomIndex = (int) (Math.random() * this.sounds.length);
+    final int randomIndex = new Random().nextInt(this.sounds.length);
     return this.sounds[randomIndex];
   }
 }
