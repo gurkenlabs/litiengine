@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.geom.Point2D;
-import java.io.Serializable;
 
 public class MapLocation {
   private final int mapId;
