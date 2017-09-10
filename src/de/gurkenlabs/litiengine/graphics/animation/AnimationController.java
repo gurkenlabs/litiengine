@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
@@ -22,7 +24,7 @@ public class AnimationController implements IAnimationController {
   private final List<Consumer<Animation>> playbackConsumer;
   private final List<Consumer<Animation>> playbackFinishedConsumer;
 
-  public AnimationController(final Animation defaultAnimation, final Animation... animations) {
+  private AnimationController(final Animation defaultAnimation) {
     this.animations = new CopyOnWriteArrayList<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
     this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
@@ -31,6 +33,18 @@ public class AnimationController implements IAnimationController {
     if (this.defaultAnimation != null) {
       this.animations.add(this.defaultAnimation);
     }
+  }
+
+  public AnimationController(final Spritesheet sprite) {
+    this(sprite, true);
+  }
+
+  public AnimationController(final Spritesheet sprite, boolean loop) {
+    this(new Animation(sprite, loop, Spritesheet.getCustomKeyFrameDurations(sprite)));
+  }
+
+  public AnimationController(final Animation defaultAnimation, final Animation... animations) {
+    this(defaultAnimation);
 
     if (animations != null && animations.length > 0) {
       for (final Animation anim : animations) {
@@ -90,6 +104,11 @@ public class AnimationController implements IAnimationController {
       return null;
     }
 
+    final String cacheKey = buildCurrentCacheKey();
+    if (ImageCache.SPRITES.containsKey(cacheKey)) {
+      return ImageCache.SPRITES.get(cacheKey);
+    }
+
     BufferedImage sprite = this.getCurrentAnimation().getSpritesheet().getSprite(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
     for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
@@ -103,6 +122,12 @@ public class AnimationController implements IAnimationController {
     if (this.getCurrentSprite() == null) {
       return null;
     }
+
+    final String cacheKey = buildCurrentCacheKey() + "_" + width + "_" + height;
+    if (ImageCache.SPRITES.containsKey(cacheKey)) {
+      return ImageCache.SPRITES.get(cacheKey);
+    }
+
     return ImageProcessing.scaleImage(this.getCurrentSprite(), width, height);
 
   }

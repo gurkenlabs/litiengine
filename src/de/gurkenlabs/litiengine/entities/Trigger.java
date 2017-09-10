@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
@@ -140,6 +141,16 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public List<Integer> getTargets() {
     return this.targets;
+  }
+
+  /**
+   * Checks whether the specified entity can interact with this trigger.
+   * 
+   * @param entity
+   * @return
+   */
+  public boolean canTrigger(ICollisionEntity entity) {
+    return entity.canCollideWith(this) && GeometricUtilities.intersects(this.getCollisionBox(), entity.getCollisionBox());
   }
 
   /**

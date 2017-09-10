@@ -133,6 +133,10 @@ public class Animation implements IUpdateable, ILaunchable {
     this.currentFrame = this.firstFrame;
   }
 
+  public void restart() {
+    this.currentFrame = this.firstFrame;
+  }
+
   @Override
   public void terminate() {
     this.elapsedTicks = 0;

@@ -208,7 +208,7 @@ public final class Game {
       mapCnt++;
     }
 
-    log.log(Level.INFO, "{0} maps loaded from \'{1}\'", new Object[] { mapCnt, gameResourceFile });
+    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {

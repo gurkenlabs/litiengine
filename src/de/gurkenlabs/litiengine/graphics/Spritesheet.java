@@ -100,6 +100,10 @@ public final class Spritesheet {
     return new int[0];
   }
 
+  public static int[] getCustomKeyFrameDurations(final Spritesheet sprite) {
+    return getCustomKeyFrameDurations(sprite.getName());
+  }
+
   public static Spritesheet load(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     return new Spritesheet(image, path, spriteWidth, spriteHeight);
   }
@@ -183,7 +187,7 @@ public final class Spritesheet {
         }
       }
 
-      log.log(Level.INFO, "{0} spritesheets loaded from \'{1}\'", new Object[] { sprites.size(), spriteInfoFile });
+      log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { sprites.size(), spriteInfoFile });
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
