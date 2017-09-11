@@ -1,0 +1,153 @@
+plugins {
+    id "org.sonarqube" version "2.5"
+}  
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+sourceSets {
+  main.java.srcDir "src"
+  main.java.srcDir "resources"
+  
+  test {
+    java {
+      srcDirs = ["tests"] 
+    }
+  }
+}
+
+repositories {
+   mavenCentral()
+   
+   flatDir {
+      dirs 'lib'
+   }
+}
+
+dependencies {
+  compile name: 'jinput'
+  compile name: 'jogg-0.0.7'
+  compile name: 'jorbis-0.0.15'
+  compile name: 'tritonus_share'
+  compile name: 'vorbisspi1.0.3'
+  compile name: 'jl1.0.1'
+  compile name: 'mp3spi1.9.5'
+  testCompile 'junit:junit:4.12'
+}
+
+jar {
+  from configurations.compile.collect { zipTree it }
+  
+  from('resources') { include '**/*' }
+  version = 'v0.4.6-alpha'
+}
+
+javadoc {
+  options.encoding = 'UTF-8'
+}
+
+signing {
+    sign configurations.archives
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled true
+    html.enabled true
+  }
+}
+
+check.dependsOn jacocoTestReport
+
+
+task copyNativeLibs(type: Copy) {
+  from(new File('lib')) { exclude '**/*.jar' }
+  into new File(buildDir, 'libs')
+  
+  from(new File('.')) { include 'LICENSE' }
+  into new File(buildDir, 'libs')
+}
+
+task createJavadocs(type: Javadoc) {
+  source = sourceSets.main.allJava
+  options.encoding = 'UTF-8'
+  dependsOn build
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+    version = 'v0.4.6-alpha'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+    version = 'v0.4.6-alpha'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    dependsOn copyNativeLibs
+}
+
+group = "de.gurkenlabs"
+archivesBaseName = "litiengine"
+version = "0.4.6"
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'litiengine'
+        packaging 'jar'
+        // optionally artifactId can be defined here 
+        description 'LITIengine is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.'
+        url 'http://litiengine.com'
+
+        scm {
+          connection 'scm:git:git://github.com/gurkenlabs/litiengine.git'
+          developerConnection 'scm:git:git@github.com:gurkenlabs/litiengine.git'
+          url 'https://github.com/gurkenlabs/litiengine/'
+        }
+
+        licenses {
+          license {
+            name 'MIT License'
+            url 'https://github.com/gurkenlabs/litiengine/blob/master/LICENSE'
+          }
+        }
+
+        developers {
+          developer {
+            id 'steffen'
+            name 'Steffen Wilke'
+            email 'steffen@gurkenlabs.de'
+          }
+          developer {
+            id 'matthias'
+            name 'Matthias Wilke'
+            email 'matthias@gurkenlabs.de'
+          }
+        }
+      }
+    }
+  }
+}
