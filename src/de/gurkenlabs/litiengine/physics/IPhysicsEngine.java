@@ -28,14 +28,16 @@ public interface IPhysicsEngine {
   public boolean collides(Rectangle2D rect);
 
   /**
-   *
+   * Checks whether the specified rectangle collides with anything.
+   * 
    * @param rect
+   *          The rectangle to check the collision for.
    * @param collisionType
    *          use the following flags
    *          <ul>
-   *          <li>{@link COLLTYPE_ENTITY}</li>
-   *          <li>{@link COLLTYPE_STATIC}</li>
-   *          <li>{@link COLLTYPE_ALL}</li>
+   *          <li>COLLTYPE_ENTITY</li>
+   *          <li>COLLTYPE_STATIC</li>
+   *          <li>COLLTYPE_ALL</li>
    *          </ul>
    * @return
    */

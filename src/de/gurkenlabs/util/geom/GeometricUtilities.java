@@ -106,10 +106,6 @@ public class GeometricUtilities {
   /**
    * Gets the connecting lines.
    *
-   * @param point
-   *          the point
-   * @param rectangle
-   *          the rectangle
    * @return the connecting lines
    */
   public static Line2D[] getConnectingLines(final Point2D point, final Point2D[] rectPoints) {

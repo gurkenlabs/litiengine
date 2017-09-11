@@ -39,8 +39,6 @@ public class ShimmerParticle extends RectangleFillParticle {
    *          the life
    * @param color
    *          the color
-   * @param particleType
-   *          the particle type
    */
   public ShimmerParticle(final Rectangle2D boundingBox, final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
     super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);

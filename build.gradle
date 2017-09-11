@@ -4,7 +4,9 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: "jacoco"
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceSets {
   main.java.srcDir "src"
@@ -43,6 +45,10 @@ jar {
   version = 'v0.4.6-alpha'
 }
 
+javadoc {
+  options.encoding = 'UTF-8'
+}
+
 jacocoTestReport {
   reports {
     xml.enabled true
@@ -52,6 +58,7 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
+
 task copyNativeLibs(type: Copy) {
   from(new File('lib')) { exclude '**/*.jar' }
   into new File(buildDir, 'libs')
@@ -60,7 +67,24 @@ task copyNativeLibs(type: Copy) {
   into new File(buildDir, 'libs')
 }
 
+task createJavadocs(type: Javadoc) {
+  source = sourceSets.main.allJava
+  options.encoding = 'UTF-8'
+  dependsOn build
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     dependsOn copyNativeLibs
 }
+

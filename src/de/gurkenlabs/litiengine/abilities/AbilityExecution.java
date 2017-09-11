@@ -82,9 +82,7 @@ public class AbilityExecution implements IUpdateable {
   /**
    * 1. Apply all ability effects after their delay. 2. Unregister this instance
    * after all effects were applied. 3. Effects will apply their follow up
-   * effects on their own. (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
+   * effects on their own.
    */
   @Override
   public void update(final IGameLoop loop) {

@@ -34,13 +34,6 @@ public class Path {
 
   /**
    * Instantiates a new path.
-   *
-   * @param entity
-   *          the entity
-   * @param target
-   *          the target
-   * @param path
-   *          the path
    */
   public Path(final Point2D start, final Point2D target, final Path2D path, final List<Point2D> points) {
     this.start = start;

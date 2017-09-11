@@ -250,9 +250,6 @@ public final class RenderEngine implements IRenderEngine {
 
   /**
    * Instantiates a new graphics engine.
-   *
-   * @param mapRenderer
-   *          the map renderer
    */
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -441,7 +438,6 @@ public final class RenderEngine implements IRenderEngine {
    *
    * @param g
    *          the g
-   * @see de.gurkenlabs.litiengine.graphics.IRenderEngine#renderMap(java.awt.Graphics)
    */
   @Override
   public void renderMap(final Graphics2D g, final IMap map) {

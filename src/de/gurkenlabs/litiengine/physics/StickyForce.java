@@ -15,16 +15,6 @@ public class StickyForce extends Force {
   /**
    * Instantiates a new sticky force.
    *
-   * @param affectedEntity
-   *          the affected entity
-   * @param forceEntity
-   *          the force entity
-   * @param strength
-   *          the strength in pixels per second
-   * @param duration
-   *          the duration
-   * @param cancelOnCollision
-   *          the cancel on collision
    */
   public StickyForce(final IEntity forceEntity, final float strength, final float size) {
     super(forceEntity.getDimensionCenter(), strength, size);
@@ -48,7 +38,6 @@ public class StickyForce extends Force {
   /*
    * (non-Javadoc)
    *
-   * @see de.gurkenlabs.liti.physics.Force#getLocation()
    */
   @Override
   public Point2D getLocation() {

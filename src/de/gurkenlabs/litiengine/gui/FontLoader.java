@@ -27,8 +27,6 @@ public class FontLoader {
    *
    * @param fontName
    *          the font name
-   * @param fontSize
-   *          the font size
    * @return the font
    */
   public static Font load(final String fontName) {

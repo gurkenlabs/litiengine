@@ -123,8 +123,8 @@ public class Environment implements IEnvironment {
   /**
    * Instantiates a new map container base.
    *
-   * @param map
-   *          the map
+   * @param mapPath
+   *          the mapPath
    */
   public Environment(final String mapPath) {
     this();

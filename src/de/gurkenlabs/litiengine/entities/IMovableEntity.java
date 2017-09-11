@@ -32,12 +32,6 @@ public interface IMovableEntity extends ICollisionEntity {
 
   public void setAcceleration(int acceleration);
 
-  /**
-   * Sets the facing direction.
-   *
-   * @param orientation
-   *          the new facing direction
-   */
   public void setAngle(float angle);
 
   public void setDeceleration(int deceleration);

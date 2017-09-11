@@ -83,8 +83,6 @@ public abstract class Particle implements ITimeToLive {
    *          The remaining lifetime of the effect.
    * @param color
    *          The color of the effect.
-   * @param particleType
-   *          the particle type
    */
   public Particle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
     this.xCurrent = xCurrent;

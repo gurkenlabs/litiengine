@@ -69,8 +69,6 @@ public interface ISoundEngine extends ILaunchable {
 
   /**
    * Stops the playback of the current background music.
-   * 
-   * @param sound
    */
   public void stopMusic();
 }

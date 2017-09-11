@@ -6,8 +6,7 @@ import de.gurkenlabs.core.ILaunchable;
 
 public interface IGameLoop extends ILaunchable {
   /**
-   * Attaches the update method of the specified
-   * {@link de.gurkenlabs.litiengine.IUpdatable IUpdatable} instance to be
+   * Attaches the update method of the specified IUpdatable instance to be
    * called every tick. The tick rate can be configured in the client
    * configuration and is independant from rendering.
    * 

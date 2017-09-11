@@ -44,8 +44,8 @@ public class ClientConnection implements Serializable {
    *          the ip address
    * @param port
    *          the port
-   * @param account
-   *          the account
+   * @param userName
+   *          the userName
    */
   public ClientConnection(final InetAddress ipAddress, final int port, final String userName) {
     super();

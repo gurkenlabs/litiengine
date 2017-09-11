@@ -16,10 +16,8 @@ import de.gurkenlabs.litiengine.IGameLoop;
  * The listener interface for receiving userKey events. The class that is
  * interested in processing a userKey event implements this interface, and the
  * object created with that class is registered with a component using the
- * component's <code>addUserKeyListener<code> method. When the userKey event
+ * component's <code>addUserKeyListener</code> method. When the userKey event
  * occurs, that object's appropriate method is invoked.
- *
- * @see UserKeyEvent
  */
 public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 

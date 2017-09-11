@@ -52,8 +52,6 @@ public class ImageProcessing {
    *          the x offset
    * @param yOffset
    *          the y offset
-   * @param border
-   *          the border
    * @return the buffered image
    */
   public static BufferedImage addShadow(final BufferedImage image, final int xOffset, final int yOffset) {
@@ -158,18 +156,25 @@ public class ImageProcessing {
    * @param cropAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link CROP_ALIGN_CENTER}</li>
-   *          <li>{@link CROP_ALIGN_LEFT}</li>
-   *          <li>{@link CROP_ALIGN_RIGHT}</li>
-   *          <ul>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_CENTER
+   *          CROP_ALIGN_CENTER}</li>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_LEFT
+   *          CROP_ALIGN_LEFT}</li>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_RIGHT
+   *          CROP_ALIGN_RIGHT}</li>
+   *          </ul>
    * @param cropVerticlaAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link CROP_VALIGN_CENTER}</li>
-   *          <li>{@link CROP_VALIGN_TOP}</li>
-   *          <li>{@link CROP_VALIGN_TOPCENTER}</li>
-   *          <li>{@link CROP_VALIGN_BOTTOM}</li>
-   *          <ul>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_CENTER
+   *          CROP_VALIGN_CENTER}</li>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_TOP
+   *          CROP_VALIGN_TOP}</li>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_TOPCENTER
+   *          CROP_VALIGN_TOPCENTER}</li>
+   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_BOTTOM
+   *          CROP_VALIGN_BOTTOM}</li>
+   *          </ul>
    * @param width
    * @param height
    * @return

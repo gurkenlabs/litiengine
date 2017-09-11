@@ -28,17 +28,10 @@ public class Force {
 
   /**
    * Instantiates a new force.
-   *
-   * @param affectedEntity
-   *          the affected entity
+   * 
    * @param location
-   *          the location
    * @param strength
-   *          the strength in pixels per second
-   * @param duration
-   *          the duration
-   * @param cancelOnCollision
-   *          the cancel on collision
+   * @param size
    */
   public Force(final Point2D location, final float strength, final float size) {
     this.location = location;

@@ -58,8 +58,8 @@ public abstract class Ability implements IRenderable {
   /**
    * Instantiates a new ability.
    *
-   * @param executingMob
-   *          the executing mob
+   * @param executor
+   *          the executing entity
    */
   protected Ability(final IMovableCombatEntity executor) {
     this.abilityCastConsumer = new CopyOnWriteArrayList<>();

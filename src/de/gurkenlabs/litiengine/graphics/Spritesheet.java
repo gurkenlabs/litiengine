@@ -130,7 +130,7 @@ public final class Spritesheet {
 
   /**
    * The sprite info file must be located under the
-   * {@link de.gurkenlags.litiengine.GameInfo#getSpritesDirectory()}. directory.
+   * GameInfo#getSpritesDirectory() directory.
    *
    * @param spriteInfoFile
    * @return
