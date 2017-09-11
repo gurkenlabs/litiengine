@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/gurkenlabs/litiengine.svg?branch=master)](https://travis-ci.org/gurkenlabs/litiengine)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=de.gurkenlabs:litiengine)](https://sonarcloud.io/dashboard?id=de.gurkenlabs%3Alitiengine)
+[![Maven Central](https://img.shields.io/maven-central/v/de.gurkenlabs/litiengine.svg)](https://maven-badges.herokuapp.com/maven-central/de.gurkenlabs/litiengine)
+[![Javadocs](http://www.javadoc.io/badge/de.gurkenlabs/litiengine.svg)](http://www.javadoc.io/doc/de.gurkenlabs/litiengine)
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
