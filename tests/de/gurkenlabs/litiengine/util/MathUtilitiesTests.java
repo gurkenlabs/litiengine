@@ -80,16 +80,18 @@ public class MathUtilitiesTests {
 
   @Test
   public void testRandomInRange() {
-    double rnd = MathUtilities.randomInRange(0.0, 10);
-    int rndInt = MathUtilities.randomInRange(0, 10);
+    for (int i = 0; i < 100; i++) {
+      double rnd = MathUtilities.randomInRange(0.0, 10);
+      int rndInt = MathUtilities.randomInRange(0, 10);
 
-    Assert.assertTrue(rnd > 0 && rnd < 10);
-    Assert.assertTrue(rndInt > 0 && rndInt < 10);
+      Assert.assertTrue(rnd >= 0 && rnd < 10);
+      Assert.assertTrue(rndInt >= 0 && rndInt < 10);
+    }
   }
 
   @Test
   public void testRandomSign() {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       int rnd = MathUtilities.randomSign();
       Assert.assertTrue(rnd == 1 || rnd == -1);
     }

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -79,8 +80,8 @@ import de.gurkenlabs.util.io.FileUtilities;
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
 
-  private static int localIdSequence = 0;
-  private static int mapIdSequence;
+  private int localIdSequence = 0;
+  private int mapIdSequence;
 
   private AmbientLight ambientLight;
   private final Collection<Collider> colliders;
@@ -116,7 +117,7 @@ public class Environment implements IEnvironment {
   public Environment(final IMap map) {
     this();
     this.map = map;
-    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
+    this.mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
 
@@ -136,7 +137,7 @@ public class Environment implements IEnvironment {
       this.map = loadedMap;
     }
 
-    mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
+    this.mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
 
@@ -643,18 +644,18 @@ public class Environment implements IEnvironment {
   @Override
   public void loadFromMap(final int mapId) {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
-      for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty() || mapObject.getId() != mapId) {
-          continue;
-        }
-
+      Optional<IMapObject> opt = layer.getMapObjects().stream().filter(mapObject -> mapObject.getType() != null && !mapObject.getType().isEmpty() && mapObject.getId() == mapId).findFirst();
+      if (opt.isPresent()) {
+        IMapObject mapObject = opt.get();
         this.addMapObject(mapObject);
         if (MapObjectType.get(mapObject.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
           this.addStaticShadows();
         }
+
         break;
       }
     }
+
   }
 
   @Override
@@ -957,11 +958,7 @@ public class Environment implements IEnvironment {
     this.addProp(mapObject);
     this.addEmitter(mapObject);
     this.addDecorMob(mapObject);
-    this.addMob(mapObject);
     this.addTrigger(mapObject);
-  }
-
-  protected void addMob(final IMapObject mapObject) {
   }
 
   protected void addProp(final IMapObject mapObject) {
