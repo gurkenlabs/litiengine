@@ -51,6 +51,8 @@ public final class Game {
   private static final List<Predicate<String>> terminatingConsumer;
   private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
 
+  private static boolean hasStarted;
+
   static {
     startedConsumer = new CopyOnWriteArrayList<>();
     terminatingConsumer = new CopyOnWriteArrayList<>();
@@ -272,6 +274,8 @@ public final class Game {
     for (final Consumer<String> cons : startedConsumer) {
       cons.accept(Game.getInfo().getName());
     }
+
+    hasStarted = true;
   }
 
   public static void terminate() {
@@ -288,5 +292,9 @@ public final class Game {
     renderLoop.terminate();
 
     System.exit(0);
+  }
+
+  public static boolean hasStarted() {
+    return hasStarted;
   }
 }

@@ -95,12 +95,13 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void displayScreen(final String screen) {
-    // if the scren is already displayed or there is no screen with the
+    // if the screen is already displayed or there is no screen with the
     // specified name
     if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
       return;
     }
-    if (System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
+
+    if (Game.hasStarted() && System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
       return;
     }
 
