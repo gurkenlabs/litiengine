@@ -196,7 +196,7 @@ public abstract class Entity implements IEntity {
     }
   }
 
-  protected void setAngle(final float angle) {
+  public void setAngle(final float angle) {
     this.angle = angle;
   }
 }

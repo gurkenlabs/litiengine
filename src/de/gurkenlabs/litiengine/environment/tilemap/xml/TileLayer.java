@@ -76,7 +76,7 @@ public class TileLayer extends Layer implements ITileLayer {
       return this.tileList;
     }
 
-    this.tileList = new CopyOnWriteArrayList<ITile>();
+    this.tileList = new CopyOnWriteArrayList<>();
     if (this.data == null) {
       return this.tileList;
     }

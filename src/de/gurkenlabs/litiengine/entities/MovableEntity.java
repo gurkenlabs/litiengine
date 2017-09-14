@@ -62,11 +62,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public void setAngle(final float angle) {
-    super.setAngle(angle);
-  }
-
-  @Override
   public void setDeceleration(final int deceleration) {
     this.deceleration = deceleration;
   }

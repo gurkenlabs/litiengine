@@ -82,17 +82,6 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     this.acceleration = acceleration;
   }
 
-  /**
-   * Sets the facing direction.
-   *
-   * @param angle
-   *          the new facing direction
-   */
-  @Override
-  public void setAngle(final float angle) {
-    super.setAngle(angle);
-  }
-
   @Override
   public void setDeceleration(final int deceleration) {
     this.deceleration = deceleration;

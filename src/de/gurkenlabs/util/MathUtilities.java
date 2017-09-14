@@ -3,7 +3,7 @@ package de.gurkenlabs.util;
 import java.util.Random;
 
 public class MathUtilities {
-  private static Random RANDOM = new Random();
+  private static Random random = new Random();
 
   private MathUtilities() {
   }
@@ -80,7 +80,7 @@ public class MathUtilities {
    * @return
    */
   public static int getRandomIndex(final double[] indexProbabilities) {
-    final double rnd = RANDOM.nextDouble();
+    final double rnd = random.nextDouble();
     double probSum = 0;
     for (int i = 0; i < indexProbabilities.length; i++) {
       final double newProbSum = probSum + indexProbabilities[i];
@@ -99,11 +99,11 @@ public class MathUtilities {
   }
 
   public static boolean probabilityIsTrue(final double probability) {
-    return RANDOM.nextDouble() < probability;
+    return random.nextDouble() < probability;
   }
 
   public static boolean randomBoolean() {
-    return RANDOM.nextDouble() < 0.5;
+    return random.nextDouble() < 0.5;
   }
 
   public static double randomInRange(final double min, final double max) {
@@ -115,7 +115,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return min + RANDOM.nextDouble() * (max - min);
+    return min + random.nextDouble() * (max - min);
   }
 
   public static int randomInRange(final int min, final int max) {
@@ -127,7 +127,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return (int) (min + RANDOM.nextDouble() * (max - min));
+    return (int) (min + random.nextDouble() * (max - min));
   }
 
   public static int randomSign() {

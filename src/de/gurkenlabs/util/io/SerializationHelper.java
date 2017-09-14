@@ -34,8 +34,7 @@ public class SerializationHelper {
    * @return
    */
   public static float decodeSmallFloatingPointNumber(final short encodedNumber, final int precision) {
-    final float smallNumber = (float) ((encodedNumber + Short.MAX_VALUE) / Math.pow(10, precision));
-    return smallNumber;
+    return (float) ((encodedNumber + Short.MAX_VALUE) / Math.pow(10, precision));
   }
 
   /**
@@ -76,7 +75,6 @@ public class SerializationHelper {
       throw new IllegalArgumentException("The specified number is not within the range to encode.");
     }
 
-    final short number = (short) (smallNumber * Math.pow(10, precision) - Short.MAX_VALUE);
-    return number;
+    return (short) (smallNumber * Math.pow(10, precision) - Short.MAX_VALUE);
   }
 }
