@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.gurkenlabs.configuration.Configuration;
 import de.gurkenlabs.configuration.ConfigurationGroup;
+import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 
 public class ConfigurationTests {
 
@@ -29,6 +30,9 @@ public class ConfigurationTests {
       config = new Configuration(group);
       config.load();
       Assert.assertTrue(config.getConfigurationGroup(group.getClass()).equals(group));
+      Assert.assertEquals("test-prefix", group.getPrefix());
+      Assert.assertTrue(config.getConfigurationGroup("test-prefix").equals(group));
+
     } finally {
       deleteTempConfigFile(config);
     }
@@ -89,6 +93,7 @@ public class ConfigurationTests {
     TEST1, TEST2;
   }
 
+  @ConfigurationGroupInfo(prefix = "test-prefix")
   private class TestConfigurationGroup extends ConfigurationGroup {
 
     private boolean testBoolean;
@@ -100,6 +105,9 @@ public class ConfigurationTests {
     private long testLong;
     private short testShort;
     private String testString;
+    private String[] testStringArray;
+
+    private String testWithNoSetter;
 
     public byte getTestByte() {
       return this.testByte;
@@ -171,6 +179,18 @@ public class ConfigurationTests {
 
     public void setTestString(final String testString) {
       this.testString = "test";
+    }
+
+    public String[] getTestStringArray() {
+      return testStringArray;
+    }
+
+    public void setTestStringArray(String[] testStringArray) {
+      this.testStringArray = testStringArray;
+    }
+
+    public String getTestWithNoSetter() {
+      return testWithNoSetter;
     }
   }
 }
