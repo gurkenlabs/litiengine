@@ -120,7 +120,7 @@ public class CustomEmitter extends Emitter {
 
     Particle particle;
     switch (this.getEmitterData().getParticleType()) {
-    case LeftLineParticle:
+    case LEFTLINE:
       particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL())
       .setX(x)
       .setY(y)
@@ -131,7 +131,7 @@ public class CustomEmitter extends Emitter {
       .setDeltaWidth(deltaWidth)
       .setDeltaHeight(deltaHeight);
       break;
-    case OvalParticle:
+    case DISC:
       particle = new OvalParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL())
           .setX(x)
           .setY(y)
@@ -142,7 +142,7 @@ public class CustomEmitter extends Emitter {
           .setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;
-    case RectangleFillParticle:
+    case RECTANGLE:
       particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL())
           .setX(x)
           .setY(y)
@@ -153,7 +153,7 @@ public class CustomEmitter extends Emitter {
           .setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;
-    case RectangleOutlineParticle:
+    case RECTANGLE_OUTLINE:
       particle = new RectangleOutlineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL())
           .setX(x)
           .setY(y)
@@ -164,7 +164,7 @@ public class CustomEmitter extends Emitter {
           .setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;
-    case RightLineParticle:
+    case RIGHTLINE:
       particle = new RightLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL())
           .setX(x)
           .setY(y)
@@ -175,7 +175,7 @@ public class CustomEmitter extends Emitter {
           .setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;
-    case ShimmerParticle:
+    case SHIMMER:
       particle = new ShimmerParticle(new Rectangle2D.Float(x, y, this.getWidth(), this.getHeight()), width, height, this.getRandomParticleColor())
           .setX(x)
           .setY(y)
@@ -186,7 +186,7 @@ public class CustomEmitter extends Emitter {
           .setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;
-    case TextParticle:
+    case TEXT:
       particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL())
           .setX(x)
           .setY(y)
