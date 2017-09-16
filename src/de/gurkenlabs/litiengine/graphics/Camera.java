@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -43,6 +44,8 @@ public class Camera implements ICamera {
   private float zoomStep;
 
   private long zoomTick;
+
+  private boolean clampToMap;
 
   /**
    * Instantiates a new camera.
@@ -181,7 +184,7 @@ public class Camera implements ICamera {
       focus.setLocation(focus.getX(), focus.getY() + 0.01);
     }
 
-    this.focus = focus;
+    this.focus = this.clampToMap(focus);
   }
 
   @Override
@@ -273,6 +276,25 @@ public class Camera implements ICamera {
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getRenderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getRenderScale());
   }
 
+  protected Point2D clampToMap(Point2D focus) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
+      return focus;
+    }
+
+    final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
+    final Dimension resolution = Game.getScreenManager().getResolution();
+
+    double minX = resolution.getWidth() / Game.getInfo().getRenderScale() / 2;
+    double maxX = mapSize.getWidth() - minX;
+    double minY = resolution.getHeight() / Game.getInfo().getRenderScale() / 2;
+    double maxY = mapSize.getHeight() - minY;
+
+    double x = mapSize.getWidth() * Game.getInfo().getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
+    double y = mapSize.getHeight() * Game.getInfo().getRenderScale() < resolution.getHeight() ? minY : MathUtilities.clamp(focus.getY(), minY, maxY);
+
+    return new Point2D.Double(x, y);
+  }
+
   /**
    * Apply shake effect.
    *
@@ -325,5 +347,13 @@ public class Camera implements ICamera {
 
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
+  }
+
+  public boolean isClampToMap() {
+    return clampToMap;
+  }
+
+  public void setClampToMap(boolean clampToMap) {
+    this.clampToMap = clampToMap;
   }
 }

@@ -92,6 +92,10 @@ public interface ICamera extends IUpdateable {
 
   public void setZoom(float zoom, int delay);
 
+  public boolean isClampToMap();
+
+  public void setClampToMap(boolean clampToMap);
+
   public void shake(double intensity, final int delay, int duration);
 
   public void updateFocus();
