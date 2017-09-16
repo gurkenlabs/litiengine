@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,16 +15,15 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 
 @XmlRootElement(name = "animation")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Animation implements ITileAnimation {
+public class Animation implements ITileAnimation, Serializable {
+  private static final long serialVersionUID = -6359129685451548791L;
 
   @XmlElement(name = "frame")
   private List<Frame> frames;
 
-  @XmlTransient
-  private List<ITileAnimationFrame> tileAnimationFrames;
+  private transient List<ITileAnimationFrame> tileAnimationFrames;
 
-  @XmlTransient
-  private int totalDuration;
+  private transient int totalDuration;
 
   @Override
   public List<ITileAnimationFrame> getFrames() {

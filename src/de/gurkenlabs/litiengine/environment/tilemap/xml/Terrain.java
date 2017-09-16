@@ -8,6 +8,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Terrain extends CustomPropertyProvider implements ITerrain {
+  private static final long serialVersionUID = 2890727446376641648L;
+
   @XmlAttribute
   private String name;
 

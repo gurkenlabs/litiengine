@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -10,7 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "property")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Property {
+public class Property implements Serializable {
+  private static final long serialVersionUID = 4684901360660207599L;
 
   /** The name. */
   @XmlAttribute

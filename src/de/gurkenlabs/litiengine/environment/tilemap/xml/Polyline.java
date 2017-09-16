@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,12 +12,13 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
 @XmlRootElement(name = "polyline")
-public class Polyline implements IPolyline {
+public class Polyline implements IPolyline, Serializable {
+  private static final long serialVersionUID = -9046398175130339L;
+
   @XmlAttribute(name = "points")
   private String rawPoints;
 
-  @XmlTransient
-  private final List<Point2D> points;
+  private final transient List<Point2D> points;
 
   public Polyline() {
     this.points = new ArrayList<>();

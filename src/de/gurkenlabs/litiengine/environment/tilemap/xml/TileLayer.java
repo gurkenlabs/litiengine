@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
@@ -19,14 +20,16 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
  */
 @XmlRootElement(name = "layer")
 public class TileLayer extends Layer implements ITileLayer {
+  private static final long serialVersionUID = -6588787132358068892L;
 
   /** The data. */
   @XmlElementWrapper(name = "data")
   @XmlElement(name = "tile")
-  private final List<Tile> data = null;
-  private List<ITile> tileList;
+  private List<Tile> data = null;
 
-  private Tile[][] tiles;
+  private transient List<ITile> tileList;
+
+  private transient Tile[][] tiles;
 
   /*
    * (non-Javadoc)

@@ -18,6 +18,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 @XmlRootElement(name = "image")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MapImage extends CustomPropertyProvider implements IMapImage {
+  private static final long serialVersionUID = -3571362172734426098L;
+
   /** The source. */
   @XmlAttribute
   private String source;

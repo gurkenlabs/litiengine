@@ -24,6 +24,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
  */
 @XmlRootElement(name = "objectgroup")
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
+  private static final long serialVersionUID = -6130660578937427531L;
+
   private static final Logger log = Logger.getLogger(MapObjectLayer.class.getName());
 
   /** The objects. */
@@ -33,11 +35,9 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @XmlAttribute
   private String color;
 
-  @XmlTransient
-  private List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
+  private transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
-  @XmlTransient
-  private boolean added;
+  private transient boolean added;
 
   /*
    * (non-Javadoc)

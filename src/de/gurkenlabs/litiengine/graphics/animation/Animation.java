@@ -50,13 +50,13 @@ public class Animation implements IUpdateable, ILaunchable {
     this.keyframes = new ArrayList<>();
 
     if (spritesheet == null) {
-      log.log(Level.WARNING, "no spritesheet defined for animation %s", this.getName());
+      log.log(Level.WARNING, "no spritesheet defined for animation {0}", this.getName());
       return;
     }
 
     this.initKeyFrames(keyFrameDurations);
     if (this.getKeyframes().isEmpty()) {
-      log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spitesheet: %s)", spritesheet.getName());
+      log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spitesheet: {0})", spritesheet.getName());
     }
 
     Game.getLoop().attach(this);

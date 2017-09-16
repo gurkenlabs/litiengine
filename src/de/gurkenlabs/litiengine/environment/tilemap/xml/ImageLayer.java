@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
  */
 @XmlRootElement(name = "imagelayer")
 public class ImageLayer extends Layer implements IImageLayer {
+  private static final long serialVersionUID = 3233918712579479523L;
 
   /** The image. */
   @XmlElement(name = "image")

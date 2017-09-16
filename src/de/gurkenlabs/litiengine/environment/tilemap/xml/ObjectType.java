@@ -1,12 +1,17 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "objecttype")
-public class ObjectType {
+public class ObjectType implements Serializable {
+  private static final long serialVersionUID = 2678464886060196465L;
+
   @XmlAttribute
   private String name;
+
   @XmlAttribute
   private String color;
 

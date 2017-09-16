@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,9 @@ import de.gurkenlabs.util.io.XmlUtilities;
  */
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Map extends CustomPropertyProvider implements IMap, Comparable<Map> {
+public class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
+
+  private static final long serialVersionUID = 402776584608365440L;
   private static final Logger log = Logger.getLogger(Map.class.getName());
   public static final String FILE_EXTENSION = "tmx";
 
@@ -354,6 +357,10 @@ public class Map extends CustomPropertyProvider implements IMap, Comparable<Map>
   }
 
   public String save(String fileName) {
+    if (fileName == null || fileName.isEmpty()) {
+      return null;
+    }
+
     if (!fileName.endsWith("." + FILE_EXTENSION)) {
       fileName += "." + FILE_EXTENSION;
     }

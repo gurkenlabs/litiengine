@@ -18,6 +18,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
  */
 @XmlRootElement(name = "object")
 public class MapObject extends CustomPropertyProvider implements IMapObject {
+  private static final long serialVersionUID = -6001981756772928868L;
+
   /** The id. */
   @XmlAttribute
   private int id;

@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
+  private static final long serialVersionUID = 1711536300667154031L;
 
   /** The firstgid. */
   @XmlAttribute

@@ -39,7 +39,7 @@ public class GameFile implements Serializable {
 
   @XmlElementWrapper(name = "maps")
   @XmlElement(name = "map")
-  private final List<Map> maps;
+  private List<Map> maps;
 
   @XmlElementWrapper(name = "spriteFiles")
   @XmlElement(name = "spritefile")

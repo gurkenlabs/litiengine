@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
+import java.io.Serializable;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -19,7 +20,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
  */
 @XmlRootElement(name = "tile")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Tile extends CustomPropertyProvider implements ITile {
+public class Tile extends CustomPropertyProvider implements ITile, Serializable {
+  private static final long serialVersionUID = -7597673646108642906L;
 
   /** The gid. */
   @XmlAttribute
@@ -35,11 +37,9 @@ public class Tile extends CustomPropertyProvider implements ITile {
   private Animation animation;
 
   /** The tile coordinate. */
-  @XmlTransient
-  private Point tileCoordinate;
+  private transient Point tileCoordinate;
 
-  @XmlTransient
-  private ITerrain[] terrains;
+  private transient ITerrain[] terrains;
 
   /*
    * (non-Javadoc)
