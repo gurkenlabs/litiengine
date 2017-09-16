@@ -27,10 +27,6 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class SoundSource {
   private static final Logger log = Logger.getLogger(SoundSource.class.getName());
   protected static final SourceDataLineCloseQueue closeQueue;
-  static {
-    closeQueue = new SourceDataLineCloseQueue();
-    closeQueue.start();
-  }
 
   private SourceDataLine dataLine;
 
@@ -49,6 +45,11 @@ public class SoundSource {
   private boolean playing;
 
   private final Sound sound;
+
+  static {
+    closeQueue = new SourceDataLineCloseQueue();
+    closeQueue.start();
+  }
 
   protected SoundSource(final Sound sound) {
     this(sound, null);
@@ -110,7 +111,8 @@ public class SoundSource {
     }
 
     this.gain = gain;
-    final PlayThread thread = new PlayThread();
+    this.location = location;
+    final PlayThread thread = new PlayThread(loop);
     thread.start();
     this.played = true;
   }
@@ -191,16 +193,16 @@ public class SoundSource {
   }
 
   private class PlayThread extends Thread {
+    private boolean loop;
+
+    public PlayThread(final boolean loop) {
+      this.loop = loop;
+    }
+
     @Override
     public void run() {
-      final DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, SoundSource.this.sound.getFormat());
 
-      try {
-        SoundSource.this.dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
-        SoundSource.this.dataLine.open();
-      } catch (final LineUnavailableException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-      }
+      this.loadDataLine();
 
       if (SoundSource.this.dataLine == null) {
         return;
@@ -216,21 +218,23 @@ public class SoundSource {
       SoundSource.this.played = false;
       SoundSource.this.playing = true;
       final byte[] buffer = new byte[1024];
-      final ByteArrayInputStream str = new ByteArrayInputStream(SoundSource.this.sound.getStreamData());
+      ByteArrayInputStream str = new ByteArrayInputStream(SoundSource.this.sound.getStreamData());
       while (true) {
         int readCount;
         try {
           readCount = str.read(buffer);
 
           if (readCount < 0) {
-            break;
-          }
+            if (!this.loop || SoundSource.this.dataLine == null) {
+              break;
+            }
 
-          if (SoundSource.this.dataLine == null) {
-            break;
-          }
+            restartDataLine();
+            str = new ByteArrayInputStream(SoundSource.this.sound.getStreamData());
 
-          SoundSource.this.dataLine.write(buffer, 0, readCount);
+          } else if (SoundSource.this.dataLine != null) {
+            SoundSource.this.dataLine.write(buffer, 0, readCount);
+          }
         } catch (final IOException e) {
           log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -239,6 +243,22 @@ public class SoundSource {
         SoundSource.this.dataLine.drain();
       }
       SoundSource.this.playing = false;
+    }
+
+    private void loadDataLine() {
+      final DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, SoundSource.this.sound.getFormat());
+      try {
+        SoundSource.this.dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
+        SoundSource.this.dataLine.open();
+      } catch (final LineUnavailableException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
+
+    private void restartDataLine() {
+      SoundSource.this.dataLine.drain();
+      this.loadDataLine();
+      SoundSource.this.dataLine.start();
     }
 
     private void initControls() {
