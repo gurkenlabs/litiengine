@@ -29,16 +29,9 @@ public final class TmxMapLoader implements IMapLoader {
       final JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
-      InputStream stream = null;
-      try {
-
-        stream = ClassLoader.getSystemResourceAsStream(path);
-        if (stream == null) {
-          stream = new FileInputStream(path);
-        }
-      } catch (IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        return null;
+      InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+      if (stream == null) {
+        stream = new FileInputStream(path);
       }
 
       final Map map = (Map) um.unmarshal(stream);
@@ -65,7 +58,7 @@ public final class TmxMapLoader implements IMapLoader {
       map.updateTileTerrain();
 
       return map;
-    } catch (final JAXBException e) {
+    } catch (final JAXBException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 

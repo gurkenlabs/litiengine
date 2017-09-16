@@ -6,15 +6,15 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 public enum MapOrientation {
 
   /** The hexagonal. */
-  hexagonal,
+  HEXAGONAL,
   /** The isometric. */
-  isometric,
+  ISOMETRIC,
   /** The orthogonal. */
-  orthogonal,
+  ORTHOGONAL,
   /** The shifted. */
-  shifted,
+  SHIFTED,
   /** The staggered. */
-  staggered;
+  STAGGERED;
 
   /**
    * Value.
@@ -22,6 +22,6 @@ public enum MapOrientation {
    * @return the string
    */
   public String value() {
-    return this.name();
+    return this.name().toLowerCase();
   }
 }

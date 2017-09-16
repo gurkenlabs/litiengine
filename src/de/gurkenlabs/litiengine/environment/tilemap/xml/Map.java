@@ -152,7 +152,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
    */
   @Override
   public MapOrientation getOrientation() {
-    return MapOrientation.valueOf(this.orientation);
+    return MapOrientation.valueOf(this.orientation.toUpperCase());
   }
 
   @Override

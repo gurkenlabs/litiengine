@@ -118,7 +118,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   @Override
   public MapOrientation getSupportedOrientation() {
-    return MapOrientation.orthogonal;
+    return MapOrientation.ORTHOGONAL;
   }
 
   @Override
@@ -153,7 +153,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       }
 
       if (layer instanceof IImageLayer) {
-        this.renderImageLayer(g, (IImageLayer) layer, map, viewport);
+        this.renderImageLayer(g, (IImageLayer) layer, viewport);
       }
     }
   }
@@ -304,7 +304,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     g.setComposite(oldComp);
   }
 
-  private void renderImageLayer(Graphics2D g, IImageLayer layer, IMap map, Rectangle2D viewport) {
+  private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
     final Composite oldComp = g.getComposite();
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);

@@ -259,7 +259,7 @@ public final class RenderEngine implements IRenderEngine {
     this.mapRenderer = new EnumMap<>(MapOrientation.class);
     this.entityComparator = new EntityYComparator();
 
-    this.mapRenderer.put(MapOrientation.orthogonal, new OrthogonalMapRenderer());
+    this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
   }
 
   @Override
