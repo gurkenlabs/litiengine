@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
-
+  private static final int IDLE_DELAY = 100;
   private int acceleration;
   private int deceleration;
   private final List<Consumer<IMovableEntity>> entityMovedConsumer;
@@ -64,8 +65,7 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
    */
   @Override
   public boolean isIdle() {
-    final int IDLE_DELAY = 100;
-    return System.currentTimeMillis() - this.lastMoved > IDLE_DELAY;
+    return Game.getLoop().getDeltaTime(this.lastMoved) > IDLE_DELAY;
   }
 
   @Override
@@ -105,7 +105,7 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     }
 
     super.setLocation(position);
-    this.lastMoved = System.currentTimeMillis();
+    this.lastMoved = Game.getLoop().getTicks();
 
     for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
