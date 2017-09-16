@@ -10,8 +10,8 @@ import java.awt.geom.Rectangle2D;
  */
 public class RectangleFillParticle extends Particle {
 
-  public RectangleFillParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, width, height, life, color);
+  public RectangleFillParticle(final float width, final float height, final Color color, final int ttl) {
+    super(width, height, color, ttl);
   }
 
   @Override

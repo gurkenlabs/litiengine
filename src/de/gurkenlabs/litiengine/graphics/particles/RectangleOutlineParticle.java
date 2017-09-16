@@ -10,8 +10,8 @@ import java.awt.geom.Rectangle2D;
 public class RectangleOutlineParticle extends Particle {
   private float stroke = 0.5f;
 
-  public RectangleOutlineParticle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
+  public RectangleOutlineParticle(final float width, final float height, final Color color, final int ttl) {
+    super(width, height, color, ttl);
   }
 
   public float getStroke() {

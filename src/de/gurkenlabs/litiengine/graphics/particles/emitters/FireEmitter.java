@@ -66,13 +66,13 @@ public class FireEmitter extends Emitter {
   public void newParticle(final Color color, final int life, final double maxAxisMovement) {
     final boolean randBool = Math.random() >= 0.5;
 
-    final float xCoord = (float) (this.getWidth() * 0.5 + Math.random() * maxAxisMovement * (randBool ? -1f : 1f));
+    final float x = (float) (this.getWidth() * 0.5 + Math.random() * maxAxisMovement * (randBool ? -1f : 1f));
     final float dx = (float) (Math.random() * 0.2);
     final float dy = (float) (Math.random() * 2 * -1f);
     final float gravityY = 0.0015f * (randBool ? 1f : -1f);
     final float size = (float) (4 + Math.random() * 5);
 
-    this.addParticle(new RectangleFillParticle(xCoord, 0, dx, dy, 0.0f, gravityY, size, size, life, color));
+    this.addParticle(new RectangleFillParticle(size, size, color, life).setX(x).setDeltaX(dx).setDeltyY(dy).setDeltaIncY(gravityY));
   }
 
   /*

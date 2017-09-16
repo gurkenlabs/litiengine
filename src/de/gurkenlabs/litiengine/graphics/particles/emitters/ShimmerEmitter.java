@@ -37,8 +37,8 @@ public class ShimmerEmitter extends Emitter {
   public Particle createNewParticle() {
     final Random rand = new Random();
 
-    final float xCoord = rand.nextInt((int) this.getWidth());
-    final float yCoord = rand.nextInt((int) this.getHeight());
+    final float x = rand.nextInt((int) this.getWidth());
+    final float y = rand.nextInt((int) this.getHeight());
     final float randX = rand.nextFloat();
     final float dx = Math.random() >= 0.5 ? -randX : randX;
     final float dy = Math.random() >= 0.5 ? -randX : randX;
@@ -49,6 +49,10 @@ public class ShimmerEmitter extends Emitter {
       color = new Color(170, 255, 255, new Random().nextInt(155) + 100);
     }
 
-    return new ShimmerParticle(this.getBoundingBox(), xCoord, yCoord, dx, dy, 0.0f, 0.0f, size, size, 0, color);
+    return new ShimmerParticle(this.getBoundingBox(), size, size, color)
+        .setX(x)
+        .setY(y)
+        .setDeltaX(dx)
+        .setDeltyY(dy);
   }
 }

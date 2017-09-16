@@ -19,29 +19,15 @@ public class ShimmerParticle extends RectangleFillParticle {
    *
    * @param boundingBox
    *          the bounding box
-   * @param xCurrent
-   *          the x current
-   * @param yCurrent
-   *          the y current
-   * @param dx
-   *          the dx
-   * @param dy
-   *          the dy
-   * @param gravityX
-   *          the gravity x
-   * @param gravityY
-   *          the gravity y
    * @param width
    *          the width
    * @param height
    *          the height
-   * @param life
-   *          the life
    * @param color
    *          the color
    */
-  public ShimmerParticle(final Rectangle2D boundingBox, final float xCurrent, final float yCurrent, final float dx, final float dy, final float gravityX, final float gravityY, final float width, final float height, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, gravityX, gravityY, width, height, life, color);
+  public ShimmerParticle(final Rectangle2D boundingBox, final float width, final float height, final Color color) {
+    super(width, height, color, 0);
     this.boundingBox = boundingBox;
   }
 
@@ -65,19 +51,19 @@ public class ShimmerParticle extends RectangleFillParticle {
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());
     final Point2D relativeParticleLocation = this.getRelativeLocation(emitterLocation);
     if (relativeParticleLocation.getX() < this.getBoundingBox().getX()) {
-      this.setDx(-this.getDx());
+      this.setDeltaX(-this.getDx());
     }
 
     if (relativeParticleLocation.getX() > this.getBoundingBox().getX() + this.getBoundingBox().getWidth()) {
-      this.setDx(-this.getDx());
+      this.setDeltaX(-this.getDx());
     }
 
     if (relativeParticleLocation.getY() < this.getBoundingBox().getY()) {
-      this.setDy(-this.getDy());
+      this.setDeltyY(-this.getDy());
     }
 
     if (relativeParticleLocation.getY() > this.getBoundingBox().getY() + this.getBoundingBox().getHeight()) {
-      this.setDy(-this.getDy());
+      this.setDeltyY(-this.getDy());
     }
   }
 

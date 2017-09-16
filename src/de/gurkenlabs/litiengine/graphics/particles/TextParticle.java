@@ -10,8 +10,8 @@ public class TextParticle extends Particle {
   private Font font;
   private final String text;
 
-  public TextParticle(final String text, final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, 0, 0, life, color);
+  public TextParticle(final String text, final Color color, final int ttl) {
+    super(0, 0, color, ttl);
     this.text = text;
   }
 

@@ -58,42 +58,20 @@ public abstract class Particle implements ITimeToLive {
 
   /**
    * Constructs a new particle.
-   *
-   * @param xCurrent
-   *          The current location of the effect on the X-axis relative to the
-   *          effects map location.
-   * @param yCurrent
-   *          The currentlocation of the particle on the Y-axis relative to the
-   *          effects map location.
-   * @param dx
-   *          The change in X, per update, of the effect.
-   * @param dy
-   *          The change in Y, per update, of the effect.
-   * @param deltaIncX
-   *          The gravitational pull to the left (negative) and right (positive)
-   *          acting on this effect.
-   * @param deltaIncY
-   *          The gravitational pull to the up (negative) and down (positive)
-   *          acting on this effect.
+   * 
    * @param width
    *          the width
    * @param height
    *          the height
-   * @param life
-   *          The remaining lifetime of the effect.
+   * @param ttl
+   *          The remaining time to live of the particle.
    * @param color
    *          The color of the effect.
    */
-  public Particle(final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
-    this.xCurrent = xCurrent;
-    this.yCurrent = yCurrent;
-    this.dx = dx;
-    this.dy = dy;
-    this.gravityX = deltaIncX;
-    this.gravityY = deltaIncY;
+  public Particle(final float width, final float height, final Color color, final int ttl) {
     this.setWidth(width);
     this.setHeight(height);
-    this.timeToLive = life;
+    this.timeToLive = ttl;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
     this.setCollisionType(CollisionType.COLLTYPE_ALL);
@@ -193,8 +171,8 @@ public abstract class Particle implements ITimeToLive {
   public Point2D getLocation(Point2D effectLocation) {
     // if we have a camera, we need to render the particle relative to the
     // viewport
-    effectLocation = Game.getScreenManager() != null ? Game.getScreenManager().getCamera().getViewPortLocation(effectLocation) : effectLocation;
-    return this.getRelativeLocation(effectLocation);
+    Point2D newEffectLocation = Game.getScreenManager() != null ? Game.getScreenManager().getCamera().getViewPortLocation(effectLocation) : effectLocation;
+    return this.getRelativeLocation(newEffectLocation);
   }
 
   @Override
@@ -235,12 +213,14 @@ public abstract class Particle implements ITimeToLive {
 
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
-  public void setApplyPhysics(final boolean applyStaticPhysics) {
+  public Particle setApplyPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
+    return this;
   }
 
-  public void setCollisionType(final int collisionType) {
+  public Particle setCollisionType(final int collisionType) {
     this.collisionType = collisionType;
+    return this;
   }
 
   /**
@@ -249,8 +229,9 @@ public abstract class Particle implements ITimeToLive {
    * @param color
    *          the new color
    */
-  public void setColor(final Color color) {
+  public Particle setColor(final Color color) {
     this.color = color;
+    return this;
   }
 
   /**
@@ -260,16 +241,18 @@ public abstract class Particle implements ITimeToLive {
    * @param colorAlpha
    *          the new color alpha
    */
-  public void setColorAlpha(final int colorAlpha) {
+  public Particle setColorAlpha(final int colorAlpha) {
     if (colorAlpha < 0 || colorAlpha > 100) {
-      return;
+      return this;
     }
 
     this.colorAlpha = colorAlpha;
+    return this;
   }
 
-  public void setDeltaHeight(final float deltaHeight) {
+  public Particle setDeltaHeight(final float deltaHeight) {
     this.deltaHeight = deltaHeight;
+    return this;
   }
 
   /**
@@ -278,8 +261,9 @@ public abstract class Particle implements ITimeToLive {
    * @param gravityX
    *          the new gravity x
    */
-  public void setDeltaIncX(final float gravityX) {
+  public Particle setDeltaIncX(final float gravityX) {
     this.gravityX = gravityX;
+    return this;
   }
 
   /**
@@ -288,12 +272,14 @@ public abstract class Particle implements ITimeToLive {
    * @param gravityY
    *          the new gravity y
    */
-  public void setDeltaIncY(final float gravityY) {
+  public Particle setDeltaIncY(final float gravityY) {
     this.gravityY = gravityY;
+    return this;
   }
 
-  public void setDeltaWidth(final float deltaWidth) {
+  public Particle setDeltaWidth(final float deltaWidth) {
     this.deltaWidth = deltaWidth;
+    return this;
   }
 
   /**
@@ -302,8 +288,9 @@ public abstract class Particle implements ITimeToLive {
    * @param dx
    *          the new dx
    */
-  public void setDx(final float dx) {
+  public Particle setDeltaX(final float dx) {
     this.dx = dx;
+    return this;
   }
 
   /**
@@ -312,8 +299,9 @@ public abstract class Particle implements ITimeToLive {
    * @param dy
    *          the new dy
    */
-  public void setDy(final float dy) {
+  public Particle setDeltyY(final float dy) {
     this.dy = dy;
+    return this;
   }
 
   /**
@@ -322,8 +310,9 @@ public abstract class Particle implements ITimeToLive {
    * @param height
    *          the new height
    */
-  public void setHeight(final float height) {
+  public Particle setHeight(final float height) {
     this.height = height;
+    return this;
   }
 
   /**
@@ -332,8 +321,9 @@ public abstract class Particle implements ITimeToLive {
    * @param width
    *          the new width
    */
-  public void setWidth(final float width) {
+  public Particle setWidth(final float width) {
     this.width = width;
+    return this;
   }
 
   /**
@@ -342,8 +332,9 @@ public abstract class Particle implements ITimeToLive {
    * @param xCurrent
    *          the new x current
    */
-  public void setxCurrent(final float xCurrent) {
-    this.xCurrent = xCurrent;
+  public Particle setX(final float x) {
+    this.xCurrent = x;
+    return this;
   }
 
   /**
@@ -352,8 +343,9 @@ public abstract class Particle implements ITimeToLive {
    * @param yCurrent
    *          the new y current
    */
-  public void setyCurrent(final float yCurrent) {
-    this.yCurrent = yCurrent;
+  public Particle setY(final float y) {
+    this.yCurrent = y;
+    return this;
   }
 
   @Override

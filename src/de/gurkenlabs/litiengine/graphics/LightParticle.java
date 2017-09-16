@@ -13,8 +13,8 @@ public class LightParticle extends RectangleFillParticle {
   private final float minHeight;
   private final float minWidth;
 
-  public LightParticle(final float maxWidth, final float maxHeight, final float xCurrent, final float yCurrent, final float dx, final float dy, final float deltaIncX, final float deltaIncY, final float width, final float height, final int life, final Color color) {
-    super(xCurrent, yCurrent, dx, dy, deltaIncX, deltaIncY, width, height, life, color);
+  public LightParticle(final float maxWidth, final float maxHeight, final float width, final float height, final Color color, final int life) {
+    super(width, height, color, life);
     this.maxWidth = maxWidth;
     this.maxHeight = maxHeight;
     this.minWidth = width;
