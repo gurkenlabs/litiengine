@@ -38,11 +38,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -731,6 +733,7 @@ public class MapComponent extends EditorComponent {
 
       Game.getScreenManager().getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
+      this.ensureUniqueIds(map);
       Environment env = new Environment(map);
       env.init();
       Game.loadEnvironment(env);
@@ -743,8 +746,21 @@ public class MapComponent extends EditorComponent {
       for (Consumer<Map> cons : this.mapLoadedConsumer) {
         cons.accept(map);
       }
+
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  private void ensureUniqueIds(IMap map) {
+    int maxMapId = MapUtilities.getMaxMapId(map);
+    List<Integer> usedIds = new ArrayList<>();
+    for (IMapObject obj : map.getMapObjects()) {
+      if (usedIds.contains(obj.getId())) {
+        obj.setId(++maxMapId);
+      }
+
+      usedIds.add(obj.getId());
     }
   }
 
