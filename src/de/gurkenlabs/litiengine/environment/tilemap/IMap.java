@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Dimension;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -60,7 +61,9 @@ public interface IMap extends ICustomPropertyProvider {
 
   public void removeMapObjectLayer(int index);
 
-  public List<IMapObject> getMapObjects(String... type);
+  public Collection<IMapObject> getMapObjects();
+
+  public Collection<IMapObject> getMapObjects(String... type);
 
   public void removeMapObject(int mapId);
 

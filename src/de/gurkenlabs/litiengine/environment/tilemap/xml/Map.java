@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -294,7 +295,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   }
 
   @Override
-  public List<IMapObject> getMapObjects(String... types) {
+  public Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> mapObjects = new ArrayList<>();
     if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
       return mapObjects;
@@ -318,6 +319,28 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
               mapObjects.add(mapObject);
             }
           }
+        }
+      }
+    }
+
+    return mapObjects;
+  }
+
+  @Override
+  public Collection<IMapObject> getMapObjects() {
+    List<IMapObject> mapObjects = new ArrayList<>();
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+      return mapObjects;
+    }
+
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      for (IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject != null) {
+          mapObjects.add(mapObject);
         }
       }
     }
