@@ -56,7 +56,7 @@ public final class StreamUtilities {
     if (is instanceof ByteArrayInputStream) {
       size = is.available();
       buf = new byte[size];
-      len = is.read(buf, 0, size);
+      is.read(buf, 0, size);
     } else {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       buf = new byte[size];
