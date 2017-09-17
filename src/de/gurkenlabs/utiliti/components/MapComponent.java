@@ -779,10 +779,6 @@ public class MapComponent extends EditorComponent {
   }
 
   public void copy() {
-    if (this.currentEditMode != EDITMODE_EDIT) {
-      return;
-    }
-
     this.copiedMapObject = this.getFocusedMapObject();
   }
 
@@ -799,10 +795,6 @@ public class MapComponent extends EditorComponent {
   }
 
   public void cut() {
-    if (this.currentEditMode != EDITMODE_EDIT) {
-      return;
-    }
-
     this.copiedMapObject = this.getFocusedMapObject();
     UndoManager.instance().mapObjectDeleting(this.getFocusedMapObject());
     this.delete(this.getFocusedMapObject());
