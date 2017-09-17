@@ -14,7 +14,7 @@
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/utiLITI.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="de.gurkenlabs.utiLITI.Program"/>
+                <attribute name="Main-Class" value="de.gurkenlabs.utiliti.Program"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="${dir.buildfile}/bin"/>

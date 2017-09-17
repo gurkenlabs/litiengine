@@ -54,9 +54,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.utiLITI.Components.GridEditPanel;
-import de.gurkenlabs.utiLITI.Components.MapComponent;
-import de.gurkenlabs.utiLITI.Components.MapPropertyPanel;
+import de.gurkenlabs.utiliti.components.GridEditPanel;
+import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.components.MapPropertyPanel;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class Program {

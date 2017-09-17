@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
-import de.gurkenlabs.utiLITI.Program;
+import de.gurkenlabs.utiliti.Program;
 
 public class MapPropertyPanel extends JPanel {
 

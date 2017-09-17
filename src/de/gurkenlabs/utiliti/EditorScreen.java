@@ -34,10 +34,10 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.utiLITI.Components.EditorComponent;
-import de.gurkenlabs.utiLITI.Components.EditorComponent.ComponentType;
-import de.gurkenlabs.utiLITI.Components.MapComponent;
-import de.gurkenlabs.utiLITI.Components.ProjectSettingsDialog;
+import de.gurkenlabs.utiliti.components.EditorComponent;
+import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
+import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.components.ProjectSettingsDialog;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 

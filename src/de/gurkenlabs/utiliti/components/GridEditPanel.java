@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import de.gurkenlabs.utiLITI.Program;
+import de.gurkenlabs.utiliti.Program;
 
 public class GridEditPanel extends JPanel {
   private JFormattedTextField textField;

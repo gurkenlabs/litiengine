@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.utiLITI.Components.JCheckBoxList;
+import de.gurkenlabs.utiliti.components.JCheckBoxList;
 
 public class MapSelectionPanel extends JPanel {
   JList list;

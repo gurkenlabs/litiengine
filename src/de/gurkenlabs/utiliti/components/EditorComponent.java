@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
-import de.gurkenlabs.utiLITI.EditorScreen;
+import de.gurkenlabs.utiliti.EditorScreen;
 
 public class EditorComponent extends GuiComponent {
 
