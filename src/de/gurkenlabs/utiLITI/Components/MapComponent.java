@@ -484,7 +484,7 @@ public class MapComponent extends EditorComponent {
     super.prepare();
     this.onMouseMoved(e -> {
 
-      if (this.getFocus() == null || this.currentEditMode != EDITMODE_EDIT) {
+      if (this.getFocus() == null || this.currentEditMode == EDITMODE_EDIT) {
         Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
         currentTransform = TransformType.NONE;
         return;
@@ -533,8 +533,7 @@ public class MapComponent extends EditorComponent {
       case EDITMODE_MOVE:
         break;
       case EDITMODE_EDIT:
-
-        if (this.currentTransform != TransformType.NONE) {
+        if (this.isMoving || this.currentTransform != TransformType.NONE) {
           return;
         }
 
@@ -626,6 +625,8 @@ public class MapComponent extends EditorComponent {
           this.isMoving = true;
           UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
         }
+
+        this.handleEntityDrag();
         break;
       }
     });
@@ -651,6 +652,12 @@ public class MapComponent extends EditorComponent {
         this.setEditMode(EDITMODE_EDIT);
         break;
       case EDITMODE_MOVE:
+
+        if (this.isMoving) {
+          this.isMoving = false;
+          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+        }
+
         break;
       case EDITMODE_EDIT:
         if (this.isMoving || this.isTransforming) {
@@ -851,8 +858,11 @@ public class MapComponent extends EditorComponent {
       EditorScreen.instance().getMapObjectPanel().bind(null);
       break;
     case EDITMODE_EDIT:
+
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       break;
     case EDITMODE_MOVE:
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
     }
 
@@ -1341,10 +1351,12 @@ public class MapComponent extends EditorComponent {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
+      if (this.currentEditMode == EDITMODE_EDIT) {
+        this.setEditMode(EDITMODE_MOVE);
+      }
     });
     Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> {
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      this.setEditMode(EDITMODE_EDIT);
     });
 
     Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
@@ -1414,12 +1426,6 @@ public class MapComponent extends EditorComponent {
       }
 
       Program.verticalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
-    });
-
-    Input.mouse().onClicked(e -> {
-      if (this.isSuspended() || !this.isVisible()) {
-        return;
-      }
     });
   }
 
