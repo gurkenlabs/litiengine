@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 
 public class StaticShadowPanel extends PropertyPanel<IMapObject> {
-  JComboBox<String> comboBoxShadowType;
+  JComboBox<StaticShadowType> comboBoxShadowType;
 
   public StaticShadowPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_staticShadow"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -27,8 +27,8 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblShadowType = new JLabel(Resources.get("panel_shadowType"));
 
-    comboBoxShadowType = new JComboBox<String>();
-    comboBoxShadowType.setModel(new DefaultComboBoxModel(StaticShadowType.values()));
+    comboBoxShadowType = new JComboBox<>();
+    comboBoxShadowType.setModel(new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
@@ -55,15 +55,12 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.SHADOWTYPE, ((StaticShadowType) this.comboBoxShadowType.getSelectedItem()).toString());
-    }));
+    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.SHADOWTYPE, ((StaticShadowType) this.comboBoxShadowType.getSelectedItem()).toString())));
   }
 
   @Override
   protected void clearControls() {
     this.comboBoxShadowType.setSelectedItem(StaticShadowType.NOOFFSET);
-
   }
 
   @Override
@@ -72,7 +69,5 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
     if (shadowType != null && !shadowType.isEmpty()) {
       this.comboBoxShadowType.setSelectedItem(StaticShadowType.valueOf(shadowType));
     }
-
   }
-
 }

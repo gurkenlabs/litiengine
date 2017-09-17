@@ -33,7 +33,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<JLabel> comboBoxSpriteSheets;
   private JCheckBox chckbxIndestructible;
   private JSpinner spinnerHealth;
-  private JComboBox comboBoxMaterial;
+  private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
 
   /**
@@ -51,8 +51,8 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblMaterial = new JLabel(Resources.get("panel_material"));
 
-    comboBoxMaterial = new JComboBox();
-    comboBoxMaterial.setModel(new DefaultComboBoxModel(Material.values()));
+    comboBoxMaterial = new JComboBox<>();
+    comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.values()));
 
     JLabel lblSprite = new JLabel(Resources.get("panel_sprite"));
 

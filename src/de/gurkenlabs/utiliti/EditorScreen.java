@@ -163,11 +163,6 @@ public class EditorScreen extends Screen {
     }
   }
 
-  @Override
-  protected void initializeComponents() {
-
-  }
-
   public GameFile getGameFile() {
     return this.gameFile;
   }

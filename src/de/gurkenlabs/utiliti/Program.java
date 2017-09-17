@@ -15,10 +15,7 @@ import java.awt.MenuShortcut;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -44,8 +41,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -60,23 +55,23 @@ import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.components.MapPropertyPanel;
 
 public class Program {
-  public static Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
+  public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
+  public static final BufferedImage CURSOR = Spritesheet.load("cursor.png", 23, 32).getSprite(0);
+  public static final BufferedImage CURSOR_MOVE = Spritesheet.load("cursor-move.png", 23, 32).getSprite(0);
+  public static final BufferedImage CURSOR_SELECT = Spritesheet.load("cursor-select.png", 21, 21).getSprite(0);
+  public static final BufferedImage CURSOR_LOAD = Spritesheet.load("cursor-load.png", 23, 32).getSprite(0);
+  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Spritesheet.load("cursor-trans-horizontal.png", 32, 23).getSprite(0);
+  public static final BufferedImage CURSOR_TRANS_VERTICAL = Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0);
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(-45));
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(45));
 
   public static UserPreferenceConfiguration USER_PREFERNCES;
   public static JScrollBar horizontalScroll;
   public static JScrollBar verticalScroll;
+  public static TrayIcon trayIcon;
+
   private static Menu recentFiles;
   private static boolean isChanging;
-  public static BufferedImage CURSOR;
-  public static BufferedImage CURSOR_MOVE;
-  public static BufferedImage CURSOR_SELECT;
-  public static BufferedImage CURSOR_LOAD;
-  public static BufferedImage CURSOR_TRANS_HORIZONTAL;
-  public static BufferedImage CURSOR_TRANS_VERTICAL;
-  public static BufferedImage CURSOR_TRANS_DIAGONAL_LEFT;
-  public static BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT;
-
-  public static TrayIcon trayIcon;
 
   public static void main(String[] args) {
 
@@ -119,15 +114,7 @@ public class Program {
 
     Game.getScreenManager().addScreen(EditorScreen.instance());
     Game.getScreenManager().displayScreen("EDITOR");
-    CURSOR = Spritesheet.load("cursor.png", 23, 32).getSprite(0);
-    CURSOR_MOVE = Spritesheet.load("cursor-move.png", 23, 32).getSprite(0);
-    CURSOR_SELECT = Spritesheet.load("cursor-select.png", 21, 21).getSprite(0);
-    CURSOR_LOAD = Spritesheet.load("cursor-load.png", 23, 32).getSprite(0);
 
-    CURSOR_TRANS_HORIZONTAL = Spritesheet.load("cursor-trans-horizontal.png", 32, 23).getSprite(0);
-    CURSOR_TRANS_VERTICAL = Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0);
-    CURSOR_TRANS_DIAGONAL_LEFT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(-45));
-    CURSOR_TRANS_DIAGONAL_RIGHT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(45));
     Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
@@ -139,6 +126,21 @@ public class Program {
 
     if (!EditorScreen.instance().fileLoaded() && USER_PREFERNCES.getLastGameFile() != null) {
       EditorScreen.instance().load(new File(USER_PREFERNCES.getLastGameFile()));
+    }
+  }
+
+  public static void loadRecentFiles() {
+    recentFiles.removeAll();
+    for (String recent : USER_PREFERNCES.getLastOpenedFiles()) {
+      if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
+        MenuItem fileButton = new MenuItem(recent);
+        fileButton.addActionListener(a -> {
+          System.out.println("load " + fileButton.getLabel());
+          EditorScreen.instance().load(new File(fileButton.getLabel()));
+        });
+
+        recentFiles.add(fileButton);
+      }
     }
   }
 
@@ -190,8 +192,10 @@ public class Program {
 
     window.setContentPane(contentPane);
     contentPane.add(renderPane, BorderLayout.CENTER);
-    renderPane.add(horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
-    renderPane.add(verticalScroll = new JScrollBar(JScrollBar.VERTICAL), BorderLayout.EAST);
+    horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL);
+    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
+    verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
+    renderPane.add(verticalScroll, BorderLayout.EAST);
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JPanel mapWrap = new JPanel(new BorderLayout());
@@ -510,15 +514,11 @@ public class Program {
 
     MenuItem zoomIn = new MenuItem(Resources.get("menu_zoomIn"));
     zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
-    zoomIn.addActionListener(a -> {
-      EditorScreen.instance().getMapComponent().zoomIn();
-    });
+    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
 
     MenuItem zoomOut = new MenuItem(Resources.get("menu_zoomOut"));
     zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
-    zoomOut.addActionListener(a -> {
-      EditorScreen.instance().getMapComponent().zoomOut();
-    });
+    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
 
     mnView.add(snapToGrid);
     mnView.add(renderGrid);
@@ -533,9 +533,7 @@ public class Program {
     menuBar.add(mnProject);
 
     MenuItem properties = new MenuItem(Resources.get("menu_properties"));
-    properties.addActionListener(a -> {
-      EditorScreen.instance().setProjectSettings();
-    });
+    properties.addActionListener(a -> EditorScreen.instance().setProjectSettings());
 
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
     compress.setState(USER_PREFERNCES.isCompressFile());
@@ -599,21 +597,6 @@ public class Program {
     mnMap.add(del2);
     mnMap.addSeparator();
     mnMap.add(mapProps);
-  }
-
-  public static void loadRecentFiles() {
-    recentFiles.removeAll();
-    for (String recent : USER_PREFERNCES.getLastOpenedFiles()) {
-      if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
-        MenuItem fileButton = new MenuItem(recent);
-        fileButton.addActionListener(a -> {
-          System.out.println("load " + fileButton.getLabel());
-          EditorScreen.instance().load(new File(fileButton.getLabel()));
-        });
-
-        recentFiles.add(fileButton);
-      }
-    }
   }
 
   private static boolean exit() {

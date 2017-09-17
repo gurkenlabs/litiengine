@@ -31,7 +31,7 @@ import de.gurkenlabs.util.ImageProcessing;
 
 public class DecorMobPanel extends PropertyPanel<IMapObject> {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
-  private final JComboBox<String> comboBoxBehaviour;
+  private final JComboBox<MovementBehaviour> comboBoxBehaviour;
   private JLabel lblVvelocity;
   JSpinner spinnerVelocity;
   JCheckBox chckbxAttackable;
@@ -52,7 +52,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     JLabel lblBehaviour = new JLabel(Resources.get("panel_behavior"));
 
     comboBoxBehaviour = new JComboBox<>();
-    comboBoxBehaviour.setModel(new DefaultComboBoxModel(MovementBehaviour.values()));
+    comboBoxBehaviour.setModel(new DefaultComboBoxModel<MovementBehaviour>(MovementBehaviour.values()));
 
     lblVvelocity = new JLabel(Resources.get("panel_velocity"));
 

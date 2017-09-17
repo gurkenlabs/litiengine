@@ -2,8 +2,6 @@ package de.gurkenlabs.utiliti.components;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,9 +30,9 @@ public class MapPropertyPanel extends JPanel {
   private JTextField textFieldTitle;
   private JTextField textFieldAmbientColor;
   private JSpinner spinnerAmbientAlpha;
-  private IMap dataSource;
   private JTextField textFieldName;
   private JTable table;
+  private transient IMap dataSource;
   DefaultTableModel model;
 
   /**
@@ -103,17 +101,17 @@ public class MapPropertyPanel extends JPanel {
 
     JScrollPane scrollPane = new JScrollPane();
 
-    JButton button_1 = new JButton("+");
-    button_1.addActionListener(a -> {
+    JButton buttonPlus = new JButton("+");
+    buttonPlus.addActionListener(a -> {
       MapObjectLayer layer = new MapObjectLayer();
       layer.setName("new layer");
       dataSource.addMapObjectLayer(layer);
       model.addRow(new Object[] { layer.getName(), layer.getColor() });
     });
-    button_1.setFont(Program.TEXT_FONT);
+    buttonPlus.setFont(Program.TEXT_FONT);
 
-    JButton button_2 = new JButton("-");
-    button_2.addActionListener(a -> {
+    JButton buttonMinus = new JButton("-");
+    buttonMinus.addActionListener(a -> {
       for (int removeIndex = 0; removeIndex < dataSource.getMapObjectLayers().size(); removeIndex++) {
         if (removeIndex == table.getSelectedRow()) {
           dataSource.removeMapObjectLayer(removeIndex);
@@ -123,88 +121,88 @@ public class MapPropertyPanel extends JPanel {
 
       model.removeRow(table.getSelectedRow());
     });
-    button_2.setFont(Program.TEXT_FONT);
-    GroupLayout gl_contentPanel = new GroupLayout(this);
-    gl_contentPanel.setHorizontalGroup(
-        gl_contentPanel.createParallelGroup(Alignment.LEADING)
-            .addGroup(gl_contentPanel.createSequentialGroup()
+    buttonMinus.setFont(Program.TEXT_FONT);
+    GroupLayout glContentPanel = new GroupLayout(this);
+    glContentPanel.setHorizontalGroup(
+        glContentPanel.createParallelGroup(Alignment.LEADING)
+            .addGroup(glContentPanel.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
                     .addComponent(lblNewLabel)
-                    .addGroup(gl_contentPanel.createSequentialGroup()
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+                    .addGroup(glContentPanel.createSequentialGroup()
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
                             .addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-                            .addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+                            .addGroup(glContentPanel.createParallelGroup(Alignment.TRAILING, false)
                                 .addComponent(lblMapTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(lblMapName, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGap(18)
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
                             .addComponent(textFieldName, 358, 358, 358)
                             .addComponent(textFieldDescription, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
                             .addComponent(textFieldTitle, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)))
-                    .addGroup(gl_contentPanel.createSequentialGroup()
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+                    .addGroup(glContentPanel.createSequentialGroup()
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
                             .addComponent(lblAmbientLight, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-                            .addGroup(gl_contentPanel.createSequentialGroup()
+                            .addGroup(glContentPanel.createSequentialGroup()
                                 .addComponent(lblAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(ComponentPlacement.UNRELATED)
                                 .addComponent(spinnerAmbientAlpha, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(gl_contentPanel.createSequentialGroup()
+                            .addGroup(glContentPanel.createSequentialGroup()
                                 .addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(ComponentPlacement.UNRELATED)
                                 .addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                                 .addGap(6)
                                 .addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)))
                         .addGap(33)
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-                            .addGroup(gl_contentPanel.createSequentialGroup()
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+                            .addGroup(glContentPanel.createSequentialGroup()
                                 .addComponent(lblLayers, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(ComponentPlacement.RELATED, 132, Short.MAX_VALUE))
                             .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
-                            .addGroup(gl_contentPanel.createSequentialGroup()
-                                .addComponent(button_1, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                            .addGroup(glContentPanel.createSequentialGroup()
+                                .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
                                 .addGap(6)
-                                .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap()));
-    gl_contentPanel.setVerticalGroup(
-        gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-            .addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
+    glContentPanel.setVerticalGroup(
+        glContentPanel.createParallelGroup(Alignment.TRAILING)
+            .addGroup(Alignment.LEADING, glContentPanel.createSequentialGroup()
                 .addComponent(lblNewLabel)
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblMapName)
                     .addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblMapTitle)
                     .addComponent(textFieldTitle, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.UNRELATED)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
                     .addComponent(textFieldDescription, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addGap(23)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblAmbientLight)
                     .addComponent(lblLayers, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE))
                 .addGap(9)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-                    .addGroup(gl_contentPanel.createSequentialGroup()
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+                .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+                    .addGroup(glContentPanel.createSequentialGroup()
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE)
                             .addComponent(lblAlpha, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
                             .addComponent(spinnerAmbientAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                         .addGap(15)
-                        .addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+                        .addGroup(glContentPanel.createParallelGroup(Alignment.TRAILING)
                             .addComponent(label, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                            .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+                            .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
                                 .addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                                .addGroup(gl_contentPanel.createSequentialGroup()
+                                .addGroup(glContentPanel.createSequentialGroup()
                                     .addGap(1)
                                     .addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))))
                     .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-                    .addComponent(button_1, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(button_2, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+                .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+                    .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(52, Short.MAX_VALUE)));
 
     table = new JTable();
@@ -217,7 +215,7 @@ public class MapPropertyPanel extends JPanel {
     model = (DefaultTableModel) table.getModel();
     table.setFont(Program.TEXT_FONT);
     scrollPane.setViewportView(table);
-    this.setLayout(gl_contentPanel);
+    this.setLayout(glContentPanel);
   }
 
   public void bind(IMap map) {

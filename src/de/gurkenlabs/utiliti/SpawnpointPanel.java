@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 
 public class SpawnpointPanel extends PropertyPanel<IMapObject> {
   private JTextField textFieldType;
-  private JComboBox<String> comboBoxDirection;
+  private JComboBox<Direction> comboBoxDirection;
 
   public SpawnpointPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_spawnPoint"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -34,8 +34,8 @@ public class SpawnpointPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblDirection = new JLabel(Resources.get("panel_direction"));
 
-    comboBoxDirection = new JComboBox<String>();
-    comboBoxDirection.setModel(new DefaultComboBoxModel(Direction.values()));
+    comboBoxDirection = new JComboBox<>();
+    comboBoxDirection.setModel(new DefaultComboBoxModel<Direction>(Direction.values()));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
@@ -72,7 +72,6 @@ public class SpawnpointPanel extends PropertyPanel<IMapObject> {
   protected void clearControls() {
     this.textFieldType.setText("");
     this.comboBoxDirection.setSelectedItem(Direction.DOWN);
-
   }
 
   @Override
@@ -86,16 +85,8 @@ public class SpawnpointPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> {
-      m.setCustomProperty(MapObjectProperties.SPAWN_TYPE, textFieldType.getText());
-    }));
-
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.SPAWN_TYPE, textFieldType.getText());
-    }));
-
-    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.SPAWN_DIRECTION, ((Direction) this.comboBoxDirection.getSelectedItem()).toString());
-    }));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.SPAWN_TYPE, textFieldType.getText())));
+    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.SPAWN_DIRECTION, ((Direction) this.comboBoxDirection.getSelectedItem()).toString())));
   }
 }

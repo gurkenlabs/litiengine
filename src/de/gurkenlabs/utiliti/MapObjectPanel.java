@@ -3,8 +3,6 @@ package de.gurkenlabs.utiliti;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +32,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final CollisionPanel collisionPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
-  private final JComboBox comboBoxType;
+  private final JComboBox<MapObjectType> comboBoxType;
   private final JSpinner spinnerY;
   private final JSpinner spinnerX;
   private final JSpinner spinnerWidth;
@@ -74,8 +72,8 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     textFieldName.setColumns(10);
 
     JLabel lblType = new JLabel(Resources.get("panel_type"));
-    comboBoxType = new JComboBox();
-    comboBoxType.setModel(new DefaultComboBoxModel(MapObjectType.values()));
+    comboBoxType = new JComboBox<>();
+    comboBoxType.setModel(new DefaultComboBoxModel<MapObjectType>(MapObjectType.values()));
 
     spinnerX = new JSpinner();
 

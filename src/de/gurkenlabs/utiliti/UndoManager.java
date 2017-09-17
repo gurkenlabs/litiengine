@@ -30,7 +30,7 @@ public class UndoManager {
   }
 
   static {
-    instance = new HashMap<String, UndoManager>();
+    instance = new HashMap<>();
     undoStackChangedConsumers = new CopyOnWriteArrayList<>();
   }
 
@@ -65,8 +65,6 @@ public class UndoManager {
     this.currentIndex--;
 
     fireUndoStackChangedEvent(this);
-
-    // System.out.println("undo " + state);
   }
 
   public void redo() {
@@ -95,8 +93,6 @@ public class UndoManager {
     }
 
     fireUndoStackChangedEvent(this);
-
-    // System.out.println("redo " + state);
   }
 
   public boolean canUndo() {
@@ -199,8 +195,8 @@ public class UndoManager {
   private static IMapObject clone(IMapObject mapObject) {
     MapObject clonedObject = new MapObject();
     clonedObject.setId(mapObject.getId());
-    clonedObject.setName(mapObject.getName() != null ? mapObject.getName().toString() : "");
-    clonedObject.setType(mapObject.getType() != null ? mapObject.getType().toString() : "");
+    clonedObject.setName(mapObject.getName() != null ? mapObject.getName() : "");
+    clonedObject.setType(mapObject.getType() != null ? mapObject.getType() : "");
 
     clonedObject.setX(mapObject.getX());
     clonedObject.setY(mapObject.getY());
@@ -266,5 +262,4 @@ public class UndoManager {
       return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
     }
   }
-
 }

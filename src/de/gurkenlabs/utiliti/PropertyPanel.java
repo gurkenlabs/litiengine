@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
-  private T dataSource;
+  private transient T dataSource;
 
   protected boolean isFocussing;
 

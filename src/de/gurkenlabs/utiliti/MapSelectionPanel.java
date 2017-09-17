@@ -13,8 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -23,11 +21,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
 
 public class MapSelectionPanel extends JPanel {
-  JList list;
+  JList<String> list;
   JCheckBoxList listObjectLayers;
   DefaultListModel<String> model;
   DefaultListModel<JCheckBox> layerModel;
   JScrollPane scrollPane;
+  JScrollPane horizontalScrollPane;
 
   /**
    * Create the panel.
@@ -35,12 +34,12 @@ public class MapSelectionPanel extends JPanel {
   public MapSelectionPanel() {
     setLayout(new BorderLayout(0, 0));
 
-    JScrollPane scrollPane = new JScrollPane();
+    scrollPane = new JScrollPane();
     add(scrollPane, BorderLayout.CENTER);
 
     model = new DefaultListModel<>();
     layerModel = new DefaultListModel<>();
-    list = new JList<String>();
+    list = new JList<>();
     list.setModel(model);
     list.setVisibleRowCount(8);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -61,16 +60,16 @@ public class MapSelectionPanel extends JPanel {
     border.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
     scrollPane.setViewportBorder(border);
 
-    JScrollPane scrollPane_1 = new JScrollPane();
+    horizontalScrollPane = new JScrollPane();
     TitledBorder border2 = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_mapObjectLayers"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border2.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
-    scrollPane_1.setViewportBorder(border2);
-    add(scrollPane_1, BorderLayout.SOUTH);
+    horizontalScrollPane.setViewportBorder(border2);
+    add(horizontalScrollPane, BorderLayout.SOUTH);
 
     listObjectLayers = new JCheckBoxList();
     listObjectLayers.setVisibleRowCount(5);
     listObjectLayers.setModel(layerModel);
-    scrollPane_1.setViewportView(listObjectLayers);
+    horizontalScrollPane.setViewportView(listObjectLayers);
 
   }
 

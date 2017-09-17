@@ -156,7 +156,6 @@ public class MapComponent extends EditorComponent {
   public void render(Graphics2D g) {
     Color COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
     Color COLOR_NAME_FILL = new Color(0, 0, 0, 60);
-    Color COLOR_BOUNDING_BOX_BORDER = new Color(0, 0, 0, 150);
     final Color COLOR_FOCUS_FILL = new Color(0, 0, 0, 50);
     final Color COLOR_FOCUS_BORDER = Color.BLACK;
     final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
@@ -183,10 +182,8 @@ public class MapComponent extends EditorComponent {
         }
 
         if (layer.getColor() != null) {
-          COLOR_BOUNDING_BOX_BORDER = layer.getColor();
           COLOR_BOUNDING_BOX_FILL = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
         } else {
-          COLOR_BOUNDING_BOX_BORDER = new Color(0, 0, 0, 150);
           COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
         }
 
@@ -420,7 +417,6 @@ public class MapComponent extends EditorComponent {
 
       @Override
       public int compare(Map arg0, Map arg1) {
-        // TODO Auto-generated method stub
         return arg0.getName().compareTo(arg1.getName());
       }
     });
@@ -1073,7 +1069,7 @@ public class MapComponent extends EditorComponent {
   }
 
   private void updateScrollSpeed() {
-    this.scrollSpeed = BASE_SCROLL_SPEED / this.zooms[this.currentZoomIndex];
+    this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }
 
   private IMapObject copyMapObject(IMapObject obj) {

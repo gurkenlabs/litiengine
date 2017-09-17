@@ -2,8 +2,6 @@ package de.gurkenlabs.utiliti;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -53,7 +51,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     textFieldColor.setColumns(10);
 
     comboBoxLightShape = new JComboBox<>();
-    comboBoxLightShape.setModel(new DefaultComboBoxModel(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
+    comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
 
     btnSelectColor = new JButton("...");
 
@@ -144,22 +142,18 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
+    btnSelectColor.addActionListener(a -> {
+      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), Color.decode(textFieldColor.getText()));
+      if (result == null) {
+        return;
+      }
 
-    btnSelectColor.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), Color.decode(textFieldColor.getText()));
-        if (result == null) {
-          return;
-        }
-
-        String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
-        textFieldColor.setText(h);
-        if (getDataSource() != null) {
-          getDataSource().setCustomProperty(MapObjectProperties.LIGHTCOLOR, h);
-          Game.getEnvironment().reloadFromMap(getDataSource().getId());
-          Game.getEnvironment().getAmbientLight().createImage();
-        }
+      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
+      textFieldColor.setText(h);
+      if (getDataSource() != null) {
+        getDataSource().setCustomProperty(MapObjectProperties.LIGHTCOLOR, h);
+        Game.getEnvironment().reloadFromMap(getDataSource().getId());
+        Game.getEnvironment().getAmbientLight().createImage();
       }
     });
 
