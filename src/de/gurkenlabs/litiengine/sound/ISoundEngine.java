@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.sound;
 
 import java.awt.geom.Point2D;
+import java.util.function.Function;
 
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -71,4 +72,15 @@ public interface ISoundEngine extends ILaunchable {
    * Stops the playback of the current background music.
    */
   public void stopMusic();
+
+  /**
+   * This method allows to set the callback that is used by the SoundEngine to
+   * determine where the listener location is.
+   * 
+   * If not explicitly set, the SoundEngine uses the camera focus (center of the
+   * screen) as listener location.
+   * 
+   * @param listenerLocationCallback
+   */
+  public void setListenerLocationCallback(Function<Point2D, Point2D> listenerLocationCallback);
 }

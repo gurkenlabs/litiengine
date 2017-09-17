@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -13,6 +14,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 public final class SoundEngine implements ISoundEngine, IUpdateable {
   private static final int DEFAULT_MAX_DISTANCE = 250;
   private Point2D listenerLocation;
+  private Function<Point2D, Point2D> listenerLocationCallback;
   private float maxDist;
   private SoundSource music;
   private final List<SoundSource> sounds;
@@ -20,6 +22,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   public SoundEngine() {
     this.sounds = new CopyOnWriteArrayList<>();
     this.maxDist = DEFAULT_MAX_DISTANCE;
+    this.setListenerLocationCallback(old -> Game.getScreenManager().getCamera().getFocus());
   }
 
   @Override
@@ -103,7 +106,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void update(final IGameLoop loop) {
-    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
+    this.listenerLocation = this.listenerLocationCallback.apply(this.listenerLocation);
 
     final List<SoundSource> remove = new ArrayList<>();
     for (final SoundSource s : this.sounds) {
@@ -122,5 +125,10 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
     if (this.music != null && !this.music.isPlaying()) {
       this.playMusic(this.music.getSound());
     }
+  }
+
+  @Override
+  public void setListenerLocationCallback(Function<Point2D, Point2D> listenerLocationCallback) {
+    this.listenerLocationCallback = listenerLocationCallback;
   }
 }
