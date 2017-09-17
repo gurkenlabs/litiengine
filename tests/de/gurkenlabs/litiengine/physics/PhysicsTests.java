@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 
 import org.junit.Test;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -17,14 +18,14 @@ public class PhysicsTests {
 
   @Test
   public void TestBasicCollisionDetection() {
-    IMovableCombatEntity ent = new MovableCombatEntity();
-    ent.setSize(16, 16);
-    ent.setCollision(true);
-    ent.setCollisionBoxWidth(16);
-    ent.setCollisionBoxHeight(16);
-    ent.setLocation(10, 10);
-
     try (GameLoop loop = new GameLoop(30)) {
+      IMovableCombatEntity ent = new MovableCombatEntity();
+      ent.setSize(16, 16);
+      ent.setCollision(true);
+      ent.setCollisionBoxWidth(16);
+      ent.setCollisionBoxHeight(16);
+      ent.setLocation(10, 10);
+
       IPhysicsEngine engine = new PhysicsEngine();
       engine.add(ent);
 

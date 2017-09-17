@@ -105,7 +105,10 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     }
 
     super.setLocation(position);
-    this.lastMoved = Game.getLoop().getTicks();
+
+    if (Game.hasStarted()) {
+      this.lastMoved = Game.getLoop().getTicks();
+    }
 
     for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
