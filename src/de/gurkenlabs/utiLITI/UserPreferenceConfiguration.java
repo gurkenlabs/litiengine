@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiLITI;
+package de.gurkenlabs.utiliti;
 
 import java.util.ArrayList;
 import java.util.Collections;
