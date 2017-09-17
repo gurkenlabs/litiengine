@@ -37,23 +37,15 @@ public class ProjectSettingsDialog extends JDialog {
     textPane = new JTextPane();
     textPane.setBounds(111, 11, 363, 113);
     contentPanel.add(textPane);
-    {
-      JPanel buttonPane = new JPanel();
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent arg0) {
-            dispose();
-          }
-        });
-        okButton.setActionCommand("OK");
-        buttonPane.add(okButton);
-        getRootPane().setDefaultButton(okButton);
-      }
-    }
+    JPanel buttonPane = new JPanel();
+    buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+    getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
+    JButton okButton = new JButton("OK");
+    okButton.addActionListener(a -> dispose());
+    okButton.setActionCommand("OK");
+    buttonPane.add(okButton);
+    getRootPane().setDefaultButton(okButton);
   }
 
   public void set(List<String> spriteFiles) {

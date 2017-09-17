@@ -45,19 +45,14 @@ public class MapSelectionPanel extends JPanel {
     list.setVisibleRowCount(8);
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-      @Override
-      public void valueChanged(ListSelectionEvent e) {
-
-        if (list.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && list.getSelectedIndex() >= 0) {
-          if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex()))) {
-            return;
-          }
-
-          EditorScreen.instance().getMapComponent().loadEnvironment(EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex()));
-          initLayerControl();
+    list.getSelectionModel().addListSelectionListener(e -> {
+      if (list.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && list.getSelectedIndex() >= 0) {
+        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex()))) {
+          return;
         }
+
+        EditorScreen.instance().getMapComponent().loadEnvironment(EditorScreen.instance().getMapComponent().getMaps().get(list.getSelectedIndex()));
+        initLayerControl();
       }
     });
 

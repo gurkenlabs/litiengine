@@ -34,12 +34,12 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.components.ProjectSettingsDialog;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.io.FileUtilities;
 
 @ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {
@@ -217,7 +217,7 @@ public class EditorScreen extends Screen {
 
       // load sprite sheets from different sources:
       // 1. add sprite sheets from sprite files
-      // 2. add sprite sheets by tilesets of all maps in the project director;
+      // 2. add sprite sheets by tile sets of all maps in the project director
       this.loadSpriteFiles(this.getProjectPath(), this.spriteFiles);
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
@@ -230,7 +230,7 @@ public class EditorScreen extends Screen {
       this.updateGameFile();
 
       // display first available map after loading all stuff
-      if (this.mapComponent.getMaps().size() > 0) {
+      if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
         this.changeComponent(ComponentType.MAP);
       }
@@ -290,7 +290,7 @@ public class EditorScreen extends Screen {
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
       // 2. add sprite sheets from sprite files
-      // 3. add sprite sheets by tilesets of all maps in the game file;
+      // 3. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getTileSets());
       System.out.println(this.getGameFile().getTileSets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
 
@@ -304,7 +304,7 @@ public class EditorScreen extends Screen {
 
       // display first available map after loading all stuff
       // also switch to map component
-      if (this.mapComponent.getMaps().size() > 0) {
+      if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
 
         this.changeComponent(ComponentType.MAP);
@@ -382,11 +382,7 @@ public class EditorScreen extends Screen {
         if (doc.getDocumentElement().getNodeName().equalsIgnoreCase("emitter")) {
           isEmitter = true;
         }
-      } catch (SAXException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (ParserConfigurationException e) {
+      } catch (SAXException | IOException | ParserConfigurationException e) {
         e.printStackTrace();
       }
 

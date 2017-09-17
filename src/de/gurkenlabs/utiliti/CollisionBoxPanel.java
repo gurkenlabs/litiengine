@@ -54,8 +54,6 @@ public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()));
-    }));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
   }
 }

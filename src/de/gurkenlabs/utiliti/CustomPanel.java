@@ -38,21 +38,14 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
     scrollPane = new JScrollPane();
 
     JButton buttonAdd = new JButton("+");
-    buttonAdd.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        model.addRow(new Object[] { "", "" });
-      }
-    });
+    buttonAdd.addActionListener(a -> model.addRow(new Object[] { "", "" }));
 
     JButton buttonRemove = new JButton("-");
-    buttonRemove.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        int[] rows = tableCustomProperties.getSelectedRows();
-        for (int i = 0; i < rows.length; i++) {
-          model.removeRow(rows[i] - i);
-        }
+    buttonRemove.addActionListener(a -> {
+      int[] rows = tableCustomProperties.getSelectedRows();
+      for (int i = 0; i < rows.length; i++) {
+        model.removeRow(rows[i] - i);
+
       }
     });
 

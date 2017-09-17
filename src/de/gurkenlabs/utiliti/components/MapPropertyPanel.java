@@ -61,17 +61,14 @@ public class MapPropertyPanel extends JPanel {
     label.setFont(Program.TEXT_FONT);
 
     JButton button = new JButton("...");
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        Color result = JColorChooser.showDialog(null, "Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
-        if (result == null) {
-          return;
-        }
-
-        String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
-        textFieldAmbientColor.setText(h);
+    button.addActionListener(a -> {
+      Color result = JColorChooser.showDialog(null, "Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
+      if (result == null) {
+        return;
       }
+
+      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
+      textFieldAmbientColor.setText(h);
     });
     button.setFont(Program.TEXT_FONT.deriveFont(10f));
 
@@ -107,31 +104,24 @@ public class MapPropertyPanel extends JPanel {
     JScrollPane scrollPane = new JScrollPane();
 
     JButton button_1 = new JButton("+");
-    button_1.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        MapObjectLayer layer = new MapObjectLayer();
-        layer.setName("new layer");
-        dataSource.addMapObjectLayer(layer);
-        model.addRow(new Object[] { layer.getName(), layer.getColor() });
-      }
+    button_1.addActionListener(a -> {
+      MapObjectLayer layer = new MapObjectLayer();
+      layer.setName("new layer");
+      dataSource.addMapObjectLayer(layer);
+      model.addRow(new Object[] { layer.getName(), layer.getColor() });
     });
     button_1.setFont(Program.TEXT_FONT);
 
     JButton button_2 = new JButton("-");
-    button_2.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-
-        for (int removeIndex = 0; removeIndex < dataSource.getMapObjectLayers().size(); removeIndex++) {
-          if (removeIndex == table.getSelectedRow()) {
-            dataSource.removeMapObjectLayer(removeIndex);
-            break;
-          }
+    button_2.addActionListener(a -> {
+      for (int removeIndex = 0; removeIndex < dataSource.getMapObjectLayers().size(); removeIndex++) {
+        if (removeIndex == table.getSelectedRow()) {
+          dataSource.removeMapObjectLayer(removeIndex);
+          break;
         }
-
-        model.removeRow(table.getSelectedRow());
       }
+
+      model.removeRow(table.getSelectedRow());
     });
     button_2.setFont(Program.TEXT_FONT);
     GroupLayout gl_contentPanel = new GroupLayout(this);
@@ -233,7 +223,6 @@ public class MapPropertyPanel extends JPanel {
   public void bind(IMap map) {
     this.dataSource = map;
     if (map == null) {
-      this.clear();
       return;
     }
 
@@ -241,11 +230,6 @@ public class MapPropertyPanel extends JPanel {
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
       this.model.addRow(new Object[] { layer.getName(), layer.getColor() != null ? "#" + Integer.toHexString(layer.getColor().getRGB()).substring(2) : null });
     }
-
-  }
-
-  private void clear() {
-
   }
 
   private void setControlValues(IMap map) {

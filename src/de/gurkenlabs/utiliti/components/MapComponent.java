@@ -38,7 +38,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
-import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
@@ -62,13 +61,13 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.utiliti.EditorScreen;
-import de.gurkenlabs.utiliti.Program;
-import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.ImageSerializer;
+import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.UndoManager;
 
 public class MapComponent extends EditorComponent {
   public enum TransformType {

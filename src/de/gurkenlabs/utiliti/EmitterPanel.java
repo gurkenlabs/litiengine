@@ -60,12 +60,8 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> {
-      m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText());
-    }));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText())));
 
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText());
-    }));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText())));
   }
 }

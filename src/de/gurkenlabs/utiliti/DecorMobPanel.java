@@ -153,22 +153,14 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
 
-    this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener((m) -> {
+    this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
       m.setCustomProperty(MapObjectProperties.SPRITESHEETNAME, selected.getText());
     }));
 
-    this.comboBoxBehaviour.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR, this.comboBoxBehaviour.getSelectedItem().toString());
-    }));
-
-    this.spinnerVelocity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperties.DECORMOB_VELOCITY, this.spinnerVelocity.getValue().toString());
-    }));
-
-    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()));
-    }));
+    this.comboBoxBehaviour.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR, this.comboBoxBehaviour.getSelectedItem().toString())));
+    this.spinnerVelocity.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperties.DECORMOB_VELOCITY, this.spinnerVelocity.getValue().toString())));
+    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()))));
   }
 
   private void loadAvailableDecorMobs() {
@@ -208,8 +200,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     public Component getListCellRendererComponent(JList list, Object value,
         int index, boolean isSelected, boolean cellHasFocus) {
       if (value != null) {
-        JLabel label = (JLabel) value;
-        return label;
+        return (JLabel) value;
       }
       return new JLabel();
     }

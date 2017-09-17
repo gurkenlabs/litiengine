@@ -54,10 +54,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.components.GridEditPanel;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.components.MapPropertyPanel;
-import de.gurkenlabs.util.ImageProcessing;
 
 public class Program {
   public static Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
@@ -95,12 +95,7 @@ public class Program {
       SystemTray tray = SystemTray.getSystemTray();
       PopupMenu menu = new PopupMenu();
       MenuItem exitItem = new MenuItem(Resources.get("menu_exit"));
-      exitItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          Game.terminate();
-        }
-      });
+      exitItem.addActionListener(a -> Game.terminate());
       menu.add(exitItem);
 
       trayIcon = new TrayIcon(RenderEngine.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
@@ -210,54 +205,28 @@ public class Program {
     JButton cr = new JButton();
     cr.setIcon(new ImageIcon(RenderEngine.getImage("button-create.png")));
     basicMenu.add(cr);
-    cr.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().create();
-      }
-    });
+    cr.addActionListener(a -> EditorScreen.instance().create());
 
     JButton op = new JButton();
     op.setIcon(new ImageIcon(RenderEngine.getImage("button-load.png")));
     basicMenu.add(op);
-    op.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().load();
-      }
-    });
+    op.addActionListener(a -> EditorScreen.instance().load());
 
     JButton sv = new JButton();
     sv.setIcon(new ImageIcon(RenderEngine.getImage("button-save.png")));
     basicMenu.add(sv);
-    sv.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().save(false);
-      }
-    });
+    sv.addActionListener(a -> EditorScreen.instance().save(false));
 
     basicMenu.addSeparator();
 
     JButton undo = new JButton();
     undo.setIcon(new ImageIcon(RenderEngine.getImage("button-undo.png")));
     basicMenu.add(undo);
-    undo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        UndoManager.instance().undo();
-      }
-    });
+    undo.addActionListener(a -> UndoManager.instance().undo());
 
     JButton redo = new JButton();
     redo.setIcon(new ImageIcon(RenderEngine.getImage("button-redo.png")));
     basicMenu.add(redo);
-    redo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        UndoManager.instance().redo();
-      }
-    });
 
     undo.setEnabled(false);
     redo.setEnabled(false);
@@ -276,48 +245,40 @@ public class Program {
     mv.setIcon(new ImageIcon(RenderEngine.getImage("button-move.png")));
     mv.setEnabled(false);
 
-    ed.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        ed.setSelected(true);
-        place.setSelected(false);
-        mv.setSelected(false);
-        isChanging = true;
-        EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
-        isChanging = false;
+    ed.addActionListener(a -> {
+      ed.setSelected(true);
+      place.setSelected(false);
+      mv.setSelected(false);
+      isChanging = true;
+      EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
+      isChanging = false;
 
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
-      }
+      Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
     });
     basicMenu.add(ed);
     basicMenu.add(mv);
 
-    place.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        place.setSelected(true);
-        ed.setSelected(false);
-        mv.setSelected(false);
-        isChanging = true;
-        EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
-        isChanging = false;
+    place.addActionListener(a -> {
 
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR_SELECT, 11, 11);
-      }
+      place.setSelected(true);
+      ed.setSelected(false);
+      mv.setSelected(false);
+      isChanging = true;
+      EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
+      isChanging = false;
+
+      Game.getScreenManager().getRenderComponent().setCursor(CURSOR_SELECT, 11, 11);
     });
 
-    mv.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        mv.setSelected(true);
-        ed.setSelected(false);
-        place.setSelected(false);
-        isChanging = true;
-        EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
-        isChanging = false;
+    mv.addActionListener(a -> {
+      mv.setSelected(true);
+      ed.setSelected(false);
+      place.setSelected(false);
+      isChanging = true;
+      EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
+      isChanging = false;
 
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
-      }
+      Game.getScreenManager().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
     });
 
     EditorScreen.instance().getMapComponent().onEditModeChanged(i -> {
@@ -351,24 +312,14 @@ public class Program {
     del.setIcon(new ImageIcon(RenderEngine.getImage("button-delete.png")));
     basicMenu.add(del);
     del.setEnabled(false);
-    del.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().delete();
-      }
-    });
+    del.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
 
     // copy
     JButton cop = new JButton();
     cop.setIcon(new ImageIcon(RenderEngine.getImage("button-copy.png")));
     basicMenu.add(cop);
     cop.setEnabled(false);
-    ActionListener copyAction = new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        EditorScreen.instance().getMapComponent().copy();
-      }
-    };
+    ActionListener copyAction = a -> EditorScreen.instance().getMapComponent().copy();
     cop.addActionListener(copyAction);
     cop.getModel().setMnemonic('C');
     KeyStroke keyStroke = KeyStroke.getKeyStroke('C', Event.CTRL_MASK, false);
@@ -378,12 +329,7 @@ public class Program {
     JButton paste = new JButton();
     paste.setIcon(new ImageIcon(RenderEngine.getImage("button-paste.png")));
     basicMenu.add(paste);
-    ActionListener pasteAction = new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        EditorScreen.instance().getMapComponent().paste();
-      }
-    };
+    ActionListener pasteAction = a -> EditorScreen.instance().getMapComponent().paste();
     paste.addActionListener(pasteAction);
     paste.getModel().setMnemonic('V');
     KeyStroke keyStrokePaste = KeyStroke.getKeyStroke('V', Event.CTRL_MASK, false);
@@ -394,12 +340,7 @@ public class Program {
     cut.setIcon(new ImageIcon(RenderEngine.getImage("button-cut.png")));
     basicMenu.add(cut);
     cut.setEnabled(false);
-    ActionListener cutAction = new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        EditorScreen.instance().getMapComponent().cut();
-      }
-    };
+    ActionListener cutAction = a -> EditorScreen.instance().getMapComponent().cut();
     cut.addActionListener(cutAction);
     cut.getModel().setMnemonic('X');
     KeyStroke keyStrokeCut = KeyStroke.getKeyStroke('X', Event.CTRL_MASK, false);
@@ -437,16 +378,13 @@ public class Program {
     spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
     spinnerAmbientAlpha.setMaximumSize(new Dimension(50, 50));
     spinnerAmbientAlpha.setEnabled(false);
-    spinnerAmbientAlpha.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
-          return;
-        }
-
-        Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
-        Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
+    spinnerAmbientAlpha.addChangeListener(e -> {
+      if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
+        return;
       }
+
+      Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
+      Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
     });
 
     basicMenu.add(spinnerAmbientAlpha);
@@ -463,24 +401,21 @@ public class Program {
     colorText.setMaximumSize(new Dimension(50, 50));
     basicMenu.add(colorText);
 
-    colorButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
-          return;
-        }
-
-        Color result = JColorChooser.showDialog(null, "Select an ambient color.", colorText.getText() != null && colorText.getText().length() > 0 ? Color.decode(colorText.getText()) : null);
-        if (result == null) {
-          return;
-        }
-
-        String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
-        colorText.setText(h);
-
-        Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
-        Game.getEnvironment().getAmbientLight().setColor(result);
+    colorButton.addActionListener(a -> {
+      if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
+        return;
       }
+
+      Color result = JColorChooser.showDialog(null, "Select an ambient color.", colorText.getText() != null && colorText.getText().length() > 0 ? Color.decode(colorText.getText()) : null);
+      if (result == null) {
+        return;
+      }
+
+      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
+      colorText.setText(h);
+
+      Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
+      Game.getEnvironment().getAmbientLight().setColor(result);
     });
 
     contentPane.add(basicMenu, BorderLayout.NORTH);
@@ -506,49 +441,22 @@ public class Program {
 
     MenuItem create = new MenuItem(Resources.get("menu_createProject"));
     create.setShortcut(new MenuShortcut(KeyEvent.VK_N));
-    create.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().create();
-      }
-    });
+    create.addActionListener(a -> EditorScreen.instance().create());
 
     MenuItem load = new MenuItem(Resources.get("menu_loadProject"));
     load.setShortcut(new MenuShortcut(KeyEvent.VK_O));
-    load.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().load();
-      }
-    });
+    load.addActionListener(a -> EditorScreen.instance().load());
 
     MenuItem save = new MenuItem(Resources.get("menu_save"));
     save.setShortcut(new MenuShortcut(KeyEvent.VK_S));
-    save.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().save(false);
-      }
-    });
+    save.addActionListener(a -> EditorScreen.instance().save(false));
 
     MenuItem saveAs = new MenuItem(Resources.get("menu_saveAs"));
-    saveAs.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().save(true);
-      }
-    });
+    saveAs.addActionListener(a -> EditorScreen.instance().save(true));
 
     MenuItem exit = new MenuItem(Resources.get("menu_exit"));
     exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
-    exit.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        Game.terminate();
-      }
-    });
+    exit.addActionListener(a -> Game.terminate());
 
     mnFile.add(load);
     mnFile.add(create);
@@ -568,68 +476,48 @@ public class Program {
     CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
     snapToGrid.setState(USER_PREFERNCES.isSnapGrid());
     EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
-    snapToGrid.addItemListener(new ItemListener() {
-
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
-        USER_PREFERNCES.setSnapGrid(snapToGrid.getState());
-      }
+    snapToGrid.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
+      USER_PREFERNCES.setSnapGrid(snapToGrid.getState());
     });
 
     CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
     renderGrid.setState(USER_PREFERNCES.isShowGrid());
     EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
     renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
-    renderGrid.addItemListener(new ItemListener() {
-
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
-        USER_PREFERNCES.setShowGrid(renderGrid.getState());
-      }
+    renderGrid.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
+      USER_PREFERNCES.setShowGrid(renderGrid.getState());
     });
 
     CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
     renderCollision.setState(USER_PREFERNCES.isRenderBoundingBoxes());
     EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
-    renderCollision.addItemListener(new ItemListener() {
-
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
-        USER_PREFERNCES.setRenderBoundingBoxes(renderCollision.getState());
-      }
+    renderCollision.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
+      USER_PREFERNCES.setRenderBoundingBoxes(renderCollision.getState());
     });
+
     MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
-    setGrid.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridSize());
-        int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-          EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize());
-        }
+    setGrid.addActionListener(a -> {
+      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridSize());
+      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
+      if (option == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize());
       }
     });
 
     MenuItem zoomIn = new MenuItem(Resources.get("menu_zoomIn"));
     zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
-    zoomIn.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().zoomIn();
-      }
+    zoomIn.addActionListener(a -> {
+      EditorScreen.instance().getMapComponent().zoomIn();
     });
 
     MenuItem zoomOut = new MenuItem(Resources.get("menu_zoomOut"));
     zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
-    zoomOut.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().zoomOut();
-      }
+    zoomOut.addActionListener(a -> {
+      EditorScreen.instance().getMapComponent().zoomOut();
     });
 
     mnView.add(snapToGrid);
@@ -645,22 +533,15 @@ public class Program {
     menuBar.add(mnProject);
 
     MenuItem properties = new MenuItem(Resources.get("menu_properties"));
-    properties.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().setProjectSettings();
-      }
+    properties.addActionListener(a -> {
+      EditorScreen.instance().setProjectSettings();
     });
 
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
     compress.setState(USER_PREFERNCES.isCompressFile());
-    compress.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        EditorScreen.COMPRESS_RESOURCE_FILE = compress.getState();
-        USER_PREFERNCES.setCompressFile(compress.getState());
-      }
+    compress.addItemListener(e -> {
+      EditorScreen.COMPRESS_RESOURCE_FILE = compress.getState();
+      USER_PREFERNCES.setCompressFile(compress.getState());
     });
 
     EditorScreen.COMPRESS_RESOURCE_FILE = USER_PREFERNCES.isCompressFile();
@@ -672,66 +553,44 @@ public class Program {
     menuBar.add(mnMap);
 
     MenuItem imp = new MenuItem(Resources.get("menu_import"));
-    imp.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().importMap();
-      }
-    });
+    imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
 
     MenuItem exp = new MenuItem(Resources.get("menu_export"));
-    exp.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().exportMap();
-      }
-    });
+    exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
     MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
-    del2.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        EditorScreen.instance().getMapComponent().deleteMap();
-      }
-    });
+    del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
     MenuItem mapProps = new MenuItem(Resources.get("menu_properties"));
     mapProps.setShortcut(new MenuShortcut(KeyEvent.VK_M));
-    mapProps.addActionListener(new ActionListener() {
+    mapProps.addActionListener(a -> {
+      if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+        return;
+      }
 
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().size() == 0) {
-          return;
-        }
+      MapPropertyPanel panel = new MapPropertyPanel();
+      panel.bind(Game.getEnvironment().getMap());
 
-        MapPropertyPanel panel = new MapPropertyPanel();
-        panel.bind(Game.getEnvironment().getMap());
+      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
+      if (option == JOptionPane.OK_OPTION) {
+        panel.saveChanges();
 
-        int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-          panel.saveChanges();
-
-          final String colorProp = Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
-          try {
-            if (Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA) != null) {
-              int alpha = Integer.parseInt(Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA));
-              Game.getEnvironment().getAmbientLight().setAlpha(alpha);
-            }
-
-            if (colorProp != null && !colorProp.isEmpty()) {
-              Color ambientColor = Color.decode(colorProp);
-              Game.getEnvironment().getAmbientLight().setColor(ambientColor);
-            }
-          } catch (final NumberFormatException nfe) {
+        final String colorProp = Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
+        try {
+          if (Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA) != null) {
+            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA));
+            Game.getEnvironment().getAmbientLight().setAlpha(alpha);
           }
 
-          EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-          EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
+          if (colorProp != null && !colorProp.isEmpty()) {
+            Color ambientColor = Color.decode(colorProp);
+            Game.getEnvironment().getAmbientLight().setColor(ambientColor);
+          }
+        } catch (final NumberFormatException nfe) {
         }
+
+        EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
+        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
       }
     });
 
@@ -747,12 +606,9 @@ public class Program {
     for (String recent : USER_PREFERNCES.getLastOpenedFiles()) {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         MenuItem fileButton = new MenuItem(recent);
-        fileButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            System.out.println("load " + fileButton.getLabel());
-            EditorScreen.instance().load(new File(fileButton.getLabel()));
-          }
+        fileButton.addActionListener(a -> {
+          System.out.println("load " + fileButton.getLabel());
+          EditorScreen.instance().load(new File(fileButton.getLabel()));
         });
 
         recentFiles.add(fileButton);
@@ -767,10 +623,6 @@ public class Program {
         "Close utiLITI",
         JOptionPane.YES_NO_OPTION);
 
-    if (n == JOptionPane.OK_OPTION) {
-      return true;
-    }
-
-    return false;
+    return n == JOptionPane.OK_OPTION;
   }
 }

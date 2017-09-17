@@ -221,6 +221,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     }
 
     this.componentPanel.add(panel, BorderLayout.CENTER);
+
     // TODO: support all types that implement ICollisionEntity
     if (type == MapObjectType.PROP || type == MapObjectType.DECORMOB) {
       this.collWrapper.add(this.collisionPanel);
@@ -266,7 +267,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     String customType = mapObject.getCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE);
     this.textFieldCustomType.setText(customType);
     this.textFieldName.setText(mapObject.getName());
-    this.labelEntityID.setText(mapObject.getId() + "");
+    this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.comboBoxType.setEnabled(false);
   }
 
@@ -277,47 +278,35 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
       textFieldCustomType.setVisible(type == MapObjectType.CUSTOM);
     }));
 
-    comboBoxType.addItemListener(new ItemListener() {
-
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        MapObjectType type = (MapObjectType) comboBoxType.getSelectedItem();
-        switchPanel(type);
-      }
+    comboBoxType.addItemListener(e -> {
+      MapObjectType type = (MapObjectType) comboBoxType.getSelectedItem();
+      switchPanel(type);
     });
 
-    this.textFieldCustomType.addFocusListener(new MapObjectPropteryFocusListener(m -> {
-      m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText());
-    }));
+    this.textFieldCustomType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
 
-    this.textFieldCustomType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText());
-    }));
+    this.textFieldCustomType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
 
-    this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> {
-      m.setName(textFieldName.getText());
-    }));
+    this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 
-    this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setName(textFieldName.getText());
-    }));
+    this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
 
-    this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener((m) -> {
+    this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setX((int) spinnerX.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
-    this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener((m) -> {
+    this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setY((int) spinnerY.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
-    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener((m) -> {
+    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setWidth((int) spinnerWidth.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
-    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener((m) -> {
+    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setHeight((int) spinnerHeight.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
