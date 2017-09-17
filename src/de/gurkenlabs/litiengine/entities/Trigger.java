@@ -189,18 +189,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   @Override
   public String sendMessage(final Object sender, final String message) {
     if (this.activationType == TriggerActivation.COLLISION && sender != null && sender instanceof IEntity || message == null || message.isEmpty()) {
-      return null;
+      return Boolean.toString(false);
     }
 
     if (sender instanceof IEntity) {
       final IEntity ent = (IEntity) sender;
       // already triggered by the entity
       if (this.activators.contains(ent.getMapId())) {
-        return null;
+        return Boolean.toString(false);
       }
 
       if (message.equals(USE_MESSAGE)) {
         this.activate(ent, ent.getMapId());
+        return Boolean.toString(true);
       }
     }
 
