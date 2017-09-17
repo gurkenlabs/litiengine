@@ -484,7 +484,7 @@ public class MapComponent extends EditorComponent {
     super.prepare();
     this.onMouseMoved(e -> {
 
-      if (this.getFocus() == null || this.currentEditMode == EDITMODE_EDIT) {
+      if (this.getFocus() == null) {
         Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
         currentTransform = TransformType.NONE;
         return;
