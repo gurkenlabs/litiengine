@@ -30,6 +30,8 @@ public class LightSource extends Entity implements IRenderable {
 
   public static final String RECTANGLE = "rectangle";
 
+  public static final String TOGGLE_MESSAGE = "toggle";
+
   /** The gradient radius for our shadow. */
   private static final float OBSTRUCTED_VISION_RADIUS = 200f;
 
@@ -46,6 +48,22 @@ public class LightSource extends Entity implements IRenderable {
    * The colors for our shadow, going from opaque black to transparent black.
    */
   private static final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
+
+  private boolean activated;
+  /** The brightness. */
+  private int brightness;
+
+  /** The color. */
+  private Color color;
+  private final IEnvironment environment;
+  private int intensity;
+
+  private Shape lightShape;
+
+  private String lightShapeType;
+
+  /** The radius. */
+  private int radius;
 
   /**
    * Gets the shadow ellipse.
@@ -76,22 +94,6 @@ public class LightSource extends Entity implements IRenderable {
   private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
     return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
   }
-
-  private boolean activated;
-  /** The brightness. */
-  private int brightness;
-
-  /** The color. */
-  private Color color;
-  private final IEnvironment environment;
-  private int intensity;
-
-  private Shape lightShape;
-
-  private String lightShapeType;
-
-  /** The radius. */
-  private int radius;
 
   /**
    * Instantiates a new light source.
@@ -139,7 +141,7 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   public int getIntensity() {
-    return this.intensity;
+    return this.activated ? this.intensity : 0;
   }
 
   public Shape getLightShape() {
@@ -216,6 +218,20 @@ public class LightSource extends Entity implements IRenderable {
 
   public void toggle() {
     this.activated = !this.activated;
+  }
+
+  @Override
+  public String sendMessage(final Object sender, final String message) {
+    if (message == null || message.isEmpty()) {
+      return null;
+    }
+
+    if (message.equals(TOGGLE_MESSAGE)) {
+      this.toggle();
+      return Boolean.toString(this.activated);
+    }
+
+    return null;
   }
 
   /**
