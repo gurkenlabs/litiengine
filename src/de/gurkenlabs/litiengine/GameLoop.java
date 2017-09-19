@@ -10,50 +10,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
-  private class TimedAction {
-    private final Consumer<Integer> action;
-    private long execution;
-    private final int index;
-
-    private TimedAction(final long execution, final Consumer<Integer> action) {
-      this.execution = execution;
-      this.action = action;
-      this.index = ++executionIndex;
-    }
-
-    public Consumer<Integer> getAction() {
-      return this.action;
-    }
-
-    public long getExecutionTick() {
-      return this.execution;
-    }
-
-    public void setExecutionTicks(long ticks) {
-      this.execution = ticks;
-    }
-
-    public int getIndex() {
-      return index;
-    }
-  }
-
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
-  private final List<TimedAction> actions;
   private static int executionIndex = -1;
+
+  private final List<TimedAction> actions;
+  private final int updateRate;
+  private final List<Consumer<Integer>> upsTrackedConsumer;
+  private final List<IUpdateable> updatables;
+  private final GameTime gameTime;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
-  private final GameTime gameTime;
+
   private long lastUpsTime;
 
   private float timeScale;
   private long totalTicks;
-  private final List<IUpdateable> updatables;
-  private int updateCount;
-  private final int updateRate;
 
-  private final List<Consumer<Integer>> upsTrackedConsumer;
+  private int updateCount;
 
   public GameLoop(final int updateRate) {
     this.updatables = new CopyOnWriteArrayList<>();
@@ -222,6 +196,34 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
       if (action.getIndex() == index) {
         action.setExecutionTicks(ticks);
       }
+    }
+  }
+
+  private class TimedAction {
+    private final Consumer<Integer> action;
+    private long execution;
+    private final int index;
+
+    private TimedAction(final long execution, final Consumer<Integer> action) {
+      this.execution = execution;
+      this.action = action;
+      this.index = ++executionIndex;
+    }
+
+    public Consumer<Integer> getAction() {
+      return this.action;
+    }
+
+    public long getExecutionTick() {
+      return this.execution;
+    }
+
+    public void setExecutionTicks(long ticks) {
+      this.execution = ticks;
+    }
+
+    public int getIndex() {
+      return index;
     }
   }
 }
