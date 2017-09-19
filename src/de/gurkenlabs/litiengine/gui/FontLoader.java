@@ -46,7 +46,7 @@ public class FontLoader {
 
       final InputStream fontStream = FileUtilities.getGameResource(fontName);
       if (fontStream == null) {
-        log.log(Level.SEVERE, "font '%s' could not be loaded", fontName);
+        log.log(Level.SEVERE, "font '{0}' could not be loaded", fontName);
       }
 
       final Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream);
