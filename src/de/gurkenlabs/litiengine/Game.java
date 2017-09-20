@@ -266,6 +266,10 @@ public final class Game {
     terminatingConsumer.add(cons);
   }
 
+  public static void onConfigurationLoaded(final Consumer<GameConfiguration> cons) {
+    configLoadedConsumer.add(cons);
+  }
+
   public static void start() {
     gameLoop.start();
     soundEngine.start();
