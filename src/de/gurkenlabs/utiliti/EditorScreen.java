@@ -471,6 +471,10 @@ public class EditorScreen extends Screen {
     return this.mapComponent;
   }
 
+  public String getCurrentResourceFile() {
+    return this.currentResourceFile;
+  }
+
   public void setMapEditorPanel(MapObjectPanel mapEditorPanel) {
     this.mapEditorPanel = mapEditorPanel;
   }

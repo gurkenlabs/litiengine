@@ -606,10 +606,14 @@ public class Program {
   private static boolean exit() {
     int n = JOptionPane.showConfirmDialog(
         null,
-        "Do you really want to close the editor?",
-        "Close utiLITI",
-        JOptionPane.YES_NO_OPTION);
+        Resources.get("hud_saveProjectMessage") + "\n" + EditorScreen.instance().getCurrentResourceFile(),
+        Resources.get("hud_saveProject"),
+        JOptionPane.YES_NO_CANCEL_OPTION);
 
-    return n == JOptionPane.OK_OPTION;
+    if (n == JOptionPane.YES_OPTION) {
+      EditorScreen.instance().save(false);
+    }
+
+    return n != JOptionPane.CANCEL_OPTION;
   }
 }
