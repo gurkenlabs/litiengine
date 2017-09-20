@@ -14,6 +14,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean snapGrid;
   private boolean renderBoundingBoxes;
   private boolean compressFile;
+  private boolean syncMaps;
   private int gridSize;
 
   private String lastGameFile;
@@ -124,5 +125,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setGridSize(int gridSize) {
     this.gridSize = gridSize;
+  }
+
+  public boolean isSyncMaps() {
+    return syncMaps;
+  }
+
+  public void setSyncMaps(boolean syncMaps) {
+    this.syncMaps = syncMaps;
   }
 }

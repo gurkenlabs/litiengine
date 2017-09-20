@@ -538,14 +538,18 @@ public class Program {
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
     compress.setState(USER_PREFERNCES.isCompressFile());
     compress.addItemListener(e -> {
-      EditorScreen.COMPRESS_RESOURCE_FILE = compress.getState();
       USER_PREFERNCES.setCompressFile(compress.getState());
     });
 
-    EditorScreen.COMPRESS_RESOURCE_FILE = USER_PREFERNCES.isCompressFile();
+    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
+    sync.setState(USER_PREFERNCES.isSyncMaps());
+    sync.addItemListener(e -> {
+      USER_PREFERNCES.setSyncMaps(sync.getState());
+    });
 
     mnProject.add(properties);
     mnProject.add(compress);
+    mnProject.add(sync);
     // init map menu
     Menu mnMap = new Menu(Resources.get("menu_map"));
     menuBar.add(mnMap);

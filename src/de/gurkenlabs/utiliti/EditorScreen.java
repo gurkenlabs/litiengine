@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,6 @@ import de.gurkenlabs.utiliti.components.ProjectSettingsDialog;
 @ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {
   private static final int STATUS_DURATION = 5000;
-  public static boolean COMPRESS_RESOURCE_FILE = true;
   private static final String DEFAULT_GAME_NAME = "game";
   private static final String[] DEFAULT_SPRITESHEET_NAMES = { "sprites.info", "game.sprites" };
   private static final String NEW_GAME_STRING = "NEW GAME *";
@@ -330,26 +330,39 @@ public class EditorScreen extends Screen {
 
         int result = chooser.showSaveDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
-          String newFile = this.getGameFile().save(chooser.getSelectedFile().toString(), COMPRESS_RESOURCE_FILE);
+          String newFile = this.saveGameFile(chooser.getSelectedFile().toString());
           this.currentResourceFile = newFile;
-          System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getTileSets().size()
-              + " tilesets to '" + this.currentResourceFile + "'");
-          Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
-          Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
-          Program.loadRecentFiles();
-          this.setCurrentStatus("saved gamefile");
         }
       } catch (IOException e1) {
         e1.printStackTrace();
       }
     } else {
-      this.getGameFile().save(this.currentResourceFile, COMPRESS_RESOURCE_FILE);
-      Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
-      Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
-      Program.loadRecentFiles();
-      System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getTileSets().size()
-          + " tilesets to '" + this.currentResourceFile + "'");
-      this.setCurrentStatus("saved gamefile");
+      this.saveGameFile(this.currentResourceFile);
+    }
+  }
+
+  private String saveGameFile(String target) {
+    String saveFile = this.getGameFile().save(target, Program.USER_PREFERNCES.isCompressFile());
+    Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
+    Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
+    Program.loadRecentFiles();
+    System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getTileSets().size()
+        + " tilesets to '" + this.currentResourceFile + "'");
+    this.setCurrentStatus("saved gamefile");
+
+    if (Program.USER_PREFERNCES.isSyncMaps()) {
+      this.saveMaps();
+    }
+
+    return saveFile;
+  }
+
+  private void saveMaps() {
+    for (Map map : this.getGameFile().getMaps()) {
+      for (String file : FileUtilities.findFiles(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
+        map.save(file);
+        System.out.println("synchronized map '" + file + "'");
+      }
     }
   }
 
