@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -18,7 +19,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
 
 public class MapSelectionPanel extends JPanel {
   JList<String> list;
@@ -27,6 +34,9 @@ public class MapSelectionPanel extends JPanel {
   DefaultListModel<JCheckBox> layerModel;
   JScrollPane scrollPane;
   JScrollPane horizontalScrollPane;
+  private JPopupMenu popupMenu;
+  private JMenuItem mntmExportMap;
+  private JMenuItem mntmDeleteMap;
 
   /**
    * Create the panel.
@@ -56,6 +66,20 @@ public class MapSelectionPanel extends JPanel {
     });
 
     scrollPane.setViewportView(list);
+
+    popupMenu = new JPopupMenu();
+    addPopup(list, popupMenu);
+
+    mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
+    mntmExportMap.setIcon(new ImageIcon(RenderEngine.getImage("button-map-exportx16.png")));
+    mntmExportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+
+    popupMenu.add(mntmExportMap);
+
+    mntmDeleteMap = new JMenuItem(Resources.get("hud_deleteMap"));
+    mntmDeleteMap.setIcon(new ImageIcon(RenderEngine.getImage("button-deletex16.png")));
+    mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
+    popupMenu.add(mntmDeleteMap);
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
     scrollPane.setViewportBorder(border);
@@ -128,5 +152,25 @@ public class MapSelectionPanel extends JPanel {
 
   public int getSelectedLayerIndex() {
     return listObjectLayers.getSelectedIndex();
+  }
+
+  private static void addPopup(Component component, final JPopupMenu popup) {
+    component.addMouseListener(new MouseAdapter() {
+      public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+          showMenu(e);
+        }
+      }
+
+      public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+          showMenu(e);
+        }
+      }
+
+      private void showMenu(MouseEvent e) {
+        popup.show(e.getComponent(), e.getX(), e.getY());
+      }
+    });
   }
 }

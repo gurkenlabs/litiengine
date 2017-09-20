@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
@@ -912,6 +913,16 @@ public class MapComponent extends EditorComponent {
     }
 
     if (Game.getEnvironment() == null && Game.getEnvironment().getMap() == null) {
+      return;
+    }
+
+    int n = JOptionPane.showConfirmDialog(
+        null,
+        Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(),
+        Resources.get("hud_deleteMap"),
+        JOptionPane.YES_NO_OPTION);
+
+    if (n != JOptionPane.YES_OPTION) {
       return;
     }
 

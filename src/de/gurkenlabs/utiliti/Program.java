@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -104,6 +105,7 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init();
+    JOptionPane.setDefaultLocale(Locale.getDefault());
 
     USER_PREFERNCES = Game.getConfiguration().getConfigurationGroup("user_");
     Game.getScreenManager().getCamera().onZoomChanged(zoom -> {
