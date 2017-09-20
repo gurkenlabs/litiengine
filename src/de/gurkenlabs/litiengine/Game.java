@@ -214,7 +214,7 @@ public final class Game {
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {
-      final List<Spritesheet> sprites = Spritesheet.load(getInfo().getSpritesDirectory() + spriteFile);
+      final List<Spritesheet> sprites = Spritesheet.load(GameDirectories.SPRITES + spriteFile);
       loadedSprites.addAll(sprites);
     }
 

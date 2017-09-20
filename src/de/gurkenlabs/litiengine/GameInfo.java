@@ -13,16 +13,13 @@ public class GameInfo {
   private String description;
 
   private String[] developers;
-
-  private String emitterDirectory;
-
   private String icon;
 
   private String logo;
   @XmlElement
   private String name;
   private float renderScale;
-  private String spritesDirectory;
+
   @XmlElement
   private String subTitle;
   @XmlElement
@@ -39,8 +36,6 @@ public class GameInfo {
     this.version = "v1.0";
 
     this.renderScale = 3.0f;
-    this.spritesDirectory = "sprites/";
-    this.emitterDirectory = "emitters/";
   }
 
   @XmlTransient
@@ -56,10 +51,6 @@ public class GameInfo {
   @XmlTransient
   public String[] getDevelopers() {
     return this.developers;
-  }
-
-  public String getEmitterDirectory() {
-    return this.emitterDirectory;
   }
 
   @XmlTransient
@@ -80,11 +71,6 @@ public class GameInfo {
   @XmlTransient
   public float getRenderScale() {
     return this.renderScale;
-  }
-
-  @XmlTransient
-  public String getSpritesDirectory() {
-    return this.spritesDirectory;
   }
 
   @XmlTransient
@@ -109,10 +95,6 @@ public class GameInfo {
     this.developers = developers;
   }
 
-  public void setEmitterDirectory(final String emitterDirectory) {
-    this.emitterDirectory = emitterDirectory;
-  }
-
   public void setIcon(final String icon) {
     this.icon = icon;
   }
@@ -127,10 +109,6 @@ public class GameInfo {
 
   public void setRenderScale(final float renderScale) {
     this.renderScale = renderScale;
-  }
-
-  public void setSpritesDirectory(final String spritesDirectory) {
-    this.spritesDirectory = spritesDirectory;
   }
 
   public void setSubTitle(final String subTitle) {

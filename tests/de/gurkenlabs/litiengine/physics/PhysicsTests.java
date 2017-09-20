@@ -7,7 +7,6 @@ import java.awt.geom.Rectangle2D;
 
 import org.junit.Test;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
