@@ -321,7 +321,7 @@ public class MapComponent extends EditorComponent {
         }
         g.setColor(new Color(0, 130, 152, 150));
         RenderEngine.drawShape(g, rect,
-            new BasicStroke(2 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
+            new BasicStroke(2 / Game.getScreenManager().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
       }
       break;
     }
@@ -330,7 +330,7 @@ public class MapComponent extends EditorComponent {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(2 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
+      Stroke stroke = new BasicStroke(2 / Game.getScreenManager().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       if (MapObjectType.get(focusedMapObject.getType()) != MapObjectType.LIGHTSOURCE) {
         g.setColor(COLOR_FOCUS_FILL);
         RenderEngine.fillShape(g, focus);
@@ -341,7 +341,7 @@ public class MapComponent extends EditorComponent {
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.getInfo().getRenderScale());
+        Stroke transStroke = new BasicStroke(1 / Game.getScreenManager().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           RenderEngine.fillShape(g, trans);
@@ -357,8 +357,8 @@ public class MapComponent extends EditorComponent {
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(COLOR_FOCUS_BORDER);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getInfo().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
-          loc.getY() * Game.getInfo().getRenderScale() - (5 * this.currentTransformRectSize));
+      RenderEngine.drawText(g, id, loc.getX() * Game.getScreenManager().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
+          loc.getY() * Game.getScreenManager().getRenderScale() - (5 * this.currentTransformRectSize));
       if (MapObjectType.get(focusedMapObject.getType()) == MapObjectType.TRIGGER) {
         g.setColor(COLOR_NOCOLLISION_BORDER);
         g.setFont(Program.TEXT_FONT.deriveFont(11f));
@@ -367,12 +367,12 @@ public class MapComponent extends EditorComponent {
     }
 
     // render the grid
-    if (this.renderGrid && Game.getInfo().getRenderScale() >= 1) {
+    if (this.renderGrid && Game.getScreenManager().getRenderScale() >= 1) {
 
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       g.setColor(new Color(255, 255, 255, 100));
-      Stroke stroke = new BasicStroke(1 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
+      Stroke stroke = new BasicStroke(1 / Game.getScreenManager().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
       final double viewPortX = Math.max(0, Game.getScreenManager().getCamera().getViewPort().getX());
       final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(),
           Game.getScreenManager().getCamera().getViewPort().getMaxX());
