@@ -47,6 +47,6 @@ public class GridEditPanel extends JPanel {
   }
 
   public int getGridSize() {
-    return (int) this.textField.getValue();
+    return Integer.parseInt(this.textField.getText());
   }
 }

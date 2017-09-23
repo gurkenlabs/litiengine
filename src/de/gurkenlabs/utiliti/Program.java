@@ -606,9 +606,10 @@ public class Program {
   }
 
   private static boolean exit() {
+    String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
     int n = JOptionPane.showConfirmDialog(
         null,
-        Resources.get("hud_saveProjectMessage") + "\n" + EditorScreen.instance().getCurrentResourceFile(),
+        Resources.get("hud_saveProjectMessage") + "\n" + resourceFile,
         Resources.get("hud_saveProject"),
         JOptionPane.YES_NO_CANCEL_OPTION);
 
