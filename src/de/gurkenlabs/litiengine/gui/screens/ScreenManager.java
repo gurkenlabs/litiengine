@@ -30,16 +30,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   private static final int NONE_FOCUS_MAX_FPS = 10;
 
   private static final long serialVersionUID = 7958549828482285935L;
-
-  /** The camera. */
-  private transient ICamera camera;
-
-  /** The current screen. */
-  private transient IScreen currentScreen;
-
-  /** The last screen change. */
-  private long lastScreenChange = 0;
-
   /** The Render canvas. */
   private final RenderComponent renderCanvas;
 
@@ -50,6 +40,17 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   /** The screens. */
   private final transient List<IScreen> screens;
+
+  /** The camera. */
+  private transient ICamera camera;
+
+  /** The current screen. */
+  private transient IScreen currentScreen;
+
+  /** The last screen change. */
+  private long lastScreenChange = 0;
+
+  private float renderScale;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -152,6 +153,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
+  public float getRenderScale() {
+    return this.renderScale;
+  }
+
+  @Override
   public void init(final int width, final int height, final boolean fullscreen) {
     this.setCamera(new Camera());
     if (fullscreen) {
@@ -160,6 +166,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     }
 
     this.setVisible(true);
+    this.renderScale = Game.getConfiguration().graphics().getRenderScale();
     this.setResolution(Game.getConfiguration().graphics().getResolution());
     this.getRenderComponent().init();
     this.requestFocus();
@@ -208,6 +215,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
+  public void setRenderScale(float renderScale) {
+    this.renderScale = renderScale;
+  }
+
+  @Override
   public void windowStateChanged(WindowEvent e) {
     if (e.getNewState() == JFrame.ICONIFIED) {
       Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
@@ -252,4 +264,5 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
     }
   }
+
 }

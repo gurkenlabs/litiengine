@@ -31,6 +31,8 @@ public interface IScreenManager extends ICameraProvider {
 
   public Point getScreenLocation();
 
+  public float getRenderScale();
+
   public String getTitle();
 
   public void init(int width, int height, boolean fullscreen);
@@ -46,4 +48,6 @@ public interface IScreenManager extends ICameraProvider {
   public void setTitle(String string);
 
   public void setResolution(Resolution res);
+
+  public void setRenderScale(float renderScale);
 }

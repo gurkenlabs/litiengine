@@ -18,7 +18,6 @@ public class GameInfo {
   private String logo;
   @XmlElement
   private String name;
-  private float renderScale;
 
   @XmlElement
   private String subTitle;
@@ -34,8 +33,6 @@ public class GameInfo {
     this.icon = "";
     this.logo = "";
     this.version = "v1.0";
-
-    this.renderScale = 3.0f;
   }
 
   @XmlTransient
@@ -66,11 +63,6 @@ public class GameInfo {
   @XmlTransient
   public String getName() {
     return this.name;
-  }
-
-  @XmlTransient
-  public float getRenderScale() {
-    return this.renderScale;
   }
 
   @XmlTransient
@@ -105,10 +97,6 @@ public class GameInfo {
 
   public void setName(final String name) {
     this.name = name;
-  }
-
-  public void setRenderScale(final float renderScale) {
-    this.renderScale = renderScale;
   }
 
   public void setSubTitle(final String subTitle) {
