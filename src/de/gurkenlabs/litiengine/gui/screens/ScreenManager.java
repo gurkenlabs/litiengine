@@ -159,9 +159,8 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 
-    this.setSize(Game.getConfiguration().graphics().getResolution());
-
     this.setVisible(true);
+    this.setResolution(Game.getConfiguration().graphics().getResolution());
     this.getRenderComponent().init();
     this.requestFocus();
   }
@@ -204,6 +203,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
+  public void setResolution(Resolution res) {
+    this.setResolution(res.getDimension());
+  }
+
+  @Override
   public void windowStateChanged(WindowEvent e) {
     if (e.getNewState() == JFrame.ICONIFIED) {
       Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
@@ -220,6 +224,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   @Override
   public void windowLostFocus(WindowEvent e) {
     Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+  }
+
+  private void setResolution(Dimension dim) {
+    Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
+    this.setSize(insetAwareDimension);
   }
 
   /**
