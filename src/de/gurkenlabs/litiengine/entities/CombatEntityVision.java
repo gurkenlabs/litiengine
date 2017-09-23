@@ -119,7 +119,7 @@ public class CombatEntityVision implements IVision {
 
     final AffineTransform oldTransform = g.getTransform();
     final AffineTransform at = new AffineTransform();
-    at.scale(Game.getScreenManager().getRenderScale(), Game.getScreenManager().getRenderScale());
+    at.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
     at.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
 
     g.setTransform(at);

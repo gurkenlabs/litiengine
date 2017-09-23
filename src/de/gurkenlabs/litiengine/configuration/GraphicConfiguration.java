@@ -30,8 +30,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private int resolutionWidth;
 
-  private float renderScale;
-
   /**
    * Instantiates a new graphic configuration.
    */
@@ -42,7 +40,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
     this.setCacheStaticTiles(true);
-    this.setRenderScale(3.0f);
   }
 
   /**
@@ -76,15 +73,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public int getResolutionWidth() {
     return this.resolutionWidth;
-  }
-
-  /**
-   * The default renderscale that will be used to initialize the Screenmanager.
-   * 
-   * @return
-   */
-  public float getRenderScale() {
-    return renderScale;
   }
 
   /**
@@ -142,9 +130,5 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setCacheStaticTiles(boolean cacheStaticTiles) {
     this.cacheStaticTiles = cacheStaticTiles;
-  }
-
-  public void setRenderScale(float renderScale) {
-    this.renderScale = renderScale;
   }
 }
