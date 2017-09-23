@@ -44,4 +44,6 @@ public interface IScreenManager extends ICameraProvider {
   public void setIconImage(Image image);
 
   public void setTitle(String string);
+
+  public void setResolution(Resolution res);
 }
