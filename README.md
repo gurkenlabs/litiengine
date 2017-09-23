@@ -18,7 +18,7 @@ LITIengine is the pure 2D free java game engine. Written in plain Java 8 it prov
 
 * Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
 * 2D Physics Engine
-* 2D Render Engine (plain Java - no OpenGL fancyness)
+* 2D Render Engine (plain Java)
   * GUI Components
   * Static and Dynamic Shadows
   * Dynamic Lighting
