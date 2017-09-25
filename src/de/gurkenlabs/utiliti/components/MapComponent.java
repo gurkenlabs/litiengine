@@ -321,7 +321,7 @@ public class MapComponent extends EditorComponent {
         }
         g.setColor(new Color(0, 130, 152, 150));
         RenderEngine.drawShape(g, rect,
-            new BasicStroke(2 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
+            new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
       }
       break;
     }
@@ -330,7 +330,7 @@ public class MapComponent extends EditorComponent {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(2 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
+      Stroke stroke = new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       if (MapObjectType.get(focusedMapObject.getType()) != MapObjectType.LIGHTSOURCE) {
         g.setColor(COLOR_FOCUS_FILL);
         RenderEngine.fillShape(g, focus);
