@@ -133,10 +133,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public void render(final IRenderable screen) {
     final long currentMillis = System.currentTimeMillis();
+    this.handleFade();
     Graphics2D g = null;
     try {
       g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
-      this.handleFade();
 
       g.setColor(Color.BLACK);
       g.fillRect(0, 0, this.getWidth(), this.getHeight());

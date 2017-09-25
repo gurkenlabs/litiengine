@@ -157,10 +157,13 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     if (fullscreen) {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
+      this.setVisible(true);
+      this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
+    } else {
+      this.setResolution(Game.getConfiguration().graphics().getResolution());
+      this.setVisible(true);
     }
 
-    this.setVisible(true);
-    this.setResolution(Game.getConfiguration().graphics().getResolution());
     this.getRenderComponent().init();
     this.requestFocus();
   }
@@ -228,6 +231,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   private void setResolution(Dimension dim) {
     Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
+
+    float ratio = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
+    Game.getInfo().setRenderScale(Game.getInfo().getRenderScale() * ratio);
+
+    System.out.println(Game.getInfo().getRenderScale());
     this.setSize(insetAwareDimension);
   }
 

@@ -20,6 +20,10 @@ public class Resolution {
     this.ratio = ratio;
   }
 
+  public static Resolution custom(int width, int height, String resolutionName) {
+    return new Resolution(width, height, resolutionName);
+  }
+
   public int getHeight() {
     return this.height;
   }
