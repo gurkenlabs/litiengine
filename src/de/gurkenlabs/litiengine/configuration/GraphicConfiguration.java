@@ -30,6 +30,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private int resolutionWidth;
 
+  private boolean enableResolutionScale;
+
   /**
    * Instantiates a new graphic configuration.
    */
@@ -40,6 +42,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
     this.setCacheStaticTiles(true);
+    this.setEnableResolutionScale(true);
   }
 
   /**
@@ -130,5 +133,13 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setCacheStaticTiles(boolean cacheStaticTiles) {
     this.cacheStaticTiles = cacheStaticTiles;
+  }
+
+  public boolean enableResolutionScale() {
+    return enableResolutionScale;
+  }
+
+  public void setEnableResolutionScale(boolean enableResolutionScale) {
+    this.enableResolutionScale = enableResolutionScale;
   }
 }

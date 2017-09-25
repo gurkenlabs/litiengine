@@ -29,6 +29,14 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   private static final long serialVersionUID = 7958549828482285935L;
 
+  /** The resolution observers. */
+  private final transient List<Consumer<Dimension>> resolutionChangedConsumer;
+
+  private final transient List<Consumer<IScreen>> screenChangedConsumer;
+
+  /** The screens. */
+  private final transient List<IScreen> screens;
+
   /** The current screen. */
   private transient IScreen currentScreen;
 
@@ -38,13 +46,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   /** The Render canvas. */
   private final RenderComponent renderCanvas;
 
-  /** The resolution observers. */
-  private final transient List<Consumer<Dimension>> resolutionChangedConsumer;
-
-  private final transient List<Consumer<IScreen>> screenChangedConsumer;
-
-  /** The screens. */
-  private final transient List<IScreen> screens;
+  private float resolutionScale = 1;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -209,8 +211,10 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   private void setResolution(Dimension dim) {
     Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
 
-    float ratio = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
-    Game.getInfo().setDefaultRenderScale(Game.getInfo().getDefaultRenderScale() * ratio);
+    if (Game.getConfiguration().graphics().enableResolutionScale()) {
+      this.resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
+      Game.getInfo().setDefaultRenderScale(Game.getInfo().getDefaultRenderScale() * this.resolutionScale);
+    }
 
     this.setSize(insetAwareDimension);
   }
@@ -235,5 +239,10 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     public void componentResized(final ComponentEvent evt) {
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
     }
+  }
+
+  @Override
+  public float getResolutionScale() {
+    return this.resolutionScale;
   }
 }

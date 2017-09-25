@@ -28,6 +28,8 @@ public interface IScreenManager {
 
   public Dimension getResolution();
 
+  public float getResolutionScale();
+
   public Point getScreenLocation();
 
   public String getTitle();
