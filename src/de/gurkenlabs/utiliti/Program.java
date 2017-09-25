@@ -85,6 +85,7 @@ public class Program {
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("litiengine creation kit");
     Game.getInfo().setVersion("v0.3.5-alpha");
+    Game.getInfo().setDefaultRenderScale(1.0f);
 
     // add system tray icon with popup menu
     if (SystemTray.isSupported()) {
