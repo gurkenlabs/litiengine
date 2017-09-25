@@ -99,7 +99,7 @@ public class Mouse implements IMouse {
 
   @Override
   public Point2D getMapLocation() {
-    return Game.getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getInfo().getDefaultRenderScale(), this.getLocation().getY() / Game.getInfo().getDefaultRenderScale()));
+    return Game.getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getCamera().getRenderScale(), this.getLocation().getY() / Game.getCamera().getRenderScale()));
   }
 
   @Override

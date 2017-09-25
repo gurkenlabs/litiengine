@@ -164,6 +164,11 @@ public class Camera implements ICamera {
   }
 
   @Override
+  public float getRenderScale() {
+    return Game.getInfo().getDefaultRenderScale();
+  }
+
+  @Override
   public void onZoomChanged(final Consumer<Float> zoomCons) {
     this.zoomChangedConsumer.add(zoomCons);
   }
@@ -276,6 +281,14 @@ public class Camera implements ICamera {
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getDefaultRenderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getDefaultRenderScale());
   }
 
+  public boolean isClampToMap() {
+    return clampToMap;
+  }
+
+  public void setClampToMap(boolean clampToMap) {
+    this.clampToMap = clampToMap;
+  }
+
   protected Point2D clampToMap(Point2D focus) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
       return focus;
@@ -347,13 +360,5 @@ public class Camera implements ICamera {
 
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
-  }
-
-  public boolean isClampToMap() {
-    return clampToMap;
-  }
-
-  public void setClampToMap(boolean clampToMap) {
-    this.clampToMap = clampToMap;
   }
 }

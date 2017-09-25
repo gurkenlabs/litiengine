@@ -95,7 +95,7 @@ public final class RenderEngine implements IRenderEngine {
 
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
-    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getDefaultRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getDefaultRenderScale());
+    g.drawString(text, (int) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (int) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
@@ -112,7 +112,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().getDefaultRenderScale()));
+    drawShape(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
@@ -123,7 +123,7 @@ public final class RenderEngine implements IRenderEngine {
     final AffineTransform oldTransForm = g.getTransform();
     final Stroke oldStroke = g.getStroke();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
     t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(t);
@@ -176,11 +176,11 @@ public final class RenderEngine implements IRenderEngine {
 
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
     t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getInfo().getDefaultRenderScale()));
+    g.setStroke(new BasicStroke(1 / Game.getCamera().getRenderScale()));
     g.fill(shape);
     g.setTransform(oldTransForm);
   }

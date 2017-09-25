@@ -755,7 +755,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    g.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
 
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
@@ -788,7 +788,7 @@ public class Environment implements IEnvironment {
     }
 
     this.informConsumers(g, this.overlayRenderedConsumer);
-    g.scale(1.0 / Game.getInfo().getDefaultRenderScale(), 1.0 / Game.getInfo().getDefaultRenderScale());
+    g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
   }
 
   @Override
@@ -846,6 +846,7 @@ public class Environment implements IEnvironment {
       return;
     }
 
+    // TODO: this is a very weird default value
     short velocity = (short) (100 / Game.getInfo().getDefaultRenderScale());
     if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
       velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));

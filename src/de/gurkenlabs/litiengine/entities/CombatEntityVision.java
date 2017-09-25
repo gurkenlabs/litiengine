@@ -107,9 +107,8 @@ public class CombatEntityVision implements IVision {
   }
 
   /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#renderFogOfWar(java.awt.Graphics)
+   * TODO: I'm not sure if fog of war rendering should be placed here. Maybe it
+   * should be moved to some kind of renderer class.
    */
   @Override
   public void renderFogOfWar(final Graphics2D g) {
@@ -119,7 +118,7 @@ public class CombatEntityVision implements IVision {
 
     final AffineTransform oldTransform = g.getTransform();
     final AffineTransform at = new AffineTransform();
-    at.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    at.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
     at.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(at);

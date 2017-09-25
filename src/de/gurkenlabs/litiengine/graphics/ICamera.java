@@ -82,6 +82,8 @@ public interface ICamera extends IUpdateable {
    */
   public Point2D getViewPortLocation(Point2D point);
 
+  public float getRenderScale();
+
   public float getZoom();
 
   public void onZoomChanged(Consumer<Float> zoomCons);
