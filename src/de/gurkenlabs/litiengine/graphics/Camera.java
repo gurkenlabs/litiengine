@@ -39,6 +39,7 @@ public class Camera implements ICamera {
   private Rectangle2D viewPort;
 
   private float zoom;
+  private float targetZoom;
   private final List<Consumer<Float>> zoomChangedConsumer;
   private int zoomDelay;
   private float zoomStep;
@@ -53,7 +54,7 @@ public class Camera implements ICamera {
   public Camera() {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
-    this.zoom = Game.getInfo().getDefaultRenderScale();
+    this.zoom = 1;
   }
 
   @Override
@@ -165,7 +166,7 @@ public class Camera implements ICamera {
 
   @Override
   public float getRenderScale() {
-    return Game.getInfo().getDefaultRenderScale();
+    return Game.getInfo().getDefaultRenderScale() * this.getZoom();
   }
 
   @Override
@@ -198,25 +199,25 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void setZoom(final float zoom, final int delay) {
+  public void setZoom(final float targetZoom, final int delay) {
     if (delay == 0) {
-      Game.getInfo().setDefaultRenderScale(zoom);
       for (final Consumer<Float> cons : this.zoomChangedConsumer) {
-        cons.accept(zoom);
+        cons.accept(targetZoom);
       }
 
-      this.zoom = 0;
+      this.zoom = targetZoom;
+      this.targetZoom = 0;
       this.zoomDelay = 0;
       this.zoomTick = 0;
       this.zoomStep = 0;
     } else {
       this.zoomTick = Game.getLoop().getTicks();
-      this.zoom = zoom;
+      this.targetZoom = targetZoom;
       this.zoomDelay = delay;
 
       final double tickduration = 1000 / (double) Game.getLoop().getUpdateRate();
       final double tickAmount = delay / tickduration;
-      final float totalDelta = zoom - Game.getInfo().getDefaultRenderScale();
+      final float totalDelta = this.targetZoom - this.zoom;
       this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
     }
   }
@@ -240,23 +241,22 @@ public class Camera implements ICamera {
       return;
     }
 
-    if (this.zoom > 0 && Game.getInfo().getDefaultRenderScale() != this.zoom) {
+    if (this.targetZoom > 0) {
       if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
-        Game.getInfo().setDefaultRenderScale(this.zoom);
         for (final Consumer<Float> cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
 
-        this.zoom = 0;
+        this.zoom = this.targetZoom;
+        this.targetZoom = 0;
         this.zoomDelay = 0;
         this.zoomTick = 0;
         this.zoomStep = 0;
       } else {
 
-        final float newRenderScale = Game.getInfo().getDefaultRenderScale() + this.zoomStep;
-        Game.getInfo().setDefaultRenderScale(newRenderScale);
+        this.zoom += this.zoomStep;
         for (final Consumer<Float> cons : this.zoomChangedConsumer) {
-          cons.accept(newRenderScale);
+          cons.accept(this.zoom);
         }
       }
     }
@@ -278,7 +278,7 @@ public class Camera implements ICamera {
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / Game.getInfo().getDefaultRenderScale(), Game.getScreenManager().getResolution().getHeight() / Game.getInfo().getDefaultRenderScale());
+    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
   }
 
   public boolean isClampToMap() {
@@ -297,13 +297,13 @@ public class Camera implements ICamera {
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
     final Dimension resolution = Game.getScreenManager().getResolution();
 
-    double minX = resolution.getWidth() / Game.getInfo().getDefaultRenderScale() / 2;
+    double minX = resolution.getWidth() / this.getRenderScale() / 2;
     double maxX = mapSize.getWidth() - minX;
-    double minY = resolution.getHeight() / Game.getInfo().getDefaultRenderScale() / 2;
+    double minY = resolution.getHeight() / this.getRenderScale() / 2;
     double maxY = mapSize.getHeight() - minY;
 
-    double x = mapSize.getWidth() * Game.getInfo().getDefaultRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
-    double y = mapSize.getHeight() * Game.getInfo().getDefaultRenderScale() < resolution.getHeight() ? minY : MathUtilities.clamp(focus.getY(), minY, maxY);
+    double x = mapSize.getWidth() * this.getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
+    double y = mapSize.getHeight() * this.getRenderScale() < resolution.getHeight() ? minY : MathUtilities.clamp(focus.getY(), minY, maxY);
 
     return new Point2D.Double(x, y);
   }
@@ -351,11 +351,11 @@ public class Camera implements ICamera {
   }
 
   private double getViewPortCenterX() {
-    return Game.getScreenManager().getResolution().getWidth() * 0.5 / Game.getInfo().getDefaultRenderScale();
+    return Game.getScreenManager().getResolution().getWidth() * 0.5 / this.getRenderScale();
   }
 
   private double getViewPortCenterY() {
-    return Game.getScreenManager().getResolution().getHeight() * 0.5 / Game.getInfo().getDefaultRenderScale();
+    return Game.getScreenManager().getResolution().getHeight() * 0.5 / this.getRenderScale();
   }
 
   private boolean isShakeEffectActive() {
