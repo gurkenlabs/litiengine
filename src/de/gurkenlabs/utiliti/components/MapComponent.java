@@ -134,7 +134,7 @@ public class MapComponent extends EditorComponent {
     this.cameraFocus = new ConcurrentHashMap<>();
     this.transformRects = new ConcurrentHashMap<>();
     this.screen = screen;
-    Game.getScreenManager().getCamera().onZoomChanged(zoom -> {
+    Game.getCamera().onZoomChanged(zoom -> {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
@@ -321,7 +321,7 @@ public class MapComponent extends EditorComponent {
         }
         g.setColor(new Color(0, 130, 152, 150));
         RenderEngine.drawShape(g, rect,
-            new BasicStroke(2 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
+            new BasicStroke(2 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
       }
       break;
     }
@@ -330,7 +330,7 @@ public class MapComponent extends EditorComponent {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(2 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
+      Stroke stroke = new BasicStroke(2 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       if (MapObjectType.get(focusedMapObject.getType()) != MapObjectType.LIGHTSOURCE) {
         g.setColor(COLOR_FOCUS_FILL);
         RenderEngine.fillShape(g, focus);
@@ -341,7 +341,7 @@ public class MapComponent extends EditorComponent {
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.getInfo().getRenderScale());
+        Stroke transStroke = new BasicStroke(1 / Game.getInfo().getDefaultRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           RenderEngine.fillShape(g, trans);
@@ -352,13 +352,13 @@ public class MapComponent extends EditorComponent {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getScreenManager().getCamera()
+      Point2D loc = Game.getCamera()
           .getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(COLOR_FOCUS_BORDER);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getInfo().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
-          loc.getY() * Game.getInfo().getRenderScale() - (5 * this.currentTransformRectSize));
+      RenderEngine.drawText(g, id, loc.getX() * Game.getInfo().getDefaultRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
+          loc.getY() * Game.getInfo().getDefaultRenderScale() - (5 * this.currentTransformRectSize));
       if (MapObjectType.get(focusedMapObject.getType()) == MapObjectType.TRIGGER) {
         g.setColor(COLOR_NOCOLLISION_BORDER);
         g.setFont(Program.TEXT_FONT.deriveFont(11f));
@@ -367,19 +367,19 @@ public class MapComponent extends EditorComponent {
     }
 
     // render the grid
-    if (this.renderGrid && Game.getInfo().getRenderScale() >= 1) {
+    if (this.renderGrid && Game.getInfo().getDefaultRenderScale() >= 1) {
 
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       g.setColor(new Color(255, 255, 255, 100));
-      Stroke stroke = new BasicStroke(1 / Game.getInfo().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
-      final double viewPortX = Math.max(0, Game.getScreenManager().getCamera().getViewPort().getX());
+      Stroke stroke = new BasicStroke(1 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
+      final double viewPortX = Math.max(0, Game.getCamera().getViewPort().getX());
       final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(),
-          Game.getScreenManager().getCamera().getViewPort().getMaxX());
+          Game.getCamera().getViewPort().getMaxX());
 
-      final double viewPortY = Math.max(0, Game.getScreenManager().getCamera().getViewPort().getY());
+      final double viewPortY = Math.max(0, Game.getCamera().getViewPort().getY());
       final double viewPortMaxY = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getHeight(),
-          Game.getScreenManager().getCamera().getViewPort().getMaxY());
+          Game.getCamera().getViewPort().getMaxY());
       final int startX = Math.max(0, (int) (viewPortX / gridSize) * gridSize);
       final int startY = Math.max(0, (int) (viewPortY / gridSize) * gridSize);
       for (int x = startX; x <= viewPortMaxX; x += gridSize) {
@@ -436,7 +436,7 @@ public class MapComponent extends EditorComponent {
 
   @Override
   public void prepare() {
-    Game.getScreenManager().getCamera().setZoom(zooms[this.currentZoomIndex], 0);
+    Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
     Program.horizontalScroll.addAdjustmentListener(new AdjustmentListener() {
 
       @Override
@@ -445,8 +445,8 @@ public class MapComponent extends EditorComponent {
           return;
         }
 
-        Point2D cameraFocus = new Point2D.Double(Program.horizontalScroll.getValue(), Game.getScreenManager().getCamera().getFocus().getY());
-        Game.getScreenManager().getCamera().setFocus(cameraFocus);
+        Point2D cameraFocus = new Point2D.Double(Program.horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
+        Game.getCamera().setFocus(cameraFocus);
       }
     });
 
@@ -457,8 +457,8 @@ public class MapComponent extends EditorComponent {
         if (isLoading) {
           return;
         }
-        Point2D cameraFocus = new Point2D.Double(Game.getScreenManager().getCamera().getFocus().getX(), Program.verticalScroll.getValue());
-        Game.getScreenManager().getCamera().setFocus(cameraFocus);
+        Point2D cameraFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), Program.verticalScroll.getValue());
+        Game.getCamera().setFocus(cameraFocus);
       }
     });
 
@@ -720,8 +720,8 @@ public class MapComponent extends EditorComponent {
     this.isLoading = true;
     try {
       if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-        double x = Game.getScreenManager().getCamera().getFocus().getX();
-        double y = Game.getScreenManager().getCamera().getFocus().getY();
+        double x = Game.getCamera().getFocus().getX();
+        double y = Game.getCamera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
         this.cameraFocus.put(Game.getEnvironment().getMap().getFileName(), newPoint);
       }
@@ -734,7 +734,7 @@ public class MapComponent extends EditorComponent {
         this.cameraFocus.put(map.getFileName(), newFocus);
       }
 
-      Game.getScreenManager().getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
+      Game.getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
       this.ensureUniqueIds(map);
       Environment env = new Environment(map);
@@ -1320,7 +1320,7 @@ public class MapComponent extends EditorComponent {
   }
 
   private void setCurrentZoom() {
-    Game.getScreenManager().getCamera().setZoom(zooms[this.currentZoomIndex], 0);
+    Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
   }
 
   private void setupControls() {
@@ -1344,7 +1344,7 @@ public class MapComponent extends EditorComponent {
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> {
       if (this.getFocusedMapObject() != null) {
-        Game.getScreenManager().getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
+        Game.getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
       }
     });
 
@@ -1389,16 +1389,16 @@ public class MapComponent extends EditorComponent {
       // horizontal scrolling
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
         if (e.getWheelRotation() < 0) {
-          Point2D cameraFocus = Game.getScreenManager().getCamera().getFocus();
+          Point2D cameraFocus = Game.getCamera().getFocus();
           Point2D newFocus = new Point2D.Double(cameraFocus.getX() - this.scrollSpeed, cameraFocus.getY());
-          Game.getScreenManager().getCamera().setFocus(newFocus);
+          Game.getCamera().setFocus(newFocus);
         } else {
-          Point2D cameraFocus = Game.getScreenManager().getCamera().getFocus();
+          Point2D cameraFocus = Game.getCamera().getFocus();
           Point2D newFocus = new Point2D.Double(cameraFocus.getX() + this.scrollSpeed, cameraFocus.getY());
-          Game.getScreenManager().getCamera().setFocus(newFocus);
+          Game.getCamera().setFocus(newFocus);
         }
 
-        Program.horizontalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterX());
+        Program.horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
         return;
       }
 
@@ -1413,17 +1413,17 @@ public class MapComponent extends EditorComponent {
       }
 
       if (e.getWheelRotation() < 0) {
-        Point2D cameraFocus = Game.getScreenManager().getCamera().getFocus();
+        Point2D cameraFocus = Game.getCamera().getFocus();
         Point2D newFocus = new Point2D.Double(cameraFocus.getX(), cameraFocus.getY() - this.scrollSpeed);
-        Game.getScreenManager().getCamera().setFocus(newFocus);
+        Game.getCamera().setFocus(newFocus);
 
       } else {
-        Point2D cameraFocus = Game.getScreenManager().getCamera().getFocus();
+        Point2D cameraFocus = Game.getCamera().getFocus();
         Point2D newFocus = new Point2D.Double(cameraFocus.getX(), cameraFocus.getY() + this.scrollSpeed);
-        Game.getScreenManager().getCamera().setFocus(newFocus);
+        Game.getCamera().setFocus(newFocus);
       }
 
-      Program.verticalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
+      Program.verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
     });
   }
 
@@ -1450,8 +1450,8 @@ public class MapComponent extends EditorComponent {
     Program.horizontalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().width);
     Program.verticalScroll.setMinimum(0);
     Program.verticalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().height);
-    Program.horizontalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterX());
-    Program.verticalScroll.setValue((int) Game.getScreenManager().getCamera().getViewPort().getCenterY());
+    Program.horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
+    Program.verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
   }
 
   private boolean hasFocus() {

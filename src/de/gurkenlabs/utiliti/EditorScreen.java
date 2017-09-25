@@ -116,7 +116,7 @@ public class EditorScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    Game.getScreenManager().getCamera().updateFocus();
+    Game.getCamera().updateFocus();
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().render(g);
     }
@@ -138,7 +138,7 @@ public class EditorScreen extends Screen {
     g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD));
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
-    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " zoom: " + (int) (Game.getInfo().getRenderScale() * 100) + " %", 10, Game.getScreenManager().getResolution().getHeight() - 40);
+    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " zoom: " + (int) (Game.getInfo().getDefaultRenderScale() * 100) + " %", 10, Game.getScreenManager().getResolution().getHeight() - 40);
     RenderEngine.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
 
     // render status
