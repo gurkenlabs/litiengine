@@ -19,8 +19,6 @@ import java.util.function.Consumer;
 import javax.swing.JFrame;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.Camera;
-import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 public class ScreenManager extends JFrame implements IScreenManager, WindowStateListener, WindowFocusListener {
