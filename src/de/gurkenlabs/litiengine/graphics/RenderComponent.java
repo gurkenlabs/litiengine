@@ -109,7 +109,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   @Override
   public void init() {
-    this.createBufferStrategy(3);
+    this.createBufferStrategy(2);
     this.currentBufferStrategy = this.getBufferStrategy();
     this.currentAlpha = 1.1f;
   }
@@ -133,48 +133,53 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public void render(final IRenderable screen) {
     final long currentMillis = System.currentTimeMillis();
-    final Graphics2D g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
+    Graphics2D g = null;
+    try {
+      g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
+      this.handleFade();
 
-    this.handleFade();
-
-    g.setColor(Color.BLACK);
-    g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-    g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
-
-    screen.render(g);
-    final Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
-    if (this.cursorImage != null && (Input.mouse().isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
-      final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
-      RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
-    }
-
-    if (Game.getConfiguration().debug().isRenderDebugMouse()) {
-      g.setColor(Color.RED);
-
-      g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));
-      g.draw(new Line2D.Double(Input.mouse().getLocation().getX() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY(), Input.mouse().getLocation().getX() + DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY()));
-    }
-
-    for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
-      consumer.accept(g);
-    }
-
-    if (this.currentAlpha != -1) {
-      g.setColor(new Color(0, 0, 0, 1 - this.currentAlpha));
+      g.setColor(Color.BLACK);
       g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+      g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
+
+      screen.render(g);
+      final Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
+      if (this.cursorImage != null && (Input.mouse().isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
+        final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
+        RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
+      }
+
+      if (Game.getConfiguration().debug().isRenderDebugMouse()) {
+        g.setColor(Color.RED);
+
+        g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));
+        g.draw(new Line2D.Double(Input.mouse().getLocation().getX() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY(), Input.mouse().getLocation().getX() + DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getY()));
+      }
+
+      for (final Consumer<Graphics2D> consumer : this.renderedConsumer) {
+        consumer.accept(g);
+      }
+
+      if (this.currentAlpha != -1) {
+        g.setColor(new Color(0, 0, 0, 1 - this.currentAlpha));
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+      }
+
+      if (this.takeScreenShot) {
+        final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+        final Graphics2D imgGraphics = img.createGraphics();
+        screen.render(imgGraphics);
+
+        imgGraphics.dispose();
+        this.saveScreenShot(img);
+      }
+
+    } finally {
+      if (g != null) {
+        g.dispose();
+      }
     }
-
-    if (this.takeScreenShot) {
-      final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-      final Graphics2D imgGraphics = img.createGraphics();
-      screen.render(imgGraphics);
-
-      imgGraphics.dispose();
-      this.saveScreenShot(img);
-    }
-
-    g.dispose();
 
     this.currentBufferStrategy.show();
     Toolkit.getDefaultToolkit().sync();
