@@ -119,8 +119,8 @@ public class CombatEntityVision implements IVision {
 
     final AffineTransform oldTransform = g.getTransform();
     final AffineTransform at = new AffineTransform();
-    at.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
-    at.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    at.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    at.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(at);
     g.setColor(FogOfWarColor);
@@ -217,7 +217,7 @@ public class CombatEntityVision implements IVision {
    * @return the render vision circle
    */
   private Ellipse2D getRenderVisionArc(final IEntity entity) {
-    final Point2D renderDimensionCenter = Game.getScreenManager().getCamera().getViewPortDimensionCenter(entity);
+    final Point2D renderDimensionCenter = Game.getCamera().getViewPortDimensionCenter(entity);
     return new Ellipse2D.Double(renderDimensionCenter.getX() - this.visionRadius, renderDimensionCenter.getY() - this.visionRadius, this.visionDiameter, this.visionDiameter);
   }
 

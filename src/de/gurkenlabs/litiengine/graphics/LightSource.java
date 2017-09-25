@@ -255,7 +255,7 @@ public class LightSource extends Entity implements IRenderable {
     final float ry = (float) bounds.getHeight() / 2f;
 
     // get relative center of entity
-    final Point2D relativeCenter = Game.getScreenManager().getCamera().getViewPortLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
+    final Point2D relativeCenter = Game.getCamera().getViewPortLocation(new Point((int) (bounds.getX() + r), (int) (bounds.getY() + ry)));
     final double cx = relativeCenter.getX();
     final double cy = relativeCenter.getY();
 
@@ -294,7 +294,7 @@ public class LightSource extends Entity implements IRenderable {
     shadowPolygon.addPoint((int) pointD.getX(), (int) pointD.getY());
     shadowPolygon.addPoint((int) pointC.getX(), (int) pointC.getY());
 
-    final Point2D shadowRenderLocation = Game.getScreenManager().getCamera().getViewPortLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
+    final Point2D shadowRenderLocation = Game.getCamera().getViewPortLocation(new Point2D.Double(shadowEllipse.getX(), shadowEllipse.getY()));
     final Ellipse2D relativeEllipse = new Ellipse2D.Double(shadowRenderLocation.getX(), shadowRenderLocation.getY(), shadowEllipse.getWidth(), shadowEllipse.getHeight());
 
     final Area ellipseArea = new Area(relativeEllipse);
@@ -337,7 +337,7 @@ public class LightSource extends Entity implements IRenderable {
     }
 
     // we'll use a radial gradient
-    final Paint gradientPaint = new RadialGradientPaint(Game.getScreenManager().getCamera().getViewPortDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
+    final Paint gradientPaint = new RadialGradientPaint(Game.getCamera().getViewPortDimensionCenter(this), SHADOW_GRADIENT_SIZE, SHADOW_GRADIENT_FRACTIONS, SHADOW_GRADIENT_COLORS);
 
     // old Paint object for resetting it later
     final Paint oldPaint = g.getPaint();
@@ -349,7 +349,7 @@ public class LightSource extends Entity implements IRenderable {
         continue;
       }
 
-      final Shape obstructedVision = this.getObstructedVisionArea(mob, Game.getScreenManager().getCamera().getViewPortDimensionCenter(this));
+      final Shape obstructedVision = this.getObstructedVisionArea(mob, Game.getCamera().getViewPortDimensionCenter(this));
       // fill the polygon with the gradient paint
 
       g.fill(obstructedVision);

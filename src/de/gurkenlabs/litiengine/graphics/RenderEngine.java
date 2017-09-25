@@ -46,6 +46,33 @@ import de.gurkenlabs.util.io.FileUtilities;
 public final class RenderEngine implements IRenderEngine {
   private static final Logger log = Logger.getLogger(RenderEngine.class.getName());
 
+  private final EntityYComparator entityComparator;
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
+
+  private final List<Predicate<IEntity>> entityRenderingConditions;
+
+  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
+
+  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
+
+  /** The map renderer. */
+  private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
+
+  /**
+   * Instantiates a new graphics engine.
+   */
+  public RenderEngine() {
+    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
+    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
+    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.mapRenderer = new EnumMap<>(MapOrientation.class);
+    this.entityComparator = new EntityYComparator();
+
+    this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
+  }
+
   public static BufferedImage createCompatibleImage(final int width, final int height) {
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
@@ -67,8 +94,8 @@ public final class RenderEngine implements IRenderEngine {
     }
 
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-    final Point2D viewPortLocation = Game.getScreenManager().getCamera().getViewPortLocation(x, y);
-    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getRenderScale());
+    final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
+    g.drawString(text, (int) viewPortLocation.getX() * Game.getInfo().getDefaultRenderScale(), (int) viewPortLocation.getY() * Game.getInfo().getDefaultRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
@@ -85,7 +112,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().getRenderScale()));
+    drawShape(g, shape, new BasicStroke(1 / Game.getInfo().getDefaultRenderScale()));
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
@@ -96,8 +123,8 @@ public final class RenderEngine implements IRenderEngine {
     final AffineTransform oldTransForm = g.getTransform();
     final Stroke oldStroke = g.getStroke();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
-    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    t.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(t);
     g.setStroke(stroke);
@@ -149,11 +176,11 @@ public final class RenderEngine implements IRenderEngine {
 
     final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
-    t.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
-    t.translate(Game.getScreenManager().getCamera().getPixelOffsetX(), Game.getScreenManager().getCamera().getPixelOffsetY());
+    t.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
+    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getInfo().getRenderScale()));
+    g.setStroke(new BasicStroke(1 / Game.getInfo().getDefaultRenderScale()));
     g.fill(shape);
     g.setTransform(oldTransForm);
   }
@@ -233,33 +260,6 @@ public final class RenderEngine implements IRenderEngine {
 
   public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
-  }
-
-  private final EntityYComparator entityComparator;
-
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-
-  private final List<Predicate<IEntity>> entityRenderingConditions;
-
-  private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-
-  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
-
-  /** The map renderer. */
-  private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
-
-  /**
-   * Instantiates a new graphics engine.
-   */
-  public RenderEngine() {
-    this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
-    this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new EnumMap<>(MapOrientation.class);
-    this.entityComparator = new EntityYComparator();
-
-    this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
   }
 
   @Override
@@ -348,7 +348,7 @@ public final class RenderEngine implements IRenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getScreenManager().getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
@@ -408,7 +408,7 @@ public final class RenderEngine implements IRenderEngine {
     final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
-      renderImage(g, img, Game.getScreenManager().getCamera().getViewPortLocation(entity));
+      renderImage(g, img, Game.getCamera().getViewPortLocation(entity));
     }
 
     if (entity instanceof IRenderable) {
@@ -429,7 +429,7 @@ public final class RenderEngine implements IRenderEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).renderOverlay(g, map, Game.getScreenManager().getCamera().getViewPort());
+    this.mapRenderer.get(map.getOrientation()).renderOverlay(g, map, Game.getCamera().getViewPort());
 
   }
 
@@ -446,7 +446,7 @@ public final class RenderEngine implements IRenderEngine {
     }
 
     // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getScreenManager().getCamera().getViewPort());
+    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort());
 
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));

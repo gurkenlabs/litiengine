@@ -69,7 +69,7 @@ public class GameInfo {
   }
 
   @XmlTransient
-  public float getRenderScale() {
+  public float getDefaultRenderScale() {
     return this.renderScale;
   }
 
@@ -107,7 +107,7 @@ public class GameInfo {
     this.name = name;
   }
 
-  public void setRenderScale(final float renderScale) {
+  public void setDefaultRenderScale(final float renderScale) {
     this.renderScale = renderScale;
   }
 

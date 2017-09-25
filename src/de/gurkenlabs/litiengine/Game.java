@@ -17,7 +17,9 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
+import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -35,6 +37,7 @@ public final class Game {
   private static final GameConfiguration configuration;
   private static final EntityControllerManager entityControllerManager;
   private static IEnvironment environment;
+  private static ICamera camera;
 
   private static final List<Consumer<IEnvironment>> environmentLoadedConsumer;
   private static IGameLoop gameLoop;
@@ -136,6 +139,10 @@ public final class Game {
     return soundEngine;
   }
 
+  public static ICamera getCamera() {
+    return camera;
+  }
+
   public static void init() {
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
@@ -150,7 +157,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop(scrMgr.getRenderComponent(), scrMgr);
+    renderLoop = new RenderLoop(scrMgr.getRenderComponent());
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
@@ -158,6 +165,7 @@ public final class Game {
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     screenManager = scrMgr;
+    setCamera(new Camera());
 
     // init logging
     if (new File(LOGGING_CONFIG_FILE).exists()) {
@@ -301,4 +309,16 @@ public final class Game {
   public static boolean hasStarted() {
     return hasStarted;
   }
+
+  public static void setCamera(final ICamera cam) {
+    if (getCamera() != null) {
+      Game.getLoop().detach(camera);
+    }
+
+    Game.getLoop().attach(cam);
+    camera = cam;
+
+    getCamera().updateFocus();
+  }
+
 }

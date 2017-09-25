@@ -22,7 +22,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   public SoundEngine() {
     this.sounds = new CopyOnWriteArrayList<>();
     this.maxDist = DEFAULT_MAX_DISTANCE;
-    this.setListenerLocationCallback(old -> Game.getScreenManager().getCamera().getFocus());
+    this.setListenerLocationCallback(old -> Game.getCamera().getFocus());
   }
 
   @Override
@@ -85,7 +85,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   @Override
   public void start() {
     Game.getLoop().attach(this);
-    this.listenerLocation = Game.getScreenManager().getCamera().getFocus();
+    this.listenerLocation = Game.getCamera().getFocus();
   }
 
   @Override

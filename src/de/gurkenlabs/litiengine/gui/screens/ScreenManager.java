@@ -31,9 +31,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   private static final long serialVersionUID = 7958549828482285935L;
 
-  /** The camera. */
-  private transient ICamera camera;
-
   /** The current screen. */
   private transient IScreen currentScreen;
 
@@ -127,11 +124,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
-  public ICamera getCamera() {
-    return this.camera;
-  }
-
-  @Override
   public IScreen getCurrentScreen() {
     return this.currentScreen;
   }
@@ -153,7 +145,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void init(final int width, final int height, final boolean fullscreen) {
-    this.setCamera(new Camera());
     if (fullscreen) {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -194,18 +185,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
-  public void setCamera(final ICamera camera) {
-    if (this.getCamera() != null) {
-      Game.getLoop().detach(this.camera);
-    }
-
-    Game.getLoop().attach(camera);
-    this.camera = camera;
-
-    this.getCamera().updateFocus();
-  }
-
-  @Override
   public void setResolution(Resolution res) {
     this.setResolution(res.getDimension());
   }
@@ -233,9 +212,8 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
 
     float ratio = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
-    Game.getInfo().setRenderScale(Game.getInfo().getRenderScale() * ratio);
+    Game.getInfo().setDefaultRenderScale(Game.getInfo().getDefaultRenderScale() * ratio);
 
-    System.out.println(Game.getInfo().getRenderScale());
     this.setSize(insetAwareDimension);
   }
 

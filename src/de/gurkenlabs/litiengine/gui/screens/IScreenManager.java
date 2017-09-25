@@ -6,7 +6,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.graphics.ICameraProvider;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
@@ -14,7 +13,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * renderCurrentScreen is called from the render loop of the game and renders
  * the current screen to the getRenderComponent() of this manager.
  */
-public interface IScreenManager extends ICameraProvider {
+public interface IScreenManager {
   public void addScreen(final IScreen screen);
 
   public void displayScreen(IScreen screen);

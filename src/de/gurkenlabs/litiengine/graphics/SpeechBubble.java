@@ -99,7 +99,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       return;
     }
 
-    final Point2D location = Game.getScreenManager().getCamera().getViewPortLocation(this.entity);
+    final Point2D location = Game.getCamera().getViewPortLocation(this.entity);
     RenderEngine.renderImage(g, this.bubble, new Point2D.Double(location.getX() + this.entity.getWidth() / 2.0 - this.textBoxWidth / 2.0 - PADDING, location.getY() - this.height - PADDING));
 
     g.setColor(SPEAK_FONT_COLOR);
@@ -111,8 +111,8 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);
-    final float x = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getX() + this.entity.getWidth() / 2.0f - this.textBoxWidth / 2.0f;
-    float y = (float) Game.getScreenManager().getCamera().getViewPortLocation(this.entity).getY() - this.height;
+    final float x = (float) Game.getCamera().getViewPortLocation(this.entity).getX() + this.entity.getWidth() / 2.0f - this.textBoxWidth / 2.0f;
+    float y = (float) Game.getCamera().getViewPortLocation(this.entity).getY() - this.height;
     while (measurer.getPosition() < text.length()) {
       final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
 

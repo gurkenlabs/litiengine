@@ -755,7 +755,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.getInfo().getRenderScale(), Game.getInfo().getRenderScale());
+    g.scale(Game.getInfo().getDefaultRenderScale(), Game.getInfo().getDefaultRenderScale());
 
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
@@ -777,10 +777,10 @@ public class Environment implements IEnvironment {
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
 
     // render static shadows
-    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+    RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getCamera().getViewPortLocation(0, 0));
 
     if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getScreenManager().getCamera().getViewPortLocation(0, 0));
+      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getCamera().getViewPortLocation(0, 0));
     }
 
     for (final IRenderable rend : this.getOverlayRenderable()) {
@@ -788,7 +788,7 @@ public class Environment implements IEnvironment {
     }
 
     this.informConsumers(g, this.overlayRenderedConsumer);
-    g.scale(1.0 / Game.getInfo().getRenderScale(), 1.0 / Game.getInfo().getRenderScale());
+    g.scale(1.0 / Game.getInfo().getDefaultRenderScale(), 1.0 / Game.getInfo().getDefaultRenderScale());
   }
 
   @Override
@@ -846,7 +846,7 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    short velocity = (short) (100 / Game.getInfo().getRenderScale());
+    short velocity = (short) (100 / Game.getInfo().getDefaultRenderScale());
     if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
       velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));
     }
