@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.MovementController;
