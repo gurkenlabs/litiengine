@@ -56,6 +56,10 @@ public class AmbientLight {
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
 
     for (final LightSource light : this.environment.getLightSources()) {
+      if (!light.isActive()) {
+        continue;
+      }
+
       this.renderLightSource(g, light, longerDimension);
     }
 

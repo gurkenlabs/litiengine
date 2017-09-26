@@ -919,6 +919,7 @@ public class Environment implements IEnvironment {
     final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
     final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
     final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
+    final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE);
     if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
       return;
     }
@@ -942,7 +943,8 @@ public class Environment implements IEnvironment {
     default:
       lightType = LightSource.ELLIPSE;
     }
-    final LightSource light = new LightSource(this, brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType);
+    boolean lightOn = mapObjectLightOn == null || mapObjectLightOn.isEmpty() ? true : Boolean.parseBoolean(mapObjectLightOn);
+    final LightSource light = new LightSource(this, brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType, lightOn);
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());

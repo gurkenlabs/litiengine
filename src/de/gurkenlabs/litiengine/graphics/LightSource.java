@@ -66,36 +66,6 @@ public class LightSource extends Entity implements IRenderable {
   private int radius;
 
   /**
-   * Gets the shadow ellipse.
-   *
-   * @param mob
-   *          the mob
-   * @return the shadow ellipse
-   */
-  private static Ellipse2D getShadowEllipse(final IEntity mob) {
-    final int shadowHeight = (int) (mob.getHeight() / 4);
-    final int shadowWidth = (int) (mob.getWidth() / 3);
-
-    final int yOffset = (int) mob.getHeight();
-    final double x = mob.getLocation().getX() + (mob.getWidth() - shadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - shadowHeight / 2.0;
-    return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
-  }
-
-  /**
-   * Checks if is in range.
-   *
-   * @param center
-   *          the center
-   * @param radius
-   *          the radius
-   * @return the predicate<? super mob>
-   */
-  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
-    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
-  }
-
-  /**
    * Instantiates a new light source.
    *
    * @param brightness
@@ -103,7 +73,7 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final int brightness, final int intensity, final Color lightColor, final String shapeType) {
+  public LightSource(final IEnvironment environment, final int brightness, final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();
     this.color = lightColor;
     this.intensity = intensity;
@@ -111,7 +81,7 @@ public class LightSource extends Entity implements IRenderable {
 
     this.setBrightness(brightness);
     this.lightShapeType = shapeType;
-    this.activated = true;
+    this.activated = activated;
   }
 
   public void activate() {
@@ -159,6 +129,10 @@ public class LightSource extends Entity implements IRenderable {
    */
   public int getRadius() {
     return this.radius;
+  }
+
+  public boolean isActive() {
+    return this.activated;
   }
 
   @Override
@@ -232,6 +206,36 @@ public class LightSource extends Entity implements IRenderable {
     }
 
     return null;
+  }
+
+  /**
+   * Gets the shadow ellipse.
+   *
+   * @param mob
+   *          the mob
+   * @return the shadow ellipse
+   */
+  private static Ellipse2D getShadowEllipse(final IEntity mob) {
+    final int shadowHeight = (int) (mob.getHeight() / 4);
+    final int shadowWidth = (int) (mob.getWidth() / 3);
+
+    final int yOffset = (int) mob.getHeight();
+    final double x = mob.getLocation().getX() + (mob.getWidth() - shadowWidth) / 2;
+    final double y = mob.getLocation().getY() + yOffset - shadowHeight / 2.0;
+    return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
+  }
+
+  /**
+   * Checks if is in range.
+   *
+   * @param center
+   *          the center
+   * @param radius
+   *          the radius
+   * @return the predicate<? super mob>
+   */
+  private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
+    return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
   }
 
   /**
