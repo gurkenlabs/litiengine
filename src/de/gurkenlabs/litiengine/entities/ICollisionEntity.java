@@ -23,6 +23,13 @@ public interface ICollisionEntity extends IEntity {
   public Rectangle2D getCollisionBox(Point2D location);
 
   /**
+   * Gets the center {@link Point2D} of the entities collision box.
+   * 
+   * @return
+   */
+  public Point2D getCollisionBoxCenter();
+
+  /**
    * Checks for collision.
    *
    * @return true, if successful

@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.physics;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
@@ -15,10 +16,12 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
   private final List<Force> activeForces;
   private final T movableEntity;
   private final List<Predicate<T>> movementPredicates;
+  private final List<Consumer<Point2D>> movedConsumer;
 
   public MovementController(final T movableEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
+    this.movedConsumer = new CopyOnWriteArrayList<>();
     this.movableEntity = movableEntity;
   }
 
@@ -51,8 +54,23 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
     this.handleForces(gameLoop);
   }
 
+  @Override
+  public void onMoved(Consumer<Point2D> cons) {
+    this.movedConsumer.add(cons);
+  }
+
   protected IPhysicsEngine getPhysicsEngine() {
     return Game.getPhysicsEngine();
+  }
+
+  protected void moveEntity(double deltaX, double deltaY) {
+    final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + deltaX, this.getEntity().getLocation().getY() + deltaY);
+    Game.getPhysicsEngine().move(this.getEntity(), newLocation);
+
+    final Point2D delta = new Point2D.Double(deltaX, deltaY);
+    for (Consumer<Point2D> cons : this.movedConsumer) {
+      cons.accept(delta);
+    }
   }
 
   protected boolean isMovementAllowed() {

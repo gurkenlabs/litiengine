@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -27,6 +28,9 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   private static final Random RANDOM = new Random();
+
+  private final List<Consumer<Emitter>> finishedConsumer;
+
   /** The activated. */
   private boolean activated;
 
@@ -83,6 +87,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public Emitter(final Point2D origin) {
     super();
     this.colors = new ArrayList<>();
+    this.finishedConsumer = new CopyOnWriteArrayList<>();
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
 
     this.maxParticles = info.maxParticles();
@@ -250,6 +255,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.paused;
   }
 
+  public void onFinished(Consumer<Emitter> cons) {
+    this.finishedConsumer.add(cons);
+  }
+
   @Override
   public void render(final Graphics2D g) {
     if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewPort().intersects(this.getBoundingBox())) {
@@ -337,6 +346,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     // clear particles if the effect time to life is reached
     if (this.isFinished()) {
+      for (Consumer<Emitter> cons : this.finishedConsumer) {
+        cons.accept(this);
+      }
+
       this.delete();
       return;
     }

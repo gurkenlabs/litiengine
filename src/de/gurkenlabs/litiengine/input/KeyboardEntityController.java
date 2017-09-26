@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -165,7 +166,6 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
       return;
     }
 
-    final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + this.velocityX, this.getEntity().getLocation().getY() + this.velocityY);
-    Game.getPhysicsEngine().move(this.getEntity(), newLocation);
+    this.moveEntity(this.velocityX, this.velocityY);
   }
 }

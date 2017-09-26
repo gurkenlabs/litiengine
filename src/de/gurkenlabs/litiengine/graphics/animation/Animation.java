@@ -13,8 +13,8 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
 public class Animation implements IUpdateable, ILaunchable {
+  public static final int DEFAULT_FRAME_DURATION = 120;
   private static final Logger log = Logger.getLogger(Animation.class.getName());
-  private static final int DEFAULT_FRAME_DURATION = 120;
   private KeyFrame currentFrame;
   private long elapsedTicks;
   private KeyFrame firstFrame;
@@ -58,20 +58,28 @@ public class Animation implements IUpdateable, ILaunchable {
     if (this.getKeyframes().isEmpty()) {
       log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spitesheet: {0})", spritesheet.getName());
     }
-
-    Game.getLoop().attach(this);
   }
 
   public KeyFrame getCurrentKeyFrame() {
     return this.currentFrame;
   }
 
-  public int getFrameDuration() {
-    return this.frameDuration;
-  }
-
   public List<KeyFrame> getKeyframes() {
     return this.keyframes;
+  }
+
+  /**
+   * Gets to aggregated duration of all {@link KeyFrame}s in this animation.
+   * 
+   * @return The total duration of a single playback.
+   */
+  public int getTotalDuration() {
+    int duration = 0;
+    for (KeyFrame keyFrame : this.getKeyframes()) {
+      duration += keyFrame.getDuration();
+    }
+
+    return duration;
   }
 
   public String getName() {
@@ -131,6 +139,8 @@ public class Animation implements IUpdateable, ILaunchable {
     }
 
     this.currentFrame = this.firstFrame;
+
+    Game.getLoop().attach(this);
   }
 
   public void restart() {
@@ -190,7 +200,7 @@ public class Animation implements IUpdateable, ILaunchable {
     // keyframe
     if (keyFrameDurations.length == 0) {
       for (int i = 0; i < this.getSpritesheet().getTotalNumberOfSprites(); i++) {
-        this.keyframes.add(i, new KeyFrame(this.getFrameDuration(), i));
+        this.keyframes.add(i, new KeyFrame(this.frameDuration, i));
       }
     } else {
       for (int i = 0; i < keyFrameDurations.length; i++) {

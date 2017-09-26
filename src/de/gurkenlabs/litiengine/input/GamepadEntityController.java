@@ -116,8 +116,7 @@ public class GamepadEntityController<T extends IMovableEntity> extends MovementC
       return;
     }
 
-    final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + this.velocityX, this.getEntity().getLocation().getY() + this.velocityY);
-    Game.getPhysicsEngine().move(this.getEntity(), newLocation);
+    this.moveEntity(this.velocityX, this.velocityY);
   }
 
   private void retrieveGamepadValues() {

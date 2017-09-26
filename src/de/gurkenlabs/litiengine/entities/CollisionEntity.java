@@ -140,6 +140,10 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return this.collisionBoxWidth;
   }
 
+  public Point2D getCollisionBoxCenter() {
+    return new Point2D.Double(this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
+  }
+
   public CollisionValign getValign() {
     return this.valign;
   }
