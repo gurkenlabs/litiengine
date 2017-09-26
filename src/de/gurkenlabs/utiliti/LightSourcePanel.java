@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.graphics.LightSource;
+import javax.swing.JCheckBox;
 
 public class LightSourcePanel extends PropertyPanel<IMapObject> {
   private final JTextField textFieldColor;
@@ -30,6 +31,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
   private final JButton btnSelectColor;
   private JSpinner spinnerIntensity;
   private JLabel lblIntensity;
+  private JCheckBox checkBoxIsActive;
 
   public LightSourcePanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_lightSource"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -59,30 +61,35 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
     lblIntensity = new JLabel(Resources.get("panel_intensity"));
 
+    checkBoxIsActive = new JCheckBox("is active");
+    checkBoxIsActive.setSelected(true);
+
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
         groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
                     .addGroup(groupLayout.createSequentialGroup()
                         .addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(spinnerBrightness, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
+                        .addComponent(spinnerBrightness, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
                     .addGroup(groupLayout.createSequentialGroup()
                         .addComponent(lblIntensity, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                         .addGap(4)
-                        .addComponent(spinnerIntensity, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
-                    .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+                        .addComponent(spinnerIntensity, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
+                    .addGroup(groupLayout.createSequentialGroup()
                         .addComponent(lblColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(btnSelectColor, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE))
-                    .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+                        .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
+                    .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
                         .addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(comboBoxLightShape, 0, 95, Short.MAX_VALUE)))
+                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                            .addComponent(checkBoxIsActive)
+                            .addComponent(comboBoxLightShape, 0, 365, Short.MAX_VALUE))))
                 .addContainerGap()));
     groupLayout.setVerticalGroup(
         groupLayout.createParallelGroup(Alignment.LEADING)
@@ -105,7 +112,9 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
                 .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
                     .addComponent(comboBoxLightShape, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(180, Short.MAX_VALUE)));
+                .addPreferredGap(ComponentPlacement.RELATED)
+                .addComponent(checkBoxIsActive)
+                .addContainerGap(153, Short.MAX_VALUE)));
     setLayout(groupLayout);
 
     this.setupChangedListeners();
@@ -125,6 +134,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     final String intensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
     final String color = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
     final String shape = mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE);
+    final String active = mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE);
 
     int bright = 0;
     if (brightness != null) {
@@ -135,10 +145,13 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     if (intensity != null) {
       intens = Integer.parseInt(intensity);
     }
+
+    boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
     this.spinnerBrightness.setValue(bright);
     this.spinnerIntensity.setValue(intens);
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
+    this.checkBoxIsActive.setSelected(isActive);
   }
 
   private void setupChangedListeners() {
@@ -169,6 +182,11 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
     comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setCustomProperty(MapObjectProperties.LIGHTSHAPE, comboBoxLightShape.getSelectedItem().toString());
+      Game.getEnvironment().getAmbientLight().createImage();
+    }));
+
+    this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
+      m.setCustomProperty(MapObjectProperties.LIGHTACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
       Game.getEnvironment().getAmbientLight().createImage();
     }));
   }

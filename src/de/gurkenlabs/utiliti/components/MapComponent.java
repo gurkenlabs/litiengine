@@ -341,7 +341,7 @@ public class MapComponent extends EditorComponent {
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.getInfo().getDefaultRenderScale());
+        Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           RenderEngine.fillShape(g, trans);
@@ -357,8 +357,8 @@ public class MapComponent extends EditorComponent {
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(COLOR_FOCUS_BORDER);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getInfo().getDefaultRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
-          loc.getY() * Game.getInfo().getDefaultRenderScale() - (5 * this.currentTransformRectSize));
+      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
+          loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
       if (MapObjectType.get(focusedMapObject.getType()) == MapObjectType.TRIGGER) {
         g.setColor(COLOR_NOCOLLISION_BORDER);
         g.setFont(Program.TEXT_FONT.deriveFont(11f));
@@ -367,12 +367,12 @@ public class MapComponent extends EditorComponent {
     }
 
     // render the grid
-    if (this.renderGrid && Game.getInfo().getDefaultRenderScale() >= 1) {
+    if (this.renderGrid && Game.getCamera().getRenderScale() >= 1) {
 
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       g.setColor(new Color(255, 255, 255, 100));
-      Stroke stroke = new BasicStroke(1 / Game.getInfo().getDefaultRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
+      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
       final double viewPortX = Math.max(0, Game.getCamera().getViewPort().getX());
       final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(),
           Game.getCamera().getViewPort().getMaxX());
@@ -755,18 +755,6 @@ public class MapComponent extends EditorComponent {
     }
   }
 
-  private void ensureUniqueIds(IMap map) {
-    int maxMapId = MapUtilities.getMaxMapId(map);
-    List<Integer> usedIds = new ArrayList<>();
-    for (IMapObject obj : map.getMapObjects()) {
-      if (usedIds.contains(obj.getId())) {
-        obj.setId(++maxMapId);
-      }
-
-      usedIds.add(obj.getId());
-    }
-  }
-
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
     layer.addMapObject(mapObject);
     Game.getEnvironment().loadFromMap(mapObject.getId());
@@ -1092,6 +1080,18 @@ public class MapComponent extends EditorComponent {
     return mo;
   }
 
+  private void ensureUniqueIds(IMap map) {
+    int maxMapId = MapUtilities.getMaxMapId(map);
+    List<Integer> usedIds = new ArrayList<>();
+    for (IMapObject obj : map.getMapObjects()) {
+      if (usedIds.contains(obj.getId())) {
+        obj.setId(++maxMapId);
+      }
+
+      usedIds.add(obj.getId());
+    }
+  }
+
   private static IMapObjectLayer getCurrentLayer() {
     int layerIndex = EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex();
     if (layerIndex < 0 || layerIndex >= Game.getEnvironment().getMap().getMapObjectLayers().size()) {
@@ -1129,6 +1129,7 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS, "180");
       mo.setCustomProperty(MapObjectProperties.LIGHTCOLOR, "#ffffff");
       mo.setCustomProperty(MapObjectProperties.LIGHTSHAPE, LightSource.ELLIPSE);
+      mo.setCustomProperty(MapObjectProperties.LIGHTACTIVE, "true");
       break;
     case SPAWNPOINT:
       mo.setWidth(3);

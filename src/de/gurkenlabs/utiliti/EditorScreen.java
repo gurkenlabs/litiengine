@@ -340,6 +340,39 @@ public class EditorScreen extends Screen {
     }
   }
 
+  public MapObjectPanel getMapObjectPanel() {
+    return mapEditorPanel;
+  }
+
+  public MapComponent getMapComponent() {
+    return this.mapComponent;
+  }
+
+  public String getCurrentResourceFile() {
+    return this.currentResourceFile;
+  }
+
+  public void setMapEditorPanel(MapObjectPanel mapEditorPanel) {
+    this.mapEditorPanel = mapEditorPanel;
+  }
+
+  public MapSelectionPanel getMapSelectionPanel() {
+    return mapSelectionPanel;
+  }
+
+  public void setMapSelectionPanel(MapSelectionPanel mapSelectionPanel) {
+    this.mapSelectionPanel = mapSelectionPanel;
+  }
+
+  public String getCurrentStatus() {
+    return currentStatus;
+  }
+
+  public void setCurrentStatus(String currentStatus) {
+    this.currentStatus = currentStatus;
+    this.statusTick = Game.getLoop().getTicks();
+  }
+
   private String saveGameFile(String target) {
     String saveFile = this.getGameFile().save(target, Program.USER_PREFERNCES.isCompressFile());
     Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
@@ -460,38 +493,5 @@ public class EditorScreen extends Screen {
 
       Spritesheet.load(info);
     }
-  }
-
-  public MapObjectPanel getMapObjectPanel() {
-    return mapEditorPanel;
-  }
-
-  public MapComponent getMapComponent() {
-    return this.mapComponent;
-  }
-
-  public String getCurrentResourceFile() {
-    return this.currentResourceFile;
-  }
-
-  public void setMapEditorPanel(MapObjectPanel mapEditorPanel) {
-    this.mapEditorPanel = mapEditorPanel;
-  }
-
-  public MapSelectionPanel getMapSelectionPanel() {
-    return mapSelectionPanel;
-  }
-
-  public void setMapSelectionPanel(MapSelectionPanel mapSelectionPanel) {
-    this.mapSelectionPanel = mapSelectionPanel;
-  }
-
-  public String getCurrentStatus() {
-    return currentStatus;
-  }
-
-  public void setCurrentStatus(String currentStatus) {
-    this.currentStatus = currentStatus;
-    this.statusTick = Game.getLoop().getTicks();
   }
 }
