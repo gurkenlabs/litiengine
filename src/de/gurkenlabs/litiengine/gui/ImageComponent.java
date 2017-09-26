@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -33,8 +33,19 @@ public class ImageComponent extends GuiComponent {
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
     super(x, y, width, height);
     this.spritesheet = spritesheet;
-    this.setFont(new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f)));
-    this.setTextColor(Color.BLACK);
+
+    Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
+    if (this.getAppearance().getFont() == null) {
+      this.getAppearance().setFont(defFont);
+    }
+
+    if (this.getAppearanceDisabled().getFont() == null) {
+      this.getAppearanceDisabled().setFont(defFont);
+    }
+
+    if (this.getAppearanceHovered().getFont() == null) {
+      this.getAppearanceHovered().setFont(defFont);
+    }
 
     this.setText(text);
 

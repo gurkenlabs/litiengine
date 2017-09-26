@@ -68,8 +68,13 @@ public class NumberAdjuster extends TextFieldComponent {
   public void prepare() {
     ImageComponent buttonUp = new ImageComponent(this.getX() + this.getWidth(), this.getY(), this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_UP.getText(), null);
     ImageComponent buttonDown = new ImageComponent(this.getX() + this.getWidth(), this.getY() + this.getHeight() / 2, this.getHeight() / 2, this.getHeight() / 2, this.getButtonSprite(), ARROW_DOWN.getText(), null);
-    buttonUp.setFont(ARROW_UP.getFont());
-    buttonDown.setFont(ARROW_UP.getFont());
+    buttonUp.getAppearance().setFont(ARROW_UP.getFont());
+    buttonUp.getAppearanceDisabled().setFont(ARROW_UP.getFont());
+    buttonUp.getAppearanceHovered().setFont(ARROW_UP.getFont());
+
+    buttonDown.getAppearance().setFont(ARROW_UP.getFont());
+    buttonDown.getAppearanceDisabled().setFont(ARROW_UP.getFont());
+    buttonDown.getAppearanceHovered().setFont(ARROW_UP.getFont());
 
     this.getComponents().add(buttonUp);
     this.getComponents().add(buttonDown);

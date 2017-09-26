@@ -28,15 +28,16 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   public static final int TEXT_ALIGN_CENTER = 3;
   public static final int TEXT_ALIGN_LEFT = 1;
   public static final int TEXT_ALIGN_RIGHT = 2;
+
   protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
 
-  /** The component id. */
   private static int componentId = 0;
-  /** The Constant DEFAULT_COLOR. */
-  private static final Color DEFAULT_COLOR = Color.WHITE;
+
+  private final Appearance appearance;
+  private final Appearance hoveredAppearance;
+  private final Appearance disabledAppearance;
 
   /** The back ground color. */
-  private Color backGroundColor;
   private Color textShadowColor;
 
   /** The click consumer. */
@@ -56,19 +57,15 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private final List<Consumer<String>> textChangedConsumer;
 
-  private Boolean drawTextShadow = false;
-  private Font font;
+  private boolean drawTextShadow = false;
 
   private Sound hoverSound;
-
-  private Color hoverTextColor;
 
   private final int id;
 
   private boolean isHovered;
   private boolean isPressed;
   private boolean isSelected;
-
   private boolean suspended;
 
   private Object tag;
@@ -79,12 +76,9 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private int textAngle = 0;
 
-  /** The text color. */
-  private Color textColor;
   private double textX;
   private double textY;
 
-  /** The visible. */
   private boolean visible;
 
   private double width;
@@ -107,8 +101,30 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.mouseMovedConsumer = new CopyOnWriteArrayList<>();
     this.textChangedConsumer = new CopyOnWriteArrayList<>();
 
-    this.setTextColor(DEFAULT_COLOR);
-    this.setHoverTextColor(DEFAULT_COLOR);
+    this.appearance = new Appearance();
+    this.appearance.update(GuiProperties.getDefaultAppearance());
+    this.appearance.onChange(app -> {
+      for (GuiComponent child : this.getComponents()) {
+        child.getAppearance().update(this.getAppearance());
+      }
+    });
+
+    this.hoveredAppearance = new Appearance();
+    this.hoveredAppearance.update(GuiProperties.getDefaultAppearanceHovered());
+    this.hoveredAppearance.onChange(app -> {
+      for (GuiComponent child : this.getComponents()) {
+        child.getAppearanceHovered().update(this.getAppearanceHovered());
+      }
+    });
+
+    this.disabledAppearance = new Appearance();
+    this.disabledAppearance.update(GuiProperties.getDefaultAppearanceDisabled());
+    this.appearance.onChange(app -> {
+      for (GuiComponent child : this.getComponents()) {
+        child.getAppearanceDisabled().update(this.getAppearanceDisabled());
+      }
+    });
+
     this.id = ++componentId;
     this.x = x;
     this.y = y;
@@ -135,17 +151,8 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.setHeight(height);
   }
 
-  public Boolean drawTextShadow() {
+  public boolean drawTextShadow() {
     return this.drawTextShadow;
-  }
-
-  /**
-   * Gets the back ground color.
-   *
-   * @return the back ground color
-   */
-  public Color getBackGroundColor() {
-    return this.backGroundColor;
   }
 
   /**
@@ -175,10 +182,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.components;
   }
 
-  public Font getFont() {
-    return this.font;
-  }
-
   /**
    * Gets the height.
    *
@@ -189,25 +192,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.height;
   }
 
-  /**
-   * Gets the hover color.
-   *
-   * @return the hover color
-   */
-  public Color getHoverColor() {
-    return this.getBackGroundColor().darker();
-  }
-
   public List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
     return this.hoverConsumer;
   }
 
   public Sound getHoverSound() {
     return this.hoverSound;
-  }
-
-  public Color getHoverTextColor() {
-    return this.hoverTextColor;
   }
 
   public List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
@@ -261,15 +251,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public int getTextAngle() {
     return this.textAngle;
-  }
-
-  /**
-   * Gets the text color.
-   *
-   * @return the text color
-   */
-  public Color getTextColor() {
-    return this.textColor;
   }
 
   public Color getTextShadowColor() {
@@ -330,6 +311,18 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   @Override
   public double getY() {
     return this.y;
+  }
+
+  public Appearance getAppearance() {
+    return appearance;
+  }
+
+  public Appearance getAppearanceHovered() {
+    return hoveredAppearance;
+  }
+
+  public Appearance getAppearanceDisabled() {
+    return disabledAppearance;
   }
 
   public boolean isDragged() {
@@ -576,9 +569,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the new y
    */
 
-  /**
-   * Prepare.
-   */
   @Override
   public void prepare() {
     this.onHovered(e -> {
@@ -597,60 +587,26 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  /**
-   * Render.
-   *
-   * @param g
-   *          the g
-   */
   @Override
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
       return;
     }
-    if (this.getBackGroundColor() != null) {
-      g.setColor(this.getBackGroundColor());
+
+    Appearance currentAppearance = this.getAppearance();
+    if (this.isHovered()) {
+      currentAppearance = this.getAppearanceHovered();
+    }
+
+    if (!currentAppearance.isTransparentBackground()) {
+      g.setPaint(currentAppearance.getBackgroundPaint(this.getWidth(), this.getHeight()));
       g.fill(this.getBoundingBox());
     }
-    g.setColor(this.isHovered() ? this.getHoverTextColor() : this.getTextColor());
-    g.setFont(this.getFont());
-    if (this.getText() != null) {
-      final FontMetrics fm = g.getFontMetrics();
 
-      double defaultTextX;
-      double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-      switch (this.getTextAlignment()) {
-      case TEXT_ALIGN_LEFT:
-        defaultTextX = this.getTextXMargin();
-        break;
-      case TEXT_ALIGN_RIGHT:
-        defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
-        break;
-      case TEXT_ALIGN_CENTER:
-      default:
-        defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
-        break;
-      }
-      if (this.getTextY() == 0) {
-        this.setTextY(defaultTextY);
-      }
+    g.setColor(currentAppearance.getForeColor());
+    g.setFont(currentAppearance.getFont());
 
-      if (this.getTextX() == 0) {
-        this.setTextX(defaultTextX);
-      }
-      if (this.getTextAngle() == 0) {
-        if (this.drawTextShadow()) {
-          RenderEngine.drawTextWithShadow(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
-        } else {
-          RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
-        }
-      } else if (this.getTextAngle() == 90) {
-        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
-      } else {
-        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
-      }
-
-    }
+    this.renderText(g);
 
     for (final GuiComponent component : this.getComponents()) {
       if (!component.isVisible() || component.isSuspended()) {
@@ -666,25 +622,10 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  public void setBackGroundColor(final Color backGroundColor) {
-    this.backGroundColor = backGroundColor;
-  }
-
   @Override
   public void setDimension(final double width, final double height) {
     this.width = width;
     this.height = height;
-  }
-
-  public void setFont(final Font font) {
-    this.font = font;
-    for (final GuiComponent comp : this.getComponents()) {
-      comp.setFont(font);
-    }
-  }
-
-  public void setFontSize(final float size) {
-    this.setFont(this.getFont().deriveFont(size));
   }
 
   @Override
@@ -697,10 +638,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     for (final GuiComponent component : this.getComponents()) {
       component.setHoverSound(hoverSound);
     }
-  }
-
-  public void setHoverTextColor(final Color hoverTextColor) {
-    this.hoverTextColor = hoverTextColor;
   }
 
   @Override
@@ -743,19 +680,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   public void setTextAngle(final int textAngle) {
     this.textAngle = textAngle;
-  }
-
-  /**
-   * Sets the text color.
-   *
-   * @param color
-   *          the new text color
-   */
-  public void setTextColor(final Color color) {
-    this.textColor = color;
-    for (final GuiComponent comp : this.getComponents()) {
-      comp.setTextColor(color);
-    }
   }
 
   public void setTextShadow(final boolean drawTextShadow) {
@@ -851,5 +775,44 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
     return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+  }
+
+  private void renderText(Graphics2D g) {
+    if (this.getText() != null) {
+      final FontMetrics fm = g.getFontMetrics();
+
+      double defaultTextX;
+      double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
+      switch (this.getTextAlignment()) {
+      case TEXT_ALIGN_LEFT:
+        defaultTextX = this.getTextXMargin();
+        break;
+      case TEXT_ALIGN_RIGHT:
+        defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
+        break;
+      case TEXT_ALIGN_CENTER:
+      default:
+        defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
+        break;
+      }
+      if (this.getTextY() == 0) {
+        this.setTextY(defaultTextY);
+      }
+
+      if (this.getTextX() == 0) {
+        this.setTextX(defaultTextX);
+      }
+      if (this.getTextAngle() == 0) {
+        if (this.drawTextShadow()) {
+          RenderEngine.drawTextWithShadow(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
+        } else {
+          RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+        }
+      } else if (this.getTextAngle() == 90) {
+        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
+      } else {
+        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
+      }
+    }
   }
 }
