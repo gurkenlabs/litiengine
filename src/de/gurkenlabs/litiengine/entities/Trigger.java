@@ -68,30 +68,17 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     this.triggered = true;
-    // always take local targets if there are any
-    List<Integer> localTargets = this.getTargets();
-    if (localTargets.isEmpty()) {
-      // as a fallback send the message to the tar
-      localTargets = new ArrayList<>();
-      if (tar > 0) {
-        localTargets.add(tar);
-      }
-    }
+    List<Integer> triggerTargets = this.getTargets(tar);
 
-    final TriggerEvent te = new TriggerEvent(this, activator, localTargets);
+    final TriggerEvent te = new TriggerEvent(this, activator, triggerTargets);
 
-    // check if the trigger is allowed to be activated
-    for (Function<TriggerEvent, String> pred : this.activatingPredicates) {
-      String result = pred.apply(te);
-      if (result != null && !result.isEmpty()) {
-        activator.sendMessage(this, result);
-        return false;
-      }
+    if (!this.checkActivationPredicates(te)) {
+      return false;
     }
 
     // if we actually have a trigger target, we send the message to the target
-    if (!localTargets.isEmpty()) {
-      for (final int target : localTargets) {
+    if (!triggerTargets.isEmpty()) {
+      for (final int target : triggerTargets) {
         final IEntity entity = Game.getEnvironment().get(target);
         if (entity == null) {
           log.log(Level.WARNING, "trigger \'{0}\' was activated, but the trigger target \'{1}\' could not be found on the environment", new Object[] { this.getName(), target });
@@ -219,24 +206,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update(final IGameLoop loop) {
-    if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION) {
+    if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION || !Game.getPhysicsEngine().collides(this.getCollisionBox(), CollisionType.COLLTYPE_ENTITY)) {
       return;
     }
 
-    if (!Game.getPhysicsEngine().collides(this.getCollisionBox(), CollisionType.COLLTYPE_ENTITY)) {
-      return;
-    }
-
-    final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
-    for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
-      if (!this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
-        continue;
-      }
-
-      if (coll.getCollisionBox().intersects(this.getCollisionBox())) {
-        collEntities.add(coll);
-      }
-    }
+    final List<IEntity> collEntities = this.getEntitiesInCollisionBox();
 
     for (final IEntity ent : collEntities) {
       if (this.activated.contains(ent)) {
@@ -262,5 +236,48 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     this.activated = collEntities;
+  }
+
+  private boolean checkActivationPredicates(TriggerEvent te) {
+    // check if the trigger is allowed to be activated
+    for (Function<TriggerEvent, String> pred : this.activatingPredicates) {
+      String result = pred.apply(te);
+      if (result != null && !result.isEmpty()) {
+        te.getEntity().sendMessage(this, result);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private List<IEntity> getEntitiesInCollisionBox() {
+    final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
+    for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
+      if (!this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
+        continue;
+      }
+
+      if (coll.getCollisionBox().intersects(this.getCollisionBox())) {
+        collEntities.add(coll);
+      }
+    }
+
+    return collEntities;
+  }
+
+  private List<Integer> getTargets(int optionalTarget) {
+    // always take local targets if there are any
+    List<Integer> localTargets = this.getTargets();
+    if (localTargets.isEmpty()) {
+
+      // as a fall back send the message to the tar
+      localTargets = new ArrayList<>();
+      if (optionalTarget > 0) {
+        localTargets.add(optionalTarget);
+      }
+    }
+
+    return localTargets;
   }
 }

@@ -15,18 +15,17 @@ import de.gurkenlabs.util.io.FileUtilities;
 @XmlRootElement(name = "sprite")
 public class SpriteSheetInfo implements Serializable {
   private static final long serialVersionUID = 3864637034834813554L;
+  @XmlAttribute(name = "width")
+  private int width;
 
   @XmlAttribute(name = "height")
   private int height;
 
-  @XmlElement
-  private String image;
-
   @XmlAttribute(name = "name")
   private String name;
 
-  @XmlAttribute(name = "width")
-  private int width;
+  @XmlElement
+  private String image;
 
   public SpriteSheetInfo() {
   }
