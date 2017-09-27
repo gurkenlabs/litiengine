@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.util.ArrayUtilities;
 
 public class TriggerPanel extends PropertyPanel<IMapObject> {
   private JTextField textFieldMessage;
@@ -199,18 +200,8 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     this.textFieldMessage.setText(mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE));
 
     String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
-    if (targets != null && !targets.isEmpty()) {
-      for (String target : targets.split(",")) {
-        if (target == null || target.isEmpty()) {
-          continue;
-        }
-
-        try {
-          int a = Integer.parseInt(target);
-          this.targetsModel.addRow(new Object[] { a });
-        } catch (NumberFormatException e) {
-        }
-      }
+    for (int target : ArrayUtilities.getIntegerArray(targets)) {
+      this.targetsModel.addRow(new Object[] { target });
     }
 
     String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
@@ -222,19 +213,9 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     this.comboBoxActivationType.setSelectedItem(act);
 
     String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
-    if (activators != null && !activators.isEmpty())
-
-      for (String activator : activators.split(",")) {
-        if (activator == null || activator.isEmpty()) {
-          continue;
-        }
-
-        try {
-          int a = Integer.parseInt(activator);
-          this.model.addRow(new Object[] { a });
-        } catch (NumberFormatException e) {
-        }
-      }
+    for (int activator : ArrayUtilities.getIntegerArray(activators)) {
+      this.model.addRow(new Object[] { activator });
+    }
   }
 
   private void setupChangedListeners() {
