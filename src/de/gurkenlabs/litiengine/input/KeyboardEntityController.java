@@ -4,22 +4,14 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.litiengine.physics.MovementController;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 
-public class KeyboardEntityController<T extends IMovableEntity> extends MovementController<T> implements IKeyObserver {
-  private float dx;
-  private float dy;
-  private boolean movedX;
-  private boolean movedY;
+public class KeyboardEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> implements IKeyObserver {
   private final List<Integer> up;
   private final List<Integer> down;
   private final List<Integer> left;
   private final List<Integer> right;
-  private double velocityX;
-  private double velocityY;
 
   public KeyboardEntityController(final T entity) {
     this(entity, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
@@ -43,17 +35,17 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
   public void handlePressedKey(final KeyEvent keyCode) {
 
     if (this.up.contains(keyCode.getKeyCode())) {
-      this.dy--;
-      this.movedY = true;
+      this.setDy(this.getDy() - 1);
+      this.setMovedY(true);
     } else if (this.down.contains(keyCode.getKeyCode())) {
-      this.movedY = true;
-      this.dy++;
+      this.setMovedY(true);
+      this.setDy(this.getDy() + 1);
     } else if (this.left.contains(keyCode.getKeyCode())) {
-      this.dx--;
-      this.movedX = true;
+      this.setDx(this.getDx() - 1);
+      this.setMovedX(true);
     } else if (this.right.contains(keyCode.getKeyCode())) {
-      this.dx++;
-      this.movedX = true;
+      this.setDx(this.getDx() + 1);
+      this.setMovedX(true);
     }
   }
 
@@ -81,88 +73,5 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Movement
   @Override
   public void handleTypedKey(final KeyEvent keyCode) {
 
-  }
-
-  @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
-    if (!this.isMovementAllowed()) {
-      return;
-    }
-
-    final long deltaTime = loop.getDeltaTime();
-
-    // pixels per ms multiplied by the passed ms
-    final double maxPixelsPerTick = this.getEntity().getVelocity() / 1000.0 * deltaTime;
-
-    double accelerationRatio = (double) deltaTime / (double) this.getEntity().getAcceleration();
-    double decelerationRatio = (double) deltaTime / (double) this.getEntity().getDeceleration();
-
-    double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : accelerationRatio * maxPixelsPerTick;
-    final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : decelerationRatio * maxPixelsPerTick;
-    final double STOP_THRESHOLD = 0.0025 * deltaTime;
-
-    if (this.movedX && this.movedY) {
-      // we don't want the entity to move faster when moving diagonally
-      // calculate a new x by dissolving the formula for diagonals of squares
-      // sqrt(2 * x^2)
-      inc /= Math.sqrt(2);
-    }
-
-    if (this.movedX) {
-      this.velocityX += this.dx > 0 ? inc : -inc;
-      this.velocityX = MathUtilities.clamp(this.velocityX, -maxPixelsPerTick, maxPixelsPerTick);
-      this.dx = 0;
-      this.movedX = false;
-    } else {
-      if (this.velocityX > 0) {
-        if (dec > this.velocityX) {
-          this.velocityX = 0;
-        } else {
-          this.velocityX -= dec;
-        }
-      } else if (this.velocityX < 0) {
-        if (dec < this.velocityX) {
-          this.velocityX = 0;
-        } else {
-          this.velocityX += dec;
-        }
-      }
-
-      if (Math.abs(this.velocityX) < STOP_THRESHOLD) {
-        this.velocityX = 0;
-      }
-    }
-
-    if (this.movedY) {
-      this.velocityY += this.dy > 0 ? inc : -inc;
-      this.velocityY = MathUtilities.clamp(this.velocityY, -maxPixelsPerTick, maxPixelsPerTick);
-      this.dy = 0;
-      this.movedY = false;
-    } else {
-      if (this.velocityY > 0) {
-        if (dec > this.velocityY) {
-          this.velocityY = 0;
-        } else {
-          this.velocityY -= dec;
-        }
-      } else if (this.velocityY < 0) {
-        if (dec < this.velocityY) {
-          this.velocityY = 0;
-        } else {
-          this.velocityY += dec;
-        }
-      }
-
-      if (Math.abs(this.velocityY) < STOP_THRESHOLD) {
-        this.velocityY = 0;
-      }
-    }
-
-    if (this.velocityX == 0 && this.velocityY == 0) {
-      return;
-    }
-
-    this.moveEntity(this.velocityX, this.velocityY);
   }
 }
