@@ -1,6 +1,11 @@
 package de.gurkenlabs.util;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public final class ArrayUtilities {
+  private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
+
   private ArrayUtilities() {
   }
 
@@ -11,5 +16,32 @@ public final class ArrayUtilities {
     System.arraycopy(firstArray, 0, combinedArray, 0, aLen);
     System.arraycopy(secondArray, 0, combinedArray, aLen, bLen);
     return combinedArray;
+  }
+
+  public static int[] getIntegerArray(String commaSeparatedIntegers) {
+    if (commaSeparatedIntegers == null || commaSeparatedIntegers.isEmpty()) {
+      return new int[0];
+    }
+
+    final String[] split = commaSeparatedIntegers.split(',');
+    int[] integers = new int[split.length];
+    if (integers.length == 0) {
+      return integers;
+    }
+
+    for (int i = 0; i < split.length; i++) {
+      String integerString = split[i];
+      if (integerString == null || integerString.isEmpty()) {
+        continue;
+      }
+
+      try {
+        integers[i] = Integer.parseInt(integerString);
+      } catch (final NumberFormatException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
+
+    return integers;
   }
 }

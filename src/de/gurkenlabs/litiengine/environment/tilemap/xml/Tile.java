@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
+import de.gurkenlabs.util.ArrayUtilities;
 
 /**
  * The Class Tile.
@@ -98,17 +99,11 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
       return terrainIds;
     }
 
-    String[] split = this.terrain.split(",");
-    if (split.length != 4) {
+    int[] ids = ArrayUtilities.getIntegerArray(this.terrain);
+    if (ids.length != 4) {
       return terrainIds;
-    }
-
-    for (int i = 0; i < split.length; i++) {
-      try {
-        terrainIds[i] = Integer.parseInt(split[i]);
-      } catch (NumberFormatException nfe) {
-        continue;
-      }
+    } else {
+      terrainIds = ids;
     }
 
     return terrainIds;

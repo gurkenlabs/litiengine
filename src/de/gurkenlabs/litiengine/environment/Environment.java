@@ -70,6 +70,7 @@ import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
+import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
@@ -1041,31 +1042,16 @@ public class Environment implements IEnvironment {
     }
 
     final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
-    if (targets != null && !targets.isEmpty()) {
-      final String[] split = targets.split(",");
-      for (final String s : split) {
-        if (s == null || s.isEmpty()) {
-          continue;
-        }
-        try {
-          trigger.addTarget(Integer.parseInt(s));
-        } catch (final NumberFormatException e) {
-          log.log(Level.SEVERE, e.getMessage(), e);
-        }
+
+    for (final int target : ArrayUtilities.getIntegerArray(targets)) {
+      if (target != 0) {
+        trigger.addTarget(target);
       }
     }
 
-    if (activators != null && !activators.isEmpty()) {
-      final String[] split = activators.split(",");
-      for (final String s : split) {
-        if (s == null || s.isEmpty()) {
-          continue;
-        }
-        try {
-          trigger.addActivator(Integer.parseInt(s));
-        } catch (final NumberFormatException e) {
-          log.log(Level.SEVERE, e.getMessage(), e);
-        }
+    for (final int activator : ArrayUtilities.getIntegerArray(activators)) {
+      if (activator != 0) {
+        trigger.addActivator(activator);
       }
     }
 
