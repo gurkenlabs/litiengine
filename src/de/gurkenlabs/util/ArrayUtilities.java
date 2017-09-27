@@ -23,7 +23,7 @@ public final class ArrayUtilities {
       return new int[0];
     }
 
-    final String[] split = commaSeparatedIntegers.split(',');
+    final String[] split = commaSeparatedIntegers.split(",");
     int[] integers = new int[split.length];
     if (integers.length == 0) {
       return integers;
