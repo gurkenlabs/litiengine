@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.util.geom.Vector2D;
 
 public class ImageProcessing {
   private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
@@ -402,30 +404,8 @@ public class ImageProcessing {
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final int max) {
-    final double width = image.getWidth();
-    final double height = image.getHeight();
-
-    if (width == 0 || height == 0) {
-      return null;
-    }
-    double dWidth = 0;
-    double dHeight = 0;
-    final double ratio = width / height;
-    final double newHeight = width / ratio;
-    final double newWidth = height * ratio;
-
-    if (newWidth == newHeight) {
-      dWidth = max;
-      dHeight = max;
-    } else if (newWidth > newHeight) {
-      dWidth = max;
-      dHeight = height / width * max;
-    } else {
-      dHeight = max;
-      dWidth = width / height * max;
-    }
-
-    return scaleImage(image, (int) dWidth, (int) dHeight);
+    Vector2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
+    return scaleImage(image, (int) newDimension.getX(), (int) newDimension.getY());
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final float factor) {

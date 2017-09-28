@@ -1,5 +1,6 @@
 package de.gurkenlabs.util.geom;
 
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -11,6 +12,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.mockito.NotExtensible;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
@@ -514,9 +517,16 @@ public class GeometricUtilities {
   }
 
   public static Shape scaleRect(final Rectangle2D shape, final int max) {
-    final double width = shape.getWidth();
-    final double height = shape.getHeight();
+    Vector2D newDimension = scaleWithRatio(shape.getWidth(), shape.getHeight(), max);
+    if (newDimension == null) {
+      return shape;
+    }
 
+    final AffineTransform transform = AffineTransform.getScaleInstance(newDimension.getX(), newDimension.getY());
+    return transform.createTransformedShape(shape);
+  }
+
+  public static Vector2D scaleWithRatio(final double width, final double height, final int max) {
     if (width == 0 || height == 0) {
       return null;
     }
@@ -536,8 +546,8 @@ public class GeometricUtilities {
       dHeight = max;
       dWidth = width / height * max;
     }
-    final AffineTransform transform = AffineTransform.getScaleInstance(dWidth, dHeight);
-    return transform.createTransformedShape(shape);
+
+    return new Vector2D(dWidth, dHeight);
   }
 
   public static Shape scaleShape(final Shape shape, final double scale) {
