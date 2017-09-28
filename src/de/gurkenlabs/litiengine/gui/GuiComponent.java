@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.core.Align;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.IGuiComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
@@ -24,11 +24,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
 /**
  * The Class GuiComponent.
  */
-public abstract class GuiComponent implements IGuiComponent, MouseListener, MouseMotionListener, MouseWheelListener {
-  public static final int TEXT_ALIGN_CENTER = 3;
-  public static final int TEXT_ALIGN_LEFT = 1;
-  public static final int TEXT_ALIGN_RIGHT = 2;
-
+public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
   protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
 
   private static int componentId = 0;
@@ -52,7 +48,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private final List<Consumer<ComponentMouseWheelEvent>> mouseWheelConsumer;
 
-  /** The components. */
   private final List<GuiComponent> components;
 
   private final List<Consumer<String>> textChangedConsumer;
@@ -72,7 +67,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
 
   private String text;
 
-  private int textAlignment = TEXT_ALIGN_CENTER;
+  private Align textAlignment = Align.CENTER;
 
   private int textAngle = 0;
 
@@ -187,45 +182,12 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the height
    */
-  @Override
   public double getHeight() {
     return this.height;
   }
 
-  public List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
-    return this.hoverConsumer;
-  }
-
   public Sound getHoverSound() {
     return this.hoverSound;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
-    return this.mouseDraggedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
-    return this.mouseEnterConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
-    return this.mouseLeaveConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseMovedConsumer() {
-    return this.mouseMovedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
-    return this.mousePressedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseEvent>> getMouseReleasedConsumer() {
-    return this.mouseReleasedConsumer;
-  }
-
-  public List<Consumer<ComponentMouseWheelEvent>> getMouseWheelConsumer() {
-    return this.mouseWheelConsumer;
   }
 
   public Point2D getLocation() {
@@ -245,7 +207,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     return this.text;
   }
 
-  public int getTextAlignment() {
+  public Align getTextAlignment() {
     return this.textAlignment;
   }
 
@@ -288,7 +250,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the width
    */
-  @Override
   public double getWidth() {
     return this.width;
   }
@@ -298,7 +259,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the x
    */
-  @Override
   public double getX() {
     return this.x;
   }
@@ -308,7 +268,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *
    * @return the y
    */
-  @Override
   public double getY() {
     return this.y;
   }
@@ -398,6 +357,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     if (!this.mouseEventShouldBeForwarded(e)) {
       return;
     }
+
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }
@@ -569,7 +529,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    *          the new y
    */
 
-  @Override
   public void prepare() {
     this.onHovered(e -> {
       if (this.getHoverSound() != null) {
@@ -587,7 +546,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  @Override
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
       return;
@@ -622,31 +580,24 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  @Override
   public void setDimension(final double width, final double height) {
     this.width = width;
     this.height = height;
   }
 
-  @Override
   public void setHeight(final double height) {
     this.height = height;
   }
 
   public void setHoverSound(final Sound hoverSound) {
     this.hoverSound = hoverSound;
-    for (final GuiComponent component : this.getComponents()) {
-      component.setHoverSound(hoverSound);
-    }
   }
 
-  @Override
   public void setPosition(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
-  @Override
   public void setPosition(final Point2D newPosition) {
     this.x = newPosition.getX();
     this.y = newPosition.getY();
@@ -674,7 +625,7 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     this.setTextX(0);
   }
 
-  public void setTextAlignment(final int textAlignment) {
+  public void setTextAlignment(final Align textAlignment) {
     this.textAlignment = textAlignment;
   }
 
@@ -718,7 +669,6 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
     }
   }
 
-  @Override
   public void setWidth(final double width) {
     this.width = width;
   }
@@ -734,14 +684,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
   /**
    * Suspend.
    */
-  @Override
   public void suspend() {
     Input.mouse().unregisterMouseListener(this);
     Input.mouse().unregisterMouseWheelListener(this);
     Input.mouse().unregisterMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
-    for (final IGuiComponent childComp : this.getComponents()) {
+    for (final GuiComponent childComp : this.getComponents()) {
       childComp.suspend();
       this.getComponents().remove(childComp);
     }
@@ -758,6 +707,38 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
    */
   protected List<Consumer<ComponentMouseEvent>> getClickConsumer() {
     return this.clickConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getHoverConsumer() {
+    return this.hoverConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseDraggedConsumer() {
+    return this.mouseDraggedConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseEnterConsumer() {
+    return this.mouseEnterConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseLeaveConsumer() {
+    return this.mouseLeaveConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseMovedConsumer() {
+    return this.mouseMovedConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMousePressedConsumer() {
+    return this.mousePressedConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseEvent>> getMouseReleasedConsumer() {
+    return this.mouseReleasedConsumer;
+  }
+
+  protected List<Consumer<ComponentMouseWheelEvent>> getMouseWheelConsumer() {
+    return this.mouseWheelConsumer;
   }
 
   /**
@@ -784,13 +765,13 @@ public abstract class GuiComponent implements IGuiComponent, MouseListener, Mous
       double defaultTextX;
       double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
       switch (this.getTextAlignment()) {
-      case TEXT_ALIGN_LEFT:
+      case LEFT:
         defaultTextX = this.getTextXMargin();
         break;
-      case TEXT_ALIGN_RIGHT:
+      case RIGHT:
         defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
         break;
-      case TEXT_ALIGN_CENTER:
+      case CENTER:
       default:
         defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
         break;

@@ -3,47 +3,17 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
-  public enum CollisionAlign {
-    CENTER, LEFT, RIGHT;
-
-    public static CollisionAlign get(final String align) {
-      if (align == null || align.isEmpty()) {
-        return CollisionAlign.CENTER;
-      }
-
-      try {
-        return CollisionAlign.valueOf(align);
-      } catch (final IllegalArgumentException iae) {
-        return CollisionAlign.CENTER;
-      }
-    }
-  }
-
-  public enum CollisionValign {
-    DOWN, MIDDLE, TOP;
-
-    public static CollisionValign get(final String valign) {
-      if (valign == null || valign.isEmpty()) {
-        return CollisionValign.DOWN;
-      }
-
-      try {
-        return CollisionValign.valueOf(valign);
-      } catch (final IllegalArgumentException iae) {
-        return CollisionValign.DOWN;
-      }
-    }
-  }
-
   private static final double HEIGHT_FACTOR = 0.4;
 
   private static final double WIDTH_FACTOR = 0.4;
 
-  public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final CollisionAlign align, final CollisionValign valign) {
+  public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
     double x;
     double y;
     switch (align) {
@@ -75,7 +45,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Rectangle2D.Double(x, y, collisionBoxWidth, collisionBoxHeight);
   }
 
-  private CollisionAlign align = CollisionAlign.CENTER;
+  private Align align = Align.CENTER;
 
   private boolean collision;
 
@@ -85,7 +55,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private float collisionBoxWidth;
 
-  private CollisionValign valign = CollisionValign.DOWN;
+  private Valign valign = Valign.DOWN;
 
   protected CollisionEntity() {
     super();
@@ -103,7 +73,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return true;
   }
 
-  public CollisionAlign getAlign() {
+  public Align getAlign() {
     return this.align;
   }
 
@@ -144,7 +114,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Point2D.Double(this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
   }
 
-  public CollisionValign getValign() {
+  public Valign getValign() {
     return this.valign;
   }
 
@@ -169,7 +139,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collision = collision;
   }
 
-  public void setCollisionBoxAlign(final CollisionAlign align) {
+  public void setCollisionBoxAlign(final Align align) {
     this.align = align;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
@@ -180,7 +150,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
-  public void setCollisionBoxValign(final CollisionValign valign) {
+  public void setCollisionBoxValign(final Valign valign) {
     this.valign = valign;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }

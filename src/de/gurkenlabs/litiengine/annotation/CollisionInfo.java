@@ -6,14 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface CollisionInfo {
-  CollisionAlign align() default CollisionAlign.CENTER;
+  Align align() default Align.CENTER;
 
   /**
    * Collision.
@@ -36,5 +36,5 @@ public @interface CollisionInfo {
    */
   int collisionBoxWidth() default -1;
 
-  CollisionValign valign() default CollisionValign.DOWN;
+  Valign valign() default Valign.DOWN;
 }

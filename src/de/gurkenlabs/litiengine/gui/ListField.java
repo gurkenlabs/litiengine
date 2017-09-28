@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.core.Align;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -160,7 +161,7 @@ public class ListField extends GuiComponent {
       } else {
         entryComponent = new ImageComponent(this.getX(), this.getY() + this.getHeight() / this.getNumberOfShownElements() * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
       }
-      entryComponent.setTextAlignment(TEXT_ALIGN_LEFT);
+      entryComponent.setTextAlignment(Align.LEFT);
       this.getListEntries().add(entryComponent);
     }
     this.getComponents().addAll(this.getListEntries());

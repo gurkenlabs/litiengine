@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.gurkenlabs.core.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
@@ -47,7 +48,7 @@ public class TextFieldComponent extends ImageComponent {
       }
     });
 
-    this.setTextAlignment(GuiComponent.TEXT_ALIGN_LEFT);
+    this.setTextAlignment(Align.LEFT);
   }
 
   public String getFormat() {

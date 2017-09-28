@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.core.Align;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -99,7 +100,7 @@ public class DropdownListField extends GuiComponent {
   public void prepare() {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
-    this.chosenElementComponent.setTextAlignment(TEXT_ALIGN_LEFT);
+    this.chosenElementComponent.setTextAlignment(Align.LEFT);
     final double buttonHeight = this.getHeight() / this.getNumberOfShownElements();
     double buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);

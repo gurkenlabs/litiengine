@@ -6,7 +6,6 @@ import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
 public abstract class Screen extends GuiComponent implements IScreen {
-  public static final Screen GAME_SCREEN = new GameScreen();
   private final String name;
 
   protected Screen() {

@@ -26,13 +26,13 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.configuration.Quality;
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.Collider;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.entities.Direction;
@@ -867,8 +867,8 @@ public class Environment implements IEnvironment {
       mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
 
-    mob.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    mob.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
     mob.setName(mapObject.getName());
@@ -994,8 +994,8 @@ public class Environment implements IEnvironment {
       prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
 
-    prop.setCollisionBoxAlign(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    prop.setCollisionBoxValign(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
     prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
 
     if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {

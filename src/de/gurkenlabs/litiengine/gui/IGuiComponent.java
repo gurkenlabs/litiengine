@@ -1,6 +1,8 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.gui;
 
 import java.awt.geom.Point2D;
+
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 
 public interface IGuiComponent extends IRenderable {
 
