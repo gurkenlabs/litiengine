@@ -126,6 +126,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.y = y;
     this.setTextXMargin(this.getWidth() / 16);
     this.setSelected(false);
+    this.setEnabled(true);
     this.initializeComponents();
   }
 
@@ -152,15 +153,15 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   public Appearance getAppearance() {
-    return appearance;
+    return this.appearance;
   }
 
   public Appearance getAppearanceHovered() {
-    return hoveredAppearance;
+    return this.hoveredAppearance;
   }
 
   public Appearance getAppearanceDisabled() {
-    return disabledAppearance;
+    return this.disabledAppearance;
   }
 
   /**
@@ -775,41 +776,43 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   private void renderText(Graphics2D g) {
-    if (this.getText() != null) {
-      final FontMetrics fm = g.getFontMetrics();
+    if (this.getText() == null || this.getText().isEmpty()) {
+      return;
+    }
 
-      double defaultTextX;
-      double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-      switch (this.getTextAlignment()) {
-      case LEFT:
-        defaultTextX = this.getTextXMargin();
-        break;
-      case RIGHT:
-        defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
-        break;
-      case CENTER:
-      default:
-        defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
-        break;
-      }
-      if (this.getTextY() == 0) {
-        this.setTextY(defaultTextY);
-      }
+    final FontMetrics fm = g.getFontMetrics();
 
-      if (this.getTextX() == 0) {
-        this.setTextX(defaultTextX);
-      }
-      if (this.getTextAngle() == 0) {
-        if (this.drawTextShadow()) {
-          RenderEngine.drawTextWithShadow(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
-        } else {
-          RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
-        }
-      } else if (this.getTextAngle() == 90) {
-        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
+    double defaultTextX;
+    double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
+    switch (this.getTextAlignment()) {
+    case LEFT:
+      defaultTextX = this.getTextXMargin();
+      break;
+    case RIGHT:
+      defaultTextX = this.getWidth() - this.getTextXMargin() - fm.stringWidth(this.getTextToRender(g));
+      break;
+    case CENTER:
+    default:
+      defaultTextX = this.getWidth() / 2 - fm.stringWidth(this.getTextToRender(g)) / 2.0;
+      break;
+    }
+    if (this.getTextY() == 0) {
+      this.setTextY(defaultTextY);
+    }
+
+    if (this.getTextX() == 0) {
+      this.setTextX(defaultTextX);
+    }
+    if (this.getTextAngle() == 0) {
+      if (this.drawTextShadow()) {
+        RenderEngine.drawTextWithShadow(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
       } else {
-        RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
+        RenderEngine.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
       }
+    } else if (this.getTextAngle() == 90) {
+      RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
+    } else {
+      RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
     }
   }
 }

@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
@@ -20,11 +19,11 @@ public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_PRESSED_INDEX = 2;
   public static final int BACKGROUND_DISABLED_INDEX = 3;
 
-  private Sound hoverSound;
-
   private Image image;
 
   private Spritesheet spritesheet;
+
+  private ImageScaleMode imageScaleMode;
 
   public ImageComponent(final double x, final double y, final Image image) {
     super(x, y, image.getWidth(null), image.getHeight(null));
@@ -82,13 +81,36 @@ public class ImageComponent extends GuiComponent {
     return img;
   }
 
-  @Override
-  public Sound getHoverSound() {
-    return this.hoverSound;
+  public Image getImage() {
+    if (this.image == null) {
+      return null;
+    }
+
+    int imageWidth = this.image.getWidth(null);
+    int imageHeight = this.image.getHeight(null);
+
+    if (this.getImageScaleMode() == ImageScaleMode.STRETCH) {
+      imageWidth = (int) this.getWidth();
+      imageHeight = (int) this.getHeight();
+    }
+
+    final String cacheKey = MessageFormat.format("{0}_{1}x{2}", this.image.hashCode(), imageWidth, imageHeight);
+    if (ImageCache.SPRITES.containsKey(cacheKey)) {
+      return ImageCache.SPRITES.get(cacheKey);
+    }
+
+    BufferedImage bufferedImage = ImageProcessing.toBufferedImage(this.image);
+    if (bufferedImage == null) {
+      return this.image;
+    }
+
+    BufferedImage img = ImageProcessing.scaleImage(bufferedImage, imageWidth, imageHeight);
+    ImageCache.SPRITES.put(cacheKey, img);
+    return img;
   }
 
-  public Image getImage() {
-    return this.image;
+  public ImageScaleMode getImageScaleMode() {
+    return imageScaleMode;
   }
 
   protected Spritesheet getSpritesheet() {
@@ -114,16 +136,16 @@ public class ImageComponent extends GuiComponent {
     super.render(g);
   }
 
-  @Override
-  public void setHoverSound(final Sound hoverSound) {
-    this.hoverSound = hoverSound;
-  }
-
   public void setImage(final Image image) {
     this.image = image;
+  }
+
+  public void setImageScaleMode(ImageScaleMode imageScaleMode) {
+    this.imageScaleMode = imageScaleMode;
   }
 
   public void setSpriteSheet(final Spritesheet spr) {
     this.spritesheet = spr;
   }
+
 }
