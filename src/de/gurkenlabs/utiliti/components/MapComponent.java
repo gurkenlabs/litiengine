@@ -35,12 +35,12 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -262,8 +262,8 @@ public class MapComponent extends EditorComponent {
           String coll = mapObject.getCustomProperty(MapObjectProperties.COLLISION);
           final String collisionBoxWidthFactor = mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH);
           final String collisionBoxHeightFactor = mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT);
-          final CollisionAlign align = CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN));
-          final CollisionValign valign = CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN));
+          final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN));
+          final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN));
 
           if (coll != null && collisionBoxWidthFactor != null && collisionBoxHeightFactor != null) {
             boolean collision = Boolean.valueOf(coll);

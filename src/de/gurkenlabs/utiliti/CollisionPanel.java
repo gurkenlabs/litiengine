@@ -15,9 +15,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionAlign;
-import de.gurkenlabs.litiengine.entities.CollisionEntity.CollisionValign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 
@@ -51,10 +51,10 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
     spinnerHeight.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
 
     comboBoxAlign = new JComboBox();
-    comboBoxAlign.setModel(new DefaultComboBoxModel(CollisionAlign.values()));
+    comboBoxAlign.setModel(new DefaultComboBoxModel(Align.values()));
 
     comboBoxValign = new JComboBox();
-    comboBoxValign.setModel(new DefaultComboBoxModel(CollisionValign.values()));
+    comboBoxValign.setModel(new DefaultComboBoxModel(Valign.values()));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
@@ -109,12 +109,12 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT, this.spinnerHeight.getValue().toString())));
 
     this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      CollisionAlign align = (CollisionAlign) this.comboBoxAlign.getSelectedItem();
+      Align align = (Align) this.comboBoxAlign.getSelectedItem();
       m.setCustomProperty(MapObjectProperties.COLLISIONALGIN, align.toString());
     }));
 
     this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      CollisionValign valign = (CollisionValign) this.comboBoxValign.getSelectedItem();
+      Valign valign = (Valign) this.comboBoxValign.getSelectedItem();
       m.setCustomProperty(MapObjectProperties.COLLISIONVALGIN, valign.toString());
     }));
   }
@@ -124,8 +124,8 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
     this.chckbxHasCollision.setSelected(false);
     this.spinnerWidth.setValue(0);
     this.spinnerHeight.setValue(0);
-    this.comboBoxAlign.setSelectedItem(CollisionAlign.CENTER);
-    this.comboBoxAlign.setSelectedItem(CollisionValign.DOWN);
+    this.comboBoxAlign.setSelectedItem(Align.CENTER);
+    this.comboBoxAlign.setSelectedItem(Valign.DOWN);
   }
 
   @Override
@@ -142,7 +142,7 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
       this.spinnerHeight.setValue(Float.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
     }
 
-    this.comboBoxAlign.setSelectedItem(CollisionAlign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    this.comboBoxValign.setSelectedItem(CollisionValign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
+    this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
   }
 }
