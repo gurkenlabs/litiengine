@@ -1,7 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -139,35 +137,19 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
               updatable.update(this);
             }
           } catch (final Exception e) {
-            final StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            final String stacktrace = sw.toString();
-            log.severe(stacktrace);
+            log.log(Level.SEVERE, e.getMessage(), e);
           }
         });
 
-        final List<TimedAction> executed = new ArrayList<>();
-        for (final TimedAction action : this.actions) {
-          if (action.getExecutionTick() <= this.totalTicks) {
-            action.getAction().accept(action.getIndex());
-            executed.add(action);
-          }
-        }
-
-        this.actions.removeAll(executed);
+        this.executeTimedActions();
       }
 
       ++this.updateCount;
 
       final long currentMillis = System.currentTimeMillis();
-      if (currentMillis - this.lastUpsTime >= 1000) {
-        this.lastUpsTime = currentMillis;
-        this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
-        this.updateCount = 0;
-      }
+      this.trackUpdateRate(currentMillis);
 
-      long lastUpdateTime = currentMillis;
-
+      final long lastUpdateTime = currentMillis;
       final long updateTime = (System.nanoTime() - updateStart) / 1000000;
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
@@ -196,6 +178,26 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
       if (action.getIndex() == index) {
         action.setExecutionTicks(ticks);
       }
+    }
+  }
+
+  private void executeTimedActions() {
+    final List<TimedAction> executed = new ArrayList<>();
+    for (final TimedAction action : this.actions) {
+      if (action.getExecutionTick() <= this.totalTicks) {
+        action.getAction().accept(action.getIndex());
+        executed.add(action);
+      }
+    }
+
+    this.actions.removeAll(executed);
+  }
+
+  private void trackUpdateRate(long currentMillis) {
+    if (currentMillis - this.lastUpsTime >= 1000) {
+      this.lastUpsTime = currentMillis;
+      this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
+      this.updateCount = 0;
     }
   }
 

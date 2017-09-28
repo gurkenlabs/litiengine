@@ -85,13 +85,7 @@ public abstract class ConfigurationGroup {
       } else if (field.getType().equals(String[].class)) {
         this.setPropertyValue(propertyName, value.split(","));
       } else if (field.getType() instanceof Class && field.getType().isEnum()) {
-        final Object[] enumArray = field.getType().getEnumConstants();
-
-        for (final Object enumConst : enumArray) {
-          if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
-            this.setPropertyValue(propertyName, field.getType().cast(enumConst));
-          }
-        }
+        this.setEnumPropertyValue(field, propertyName, value);
       }
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
@@ -189,6 +183,16 @@ public abstract class ConfigurationGroup {
       }
     } catch (final SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
+    }
+  }
+
+  private void setEnumPropertyValue(final Field field, String propertyName, String value) {
+    final Object[] enumArray = field.getType().getEnumConstants();
+
+    for (final Object enumConst : enumArray) {
+      if (enumConst != null && enumConst.toString().equalsIgnoreCase(value)) {
+        this.setPropertyValue(propertyName, field.getType().cast(enumConst));
+      }
     }
   }
 }
