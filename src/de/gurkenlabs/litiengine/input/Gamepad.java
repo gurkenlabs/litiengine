@@ -81,12 +81,7 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     final Event event = new Event();
     while (this.controller.getEventQueue().getNextEvent(event)) {
-      final List<Consumer<Float>> consumers = this.pollConsumer.get(event.getComponent().getIdentifier().getName());
-      if (consumers != null) {
-        for (final Consumer<Float> cons : consumers) {
-          cons.accept(event.getValue());
-        }
-      }
+      this.handleEvents(event);
     }
 
     for (final Map.Entry<String, List<Consumer<Float>>> consumers : this.pressedConsumer.entrySet()) {
@@ -116,6 +111,15 @@ public class Gamepad implements IGamepad, IUpdateable {
     this.pollConsumer.clear();
     this.pressedConsumer.clear();
     Input.gamepadManager().remove(this);
+  }
+
+  private void handleEvents(Event event) {
+    final List<Consumer<Float>> consumers = this.pollConsumer.get(event.getComponent().getIdentifier().getName());
+    if (consumers != null) {
+      for (final Consumer<Float> cons : consumers) {
+        cons.accept(event.getValue());
+      }
+    }
   }
 
   public static class Axis {

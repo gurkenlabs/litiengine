@@ -238,7 +238,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
         // there was a collision in between
         final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
         if (intersection != null) {
-          newPosition = entity.getLocation();
+          return false;
         }
       }
     }
