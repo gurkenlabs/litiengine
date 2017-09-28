@@ -62,6 +62,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private boolean isPressed;
   private boolean isSelected;
   private boolean suspended;
+  private boolean enabled;
 
   private Object tag;
 
@@ -148,6 +149,18 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   public boolean drawTextShadow() {
     return this.drawTextShadow;
+  }
+
+  public Appearance getAppearance() {
+    return appearance;
+  }
+
+  public Appearance getAppearanceHovered() {
+    return hoveredAppearance;
+  }
+
+  public Appearance getAppearanceDisabled() {
+    return disabledAppearance;
   }
 
   /**
@@ -272,20 +285,12 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.y;
   }
 
-  public Appearance getAppearance() {
-    return appearance;
-  }
-
-  public Appearance getAppearanceHovered() {
-    return hoveredAppearance;
-  }
-
-  public Appearance getAppearanceDisabled() {
-    return disabledAppearance;
-  }
-
   public boolean isDragged() {
     return this.isDragged();
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 
   /**
@@ -556,6 +561,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       currentAppearance = this.getAppearanceHovered();
     }
 
+    if (!this.isEnabled()) {
+      currentAppearance = this.getAppearanceDisabled();
+    }
+
     if (!currentAppearance.isTransparentBackground()) {
       g.setPaint(currentAppearance.getBackgroundPaint(this.getWidth(), this.getHeight()));
       g.fill(this.getBoundingBox());
@@ -583,6 +592,13 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   public void setDimension(final double width, final double height) {
     this.width = width;
     this.height = height;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    for (GuiComponent comp : this.getComponents()) {
+      comp.setEnabled(this.isEnabled());
+    }
   }
 
   public void setHeight(final double height) {
@@ -755,7 +771,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * @return true, if successful
    */
   private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+    return this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
   }
 
   private void renderText(Graphics2D g) {

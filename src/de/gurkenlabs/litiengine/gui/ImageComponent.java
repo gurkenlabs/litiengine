@@ -18,6 +18,7 @@ public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_INDEX = 0;
   public static final int BACKGROUND_HOVER_INDEX = 1;
   public static final int BACKGROUND_PRESSED_INDEX = 2;
+  public static final int BACKGROUND_DISABLED_INDEX = 3;
 
   private Sound hoverSound;
 
@@ -58,22 +59,22 @@ public class ImageComponent extends GuiComponent {
     if (this.getSpritesheet() == null) {
       return null;
     }
-    final String cacheKey = MessageFormat.format("{0}_{1}_{2}_{3}x{4}", this.getSpritesheet().getName().hashCode(), this.isHovered(), this.isPressed(), this.getWidth(), this.getHeight());
+
+    final String cacheKey = MessageFormat.format("{0}_{1}_{2}_{3}_{4}x{5}", this.getSpritesheet().getName().hashCode(), this.isHovered(), this.isPressed(), this.isEnabled(), this.getWidth(), this.getHeight());
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
 
-    BufferedImage img;
-    if (this.isHovered() && this.getSpritesheet().getTotalNumberOfSprites() > 1) {
-      if (this.isPressed()) {
-        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_PRESSED_INDEX), (int) this.getWidth(), (int) this.getHeight());
-      } else {
-        img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_HOVER_INDEX), (int) this.getWidth(), (int) this.getHeight());
-      }
-    } else {
-      img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(BACKGROUND_INDEX), (int) this.getWidth(), (int) this.getHeight());
+    int spriteIndex = BACKGROUND_INDEX;
+    if (!this.isEnabled() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_DISABLED_INDEX) {
+      spriteIndex = BACKGROUND_DISABLED_INDEX;
+    } else if (this.isPressed() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_PRESSED_INDEX) {
+      spriteIndex = BACKGROUND_PRESSED_INDEX;
+    } else if (this.isHovered() && this.getSpritesheet().getTotalNumberOfSprites() > BACKGROUND_HOVER_INDEX) {
+      spriteIndex = BACKGROUND_HOVER_INDEX;
     }
 
+    BufferedImage img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(spriteIndex), (int) this.getWidth(), (int) this.getHeight());
     if (img != null) {
       ImageCache.SPRITES.put(cacheKey, img);
     }
@@ -99,6 +100,7 @@ public class ImageComponent extends GuiComponent {
     if (this.isSuspended() || !this.isVisible()) {
       return;
     }
+
     final Image bg = this.getBackground();
     if (bg != null) {
       RenderEngine.renderImage(g, bg, this.getLocation());

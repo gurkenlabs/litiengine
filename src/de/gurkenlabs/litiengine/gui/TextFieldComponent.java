@@ -65,7 +65,7 @@ public class TextFieldComponent extends ImageComponent {
   }
 
   public void handleTypedKey(final KeyEvent event) {
-    if (this.isSuspended() || !this.isSelected() || !this.isVisible()) {
+    if (this.isSuspended() || !this.isSelected() || !this.isVisible() || !this.isEnabled()) {
       return;
     }
 
