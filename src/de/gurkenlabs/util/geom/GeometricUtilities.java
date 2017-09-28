@@ -1,6 +1,5 @@
 package de.gurkenlabs.util.geom;
 
-import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -12,8 +11,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.mockito.NotExtensible;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
