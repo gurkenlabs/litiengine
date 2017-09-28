@@ -3,11 +3,14 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 
 import javax.swing.JLabel;
 
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -24,6 +27,8 @@ public class ImageComponent extends GuiComponent {
   private Spritesheet spritesheet;
 
   private ImageScaleMode imageScaleMode;
+  private Align imageAlign;
+  private Valign imageValign;
 
   public ImageComponent(final double x, final double y, final Image image) {
     super(x, y, image.getWidth(null), image.getHeight(null));
@@ -48,7 +53,8 @@ public class ImageComponent extends GuiComponent {
     }
 
     this.setText(text);
-
+    this.setImageAlign(Align.LEFT);
+    this.setImageValign(Valign.TOP);
     if (image != null) {
       this.image = image;
     }
@@ -109,8 +115,16 @@ public class ImageComponent extends GuiComponent {
     return img;
   }
 
+  public Align getImageAlign() {
+    return this.imageAlign;
+  }
+
   public ImageScaleMode getImageScaleMode() {
-    return imageScaleMode;
+    return this.imageScaleMode;
+  }
+
+  public Valign getImageValign() {
+    return this.imageValign;
   }
 
   protected Spritesheet getSpritesheet() {
@@ -130,7 +144,7 @@ public class ImageComponent extends GuiComponent {
 
     final Image img = this.getImage();
     if (img != null) {
-      RenderEngine.renderImage(g, img, this.getLocation());
+      RenderEngine.renderImage(g, img, this.getImageLocation(img));
     }
 
     super.render(g);
@@ -148,4 +162,33 @@ public class ImageComponent extends GuiComponent {
     this.spritesheet = spr;
   }
 
+  public void setImageAlign(Align imageAlign) {
+    this.imageAlign = imageAlign;
+  }
+
+  public void setImageValign(Valign imageValign) {
+    this.imageValign = imageValign;
+  }
+
+  private Point2D getImageLocation(final Image img) {
+    double x = this.getX();
+    double y = this.getY();
+    if (this.getImageScaleMode() == ImageScaleMode.STRETCH) {
+      return new Point2D.Double(x, y);
+    }
+
+    if (this.getImageAlign() == Align.RIGHT) {
+      x = x + this.getWidth() - img.getWidth(null);
+    } else if (this.getImageAlign() == Align.CENTER) {
+      x = x + this.getWidth() / 2.0 - img.getWidth(null) / 2.0;
+    }
+
+    if (this.getImageValign() == Valign.DOWN) {
+      y = y + this.getHeight() - img.getHeight(null);
+    } else if (this.getImageValign() == Valign.MIDDLE) {
+      y = y + this.getHeight() / 2.0 - img.getHeight(null) / 2.0;
+    }
+
+    return new Point2D.Double(x, y);
+  }
 }

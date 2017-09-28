@@ -221,7 +221,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.text;
   }
 
-  public Align getTextAlignment() {
+  public Align getTextAlign() {
     return this.textAlignment;
   }
 
@@ -784,7 +784,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     double defaultTextX;
     double defaultTextY = fm.getAscent() + (this.getHeight() - (fm.getAscent() + fm.getDescent())) / 2;
-    switch (this.getTextAlignment()) {
+    switch (this.getTextAlign()) {
     case LEFT:
       defaultTextX = this.getTextXMargin();
       break;
