@@ -24,10 +24,12 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   private boolean consumeAlt;
   /** The key observers. */
   private final List<IKeyObserver> keyObservers;
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keyPressedConsumer;
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keyReleasedConsumer;
-
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keyTypedConsumer;
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer;
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer;
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer;
+  private final List<Consumer<KeyEvent>> keyPressedConsumer;
+  private final List<Consumer<KeyEvent>> keyReleasedConsumer;
+  private final List<Consumer<KeyEvent>> keyTypedConsumer;
 
   /** The pressed keys. */
   private final List<KeyEvent> pressedKeys;
@@ -42,9 +44,13 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * Instantiates a new key board.
    */
   public KeyBoard() {
-    this.keyTypedConsumer = new CopyOnWriteArrayList<>();
+    this.keySpecificTypedConsumer = new CopyOnWriteArrayList<>();
+    this.keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
+    this.keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
     this.keyPressedConsumer = new CopyOnWriteArrayList<>();
     this.keyReleasedConsumer = new CopyOnWriteArrayList<>();
+    this.keyTypedConsumer = new CopyOnWriteArrayList<>();
+
     this.pressedKeys = new CopyOnWriteArrayList<>();
     this.releasedKeys = new CopyOnWriteArrayList<>();
     this.typedKeys = new CopyOnWriteArrayList<>();
@@ -113,17 +119,32 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 
   @Override
   public void onKeyPressed(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keyPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
   @Override
   public void onKeyReleased(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keyReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
   @Override
   public void onKeyTyped(final int keyCode, final Consumer<KeyEvent> consumer) {
-    this.keyTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+    this.keySpecificTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
+  }
+
+  @Override
+  public void onKeyPressed(Consumer<KeyEvent> consumer) {
+    this.keyPressedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onKeyReleased(Consumer<KeyEvent> consumer) {
+    this.keyReleasedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onKeyTyped(Consumer<KeyEvent> consumer) {
+    this.keyTypedConsumer.add(consumer);
   }
 
   /*
@@ -217,11 +238,13 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   private void executePressedKeys() {
     // called at the rate of the updaterate
     this.pressedKeys.forEach(key -> {
-      this.keyPressedConsumer.forEach(consumer -> {
+      this.keySpecificPressedConsumer.forEach(consumer -> {
         if (consumer.getKey().intValue() == key.getKeyCode()) {
           consumer.getValue().accept(key);
         }
       });
+
+      this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyObservers.forEach(observer -> observer.handlePressedKey(key));
     });
   }
@@ -231,12 +254,13 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeReleasedKeys() {
     this.releasedKeys.forEach(key -> {
-      this.keyReleasedConsumer.forEach(consumer -> {
+      this.keySpecificReleasedConsumer.forEach(consumer -> {
         if (consumer.getKey().intValue() == key.getKeyCode()) {
           consumer.getValue().accept(key);
         }
       });
 
+      this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyObservers.forEach(observer -> observer.handleReleasedKey(key));
     });
 
@@ -248,12 +272,13 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    */
   private void executeTypedKeys() {
     this.typedKeys.forEach(key -> {
-      this.keyTypedConsumer.forEach(consumer -> {
+      this.keySpecificTypedConsumer.forEach(consumer -> {
         if (consumer.getKey().intValue() == key.getKeyCode()) {
           consumer.getValue().accept(key);
         }
       });
 
+      this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
       this.keyObservers.forEach(observer -> observer.handleTypedKey(key));
     });
 
@@ -403,5 +428,4 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       return "";
     }
   }
-
 }

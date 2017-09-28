@@ -7,7 +7,7 @@ import java.util.List;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 
-public class KeyboardEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> implements IKeyObserver {
+public class KeyboardEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> {
   private final List<Integer> up;
   private final List<Integer> down;
   private final List<Integer> left;
@@ -28,12 +28,10 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Accelera
     this.down.add(down);
     this.left.add(left);
     this.right.add(right);
-    Input.keyboard().registerForKeyEvents(this);
+    Input.keyboard().onKeyPressed(this::handlePressedKey);
   }
 
-  @Override
   public void handlePressedKey(final KeyEvent keyCode) {
-
     if (this.up.contains(keyCode.getKeyCode())) {
       this.setDy(this.getDy() - 1);
       this.setMovedY(true);
@@ -63,15 +61,5 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Accelera
 
   public void addRightKey(int keyCode) {
     this.right.add(keyCode);
-  }
-
-  @Override
-  public void handleReleasedKey(final KeyEvent keyCode) {
-
-  }
-
-  @Override
-  public void handleTypedKey(final KeyEvent keyCode) {
-
   }
 }

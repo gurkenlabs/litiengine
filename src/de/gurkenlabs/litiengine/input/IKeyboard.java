@@ -22,6 +22,12 @@ public interface IKeyboard extends IUpdateable {
 
   public void onKeyTyped(int keyCode, Consumer<KeyEvent> consumer);
 
+  public void onKeyPressed(Consumer<KeyEvent> consumer);
+
+  public void onKeyReleased(Consumer<KeyEvent> consumer);
+
+  public void onKeyTyped(Consumer<KeyEvent> consumer);
+
   /**
    * Register for key events.
    *

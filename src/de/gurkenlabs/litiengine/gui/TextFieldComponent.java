@@ -14,10 +14,9 @@ import java.util.regex.Pattern;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.input.IKeyObserver;
 import de.gurkenlabs.litiengine.input.Input;
 
-public class TextFieldComponent extends ImageComponent implements IKeyObserver {
+public class TextFieldComponent extends ImageComponent {
   public static final String DOUBLE_FORMAT = "[-+]?[0-9]*\\.?[0-9]*([eE][-+]?[0-9]*)?";
   public static final String INTEGER_FORMAT = "[0-9]{1,10}";
   private static final Logger log = Logger.getLogger(TextFieldComponent.class.getName());
@@ -35,7 +34,7 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     this.changeConfirmedConsumers = new CopyOnWriteArrayList<>();
     this.setText(text);
     this.flickerDelay = 100;
-    Input.keyboard().registerForKeyEvents(this);
+    Input.keyboard().onKeyTyped(this::handleTypedKey);
     this.onClicked(e -> {
       if (!this.isSelected()) {
         this.toggleSelection();
@@ -64,15 +63,6 @@ public class TextFieldComponent extends ImageComponent implements IKeyObserver {
     return this.fullText;
   }
 
-  @Override
-  public void handlePressedKey(final KeyEvent keyCode) {
-  }
-
-  @Override
-  public void handleReleasedKey(final KeyEvent keyCode) {
-  }
-
-  @Override
   public void handleTypedKey(final KeyEvent event) {
     if (this.isSuspended() || !this.isSelected() || !this.isVisible()) {
       return;
