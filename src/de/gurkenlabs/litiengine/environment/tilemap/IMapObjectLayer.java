@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,4 +23,6 @@ public interface IMapObjectLayer extends ILayer {
   public Color getColor();
 
   public void setColor(String color);
+
+  public Collection<IMapObject> getMapObjects(String... type);
 }

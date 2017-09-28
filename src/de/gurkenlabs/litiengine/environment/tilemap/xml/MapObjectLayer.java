@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -100,6 +101,29 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     return null;
   }
 
+  @Override
+  public void setColor(String color) {
+    this.color = color;
+  }
+
+  @Override
+  public Collection<IMapObject> getMapObjects(String... types) {
+    List<IMapObject> objs = new ArrayList<>();
+    for (IMapObject mapObject : this.getMapObjects()) {
+      if (mapObject == null || mapObject.getType() == null || mapObject.getType().isEmpty()) {
+        continue;
+      }
+
+      for (String type : types) {
+        if (mapObject.getType().equals(type)) {
+          objs.add(mapObject);
+        }
+      }
+    }
+
+    return objs;
+  }
+
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.objects == null) {
@@ -114,10 +138,5 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-  }
-
-  @Override
-  public void setColor(String color) {
-    this.color = color;
   }
 }

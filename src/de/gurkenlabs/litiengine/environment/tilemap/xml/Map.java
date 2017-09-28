@@ -297,7 +297,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   @Override
   public Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty() || types.length == 0) {
       return mapObjects;
     }
 
@@ -306,21 +306,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
         continue;
       }
 
-      for (IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject != null && mapObject.getType() != null && !mapObject.getType().isEmpty()) {
-
-          if (types.length == 0) {
-            mapObjects.add(mapObject);
-            continue;
-          }
-
-          for (String type : types) {
-            if (mapObject.getType().equals(type)) {
-              mapObjects.add(mapObject);
-            }
-          }
-        }
-      }
+      mapObjects.addAll(layer.getMapObjects(types));
     }
 
     return mapObjects;
@@ -384,11 +370,12 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
       return null;
     }
 
-    if (!fileName.endsWith("." + FILE_EXTENSION)) {
-      fileName += "." + FILE_EXTENSION;
+    String fileNameWithExtension = fileName;
+    if (!fileNameWithExtension.endsWith("." + FILE_EXTENSION)) {
+      fileNameWithExtension += "." + FILE_EXTENSION;
     }
 
-    File newFile = new File(fileName);
+    File newFile = new File(fileNameWithExtension);
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
       JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
