@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -32,6 +33,20 @@ public class Appearance {
     this();
     this.foreColor = foreColor;
     this.backgroundColor1 = backColor;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Appearance) {
+      return this.hashCode() == obj.hashCode();
+    }
+
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground(), this.getFont());
   }
 
   public Color getForeColor() {
