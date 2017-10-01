@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.net.messages.MessageType;
 /**
  * The Class MessageHandlerProvider.
  */
-public class MessageHandlerProvider implements IMessageHandlerProvider {
+public abstract class MessageHandlerProvider implements IMessageHandlerProvider {
 
   /** The message handlers. */
   private final HashMap<MessageType, List<IMessageHandler>> messageHandlers;
@@ -65,6 +65,5 @@ public class MessageHandlerProvider implements IMessageHandlerProvider {
   /**
    * Initialize handlers.
    */
-  protected void initializeHandlers() {
-  }
+  protected abstract void initializeHandlers();
 }
