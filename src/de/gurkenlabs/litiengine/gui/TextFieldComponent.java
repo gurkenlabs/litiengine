@@ -71,22 +71,7 @@ public class TextFieldComponent extends ImageComponent {
 
     switch (event.getKeyCode()) {
     case KeyEvent.VK_BACK_SPACE:
-      if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
-        while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) == ' ') {
-          this.setText(this.getText().substring(0, this.getText().length() - 1));
-        }
-
-        while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) != ' ') {
-          this.setText(this.getText().substring(0, this.getText().length() - 1));
-        }
-      } else if (this.getText().length() >= 1) {
-        this.setText(this.getText().substring(0, this.getText().length() - 1));
-      }
-
-      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && (this.getText() == null || this.getText().isEmpty())) {
-        this.setText("0");
-      }
-
+      this.handleBackSpace();
       break;
     case KeyEvent.VK_SPACE:
       if (this.getText() != "") {
@@ -100,30 +85,7 @@ public class TextFieldComponent extends ImageComponent {
       log.log(Level.INFO, "\'{0}\' typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
       break;
     default:
-      if (this.getMaxLength() > 0 && this.getText().length() >= this.getMaxLength()) {
-        break;
-      }
-
-      final String text = Input.keyboard().getText(event);
-      if (text == null || text.isEmpty()) {
-        break;
-      }
-
-      // regex check to ensure certain formats
-      if (this.getFormat() != null && !this.getFormat().isEmpty()) {
-        final Pattern pat = Pattern.compile(this.getFormat());
-        final Matcher mat = pat.matcher(this.getText() + text);
-        if (!mat.matches()) {
-          break;
-        }
-      }
-
-      if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.getText().equals("0")) {
-        this.setText("");
-      }
-
-      this.setText(this.getText() + text);
-
+      this.handleNormalTyping(event);
       break;
     }
   }
@@ -162,4 +124,47 @@ public class TextFieldComponent extends ImageComponent {
     this.fullText = text;
   }
 
+  private void handleBackSpace() {
+    if (Input.keyboard().isPressed(KeyEvent.VK_SHIFT)) {
+      while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) == ' ') {
+        this.setText(this.getText().substring(0, this.getText().length() - 1));
+      }
+
+      while (this.getText().length() >= 1 && this.getText().charAt(this.getText().length() - 1) != ' ') {
+        this.setText(this.getText().substring(0, this.getText().length() - 1));
+      }
+    } else if (this.getText().length() >= 1) {
+      this.setText(this.getText().substring(0, this.getText().length() - 1));
+    }
+
+    if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && (this.getText() == null || this.getText().isEmpty())) {
+      this.setText("0");
+    }
+  }
+
+  private void handleNormalTyping(KeyEvent event) {
+    if (this.getMaxLength() > 0 && this.getText().length() >= this.getMaxLength()) {
+      return;
+    }
+
+    final String text = Input.keyboard().getText(event);
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+
+    // regex check to ensure certain formats
+    if (this.getFormat() != null && !this.getFormat().isEmpty()) {
+      final Pattern pat = Pattern.compile(this.getFormat());
+      final Matcher mat = pat.matcher(this.getText() + text);
+      if (!mat.matches()) {
+        return;
+      }
+    }
+
+    if (this.getFormat() != null && (this.getFormat() == INTEGER_FORMAT || this.getFormat() == DOUBLE_FORMAT) && this.getText().equals("0")) {
+      this.setText("");
+    }
+
+    this.setText(this.getText() + text);
+  }
 }
