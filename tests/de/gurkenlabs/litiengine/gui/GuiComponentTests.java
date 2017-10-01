@@ -14,6 +14,12 @@ public class GuiComponentTests {
     Assert.assertEquals(20.0, component.getY(), 0.0001);
     Assert.assertEquals(100.0, component.getWidth(), 0.0001);
     Assert.assertEquals(50.0, component.getHeight(), 0.0001);
+
+    Assert.assertTrue(component.isEnabled());
+
+    Assert.assertFalse(component.isVisible());
+    Assert.assertFalse(component.isHovered());
+    Assert.assertFalse(component.isSelected());
   }
 
   @Test

@@ -290,10 +290,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.y;
   }
 
-  public boolean isDragged() {
-    return this.isDragged();
-  }
-
   public boolean isEnabled() {
     return enabled;
   }
