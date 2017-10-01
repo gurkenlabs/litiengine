@@ -161,30 +161,7 @@ public final class Spritesheet {
           continue;
         }
 
-        try {
-          final String name = gameDirectory + GameDirectories.SPRITES + items.get(0);
-
-          final int width = Integer.parseInt(items.get(1));
-          final int height = Integer.parseInt(items.get(2));
-
-          final Spritesheet sprite = load(name, width, height);
-          sprites.add(sprite);
-          if (parts.length >= 2) {
-            final List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
-            if (!keyFrameStrings.isEmpty()) {
-              final int[] keyFrames = new int[keyFrameStrings.size()];
-              for (int i = 0; i < keyFrameStrings.size(); i++) {
-                final int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
-                keyFrames[i] = keyFrame;
-              }
-
-              customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
-            }
-          }
-        } catch (final NumberFormatException e) {
-          log.log(Level.SEVERE, e.getMessage(), e);
-          continue;
-        }
+        getSpriteSheetFromSpriteInfoLine(gameDirectory, sprites, items, parts);
       }
 
       log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { sprites.size(), spriteInfoFile });
@@ -301,6 +278,32 @@ public final class Spritesheet {
   public void setSpriteWidth(final int spriteWidth) {
     this.spriteWidth = spriteWidth;
     this.updateRowsAndCols();
+  }
+
+  private static void getSpriteSheetFromSpriteInfoLine(String gameDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
+    try {
+      final String name = gameDirectory + GameDirectories.SPRITES + items.get(0);
+
+      final int width = Integer.parseInt(items.get(1));
+      final int height = Integer.parseInt(items.get(2));
+
+      final Spritesheet sprite = load(name, width, height);
+      sprites.add(sprite);
+      if (parts.length >= 2) {
+        final List<String> keyFrameStrings = Arrays.asList(parts[1].split("\\s*,\\s*"));
+        if (!keyFrameStrings.isEmpty()) {
+          final int[] keyFrames = new int[keyFrameStrings.size()];
+          for (int i = 0; i < keyFrameStrings.size(); i++) {
+            final int keyFrame = Integer.parseInt(keyFrameStrings.get(i));
+            keyFrames[i] = keyFrame;
+          }
+
+          customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
+        }
+      }
+    } catch (final NumberFormatException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
   }
 
   private Point getLocation(final int index) {
