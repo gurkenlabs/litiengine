@@ -57,23 +57,7 @@ public class GameFile implements Serializable {
 
   public static GameFile load(final String file) {
     try {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
-      final Unmarshaller um = jaxbContext.createUnmarshaller();
-
-      GameFile gameFile = null;
-      try (InputStream inputStream = FileUtilities.getGameResource(file)) {
-        final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
-        gameFile = (GameFile) um.unmarshal(zipStream);
-      } catch (final ZipException e) {
-        InputStream stream = null;
-        stream = FileUtilities.getGameResource(file);
-        if (stream == null) {
-          return null;
-        }
-
-        gameFile = (GameFile) um.unmarshal(stream);
-      }
-
+      GameFile gameFile = getGameFileFromFile(file);
       if (gameFile == null) {
         return null;
       }
@@ -158,6 +142,27 @@ public class GameFile implements Serializable {
 
   public void setTileSets(final List<SpriteSheetInfo> tileSets) {
     this.tilesets = tileSets;
+  }
+
+  private static GameFile getGameFileFromFile(String file) throws JAXBException, IOException {
+    final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
+    final Unmarshaller um = jaxbContext.createUnmarshaller();
+    try (InputStream inputStream = FileUtilities.getGameResource(file)) {
+
+      // try to get compressed game file
+      final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
+      return (GameFile) um.unmarshal(zipStream);
+    } catch (final ZipException e) {
+
+      // if it fails to load the compressed file, get it from plain XML
+      InputStream stream = null;
+      stream = FileUtilities.getGameResource(file);
+      if (stream == null) {
+        return null;
+      }
+
+      return (GameFile) um.unmarshal(stream);
+    }
   }
 
   void beforeMarshal(Marshaller m) {
