@@ -38,6 +38,21 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     return Integer.compare(this.getModification().getApplyOrder(), otherModifier.getModification().getApplyOrder());
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof AttributeModifier<?>) {
+      AttributeModifier<?> attr = (AttributeModifier<?>) obj;
+      return this.getModification() == attr.getModification() && this.getModifyValue() == attr.getModifyValue();
+    }
+
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
   /**
    * Gets the modification.
    *
