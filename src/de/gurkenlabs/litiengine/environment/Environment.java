@@ -1249,30 +1249,11 @@ public class Environment implements IEnvironment {
    * @param entity
    */
   private void load(final IEntity entity) {
-    // 1. add to physics engins
-    if (entity instanceof Collider) {
-      final Collider coll = (Collider) entity;
-      if (coll.isObstacle()) {
-        Game.getPhysicsEngine().add(coll.getBoundingBox());
-      } else {
-        Game.getPhysicsEngine().add(coll);
-      }
-    } else if (entity instanceof ICollisionEntity) {
-      final ICollisionEntity coll = (ICollisionEntity) entity;
-      if (coll.hasCollision()) {
-        Game.getPhysicsEngine().add(coll);
-      }
-    }
+    // 1. add to physics engine
+    this.loadPhysicsEntity(entity);
 
     // 2. register for update or activate
-    if (entity instanceof Emitter) {
-      final Emitter emitter = (Emitter) entity;
-      if (emitter.isActivateOnInit()) {
-        emitter.activate(Game.getLoop());
-      }
-    } else if (entity instanceof IUpdateable) {
-      Game.getLoop().attach((IUpdateable) entity);
-    }
+    this.loadUpdatableOrEmitterEntity(entity);
 
     // 3. register animation controller for update
     final IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
@@ -1292,6 +1273,33 @@ public class Environment implements IEnvironment {
     final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
     if (controller != null) {
       Game.getLoop().attach(controller);
+    }
+  }
+
+  private void loadPhysicsEntity(IEntity entity) {
+    if (entity instanceof Collider) {
+      final Collider coll = (Collider) entity;
+      if (coll.isObstacle()) {
+        Game.getPhysicsEngine().add(coll.getBoundingBox());
+      } else {
+        Game.getPhysicsEngine().add(coll);
+      }
+    } else if (entity instanceof ICollisionEntity) {
+      final ICollisionEntity coll = (ICollisionEntity) entity;
+      if (coll.hasCollision()) {
+        Game.getPhysicsEngine().add(coll);
+      }
+    }
+  }
+
+  private void loadUpdatableOrEmitterEntity(IEntity entity) {
+    if (entity instanceof Emitter) {
+      final Emitter emitter = (Emitter) entity;
+      if (emitter.isActivateOnInit()) {
+        emitter.activate(Game.getLoop());
+      }
+    } else if (entity instanceof IUpdateable) {
+      Game.getLoop().attach((IUpdateable) entity);
     }
   }
 
