@@ -43,7 +43,7 @@ jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
-  version = 'v0.4.6-alpha'
+  version = 'v0.4.7-alpha'
 }
 
 javadoc {

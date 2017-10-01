@@ -42,7 +42,7 @@ jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
-  version = 'v0.4.6-alpha'
+  version = 'v0.4.7-alpha'
 }
 
 javadoc {
@@ -80,13 +80,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
-    version = 'v0.4.6-alpha'
+    version = 'v0.4.7-alpha'
 }
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
-    version = 'v0.4.6-alpha'
+    version = 'v0.4.7-alpha'
 }
 
 artifacts {
@@ -100,7 +100,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.6"
+version = "0.4.7"
 
 uploadArchives {
   repositories {
