@@ -329,7 +329,7 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Sets the x current.
    *
-   * @param xCurrent
+   * @param x
    *          the new x current
    */
   public Particle setX(final float x) {
@@ -340,7 +340,7 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Sets the y current.
    *
-   * @param yCurrent
+   * @param y
    *          the new y current
    */
   public Particle setY(final float y) {

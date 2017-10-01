@@ -526,15 +526,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.textChangedConsumer.add(cons);
   }
 
-  /**
-   * Sets the location.
-   *
-   * @param newX
-   *          the new x
-   * @param newY
-   *          the new y
-   */
-
   public void prepare() {
     this.onHovered(e -> {
       if (this.getHoverSound() != null) {
