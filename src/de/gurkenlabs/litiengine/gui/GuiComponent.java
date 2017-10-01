@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * The Class GuiComponent.
  */
 public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
-  protected static final Font ICON_FONT = FontLoader.load("fontello.ttf").deriveFont(16f);
+  protected static final Font ICON_FONT;
 
   private static int componentId = 0;
 
@@ -83,6 +83,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private double y;
 
   private double xMargin;
+  static {
+    Font icon = FontLoader.load("fontello.ttf");
+    ICON_FONT = icon != null ? icon.deriveFont(16f) : null;
+  }
 
   protected GuiComponent(final double x, final double y) {
     this.components = new CopyOnWriteArrayList<>();
