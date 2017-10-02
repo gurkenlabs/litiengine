@@ -82,7 +82,8 @@ public class EnvironmentTests {
     Assert.assertNull(env.get(null));
 
     Assert.assertEquals(2, env.getEntities(RenderType.NORMAL).size());
-    Assert.assertEquals(3, env.getEntities(RenderType.OVERLAY).size());
+    Assert.assertEquals(2, env.getEntities(RenderType.OVERLAY).size());
+    Assert.assertEquals(1, env.getEntities(RenderType.GROUND).size());
     Assert.assertEquals(5, env.getEntities().size());
     Assert.assertEquals(1, env.getEntitiesByType(Trigger.class).size());
   }
