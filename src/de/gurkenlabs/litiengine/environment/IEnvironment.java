@@ -61,6 +61,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Collider> getColliders();
 
+  public Collider getCollider(final int mapId);
+
   public Collection<StaticShadow> getStaticShadows();
 
   public Collection<ICombatEntity> getCombatEntities();

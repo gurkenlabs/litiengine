@@ -408,7 +408,17 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<Collider> getColliders() {
     return this.colliders;
+  }
 
+  @Override
+  public Collider getCollider(int mapId) {
+    for (final Collider collider : this.getColliders()) {
+      if (collider.getMapId() == mapId) {
+        return collider;
+      }
+    }
+
+    return null;
   }
 
   @Override
@@ -943,7 +953,7 @@ public class Environment implements IEnvironment {
       lightType = LightSource.ELLIPSE;
     }
     boolean lightOn = mapObjectLightOn == null || mapObjectLightOn.isEmpty() ? true : Boolean.parseBoolean(mapObjectLightOn);
-    final LightSource light = new LightSource(this, brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType, lightOn);
+    final LightSource light = new LightSource(brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType, lightOn);
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());

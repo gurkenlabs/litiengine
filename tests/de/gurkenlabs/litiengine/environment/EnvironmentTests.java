@@ -1,12 +1,21 @@
 package de.gurkenlabs.litiengine.environment;
 
-import org.junit.Assert;
-import org.junit.Test;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.gurkenlabs.litiengine.entities.Collider;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.LightSource;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class EnvironmentTests {
 
@@ -18,5 +27,46 @@ public class EnvironmentTests {
     Environment env = new Environment(map);
 
     Assert.assertNotNull(env);
+  }
+
+  @Test
+  public void testAddAndGetEntities() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+
+    Environment env = new Environment(map);
+
+    Trigger testTrigger = new Trigger("test", "testmessage");
+
+    LightSource testLight = new LightSource(100, 100, Color.WHITE, LightSource.ELLIPSE, true);
+    testLight.setMapId(999);
+
+    Collider testCollider = new Collider(true);
+    testCollider.setMapId(1);
+
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(123);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    IMovableEntity movableEntity = mock(IMovableEntity.class);
+    when(movableEntity.getMapId()).thenReturn(456);
+    when(movableEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    env.add(testTrigger);
+    env.add(testLight);
+    env.add(testCollider);
+    env.add(combatEntity);
+    env.add(movableEntity);
+
+    Assert.assertNotNull(env.getTrigger("test"));
+    Assert.assertNotNull(env.getLightSource(999));
+    Assert.assertNotNull(env.getCollider(1));
+
+    Assert.assertNotNull(env.get(123));
+    Assert.assertNotNull(env.getCombatEntity(123));
+    Assert.assertNotNull(env.get(456));
+    Assert.assertNotNull(env.getMovableEntity(456));
+
+    Assert.assertEquals(2, env.getEntities(RenderType.NORMAL).size());
   }
 }

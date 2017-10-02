@@ -18,7 +18,6 @@ import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 /**
@@ -55,7 +54,6 @@ public class LightSource extends Entity implements IRenderable {
 
   /** The color. */
   private Color color;
-  private final IEnvironment environment;
   private int intensity;
 
   private Shape lightShape;
@@ -73,11 +71,10 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final IEnvironment environment, final int brightness, final int intensity, final Color lightColor, final String shapeType, boolean activated) {
+  public LightSource(final int brightness, final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();
     this.color = lightColor;
     this.intensity = intensity;
-    this.environment = environment;
 
     this.setBrightness(brightness);
     this.lightShapeType = shapeType;
@@ -336,7 +333,7 @@ public class LightSource extends Entity implements IRenderable {
    *          the center
    */
   private void renderShadows(final Graphics2D g) {
-    if (!this.environment.getCombatEntities().stream().anyMatch(isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE))) {
+    if (!Game.getEnvironment().getCombatEntities().stream().anyMatch(isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE))) {
       return;
     }
 
@@ -348,7 +345,7 @@ public class LightSource extends Entity implements IRenderable {
     g.setPaint(gradientPaint);
 
     // for each entity
-    for (final ICombatEntity mob : this.environment.getCombatEntities()) {
+    for (final ICombatEntity mob : Game.getEnvironment().getCombatEntities()) {
       if (mob.isDead() || !isInRange(this.getDimensionCenter(), SHADOW_GRADIENT_SIZE).test(mob)) {
         continue;
       }
