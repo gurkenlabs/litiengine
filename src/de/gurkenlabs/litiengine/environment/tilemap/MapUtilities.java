@@ -94,16 +94,9 @@ public final class MapUtilities {
 
   public static ITerrain[] getTerrain(final IMap map, final int gId) {
     for (final ITileset tileset : map.getTilesets()) {
-      final int lastGridId = tileset.getFirstGridId() - 1 + tileset.getTilecount();
-      if (tileset.getFirstGridId() - 1 > gId) {
-        continue;
+      if (tileset.containsTile(gId)) {
+        return tileset.getTerrain(gId);
       }
-
-      if (lastGridId < gId) {
-        continue;
-      }
-
-      return tileset.getTerrain(gId);
     }
 
     return new ITerrain[4];
@@ -136,25 +129,18 @@ public final class MapUtilities {
     }
 
     for (final ITileset tileset : map.getTilesets()) {
-      final int lastGridId = tileset.getFirstGridId() - 1 + tileset.getTilecount();
-      if (tileset.getFirstGridId() - 1 > gId) {
-        continue;
+      if (tileset.containsTile(gId)) {
+        ITileAnimation anim = tileset.getAnimation(gId);
+        boolean animation = false;
+        if (anim != null) {
+          animations.put(cacheKey, anim);
+          animation = true;
+        }
+
+        hasAnimation.put(cacheKey, animation);
+
+        return anim;
       }
-
-      if (lastGridId < gId) {
-        continue;
-      }
-
-      ITileAnimation anim = tileset.getAnimation(gId);
-      boolean animation = false;
-      if (anim != null) {
-        animations.put(cacheKey, anim);
-        animation = true;
-      }
-
-      hasAnimation.put(cacheKey, animation);
-
-      return anim;
     }
 
     return null;
@@ -183,17 +169,10 @@ public final class MapUtilities {
     ITileset match = null;
 
     for (final ITileset tileset : map.getTilesets()) {
-      final int lastGridId = tileset.getFirstGridId() - 1 + tileset.getTilecount();
-      if (tileset.getFirstGridId() > tile.getGridId()) {
-        continue;
+      if (tileset.containsTile(tile)) {
+        match = tileset;
+        break;
       }
-
-      if (lastGridId < tile.getGridId()) {
-        continue;
-      }
-
-      match = tileset;
-      break;
     }
 
     if (match != null) {

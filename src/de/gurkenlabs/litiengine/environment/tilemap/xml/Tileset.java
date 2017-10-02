@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
@@ -221,6 +222,21 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   public int getTilecount() {
     return this.tilecount;
+  }
+
+  @Override
+  public boolean containsTile(ITile tile) {
+    return this.containsTile(tile.getGridId());
+  }
+
+  @Override
+  public boolean containsTile(int tileId) {
+    final int lastGridId = this.getFirstGridId() - 1 + this.getTilecount();
+    if (this.getFirstGridId() - 1 > tileId) {
+      return false;
+    }
+
+    return lastGridId >= tileId;
   }
 
   @SuppressWarnings("unused")
