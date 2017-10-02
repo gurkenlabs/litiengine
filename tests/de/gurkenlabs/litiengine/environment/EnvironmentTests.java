@@ -53,6 +53,9 @@ public class EnvironmentTests {
     when(movableEntity.getMapId()).thenReturn(456);
     when(movableEntity.getRenderType()).thenReturn(RenderType.NORMAL);
 
+    IMovableEntity notAddedToEnvironment = mock(IMovableEntity.class);
+    when(notAddedToEnvironment.getMapId()).thenReturn(222);
+
     env.add(testTrigger);
     env.add(testLight);
     env.add(testCollider);
@@ -70,7 +73,12 @@ public class EnvironmentTests {
     Assert.assertNotNull(env.get(456));
     Assert.assertNotNull(env.getMovableEntity(456));
 
+    Assert.assertNull(env.get(123456789));
+    Assert.assertNull(env.get(""));
+    Assert.assertNull(env.get(null));
+
     Assert.assertEquals(2, env.getEntities(RenderType.NORMAL).size());
+    Assert.assertEquals(3, env.getEntities(RenderType.OVERLAY).size());
     Assert.assertEquals(5, env.getEntities().size());
     Assert.assertEquals(1, env.getEntitiesByType(Trigger.class).size());
   }
@@ -86,13 +94,20 @@ public class EnvironmentTests {
     when(entityWithTags.getMapId()).thenReturn(456);
     when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
 
+    IMovableEntity anotherEntityWithTags = mock(IMovableEntity.class);
+    when(anotherEntityWithTags.getMapId()).thenReturn(123);
+    when(anotherEntityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
+
     ArrayList<String> tags = new ArrayList<>();
     tags.add("tag1");
     tags.add("tag2");
     when(entityWithTags.getTags()).thenReturn(tags);
-    env.add(entityWithTags);
+    when(anotherEntityWithTags.getTags()).thenReturn(tags);
 
-    Assert.assertEquals(1, env.getByTag("tag1").size());
-    Assert.assertEquals(1, env.getByTag("tag2").size());
+    env.add(entityWithTags);
+    env.add(anotherEntityWithTags);
+
+    Assert.assertEquals(2, env.getByTag("tag1").size());
+    Assert.assertEquals(2, env.getByTag("tag2").size());
   }
 }
