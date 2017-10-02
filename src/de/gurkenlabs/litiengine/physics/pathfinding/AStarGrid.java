@@ -61,6 +61,7 @@ public class AStarGrid {
     final List<AStarNode> neighbors = new ArrayList<>();
     final int x = node.getGridX();
     final int y = node.getGridY();
+
     final AStarNode top = this.getNode(x, y - 1);
     final AStarNode bottom = this.getNode(x, y + 1);
     final AStarNode left = this.getNode(x - 1, y);
@@ -72,38 +73,15 @@ public class AStarGrid {
     final AStarNode bottomLeft = this.getNode(x - 1, y + 1);
     final AStarNode bottomRight = this.getNode(x + 1, y + 1);
 
-    if (top != null && top.isWalkable()) {
-      neighbors.add(top);
-    }
+    addNode(neighbors, top);
+    addNode(neighbors, bottom);
+    addNode(neighbors, right);
+    addNode(neighbors, left);
 
-    if (bottom != null && bottom.isWalkable()) {
-      neighbors.add(bottom);
-    }
-
-    if (right != null && right.isWalkable()) {
-      neighbors.add(right);
-    }
-
-    if (left != null && left.isWalkable()) {
-      neighbors.add(left);
-    }
-
-    // only add diagonal neighbors when they are not on a corner
-    if (topLeft != null && this.diagonalMovementOnCorners() || topLeft != null && top != null && top.isWalkable() && left.isWalkable()) {
-      neighbors.add(topLeft);
-    }
-
-    if (topRight != null && this.diagonalMovementOnCorners() || topRight != null && top != null && top.isWalkable() && right.isWalkable()) {
-      neighbors.add(topRight);
-    }
-
-    if (bottomLeft != null && this.diagonalMovementOnCorners() || bottomLeft != null && bottom != null && bottom.isWalkable() && left.isWalkable()) {
-      neighbors.add(bottomLeft);
-    }
-
-    if (bottomRight != null && this.diagonalMovementOnCorners() || bottomRight != null && bottom != null && bottom.isWalkable() && right.isWalkable()) {
-      neighbors.add(bottomRight);
-    }
+    this.addDiagonalNode(neighbors, topLeft, top, left);
+    this.addDiagonalNode(neighbors, topRight, top, right);
+    this.addDiagonalNode(neighbors, bottomLeft, bottom, left);
+    this.addDiagonalNode(neighbors, bottomRight, bottom, right);
 
     return neighbors;
   }
@@ -140,6 +118,19 @@ public class AStarGrid {
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
       node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
+    }
+  }
+
+  private static void addNode(final List<AStarNode> neighbors, AStarNode node) {
+    if (node != null && node.isWalkable()) {
+      neighbors.add(node);
+    }
+  }
+
+  private void addDiagonalNode(final List<AStarNode> neighbors, AStarNode node, AStarNode diagonalNeighbor1, AStarNode diagonalNeighbor2) {
+    // only add diagonal neighbors when they are not on a corner
+    if (node != null && this.diagonalMovementOnCorners() || node != null && diagonalNeighbor1 != null && diagonalNeighbor1.isWalkable() && diagonalNeighbor2 != null && diagonalNeighbor2.isWalkable()) {
+      neighbors.add(node);
     }
   }
 
