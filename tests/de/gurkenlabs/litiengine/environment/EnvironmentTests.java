@@ -70,10 +70,14 @@ public class EnvironmentTests {
 
     Assert.assertNotNull(env.get(123));
     Assert.assertNotNull(env.getCombatEntity(123));
+    Assert.assertEquals(1, env.getCombatEntities().size());
     Assert.assertNotNull(env.get(456));
     Assert.assertNotNull(env.getMovableEntity(456));
+    Assert.assertEquals(1, env.getMovableEntities().size());
 
     Assert.assertNull(env.get(123456789));
+    Assert.assertNull(env.getCombatEntity(123456789));
+    Assert.assertNull(env.getMovableEntity(123456789));
     Assert.assertNull(env.get(""));
     Assert.assertNull(env.get(null));
 
@@ -109,5 +113,6 @@ public class EnvironmentTests {
 
     Assert.assertEquals(2, env.getByTag("tag1").size());
     Assert.assertEquals(2, env.getByTag("tag2").size());
+    Assert.assertEquals(0, env.getByTag("invalidTag").size());
   }
 }
