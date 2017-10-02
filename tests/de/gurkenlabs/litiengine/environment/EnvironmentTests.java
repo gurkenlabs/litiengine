@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,6 +60,8 @@ public class EnvironmentTests {
     env.add(movableEntity);
 
     Assert.assertNotNull(env.getTrigger("test"));
+    Assert.assertNotNull(env.get("test"));
+
     Assert.assertNotNull(env.getLightSource(999));
     Assert.assertNotNull(env.getCollider(1));
 
@@ -68,5 +71,28 @@ public class EnvironmentTests {
     Assert.assertNotNull(env.getMovableEntity(456));
 
     Assert.assertEquals(2, env.getEntities(RenderType.NORMAL).size());
+    Assert.assertEquals(5, env.getEntities().size());
+    Assert.assertEquals(1, env.getEntitiesByType(Trigger.class).size());
+  }
+
+  @Test
+  public void testAddandGetEntitiesByTag() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+
+    Environment env = new Environment(map);
+
+    IMovableEntity entityWithTags = mock(IMovableEntity.class);
+    when(entityWithTags.getMapId()).thenReturn(456);
+    when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    ArrayList<String> tags = new ArrayList<>();
+    tags.add("tag1");
+    tags.add("tag2");
+    when(entityWithTags.getTags()).thenReturn(tags);
+    env.add(entityWithTags);
+
+    Assert.assertEquals(1, env.getByTag("tag1").size());
+    Assert.assertEquals(1, env.getByTag("tag2").size());
   }
 }
