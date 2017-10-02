@@ -80,11 +80,6 @@ import de.gurkenlabs.util.io.FileUtilities;
  */
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
-
-  private int localIdSequence = 0;
-  private int mapIdSequence;
-
-  private AmbientLight ambientLight;
   private final Collection<Collider> colliders;
   private final Map<Integer, ICombatEntity> combatEntities;
 
@@ -93,15 +88,12 @@ public class Environment implements IEnvironment {
 
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
   private final List<IRenderable> groundRenderable;
-  private boolean initialized;
   private final List<Consumer<IEnvironment>> initializedConsumer;
   private final List<Consumer<IEnvironment>> loadedConsumer;
 
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
-  private boolean loaded;
-
-  private IMap map;
+  private final Collection<Trigger> triggers;
 
   private final List<MapArea> mapAreas;
 
@@ -112,8 +104,14 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Spawnpoint> spawnPoints;
 
+  private AmbientLight ambientLight;
+  private boolean loaded;
+  private boolean initialized;
+  private IMap map;
   private Image staticShadowImage;
-  private final Collection<Trigger> triggers;
+
+  private int localIdSequence = 0;
+  private int mapIdSequence;
 
   public Environment(final IMap map) {
     this();
