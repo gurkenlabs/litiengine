@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 
@@ -22,6 +23,7 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 
@@ -195,5 +197,39 @@ public class MapObjectLoaderTests {
 
     Emitter emitter = (Emitter) entity;
     Assert.assertTrue(emitter instanceof FireEmitter);
+  }
+
+  @Test
+  public void testLightSourceMapObjectLoader() {
+    LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("testLight");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+
+    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS)).thenReturn("100");
+    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY)).thenReturn("100");
+    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR)).thenReturn("#ffffff");
+    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);
+
+    IEntity entity = loader.load(mapObject);
+
+    Assert.assertNotNull(entity);
+    Assert.assertEquals(entity.getMapId(), 111);
+    Assert.assertEquals(entity.getName(), "testLight");
+    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+
+    LightSource light = (LightSource) entity;
+    Assert.assertTrue(light.isActive());
+    Assert.assertEquals(Color.WHITE.getRed(), light.getColor().getRed());
+    Assert.assertEquals(Color.WHITE.getBlue(), light.getColor().getBlue());
+    Assert.assertEquals(Color.WHITE.getGreen(), light.getColor().getGreen());
+    Assert.assertEquals(100, light.getBrightness());
+    Assert.assertEquals(100, light.getIntensity());
+    Assert.assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
   }
 }

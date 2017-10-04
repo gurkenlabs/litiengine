@@ -821,58 +821,6 @@ public class Environment implements IEnvironment {
     this.loaded = false;
   }
 
-  protected void addStaticShadow(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.STATICSHADOW) {
-      return;
-    }
-    double x = mapObject.getX();
-    double y = mapObject.getY();
-    double width = mapObject.getDimension().getWidth();
-    double height = mapObject.getDimension().getHeight();
-    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
-    this.getStaticShadows().add(shadow);
-  }
-
-  protected void addLightSource(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
-      return;
-    }
-    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
-    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE);
-    if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty()) {
-      return;
-    }
-
-    final int brightness = Integer.parseInt(mapObjectBrightness);
-    final Color color = Color.decode(mapObjectColor);
-
-    int intensity = brightness;
-    if (mapObjectIntensity != null && !mapObjectIntensity.isEmpty()) {
-      intensity = Integer.parseInt(mapObjectIntensity);
-    }
-
-    String lightType;
-    switch (mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)) {
-    case LightSource.ELLIPSE:
-      lightType = LightSource.ELLIPSE;
-      break;
-    case LightSource.RECTANGLE:
-      lightType = LightSource.RECTANGLE;
-      break;
-    default:
-      lightType = LightSource.ELLIPSE;
-    }
-    boolean lightOn = mapObjectLightOn == null || mapObjectLightOn.isEmpty() ? true : Boolean.parseBoolean(mapObjectLightOn);
-    final LightSource light = new LightSource(brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType, lightOn);
-    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    light.setLocation(mapObject.getLocation());
-    light.setMapId(mapObject.getId());
-    light.setName(mapObject.getName());
-    this.add(light);
-  }
-
   protected void addMapObject(final IMapObject mapObject) {
     if (mapObjectLoaders.containsKey(mapObject.getType())) {
       IEntity entity = mapObjectLoaders.get(mapObject.getType()).load(mapObject);
@@ -883,9 +831,20 @@ public class Environment implements IEnvironment {
     }
 
     this.addStaticShadow(mapObject);
-    this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
+  }
+
+  protected void addStaticShadow(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.STATICSHADOW) {
+      return;
+    }
+    double x = mapObject.getX();
+    double y = mapObject.getY();
+    double width = mapObject.getDimension().getWidth();
+    double height = mapObject.getDimension().getHeight();
+    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
+    this.getStaticShadows().add(shadow);
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
@@ -901,6 +860,15 @@ public class Environment implements IEnvironment {
     spawn.setSpawnType(spawnType);
 
     this.getSpawnPoints().add(spawn);
+  }
+
+  protected void addMapArea(final IMapObject mapObject) {
+    if (MapObjectType.get(mapObject.getType()) != MapObjectType.AREA) {
+      return;
+    }
+
+    final MapArea area = new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight());
+    this.getAreas().add(area);
   }
 
   private void addAmbientLight() {
@@ -921,15 +889,6 @@ public class Environment implements IEnvironment {
     }
 
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
-  }
-
-  private void addMapArea(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.AREA) {
-      return;
-    }
-
-    final MapArea area = new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight());
-    this.getAreas().add(area);
   }
 
   private void addStaticShadows() {
@@ -1151,6 +1110,7 @@ public class Environment implements IEnvironment {
     this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
   }
 
   /**
