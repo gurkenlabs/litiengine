@@ -24,13 +24,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.configuration.Quality;
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.Collider;
-import de.gurkenlabs.litiengine.entities.DecorMob;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -840,43 +836,6 @@ public class Environment implements IEnvironment {
     this.getStaticShadows().add(shadow);
   }
 
-  protected void addDecorMob(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
-      return;
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) == null) {
-      return;
-    }
-
-    // TODO: this is a very weird default value
-    short velocity = (short) (100 / Game.getInfo().getDefaultRenderScale());
-    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
-      velocity = Short.parseShort(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY));
-    }
-
-    final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)), velocity);
-
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      mob.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
-    }
-
-    mob.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
-      mob.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
-      mob.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
-    }
-
-    mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
-    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    mob.setMapId(mapObject.getId());
-    mob.setName(mapObject.getName());
-
-    this.add(mob);
-  }
-
   protected void addEmitter(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
       return;
@@ -968,7 +927,6 @@ public class Environment implements IEnvironment {
     this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
     this.addEmitter(mapObject);
-    this.addDecorMob(mapObject);
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
@@ -1232,6 +1190,7 @@ public class Environment implements IEnvironment {
     this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new ColliderMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
   }
 
   /**

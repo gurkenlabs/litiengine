@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.physics.MovementController;
 
 @CombatAttributesInfo(health = 1)
 public class DecorMob extends MovableCombatEntity {
-  public enum MovementBehaviour {
+  public enum MovementBehavior {
     IDLE,
 
     // rabbit
@@ -20,15 +20,15 @@ public class DecorMob extends MovableCombatEntity {
     // butterfly
     SHY;
 
-    public static MovementBehaviour get(final String behaviour) {
+    public static MovementBehavior get(final String behaviour) {
       if (behaviour == null || behaviour.isEmpty()) {
-        return MovementBehaviour.IDLE;
+        return MovementBehavior.IDLE;
       }
 
       try {
-        return MovementBehaviour.valueOf(behaviour);
+        return MovementBehavior.valueOf(behaviour);
       } catch (final IllegalArgumentException iae) {
-        return MovementBehaviour.IDLE;
+        return MovementBehavior.IDLE;
       }
     }
   }
@@ -67,18 +67,19 @@ public class DecorMob extends MovableCombatEntity {
     }
   }
 
-  private final MovementBehaviour behaviour;
+  private final MovementBehavior movementBehaviour;
 
   private final String mobType;
 
-  public DecorMob(final Point2D location, final String mobType, final MovementBehaviour behaviour, final short velocity) {
+  public DecorMob(final Point2D location, final String mobType, final MovementBehavior behaviour, final short velocity) {
     super();
     this.mobType = mobType;
     this.setLocation(location);
 
     Game.getEntityControllerManager().addController(this, new DecorMobAnimationController(this));
-    this.behaviour = behaviour;
-    switch (this.behaviour) {
+    this.movementBehaviour = behaviour;
+
+    switch (this.movementBehaviour) {
     case SHY:
       Game.getEntityControllerManager().addController(this, new ShyDecorMobMovementController(this));
       break;
@@ -93,5 +94,9 @@ public class DecorMob extends MovableCombatEntity {
 
   public String getMobType() {
     return this.mobType;
+  }
+
+  public MovementBehavior getMovementBehavior() {
+    return this.movementBehaviour;
   }
 }
