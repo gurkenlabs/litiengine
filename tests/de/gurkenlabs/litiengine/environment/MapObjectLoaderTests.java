@@ -15,6 +15,8 @@ import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -46,17 +48,15 @@ public class MapObjectLoaderTests {
     IEntity ent = loader.load(mapObject);
 
     Assert.assertNotNull(ent);
+    Assert.assertEquals(ent.getMapId(), 111);
+    Assert.assertEquals(ent.getName(), "testProp");
+    Assert.assertEquals(ent.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(ent.getLocation().getY(), 100, 0.0001);
 
     Prop prop = (Prop) ent;
-
-    Assert.assertEquals(prop.getMapId(), 111);
-    Assert.assertEquals(prop.getName(), "testProp");
-    Assert.assertEquals(prop.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(prop.getLocation().getY(), 100, 0.0001);
-
     Assert.assertEquals(prop.getMaterial(), Material.PLASTIC);
-    Assert.assertEquals(prop.isIndestructible(), true);
-    Assert.assertEquals(prop.hasCollision(), true);
+    Assert.assertTrue(prop.isIndestructible());
+    Assert.assertTrue(prop.hasCollision());
     Assert.assertEquals(prop.getAttributes().getHealth().getMaxValue().intValue(), 100);
     Assert.assertEquals(prop.getAttributes().getHealth().getCurrentValue().intValue(), 100);
 
@@ -80,15 +80,48 @@ public class MapObjectLoaderTests {
     IEntity entity = loader.load(mapObject);
 
     Assert.assertNotNull(entity);
+    Assert.assertEquals(entity.getMapId(), 111);
+    Assert.assertEquals(entity.getName(), "testCollider");
+    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     Collider collider = (Collider) entity;
 
-    Assert.assertEquals(collider.getMapId(), 111);
-    Assert.assertEquals(collider.getName(), "testCollider");
-    Assert.assertEquals(collider.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(collider.getLocation().getY(), 100, 0.0001);
-
     Assert.assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
     Assert.assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);
+  }
+
+  @Test
+  public void testTriggerMapObjectLoader() {
+    TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("testTrigger");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+
+    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE)).thenReturn("message");
+    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS)).thenReturn("1,2,3");
+    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS)).thenReturn("4,5,6");
+    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME)).thenReturn("false");
+
+    IEntity entity = loader.load(mapObject);
+
+    Assert.assertNotNull(entity);
+    Assert.assertEquals(entity.getMapId(), 111);
+    Assert.assertEquals(entity.getName(), "testTrigger");
+    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+
+    Trigger trigger = (Trigger) entity;
+
+    Assert.assertFalse(trigger.isOneTimeTrigger());
+    Assert.assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
+    Assert.assertArrayEquals(new Integer[] { 1, 2, 3 }, trigger.getTargets().toArray());
+    Assert.assertArrayEquals(new Integer[] { 4, 5, 6 }, trigger.getActivators().toArray());
+    Assert.assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
+    Assert.assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
   }
 }

@@ -140,6 +140,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return entity.canCollideWith(this) && GeometricUtilities.intersects(this.getCollisionBox(), entity.getCollisionBox());
   }
 
+  public boolean isOneTimeTrigger() {
+    return this.isOneTimeTrigger;
+  }
+
   /**
    * Allows to register functions that contain additional checks for the trigger
    * activation. The return value of the function is considered the reason why

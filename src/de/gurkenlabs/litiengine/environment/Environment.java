@@ -8,12 +8,10 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +37,6 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
-import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
@@ -54,7 +51,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -66,7 +62,6 @@ import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
-import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
@@ -974,7 +969,6 @@ public class Environment implements IEnvironment {
     this.addMapArea(mapObject);
     this.addEmitter(mapObject);
     this.addDecorMob(mapObject);
-    this.addTrigger(mapObject);
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
@@ -990,48 +984,6 @@ public class Environment implements IEnvironment {
     spawn.setSpawnType(spawnType);
 
     this.getSpawnPoints().add(spawn);
-  }
-
-  protected void addTrigger(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
-      return;
-    }
-
-    final String message = mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE);
-
-    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
-    final String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
-    final String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
-    final String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
-    final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
-
-    final Map<String, String> triggerArguments = new HashMap<>();
-    for (final Property prop : mapObject.getAllCustomProperties()) {
-      if (MapObjectProperties.isCustom(prop.getName())) {
-        triggerArguments.put(prop.getName(), prop.getValue());
-      }
-    }
-
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
-
-    for (final int target : ArrayUtilities.getIntegerArray(targets)) {
-      if (target != 0) {
-        trigger.addTarget(target);
-      }
-    }
-
-    for (final int activator : ArrayUtilities.getIntegerArray(activators)) {
-      if (activator != 0) {
-        trigger.addActivator(activator);
-      }
-    }
-
-    trigger.setMapId(mapObject.getId());
-    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    trigger.setCollisionBoxHeight(trigger.getHeight());
-    trigger.setCollisionBoxWidth(trigger.getWidth());
-    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
-    this.add(trigger);
   }
 
   private void addAmbientLight() {
@@ -1279,6 +1231,7 @@ public class Environment implements IEnvironment {
   private void registerDefaultMapObjectLoaders() {
     this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new ColliderMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
   }
 
   /**

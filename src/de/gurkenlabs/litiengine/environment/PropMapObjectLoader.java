@@ -20,7 +20,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
   @Override
   public IEntity load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
-      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject + " with a loader of the type " + PropMapObjectLoader.class);
+      throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + PropMapObjectLoader.class);
     }
 
     // set map properties by map object
