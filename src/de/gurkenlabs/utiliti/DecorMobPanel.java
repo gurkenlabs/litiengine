@@ -23,7 +23,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
+import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -31,7 +31,7 @@ import de.gurkenlabs.util.ImageProcessing;
 
 public class DecorMobPanel extends PropertyPanel<IMapObject> {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
-  private final JComboBox<MovementBehaviour> comboBoxBehaviour;
+  private final JComboBox<MovementBehavior> comboBoxBehaviour;
   private JLabel lblVvelocity;
   JSpinner spinnerVelocity;
   JCheckBox chckbxAttackable;
@@ -52,7 +52,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     JLabel lblBehaviour = new JLabel(Resources.get("panel_behavior"));
 
     comboBoxBehaviour = new JComboBox<>();
-    comboBoxBehaviour.setModel(new DefaultComboBoxModel<MovementBehaviour>(MovementBehaviour.values()));
+    comboBoxBehaviour.setModel(new DefaultComboBoxModel<MovementBehavior>(MovementBehavior.values()));
 
     lblVvelocity = new JLabel(Resources.get("panel_velocity"));
 
@@ -121,7 +121,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
   @Override
   protected void clearControls() {
     this.comboBoxSpriteSheets.setSelectedItem(null);
-    this.comboBoxBehaviour.setSelectedItem(MovementBehaviour.IDLE);
+    this.comboBoxBehaviour.setSelectedItem(MovementBehavior.IDLE);
     this.spinnerVelocity.setValue(2);
     this.chckbxAttackable.setSelected(false);
   }
@@ -138,7 +138,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
       }
     }
     if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR) != null) {
-      MovementBehaviour beh = MovementBehaviour.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR));
+      MovementBehavior beh = MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR));
       this.comboBoxBehaviour.setSelectedItem(beh);
     }
 

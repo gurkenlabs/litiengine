@@ -41,7 +41,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehaviour;
+import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -1123,7 +1123,7 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT, (this.newObject.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperties.COLLISION, "false");
       mo.setCustomProperty(MapObjectProperties.DECORMOB_VELOCITY, "2");
-      mo.setCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR, MovementBehaviour.IDLE.toString());
+      mo.setCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR, MovementBehavior.IDLE.toString());
       break;
     case LIGHTSOURCE:
       mo.setCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS, "180");
