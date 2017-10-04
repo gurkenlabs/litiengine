@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -27,7 +28,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getType()).thenReturn(MapObjectType.PROP.name());
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testProp");
-    when(mapObject.getLocation()).thenReturn(new Point(0, 0));
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     when(mapObject.getCustomProperty(MapObjectProperties.MATERIAL)).thenReturn(Material.PLASTIC.name());
@@ -48,6 +49,11 @@ public class MapObjectLoaderTests {
 
     Prop prop = (Prop) ent;
 
+    Assert.assertEquals(prop.getMapId(), 111);
+    Assert.assertEquals(prop.getName(), "testProp");
+    Assert.assertEquals(prop.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(prop.getLocation().getY(), 100, 0.0001);
+
     Assert.assertEquals(prop.getMaterial(), Material.PLASTIC);
     Assert.assertEquals(prop.isIndestructible(), true);
     Assert.assertEquals(prop.hasCollision(), true);
@@ -59,5 +65,30 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(prop.getCollisionBoxAlign(), Align.LEFT);
     Assert.assertEquals(prop.getCollisionBoxValign(), Valign.MIDDLE);
     Assert.assertEquals(prop.getTeam(), 1);
+  }
+
+  @Test
+  public void testColliderMapObjectLoader() {
+    ColliderMapObjectLoader loader = new ColliderMapObjectLoader();
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("testCollider");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+
+    IEntity entity = loader.load(mapObject);
+
+    Assert.assertNotNull(entity);
+
+    Collider collider = (Collider) entity;
+
+    Assert.assertEquals(collider.getMapId(), 111);
+    Assert.assertEquals(collider.getName(), "testCollider");
+    Assert.assertEquals(collider.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(collider.getLocation().getY(), 100, 0.0001);
+
+    Assert.assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
+    Assert.assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);
   }
 }

@@ -845,27 +845,6 @@ public class Environment implements IEnvironment {
     this.getStaticShadows().add(shadow);
   }
 
-  protected void addCollisionBox(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
-      return;
-    }
-
-    final String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
-    boolean isObstacle = true;
-    if (obstacle != null && !obstacle.isEmpty()) {
-      isObstacle = Boolean.valueOf(obstacle);
-    }
-
-    final Collider col = new Collider(isObstacle);
-    col.setLocation(mapObject.getLocation());
-    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    col.setCollisionBoxWidth(col.getWidth());
-    col.setCollisionBoxHeight(col.getHeight());
-    col.setMapId(mapObject.getId());
-    col.setName(mapObject.getName());
-    this.add(col);
-  }
-
   protected void addDecorMob(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
       return;
@@ -989,7 +968,6 @@ public class Environment implements IEnvironment {
       }
     }
 
-    this.addCollisionBox(mapObject);
     this.addStaticShadow(mapObject);
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
@@ -1300,6 +1278,7 @@ public class Environment implements IEnvironment {
 
   private void registerDefaultMapObjectLoaders() {
     this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new ColliderMapObjectLoader());
   }
 
   /**
