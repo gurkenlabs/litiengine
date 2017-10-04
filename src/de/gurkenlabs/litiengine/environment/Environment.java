@@ -104,6 +104,8 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Spawnpoint> spawnPoints;
 
+  private final Map<String, IMapObjectLoader> mapObjectLoaders;
+
   private AmbientLight ambientLight;
   private boolean loaded;
   private boolean initialized;
@@ -166,6 +168,10 @@ public class Environment implements IEnvironment {
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
+
+    this.mapObjectLoaders = new ConcurrentHashMap<>();
+
+    this.registerDefaultMapObjectLoaders();
   }
 
   @Override
@@ -693,6 +699,16 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
+    this.mapObjectLoaders.put(mapObjectType, mapObjectLoader);
+  }
+
+  @Override
+  public void registerMapObjectLoader(MapObjectType mapObjectType, IMapObjectLoader mapObjectLoader) {
+    this.registerMapObjectLoader(mapObjectType.name(), mapObjectLoader);
+  }
+
+  @Override
   public void reloadFromMap(final int mapId) {
     this.remove(mapId);
     this.loadFromMap(mapId);
@@ -749,6 +765,13 @@ public class Environment implements IEnvironment {
     }
 
     this.remove(ent);
+  }
+
+  @Override
+  public <T extends IEntity> void remove(Collection<T> entities) {
+    for (T ent : entities) {
+      this.remove(ent);
+    }
   }
 
   @Override
@@ -962,56 +985,22 @@ public class Environment implements IEnvironment {
   }
 
   protected void addMapObject(final IMapObject mapObject) {
+    if (mapObjectLoaders.containsKey(mapObject.getType())) {
+      IEntity entity = mapObjectLoaders.get(mapObject.getType()).load(mapObject);
+      if (entity != null) {
+        this.add(entity);
+        return;
+      }
+    }
+
     this.addCollisionBox(mapObject);
     this.addStaticShadow(mapObject);
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
-    this.addProp(mapObject);
     this.addEmitter(mapObject);
     this.addDecorMob(mapObject);
     this.addTrigger(mapObject);
-  }
-
-  protected void addProp(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
-      return;
-    }
-
-    // set map properties by map object
-    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
-    final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
-    prop.setMapId(mapObject.getId());
-
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
-      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
-      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
-      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
-    }
-
-    prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
-    prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-
-    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
-      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
-    }
-    prop.setMapId(mapObject.getId());
-    prop.setName(mapObject.getName());
-    this.add(prop);
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
@@ -1069,16 +1058,6 @@ public class Environment implements IEnvironment {
     trigger.setCollisionBoxWidth(trigger.getWidth());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
     this.add(trigger);
-  }
-
-  protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
-    Prop prop = new Prop(mapObject.getLocation(), spriteSheetName, material);
-    final String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
-    if (obstacle != null && !obstacle.isEmpty()) {
-      prop.setObstacle(Boolean.valueOf(obstacle));
-    }
-
-    return prop;
   }
 
   private void addAmbientLight() {
@@ -1323,6 +1302,10 @@ public class Environment implements IEnvironment {
     }
   }
 
+  private void registerDefaultMapObjectLoaders() {
+    this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
+  }
+
   /**
    * Unload the specified entity by performing the following steps:
    * <ol>
@@ -1377,13 +1360,6 @@ public class Environment implements IEnvironment {
     if (entity instanceof Emitter) {
       Emitter em = (Emitter) entity;
       em.deactivate();
-    }
-  }
-
-  @Override
-  public <T extends IEntity> void remove(Collection<T> entities) {
-    for (T ent : entities) {
-      this.remove(ent);
     }
   }
 }

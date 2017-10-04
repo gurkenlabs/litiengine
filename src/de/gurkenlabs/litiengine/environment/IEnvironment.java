@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
@@ -129,6 +130,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onMapRendered(final Consumer<Graphics2D> consumer);
 
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
+
+  public void registerMapObjectLoader(final String mapObjectType, final IMapObjectLoader mapObjectLoader);
+
+  public void registerMapObjectLoader(final MapObjectType mapObjectType, final IMapObjectLoader mapObjectLoader);
 
   public void reloadFromMap(final int mapId);
 

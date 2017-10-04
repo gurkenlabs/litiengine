@@ -73,7 +73,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return true;
   }
 
-  public Align getAlign() {
+  public Align getCollisionBoxAlign() {
     return this.align;
   }
 
@@ -99,7 +99,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     final double newCollisionBoxWidth = this.getCollisionBoxWidth() != -1 ? this.getCollisionBoxWidth() : this.getWidth() * WIDTH_FACTOR;
     final double newCollisionBoxHeight = this.getCollisionBoxHeight() != -1 ? this.getCollisionBoxHeight() : this.getHeight() * HEIGHT_FACTOR;
 
-    return getCollisionBox(location, this.getWidth(), this.getHeight(), newCollisionBoxWidth, newCollisionBoxHeight, this.getAlign(), this.getValign());
+    return getCollisionBox(location, this.getWidth(), this.getHeight(), newCollisionBoxWidth, newCollisionBoxHeight, this.getCollisionBoxAlign(), this.getCollisionBoxValign());
   }
 
   public float getCollisionBoxHeight() {
@@ -114,7 +114,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Point2D.Double(this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
   }
 
-  public Valign getValign() {
+  public Valign getCollisionBoxValign() {
     return this.valign;
   }
 
