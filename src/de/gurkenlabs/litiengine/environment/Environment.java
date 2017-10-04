@@ -54,9 +54,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -836,43 +833,6 @@ public class Environment implements IEnvironment {
     this.getStaticShadows().add(shadow);
   }
 
-  protected void addEmitter(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
-      return;
-    }
-
-    Emitter emitter;
-    final String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
-    if (emitterType == null || emitterType.isEmpty()) {
-      return;
-    }
-
-    switch (emitterType) {
-    case "fire":
-      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    case "shimmer":
-      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    default:
-      emitter = null;
-      break;
-    }
-
-    // try to load custom emitter
-    if (emitter == null && emitterType.endsWith(".xml")) {
-      emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y, emitterType);
-    }
-
-    if (emitter != null) {
-      emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-      emitter.setMapId(mapObject.getId());
-      emitter.setName(mapObject.getName());
-
-      this.add(emitter);
-    }
-  }
-
   protected void addLightSource(final IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
       return;
@@ -926,7 +886,6 @@ public class Environment implements IEnvironment {
     this.addLightSource(mapObject);
     this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
-    this.addEmitter(mapObject);
   }
 
   protected void addSpawnpoint(final IMapObject mapObject) {
@@ -1191,6 +1150,7 @@ public class Environment implements IEnvironment {
     this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new ColliderMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
   }
 
   /**

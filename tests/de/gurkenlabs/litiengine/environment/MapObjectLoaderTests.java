@@ -22,6 +22,8 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
 
 public class MapObjectLoaderTests {
 
@@ -169,5 +171,29 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(decorMob.getMovementBehavior(), MovementBehavior.SHY);
     Assert.assertEquals(decorMob.getVelocity(), 200, 0.0001);
     Assert.assertEquals(decorMob.getMobType(), "decorSprite");
+  }
+
+  @Test
+  public void testEmitterMapObjectLoader() {
+    EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("testEmitter");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+
+    when(mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)).thenReturn("fire");
+
+    IEntity entity = loader.load(mapObject);
+
+    Assert.assertNotNull(entity);
+    Assert.assertEquals(entity.getMapId(), 111);
+    Assert.assertEquals(entity.getName(), "testEmitter");
+    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+
+    Emitter emitter = (Emitter) entity;
+    Assert.assertTrue(emitter instanceof FireEmitter);
   }
 }
