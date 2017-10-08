@@ -52,7 +52,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   private double version;
 
   @XmlAttribute
-  private double tiledversion;
+  private String tiledversion;
 
   /** The orientation. */
   @XmlAttribute

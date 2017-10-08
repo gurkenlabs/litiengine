@@ -30,7 +30,7 @@ public class ClientConfiguration extends ConfigurationGroup {
    */
   public ClientConfiguration() {
     super();
-    this.setUpdaterate(23);
+    this.setUpdaterate(60);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
     this.setLanguage("en");
