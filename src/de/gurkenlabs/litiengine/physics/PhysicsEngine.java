@@ -4,12 +4,12 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -25,12 +25,17 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   private final List<Rectangle2D> staticCollisionBoxes;
 
+  private final List<CollisionBox> allCollisionBoxes;
+  private final List<Rectangle2D> allCollisionBoxRectangles;
+
   /**
    * Instantiates a new physics engine.
    */
   public PhysicsEngine() {
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
+    this.allCollisionBoxes = new CopyOnWriteArrayList<>();
+    this.allCollisionBoxRectangles = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -159,16 +164,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.getCollisionBoxes().stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList());
-  }
-
-  private List<CollisionBox> getCollisionBoxes() {
-    List<CollisionBox> allCollisionBoxes = new ArrayList<>();
-    allCollisionBoxes.clear();
-    allCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
-    allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
-
-    return allCollisionBoxes;
+    return this.getAllCollisionBoxRectangles();
   }
 
   @Override
@@ -230,7 +226,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
       // special case to prevent entities to glitch through collision boxes if
       // they have a large enough stepsize
       final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
-      for (final CollisionBox collisionBox : this.getCollisionBoxes()) {
+      for (final CollisionBox collisionBox : this.getAllCollisionBoxesInternal()) {
         if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
           continue;
         }
@@ -281,6 +277,36 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.environmentBounds = environmentBounds;
   }
 
+  @Override
+  public void update(IGameLoop loop) {
+    this.updateAllCollisionBoxes();
+  }
+
+  private List<CollisionBox> getAllCollisionBoxesInternal() {
+    if (this.allCollisionBoxes.isEmpty()) {
+      this.updateAllCollisionBoxes();
+    }
+
+    return this.allCollisionBoxes;
+  }
+
+  private List<Rectangle2D> getAllCollisionBoxRectangles() {
+    if (this.allCollisionBoxRectangles.isEmpty()) {
+      this.updateAllCollisionBoxes();
+    }
+
+    return this.allCollisionBoxRectangles;
+  }
+
+  private void updateAllCollisionBoxes() {
+    this.allCollisionBoxes.clear();
+    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
+    this.allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
+
+    this.allCollisionBoxRectangles.clear();
+    this.allCollisionBoxRectangles.addAll(this.allCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
+  }
+
   /**
    * Collides with any entity.
    *
@@ -328,7 +354,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   private Rectangle2D collidesWithAnything(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
-    for (final CollisionBox collisionBox : this.getCollisionBoxes()) {
+    for (final CollisionBox collisionBox : this.allCollisionBoxes) {
 
       // an entity cannot collide with itself or other entities that are
       // excluded from collision by the canCollideWith method

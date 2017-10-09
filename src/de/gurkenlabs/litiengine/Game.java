@@ -153,6 +153,7 @@ public final class Game {
     final GameLoop updateLoop = new GameLoop(getConfiguration().client().getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
+    getLoop().attach(getPhysicsEngine());
 
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
@@ -194,6 +195,7 @@ public final class Game {
 
     getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));
 
+    // init inputs
     Input.init();
     getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
     getScreenManager().getRenderComponent().addMouseMotionListener(Input.mouse());
