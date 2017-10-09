@@ -57,8 +57,19 @@ jacocoTestReport {
   }
 }
 
-check.dependsOn jacocoTestReport
+task createJavadocs(type: Javadoc) {
+  source = sourceSets.main.allJava
+  options.encoding = 'UTF-8'
+  dependsOn build
+}
 
+task fullbuild{
+  group 'build'
+  description 'executes the build including unit tests, coverage reports and javadoc'
+  dependsOn createJavadocs
+}
+
+fullbuild.dependsOn jacocoTestReport
 
 task copyNativeLibs(type: Copy) {
   from(new File('lib')) { exclude '**/*.jar' }
@@ -68,24 +79,7 @@ task copyNativeLibs(type: Copy) {
   into new File(buildDir, 'libs')
 }
 
-task createJavadocs(type: Javadoc) {
-  source = sourceSets.main.allJava
-  options.encoding = 'UTF-8'
-  dependsOn build
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     dependsOn copyNativeLibs
 }
-
