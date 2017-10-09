@@ -8,6 +8,9 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+archivesBaseName = "litiengine"
+version = "v0.4.7-alpha"
+
 sourceSets {
   main.java.srcDir "src"
   main.java.srcDir "resources"
@@ -28,13 +31,11 @@ repositories {
 }
 
 dependencies {
-  compile name: 'jinput'
-  compile name: 'jogg-0.0.7'
-  compile name: 'jorbis-0.0.15'
-  compile name: 'tritonus_share'
-  compile name: 'vorbisspi1.0.3'
-  compile name: 'jl1.0.1'
-  compile name: 'mp3spi1.9.5'
+  compile 'net.java.jinput:jinput:2.0.7'
+  compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
+  compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
+  compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+  compile 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:2.+'
 }
@@ -43,11 +44,15 @@ jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
-  version = 'v0.4.7-alpha'
+  
+  exclude '**/*.dll'
+  exclude '**/*.jnilib'
+  exclude '**/*.so'
+  exclude 'junit**/**'
 }
 
 javadoc {
-  options.encoding = 'UTF-8'
+  options.encoding 'UTF-8'
 }
 
 jacocoTestReport {
@@ -58,9 +63,18 @@ jacocoTestReport {
 }
 
 task createJavadocs(type: Javadoc) {
-  source = sourceSets.main.allJava
-  options.encoding = 'UTF-8'
+  source sourceSets.main.allJava
+  options.encoding 'UTF-8'
   dependsOn build
+}
+
+task distZip(type: Zip) {
+   group 'build'
+   from 'build/libs/'
+   include '*'
+   archiveName archivesBaseName + '-' + version + '.zip'
+   exclude archiveName
+   destinationDir(file('build/libs/'))
 }
 
 task fullbuild{
@@ -70,6 +84,7 @@ task fullbuild{
 }
 
 fullbuild.dependsOn jacocoTestReport
+fullbuild.dependsOn distZip
 
 task copyNativeLibs(type: Copy) {
   from(new File('lib')) { exclude '**/*.jar' }

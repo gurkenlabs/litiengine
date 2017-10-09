@@ -86,10 +86,14 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     for (final Map.Entry<String, List<Consumer<Float>>> consumers : this.pressedConsumer.entrySet()) {
       final Identifier ident = get(consumers.getKey());
-      if (ident != null) {
-        final Component comp = this.controller.getComponent(ident);
-        if (comp != null && comp.getPollData() != 0) {
-          for (final Consumer<Float> cons : this.pressedConsumer.get(consumers)) {
+      if (ident == null) {
+        continue;
+      }
+
+      final Component comp = this.controller.getComponent(ident);
+      if (comp != null && comp.getPollData() != 0) {
+        for (final Consumer<Float> cons : this.pressedConsumer.get(consumers.getKey())) {
+          if (cons != null) {
             cons.accept(comp.getPollData());
           }
         }
