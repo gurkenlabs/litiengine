@@ -1,6 +1,12 @@
 plugins {
-    id "org.sonarqube" version "2.5"
-}  
+  id 'com.stehno.natives' version '0.3.1'
+  id "org.sonarqube" version "2.5"
+}
+
+natives {
+  configurations = ['runtime']
+  outputDir = 'libs'
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -24,10 +30,6 @@ sourceSets {
 
 repositories {
    mavenCentral()
-   jcenter()
-   flatDir {
-      dirs 'lib'
-   }
 }
 
 dependencies {
@@ -85,11 +87,9 @@ task fullbuild{
 
 fullbuild.dependsOn jacocoTestReport
 fullbuild.dependsOn distZip
+build.dependsOn includeNatives
 
-task copyNativeLibs(type: Copy) {
-  from(new File('lib')) { exclude '**/*.jar' }
-  into new File(buildDir, 'libs')
-  
+task copyNativeLibs(type: Copy) { 
   from(new File('.')) { include 'LICENSE' }
   into new File(buildDir, 'libs')
 }
