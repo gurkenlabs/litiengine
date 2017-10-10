@@ -1,10 +1,5 @@
-plugins {
-    id "org.sonarqube" version "2.5"
-}  
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -28,21 +23,25 @@ repositories {
 }
 
 dependencies {
-  compile name: 'jinput'
-  compile name: 'jogg-0.0.7'
-  compile name: 'jorbis-0.0.15'
-  compile name: 'tritonus_share'
-  compile name: 'vorbisspi1.0.3'
-  compile name: 'jl1.0.1'
-  compile name: 'mp3spi1.9.5'
+  compile 'net.java.jinput:jinput:2.0.7'
+  compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
+  compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
+  compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+  compile 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
   testCompile 'junit:junit:4.12'
+  testCompile 'org.mockito:mockito-core:2.10.0'
 }
 
 jar {
   from configurations.compile.collect { zipTree it }
   
   from('resources') { include '**/*' }
+  
   version = 'v0.4.7-alpha'
+  exclude '**/*.dll'
+  exclude '**/*.jnilib'
+  exclude '**/*.so'
+  exclude 'junit**/**'
 }
 
 javadoc {
@@ -52,16 +51,6 @@ javadoc {
 signing {
     sign configurations.archives
 }
-
-jacocoTestReport {
-  reports {
-    xml.enabled true
-    html.enabled true
-  }
-}
-
-check.dependsOn jacocoTestReport
-
 
 task copyNativeLibs(type: Copy) {
   from(new File('lib')) { exclude '**/*.jar' }
@@ -100,7 +89,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.7"
+version = "v0.4.7-alpha"
 
 uploadArchives {
   repositories {
