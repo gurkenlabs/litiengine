@@ -71,11 +71,7 @@ public class AStarPathFinder extends PathFinder {
 
       // check all neighbors for the potential next one
       for (final AStarNode neighbour : this.grid.getNeighbours(currentNode)) {
-        if (!neighbour.equals(targetNode) && !neighbour.isWalkable()) {
-          continue;
-        }
-
-        if (closed.contains(neighbour)) {
+        if (!neighbour.equals(targetNode) && !neighbour.isWalkable() || closed.contains(neighbour)) {
           continue;
         }
 

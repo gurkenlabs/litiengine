@@ -318,11 +318,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
    */
   private Rectangle2D collidesWithAnyEntity(final ICollisionEntity entity, final Rectangle2D collisionBox) {
     for (final ICollisionEntity otherEntity : this.collisionEntities) {
-      if (entity != null && (otherEntity.equals(entity) || !entity.canCollideWith(otherEntity))) {
-        continue;
-      }
-
-      if (!otherEntity.hasCollision()) {
+      if (otherEntity == null || entity == null || !otherEntity.hasCollision() || otherEntity.equals(entity) || !entity.canCollideWith(otherEntity)) {
         continue;
       }
 
