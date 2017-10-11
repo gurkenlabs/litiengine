@@ -31,8 +31,7 @@ public class AStarPathFinder extends PathFinder {
     // if there is no collision between the start and the target return a direct
     // path
     final Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
-    final Rectangle2D collisionBox = this.getFirstIntersectedCollisionBox(entity, startLocation, target);
-    if (collisionBox == null) {
+    if (!this.intersectsWithAnyCollisionBox(entity, startLocation, target)) {
       return this.findDirectPath(startLocation, target);
     }
 
