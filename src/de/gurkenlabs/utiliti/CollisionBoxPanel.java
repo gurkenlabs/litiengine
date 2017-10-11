@@ -11,7 +11,7 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
 public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
   JCheckBox chckbxIsObstacle;
@@ -47,13 +47,13 @@ public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     if (obstacle != null && !obstacle.isEmpty()) {
       this.chckbxIsObstacle.setSelected(Boolean.valueOf(obstacle));
     }
   }
 
   private void setupChangedListeners() {
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
   }
 }

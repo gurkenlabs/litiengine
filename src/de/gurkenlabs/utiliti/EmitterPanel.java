@@ -13,7 +13,7 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
 public class EmitterPanel extends PropertyPanel<IMapObject> {
   private JTextField textFieldType;
@@ -56,12 +56,12 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE));
+    this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE));
   }
 
   private void setupChangedListeners() {
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText())));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.EMITTERTYPE, textFieldType.getText())));
 
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.EMITTERTYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.EMITTERTYPE, textFieldType.getText())));
   }
 }

@@ -20,7 +20,7 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import javax.swing.JCheckBox;
 
@@ -130,11 +130,11 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String brightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String intensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
-    final String color = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    final String shape = mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE);
-    final String active = mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE);
+    final String brightness = mapObject.getCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS);
+    final String intensity = mapObject.getCustomProperty(MapObjectProperty.LIGHTINTENSITY);
+    final String color = mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR);
+    final String shape = mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE);
+    final String active = mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE);
 
     int bright = 0;
     if (brightness != null) {
@@ -164,29 +164,29 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
       String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
       textFieldColor.setText(h);
       if (getDataSource() != null) {
-        getDataSource().setCustomProperty(MapObjectProperties.LIGHTCOLOR, h);
+        getDataSource().setCustomProperty(MapObjectProperty.LIGHTCOLOR, h);
         Game.getEnvironment().reloadFromMap(getDataSource().getId());
         Game.getEnvironment().getAmbientLight().createImage();
       }
     });
 
     spinnerBrightness.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS, spinnerBrightness.getValue().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS, spinnerBrightness.getValue().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperties.LIGHTINTENSITY, spinnerIntensity.getValue().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHTINTENSITY, spinnerIntensity.getValue().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.LIGHTSHAPE, comboBoxLightShape.getSelectedItem().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHTSHAPE, comboBoxLightShape.getSelectedItem().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.LIGHTACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
+      m.setCustomProperty(MapObjectProperty.LIGHTACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
       Game.getEnvironment().getAmbientLight().createImage();
     }));
   }

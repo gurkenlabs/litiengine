@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
@@ -128,26 +128,26 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) != null) {
+    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
       for (int i = 0; i < this.comboBoxSpriteSheets.getModel().getSize(); i++) {
         JLabel label = this.comboBoxSpriteSheets.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME))) {
+        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
           this.comboBoxSpriteSheets.setSelectedItem(label);
           break;
         }
       }
     }
-    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR) != null) {
-      MovementBehavior beh = MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR));
+    if (mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR) != null) {
+      MovementBehavior beh = MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR));
       this.comboBoxBehaviour.setSelectedItem(beh);
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY) != null) {
-      this.spinnerVelocity.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY)));
+    if (mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY) != null) {
+      this.spinnerVelocity.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)));
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null) {
-      this.chckbxAttackable.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null) {
+      this.chckbxAttackable.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
     }
   }
 
@@ -155,12 +155,12 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
-      m.setCustomProperty(MapObjectProperties.SPRITESHEETNAME, selected.getText());
+      m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
-    this.comboBoxBehaviour.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR, this.comboBoxBehaviour.getSelectedItem().toString())));
-    this.spinnerVelocity.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperties.DECORMOB_VELOCITY, this.spinnerVelocity.getValue().toString())));
-    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()))));
+    this.comboBoxBehaviour.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, this.comboBoxBehaviour.getSelectedItem().toString())));
+    this.spinnerVelocity.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.DECORMOB_VELOCITY, this.spinnerVelocity.getValue().toString())));
+    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()))));
   }
 
   private void loadAvailableDecorMobs() {

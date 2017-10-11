@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 
 public class CustomPanel extends PropertyPanel<IMapObject> {
@@ -119,7 +119,7 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
       return;
     }
     for (Property prop : mapObject.getAllCustomProperties()) {
-      if (MapObjectProperties.isCustom(prop.getName())) {
+      if (MapObjectProperty.isCustom(prop.getName())) {
         this.model.addRow(new Object[] { prop.getName(), prop.getValue() });
       }
     }
@@ -145,7 +145,7 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
           }
         }
 
-        getDataSource().getAllCustomProperties().removeIf(p -> MapObjectProperties.isCustom(p.getName()) && !setProperties.contains(p.getName()));
+        getDataSource().getAllCustomProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
         UndoManager.instance().mapObjectChanged(getDataSource());
       }
     });

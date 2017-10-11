@@ -20,7 +20,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -262,7 +262,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     MapObjectType type = MapObjectType.get(mapObject.getType());
     this.comboBoxType.setSelectedItem(type);
-    String customType = mapObject.getCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE);
+    String customType = mapObject.getCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE);
     this.textFieldCustomType.setText(customType);
     this.textFieldName.setText(mapObject.getName());
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
@@ -281,9 +281,9 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
       switchPanel(type);
     });
 
-    this.textFieldCustomType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
+    this.textFieldCustomType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
 
-    this.textFieldCustomType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
+    this.textFieldCustomType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
 
     this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 

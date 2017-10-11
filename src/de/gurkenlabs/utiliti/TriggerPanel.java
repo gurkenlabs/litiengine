@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.util.ArrayUtilities;
 
 public class TriggerPanel extends PropertyPanel<IMapObject> {
@@ -197,35 +197,35 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldMessage.setText(mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE));
+    this.textFieldMessage.setText(mapObject.getCustomProperty(MapObjectProperty.TRIGGERMESSAGE));
 
-    String targets = mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS);
+    String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGERTARGETS);
     for (int target : ArrayUtilities.getIntegerArray(targets)) {
       this.targetsModel.addRow(new Object[] { target });
     }
 
-    String oneTime = mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME);
+    String oneTime = mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME);
     if (oneTime != null) {
       this.chckbxOneTimeOnly.setSelected(Boolean.valueOf(oneTime));
     }
 
-    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION));
+    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION));
     this.comboBoxActivationType.setSelectedItem(act);
 
-    String activators = mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS);
+    String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS);
     for (int activator : ArrayUtilities.getIntegerArray(activators)) {
       this.model.addRow(new Object[] { activator });
     }
   }
 
   private void setupChangedListeners() {
-    this.chckbxOneTimeOnly.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.TRIGGERONETIME, Boolean.toString(this.chckbxOneTimeOnly.isSelected()))));
-    this.textFieldMessage.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperties.TRIGGERMESSAGE, textFieldMessage.getText())));
-    this.textFieldMessage.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.TRIGGERMESSAGE, textFieldMessage.getText())));
+    this.chckbxOneTimeOnly.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.TRIGGERONETIME, Boolean.toString(this.chckbxOneTimeOnly.isSelected()))));
+    this.textFieldMessage.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.TRIGGERMESSAGE, textFieldMessage.getText())));
+    this.textFieldMessage.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.TRIGGERMESSAGE, textFieldMessage.getText())));
 
     this.comboBoxActivationType.addActionListener(new MapObjectPropertyActionListener(m -> {
       TriggerActivation act = (TriggerActivation) this.comboBoxActivationType.getSelectedItem();
-      m.setCustomProperty(MapObjectProperties.TRIGGERACTIVATION, act.toString());
+      m.setCustomProperty(MapObjectProperty.TRIGGERACTIVATION, act.toString());
     }));
 
     this.model.addTableModelListener(t -> {
@@ -241,7 +241,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
         }
       }
 
-      getDataSource().setCustomProperty(MapObjectProperties.TRIGGERACTIVATORS, String.join(",", activators));
+      getDataSource().setCustomProperty(MapObjectProperty.TRIGGERACTIVATORS, String.join(",", activators));
     });
 
     this.targetsModel.addTableModelListener(t -> {
@@ -257,7 +257,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
         }
       }
 
-      getDataSource().setCustomProperty(MapObjectProperties.TRIGGERTARGETS, String.join(",", targets));
+      getDataSource().setCustomProperty(MapObjectProperty.TRIGGERTARGETS, String.join(",", targets));
     });
   }
 }

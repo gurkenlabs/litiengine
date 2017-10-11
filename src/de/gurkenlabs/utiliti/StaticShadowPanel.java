@@ -14,7 +14,7 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 
 public class StaticShadowPanel extends PropertyPanel<IMapObject> {
@@ -55,7 +55,7 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperties.SHADOWTYPE, ((StaticShadowType) this.comboBoxShadowType.getSelectedItem()).toString())));
+    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SHADOWTYPE, ((StaticShadowType) this.comboBoxShadowType.getSelectedItem()).toString())));
   }
 
   @Override
@@ -65,7 +65,7 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    String shadowType = mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE);
+    String shadowType = mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE);
     if (shadowType != null && !shadowType.isEmpty()) {
       this.comboBoxShadowType.setSelectedItem(StaticShadowType.valueOf(shadowType));
     }

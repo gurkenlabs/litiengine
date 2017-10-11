@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
@@ -125,27 +125,27 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME) != null) {
+    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
       for (int i = 0; i < this.comboBoxSpriteSheets.getModel().getSize(); i++) {
         JLabel label = this.comboBoxSpriteSheets.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME))) {
+        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
           this.comboBoxSpriteSheets.setSelectedItem(label);
           break;
         }
       }
     }
 
-    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
+    final Material material = mapObject.getCustomProperty(MapObjectProperty.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
-    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      this.spinnerHealth.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH)));
+    if (mapObject.getCustomProperty(MapObjectProperty.HEALTH) != null) {
+      this.spinnerHealth.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH)));
     }
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      this.chckbxIndestructible.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE).isEmpty()) {
+      this.chckbxIndestructible.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
     }
 
-    String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     if (obstacle != null && !obstacle.isEmpty()) {
       this.chckbxIsObstacle.setSelected(Boolean.valueOf(obstacle));
     }
@@ -153,25 +153,25 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener((m) -> {
-      m.setCustomProperty(MapObjectProperties.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()));
+      m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()));
     }));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener((m) -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
-      m.setCustomProperty(MapObjectProperties.MATERIAL, material.toString());
+      m.setCustomProperty(MapObjectProperty.MATERIAL, material.toString());
     }));
 
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener((m) -> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
-      m.setCustomProperty(MapObjectProperties.SPRITESHEETNAME, selected.getText());
+      m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
     this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener((m) -> {
-      m.setCustomProperty(MapObjectProperties.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()));
+      m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()));
     }));
 
     this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperties.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()));
+      m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()));
     }));
   }
 
