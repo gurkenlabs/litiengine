@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -10,6 +12,7 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
  * The Class RenderLoop.
  */
 public class RenderLoop extends Thread {
+  private static final Logger log = Logger.getLogger(RenderLoop.class.getName());
   private final IRenderComponent component;
   /** The game is running. */
   private boolean gameIsRunning = true;
@@ -50,7 +53,7 @@ public class RenderLoop extends Thread {
         this.interrupt();
         break;
       } catch (final Exception e) {
-        continue;
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
   }

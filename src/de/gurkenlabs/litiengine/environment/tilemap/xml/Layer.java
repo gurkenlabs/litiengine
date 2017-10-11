@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 /**
  * The Class Layer.
@@ -109,6 +111,16 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     }
 
     return offsety;
+  }
+
+  @Override
+  public RenderType getRenderType() {
+    final String renderTypeProp = this.getCustomProperty(LayerProperty.LAYER_RENDER_TYPE);
+    if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
+      return RenderType.valueOf(renderTypeProp);
+    }
+
+    return RenderType.NORMAL;
   }
 
   /*

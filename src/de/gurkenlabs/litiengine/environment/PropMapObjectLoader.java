@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class PropMapObjectLoader extends MapObjectLoader {
@@ -24,38 +24,38 @@ public class PropMapObjectLoader extends MapObjectLoader {
     }
 
     // set map properties by map object
-    final Material material = mapObject.getCustomProperty(MapObjectProperties.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperties.MATERIAL));
-    final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME), material);
+    final Material material = mapObject.getCustomProperty(MapObjectProperty.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.MATERIAL));
+    final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
 
-    if (mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE).isEmpty()) {
-      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)));
+    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE).isEmpty()) {
+      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.HEALTH) != null) {
-      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.HEALTH))));
+    if (mapObject.getCustomProperty(MapObjectProperty.HEALTH) != null) {
+      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH))));
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISION) != null) {
-      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperties.COLLISION)));
+    if (mapObject.getCustomProperty(MapObjectProperty.COLLISION) != null) {
+      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.COLLISION)));
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH) != null) {
-      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)));
+    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH) != null) {
+      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)));
     }
-    if (mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT) != null) {
-      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)));
+    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT) != null) {
+      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)));
     }
 
-    prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)));
-    prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)));
+    prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)));
+    prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)));
 
     if (mapObject.getDimension() != null) {
       prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperties.TEAM) != null) {
-      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperties.TEAM)));
+    if (mapObject.getCustomProperty(MapObjectProperty.TEAM) != null) {
+      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.TEAM)));
     }
 
     prop.setName(mapObject.getName());
@@ -64,7 +64,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
     Prop prop = new Prop(mapObject.getLocation(), spriteSheetName, material);
-    final String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    final String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     if (obstacle != null && !obstacle.isEmpty()) {
       prop.setObstacle(Boolean.valueOf(obstacle));
     }

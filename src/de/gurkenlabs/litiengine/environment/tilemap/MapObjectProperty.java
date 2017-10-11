@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class MapObjectProperties {
-  private static final Logger log = Logger.getLogger(MapObjectProperties.class.getName());
+public final class MapObjectProperty {
+  private static final Logger log = Logger.getLogger(MapObjectProperty.class.getName());
   public static final String COLLISION = "collision";
   public static final String COLLISIONALGIN = "collisionAlign";
 
@@ -58,12 +58,12 @@ public final class MapObjectProperties {
 
   private static List<Field> availableProperties = new ArrayList<>();
 
-  private MapObjectProperties() {
+  private MapObjectProperty() {
   }
 
   public static boolean isCustom(final String name) {
     if (availableProperties.isEmpty()) {
-      for (final Field field : MapObjectProperties.class.getDeclaredFields()) {
+      for (final Field field : MapObjectProperty.class.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           availableProperties.add(field);
         }

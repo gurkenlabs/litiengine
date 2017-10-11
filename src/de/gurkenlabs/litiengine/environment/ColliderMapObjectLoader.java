@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import de.gurkenlabs.litiengine.entities.Collider;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class ColliderMapObjectLoader extends MapObjectLoader {
@@ -18,7 +18,7 @@ public class ColliderMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + ColliderMapObjectLoader.class);
     }
 
-    final String obstacle = mapObject.getCustomProperty(MapObjectProperties.OBSTACLE);
+    final String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     boolean isObstacle = true;
     if (obstacle != null && !obstacle.isEmpty()) {
       isObstacle = Boolean.valueOf(obstacle);

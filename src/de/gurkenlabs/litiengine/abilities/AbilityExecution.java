@@ -94,13 +94,9 @@ public class AbilityExecution implements IUpdateable {
 
     // handle all effects from the ability that were not applied yet
     for (final IEffect effect : this.getAbility().getEffects()) {
-      if (this.getAppliedEffects().contains(effect)) {
-        continue;
-      }
-
       // if the ability was not executed yet or the delay of the effect is not
       // yet reached
-      if (loop.getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
+      if (this.getAppliedEffects().contains(effect) || loop.getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
         continue;
       }
 

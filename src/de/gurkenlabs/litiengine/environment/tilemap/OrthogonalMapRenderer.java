@@ -26,7 +26,6 @@ import de.gurkenlabs.util.MathUtilities;
  * The Class OrthogonalMapRenderer.
  */
 public class OrthogonalMapRenderer implements IMapRenderer {
-  private static final String LAYER_RENDER_TYPE = "RENDERTYPE";
 
   /**
    * Gets the cache key.
@@ -95,16 +94,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
+      if (layer == null || layer.getRenderType() == RenderType.OVERLAY) {
         continue;
-      }
-
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-        final RenderType renderType = RenderType.valueOf(renderTypeProp);
-        if (renderType == RenderType.OVERLAY) {
-          continue;
-        }
       }
 
       RenderEngine.renderImage(g, this.getLayerImage(layer, map, true), layer.getPosition());
@@ -136,16 +127,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
 
     for (final ILayer layer : this.getAllRenderLayers(map)) {
-      if (layer == null) {
+      if (layer == null || layer.getRenderType() == RenderType.OVERLAY) {
         continue;
-      }
-
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-      if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-        final RenderType renderType = RenderType.valueOf(renderTypeProp);
-        if (renderType == RenderType.OVERLAY) {
-          continue;
-        }
       }
 
       if (layer instanceof ITileLayer) {
@@ -161,17 +144,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   @Override
   public void renderOverlay(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
     for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
-        continue;
-      }
-
-      final String renderTypeProp = layer.getCustomProperty(LAYER_RENDER_TYPE);
-      if (renderTypeProp == null || renderTypeProp.isEmpty()) {
-        continue;
-      }
-
-      final RenderType renderType = RenderType.valueOf(renderTypeProp);
-      if (renderType != RenderType.OVERLAY) {
+      if (layer == null || layer.getRenderType() != RenderType.OVERLAY) {
         continue;
       }
 

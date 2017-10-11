@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 
@@ -20,11 +20,11 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
 
-    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS);
-    final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY);
-    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR);
-    final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE);
-    final String lightShape = mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE);
+    final String mapObjectBrightness = mapObject.getCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS);
+    final String mapObjectIntensity = mapObject.getCustomProperty(MapObjectProperty.LIGHTINTENSITY);
+    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR);
+    final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE);
+    final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE);
     if (mapObjectBrightness == null || mapObjectBrightness.isEmpty() || mapObjectColor == null || mapObjectColor.isEmpty() || lightShape == null) {
       return null;
     }

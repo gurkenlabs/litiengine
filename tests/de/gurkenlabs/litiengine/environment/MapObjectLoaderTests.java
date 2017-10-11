@@ -21,7 +21,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
@@ -39,17 +39,17 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperties.MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISION)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperties.HEALTH)).thenReturn("100");
+    when(mapObject.getCustomProperty(MapObjectProperty.MATERIAL)).thenReturn(Material.PLASTIC.name());
+    when(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperty.HEALTH)).thenReturn("100");
 
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)).thenReturn("100.0");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)).thenReturn("100.0");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn("100.0");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn("100.0");
 
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)).thenReturn("MIDDLE");
-    when(mapObject.getCustomProperty(MapObjectProperties.TEAM)).thenReturn("1");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
+    when(mapObject.getCustomProperty(MapObjectProperty.TEAM)).thenReturn("1");
 
     IEntity ent = loader.load(mapObject);
 
@@ -107,11 +107,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERMESSAGE)).thenReturn("message");
-    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
-    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERTARGETS)).thenReturn("1,2,3");
-    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERACTIVATORS)).thenReturn("4,5,6");
-    when(mapObject.getCustomProperty(MapObjectProperties.TRIGGERONETIME)).thenReturn("false");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERMESSAGE)).thenReturn("message");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERTARGETS)).thenReturn("1,2,3");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS)).thenReturn("4,5,6");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME)).thenReturn("false");
 
     IEntity entity = loader.load(mapObject);
 
@@ -141,16 +141,16 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperties.SPRITESHEETNAME)).thenReturn("decorSprite");
-    when(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_VELOCITY)).thenReturn("200");
-    when(mapObject.getCustomProperty(MapObjectProperties.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
-    when(mapObject.getCustomProperty(MapObjectProperties.INDESTRUCTIBLE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISION)).thenReturn("false");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXWIDTH)).thenReturn("100.0");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONBOXHEIGHT)).thenReturn("100.0");
+    when(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME)).thenReturn("decorSprite");
+    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)).thenReturn("200");
+    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
+    when(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION)).thenReturn("false");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn("100.0");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn("100.0");
 
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperties.COLLISIONVALGIN)).thenReturn("MIDDLE");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
 
     IEntity entity = loader.load(mapObject);
 
@@ -185,7 +185,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE)).thenReturn("fire");
+    when(mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE)).thenReturn("fire");
 
     IEntity entity = loader.load(mapObject);
 
@@ -209,11 +209,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTBRIGHTNESS)).thenReturn("100");
-    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTINTENSITY)).thenReturn("100");
-    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTCOLOR)).thenReturn("#ffffff");
-    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTACTIVE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperties.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS)).thenReturn("100");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTINTENSITY)).thenReturn("100");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR)).thenReturn("#ffffff");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);
 
     IEntity entity = loader.load(mapObject);
 

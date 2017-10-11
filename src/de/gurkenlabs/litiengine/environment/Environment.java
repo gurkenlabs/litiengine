@@ -39,7 +39,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
@@ -843,7 +843,7 @@ public class Environment implements IEnvironment {
     double y = mapObject.getY();
     double width = mapObject.getDimension().getWidth();
     double height = mapObject.getDimension().getHeight();
-    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperties.SHADOWTYPE)));
+    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE)));
     this.getStaticShadows().add(shadow);
   }
 
@@ -852,11 +852,11 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    final Direction direction = mapObject.getCustomProperty(MapObjectProperties.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperties.SPAWN_DIRECTION)) : Direction.DOWN;
+    final Direction direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
     final Spawnpoint spawn = new Spawnpoint(mapObject.getId(), new Point(mapObject.getLocation()), direction);
     spawn.setName(mapObject.getName());
 
-    final String spawnType = mapObject.getCustomProperty(MapObjectProperties.SPAWN_TYPE);
+    final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
     spawn.setSpawnType(spawnType);
 
     this.getSpawnPoints().add(spawn);

@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import de.gurkenlabs.litiengine.graphics.RenderType;
+
 /**
  * The Interface ILayer.
  */
@@ -50,4 +52,6 @@ public interface ILayer extends ICustomPropertyProvider {
   public boolean isVisible();
 
   public void setName(String name);
+
+  public RenderType getRenderType();
 }

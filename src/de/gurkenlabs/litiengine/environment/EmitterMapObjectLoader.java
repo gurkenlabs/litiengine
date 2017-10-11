@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.environment;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperties;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
@@ -26,7 +26,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     }
 
     Emitter emitter;
-    final String emitterType = mapObject.getCustomProperty(MapObjectProperties.EMITTERTYPE);
+    final String emitterType = mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE);
     if (emitterType == null || emitterType.isEmpty()) {
       return null;
     }
