@@ -146,7 +146,7 @@ public class ListField extends GuiComponent {
     }
     final int sliderMax = this.contents.length - this.getNumberOfShownElements();
     if (sliderMax > 0) {
-      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, sliderMax, 1, this.buttonSprite, this.buttonSprite, null, showButtons);
+      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, sliderMax, 1, this.buttonSprite, this.buttonSprite, showButtons);
       this.getSlider().setCurrentValue(this.getLowerBound());
       this.getComponents().add(this.getSlider());
     }
