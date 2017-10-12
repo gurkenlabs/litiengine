@@ -35,7 +35,9 @@ public class EntityNavigator implements IEntityNavigator {
    * Instantiates a new entity navigator.
    * 
    * @param entity
+   *          The entity that will be navigated by this instance
    * @param pathFinder
+   *          The pathfinder that is used to navigate the entity
    */
   public EntityNavigator(final IMovableEntity entity, final IPathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();

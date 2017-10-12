@@ -30,8 +30,12 @@ public class Force {
    * Instantiates a new force.
    * 
    * @param location
+   *          The location where the force is originating from
    * @param strength
+   *          The strength/intensity of this force instance
    * @param size
+   *          The size of this force (used to determine if/when an entity has
+   *          reached the force)
    */
   public Force(final Point2D location, final float strength, final float size) {
     this.location = location;

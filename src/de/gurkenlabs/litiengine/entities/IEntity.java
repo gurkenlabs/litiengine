@@ -55,6 +55,7 @@ public interface IEntity {
    * information.
    *
    * @param mapId
+   *          The unique map ID for this {@link IEntity}
    */
   public void setMapId(int mapId);
 

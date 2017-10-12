@@ -78,9 +78,6 @@ public class Trigonometry {
     return (atan2[yi * ATAN2_DIM + xi] + add) * mul;
   }
 
-  /**
-   * ATAN2
-   */
   public static final float atan2Deg(final float y, final float x) {
     return atan2(y, x) * DEG;
   }
@@ -97,16 +94,10 @@ public class Trigonometry {
     return cos[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }
 
-  /**
-   * SIN / COS (RAD)
-   */
   public static final float sin(final float rad) {
     return sin[(int) (rad * RAD_TO_INDEX) & SIN_MASK];
   }
 
-  /**
-   * SIN / COS (DEG)
-   */
   public static final float sinDeg(final float deg) {
     return sin[(int) (deg * DEG_TO_INDEX) & SIN_MASK];
   }

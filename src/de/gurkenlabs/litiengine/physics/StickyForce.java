@@ -12,9 +12,15 @@ public class StickyForce extends Force {
   /** The force entiy. */
   private final IEntity forceEntiy;
 
-  /**
+  /***
    * Instantiates a new sticky force.
-   *
+   * 
+   * @param forceEntity
+   *          The entity to who's location this force will be bound
+   * @param strength
+   *          The strength/intensity of this force
+   * @param size
+   *          The size of this force
    */
   public StickyForce(final IEntity forceEntity, final float strength, final float size) {
     super(forceEntity.getDimensionCenter(), strength, size);
@@ -35,10 +41,6 @@ public class StickyForce extends Force {
     return this.forceEntiy;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   */
   @Override
   public Point2D getLocation() {
     if (this.getForceEntiy() != null) {

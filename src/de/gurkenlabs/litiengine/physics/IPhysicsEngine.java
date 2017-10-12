@@ -40,7 +40,8 @@ public interface IPhysicsEngine extends IUpdateable {
    *          <li>COLLTYPE_STATIC</li>
    *          <li>COLLTYPE_ALL</li>
    *          </ul>
-   * @return
+   * @return Returns true if the specified rectangle collides with any collision
+   *         box of the specified type(s); otherwise false.
    */
   public boolean collides(Rectangle2D rect, int collisionType);
 
@@ -72,14 +73,6 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public boolean move(final IMovableEntity entity, Point2D newPosition);
 
-  /**
-   * Moves the specified entity towards target by the delta.
-   *
-   * @param entity
-   * @param target
-   * @param delta
-   * @return
-   */
   public boolean move(IMovableEntity entity, Point2D target, float delta);
 
   public void remove(ICollisionEntity entity);

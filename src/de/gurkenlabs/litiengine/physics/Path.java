@@ -32,8 +32,17 @@ public class Path {
     }
   }
 
-  /**
+  /***
    * Instantiates a new path.
+   * 
+   * @param start
+   *          The starting point of the path
+   * @param target
+   *          The target of this instance
+   * @param path
+   *          The {@link Path2D} reference
+   * @param points
+   *          A list of all {@link Point2D} contained by the path
    */
   public Path(final Point2D start, final Point2D target, final Path2D path, final List<Point2D> points) {
     this.start = start;
