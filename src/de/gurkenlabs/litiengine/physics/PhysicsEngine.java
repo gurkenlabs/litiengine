@@ -195,7 +195,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean move(final IMovableEntity entity, Point2D newPosition) {
-    boolean success = true;
     if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
@@ -210,38 +209,65 @@ public final class PhysicsEngine implements IPhysicsEngine {
       return true;
     }
 
-    // resolve collision for current location
-    if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
-      final Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
-      entity.setLocation(resolvedPosition);
-      success = false;
+    if (this.resolveCollisionForCurrentLocation(entity)) {
+      return false;
     }
 
-    // resolve collision for new location
-    if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
-      final Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
-      entity.setLocation(resolvedPosition);
+    if (this.resolveCollisionForNewPosition(entity, newPosition)) {
       return false;
-    } else {
-      // special case to prevent entities to glitch through collision boxes if
-      // they have a large enough stepsize
-      final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
-      for (final CollisionBox collisionBox : this.getAllCollisionBoxesInternal()) {
-        if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
-          continue;
-        }
+    }
 
-        // there was a collision in between
-        final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
-        if (intersection != null) {
-          return false;
-        }
-      }
+    // This method provides a simplified approach for a multi-sampling algorithm
+    // to prevent glitching through collision boxes that are smaller than the
+    // movement step size
+    if (this.resolveCollisionForRaycastToNewPosition(entity, newPosition)) {
+      return false;
     }
 
     // set new map location
     entity.setLocation(newPosition);
-    return success;
+    return true;
+  }
+
+  private boolean resolveCollisionForCurrentLocation(IMovableEntity entity) {
+    // resolve collision for current location
+    if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
+      final Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
+      entity.setLocation(resolvedPosition);
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean resolveCollisionForNewPosition(IMovableEntity entity, Point2D newPosition) {
+    // resolve collision for new location
+    if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
+      final Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
+      entity.setLocation(resolvedPosition);
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean resolveCollisionForRaycastToNewPosition(IMovableEntity entity, Point2D newPosition) {
+    // special case to prevent entities to glitch through collision boxes if
+    // they have a large enough step size
+    final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
+    for (final CollisionBox collisionBox : this.getAllCollisionBoxesInternal()) {
+      if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
+        continue;
+      }
+
+      // there was a collision in between
+      final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
+      if (intersection != null) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Override
