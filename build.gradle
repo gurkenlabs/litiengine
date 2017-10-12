@@ -66,6 +66,7 @@ jacocoTestReport {
 
 task createJavadocs(type: Javadoc) {
   source sourceSets.main.allJava
+  classpath = configurations.compile
   options.encoding 'UTF-8'
   dependsOn build
 }
