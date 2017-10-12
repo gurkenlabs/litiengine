@@ -7,7 +7,6 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.sound.Sound;
 
 public class HorizontalSlider extends Slider {
   public static final FontIcon ARROW_LEFT = new FontIcon(ICON_FONT, "\uE805");
@@ -15,7 +14,7 @@ public class HorizontalSlider extends Slider {
   private final double minSliderX;
   private final double maxSliderX;
 
-  public HorizontalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final Sound hoverSound, final boolean showArrowButtons) {
+  public HorizontalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final boolean showArrowButtons) {
     super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);
     this.minSliderX = this.getX() + this.getHeight();
     this.maxSliderX = this.getX() + this.getWidth() - this.getHeight() * 3;

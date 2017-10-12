@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
 @XmlRootElement(name = "polyline")

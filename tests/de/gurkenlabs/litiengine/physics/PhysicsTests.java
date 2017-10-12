@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.entities.MovableCombatEntity;
 public class PhysicsTests {
 
   @Test
-  public void TestBasicCollisionDetection() {
+  public void testBasicCollisionDetection() {
     try (GameLoop loop = new GameLoop(30)) {
       IMovableCombatEntity ent = new MovableCombatEntity();
       ent.setSize(16, 16);
