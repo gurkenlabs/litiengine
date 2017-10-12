@@ -4,14 +4,16 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
 @XmlRootElement(name = "polyline")
 public class Polyline implements IPolyline, Serializable {
+  private static final Logger log = Logger.getLogger(Polyline.class.getName());
   private static final long serialVersionUID = -9046398175130339L;
 
   @XmlAttribute(name = "points")
@@ -48,7 +50,7 @@ public class Polyline implements IPolyline, Serializable {
           float y = Float.parseFloat(coords[1]);
           this.points.add(new Point2D.Float(x, y));
         } catch (NumberFormatException e) {
-          continue;
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
     }

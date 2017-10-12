@@ -154,13 +154,10 @@ public class AmbientLight {
 
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBounds2D());
       for (final Line2D line : bounds) {
-        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBounds2D().contains(light.getDimensionCenter())) {
-          continue;
-        }
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
         final Vector2D lightVector = new Vector2D(lightCenter, line.getP1());
 
-        if (lineVector.normalVector().dotProduct(lightVector) >= 0) {
+        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBounds2D().contains(light.getDimensionCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
 
