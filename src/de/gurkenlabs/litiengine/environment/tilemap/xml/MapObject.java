@@ -62,7 +62,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    */
   @Override
   public Dimension getDimension() {
-    return new Dimension((int) this.width, (int) this.height);
+    return new Dimension(this.width, this.height);
   }
 
   /*
@@ -106,7 +106,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    */
   @Override
   public Point getLocation() {
-    return new Point((int) this.x, (int) this.y);
+    return new Point(this.x, this.y);
   }
 
   /*
@@ -134,41 +134,49 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.polyline;
   }
 
+  @Override
   @XmlTransient
   public void setGid(int gid) {
     this.gid = gid;
   }
 
+  @Override
   @XmlTransient
   public void setHeight(int height) {
     this.height = height;
   }
 
+  @Override
   @XmlTransient
   public void setId(int id) {
     this.id = id;
   }
 
+  @Override
   @XmlTransient
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   @XmlTransient
   public void setType(String type) {
     this.type = type;
   }
 
+  @Override
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
   }
 
+  @Override
   @XmlTransient
   public void setX(int x) {
     this.x = x;
   }
 
+  @Override
   @XmlTransient
   public void setY(int y) {
     this.y = y;

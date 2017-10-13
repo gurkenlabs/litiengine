@@ -216,10 +216,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return optTile.get().getAnimation();
   }
 
+  @Override
   public int getColumns() {
     return this.columns;
   }
 
+  @Override
   public int getTilecount() {
     return this.tilecount;
   }

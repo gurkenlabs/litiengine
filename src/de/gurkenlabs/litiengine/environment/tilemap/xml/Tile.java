@@ -89,6 +89,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     return this.terrains;
   }
 
+  @Override
   public ITileAnimation getAnimation() {
     return this.animation;
   }

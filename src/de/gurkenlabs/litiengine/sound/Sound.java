@@ -19,7 +19,7 @@ import de.gurkenlabs.util.io.StreamUtilities;
  * This class implements all required functionality to load sounds from the file
  * system and provide a stream that can later on be used for the sound playback.
  */
-public class Sound {
+public final class Sound {
   private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Sound.class.getName());
 

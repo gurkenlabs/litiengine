@@ -281,10 +281,12 @@ public class Camera implements ICamera {
     this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
   }
 
+  @Override
   public boolean isClampToMap() {
     return clampToMap;
   }
 
+  @Override
   public void setClampToMap(boolean clampToMap) {
     this.clampToMap = clampToMap;
   }

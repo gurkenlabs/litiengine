@@ -26,6 +26,7 @@ public class Polyline implements IPolyline, Serializable {
     this.points = new ArrayList<>();
   }
 
+  @Override
   public List<Point2D> getPoints() {
     if (this.points.isEmpty()) {
       this.populateList();

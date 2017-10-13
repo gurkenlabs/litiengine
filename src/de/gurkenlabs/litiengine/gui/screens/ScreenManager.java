@@ -191,7 +191,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void windowStateChanged(WindowEvent e) {
-    if (e.getNewState() == JFrame.ICONIFIED) {
+    if (e.getNewState() == Frame.ICONIFIED) {
       Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
     } else {
       Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());

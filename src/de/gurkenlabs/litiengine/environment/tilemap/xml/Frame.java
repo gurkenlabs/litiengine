@@ -21,11 +21,13 @@ public class Frame implements ITileAnimationFrame, Serializable {
   @XmlAttribute
   private int duration;
 
+  @Override
   @XmlTransient
   public int getTileId() {
     return this.tileid;
   }
 
+  @Override
   @XmlTransient
   public int getDuration() {
     return this.duration;

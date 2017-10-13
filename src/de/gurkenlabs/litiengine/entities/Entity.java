@@ -176,20 +176,24 @@ public abstract class Entity implements IEntity {
     this.boundingBox = null;
   }
 
+  @Override
   public List<String> getTags() {
     return this.tags;
   }
 
+  @Override
   public boolean hasTag(String tag) {
     return this.tags.contains(tag);
   }
 
+  @Override
   public void addTag(String tag) {
     if (!this.tags.contains(tag)) {
       this.tags.add(tag);
     }
   }
 
+  @Override
   public void removeTag(String tag) {
     if (!this.tags.contains(tag)) {
       this.tags.remove(tag);
