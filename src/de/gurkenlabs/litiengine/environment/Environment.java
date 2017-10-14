@@ -70,22 +70,23 @@ public class Environment implements IEnvironment {
   private final Map<RenderType, Map<Integer, IEntity>> entities;
   private final Map<String, List<IEntity>> entitiesByTag;
 
-  private final List<Consumer<Graphics2D>> entitiesRenderedConsumer;
-  private final List<IRenderable> groundRenderable;
-  private final List<Consumer<IEnvironment>> initializedConsumer;
-  private final List<Consumer<IEnvironment>> loadedConsumer;
+  private final List<Consumer<Graphics2D>> entitiesRenderedConsumers;
+  private final List<Consumer<IEnvironment>> initializedConsumers;
+  private final List<Consumer<IEnvironment>> loadedConsumers;
+  private final List<Consumer<IEntity>> entityAddedConsumers;
+  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
 
+  private final List<IRenderable> groundRenderable;
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
   private final Collection<Trigger> triggers;
 
   private final List<MapArea> mapAreas;
 
-  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
-
   private final Map<Integer, IMovableEntity> movableEntities;
   private final List<IRenderable> overlayRenderable;
-  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+
   private final List<Spawnpoint> spawnPoints;
 
   private final Map<String, IMapObjectLoader> mapObjectLoaders;
@@ -143,10 +144,11 @@ public class Environment implements IEnvironment {
     this.staticShadows = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.entitiesRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
-    this.initializedConsumer = new CopyOnWriteArrayList<>();
-    this.loadedConsumer = new CopyOnWriteArrayList<>();
+    this.initializedConsumers = new CopyOnWriteArrayList<>();
+    this.loadedConsumers = new CopyOnWriteArrayList<>();
+    this.entityAddedConsumers = new CopyOnWriteArrayList<>();
 
     this.spawnPoints = new CopyOnWriteArrayList<>();
 
@@ -206,6 +208,10 @@ public class Environment implements IEnvironment {
     }
 
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
+
+    for (Consumer<IEntity> cons : this.entityAddedConsumers) {
+      cons.accept(entity);
+    }
   }
 
   @Override
@@ -615,7 +621,7 @@ public class Environment implements IEnvironment {
     this.addStaticShadows();
     this.addAmbientLight();
 
-    for (final Consumer<IEnvironment> cons : this.initializedConsumer) {
+    for (final Consumer<IEnvironment> cons : this.initializedConsumers) {
       cons.accept(this);
     }
 
@@ -635,7 +641,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = true;
-    for (final Consumer<IEnvironment> cons : this.loadedConsumer) {
+    for (final Consumer<IEnvironment> cons : this.loadedConsumers) {
       cons.accept(this);
     }
   }
@@ -658,18 +664,23 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void onEntityAdded(Consumer<IEntity> consumer) {
+    this.entityAddedConsumers.add(consumer);
+  }
+
+  @Override
   public void onEntitiesRendered(final Consumer<Graphics2D> consumer) {
-    this.entitiesRenderedConsumer.add(consumer);
+    this.entitiesRenderedConsumers.add(consumer);
   }
 
   @Override
   public void onInitialized(final Consumer<IEnvironment> consumer) {
-    this.initializedConsumer.add(consumer);
+    this.initializedConsumers.add(consumer);
   }
 
   @Override
   public void onLoaded(final Consumer<IEnvironment> consumer) {
-    this.loadedConsumer.add(consumer);
+    this.loadedConsumers.add(consumer);
   }
 
   @Override
@@ -786,7 +797,7 @@ public class Environment implements IEnvironment {
     }
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
-    this.informConsumers(g, this.entitiesRenderedConsumer);
+    this.informConsumers(g, this.entitiesRenderedConsumers);
 
     Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
 

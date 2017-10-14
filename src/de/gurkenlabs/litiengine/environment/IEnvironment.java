@@ -121,6 +121,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void loadFromMap(final int mapId);
 
+  public void onEntityAdded(final Consumer<IEntity> consumer);
+
   public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
 
   public void onInitialized(final Consumer<IEnvironment> consumer);
