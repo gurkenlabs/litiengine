@@ -52,8 +52,6 @@ public class RenderLoop extends Thread {
       } catch (final InterruptedException e) {
         this.interrupt();
         break;
-      } catch (final Exception e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
       }
     }
   }
