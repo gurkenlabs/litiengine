@@ -22,6 +22,11 @@ public interface IEntity {
 
   public int getMapId();
 
+  /***
+   * Gets the name of this entity.
+   * 
+   * @return The name of this entity.
+   */
   public String getName();
 
   public RenderType getRenderType();

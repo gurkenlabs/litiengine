@@ -94,6 +94,16 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
+  public Animation getAnimation(String animationName) {
+    final Optional<Animation> opt = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst();
+    if (!opt.isPresent()) {
+      return null;
+    }
+
+    return opt.get();
+  }
+
+  @Override
   public Animation getCurrentAnimation() {
     return this.currentAnimation;
   }
@@ -167,12 +177,10 @@ public class AnimationController implements IAnimationController {
       this.getCurrentAnimation().terminate();
     }
 
-    final Optional<Animation> opt = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst();
-    if (!opt.isPresent()) {
+    final Animation anim = this.getAnimation(animationName);
+    if (anim == null) {
       return;
     }
-
-    final Animation anim = opt.get();
 
     this.currentAnimation = anim;
     this.currentAnimation.start();

@@ -16,6 +16,8 @@ public interface IAnimationController extends IUpdateable {
 
   public List<Animation> getAnimations();
 
+  public Animation getAnimation(String animationName);
+
   public Animation getCurrentAnimation();
 
   public BufferedImage getCurrentSprite();
