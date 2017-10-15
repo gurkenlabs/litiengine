@@ -928,7 +928,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void importMap() {
-    if (this.getMaps() == null || this.getMaps().size() == 0) {
+    if (this.getMaps() == null) {
       return;
     }
 
