@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
