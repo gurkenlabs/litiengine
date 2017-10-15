@@ -155,6 +155,10 @@ public class MapComponent extends EditorComponent {
 
   @Override
   public void render(Graphics2D g) {
+    if (Game.getEnvironment() == null) {
+      return;
+    }
+
     Color COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
     Color COLOR_NAME_FILL = new Color(0, 0, 0, 60);
     final Color COLOR_FOCUS_FILL = new Color(0, 0, 0, 50);

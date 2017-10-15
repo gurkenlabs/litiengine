@@ -200,6 +200,10 @@ public class EditorScreen extends Screen {
         return;
       }
 
+      if (Game.getEnvironment() != null) {
+        Game.loadEnvironment(null);
+      }
+
       // set up project settings
       this.setProjectPath(chooser.getSelectedFile().getCanonicalPath());
       this.setProjectSettings();
@@ -434,7 +438,11 @@ public class EditorScreen extends Screen {
 
   private void loadSpriteFiles(String projectPath, String[] spriteInfoFiles) {
     for (String spriteFile : FileUtilities.findFiles(new ArrayList<>(), Paths.get(projectPath), spriteInfoFiles)) {
-      List<Spritesheet> loaded = Spritesheet.load(spriteFile, FileUtilities.getParentDirPath(this.currentResourceFile) + "\\resources\\");
+      if (spriteFile == null || spriteFile.isEmpty()) {
+        continue;
+      }
+
+      List<Spritesheet> loaded = Spritesheet.load(spriteFile, projectPath + "\\resources\\");
       List<SpriteSheetInfo> infos = new ArrayList<>();
       for (Spritesheet sprite : loaded) {
         infos.add(new SpriteSheetInfo(sprite));
