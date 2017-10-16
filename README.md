@@ -9,7 +9,7 @@
 
 LITIengine is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
 
-> ## Important Note
+> ## Important Note 16.10.2017
 
 > Currently the LITIengine is being actively developed and therefore some parts of the framework are not final yet. Be aware that the engine API might change over the course of the next releases up until beta (v0.5.0-beta).
 Nontheless, the LITIengine can of course already be used to make fully functioning **2D java games**, at least we did that multiple times now :smile:.
