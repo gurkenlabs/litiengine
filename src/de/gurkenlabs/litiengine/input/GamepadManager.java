@@ -211,8 +211,6 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       }
     } catch (IllegalStateException e) {
       this.loop.terminate();
-    } catch (UnsatisfiedLinkError e) {
-
     }
   }
 }
