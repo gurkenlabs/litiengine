@@ -147,8 +147,13 @@ public final class FileUtilities {
       if (resourceStream2 != null) {
         return resourceStream2;
       }
-
-      return new FileInputStream(file);
+      File f = new File(file);
+      if (f.exists()) {
+        return new FileInputStream(file);
+      } else {
+        log.log(Level.INFO, "{0} could not be found.", file);
+        return null;
+      }
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
       return null;

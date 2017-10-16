@@ -35,8 +35,16 @@ public final class Input {
       gamePads = new CopyOnWriteArrayList<>();
       gamePadManager = new GamepadManager();
     }
+  }
 
+  public static void start() {
     InputLoop.start();
+    gamePadManager.start();
+  }
+
+  public static void terminate() {
+    InputLoop.terminate();
+    gamePadManager.terminate();
   }
 
   public static IGamepadManager gamepadManager() {

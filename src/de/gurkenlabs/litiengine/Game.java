@@ -282,6 +282,8 @@ public final class Game {
 
   public static void start() {
     gameLoop.start();
+    Input.start();
+
     soundEngine.start();
     renderLoop.start();
 
@@ -300,6 +302,7 @@ public final class Game {
     }
 
     getConfiguration().save();
+    Input.terminate();
     gameLoop.terminate();
 
     soundEngine.terminate();

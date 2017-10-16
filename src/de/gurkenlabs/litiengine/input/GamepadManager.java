@@ -44,8 +44,6 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       return true;
     });
 
-    this.loop.start();
-
     this.onGamepadAdded(pad -> {
       if (this.defaultgamePadIndex == -1) {
         this.defaultgamePadIndex = pad.getIndex();
@@ -119,6 +117,16 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     for (final Consumer<IGamepad> cons : this.gamepadRemovedConsumer) {
       cons.accept(gamepad);
     }
+  }
+
+  @Override
+  public void start() {
+    this.loop.start();
+  }
+
+  @Override
+  public void terminate() {
+    this.loop.terminate();
   }
 
   @Override
@@ -203,6 +211,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       }
     } catch (IllegalStateException e) {
       this.loop.terminate();
+    } catch (UnsatisfiedLinkError e) {
+
     }
   }
 }
