@@ -59,11 +59,11 @@ public class ShimmerParticle extends RectangleFillParticle {
     }
 
     if (relativeParticleLocation.getY() < this.getBoundingBox().getY()) {
-      this.setDeltyY(-this.getDy());
+      this.setDeltaY(-this.getDy());
     }
 
     if (relativeParticleLocation.getY() > this.getBoundingBox().getY() + this.getBoundingBox().getHeight()) {
-      this.setDeltyY(-this.getDy());
+      this.setDeltaY(-this.getDy());
     }
   }
 

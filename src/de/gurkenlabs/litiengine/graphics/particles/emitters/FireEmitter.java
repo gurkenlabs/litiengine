@@ -72,7 +72,7 @@ public class FireEmitter extends Emitter {
     final float gravityY = 0.0015f * (randBool ? 1f : -1f);
     final float size = (float) (4 + Math.random() * 5);
 
-    this.addParticle(new RectangleFillParticle(size, size, color, life).setX(x).setDeltaX(dx).setDeltyY(dy).setDeltaIncY(gravityY));
+    this.addParticle(new RectangleFillParticle(size, size, color, life).setX(x).setDeltaX(dx).setDeltaY(dy).setDeltaIncY(gravityY));
   }
 
   /*

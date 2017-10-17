@@ -53,6 +53,6 @@ public class ShimmerEmitter extends Emitter {
         .setX(x)
         .setY(y)
         .setDeltaX(dx)
-        .setDeltyY(dy);
+        .setDeltaY(dy);
   }
 }
