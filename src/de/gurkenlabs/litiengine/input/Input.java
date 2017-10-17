@@ -39,12 +39,16 @@ public final class Input {
 
   public static void start() {
     InputLoop.start();
-    gamePadManager.start();
+    if (gamePadManager != null) {
+      gamePadManager.start();
+    }
   }
 
   public static void terminate() {
     InputLoop.terminate();
-    gamePadManager.terminate();
+    if (gamePadManager != null) {
+      gamePadManager.terminate();
+    }
   }
 
   public static IGamepadManager gamepadManager() {
