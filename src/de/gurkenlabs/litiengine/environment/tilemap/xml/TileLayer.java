@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
@@ -22,9 +21,8 @@ public class TileLayer extends Layer implements ITileLayer {
   private static final long serialVersionUID = -6588787132358068892L;
 
   /** The data. */
-  @XmlElementWrapper(name = "data")
-  @XmlElement(name = "tile")
-  private List<Tile> data = null;
+  @XmlElement
+  private TileData data = null;
 
   private transient List<ITile> tileList;
 
@@ -84,11 +82,11 @@ public class TileLayer extends Layer implements ITileLayer {
     }
 
     this.tiles = new Tile[this.getWidth()][this.getHeight()];
-    for (int i = 0; i < this.data.size(); i++) {
+    for (int i = 0; i < this.getData().size(); i++) {
       final int x = i % this.getWidth();
       final int y = i / this.getWidth();
 
-      final Tile tile = this.data.get(i);
+      final Tile tile = this.getData().get(i);
       tile.setTileCoordinate(new Point(x, y));
       this.tileList.add(tile);
       this.tiles[x][y] = tile;
@@ -98,6 +96,6 @@ public class TileLayer extends Layer implements ITileLayer {
   }
 
   protected List<Tile> getData() {
-    return this.data;
+    return this.data.parseTiles();
   }
 }

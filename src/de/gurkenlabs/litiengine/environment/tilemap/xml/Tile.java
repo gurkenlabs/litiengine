@@ -21,6 +21,14 @@ import de.gurkenlabs.util.ArrayUtilities;
 @XmlRootElement(name = "tile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile extends CustomPropertyProvider implements ITile, Serializable {
+  protected static final long FLIPPED_HORIZONTALLY_FLAG = 0xFFFFFFFF80000000L;
+  protected static final long FLIPPED_VERTICALLY_FLAG = 0xFFFFFFFF40000000L;
+  protected static final long FLIPPED_DIAGONALLY_FLAG = 0xFFFFFFFF20000000L;
+
+  protected static final long FLIPPED_HORIZONTALLY_FLAG_CSV = 0x80000000L;
+  protected static final long FLIPPED_VERTICALLY_FLAG_CSV = 0x40000000L;
+  protected static final long FLIPPED_DIAGONALLY_FLAG_CSV = 0x20000000L;
+
   private static final long serialVersionUID = -7597673646108642906L;
 
   /** The gid. */
@@ -40,6 +48,57 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   private transient Point tileCoordinate;
 
   private transient ITerrain[] terrains;
+
+  private transient long gidMask;
+
+  private transient boolean csv;
+
+  public Tile() {
+  }
+
+  public Tile(int gid) {
+    this.gid = gid;
+  }
+
+  public Tile(long gidBitmask, boolean csv) {
+    this.csv = csv;
+
+    // Clear the flags
+    long tileId = gidBitmask;
+
+    if (this.csv) {
+      tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
+    } else {
+      tileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+    }
+
+    this.gidMask = gidBitmask;
+    this.gid = (int) tileId;
+  }
+
+  public boolean isFlippedHorizontally() {
+    if (this.csv) {
+      return (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
+    } else {
+      return (this.gidMask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
+    }
+  }
+
+  public boolean isFlippedVertically() {
+    if (this.csv) {
+      return (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
+    } else {
+      return (this.gidMask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
+    }
+  }
+
+  public boolean isFlippedDiagonally() {
+    if (this.csv) {
+      return (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) != FLIPPED_VERTICALLY_FLAG_CSV;
+    } else {
+      return (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
+    }
+  }
 
   /*
    * (non-Javadoc)
