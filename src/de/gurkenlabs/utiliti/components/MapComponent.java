@@ -56,6 +56,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -83,6 +84,7 @@ public class MapComponent extends EditorComponent {
     NONE
   }
 
+  private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
   private static final int TRANSFORM_RECT_SIZE = 6;
   private static final int BASE_SCROLL_SPEED = 50;
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
@@ -951,6 +953,14 @@ public class MapComponent extends EditorComponent {
         if (map == null) {
           System.out.println("could not load map from file '" + chooser.getSelectedFile().toString() + "'");
           return;
+        }
+
+        if (map.getMapObjectLayers().size() == 0) {
+
+          // make sure there's a map object layer on the map because we need one to add any kind of entities
+          MapObjectLayer layer = new MapObjectLayer();
+          layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
+          map.addMapObjectLayer(layer);
         }
 
         Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
