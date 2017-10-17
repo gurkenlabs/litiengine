@@ -299,7 +299,7 @@ public abstract class Particle implements ITimeToLive {
    * @param dy
    *          the new dy
    */
-  public Particle setDeltyY(final float dy) {
+  public Particle setDeltaY(final float dy) {
     this.dy = dy;
     return this;
   }
