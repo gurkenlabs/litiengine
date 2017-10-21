@@ -80,4 +80,6 @@ public interface IPhysicsEngine extends IUpdateable {
   public void remove(Rectangle2D staticCollisionBox);
 
   public void setBounds(Rectangle2D environmentBounds);
+
+  public Rectangle2D getBounds();
 }

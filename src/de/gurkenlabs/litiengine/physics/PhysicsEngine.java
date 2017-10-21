@@ -178,6 +178,11 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
+  public Rectangle2D getBounds() {
+    return this.environmentBounds;
+  }
+
+  @Override
   public boolean move(final IMovableEntity entity, final double angle, final double delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
