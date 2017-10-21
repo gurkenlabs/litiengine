@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 public enum Direction {
   DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);
 
-  public static Direction fromAngle(final float angle) {
+  public static Direction fromAngle(final double angle) {
     if (angle >= 0 && angle < 45) {
       return Direction.DOWN;
     }
