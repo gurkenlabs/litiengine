@@ -1,5 +1,6 @@
 package de.gurkenlabs.util;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,5 +44,14 @@ public final class ArrayUtilities {
     }
 
     return integers;
+  }
+
+  public static <T> T getRandom(T[] arr) {
+    if (arr.length == 0) {
+      return null;
+    }
+
+    final int randomIndex = new Random().nextInt(arr.length);
+    return arr[randomIndex];
   }
 }
