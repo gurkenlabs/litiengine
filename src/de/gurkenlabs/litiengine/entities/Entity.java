@@ -50,6 +50,21 @@ public abstract class Entity implements IEntity {
     }
   }
 
+  protected Entity(int mapId) {
+    this();
+    this.mapId = mapId;
+  }
+
+  protected Entity(String name) {
+    this();
+    this.name = name;
+  }
+
+  protected Entity(int mapId, String name) {
+    this(mapId);
+    this.name = name;
+  }
+
   @Override
   public float getAngle() {
     return this.angle;

@@ -3,17 +3,19 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.Direction;
+import de.gurkenlabs.litiengine.entities.Entity;
 
-public class Spawnpoint extends MapLocation {
+public class Spawnpoint extends Entity {
   private Direction direction;
   private String spawnType;
 
   public Spawnpoint(int mapId, Point2D point) {
-    super(mapId, point);
+    super(mapId);
+    this.setLocation(point);
   }
 
   public Spawnpoint(int mapId, Point2D point, Direction direction) {
-    super(mapId, point);
+    this(mapId, point);
     this.setDirection(direction);
   }
 

@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
@@ -99,7 +98,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
     switch (this.getSpawnMode()) {
     case ALLSPAWNPOINTS:
-      for (final MapLocation spawn : this.getSpawnPoints()) {
+      for (final Spawnpoint spawn : this.getSpawnPoints()) {
         this.spawn(spawn, this.getAmount());
       }
       break;
@@ -119,15 +118,15 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
   }
 
-  private void spawn(final MapLocation spawnpoint, final int amount) {
+  private void spawn(final Spawnpoint spawnpoint, final int amount) {
     new SpawnThread(spawnpoint, amount).start();
   }
 
   private class SpawnThread extends Thread {
     private final int amount;
-    private final MapLocation point;
+    private final Spawnpoint point;
 
-    public SpawnThread(final MapLocation point, final int amount) {
+    public SpawnThread(final Spawnpoint point, final int amount) {
       this.point = point;
       this.amount = amount;
     }
@@ -136,7 +135,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     public void run() {
       for (int i = 0; i < this.amount; i++) {
         final T newEntity = EntitySpawner.this.createNew();
-        newEntity.setLocation(this.point.getPoint());
+        newEntity.setLocation(this.point.getLocation());
         newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
         EntitySpawner.this.addToEnvironment(EntitySpawner.this.environment, newEntity);
 
