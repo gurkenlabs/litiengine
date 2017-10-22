@@ -189,6 +189,10 @@ public class Environment implements IEnvironment {
       this.triggers.add((Trigger) entity);
     }
 
+    if (entity instanceof Spawnpoint) {
+      this.spawnPoints.add((Spawnpoint) entity);
+    }
+
     for (String tag : entity.getTags()) {
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).add(entity);
