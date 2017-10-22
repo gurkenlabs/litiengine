@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLocation;
+import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
@@ -19,9 +20,9 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
   private SpawnMode spawnMode;
 
-  private List<MapLocation> spawnpoints;
+  private List<Spawnpoint> spawnpoints;
 
-  public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<MapLocation> spawnpoints, final int interval, final int amount) {
+  public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this(environment, interval, amount);
     this.spawnpoints = spawnpoints;
     loop.attach(this);
@@ -55,7 +56,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public List<MapLocation> getSpawnPoints() {
+  public List<Spawnpoint> getSpawnPoints() {
     return this.spawnpoints;
   }
 
