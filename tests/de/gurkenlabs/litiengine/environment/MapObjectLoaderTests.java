@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.core.Valign;
-import de.gurkenlabs.litiengine.entities.Collider;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -75,7 +75,7 @@ public class MapObjectLoaderTests {
 
   @Test
   public void testColliderMapObjectLoader() {
-    ColliderMapObjectLoader loader = new ColliderMapObjectLoader();
+    CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
     when(mapObject.getId()).thenReturn(111);
@@ -91,7 +91,7 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
     Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
-    Collider collider = (Collider) entity;
+    CollisionBox collider = (CollisionBox) entity;
 
     Assert.assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
     Assert.assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);

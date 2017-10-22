@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.gurkenlabs.litiengine.entities.Collider;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -42,7 +42,7 @@ public class EnvironmentTests {
     LightSource testLight = new LightSource(100, 100, Color.WHITE, LightSource.ELLIPSE, true);
     testLight.setMapId(999);
 
-    Collider testCollider = new Collider(true);
+    CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
 
     ICombatEntity combatEntity = mock(ICombatEntity.class);
@@ -66,7 +66,7 @@ public class EnvironmentTests {
     Assert.assertNotNull(env.get("test"));
 
     Assert.assertNotNull(env.getLightSource(999));
-    Assert.assertNotNull(env.getCollider(1));
+    Assert.assertNotNull(env.getCollisionBox(1));
 
     Assert.assertNotNull(env.get(123));
     Assert.assertNotNull(env.getCombatEntity(123));

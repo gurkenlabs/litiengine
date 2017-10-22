@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.configuration.Quality;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.Collider;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -64,7 +64,7 @@ import de.gurkenlabs.util.io.FileUtilities;
  */
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
-  private final Collection<Collider> colliders;
+  private final Collection<CollisionBox> colliders;
   private final Map<Integer, ICombatEntity> combatEntities;
 
   private final Map<RenderType, Map<Integer, IEntity>> entities;
@@ -179,8 +179,8 @@ public class Environment implements IEnvironment {
       this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
     }
 
-    if (entity instanceof Collider) {
-      this.colliders.add((Collider) entity);
+    if (entity instanceof CollisionBox) {
+      this.colliders.add((CollisionBox) entity);
     }
 
     if (entity instanceof LightSource) {
@@ -237,7 +237,7 @@ public class Environment implements IEnvironment {
     this.getCombatEntities().clear();
     this.getMovableEntities().clear();
     this.getLightSources().clear();
-    this.getColliders().clear();
+    this.getCollisionBoxes().clear();
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
@@ -402,13 +402,13 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<Collider> getColliders() {
+  public Collection<CollisionBox> getCollisionBoxes() {
     return this.colliders;
   }
 
   @Override
-  public Collider getCollider(int mapId) {
-    for (final Collider collider : this.getColliders()) {
+  public CollisionBox getCollisionBox(int mapId) {
+    for (final CollisionBox collider : this.getCollisionBoxes()) {
       if (collider.getMapId() == mapId) {
         return collider;
       }
@@ -722,7 +722,7 @@ public class Environment implements IEnvironment {
       }
     }
 
-    if (entity instanceof Collider) {
+    if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
     }
 
@@ -1077,8 +1077,8 @@ public class Environment implements IEnvironment {
   }
 
   private void loadPhysicsEntity(IEntity entity) {
-    if (entity instanceof Collider) {
-      final Collider coll = (Collider) entity;
+    if (entity instanceof CollisionBox) {
+      final CollisionBox coll = (CollisionBox) entity;
       if (coll.isObstacle()) {
         Game.getPhysicsEngine().add(coll.getBoundingBox());
       } else {
@@ -1117,7 +1117,7 @@ public class Environment implements IEnvironment {
 
   private void registerDefaultMapObjectLoaders() {
     this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new ColliderMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new CollisionBoxMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
@@ -1138,8 +1138,8 @@ public class Environment implements IEnvironment {
    */
   private void unload(final IEntity entity) {
     // 1. remove from physics engine
-    if (entity instanceof Collider) {
-      final Collider coll = (Collider) entity;
+    if (entity instanceof CollisionBox) {
+      final CollisionBox coll = (CollisionBox) entity;
       if (coll.isObstacle()) {
         Game.getPhysicsEngine().remove(coll.getBoundingBox());
       } else {

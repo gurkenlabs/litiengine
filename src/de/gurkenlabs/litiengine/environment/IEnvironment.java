@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.core.IInitializable;
-import de.gurkenlabs.litiengine.entities.Collider;
+import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -60,9 +60,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public List<MapArea> getAreas();
 
-  public Collection<Collider> getColliders();
+  public Collection<CollisionBox> getCollisionBoxes();
 
-  public Collider getCollider(final int mapId);
+  public CollisionBox getCollisionBox(final int mapId);
 
   public Collection<StaticShadow> getStaticShadows();
 
