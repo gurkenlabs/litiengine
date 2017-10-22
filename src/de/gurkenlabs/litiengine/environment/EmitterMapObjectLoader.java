@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 
-  public EmitterMapObjectLoader() {
+  protected EmitterMapObjectLoader() {
     super(MapObjectType.EMITTER);
   }
 

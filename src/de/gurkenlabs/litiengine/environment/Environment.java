@@ -842,7 +842,6 @@ public class Environment implements IEnvironment {
     }
 
     this.addStaticShadow(mapObject);
-    this.addSpawnpoint(mapObject);
     this.addMapArea(mapObject);
   }
 
@@ -856,21 +855,6 @@ public class Environment implements IEnvironment {
     double height = mapObject.getDimension().getHeight();
     final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE)));
     this.getStaticShadows().add(shadow);
-  }
-
-  protected void addSpawnpoint(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
-      return;
-    }
-
-    final Direction direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
-    final Spawnpoint spawn = new Spawnpoint(mapObject.getId(), new Point(mapObject.getLocation()), direction);
-    spawn.setName(mapObject.getName());
-
-    final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
-    spawn.setSpawnType(spawnType);
-
-    this.getSpawnPoints().add(spawn);
   }
 
   protected void addMapArea(final IMapObject mapObject) {
@@ -1122,6 +1106,7 @@ public class Environment implements IEnvironment {
     this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
     this.registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
+    this.registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
   }
 
   /**

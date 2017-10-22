@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.graphics.LightSource;
 
 public class LightSourceMapObjectLoader extends MapObjectLoader {
 
-  public LightSourceMapObjectLoader() {
+  protected LightSourceMapObjectLoader() {
     super(MapObjectType.LIGHTSOURCE);
   }
 

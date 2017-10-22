@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class DecorMobMapObjectLoader extends MapObjectLoader {
 
-  public DecorMobMapObjectLoader() {
+  protected DecorMobMapObjectLoader() {
     super(MapObjectType.DECORMOB);
   }
 

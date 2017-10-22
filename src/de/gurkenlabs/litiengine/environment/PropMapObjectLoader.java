@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class PropMapObjectLoader extends MapObjectLoader {
 
-  public PropMapObjectLoader() {
+  protected PropMapObjectLoader() {
     super(MapObjectType.PROP);
   }
 
