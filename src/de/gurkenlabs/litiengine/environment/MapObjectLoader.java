@@ -14,7 +14,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   @Override
-  public String getMapObjectTypeQ() {
+  public String getMapObjectType() {
     return this.mapObjectType;
   }
 }

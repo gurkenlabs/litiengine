@@ -133,10 +133,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
-  public void registerMapObjectLoader(final String mapObjectType, final IMapObjectLoader mapObjectLoader);
-
-  public void registerMapObjectLoader(final MapObjectType mapObjectType, final IMapObjectLoader mapObjectLoader);
-
   public void reloadFromMap(final int mapId);
 
   public void remove(final IEntity entity);

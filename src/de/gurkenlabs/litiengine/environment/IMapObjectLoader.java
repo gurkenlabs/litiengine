@@ -5,7 +5,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
 public interface IMapObjectLoader {
 
-  String getMapObjectTypeQ();
+  String getMapObjectType();
 
   IEntity load(IMapObject mapObject);
 }

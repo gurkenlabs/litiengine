@@ -62,6 +62,8 @@ import de.gurkenlabs.util.io.FileUtilities;
  */
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
+  private static final Map<String, IMapObjectLoader> mapObjectLoaders;
+
   private final Collection<CollisionBox> colliders;
   private final Map<Integer, ICombatEntity> combatEntities;
 
@@ -87,8 +89,6 @@ public class Environment implements IEnvironment {
 
   private final List<Spawnpoint> spawnPoints;
 
-  private final Map<String, IMapObjectLoader> mapObjectLoaders;
-
   private AmbientLight ambientLight;
   private boolean loaded;
   private boolean initialized;
@@ -97,6 +97,11 @@ public class Environment implements IEnvironment {
 
   private int localIdSequence = 0;
   private int mapIdSequence;
+
+  static {
+    mapObjectLoaders = new ConcurrentHashMap<>();
+    registerDefaultMapObjectLoaders();
+  }
 
   public Environment(final IMap map) {
     this();
@@ -152,10 +157,6 @@ public class Environment implements IEnvironment {
 
     this.groundRenderable = new CopyOnWriteArrayList<>();
     this.overlayRenderable = new CopyOnWriteArrayList<>();
-
-    this.mapObjectLoaders = new ConcurrentHashMap<>();
-
-    this.registerDefaultMapObjectLoaders();
   }
 
   @Override
@@ -695,14 +696,12 @@ public class Environment implements IEnvironment {
     this.overlayRenderedConsumer.add(consumer);
   }
 
-  @Override
-  public void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
-    this.mapObjectLoaders.put(mapObjectType, mapObjectLoader);
+  public static void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
+    mapObjectLoaders.put(mapObjectType, mapObjectLoader);
   }
 
-  @Override
-  public void registerMapObjectLoader(MapObjectType mapObjectType, IMapObjectLoader mapObjectLoader) {
-    this.registerMapObjectLoader(mapObjectType.name(), mapObjectLoader);
+  public static void registerMapObjectLoader(MapObjectType mapObjectType, IMapObjectLoader mapObjectLoader) {
+    registerMapObjectLoader(mapObjectType.name(), mapObjectLoader);
   }
 
   @Override
@@ -1101,14 +1100,14 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private void registerDefaultMapObjectLoaders() {
-    this.registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.COLLISIONBOX, new CollisionBoxMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
-    this.registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
+  private static void registerDefaultMapObjectLoaders() {
+    registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.COLLISIONBOX, new CollisionBoxMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
   }
 
   /**
