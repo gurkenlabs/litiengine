@@ -246,6 +246,11 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
 
+    if (angle == 0 || angle % 360 == 0) {
+      renderImage(g, image, x, y);
+      return;
+    }
+
     final AffineTransform t = new AffineTransform();
 
     t.translate(x, y);
