@@ -56,9 +56,11 @@ public class MovableCombatEntityAnimationController extends EntityAnimationContr
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return;
     }
+    
     if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop()) {
       return;
     }
+    
     if (this.getEntity() == null) {
       return;
     }
