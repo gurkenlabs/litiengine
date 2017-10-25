@@ -210,12 +210,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public void update(final IGameLoop loop) {
-    if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION || !Game.getPhysicsEngine().collides(this.getCollisionBox(), CollisionType.COLLTYPE_ENTITY)) {
+    if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION) {
       return;
     }
 
     final List<IEntity> collEntities = this.getEntitiesInCollisionBox();
-
     for (final IEntity ent : collEntities) {
       if (this.activated.contains(ent)) {
         continue;
