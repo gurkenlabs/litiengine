@@ -214,9 +214,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
       return true;
     }
 
-    if (this.resolveCollisionForCurrentLocation(entity)) {
-      return false;
-    }
+    boolean success = !this.resolveCollisionForCurrentLocation(entity);
 
     if (this.resolveCollisionForNewPosition(entity, newPosition)) {
       return false;
@@ -231,7 +229,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
     // set new map location
     entity.setLocation(newPosition);
-    return true;
+    return success;
   }
 
   private boolean resolveCollisionForCurrentLocation(IMovableEntity entity) {
