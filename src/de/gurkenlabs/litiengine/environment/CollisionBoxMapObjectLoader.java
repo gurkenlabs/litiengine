@@ -26,7 +26,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
     final CollisionBox col = new CollisionBox(isObstacle);
     col.setLocation(mapObject.getLocation());
-    col.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
+    col.setSize(mapObject.getWidth(), mapObject.getHeight());
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
     col.setMapId(mapObject.getId());
