@@ -12,6 +12,7 @@ public class Prop extends CombatEntity {
   private Material material;
   private String spritePath;
   private boolean isObstacle;
+  private boolean addShadow;
 
   /**
    * Instantiates a new destructible.
@@ -61,5 +62,13 @@ public class Prop extends CombatEntity {
 
   public void setObstacle(boolean isObstacle) {
     this.isObstacle = isObstacle;
+  }
+
+  public boolean isAddShadow() {
+    return this.addShadow;
+  }
+
+  public void setAddShadow(boolean addShadow) {
+    this.addShadow = addShadow;
   }
 }

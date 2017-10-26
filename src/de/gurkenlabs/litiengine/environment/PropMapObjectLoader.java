@@ -47,6 +47,10 @@ public class PropMapObjectLoader extends MapObjectLoader {
       prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)));
     }
 
+    if (mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW) != null) {
+      prop.setAddShadow(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW)));
+    }
+
     prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)));
     prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)));
 

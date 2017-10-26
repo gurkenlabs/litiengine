@@ -41,6 +41,7 @@ public final class MapObjectProperty {
   // collision box
   public static final String SHADOWTYPE = "shadowType";
   public static final String SPRITESHEETNAME = "spritesheetName";
+  public static final String PROP_ADDSHADOW = "addShadow";
 
   // spawnpoint
   public static final String SPAWN_TYPE = "spawnType";

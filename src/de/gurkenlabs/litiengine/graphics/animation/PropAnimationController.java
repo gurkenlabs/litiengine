@@ -54,15 +54,15 @@ public class PropAnimationController extends AnimationController {
     }
 
     String cacheKey = this.buildCurrentCacheKey();
-    cacheKey += "_";
+    cacheKey += "_" + this.prop.isAddShadow();
     cacheKey += "_" + this.prop.getState();
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
 
     final BufferedImage currentImage = super.getCurrentSprite();
-    if (currentImage == null) {
-      return null;
+    if (currentImage == null || !prop.isAddShadow()) {
+      return currentImage;
     }
 
     // add a shadow at the lower end of the current sprite.
