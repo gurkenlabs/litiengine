@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @CollisionInfo(collision = false)
@@ -41,10 +40,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private String message;
   private final List<Integer> targets;
 
-  private boolean triggered;
+  private boolean isActivated;
 
-  public Trigger(final String name, final String message) {
-    this(TriggerActivation.COLLISION, name, message, false, new ConcurrentHashMap<>());
+  public Trigger(final TriggerActivation activation, final String name, final String message) {
+    this(activation, name, message, false, new ConcurrentHashMap<>());
   }
 
   public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, final Map<String, String> arguments) {
@@ -60,46 +59,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
-  }
-
-  public boolean activate(final IEntity activator, final int tar) {
-    if (this.isOneTimeTrigger && this.triggered || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.activated.contains(activator)) {
-      return false;
-    }
-
-    this.triggered = true;
-    List<Integer> triggerTargets = this.getTargets(tar);
-
-    final TriggerEvent te = new TriggerEvent(this, activator, triggerTargets);
-
-    if (!this.checkActivationPredicates(te)) {
-      return false;
-    }
-
-    // if we actually have a trigger target, we send the message to the target
-    if (!triggerTargets.isEmpty()) {
-      for (final int target : triggerTargets) {
-        final IEntity entity = Game.getEnvironment().get(target);
-        if (entity == null) {
-          log.log(Level.WARNING, "trigger \'{0}\' was activated, but the trigger target \'{1}\' could not be found on the environment", new Object[] { this.getName(), target });
-          continue;
-        }
-
-        entity.sendMessage(this, this.message);
-        this.activated.add(activator);
-      }
-    }
-
-    // also send the trigger event to all registered consumers
-    for (final Consumer<TriggerEvent> cons : this.activatedConsumer) {
-      cons.accept(te);
-    }
-
-    if (this.isOneTimeTrigger && this.triggered) {
-      Game.getEnvironment().remove(this);
-    }
-
-    return true;
   }
 
   public void addActivator(final int mapId) {
@@ -144,6 +103,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.isOneTimeTrigger;
   }
 
+  public boolean isActivated() {
+    return this.isActivated;
+  }
+
   /**
    * Allows to register functions that contain additional checks for the trigger
    * activation. The return value of the function is considered the reason why
@@ -183,16 +146,19 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return Boolean.toString(false);
     }
 
+    if (!message.equals(USE_MESSAGE)) {
+      return Boolean.toString(false);
+    }
+
     if (sender instanceof IEntity) {
       final IEntity ent = (IEntity) sender;
-      // already triggered by the entity
-      if (this.activators.contains(ent.getMapId())) {
-        return Boolean.toString(false);
-      }
 
-      if (message.equals(USE_MESSAGE)) {
+      if (this.activators.isEmpty() || this.activators.contains(ent.getMapId())) {
         this.activate(ent, ent.getMapId());
         return Boolean.toString(true);
+      } else {
+        log.log(Level.INFO, "[{1}] tried to activate trigger [{0}] but was not allowed so because it was not on the list of activators", new Object[] { this.getName(), ent.getMapId() });
+        return Boolean.toString(false);
       }
     }
 
@@ -201,6 +167,25 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public void setMessage(final String message) {
     this.message = message;
+  }
+
+  @Override
+  public void setHeight(final float height) {
+    this.setCollisionBoxHeight(height);
+    super.setHeight(height);
+  }
+
+  @Override
+  public void setWidth(final float width) {
+    this.setCollisionBoxWidth(width);
+    super.setWidth(width);
+  }
+
+  @Override
+  public void setSize(final float width, final float height) {
+    this.setCollisionBoxWidth(width);
+    this.setCollisionBoxHeight(height);
+    super.setSize(width, height);
   }
 
   @Override
@@ -239,6 +224,46 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     this.activated = collEntities;
+  }
+
+  private boolean activate(final IEntity activator, final int tar) {
+    if (this.isOneTimeTrigger && this.isActivated || this.getActivationType() == TriggerActivation.COLLISION && activator != null && this.activated.contains(activator)) {
+      return false;
+    }
+
+    this.isActivated = true;
+    List<Integer> triggerTargets = this.getTargets(tar);
+
+    final TriggerEvent te = new TriggerEvent(this, activator, triggerTargets);
+
+    if (!this.checkActivationPredicates(te)) {
+      return false;
+    }
+
+    // if we actually have a trigger target, we send the message to the target
+    if (!triggerTargets.isEmpty()) {
+      for (final int target : triggerTargets) {
+        final IEntity entity = Game.getEnvironment().get(target);
+        if (entity == null) {
+          log.log(Level.WARNING, "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment", new Object[] { this.getName(), target });
+          continue;
+        }
+
+        entity.sendMessage(this, this.message);
+        this.activated.add(activator);
+      }
+    }
+
+    // also send the trigger event to all registered consumers
+    for (final Consumer<TriggerEvent> cons : this.activatedConsumer) {
+      cons.accept(te);
+    }
+
+    if (this.isOneTimeTrigger && this.isActivated) {
+      Game.getEnvironment().remove(this);
+    }
+
+    return true;
   }
 
   private boolean checkActivationPredicates(TriggerEvent te) {

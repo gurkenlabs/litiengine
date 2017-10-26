@@ -56,8 +56,6 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
 
     trigger.setMapId(mapObject.getId());
     trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    trigger.setCollisionBoxHeight(trigger.getHeight());
-    trigger.setCollisionBoxWidth(trigger.getWidth());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
 
     return trigger;

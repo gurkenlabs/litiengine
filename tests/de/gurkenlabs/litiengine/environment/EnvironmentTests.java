@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -37,7 +38,7 @@ public class EnvironmentTests {
 
     Environment env = new Environment(map);
 
-    Trigger testTrigger = new Trigger("test", "testmessage");
+    Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
 
     LightSource testLight = new LightSource(100, 100, Color.WHITE, LightSource.ELLIPSE, true);
     testLight.setMapId(999);

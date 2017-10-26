@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
