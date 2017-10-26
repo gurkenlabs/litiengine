@@ -716,7 +716,10 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
+    if (this.entities.get(entity.getRenderType()) != null) {
+      this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
+    }
+
     for (String tag : entity.getTags()) {
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).remove(entity);
