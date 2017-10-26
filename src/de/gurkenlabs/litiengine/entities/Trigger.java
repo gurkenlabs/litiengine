@@ -77,6 +77,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.arguments;
   }
 
+  public String getArgument(String key) {
+    if (this.getArguments().containsKey(key)) {
+      return this.getArguments().get(key);
+    }
+
+    return null;
+  }
+
   public List<Integer> getActivators() {
     return this.activators;
   }

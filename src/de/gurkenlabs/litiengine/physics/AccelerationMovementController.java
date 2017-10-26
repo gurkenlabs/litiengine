@@ -21,6 +21,8 @@ public abstract class AccelerationMovementController<T extends IMovableEntity> e
   public void update(final IGameLoop loop) {
     super.update(loop);
     if (!this.isMovementAllowed()) {
+      this.velocityX = 0;
+      this.velocityY = 0;
       return;
     }
 
