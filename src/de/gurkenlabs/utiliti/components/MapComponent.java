@@ -1147,8 +1147,6 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperty.LIGHTACTIVE, "true");
       break;
     case SPAWNPOINT:
-      mo.setWidth(3);
-      mo.setHeight(3);
     default:
       break;
     }
