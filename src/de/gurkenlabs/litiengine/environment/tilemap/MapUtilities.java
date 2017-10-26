@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.gurkenlabs.litiengine.Game;
+
 public final class MapUtilities {
   private static Map<String, ITileAnimation> animations;
   private static Map<String, Boolean> hasAnimation;
@@ -58,6 +60,14 @@ public final class MapUtilities {
       return null;
     }
     return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
+  }
+
+  public static Point getTileLocation(final Point2D mapLocation) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return new Point();
+    }
+
+    return getTileLocation(Game.getEnvironment().getMap(), mapLocation);
   }
 
   public static Point getTileLocation(final IMap map, final Point2D mapLocation) {
