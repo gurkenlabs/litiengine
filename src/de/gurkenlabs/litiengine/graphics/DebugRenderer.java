@@ -9,6 +9,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
@@ -20,8 +22,17 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class DebugRenderer {
+  private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
+
+  static {
+    mapDebugConsumer = new CopyOnWriteArrayList<>();
+  }
 
   private DebugRenderer() {
+  }
+
+  public static void onMapDebugRendered(Consumer<MapDebugArgs> cons) {
+    mapDebugConsumer.add(cons);
   }
 
   public static void renderEntityDebugInfo(final Graphics2D g, final IEntity entity) {
@@ -63,6 +74,11 @@ public class DebugRenderer {
       // draw mouse tile info
       drawTileBoundingBox(g, map, Input.mouse().getMapLocation());
     }
+
+    final MapDebugArgs args = new MapDebugArgs(map, g);
+    for (Consumer<MapDebugArgs> cons : mapDebugConsumer) {
+      cons.accept(args);
+    }
   }
 
   /**
@@ -91,7 +107,7 @@ public class DebugRenderer {
     RenderEngine.drawShape(g, playerTile);
 
     // draw coords
-    final Point tileLocation = MapUtilities.getTileLocation(map, location);
+    final Point tileLocation = MapUtilities.getTile(map, location);
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
     final FontMetrics fm = g.getFontMetrics();

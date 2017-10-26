@@ -226,8 +226,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @param viewport
    */
   private void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
-    final Point startTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getX(), viewport.getY()));
-    final Point endTile = MapUtilities.getTileLocation(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
+    final Point startTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getX(), viewport.getY()));
+    final Point endTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
     final double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
     final double viewportOffsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
 

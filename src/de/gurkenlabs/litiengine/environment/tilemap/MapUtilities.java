@@ -50,8 +50,16 @@ public final class MapUtilities {
     return maxId;
   }
 
+  public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return new Rectangle2D.Double();
+    }
+
+    return getTileBoundingBox(Game.getEnvironment().getMap(), mapLocation);
+  }
+
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
-    Point location = getTileLocation(map, mapLocation);
+    Point location = getTile(map, mapLocation);
     return new Rectangle2D.Double(location.x * map.getTileSize().getWidth(), location.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
@@ -70,15 +78,15 @@ public final class MapUtilities {
     return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
-  public static Point getTileLocation(final Point2D mapLocation) {
+  public static Point getTile(final Point2D mapLocation) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return new Point();
     }
 
-    return getTileLocation(Game.getEnvironment().getMap(), mapLocation);
+    return getTile(Game.getEnvironment().getMap(), mapLocation);
   }
 
-  public static Point getTileLocation(final IMap map, final Point2D mapLocation) {
+  public static Point getTile(final IMap map, final Point2D mapLocation) {
     return new Point((int) (mapLocation.getX() / map.getTileSize().getWidth()), (int) (mapLocation.getY() / map.getTileSize().getHeight()));
   }
 
@@ -99,7 +107,7 @@ public final class MapUtilities {
       return tilesAtLocation;
     }
 
-    final Point tileLocation = getTileLocation(map, location);
+    final Point tileLocation = getTile(map, location);
     for (final ITileLayer layer : map.getTileLayers()) {
       final ITile tile = layer.getTile(tileLocation.x, tileLocation.y);
       if (tile != null) {
