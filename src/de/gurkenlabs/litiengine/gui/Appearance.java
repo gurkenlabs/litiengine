@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import javax.swing.JPanel;
+
 public class Appearance {
   private final List<Consumer<Appearance>> changedConsumer;
 
@@ -21,6 +23,7 @@ public class Appearance {
 
   public Appearance() {
     this.changedConsumer = new CopyOnWriteArrayList<>();
+    this.font = new JPanel().getFont();
   }
 
   public Appearance(Color foreColor) {

@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.gui.GuiProperties;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.util.ImageProcessing;
 
@@ -37,6 +38,11 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final Color SPEAK_BACKGROUNDCOLOR = new Color(0, 0, 0, 80);
   private static final Color SPEAK_BORDERCOLOR = new Color(0, 0, 0, 160);
   private static final Color SPEAK_FONT_COLOR = Color.WHITE;
+
+  public static SpeechBubble createEntityBubble(final IEntity entity, final String text) {
+    float fontSize = GuiProperties.getDefaultAppearance().getFont().getSize() / Game.getCamera().getRenderScale();
+    return new SpeechBubble(entity, GuiProperties.getDefaultAppearance().getFont().deriveFont(fontSize), text);
+  }
 
   public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text) {
     return new SpeechBubble(entity, font, text);
