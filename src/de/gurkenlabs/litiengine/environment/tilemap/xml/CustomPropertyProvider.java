@@ -50,6 +50,10 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   @Override
   @XmlTransient
   public List<Property> getAllCustomProperties() {
+    if (this.properties == null) {
+      return new ArrayList<>();
+    }
+
     return this.properties;
   }
 
