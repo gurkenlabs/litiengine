@@ -35,6 +35,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JSpinner spinnerHealth;
   private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
+  private JCheckBox chckbxShadow;
 
   /**
    * Create the panel.
@@ -62,6 +63,8 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     chckbxIndestructible = new JCheckBox(Resources.get("panel_destructible"));
 
     chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
+
+    chckbxShadow = new JCheckBox("shadow");
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
         groupLayout.createParallelGroup(Alignment.LEADING)
@@ -73,6 +76,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
                     .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
                     .addComponent(comboBoxMaterial, 0, 365, Short.MAX_VALUE)
                     .addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE)
@@ -98,7 +102,9 @@ public class PropPanel extends PropertyPanel<IMapObject> {
                 .addComponent(chckbxIndestructible)
                 .addPreferredGap(ComponentPlacement.UNRELATED)
                 .addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(159, Short.MAX_VALUE)));
+                .addPreferredGap(ComponentPlacement.RELATED)
+                .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(138, Short.MAX_VALUE)));
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
@@ -118,6 +124,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   protected void clearControls() {
     this.chckbxIndestructible.setSelected(false);
     this.chckbxIsObstacle.setSelected(false);
+    this.chckbxShadow.setSelected(false);
     this.comboBoxMaterial.setSelectedItem(Material.UNDEFINED);
     this.spinnerHealth.setValue(0);
     this.comboBoxSpriteSheets.setSelectedItem(null);
@@ -145,6 +152,10 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       this.chckbxIndestructible.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
     }
 
+    if (mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW) != null && !mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW).isEmpty()) {
+      this.chckbxShadow.setSelected(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW)));
+    }
+
     String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     if (obstacle != null && !obstacle.isEmpty()) {
       this.chckbxIsObstacle.setSelected(Boolean.valueOf(obstacle));
@@ -154,6 +165,10 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private void setupChangedListeners() {
     this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener((m) -> {
       m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()));
+    }));
+
+    this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener((m) -> {
+      m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()));
     }));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener((m) -> {

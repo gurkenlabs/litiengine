@@ -1131,6 +1131,7 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT, (this.newObject.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
       mo.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, "false");
+      mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
       break;
     case DECORMOB:
       mo.setCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH, (this.newObject.getWidth() * 0.4) + "");
