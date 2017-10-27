@@ -13,6 +13,29 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private static final double WIDTH_FACTOR = 0.4;
 
+  private Align align = Align.CENTER;
+
+  private boolean collision;
+
+  private Rectangle2D collisionBox;
+
+  private float collisionBoxHeight;
+
+  private float collisionBoxWidth;
+
+  private Valign valign = Valign.DOWN;
+
+  protected CollisionEntity() {
+    super();
+    final CollisionInfo info = this.getClass().getAnnotation(CollisionInfo.class);
+    this.collisionBoxWidth = info.collisionBoxWidth();
+    this.collisionBoxHeight = info.collisionBoxHeight();
+    this.collision = info.collision();
+    this.setCollisionBoxValign(info.valign());
+    this.setCollisionBoxAlign(info.align());
+    this.collisionBox = this.getCollisionBox(this.getLocation());
+  }
+
   public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
     double x;
     double y;
@@ -43,29 +66,6 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     }
 
     return new Rectangle2D.Double(x, y, collisionBoxWidth, collisionBoxHeight);
-  }
-
-  private Align align = Align.CENTER;
-
-  private boolean collision;
-
-  private Rectangle2D collisionBox;
-
-  private float collisionBoxHeight;
-
-  private float collisionBoxWidth;
-
-  private Valign valign = Valign.DOWN;
-
-  protected CollisionEntity() {
-    super();
-    final CollisionInfo info = this.getClass().getAnnotation(CollisionInfo.class);
-    this.collisionBoxWidth = info.collisionBoxWidth();
-    this.collisionBoxHeight = info.collisionBoxHeight();
-    this.collision = info.collision();
-    this.setCollisionBoxValign(info.valign());
-    this.setCollisionBoxAlign(info.align());
-    this.collisionBox = this.getCollisionBox(this.getLocation());
   }
 
   @Override

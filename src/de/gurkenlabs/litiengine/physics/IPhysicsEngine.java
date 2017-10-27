@@ -22,9 +22,17 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public boolean collides(double x, double y);
 
+  public boolean collides(double x, double y, ICollisionEntity collisionEntity);
+
+  public boolean collides(double x, double y, int collisionType);
+
   public Point2D collides(Line2D rayCast);
 
   public boolean collides(Point2D point);
+
+  public boolean collides(Point2D point, int collisionType);
+
+  public boolean collides(Point2D point, ICollisionEntity collisionEntity);
 
   public boolean collides(Rectangle2D rect);
 

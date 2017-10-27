@@ -72,6 +72,39 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
+  public boolean collides(double x, double y, int collisionType) {
+    return this.collides(new Point2D.Double(x, y), collisionType);
+  }
+
+  @Override
+  public boolean collides(double x, double y, ICollisionEntity collisionEntity) {
+    return collides(new Point2D.Double(x, y), collisionEntity);
+  }
+
+  @Override
+  public boolean collides(Point2D point, ICollisionEntity collisionEntity) {
+    return this.collidesWithAnyEntity(collisionEntity, point) || this.collidesWithAnyStaticCollisionBox(point);
+  }
+
+  @Override
+  public boolean collides(Point2D point, int collisionType) {
+
+    if ((collisionType & CollisionType.COLLTYPE_ALL) == CollisionType.COLLTYPE_ALL) {
+      return this.collides(point);
+    }
+
+    if ((collisionType & CollisionType.COLLTYPE_ENTITY) == CollisionType.COLLTYPE_ENTITY) {
+      return this.collidesWithAnyEntity(null, point);
+    }
+
+    if ((collisionType & CollisionType.COLLTYPE_STATIC) == CollisionType.COLLTYPE_STATIC) {
+      return this.collidesWithAnyStaticCollisionBox(point);
+    }
+
+    return false;
+  }
+
+  @Override
   public Point2D collides(final Line2D rayCast) {
     final Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
     final List<Rectangle2D> collBoxes = this.getAllCollisionBoxes();
@@ -113,6 +146,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean collides(final Point2D point) {
+    if (!this.environmentBounds.contains(point)) {
+      return true;
+    }
+
     for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (collisionBox.contains(point)) {
         return true;
@@ -359,6 +396,20 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return null;
   }
 
+  private boolean collidesWithAnyEntity(final ICollisionEntity entity, final Point2D location) {
+    for (final ICollisionEntity otherEntity : this.collisionEntities) {
+      if (otherEntity == null || !otherEntity.hasCollision() || entity != null && otherEntity.equals(entity) || entity != null && !entity.canCollideWith(otherEntity)) {
+        continue;
+      }
+
+      if (otherEntity.getCollisionBox().contains(location)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * Collides with any map object.
    *
@@ -376,6 +427,16 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
 
     return null;
+  }
+
+  private boolean collidesWithAnyStaticCollisionBox(final Point2D location) {
+    for (final Rectangle2D collisionBox : this.staticCollisionBoxes) {
+      if (collisionBox.contains(location)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private Rectangle2D collidesWithAnything(final ICollisionEntity entity, final Rectangle2D entityCollisionBox) {
