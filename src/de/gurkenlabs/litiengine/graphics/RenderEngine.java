@@ -236,11 +236,25 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-    t.translate(x, y);
+    final AffineTransform t = AffineTransform.getTranslateInstance(x, y);
     g.drawImage(image, t, null);
   }
 
+  /***
+   * Note that rotating an image with 90/180/270 degree is way more performant
+   * than rotating with in other degrees.
+   * 
+   * @param g
+   *          The graphics object to draw on.
+   * @param image
+   *          The image to be drawn
+   * @param x
+   *          The x-coordinate of the image.
+   * @param y
+   *          The y-coordinate of the image
+   * @param angle
+   *          The angle by which the image will be rotated.s
+   */
   public static void renderImage(final Graphics2D g, final Image image, final double x, final double y, final float angle) {
     if (image == null) {
       return;

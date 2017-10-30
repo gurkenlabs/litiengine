@@ -23,6 +23,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean renderDynamicShadows;
 
+  // TODO: on low performance machines (surface 2 pro tablet) this can lead to frame drops (65->35fps); on high performance machines this can increase frame rate...
+  // Possible explanation: on low performance machines it takes more computing time to render larger images?
   private boolean cacheStaticTiles;
 
   /** The resolution. */
