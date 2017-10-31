@@ -47,4 +47,8 @@ public interface ICollisionEntity extends IEntity {
   public void setCollisionBoxHeight(final float collisionBoxHeight);
 
   public void setCollisionBoxWidth(final float collisionBoxWidth);
+
+  public float getCollisionBoxHeight();
+
+  public float getCollisionBoxWidth();
 }

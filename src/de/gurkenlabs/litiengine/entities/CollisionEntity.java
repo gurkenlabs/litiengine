@@ -102,10 +102,12 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return getCollisionBox(location, this.getWidth(), this.getHeight(), newCollisionBoxWidth, newCollisionBoxHeight, this.getCollisionBoxAlign(), this.getCollisionBoxValign());
   }
 
+  @Override
   public float getCollisionBoxHeight() {
     return this.collisionBoxHeight;
   }
 
+  @Override
   public float getCollisionBoxWidth() {
     return this.collisionBoxWidth;
   }
