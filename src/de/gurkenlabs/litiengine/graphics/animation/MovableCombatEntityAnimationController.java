@@ -30,13 +30,13 @@ import de.gurkenlabs.util.ImageProcessing;
  * @see de.gurkenlabs.litiengine.entities.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
-public class MovableCombatEntityAnimationController extends EntityAnimationController<IMovableCombatEntity> {
+public class MovableCombatEntityAnimationController<T extends IMovableCombatEntity> extends EntityAnimationController<T> {
 
-  public MovableCombatEntityAnimationController(IMovableCombatEntity entity, Animation defaultAnimation) {
+  public MovableCombatEntityAnimationController(T entity, Animation defaultAnimation) {
     this(entity, defaultAnimation, true);
   }
 
-  public MovableCombatEntityAnimationController(IMovableCombatEntity entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
+  public MovableCombatEntityAnimationController(T entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
     super(entity, defaultAnimation);
     if (this.getEntity().getName() == null || this.getEntity().getName().isEmpty()) {
       throw new IllegalArgumentException("Make sure the name of the entity is set before using a MovableCombatEntityAnimationController.");
@@ -64,11 +64,15 @@ public class MovableCombatEntityAnimationController extends EntityAnimationContr
     if (this.getEntity() == null) {
       return;
     }
-
-    String animationName = this.getEntity().isIdle() ? this.getIdleSpriteName(this.getEntity().getFacingDirection()) : this.getWalkSpriteName(this.getEntity().getFacingDirection());
+    
+    String animationName = this.getCurrentAnimationName();
     if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       this.playAnimation(animationName);
     }
+  }
+
+  protected String getCurrentAnimationName() {
+    return this.getEntity().isIdle() ? this.getIdleSpriteName(this.getEntity().getFacingDirection()) : this.getWalkSpriteName(this.getEntity().getFacingDirection());
   }
 
   private List<Animation> initializeAvailableAnimations() {
