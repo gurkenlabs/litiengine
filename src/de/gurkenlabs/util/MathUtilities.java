@@ -127,7 +127,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return clamp(random.nextInt(max), min, max);
+    return random.nextInt(max - min) + min;
   }
 
   public static int randomSign() {

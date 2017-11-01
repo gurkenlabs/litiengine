@@ -118,6 +118,32 @@ public final class MapUtilities {
     return tilesAtLocation;
   }
 
+  public static ITile getTopMostTile(final Point2D location) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return null;
+    }
+
+    return getTopMostTile(Game.getEnvironment().getMap(), location);
+  }
+
+  public static ITile getTopMostTile(final IMap map, final Point2D location) {
+    if (map.getTileLayers() == null || map.getTileLayers().isEmpty()) {
+      return null;
+    }
+
+    final Point tileLocation = getTile(map, location);
+
+    ITile tile = null;
+    for (final ITileLayer layer : map.getTileLayers()) {
+      ITile tileOfLayer = layer.getTile(tileLocation.x, tileLocation.y);
+      if (tileOfLayer != null && tileOfLayer.getGridId() != 0) {
+        tile = tileOfLayer;
+      }
+    }
+
+    return tile;
+  }
+
   public static ITerrain[] getTerrain(final IMap map, final int gId) {
     for (final ITileset tileset : map.getTilesets()) {
       if (tileset.containsTile(gId)) {

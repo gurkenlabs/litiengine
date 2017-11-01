@@ -14,7 +14,7 @@ public abstract class Particle implements ITimeToLive {
   /** The activation tick. */
   private long aliveTick;
   private long aliveTime;
-  private boolean applyStaticPhysics;
+  private boolean applyPhysics;
   private int collisionType;
   /** The color of the particle. */
   private Color color;
@@ -51,10 +51,10 @@ public abstract class Particle implements ITimeToLive {
   private float width;
 
   /** The currentlocation of the particle on the X-axis. */
-  private float xCurrent;
+  private float x;
 
   /** The current location of the particle on the Y-axis. */
-  private float yCurrent;
+  private float y;
 
   /**
    * Constructs a new particle.
@@ -83,7 +83,7 @@ public abstract class Particle implements ITimeToLive {
   }
 
   public Rectangle2D getBoundingBox(final Point2D origin) {
-    return new Rectangle2D.Double(origin.getX() + this.getxCurrent(), origin.getY() + this.getyCurrent(), this.getWidth(), this.getHeight());
+    return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());
   }
 
   public int getCollisionType() {
@@ -194,8 +194,8 @@ public abstract class Particle implements ITimeToLive {
    *
    * @return the x current
    */
-  public float getxCurrent() {
-    return this.xCurrent;
+  public float getX() {
+    return this.x;
   }
 
   /**
@@ -203,18 +203,18 @@ public abstract class Particle implements ITimeToLive {
    *
    * @return the y current
    */
-  public float getyCurrent() {
-    return this.yCurrent;
+  public float getY() {
+    return this.y;
   }
 
-  public boolean isApplyingStaticPhysics() {
-    return this.applyStaticPhysics;
+  public boolean isApplyingPhysics() {
+    return this.applyPhysics;
   }
 
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
   public Particle setApplyPhysics(final boolean applyStaticPhysics) {
-    this.applyStaticPhysics = applyStaticPhysics;
+    this.applyPhysics = applyStaticPhysics;
     return this;
   }
 
@@ -333,7 +333,7 @@ public abstract class Particle implements ITimeToLive {
    *          the new x current
    */
   public Particle setX(final float x) {
-    this.xCurrent = x;
+    this.x = x;
     return this;
   }
 
@@ -344,7 +344,7 @@ public abstract class Particle implements ITimeToLive {
    *          the new y current
    */
   public Particle setY(final float y) {
-    this.yCurrent = y;
+    this.y = y;
     return this;
   }
 
@@ -366,12 +366,12 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-    this.xCurrent += this.dx * updateRatio;
-    this.yCurrent += this.dy * updateRatio;
+    this.x += this.dx * updateRatio;
+    this.y += this.dy * updateRatio;
 
-    if (this.isApplyingStaticPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
-      this.xCurrent -= this.dx * updateRatio;
-      this.yCurrent -= this.dy * updateRatio;
+    if (this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+      this.x -= this.dx * updateRatio;
+      this.y -= this.dy * updateRatio;
     }
 
     this.dx += this.gravityX * updateRatio;
@@ -385,6 +385,6 @@ public abstract class Particle implements ITimeToLive {
   }
 
   protected Point2D getRelativeLocation(final Point2D effectLocation) {
-    return new Point2D.Double(effectLocation.getX() + (int) this.getxCurrent() - this.getWidth() / 2, effectLocation.getY() + (int) this.getyCurrent() - this.getHeight() / 2);
+    return new Point2D.Double(effectLocation.getX() + (int) this.getX() - this.getWidth() / 2, effectLocation.getY() + (int) this.getY() - this.getHeight() / 2);
   }
 }

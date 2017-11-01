@@ -17,6 +17,8 @@ import de.gurkenlabs.util.MathUtilities;
  * The Class Camera.
  */
 public class Camera implements ICamera {
+  private final List<Consumer<Float>> zoomChangedConsumer;
+  private final List<Consumer<Point2D>> focusChangedConsumer;
   /**
    * Provides the center location for the viewport.
    */
@@ -40,7 +42,7 @@ public class Camera implements ICamera {
 
   private float zoom;
   private float targetZoom;
-  private final List<Consumer<Float>> zoomChangedConsumer;
+
   private int zoomDelay;
   private float zoomStep;
 
@@ -53,6 +55,7 @@ public class Camera implements ICamera {
    */
   public Camera() {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
+    this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
     this.zoom = 1;
   }
@@ -175,6 +178,11 @@ public class Camera implements ICamera {
   }
 
   @Override
+  public void onFocusChanged(Consumer<Point2D> focusCons) {
+    this.focusChangedConsumer.add(focusCons);
+  }
+
+  @Override
   public void setFocus(final Point2D focus) {
     // dunno why but without the factor of 0.01 sometimes everything starts to
     // get wavy while rendering ...
@@ -191,6 +199,9 @@ public class Camera implements ICamera {
     }
 
     this.focus = this.clampToMap(focus);
+    for (Consumer<Point2D> consumer : this.focusChangedConsumer) {
+      consumer.accept(this.focus);
+    }
   }
 
   @Override

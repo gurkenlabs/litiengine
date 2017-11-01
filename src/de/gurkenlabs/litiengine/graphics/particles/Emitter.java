@@ -281,10 +281,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.maxParticles = maxPart;
   }
 
-  public void setOrigin(final Point2D location) {
-    this.setLocation(location);
-  }
-
   public void setParticleMaxTTL(final int maxTTL) {
     this.particleMaxTTL = maxTTL;
   }

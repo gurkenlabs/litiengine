@@ -87,6 +87,8 @@ public interface ICamera extends IUpdateable {
   public float getZoom();
 
   public void onZoomChanged(Consumer<Float> zoomCons);
+  
+  public void onFocusChanged(Consumer<Point2D> focusCons);
 
   public void setFocus(Point2D focus);
 
