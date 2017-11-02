@@ -38,6 +38,9 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
 
   public MovableCombatEntityAnimationController(T entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
     super(entity, defaultAnimation);
+
+    // TODO: evaluate a better way to determine the animation name because the
+    // name of entities of the same type might differ
     if (this.getEntity().getName() == null || this.getEntity().getName().isEmpty()) {
       throw new IllegalArgumentException("Make sure the name of the entity is set before using a MovableCombatEntityAnimationController.");
     }
@@ -56,15 +59,15 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return;
     }
-    
+
     if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop()) {
       return;
     }
-    
+
     if (this.getEntity() == null) {
       return;
     }
-    
+
     String animationName = this.getCurrentAnimationName();
     if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       this.playAnimation(animationName);
