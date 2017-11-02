@@ -55,7 +55,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     // support for animated tiles
     final ITileAnimation animation = MapUtilities.getAnimation(map, index);
     if (animation != null && !animation.getFrames().isEmpty()) {
-      final long playedMs = Game.getLoop().getTime().getMilliseconds();
+      final long playedMs = Game.getTime().sinceGameStart();
 
       final int totalDuration = animation.getTotalDuration();
       final long animationsPlayed = playedMs / totalDuration;

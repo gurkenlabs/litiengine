@@ -15,7 +15,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   private final int updateRate;
   private final List<Consumer<Integer>> upsTrackedConsumer;
   private final List<IUpdateable> updatables;
-  private final GameTime gameTime;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
@@ -32,7 +31,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
-    this.gameTime = new GameTime(this);
     this.setTimeScale(1.0F);
   }
 
@@ -93,11 +91,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   @Override
   public long getTicks() {
     return this.totalTicks;
-  }
-
-  @Override
-  public GameTime getTime() {
-    return this.gameTime;
   }
 
   @Override

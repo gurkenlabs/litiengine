@@ -47,8 +47,6 @@ public interface IGameLoop extends ILaunchable {
 
   public long getTicks();
 
-  public GameTime getTime();
-
   public float getTimeScale();
 
   public int getUpdateRate();

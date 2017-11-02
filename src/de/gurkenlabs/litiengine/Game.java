@@ -32,23 +32,27 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
+  protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
   private static final GameConfiguration configuration;
   private static final EntityControllerManager entityControllerManager;
-  private static IEnvironment environment;
-  private static ICamera camera;
 
   private static final List<Consumer<IEnvironment>> environmentLoadedConsumer;
-  private static IGameLoop gameLoop;
+
   private static final IRenderEngine graphicsEngine;
   private static final GameInfo info;
   private static final List<IMap> maps;
   private static final GameMetrics metrics;
   private static final IPhysicsEngine physicsEngine;
+  private static final ISoundEngine soundEngine;
+  private static final GameTime gameTime;
+
+  private static IEnvironment environment;
+  private static ICamera camera;
+  private static IGameLoop gameLoop;
   private static RenderLoop renderLoop;
   private static IScreenManager screenManager;
-  private static final ISoundEngine soundEngine;
 
   private static final List<Consumer<String>> startedConsumer;
   private static final List<Predicate<String>> terminatingConsumer;
@@ -68,6 +72,7 @@ public final class Game {
     entityControllerManager = new EntityControllerManager();
     info = new GameInfo();
     maps = new CopyOnWriteArrayList<>();
+    gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
     // to initialize components
@@ -141,6 +146,10 @@ public final class Game {
 
   public static ICamera getCamera() {
     return camera;
+  }
+
+  public static GameTime getTime() {
+    return gameTime;
   }
 
   public static void init() {
@@ -257,6 +266,8 @@ public final class Game {
     for (final Consumer<IEnvironment> cons : environmentLoadedConsumer) {
       cons.accept(getEnvironment());
     }
+
+    environmentLoadTick = getLoop().getTicks();
   }
 
   public static void onEnvironmentLoaded(final Consumer<IEnvironment> cons) {
