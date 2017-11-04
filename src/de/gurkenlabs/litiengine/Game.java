@@ -267,7 +267,9 @@ public final class Game {
       cons.accept(getEnvironment());
     }
 
-    environmentLoadTick = getLoop().getTicks();
+    if (getLoop() != null) {
+      environmentLoadTick = getLoop().getTicks();
+    }
   }
 
   public static void onEnvironmentLoaded(final Consumer<IEnvironment> cons) {
