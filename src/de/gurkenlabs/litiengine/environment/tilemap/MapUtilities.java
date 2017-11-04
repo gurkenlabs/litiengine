@@ -50,6 +50,18 @@ public final class MapUtilities {
     return maxId;
   }
 
+  public static Point2D getCenterMapLocation() {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return new Point2D.Double();
+    }
+
+    return getCenterMapLocation(Game.getEnvironment().getMap());
+  }
+
+  public static Point2D getCenterMapLocation(IMap map) {
+    return new Point2D.Double(map.getSizeInPixels().width / 2.0, map.getSizeInPixels().height / 2.0);
+  }
+
   public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return new Rectangle2D.Double();
