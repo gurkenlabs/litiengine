@@ -32,7 +32,7 @@ public class TriggerTests {
 
     Assert.assertFalse(trigger.isActivated());
 
-    trigger.sendMessage(entity, Trigger.USE_MESSAGE);
+    trigger.sendMessage(entity, Trigger.INTERACT_MESSAGE);
 
     Assert.assertTrue(trigger.isActivated());
     verify(target, times(1)).sendMessage(trigger, trigger.getMessage());

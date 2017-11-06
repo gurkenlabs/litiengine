@@ -26,7 +26,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     COLLISION, INTERACT
   }
 
-  public static final String USE_MESSAGE = "use";
+  public static final String INTERACT_MESSAGE = "interact";
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
   private List<IEntity> activated;
@@ -154,7 +154,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return Boolean.toString(false);
     }
 
-    if (!message.equals(USE_MESSAGE)) {
+    if (!message.equals(INTERACT_MESSAGE)) {
       return Boolean.toString(false);
     }
 
