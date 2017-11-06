@@ -42,8 +42,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
-   * Searches for all combat entities whose {@link ICombatEntity.getHitBox()}
-   * intersect the specified shape.
+   * Searches for all combat entities whose hitBox intersect the specified
+   * shape.
    * 
    * @param shape
    *          The shape to check intersection for.
