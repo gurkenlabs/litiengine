@@ -37,6 +37,7 @@ dependencies {
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
   compile 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
+  compile 'com.code-disaster.steamworks4j:steamworks4j:1.6.2'
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:2.+'
 }
@@ -48,6 +49,7 @@ jar {
   
   exclude '**/*.dll'
   exclude '**/*.jnilib'
+  exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
 }
