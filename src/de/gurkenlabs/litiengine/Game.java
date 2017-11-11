@@ -32,6 +32,11 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
+  /***
+   * This flag indicates if the game currently supports debugging. This should
+   * be set to false for release builds.
+   */
+  public static boolean DEBUG = true;
   protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
@@ -153,6 +158,7 @@ public final class Game {
   }
 
   public static void init() {
+    getConfiguration().setAllowDebug(DEBUG);
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
     for (Consumer<GameConfiguration> cons : configLoadedConsumer) {

@@ -33,8 +33,9 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.setUpdaterate(60);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
-    this.setLanguage("en");
-    this.setCountry("US");
+
+    this.setLanguage(Locale.getDefault().getLanguage());
+    this.setCountry(Locale.getDefault().getCountry());
   }
 
   public String getCountry() {
@@ -46,11 +47,10 @@ public class ClientConfiguration extends ConfigurationGroup {
   }
 
   public Locale getLocale() {
-    if (this.locale == null) {
-      this.locale = new Locale(this.getLanguage(), this.getCountry());
+    if (this.getCountry() == null || this.getCountry().isEmpty()) {
+      return new Locale(this.getLanguage());
     }
-
-    return this.locale;
+    return new Locale(this.getLanguage(), this.getCountry());
   }
 
   /**
