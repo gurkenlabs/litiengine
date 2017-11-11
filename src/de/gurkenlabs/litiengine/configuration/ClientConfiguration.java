@@ -47,11 +47,10 @@ public class ClientConfiguration extends ConfigurationGroup {
   }
 
   public Locale getLocale() {
-    if (this.locale == null) {
-      this.locale = new Locale(this.getLanguage(), this.getCountry());
+    if (this.getCountry() == null || this.getCountry().isEmpty()) {
+      return new Locale(this.getLanguage());
     }
-
-    return this.locale;
+    return new Locale(this.getLanguage(), this.getCountry());
   }
 
   /**
