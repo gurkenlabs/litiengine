@@ -33,8 +33,9 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.setUpdaterate(60);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
-    this.setLanguage("en");
-    this.setCountry("US");
+
+    this.setLanguage(Locale.getDefault().getLanguage());
+    this.setCountry(Locale.getDefault().getCountry());
   }
 
   public String getCountry() {
