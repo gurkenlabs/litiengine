@@ -76,6 +76,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     this.gid = (int) tileId;
   }
 
+  @Override
   public boolean isFlippedHorizontally() {
     if (this.csv) {
       return (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
@@ -84,6 +85,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     }
   }
 
+  @Override
   public boolean isFlippedVertically() {
     if (this.csv) {
       return (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
@@ -92,9 +94,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     }
   }
 
+  @Override
   public boolean isFlippedDiagonally() {
     if (this.csv) {
-      return (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) != FLIPPED_VERTICALLY_FLAG_CSV;
+      return (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
     } else {
       return (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
     }

@@ -299,7 +299,7 @@ public class ImageProcessing {
 
     final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
     for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.horizontalflip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+      g.drawImage(ImageProcessing.horizontalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
     }
     g.dispose();
 
@@ -340,7 +340,7 @@ public class ImageProcessing {
    *          the img
    * @return the buffered image
    */
-  public static BufferedImage horizontalflip(final BufferedImage img) {
+  public static BufferedImage horizontalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
     final BufferedImage dimg = new BufferedImage(w, h, img.getType());

@@ -81,7 +81,19 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       }
     }
 
-    return sprite.getSprite(index);
+    BufferedImage tileImage = sprite.getSprite(index);
+    if (tile.isFlippedDiagonally()) {
+      tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
+      tileImage = ImageProcessing.verticalFlip(tileImage);
+    }
+    if (tile.isFlippedHorizontally()) {
+      tileImage = ImageProcessing.horizontalFlip(tileImage);
+    }
+    if (tile.isFlippedVertically()) {
+      tileImage = ImageProcessing.verticalFlip(tileImage);
+    }
+
+    return tileImage;
   }
 
   @Override

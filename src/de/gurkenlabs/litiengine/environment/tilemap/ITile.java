@@ -26,4 +26,11 @@ public interface ITile extends ICustomPropertyProvider {
   public Point getTileCoordinate();
 
   public ITileAnimation getAnimation();
+
+  public boolean isFlippedHorizontally();
+
+  public boolean isFlippedVertically();
+
+  public boolean isFlippedDiagonally();
+
 }
