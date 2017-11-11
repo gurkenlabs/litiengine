@@ -20,4 +20,6 @@ public @interface ConfigurationGroupInfo {
    * @return the string
    */
   String prefix() default "";
+
+  boolean debug() default false;
 }

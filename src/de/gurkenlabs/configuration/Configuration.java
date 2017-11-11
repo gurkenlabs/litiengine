@@ -20,20 +20,11 @@ public class Configuration {
   /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
-  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
-    try {
-      final Properties groupProperties = new Properties();
-      group.storeProperties(groupProperties);
-      groupProperties.store(out, group.getPrefix() + "SETTINGS");
-      out.flush();
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-  }
-
   private final List<ConfigurationGroup> configurationGroups;
 
   private final String fileName;
+
+  private boolean allowDebug = true;
 
   public Configuration(final ConfigurationGroup... configurationGroups) {
     this(DEFAULT_CONFIGURATION_FILE_NAME, configurationGroups);
@@ -94,10 +85,33 @@ public class Configuration {
     try {
       final OutputStream out = new FileOutputStream(settingsFile, false);
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
+        if (!this.isAllowDebug() && group.isDebug()) {
+          continue;
+        }
+
         storeConfigurationGroup(out, group);
       }
       out.close();
       log.log(Level.INFO, "Configuration " + this.getFileName() + " saved");
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+  }
+
+  public boolean isAllowDebug() {
+    return this.allowDebug;
+  }
+
+  public void setAllowDebug(boolean allow) {
+    this.allowDebug = allow;
+  }
+
+  private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
+    try {
+      final Properties groupProperties = new Properties();
+      group.storeProperties(groupProperties);
+      groupProperties.store(out, group.getPrefix() + "SETTINGS");
+      out.flush();
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }

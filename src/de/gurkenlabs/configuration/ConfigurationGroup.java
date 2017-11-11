@@ -19,12 +19,15 @@ public abstract class ConfigurationGroup {
   /** The prefix. */
   private final String prefix;
 
+  private boolean debug;
+
   /**
    * Instantiates a new configuration group.
    */
   public ConfigurationGroup() {
     final ConfigurationGroupInfo info = this.getClass().getAnnotation(ConfigurationGroupInfo.class);
     this.prefix = info.prefix();
+    this.debug = info.debug();
   }
 
   /**
@@ -194,5 +197,13 @@ public abstract class ConfigurationGroup {
         this.setPropertyValue(propertyName, field.getType().cast(enumConst));
       }
     }
+  }
+
+  public boolean isDebug() {
+    return debug;
+  }
+
+  public void setDebug(boolean debug) {
+    this.debug = debug;
   }
 }

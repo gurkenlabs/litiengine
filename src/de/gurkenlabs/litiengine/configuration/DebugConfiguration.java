@@ -2,8 +2,9 @@ package de.gurkenlabs.litiengine.configuration;
 
 import de.gurkenlabs.configuration.ConfigurationGroup;
 import de.gurkenlabs.configuration.ConfigurationGroupInfo;
+import de.gurkenlabs.litiengine.Game;
 
-@ConfigurationGroupInfo(prefix = "DEBUG_")
+@ConfigurationGroupInfo(prefix = "DEBUG_", debug = true)
 public class DebugConfiguration extends ConfigurationGroup {
   private boolean debugEnabled = false;
 
@@ -95,7 +96,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   }
 
   public void setDebugEnabled(final boolean debugEnabled) {
-    this.debugEnabled = debugEnabled;
+    this.debugEnabled = Game.DEBUG && debugEnabled;
   }
 
   public void setRenderAStarInfo(final boolean renderAStarInfo) {
