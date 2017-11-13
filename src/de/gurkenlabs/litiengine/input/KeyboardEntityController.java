@@ -62,4 +62,20 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Accelera
   public void addRightKey(int keyCode) {
     this.right.add(keyCode);
   }
+
+  public List<Integer> getUpKeys() {
+    return this.up;
+  }
+
+  public List<Integer> getDownKeys() {
+    return this.down;
+  }
+
+  public List<Integer> getLeftKeys() {
+    return this.left;
+  }
+
+  public List<Integer> getRightKeys() {
+    return this.right;
+  }
 }

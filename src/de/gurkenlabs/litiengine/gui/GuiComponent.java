@@ -53,6 +53,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final List<Consumer<String>> textChangedConsumer;
 
   private boolean drawTextShadow = false;
+  private boolean forwardMouseEvents = true;
 
   private Sound hoverSound;
 
@@ -292,6 +293,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   public boolean isEnabled() {
     return enabled;
+  }
+
+  public boolean isForwardMouseEvents() {
+    return this.forwardMouseEvents;
   }
 
   /**
@@ -593,8 +598,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
+  public void setForwardMouseEvents(boolean forwardMouseEvents) {
+    this.forwardMouseEvents = forwardMouseEvents;
+  }
+
   public void setHeight(final double height) {
     this.height = height;
+  }
+
+  public void setHovered(boolean hovered) {
+    this.isHovered = hovered;
   }
 
   public void setHoverSound(final Sound hoverSound) {
@@ -762,8 +775,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    *          the e
    * @return true, if successful
    */
-  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+  protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
   }
 
   private void renderText(Graphics2D g) {
