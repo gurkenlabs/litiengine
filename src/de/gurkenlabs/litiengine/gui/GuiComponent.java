@@ -380,6 +380,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
+    if (!this.isForwardMouseEvents()) {
+      return;
+    }
+
     if (!this.mouseEventShouldBeForwarded(e)) {
       this.isHovered = false;
       return;
@@ -398,6 +402,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   @Override
   public void mouseExited(final MouseEvent e) {
+    if (!this.isForwardMouseEvents()) {
+      return;
+    }
+
     this.isHovered = false;
     this.isPressed = false;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);

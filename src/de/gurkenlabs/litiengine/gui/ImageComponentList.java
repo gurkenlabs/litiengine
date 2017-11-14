@@ -48,7 +48,6 @@ public class ImageComponentList extends GuiComponent {
       this.xOffset = this.getWidth() / (this.getColumns() - 1) * 1 / 10;
 
     }
-
   }
 
   public Spritesheet getBackground() {
@@ -85,13 +84,17 @@ public class ImageComponentList extends GuiComponent {
         } else {
           img = null;
         }
-        final ImageComponent cell = new ImageComponent(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
+        final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
         this.cells.add(cell);
       }
     }
 
     this.getComponents().addAll(0, this.cells);
     super.prepare();
+  }
+
+  protected ImageComponent createNewEntry(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {
+    return new ImageComponent(x, y, width, height, spritesheet, text, image);
   }
 
   @Override
