@@ -5,6 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
+import de.gurkenlabs.litiengine.IGameLoop;
 
 /**
  * The Class Input.
@@ -49,6 +50,10 @@ public final class Input {
     if (gamePadManager != null) {
       gamePadManager.terminate();
     }
+  }
+
+  public static IGameLoop getLoop() {
+    return InputLoop;
   }
 
   public static IGamepadManager gamepadManager() {
