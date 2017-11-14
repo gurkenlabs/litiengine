@@ -24,7 +24,7 @@ public class PositionLockCamera extends Camera {
   public void updateFocus() {
     final Point2D cameraLocation = this.getLockedCameraLocation();
 
-    this.setFocus(new Point2D.Double(cameraLocation.getX(), cameraLocation.getY()));
+    this.setFocus(cameraLocation);
     super.updateFocus();
   }
 
