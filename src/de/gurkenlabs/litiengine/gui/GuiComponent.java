@@ -53,6 +53,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   private final List<Consumer<String>> textChangedConsumer;
 
   private boolean drawTextShadow = false;
+  private boolean forwardMouseEvents = true;
 
   private Sound hoverSound;
 
@@ -294,6 +295,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return enabled;
   }
 
+  public boolean isForwardMouseEvents() {
+    return this.forwardMouseEvents;
+  }
+
   /**
    * Checks if is hovered.
    *
@@ -375,6 +380,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   @Override
   public void mouseEntered(final MouseEvent e) {
+    if (!this.isForwardMouseEvents()) {
+      return;
+    }
+
     if (!this.mouseEventShouldBeForwarded(e)) {
       this.isHovered = false;
       return;
@@ -393,6 +402,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   @Override
   public void mouseExited(final MouseEvent e) {
+    if (!this.isForwardMouseEvents()) {
+      return;
+    }
+
     this.isHovered = false;
     this.isPressed = false;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
@@ -593,8 +606,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
+  public void setForwardMouseEvents(boolean forwardMouseEvents) {
+    this.forwardMouseEvents = forwardMouseEvents;
+  }
+
   public void setHeight(final double height) {
     this.height = height;
+  }
+
+  public void setHovered(boolean hovered) {
+    this.isHovered = hovered;
   }
 
   public void setHoverSound(final Sound hoverSound) {
@@ -762,8 +783,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    *          the e
    * @return true, if successful
    */
-  private boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+  protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
   }
 
   private void renderText(Graphics2D g) {

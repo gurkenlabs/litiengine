@@ -95,6 +95,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     // if the screen is already displayed or there is no screen with the
     // specified name
     if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
+      // TODO: provide reasonable log, why the screen was not switched
       return;
     }
 

@@ -16,11 +16,14 @@ public class Menu extends ImageComponentList {
   private final String[] items;
   private final List<Consumer<Integer>> selectionChangeConsumers;
 
-  public Menu(final double x, final double y, final double width, final double height, final int rows, final int columns, final String[] items, final Spritesheet background) {
-    super(x, y, width, height, rows, columns, null, background);
+  public Menu(final double x, final double y, final double width, final double height, final String[] items) {
+    this(x, y, width, height, items, null);
+  }
+
+  public Menu(final double x, final double y, final double width, final double height, final String[] items, final Spritesheet background) {
+    super(x, y, width, height, items.length, 1, null, background);
     this.items = items;
     this.selectionChangeConsumers = new CopyOnWriteArrayList<>();
-
   }
 
   public int getCurrentSelection() {
@@ -38,21 +41,17 @@ public class Menu extends ImageComponentList {
     for (int i = 0; i < this.items.length; i++) {
       final ImageComponent menuButton = this.getCellComponents().get(i);
       menuButton.setText(this.items[i]);
-      this.getCellComponents().add(menuButton);
       menuButton.onClicked(c -> this.setCurrentSelection(this.getCellComponents().indexOf(menuButton)));
-
     }
-    for (final ImageComponent comp : this.getCellComponents()) {
-      if (this.getCellComponents().indexOf(comp) >= this.items.length) {
-        this.getCellComponents().remove(comp);
-        this.getComponents().remove(comp);
-      }
-    }
-
   }
 
   public void setCurrentSelection(final int currentSelection) {
     this.currentSelection = currentSelection;
+
+    for (int i = 0; i < this.getCellComponents().size(); i++) {
+      this.getCellComponents().get(this.currentSelection).setSelected(i == this.currentSelection);
+    }
+
     this.selectionChangeConsumers.forEach(c -> c.accept(this.getCurrentSelection()));
   }
 }
