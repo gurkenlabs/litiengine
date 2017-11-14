@@ -32,6 +32,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   private final Map<String, List<Consumer<Float>>> pollConsumer;
   private final Map<String, List<Consumer<Float>>> pressedConsumer;
 
+  private boolean handleHotPluggedControllers;
+
   public GamepadManager() {
     this.loop = new GameLoop(1000 / GAMEPAD_UPDATE_DELAY);
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
@@ -126,6 +128,14 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
   @Override
   public void terminate() {
+    while (handleHotPluggedControllers) {
+      try {
+        Thread.sleep(50);
+      } catch (Exception e) {
+        break;
+      }
+    }
+
     this.loop.terminate();
   }
 
@@ -186,6 +196,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   private void updateGamepads() {
+    this.handleHotPluggedControllers = true;
     try {
       this.hackTheShitOutOfJInputBecauseItSucksHard();
       // update plugged in gamepads
@@ -211,6 +222,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       }
     } catch (IllegalStateException e) {
       this.loop.terminate();
+    } finally {
+      this.handleHotPluggedControllers = false;
     }
   }
 }
