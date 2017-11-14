@@ -97,13 +97,6 @@ public class ImageComponentList extends GuiComponent {
     return new ImageComponent(x, y, width, height, spritesheet, text, image);
   }
 
-  @Override
-  public void render(final Graphics2D g) {
-    for (final ImageComponent bg : this.getCellComponents()) {
-      bg.render(g);
-    }
-  }
-
   public void setXOffset(final double xOffset) {
     this.xOffset = xOffset;
     this.suspend();

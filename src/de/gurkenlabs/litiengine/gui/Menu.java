@@ -16,11 +16,11 @@ public class Menu extends ImageComponentList {
   private final String[] items;
   private final List<Consumer<Integer>> selectionChangeConsumers;
 
-  public Menu(final double x, final double y, final double width, final double height, final String[] items) {
-    this(x, y, width, height, items, null);
+  public Menu(final double x, final double y, final double width, final double height, final String... items) {
+    this(x, y, width, height, null, items);
   }
 
-  public Menu(final double x, final double y, final double width, final double height, final String[] items, final Spritesheet background) {
+  public Menu(final double x, final double y, final double width, final double height, final Spritesheet background, final String... items) {
     super(x, y, width, height, items.length, 1, null, background);
     this.items = items;
     this.selectionChangeConsumers = new CopyOnWriteArrayList<>();
