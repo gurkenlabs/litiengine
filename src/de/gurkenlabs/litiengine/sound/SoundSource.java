@@ -159,7 +159,7 @@ public class SoundSource {
     return (float) -Math.sin(angle);
   }
 
-  private void setGain(final float g) {
+  protected void setGain(final float g) {
     // Make sure there is a gain control
     if (this.gainControl == null) {
       return;
