@@ -1,5 +1,6 @@
 package de.gurkenlabs.util.io;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -138,18 +139,20 @@ public final class FileUtilities {
    */
   public static InputStream getGameResource(final String file) {
     try {
-      final InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
+      InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
       if (resourceStream != null) {
-        return resourceStream;
+        return new BufferedInputStream(resourceStream);
       }
 
-      final InputStream resourceStream2 = FileUtilities.class.getResourceAsStream(file);
-      if (resourceStream2 != null) {
-        return resourceStream2;
+      resourceStream = FileUtilities.class.getResourceAsStream(file);
+      if (resourceStream != null) {
+        return new BufferedInputStream(resourceStream);
       }
+
       File f = new File(file);
       if (f.exists()) {
-        return new FileInputStream(file);
+        resourceStream = new FileInputStream(file);
+        return new BufferedInputStream(resourceStream);
       } else {
         log.log(Level.INFO, "{0} could not be found.", file);
         return null;
