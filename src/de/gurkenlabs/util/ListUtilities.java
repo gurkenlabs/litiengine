@@ -1,5 +1,6 @@
 package de.gurkenlabs.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListUtilities {
@@ -10,4 +11,12 @@ public class ListUtilities {
     return list.stream().anyMatch(e -> clazz.isInstance(e));
   }
 
+  public static List<Integer> getIntList(int... values) {
+    List<Integer> list = new ArrayList<>();
+    for (int upKey : values) {
+      list.add(upKey);
+    }
+
+    return list;
+  }
 }

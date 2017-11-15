@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
