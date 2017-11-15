@@ -43,8 +43,11 @@ dependencies {
 }
 
 jar {
-  from configurations.compile.collect { zipTree it }
-  
+  from  {configurations.compile.collect { zipTree it }
+  } {
+     exclude 'META-INF/services/**'
+  }
+
   from('resources') { include '**/*' }
   
   exclude '**/*.dll'
@@ -52,6 +55,7 @@ jar {
   exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
+
 }
 
 javadoc {
