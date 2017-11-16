@@ -1,10 +1,11 @@
 package de.gurkenlabs.litiengine.input;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IGameLoop;
@@ -22,13 +23,23 @@ public class Gamepad implements IGamepad, IUpdateable {
 
   private final int index;
 
-  private final Map<String, List<Consumer<Float>>> pollConsumer;
+  private final Map<String, List<Consumer<Float>>> componentPollConsumer;
 
-  private final Map<String, List<Consumer<Float>>> pressedConsumer;
+  private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
+
+  private final List<BiConsumer<String, Float>> pollConsumer;
+
+  private final List<BiConsumer<String, Float>> pressedConsumer;
+
+  private final List<String> pressedComponents;
 
   protected Gamepad(final int index, final Controller controller) {
-    this.pollConsumer = new ConcurrentHashMap<>();
-    this.pressedConsumer = new ConcurrentHashMap<>();
+    this.componentPollConsumer = new ConcurrentHashMap<>();
+    this.componentPressedConsumer = new ConcurrentHashMap<>();
+    this.pollConsumer = new CopyOnWriteArrayList<>();
+    this.pressedConsumer = new CopyOnWriteArrayList<>();
+    this.pressedComponents = new CopyOnWriteArrayList<>();
+
     this.index = index;
     this.controller = controller;
     Input.InputLoop.attach(this);
@@ -56,20 +67,30 @@ public class Gamepad implements IGamepad, IUpdateable {
 
   @Override
   public void onPoll(final String identifier, final Consumer<Float> consumer) {
-    if (!this.pollConsumer.containsKey(identifier)) {
-      this.pollConsumer.put(identifier, new ArrayList<>());
-    }
-
-    this.pollConsumer.get(identifier).add(consumer);
+    GamepadManager.addComponentConsumer(this.componentPollConsumer, identifier, consumer);
   }
 
   @Override
   public void onPressed(final String identifier, final Consumer<Float> consumer) {
-    if (!this.pressedConsumer.containsKey(identifier)) {
-      this.pressedConsumer.put(identifier, new ArrayList<>());
+    GamepadManager.addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
+  }
+
+  @Override
+  public void onPoll(BiConsumer<String, Float> consumer) {
+    if (this.pollConsumer.contains(consumer)) {
+      return;
     }
 
-    this.pressedConsumer.get(identifier).add(consumer);
+    this.pollConsumer.add(consumer);
+  }
+
+  @Override
+  public void onPressed(BiConsumer<String, Float> consumer) {
+    if (this.pressedConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.pressedConsumer.add(consumer);
   }
 
   @Override
@@ -81,10 +102,28 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     final Event event = new Event();
     while (this.controller.getEventQueue().getNextEvent(event)) {
-      this.handleEvents(event);
+      this.handlePollEvents(event);
     }
 
-    for (final Map.Entry<String, List<Consumer<Float>>> consumers : this.pressedConsumer.entrySet()) {
+    for (Component comp : this.controller.getComponents()) {
+      if (Math.abs(comp.getPollData()) > 0.1) {
+        for (final BiConsumer<String, Float> cons : this.pressedConsumer) {
+          cons.accept(comp.getIdentifier().getName(), event.getValue());
+        }
+
+        if (!this.pressedComponents.contains(comp.getIdentifier().getName())) {
+          this.pressedComponents.add(comp.getIdentifier().getName());
+        }
+      } else {
+        if (this.pressedComponents.contains(comp.getIdentifier().getName())) {
+          this.handleRelease(comp);
+          this.pressedComponents.remove(comp.getIdentifier().getName());
+        }
+      }
+    }
+
+    // TODO: implement release
+    for (final Map.Entry<String, List<Consumer<Float>>> consumers : this.componentPressedConsumer.entrySet()) {
       final Identifier ident = get(consumers.getKey());
       if (ident == null) {
         continue;
@@ -92,7 +131,8 @@ public class Gamepad implements IGamepad, IUpdateable {
 
       final Component comp = this.controller.getComponent(ident);
       if (comp != null && comp.getPollData() != 0) {
-        for (final Consumer<Float> cons : this.pressedConsumer.get(consumers.getKey())) {
+
+        for (final Consumer<Float> cons : this.componentPressedConsumer.get(consumers.getKey())) {
           if (cons != null) {
             cons.accept(comp.getPollData());
           }
@@ -112,16 +152,34 @@ public class Gamepad implements IGamepad, IUpdateable {
 
   private void dispose() {
     Input.InputLoop.detach(this);
-    this.pollConsumer.clear();
-    this.pressedConsumer.clear();
+    this.componentPollConsumer.clear();
+    this.componentPressedConsumer.clear();
     Input.gamepadManager().remove(this);
   }
 
-  private void handleEvents(Event event) {
-    final List<Consumer<Float>> consumers = this.pollConsumer.get(event.getComponent().getIdentifier().getName());
+  private void handlePollEvents(Event event) {
+
+    for (final BiConsumer<String, Float> cons : this.pollConsumer) {
+      cons.accept(event.getComponent().getIdentifier().getName(), event.getValue());
+    }
+
+    final List<Consumer<Float>> consumers = this.componentPollConsumer.get(event.getComponent().getIdentifier().getName());
     if (consumers != null) {
       for (final Consumer<Float> cons : consumers) {
         cons.accept(event.getValue());
+      }
+    }
+  }
+
+  private void handleRelease(Component comp) {
+    for (final BiConsumer<String, Float> cons : this.pollConsumer) {
+      cons.accept(comp.getIdentifier().getName(), comp.getPollData());
+    }
+
+    final List<Consumer<Float>> consumers = this.componentPollConsumer.get(comp.getIdentifier().getName());
+    if (consumers != null) {
+      for (final Consumer<Float> cons : consumers) {
+        cons.accept(comp.getPollData());
       }
     }
   }
