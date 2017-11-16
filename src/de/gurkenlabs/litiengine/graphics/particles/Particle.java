@@ -8,9 +8,12 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
-import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public abstract class Particle implements ITimeToLive {
+  public enum ParticleRenderType {
+    NONE, EMITTER, GROUND, OVERLAY
+  }
+
   /** The activation tick. */
   private long aliveTick;
   private long aliveTime;
@@ -56,6 +59,8 @@ public abstract class Particle implements ITimeToLive {
   /** The current location of the particle on the Y-axis. */
   private float y;
 
+  private ParticleRenderType particleRenderType;
+
   /**
    * Constructs a new particle.
    * 
@@ -69,12 +74,12 @@ public abstract class Particle implements ITimeToLive {
    *          The color of the effect.
    */
   public Particle(final float width, final float height, final Color color, final int ttl) {
+    this.setParticleRenderType(ParticleRenderType.EMITTER);
     this.setWidth(width);
     this.setHeight(height);
     this.timeToLive = ttl;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
-    this.setCollisionType(CollisionType.COLLTYPE_ALL);
   }
 
   @Override
@@ -173,6 +178,10 @@ public abstract class Particle implements ITimeToLive {
     // viewport
     Point2D newEffectLocation = Game.getScreenManager() != null ? Game.getCamera().getViewPortLocation(effectLocation) : effectLocation;
     return this.getRelativeLocation(newEffectLocation);
+  }
+
+  public ParticleRenderType getParticleRenderType() {
+    return particleRenderType;
   }
 
   @Override
@@ -312,6 +321,11 @@ public abstract class Particle implements ITimeToLive {
    */
   public Particle setHeight(final float height) {
     this.height = height;
+    return this;
+  }
+
+  public Particle setParticleRenderType(ParticleRenderType particleRenderType) {
+    this.particleRenderType = particleRenderType;
     return this;
   }
 

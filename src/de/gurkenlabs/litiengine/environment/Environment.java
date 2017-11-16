@@ -170,6 +170,12 @@ public class Environment implements IEnvironment {
       entity.setMapId(this.getLocalMapId());
     }
 
+    if (entity instanceof Emitter) {
+      Emitter emitter = (Emitter) entity;
+      this.getGroundRenderables().add(emitter.getGroundRenderable());
+      this.getOverlayRenderables().add(emitter.getOverlayRenderable());
+    }
+
     if (entity instanceof ICombatEntity) {
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
@@ -221,10 +227,10 @@ public class Environment implements IEnvironment {
   public void add(final IRenderable renderable, final RenderType type) {
     switch (type) {
     case GROUND:
-      this.getGroundRenderable().add(renderable);
+      this.getGroundRenderables().add(renderable);
       break;
     case OVERLAY:
-      this.getOverlayRenderable().add(renderable);
+      this.getOverlayRenderables().add(renderable);
       break;
 
     default:
@@ -460,7 +466,7 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
-  public Collection<IRenderable> getGroundRenderable() {
+  public Collection<IRenderable> getGroundRenderables() {
     return this.groundRenderable;
   }
 
@@ -517,7 +523,7 @@ public class Environment implements IEnvironment {
     return ++mapIdSequence;
   }
 
-  public List<IRenderable> getOverlayRenderable() {
+  public List<IRenderable> getOverlayRenderables() {
     return this.overlayRenderable;
   }
 
@@ -726,6 +732,12 @@ public class Environment implements IEnvironment {
       }
     }
 
+    if (entity instanceof Emitter) {
+      Emitter emitter = (Emitter) entity;
+      this.groundRenderable.remove(emitter.getGroundRenderable());
+      this.overlayRenderable.remove(emitter.getOverlayRenderable());
+    }
+
     if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
     }
@@ -775,12 +787,12 @@ public class Environment implements IEnvironment {
 
   @Override
   public void removeRenderable(final IRenderable renderable) {
-    if (this.getGroundRenderable().contains(renderable)) {
-      this.getGroundRenderable().remove(renderable);
+    if (this.getGroundRenderables().contains(renderable)) {
+      this.getGroundRenderables().remove(renderable);
     }
 
-    if (this.getOverlayRenderable().contains(renderable)) {
-      this.getOverlayRenderable().remove(renderable);
+    if (this.getOverlayRenderables().contains(renderable)) {
+      this.getOverlayRenderables().remove(renderable);
     }
   }
 
@@ -791,7 +803,7 @@ public class Environment implements IEnvironment {
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
 
-    for (final IRenderable rend : this.getGroundRenderable()) {
+    for (final IRenderable rend : this.getGroundRenderables()) {
       rend.render(g);
     }
 
@@ -814,7 +826,7 @@ public class Environment implements IEnvironment {
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getCamera().getViewPortLocation(0, 0));
     }
 
-    for (final IRenderable rend : this.getOverlayRenderable()) {
+    for (final IRenderable rend : this.getOverlayRenderables()) {
       rend.render(g);
     }
 
