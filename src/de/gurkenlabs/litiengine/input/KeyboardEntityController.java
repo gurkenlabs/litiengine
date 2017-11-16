@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
+import de.gurkenlabs.util.ListUtilities;
 
 public class KeyboardEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> {
   private final List<Integer> up;
@@ -48,18 +49,34 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Accelera
   }
 
   public void addUpKey(int keyCode) {
+    if (this.up.contains(keyCode)) {
+      return;
+    }
+
     this.up.add(keyCode);
   }
 
   public void addDownKey(int keyCode) {
+    if (this.down.contains(keyCode)) {
+      return;
+    }
+
     this.down.add(keyCode);
   }
 
   public void addLeftKey(int keyCode) {
+    if (this.left.contains(keyCode)) {
+      return;
+    }
+
     this.left.add(keyCode);
   }
 
   public void addRightKey(int keyCode) {
+    if (this.right.contains(keyCode)) {
+      return;
+    }
+
     this.right.add(keyCode);
   }
 
@@ -77,5 +94,44 @@ public class KeyboardEntityController<T extends IMovableEntity> extends Accelera
 
   public List<Integer> getRightKeys() {
     return this.right;
+  }
+
+  public void setUpKeys(int... up) {
+    this.setUpKeys(ListUtilities.getIntList(up));
+  }
+
+  public void setUpKeys(List<Integer> up) {
+    set(this.up, up);
+  }
+
+  public void setDownKeys(int... down) {
+    this.setDownKeys(ListUtilities.getIntList(down));
+  }
+
+  public void setDownKeys(List<Integer> down) {
+    set(this.down, down);
+  }
+
+  public void setLeftKeys(int... left) {
+    this.setLeftKeys(ListUtilities.getIntList(left));
+  }
+
+  public void setLeftKeys(List<Integer> left) {
+    set(this.left, left);
+  }
+
+  public void setRightKeys(int... right) {
+    this.setRightKeys(ListUtilities.getIntList(right));
+  }
+
+  public void setRightKeys(List<Integer> right) {
+    set(this.right, right);
+  }
+
+  private static void set(List<Integer> keyList, List<Integer> keys) {
+    keyList.clear();
+    for (int key : keys) {
+      keyList.add(key);
+    }
   }
 }

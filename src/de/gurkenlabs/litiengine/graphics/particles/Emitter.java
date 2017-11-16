@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
 
 /**
  * An abstract implementation for emitters that provide a particle effect.
@@ -72,6 +73,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /** The time to live. */
   private int timeToLive;
 
+  private IRenderable groundRenderable;
+
+  private IRenderable overlayRenderable;
+
   /**
    * Basic constructor for an effect.
    *
@@ -100,6 +105,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.particles = new CopyOnWriteArrayList<>();
     this.setLocation(origin);
     this.activateOnInit = info.activateOnInit();
+
+    this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
+    this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
   }
 
   /**
@@ -163,6 +171,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public List<Color> getColors() {
     return this.colors;
+  }
+
+  public IRenderable getGroundRenderable() {
+    return this.groundRenderable;
+  }
+
+  public IRenderable getOverlayRenderable() {
+    return this.overlayRenderable;
   }
 
   /**
@@ -265,8 +281,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    final Point2D origin = this.getOrigin();
-    this.particles.forEach(particle -> particle.render(g, origin));
+    this.renderParticles(g, ParticleRenderType.EMITTER);
+
     if (Game.getConfiguration().debug().renderHitBoxes()) {
       DebugRenderer.renderEntityDebugInfo(g, this);
     }
@@ -454,4 +470,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
+  private void renderParticles(final Graphics2D g, final ParticleRenderType renderType) {
+    final Point2D origin = this.getOrigin();
+    this.particles.forEach(particle -> {
+      if (particle.getParticleRenderType() == renderType) {
+        particle.render(g, origin);
+      }
+    });
+  }
 }
