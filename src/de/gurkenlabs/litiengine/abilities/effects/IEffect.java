@@ -4,10 +4,8 @@ import java.awt.Shape;
 import java.util.List;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public interface IEffect extends IUpdateable {
   /**
@@ -18,7 +16,7 @@ public interface IEffect extends IUpdateable {
    * @param environment
    * @param impactArea
    */
-  public void apply(IGameLoop loop, IEnvironment environment, Shape impactArea);
+  public void apply(Shape impactArea);
 
   public void cease(final ICombatEntity affectedEntity);
 

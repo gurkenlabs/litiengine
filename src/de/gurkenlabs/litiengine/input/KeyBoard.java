@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.IGameLoop;
-
 /**
  * The listener interface for receiving userKey events. The class that is
  * interested in processing a userKey event implements this interface, and the
@@ -184,7 +182,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update(final IGameLoop gameLoop) {
+  public void update() {
     this.executePressedKeys();
     this.executeReleasedKeys();
     this.executeTypedKeys();

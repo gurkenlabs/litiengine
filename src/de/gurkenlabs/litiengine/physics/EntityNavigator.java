@@ -8,7 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -103,7 +102,7 @@ public class EntityNavigator implements IEntityNavigator {
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (!this.isNavigating()) {
       return;
     }
@@ -154,7 +153,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    final float pixelsPerTick = loop.getDeltaTime() * 0.001f * this.entity.getVelocity() * loop.getTimeScale();
+    final float pixelsPerTick = Game.getLoop().getDeltaTime() * 0.001f * this.entity.getVelocity() * Game.getLoop().getTimeScale();
     Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }

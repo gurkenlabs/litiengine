@@ -5,7 +5,6 @@ import java.util.Random;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.sound.Sound;
 
 public class SoundEffect extends Effect {
@@ -17,8 +16,8 @@ public class SoundEffect extends Effect {
   }
 
   @Override
-  protected void apply(final ICombatEntity entity, final IEnvironment environment) {
-    super.apply(entity, environment);
+  protected void apply(final ICombatEntity entity) {
+    super.apply(entity);
     if (this.sounds.length == 0) {
       return;
     }

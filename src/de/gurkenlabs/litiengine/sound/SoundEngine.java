@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
@@ -105,7 +104,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     this.listenerLocation = this.listenerLocationCallback.apply(this.listenerLocation);
 
     final List<SoundSource> remove = new ArrayList<>();

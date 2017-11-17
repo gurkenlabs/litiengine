@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.physics;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.MathUtilities;
 
@@ -18,15 +17,15 @@ public abstract class AccelerationMovementController<T extends IMovableEntity> e
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public void update() {
+    super.update();
     if (!this.isMovementAllowed()) {
       this.velocityX = 0;
       this.velocityY = 0;
       return;
     }
 
-    final long deltaTime = loop.getDeltaTime();
+    final long deltaTime = Game.getLoop().getDeltaTime();
 
     // pixels per ms multiplied by the passed ms
     final double maxPixelsPerTick = this.getEntity().getVelocity() / 1000.0 * deltaTime;

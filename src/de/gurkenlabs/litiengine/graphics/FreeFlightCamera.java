@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -28,8 +27,8 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    this.handleFreeFlightCamera(loop);
+  public void update() {
+    this.handleFreeFlightCamera();
   }
 
   @Override
@@ -38,10 +37,10 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
     super.updateFocus();
   }
 
-  private void handleFreeFlightCamera(final IGameLoop gameLoop) {
+  private void handleFreeFlightCamera() {
     final Point2D mouseLocation = Input.mouse().getLocation();
 
-    final double scrollSpeed = SCROLL_PIXELS_PER_SECOND / (double) gameLoop.getUpdateRate() * Game.getConfiguration().input().getMouseSensitivity();
+    final double scrollSpeed = SCROLL_PIXELS_PER_SECOND / (double) Game.getLoop().getUpdateRate() * Game.getConfiguration().input().getMouseSensitivity();
 
     double x = this.getLocation().getX();
     double y = this.getLocation().getY();

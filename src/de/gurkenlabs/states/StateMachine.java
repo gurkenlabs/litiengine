@@ -3,8 +3,6 @@ package de.gurkenlabs.states;
 import java.util.Collections;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.IGameLoop;
-
 public class StateMachine implements IStateMachine {
   private IState currentState;
 
@@ -27,17 +25,17 @@ public class StateMachine implements IStateMachine {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (this.currentState == null) {
       return;
     }
 
-    this.currentState.executeBehaviour(loop);
+    this.currentState.executeBehaviour();
     final List<ITransition> transitions = this.currentState.getTransitions();
     Collections.sort(transitions);
 
     for (final ITransition transition : transitions) {
-      if (!transition.conditionsFullfilled(loop)) {
+      if (!transition.conditionsFullfilled()) {
         continue;
       }
 

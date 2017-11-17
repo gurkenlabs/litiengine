@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -344,7 +343,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public void update(IGameLoop loop) {
+  public void update() {
     this.updateAllCollisionBoxes();
   }
 

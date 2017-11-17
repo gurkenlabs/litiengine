@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.gui.GuiProperties;
@@ -130,15 +129,15 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (this.currentText == null || this.cancelled) {
       Game.getEnvironment().removeRenderable(this);
-      loop.detach(this);
+      Game.getLoop().detach(this);
       return;
     }
 
     // old text was displayed long enough
-    if (this.lastTextDispay != 0 && loop.getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
+    if (this.lastTextDispay != 0 && Game.getLoop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
       this.currentText = null;
       this.displayedText = null;
       this.lastTextDispay = 0;
@@ -146,9 +145,9 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     }
 
     // display new text
-    if (!this.currentTextQueue.isEmpty() && loop.getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
+    if (!this.currentTextQueue.isEmpty() && Game.getLoop().getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
       this.displayedText += this.currentTextQueue.poll();
-      this.lastCharPoll = loop.getTicks();
+      this.lastCharPoll = Game.getLoop().getTicks();
       if (this.typeSound != null) {
         Game.getSoundEngine().playSound(this.entity, this.typeSound);
       }

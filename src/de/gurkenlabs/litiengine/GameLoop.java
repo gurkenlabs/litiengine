@@ -127,7 +127,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
         this.updatables.forEach(updatable -> {
           try {
             if (updatable != null) {
-              updatable.update(this);
+              updatable.update();
             }
           } catch (final Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);

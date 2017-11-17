@@ -8,7 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier;
@@ -94,7 +93,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     final boolean couldPoll = this.controller.poll();
     if (!couldPoll) {
       this.dispose();

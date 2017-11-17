@@ -1,9 +1,7 @@
 package de.gurkenlabs.litiengine.abilities.effects;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.physics.Force;
 
 public abstract class ForceEffect extends Effect {
@@ -19,14 +17,14 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  public void apply(final ICombatEntity affectedEntity, final IEnvironment environment) {
-    super.apply(affectedEntity, environment);
+  public void apply(final ICombatEntity affectedEntity) {
+    super.apply(affectedEntity);
     // only apply one force per effect
     if (this.getAppliedForce() != null) {
       return;
     }
 
-    final Force force = this.applyForce(affectedEntity, environment);
+    final Force force = this.applyForce(affectedEntity);
     if (force != null) {
       this.appliedForce = force;
     }
@@ -36,11 +34,11 @@ public abstract class ForceEffect extends Effect {
     return this.strength;
   }
 
-  protected abstract Force applyForce(final ICombatEntity affectedEntity, final IEnvironment environment);
+  protected abstract Force applyForce(final ICombatEntity affectedEntity);
 
   @Override
-  protected void cease(final IGameLoop loop, final EffectApplication appliance) {
-    super.cease(loop, appliance);
+  protected void cease(final EffectApplication appliance) {
+    super.cease(appliance);
     if (this.getAppliedForce() != null) {
       this.getAppliedForce().end();
       this.appliedForce = null;
@@ -52,7 +50,7 @@ public abstract class ForceEffect extends Effect {
   }
 
   @Override
-  protected boolean hasEnded(final IGameLoop loop, final EffectApplication appliance) {
-    return super.hasEnded(loop, appliance) || this.getAppliedForce() == null;
+  protected boolean hasEnded(final EffectApplication appliance) {
+    return super.hasEnded(appliance) || this.getAppliedForce() == null;
   }
 }

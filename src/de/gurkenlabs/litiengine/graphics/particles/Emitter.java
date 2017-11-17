@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
@@ -44,8 +43,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private long aliveTime;
 
   private final List<Color> colors;
-
-  private IGameLoop gameLoop;
 
   /** The last spawn. */
   private long lastSpawn;
@@ -113,15 +110,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   /**
    * Activate.
    */
-  public void activate(final IGameLoop gameLoop) {
-    if (gameLoop == null || this.activated) {
+  public void activate() {
+    if (this.activated) {
       return;
     }
 
-    this.gameLoop = gameLoop;
     this.activated = true;
-    this.activationTick = this.gameLoop.getTicks();
-    this.gameLoop.attach(this);
+    this.activationTick = Game.getLoop().getTicks();
+    Game.getRenderLoop().attach(this);
   }
 
   /**
@@ -147,9 +143,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.aliveTime = 0;
     this.activationTick = 0;
     this.lastSpawn = 0;
-    if (this.gameLoop != null) {
-      this.gameLoop.detach(this);
-    }
+    Game.getRenderLoop().detach(this);
   }
 
   public void delete() {
@@ -351,7 +345,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    * @see de.gurkenlabs.liti.core.IUpdateable#update()
    */
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (this.isPaused()) {
       return;
     }
@@ -366,7 +360,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    final float updateRatio = (float) this.getParticleUpdateRate() / loop.getUpdateRate();
+    final float updateRatio = (float) this.getParticleUpdateRate() / Game.getLoop().getUpdateRate();
     for (final Particle p : this.getParticles().stream().collect(Collectors.toList())) {
       if (this.particleCanBeRemoved(p)) {
         // remove dead particles
@@ -374,12 +368,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         continue;
       }
 
-      p.update(loop, this.getOrigin(), updateRatio);
+      p.update(Game.getLoop(), this.getOrigin(), updateRatio);
     }
 
-    this.aliveTime = loop.getDeltaTime(this.activationTick);
+    this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
 
-    if (loop.getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
+    if (Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
     }
   }

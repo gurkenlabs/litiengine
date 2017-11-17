@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
@@ -73,8 +72,8 @@ public class PropAnimationController extends AnimationController {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public void update() {
+    super.update();
     switch (this.prop.getState()) {
     case DAMAGED:
       this.playAnimation(DAMAGED);

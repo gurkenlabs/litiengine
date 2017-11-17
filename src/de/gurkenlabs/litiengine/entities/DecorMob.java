@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.util.Random;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 import de.gurkenlabs.litiengine.physics.MovementController;
@@ -48,13 +47,13 @@ public class DecorMob extends MovableCombatEntity {
     }
 
     @Override
-    public void update(final IGameLoop gameLoop) {
-      super.update(gameLoop);
+    public void update() {
+      super.update();
       if (Game.getEnvironment() == null || DecorMob.this.isDead()) {
         return;
       }
-      final long currentTick = gameLoop.getTicks();
-      final long timeSinceLastAngleChange = gameLoop.getDeltaTime(this.lastAngleChange);
+      final long currentTick = Game.getLoop().getTicks();
+      final long timeSinceLastAngleChange = Game.getLoop().getDeltaTime(this.lastAngleChange);
       if (this.angle == 0 || timeSinceLastAngleChange > this.nextAngleChange) {
         final Random rand = new Random();
         this.angle = rand.nextInt(360);
@@ -62,7 +61,7 @@ public class DecorMob extends MovableCombatEntity {
         this.calculateNextAngleChange();
       }
 
-      final float pixelsPerTick = gameLoop.getDeltaTime() * 0.001F * this.getEntity().getVelocity();
+      final float pixelsPerTick = Game.getLoop().getDeltaTime() * 0.001F * this.getEntity().getVelocity();
       this.getPhysicsEngine().move(this.getEntity(), this.angle, pixelsPerTick);
     }
   }

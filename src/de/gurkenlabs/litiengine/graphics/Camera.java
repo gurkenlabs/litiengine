@@ -8,7 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.util.MathUtilities;
@@ -22,7 +21,7 @@ public class Camera implements ICamera {
   /**
    * Provides the center location for the viewport.
    */
-  private Point2D focus;
+  protected Point2D focus;
   private long lastShake;
 
   private int shakeDelay;
@@ -247,13 +246,13 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (Game.getCamera() != null && !Game.getCamera().equals(this)) {
       return;
     }
 
     if (this.targetZoom > 0) {
-      if (loop.getDeltaTime(this.zoomTick) >= this.zoomDelay) {
+      if (Game.getLoop().getDeltaTime(this.zoomTick) >= this.zoomDelay) {
         for (final Consumer<Float> cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
@@ -278,10 +277,10 @@ public class Camera implements ICamera {
       return;
     }
 
-    if (loop.getDeltaTime(this.lastShake) > this.shakeDelay) {
+    if (Game.getLoop().getDeltaTime(this.lastShake) > this.shakeDelay) {
       this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
       this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.lastShake = loop.getTicks();
+      this.lastShake = Game.getLoop().getTicks();
     }
   }
 

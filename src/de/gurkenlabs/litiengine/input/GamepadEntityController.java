@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -35,10 +34,10 @@ public class GamepadEntityController<T extends IMovableEntity> extends Accelerat
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
 
     this.retrieveGamepadValues();
-    super.update(loop);
+    super.update();
   }
 
   public double getGamePadDeadzone() {
