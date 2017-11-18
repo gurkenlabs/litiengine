@@ -12,8 +12,6 @@ public interface IEffect extends IUpdateable {
    * Applies the effect in the specified impact area on the specified
    * environment.
    * 
-   * @param loop
-   * @param environment
    * @param impactArea
    */
   public void apply(Shape impactArea);
