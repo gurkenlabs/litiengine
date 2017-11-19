@@ -36,7 +36,7 @@ public class Prop extends CombatEntity {
   public void updateAnimationController() {
     PropAnimationController controller = new PropAnimationController(this);
     Game.getEntityControllerManager().addController(this, controller);
-    if (Game.getEnvironment().isLoaded()) {
+    if (Game.getEnvironment() != null && Game.getEnvironment().isLoaded()) {
       Game.getLoop().attach(controller);
     }
   }
