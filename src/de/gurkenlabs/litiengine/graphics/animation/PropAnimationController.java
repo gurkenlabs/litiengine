@@ -24,12 +24,12 @@ public class PropAnimationController extends AnimationController {
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
-    if (prop == null || prop.getSpritePath() == null || prop.getSpritePath().isEmpty()) {
+    if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
       return null;
     }
 
     final String propState = state.name().toLowerCase();
-    final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
+    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState + ".png";
     return Spritesheet.find(name);
   }
 

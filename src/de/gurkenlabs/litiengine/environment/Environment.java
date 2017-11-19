@@ -638,6 +638,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public boolean isLoaded() {
+    return this.loaded;
+  }
+
+  @Override
   public void load() {
     this.init();
     if (this.loaded) {
