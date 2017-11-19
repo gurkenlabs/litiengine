@@ -12,6 +12,8 @@ public interface IGameLoop extends ILoop, ILaunchable {
 
   public int execute(int delay, Consumer<Integer> action);
 
+  public int execute(int delay, Runnable action);
+
   public void updateExecutionTime(int index, long ticks);
 
   /**
