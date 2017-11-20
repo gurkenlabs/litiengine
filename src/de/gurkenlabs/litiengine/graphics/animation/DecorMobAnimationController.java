@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -71,8 +70,8 @@ public class DecorMobAnimationController extends AnimationController {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public void update() {
+    super.update();
     if (this.mob.isDead()) {
       final String deadAnim = DECORMOBPREFIX + this.mob.getMobType().toLowerCase() + "-dead";
       if (this.getAnimations().stream().anyMatch(x -> x != null && x.getName().equals(deadAnim))) {

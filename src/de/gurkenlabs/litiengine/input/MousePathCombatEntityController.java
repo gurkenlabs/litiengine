@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 import de.gurkenlabs.litiengine.physics.MovementController;
@@ -39,8 +38,8 @@ public class MousePathCombatEntityController extends MovementController<IMovable
   }
 
   @Override
-  public void update(final IGameLoop gameLoop) {
-    super.update(gameLoop);
+  public void update() {
+    super.update();
     // can only walk if no forces are active
     if (!this.isMovementAllowed() || !this.getActiceForces().isEmpty()) {
       this.navigator.stop();

@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -191,7 +190,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
       return;
     }

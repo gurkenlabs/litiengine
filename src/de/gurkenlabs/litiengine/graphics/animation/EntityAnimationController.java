@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
@@ -30,8 +29,8 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public void update() {
+    super.update();
 
     for (Entry<Predicate<T>, String> animationRule : this.animationRules.entrySet()) {
       if (animationRule.getKey().test(this.getEntity())) {

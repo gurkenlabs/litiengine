@@ -638,6 +638,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public boolean isLoaded() {
+    return this.loaded;
+  }
+
+  @Override
   public void load() {
     this.init();
     if (this.loaded) {
@@ -1096,7 +1101,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof Emitter) {
       final Emitter emitter = (Emitter) entity;
       if (emitter.isActivateOnInit()) {
-        emitter.activate(Game.getLoop());
+        emitter.activate();
       }
     } else if (entity instanceof IUpdateable) {
       Game.getLoop().attach((IUpdateable) entity);

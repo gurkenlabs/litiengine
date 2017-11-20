@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
@@ -80,13 +81,13 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    if (loop.getDeltaTime(this.lastSpawn) < this.getInterval()) {
+  public void update() {
+    if (Game.getLoop().getDeltaTime(this.lastSpawn) < this.getInterval()) {
       return;
     }
 
     this.spawnNewEntities();
-    this.lastSpawn = loop.getTicks();
+    this.lastSpawn = Game.getLoop().getTicks();
   }
 
   protected abstract void addToEnvironment(final IEnvironment env, T newEntity);

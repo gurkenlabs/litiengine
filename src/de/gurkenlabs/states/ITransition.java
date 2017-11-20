@@ -1,9 +1,7 @@
 package de.gurkenlabs.states;
 
-import de.gurkenlabs.litiengine.IGameLoop;
-
 public interface ITransition extends Comparable<ITransition> {
-  public boolean conditionsFullfilled(IGameLoop loop);
+  public boolean conditionsFullfilled();
 
   public IState getNextState();
 

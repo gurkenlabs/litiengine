@@ -4,28 +4,15 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.core.ILaunchable;
 
-public interface IGameLoop extends ILaunchable {
-  /**
-   * Attaches the update method of the specified IUpdatable instance to be
-   * called every tick. The tick rate can be configured in the client
-   * configuration and is independant from rendering.
-   * 
-   * @param updatable
-   */
-  public void attach(final IUpdateable updatable);
+public interface IGameLoop extends ILoop, ILaunchable {
 
   public long convertToMs(final long ticks);
 
   public long convertToTicks(final int ms);
 
-  /**
-   * Detaches the specified instance from the game loop.
-   * 
-   * @param updatable
-   */
-  public void detach(final IUpdateable updatable);
-
   public int execute(int delay, Consumer<Integer> action);
+
+  public int execute(int delay, Runnable action);
 
   public void updateExecutionTime(int index, long ticks);
 

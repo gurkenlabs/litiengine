@@ -18,7 +18,6 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -102,12 +101,8 @@ public abstract class Ability implements IRenderable {
    *
    * @return true, if successful
    */
-  public boolean canCast(final IGameLoop gameLoop) {
-    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
-  }
-
-  public AbilityExecution cast() {
-    return this.cast(Game.getLoop(), Game.getEnvironment());
+  public boolean canCast() {
+    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.getLoop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
 
   /**
@@ -116,11 +111,11 @@ public abstract class Ability implements IRenderable {
    * execution will be taken out that start applying all the effects of this
    * ability.
    */
-  public AbilityExecution cast(final IGameLoop gameLoop, final IEnvironment environment) {
-    if (!this.canCast(gameLoop)) {
+  public AbilityExecution cast() {
+    if (!this.canCast()) {
       return null;
     }
-    this.currentExecution = new AbilityExecution(gameLoop, environment, this);
+    this.currentExecution = new AbilityExecution(this);
 
     for (final Consumer<AbilityExecution> castConsumer : this.abilityCastConsumer) {
       castConsumer.accept(this.currentExecution);
@@ -207,7 +202,7 @@ public abstract class Ability implements IRenderable {
     }
 
     // calculate cooldown in seconds
-    return (float) (!this.canCast(loop) ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
+    return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
   public boolean isCasting(final IGameLoop gameLoop) {

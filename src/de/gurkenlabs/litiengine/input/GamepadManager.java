@@ -145,7 +145,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     this.updateGamepads();
   }
 

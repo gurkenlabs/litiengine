@@ -11,12 +11,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.EntityComparator;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * The Class Effect seeks for affected entities in the game's current
@@ -74,17 +73,17 @@ public abstract class Effect implements IEffect {
    * Apply.
    */
   @Override
-  public void apply(final IGameLoop loop, final IEnvironment environment, final Shape impactArea) {
-    final List<ICombatEntity> affected = this.lookForAffectedEntities(environment, impactArea);
+  public void apply(final Shape impactArea) {
+    final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
     for (final ICombatEntity affectedEntity : affected) {
-      this.apply(affectedEntity, environment);
+      this.apply(affectedEntity);
     }
 
-    this.appliances.add(new EffectApplication(environment, loop.getTicks(), affected, impactArea));
+    this.appliances.add(new EffectApplication(affected, impactArea));
 
     // if it is the first appliance -> register for update
     if (this.appliances.size() == 1) {
-      loop.attach(this);
+      Game.getLoop().attach(this);
     }
   }
 
@@ -211,25 +210,25 @@ public abstract class Effect implements IEffect {
    * remove appliance 4. unregister from loop if all appliances are done
    */
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
 
     for (final Iterator<EffectApplication> iterator = this.getActiveAppliances().iterator(); iterator.hasNext();) {
       final EffectApplication appliance = iterator.next();
       // if the effect duration is reached
-      if (this.hasEnded(loop, appliance)) {
+      if (this.hasEnded(appliance)) {
 
         iterator.remove();
-        this.cease(loop, appliance);
+        this.cease(appliance);
       }
     }
 
     // 4. unregister if all appliances are finished
     if (this.getActiveAppliances().isEmpty()) {
-      loop.detach(this);
+      Game.getLoop().detach(this);
     }
   }
 
-  protected void apply(final ICombatEntity entity, final IEnvironment env) {
+  protected void apply(final ICombatEntity entity) {
     entity.getAppliedEffects().add(this);
     final EffectArgument arg = new EffectArgument(this, entity);
     for (final Consumer<EffectArgument> consumer : this.appliedConsumer) {
@@ -237,18 +236,18 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  protected void cease(final IGameLoop loop, final EffectApplication appliance) {
+  protected void cease(final EffectApplication appliance) {
     // 1. cease the effect for all affected entities
     for (final ICombatEntity entity : appliance.getAffectedEntities()) {
       this.cease(entity);
     }
 
     // 2. apply follow up effects
-    this.getFollowUpEffects().forEach(followUp -> followUp.apply(loop, appliance.getEnvironment(), appliance.getImpactArea()));
+    this.getFollowUpEffects().forEach(followUp -> followUp.apply(appliance.getImpactArea()));
   }
 
-  protected Collection<ICombatEntity> getEntitiesInImpactArea(IEnvironment environment, final Shape impactArea) {
-    return environment.findCombatEntities(impactArea);
+  protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
+    return Game.getEnvironment().findCombatEntities(impactArea);
   }
 
   /**
@@ -260,8 +259,8 @@ public abstract class Effect implements IEffect {
     return this.getDuration() + (long) this.getDelay();
   }
 
-  protected boolean hasEnded(final IGameLoop loop, final EffectApplication appliance) {
-    final long effectDuration = loop.getDeltaTime(appliance.getAppliedTicks());
+  protected boolean hasEnded(final EffectApplication appliance) {
+    final long effectDuration = Game.getLoop().getDeltaTime(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }
 
@@ -270,7 +269,7 @@ public abstract class Effect implements IEffect {
    *
    * @return the list
    */
-  protected List<ICombatEntity> lookForAffectedEntities(final IEnvironment environment, final Shape impactArea) {
+  protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
     List<ICombatEntity> affectedEntities = new ArrayList<>();
 
     for (final EffectTarget target : this.effectTargets) {
@@ -279,15 +278,15 @@ public abstract class Effect implements IEffect {
         affectedEntities.add(this.getAbility().getExecutor());
         return affectedEntities;
       case ENEMY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.canAttackEntity()).collect(Collectors.toList());
         break;
       case FRIENDLY:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isAliveFriendlyEntity()).collect(Collectors.toList());
         break;
       case FRIENDLYDEAD:
-        affectedEntities.addAll(this.getEntitiesInImpactArea(environment, impactArea));
+        affectedEntities.addAll(this.getEntitiesInImpactArea(impactArea));
         affectedEntities = affectedEntities.stream().filter(this.isDeadFriendlyEntity()).collect(Collectors.toList());
         break;
       default:

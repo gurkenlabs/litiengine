@@ -5,7 +5,6 @@ import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * An attribute effect appies an attribute modifier to the affected entity when
@@ -52,8 +51,8 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
   }
 
   @Override
-  protected void apply(final ICombatEntity affectedEntity, final IEnvironment environment) {
-    super.apply(affectedEntity, environment);
+  protected void apply(final ICombatEntity affectedEntity) {
+    super.apply(affectedEntity);
     this.getAttribute(affectedEntity).addModifier(this.getModifier());
   }
 

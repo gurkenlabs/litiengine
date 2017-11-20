@@ -5,10 +5,9 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 /**
  * The Class AbilityExecution.
@@ -26,22 +25,19 @@ public class AbilityExecution implements IUpdateable {
   /** The impact area. */
   private final Shape impactArea;
 
-  private final IEnvironment environment;
-
   /**
    * Instantiates a new ability execution.
    *
    * @param ability
    *          the ability
    */
-  public AbilityExecution(final IGameLoop gameLoop, final IEnvironment environment, final Ability ability) {
+  public AbilityExecution(final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;
-    this.executionTicks = gameLoop.getTicks();
+    this.executionTicks = Game.getLoop().getTicks();
     this.impactArea = ability.calculateImpactArea();
     this.castLocation = ability.getExecutor().getDimensionCenter();
-    this.environment = environment;
-    gameLoop.attach(this);
+    Game.getLoop().attach(this);
   }
 
   /**
@@ -85,10 +81,10 @@ public class AbilityExecution implements IUpdateable {
    * effects on their own.
    */
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     // if there a no effects to apply -> unregister this instance and we're done
     if (this.getAbility().getEffects().isEmpty() || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
-      loop.detach(this);
+      Game.getLoop().detach(this);
       return;
     }
 
@@ -96,11 +92,11 @@ public class AbilityExecution implements IUpdateable {
     for (final IEffect effect : this.getAbility().getEffects()) {
       // if the ability was not executed yet or the delay of the effect is not
       // yet reached
-      if (this.getAppliedEffects().contains(effect) || loop.getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
+      if (this.getAppliedEffects().contains(effect) || Game.getLoop().getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
         continue;
       }
 
-      effect.apply(loop, this.environment, this.getExecutionImpactArea());
+      effect.apply(this.getExecutionImpactArea());
       this.getAppliedEffects().add(effect);
     }
   }

@@ -68,6 +68,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
     Prop prop = new Prop(mapObject.getLocation(), spriteSheetName, material);
+    prop.setName(mapObject.getName());
     final String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
     if (obstacle != null && !obstacle.isEmpty()) {
       prop.setObstacle(Boolean.valueOf(obstacle));

@@ -79,6 +79,16 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   }
 
   @Override
+  public int execute(int delay, Runnable action) {
+    final long d = this.convertToTicks(delay);
+
+    TimedAction a = new TimedAction(this.getTicks() + d, action);
+    this.actions.add(a);
+
+    return a.getIndex();
+  }
+
+  @Override
   public long getDeltaTime() {
     return this.deltaTime;
   }
@@ -127,7 +137,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
         this.updatables.forEach(updatable -> {
           try {
             if (updatable != null) {
-              updatable.update(this);
+              updatable.update();
             }
           } catch (final Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -178,7 +188,13 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     final List<TimedAction> executed = new ArrayList<>();
     for (final TimedAction action : this.actions) {
       if (action.getExecutionTick() <= this.totalTicks) {
-        action.getAction().accept(action.getIndex());
+
+        if (action.getConsumerAction() != null) {
+          action.getConsumerAction().accept(action.getIndex());
+        } else {
+          action.getAction().run();
+        }
+
         executed.add(action);
       }
     }
@@ -195,17 +211,30 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   }
 
   private class TimedAction {
-    private final Consumer<Integer> action;
+    private final Consumer<Integer> consumerAction;
+    private final Runnable action;
     private long execution;
     private final int index;
 
-    private TimedAction(final long execution, final Consumer<Integer> action) {
+    private TimedAction(final long execution, final Runnable action) {
       this.execution = execution;
+      this.consumerAction = null;
       this.action = action;
       this.index = ++executionIndex;
     }
 
-    public Consumer<Integer> getAction() {
+    private TimedAction(final long execution, final Consumer<Integer> action) {
+      this.execution = execution;
+      this.consumerAction = action;
+      this.action = null;
+      this.index = ++executionIndex;
+    }
+
+    public Consumer<Integer> getConsumerAction() {
+      return this.consumerAction;
+    }
+
+    public Runnable getAction() {
       return this.action;
     }
 

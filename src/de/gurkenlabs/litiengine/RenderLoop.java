@@ -9,18 +9,39 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 /**
  * The Class RenderLoop.
  */
-public class RenderLoop extends Thread {
+public class RenderLoop extends Thread implements ILoop {
   private final IRenderComponent component;
   /** The game is running. */
   private boolean gameIsRunning = true;
   private final List<IRenderable> renderables;
+  private final List<IUpdateable> updatables;
 
   private int maxFps;
 
   public RenderLoop(final IRenderComponent component) {
     this.renderables = new CopyOnWriteArrayList<>();
+    this.updatables = new CopyOnWriteArrayList<>();
+
     this.component = component;
     this.maxFps = Game.getConfiguration().client().getMaxFps();
+  }
+
+  @Override
+  public void attach(final IUpdateable updatable) {
+    if (updatable == null) {
+      return;
+    }
+
+    if (this.updatables.contains(updatable)) {
+      return;
+    }
+
+    this.updatables.add(updatable);
+  }
+
+  @Override
+  public void detach(final IUpdateable updatable) {
+    this.updatables.remove(updatable);
   }
 
   public void register(final IRenderable render) {
@@ -39,6 +60,12 @@ public class RenderLoop extends Thread {
       final long renderStart = System.nanoTime();
       try {
         Game.getCamera().updateFocus();
+        this.updatables.forEach(updatable -> {
+          if (updatable != null) {
+            updatable.update();
+          }
+        });
+
         for (final IRenderable render : this.renderables) {
           this.component.render(render);
         }

@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
@@ -163,10 +162,10 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     // do nothing if the animation is not playing of the current keyframe is not
     // finished
-    if (!this.isPlaying() || loop.convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
+    if (!this.isPlaying() || Game.getLoop().convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
       return;
     }
 

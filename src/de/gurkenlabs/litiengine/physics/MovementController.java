@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -50,8 +49,8 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
   }
 
   @Override
-  public void update(final IGameLoop gameLoop) {
-    this.handleForces(gameLoop);
+  public void update() {
+    this.handleForces();
   }
 
   @Override
@@ -83,7 +82,7 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
     return true;
   }
 
-  private void handleForces(final IGameLoop gameLoop) {
+  private void handleForces() {
     // clean up forces
     this.activeForces.forEach(x -> {
       if (x.hasEnded()) {
@@ -104,7 +103,7 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
         this.getEntity().setLocation(entityLocation);
       } else {
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final boolean success = this.getPhysicsEngine().move(this.getEntity(), (float) angle, gameLoop.getDeltaTime() * 0.001f * force.getStrength());
+        final boolean success = this.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength());
         if (force.cancelOnCollision() && !success) {
           force.end();
         }

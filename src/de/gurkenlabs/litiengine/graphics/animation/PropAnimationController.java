@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
@@ -25,12 +24,12 @@ public class PropAnimationController extends AnimationController {
   }
 
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
-    if (prop == null || prop.getSpritePath() == null || prop.getSpritePath().isEmpty()) {
+    if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
       return null;
     }
 
     final String propState = state.name().toLowerCase();
-    final String name = "prop-" + prop.getSpritePath().toLowerCase() + "-" + propState + ".png";
+    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState + ".png";
     return Spritesheet.find(name);
   }
 
@@ -73,8 +72,8 @@ public class PropAnimationController extends AnimationController {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
-    super.update(loop);
+  public void update() {
+    super.update();
     switch (this.prop.getState()) {
     case DAMAGED:
       this.playAnimation(DAMAGED);

@@ -128,6 +128,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Trigger> getTriggers(String name);
 
+  public boolean isLoaded();
+
   public void load();
 
   public void loadFromMap(final int mapId);

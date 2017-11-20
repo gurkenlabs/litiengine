@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
  */
 public class Prop extends CombatEntity {
   private Material material;
-  private String spritePath;
+  private String spritesheetName;
   private boolean isObstacle;
   private boolean addShadow;
 
@@ -19,18 +19,26 @@ public class Prop extends CombatEntity {
    */
   public Prop(final Point2D location, final String spritesheetName, final Material mat) {
     super();
-    this.spritePath = spritesheetName;
+    this.spritesheetName = spritesheetName;
     this.material = mat;
     this.setLocation(location);
-    Game.getEntityControllerManager().addController(this, new PropAnimationController(this));
+    this.updateAnimationController();
   }
 
   public Material getMaterial() {
     return this.material;
   }
 
-  public String getSpritePath() {
-    return this.spritePath;
+  public String getSpritesheetName() {
+    return this.spritesheetName;
+  }
+
+  public void updateAnimationController() {
+    PropAnimationController controller = new PropAnimationController(this);
+    Game.getEntityControllerManager().addController(this, controller);
+    if (Game.getEnvironment() != null && Game.getEnvironment().isLoaded()) {
+      Game.getLoop().attach(controller);
+    }
   }
 
   /**
@@ -52,8 +60,9 @@ public class Prop extends CombatEntity {
     this.material = material;
   }
 
-  public void setSpritePath(final String spritePath) {
-    this.spritePath = spritePath;
+  public void setSpritesheetName(final String spriteName) {
+    this.spritesheetName = spriteName;
+    this.updateAnimationController();
   }
 
   public boolean isObstacle() {

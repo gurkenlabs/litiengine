@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -202,7 +201,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   @Override
-  public void update(final IGameLoop loop) {
+  public void update() {
     if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION) {
       return;
     }

@@ -380,19 +380,32 @@ public abstract class Particle implements ITimeToLive {
     if (this.timeToLiveReached()) {
       return;
     }
-    this.x += this.dx * updateRatio;
-    this.y += this.dy * updateRatio;
 
-    if (this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
-      this.x -= this.dx * updateRatio;
-      this.y -= this.dy * updateRatio;
+    if (!(this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType()))) {
+      if (this.getDx() != 0) {
+        this.x += this.getDx() * updateRatio;
+      }
+
+      if (this.getDy() != 0) {
+        this.y += this.getDy() * updateRatio;
+      }
+
+      if (this.getGravityX() != 0) {
+        this.dx += this.getGravityX() * updateRatio;
+      }
+
+      if (this.getGravityY() != 0) {
+        this.dy += this.getGravityY() * updateRatio;
+      }
     }
 
-    this.dx += this.gravityX * updateRatio;
-    this.dy += this.gravityY * updateRatio;
+    if (this.getDeltaWidth() != 0) {
+      this.width += this.getDeltaWidth() * updateRatio;
+    }
 
-    this.width += this.getDeltaWidth() * updateRatio;
-    this.height += this.getDeltaHeight() * updateRatio;
+    if (this.getDeltaHeight() != 0) {
+      this.height += this.getDeltaHeight() * updateRatio;
+    }
 
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);

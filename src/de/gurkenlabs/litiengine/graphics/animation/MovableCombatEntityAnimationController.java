@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -53,8 +52,8 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
   }
 
   @Override
-  public void update(final IGameLoop gameLoop) {
-    super.update(gameLoop);
+  public void update() {
+    super.update();
 
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return;
