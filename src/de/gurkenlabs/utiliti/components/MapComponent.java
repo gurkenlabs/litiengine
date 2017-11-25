@@ -315,7 +315,7 @@ public class MapComponent extends EditorComponent {
       // draw selection
       final Point2D start = this.startPoint;
       if (start != null && !Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Rectangle2D rect = this.getCurrentMouseSelectionArea();
+        final Rectangle2D rect = this.getCurrentMouseSelectionArea();
 
         g.setColor(new Color(0, 130, 152, 30));
         RenderEngine.fillShape(g, rect);
