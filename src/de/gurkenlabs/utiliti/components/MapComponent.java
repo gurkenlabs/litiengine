@@ -52,7 +52,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
@@ -973,7 +972,7 @@ public class MapComponent extends EditorComponent {
 
           if (n == JOptionPane.YES_OPTION) {
             this.getMaps().remove(current.get());
-            ImageCache.MAPS.clear("^(" + OrthogonalMapRenderer.getCacheKey(map) + ").*(static)$");
+            ImageCache.MAPS.clear();
           } else {
             return;
           }
