@@ -46,6 +46,8 @@ public class SoundSource {
 
   private final Sound sound;
 
+  private PlayThread thread;
+
   static {
     closeQueue = new SourceDataLineCloseQueue();
     closeQueue.start();
@@ -94,6 +96,10 @@ public class SoundSource {
     this.play(false, null, -1);
   }
 
+  public void interrupt() {
+    thread.setCancelled(true);
+  }
+
   /**
    * Loops the sound with the specified volume.
    *
@@ -112,7 +118,7 @@ public class SoundSource {
 
     this.gain = gain;
     this.location = location;
-    final PlayThread thread = new PlayThread(loop);
+    thread = new PlayThread(loop);
     thread.start();
     this.played = true;
   }
@@ -195,6 +201,8 @@ public class SoundSource {
   private class PlayThread extends Thread {
     private boolean loop;
 
+    private boolean cancelled;
+
     public PlayThread(final boolean loop) {
       this.loop = loop;
     }
@@ -219,7 +227,7 @@ public class SoundSource {
       SoundSource.this.playing = true;
       final byte[] buffer = new byte[1024];
       ByteArrayInputStream str = new ByteArrayInputStream(SoundSource.this.sound.getStreamData());
-      while (true) {
+      while (!this.cancelled) {
         int readCount;
         try {
           readCount = str.read(buffer);
@@ -243,6 +251,10 @@ public class SoundSource {
         SoundSource.this.dataLine.drain();
       }
       SoundSource.this.playing = false;
+    }
+
+    public void setCancelled(boolean cancelled) {
+      this.cancelled = cancelled;
     }
 
     private void loadDataLine() {

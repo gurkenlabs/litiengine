@@ -104,17 +104,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     return this.team;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.entities.Entity#hasCollision()
-   */
-  @Override
-  public boolean hasCollision() {
-    // if the entity is dead, ignore collision
-    return !this.isDead() && super.hasCollision();
-  }
-
   @Override
   public boolean hit(final int damage, final Ability ability) {
     if (this.isDead()) {
@@ -137,12 +126,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (this.isDead()) {
+      this.setCollision(false);
       this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, 0));
       for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
         consumer.accept(this);
       }
-
-      this.setCollision(false);
     }
 
     final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, actualDamage, ability);

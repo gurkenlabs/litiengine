@@ -23,6 +23,8 @@ public class PropMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + PropMapObjectLoader.class);
     }
 
+    // TODO: make this accessible by child implementations that add create
+    // custom Prop implementations
     // set map properties by map object
     final Material material = mapObject.getCustomProperty(MapObjectProperty.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.MATERIAL));
     final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), material);
@@ -33,7 +35,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
     }
 
     if (mapObject.getCustomProperty(MapObjectProperty.HEALTH) != null) {
-      prop.getAttributes().getHealth().modifyMaxBaseValue(new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH))));
+      AttributeModifier<Short> mod = new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH)));
+      prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
+      prop.getAttributes().getHealth().modifyBaseValue(mod);
     }
 
     if (mapObject.getCustomProperty(MapObjectProperty.COLLISION) != null) {

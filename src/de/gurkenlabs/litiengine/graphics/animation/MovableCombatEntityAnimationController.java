@@ -59,7 +59,7 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
       return;
     }
 
-    if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop()) {
+    if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop() && this.getCurrentAnimation().isPlaying()) {
       return;
     }
 

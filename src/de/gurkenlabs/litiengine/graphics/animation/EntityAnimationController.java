@@ -32,6 +32,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public void update() {
     super.update();
 
+    if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop() && this.getCurrentAnimation().isPlaying()) {
+      return;
+    }
+
     for (Entry<Predicate<T>, String> animationRule : this.animationRules.entrySet()) {
       if (animationRule.getKey().test(this.getEntity())) {
         this.playAnimation(animationRule.getValue());

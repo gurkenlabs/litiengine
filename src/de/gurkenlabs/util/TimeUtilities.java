@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class TimeUtilities {
   public enum TimerFormat {
-    UNDEFINED, HH_MM_SS, MM_SS_000, HH_MM_SS_000, DD_HH_MM;
+    UNDEFINED, HH_MM_SS, MM_SS_000, MM_SS_0, HH_MM_SS_000, DD_HH_MM;
 
     public String toFormatString() {
       switch (this) {
@@ -14,6 +14,8 @@ public final class TimeUtilities {
         return "%02d:%02d:%02d.%03d";
       case MM_SS_000:
         return "%02d:%02d.%03d";
+      case MM_SS_0:
+        return "%02d:%02d.%01d";
       default:
         return null;
       }
@@ -72,6 +74,8 @@ public final class TimeUtilities {
       return String.format(format.toFormatString(), h, m, s, ms);
     case MM_SS_000:
       return String.format(format.toFormatString(), m, s, ms);
+    case MM_SS_0:
+      return String.format(format.toFormatString(), m, s, ms / 100);
     case UNDEFINED:
     default:
       return Long.toString(ms);

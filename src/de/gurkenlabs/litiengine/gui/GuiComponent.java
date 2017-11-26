@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
@@ -24,7 +25,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
 /**
  * The Class GuiComponent.
  */
-public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
+public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable {
   protected static final Font ICON_FONT;
 
   private static int componentId = 0;
@@ -556,6 +557,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
+  @Override
   public void render(final Graphics2D g) {
     if (this.isSuspended() || !this.isVisible()) {
       return;

@@ -171,14 +171,14 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    // ensure that only one animation is playing at a time
-    if (this.getCurrentAnimation() != null) {
-      this.getCurrentAnimation().terminate();
-    }
-
     final Animation anim = this.getAnimation(animationName);
     if (anim == null) {
       return;
+    }
+
+    // ensure that only one animation is playing at a time
+    if (this.getCurrentAnimation() != null) {
+      this.getCurrentAnimation().terminate();
     }
 
     this.currentAnimation = anim;
@@ -194,6 +194,7 @@ public class AnimationController implements IAnimationController {
     if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
       return;
     }
+
     final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
     if (playbackFinished) {
       for (final Consumer<Animation> cons : this.playbackFinishedConsumer) {
@@ -208,7 +209,6 @@ public class AnimationController implements IAnimationController {
         this.currentAnimation = null;
       }
     }
-
   }
 
   protected String buildCurrentCacheKey() {
