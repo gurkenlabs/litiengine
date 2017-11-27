@@ -155,6 +155,7 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
     return getSpriteName(spriteWalk, dir);
   }
 
+  // TODO: this formatting is not very performant...
   private String getSpriteName(String formatString, Direction dir) {
     return String.format(formatString, this.getEntity().getName().toLowerCase(), dir.toString().toLowerCase());
   }

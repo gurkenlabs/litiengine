@@ -48,6 +48,8 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   private float resolutionScale = 1;
 
+  private Dimension resolution;
+
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
@@ -136,7 +138,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public Dimension getResolution() {
-    return this.getRenderComponent().getSize();
+    return this.resolution;
   }
 
   @Override
@@ -157,6 +159,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     }
 
     this.getRenderComponent().init();
+    resolution = this.getRenderComponent().getSize();
     this.requestFocus();
   }
 
@@ -238,6 +241,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
      */
     @Override
     public void componentResized(final ComponentEvent evt) {
+      resolution = getRenderComponent().getSize();
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
     }
   }
