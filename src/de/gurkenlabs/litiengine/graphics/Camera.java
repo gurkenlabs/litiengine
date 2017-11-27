@@ -309,9 +309,9 @@ public class Camera implements ICamera {
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
     final Dimension resolution = Game.getScreenManager().getResolution();
 
-    double minX = resolution.getWidth() / this.getRenderScale() / 2;
+    double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
     double maxX = mapSize.getWidth() - minX;
-    double minY = resolution.getHeight() / this.getRenderScale() / 2;
+    double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
     double x = mapSize.getWidth() * this.getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
