@@ -49,8 +49,8 @@ public class FireEmitter extends Emitter {
    * @see de.gurkenlabs.liti.graphics.particles.Emitter#getOrigin()
    */
   @Override
-  public Point2D getOrigin() {
-    return new Point2D.Double(this.getLocation().getX(), this.getLocation().getY() + this.getHeight());
+  public Point2D getLocation() {
+    return new Point2D.Double(super.getLocation().getX(), super.getLocation().getY() + this.getHeight());
   }
 
   /**

@@ -27,8 +27,8 @@ public class LightParticle extends RectangleFillParticle {
    * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
    */
   @Override
-  public void update(final IGameLoop gameLoop, final Point2D origin, final float updateRatio) {
-    super.update(gameLoop, origin, updateRatio);
+  public void update(final Point2D origin, final float updateRatio) {
+    super.update(origin, updateRatio);
     if (Math.abs(this.maxWidth - this.getWidth()) < 0.1 || Math.abs(this.getWidth() - this.minWidth) < 0.1) {
       this.setDeltaWidth(-this.getDeltaWidth());
     }
