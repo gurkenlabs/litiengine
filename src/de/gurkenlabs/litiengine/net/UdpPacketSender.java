@@ -38,12 +38,6 @@ public class UdpPacketSender implements IPacketSender {
     return this.socket;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.IPacketSender#sendData(de.gurkenlabs.liti.net.
-   * Package, java.net.InetAddress, int)
-   */
   @Override
   public void sendData(final Package packet, final InetAddress ipAddress, final int port) {
     final DatagramPacket datagramPacket = new DatagramPacket(packet.getData(), packet.getData().length, ipAddress, port);
@@ -54,12 +48,6 @@ public class UdpPacketSender implements IPacketSender {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.IPacketSender#sendData(de.gurkenlabs.liti.net.
-   * Package, java.lang.String, int)
-   */
   @Override
   public void sendData(final Package packet, final String ipAddress, final int port) {
     try {

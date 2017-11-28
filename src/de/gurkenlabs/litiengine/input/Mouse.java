@@ -87,11 +87,6 @@ public class Mouse implements IMouse {
     this.grabMouse = true;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.input.IMouse#getRenderLocation()
-   */
   @Override
   public Point2D getLocation() {
     return this.location;
@@ -112,11 +107,6 @@ public class Mouse implements IMouse {
     return this.isLeftMouseButtonDown;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.input.IMouse#isPressed()
-   */
   @Override
   public boolean isPressed() {
     return this.pressed;
@@ -127,11 +117,6 @@ public class Mouse implements IMouse {
     return this.isRightMouseButtonDown;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseClicked(final MouseEvent e) {
     this.setLocation(e);
@@ -142,12 +127,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseDragged(final MouseEvent e) {
     this.setLocation(e);
@@ -158,11 +137,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseEntered(final MouseEvent e) {
     if (!this.grabMouse) {
@@ -175,23 +149,12 @@ public class Mouse implements IMouse {
     this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseExited(final MouseEvent e) {
     this.setLocation(e);
     this.mouseListeners.forEach(listener -> listener.mouseExited(this.createEvent(e)));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseMoved(final MouseEvent e) {
     this.setLocation(e);
@@ -202,11 +165,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-   */
   @Override
   public void mousePressed(final MouseEvent e) {
     this.setLocation(e);
@@ -226,11 +184,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseReleased(final MouseEvent e) {
     this.setLocation(e);
@@ -250,12 +203,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseWheelListener#mouseWheelMoved(java.awt.event.
-   * MouseWheelEvent)
-   */
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
@@ -292,12 +239,6 @@ public class Mouse implements IMouse {
     this.wheelMovedConsumer.add(consumer);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.input.IMouse#registerMouseListener(java.awt.event.
-   * MouseListener)
-   */
   @Override
   public void registerMouseListener(final MouseListener listener) {
     if (this.mouseListeners.contains(listener)) {
@@ -307,13 +248,6 @@ public class Mouse implements IMouse {
     this.mouseListeners.add(listener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IMouse#registerMouseMotionListener(java.awt.event.
-   * MouseMotionListener)
-   */
   @Override
   public void registerMouseMotionListener(final MouseMotionListener listener) {
     if (this.mouseMotionListeners.contains(listener)) {
@@ -323,13 +257,6 @@ public class Mouse implements IMouse {
     this.mouseMotionListeners.add(listener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IMouse#registerMouseWheelListener(java.awt.event.
-   * MouseWheelListener)
-   */
   @Override
   public void registerMouseWheelListener(final MouseWheelListener listener) {
     if (this.mouseWheelListeners.contains(listener)) {
@@ -359,13 +286,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IMouse#unregisterMouseListener(java.awt.event.
-   * MouseListener)
-   */
   @Override
   public void unregisterMouseListener(final MouseListener listener) {
     if (!this.mouseListeners.contains(listener)) {
@@ -375,13 +295,6 @@ public class Mouse implements IMouse {
     this.mouseListeners.remove(listener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IMouse#unregisterMouseMotionListener(java.awt.
-   * event.MouseMotionListener)
-   */
   @Override
   public void unregisterMouseMotionListener(final MouseMotionListener listener) {
     if (!this.mouseMotionListeners.contains(listener)) {
@@ -391,13 +304,6 @@ public class Mouse implements IMouse {
     this.mouseMotionListeners.remove(listener);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IMouse#unregisterMouseWheelListener(java.awt.event
-   * .MouseWheelListener)
-   */
   @Override
   public void unregisterMouseWheelListener(final MouseWheelListener listener) {
     if (!this.mouseWheelListeners.contains(listener)) {

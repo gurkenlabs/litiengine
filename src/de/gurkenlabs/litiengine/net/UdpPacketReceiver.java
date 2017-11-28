@@ -49,22 +49,11 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.IPacketReceiver#registerForIncomingPackets(de.
-   * gurkenlabs.liti.net.IIncomingPacketObserver)
-   */
   @Override
   public void registerForIncomingPackets(final IIncomingPacketObserver observer) {
     this.incomingPacketObservers.add(observer);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Thread#run()
-   */
   @Override
   public void run() {
     while (!this.isTerminated) {
@@ -84,11 +73,6 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
     this.socket.close();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.IPacketReceiver#terminate()
-   */
   @Override
   public void terminate() {
     this.isTerminated = true;

@@ -52,11 +52,6 @@ public class UdpServer implements IServer {
     return this.commandManager;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.server.IGameServer#getConnectionManager()
-   */
   @Override
   public IClientConnectionManager getConnectionManager() {
     return this.clientConnectionManager;

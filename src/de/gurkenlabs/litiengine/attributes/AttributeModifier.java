@@ -28,11 +28,6 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     this.modifyValue = modifyValue;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
   @Override
   public int compareTo(final AttributeModifier<T> otherModifier) {
     return Integer.compare(this.getModification().getApplyOrder(), otherModifier.getModification().getApplyOrder());

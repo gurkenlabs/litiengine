@@ -103,11 +103,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ITile#GetGridId()
-   */
   @Override
   public int getGridId() {
     if (this.gid == null) {
@@ -117,11 +112,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     return this.gid;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.ITile#getTileCoordinate()
-   */
   @Override
   public Point getTileCoordinate() {
     return this.tileCoordinate;

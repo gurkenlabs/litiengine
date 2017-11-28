@@ -95,7 +95,7 @@ public final class RenderEngine implements IRenderEngine {
 
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
-    g.drawString(text, (int) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (int) viewPortLocation.getY() * Game.getCamera().getRenderScale());
+    g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 

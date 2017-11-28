@@ -64,12 +64,6 @@ public class Camera implements ICamera {
     return this.focus;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.graphics.ICamera#getMapLocation(java.awt.geom.Point2D)
-   */
   @Override
   public Point2D getMapLocation(final Point2D viewPortLocation) {
     final double x = viewPortLocation.getX() - this.getPixelOffsetX();
@@ -77,31 +71,16 @@ public class Camera implements ICamera {
     return new Point2D.Double(x, y);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getPixelOffsetX()
-   */
   @Override
   public double getPixelOffsetX() {
     return this.getViewPortCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getPixelOffsetY()
-   */
   @Override
   public double getPixelOffsetY() {
     return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getCameraRegion()
-   */
   @Override
   public Rectangle2D getViewPort() {
     return this.viewPort;
@@ -120,23 +99,11 @@ public class Camera implements ICamera {
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(double, double)
-   */
   @Override
   public Point2D getViewPortLocation(final double x, final double y) {
     return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(de.gurkenlabs.liti.
-   * entities.Entity)
-   */
   @Override
   public Point2D getViewPortLocation(final IEntity entity) {
     // localplayer camera causes flickering and bouncing of the sprite
@@ -150,12 +117,6 @@ public class Camera implements ICamera {
     return this.getViewPortLocation(entity.getLocation());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#getRenderLocation(java.awt.geom.
-   * Point2D)
-   */
   @Override
   public Point2D getViewPortLocation(final Point2D mapLocation) {
     return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
@@ -232,11 +193,6 @@ public class Camera implements ICamera {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.ICamera#shake(int, int)
-   */
   @Override
   public void shake(final double intensity, final int delay, final int shakeDuration) {
     this.shakeTick = Game.getLoop().getTicks();
@@ -309,9 +265,9 @@ public class Camera implements ICamera {
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
     final Dimension resolution = Game.getScreenManager().getResolution();
 
-    double minX = resolution.getWidth() / this.getRenderScale() / 2;
+    double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
     double maxX = mapSize.getWidth() - minX;
-    double minY = resolution.getHeight() / this.getRenderScale() / 2;
+    double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
     double x = mapSize.getWidth() * this.getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);

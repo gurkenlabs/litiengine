@@ -24,21 +24,11 @@ public class ImageLayer extends Layer implements IImageLayer {
   @XmlAttribute(name = "trans")
   private String transparentcolor;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IImageLayer#getImage()
-   */
   @Override
   public IMapImage getImage() {
     return this.image;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IImageLayer#getTransparentColor()
-   */
   @Override
   public Color getTransparentColor() {
     if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {

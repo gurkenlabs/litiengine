@@ -340,11 +340,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.visible;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {
@@ -358,12 +353,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseDragged(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {
@@ -374,11 +363,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.getMouseDraggedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseEntered(final MouseEvent e) {
     if (!this.isForwardMouseEvents()) {
@@ -396,11 +380,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseExited(final MouseEvent e) {
     if (!this.isForwardMouseEvents()) {
@@ -413,12 +392,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.getMouseLeaveConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseMoved(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e) && this.isHovered()) {
@@ -436,11 +409,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.getMouseMovedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-   */
   @Override
   public void mousePressed(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {
@@ -452,11 +420,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.getMousePressedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-   */
   @Override
   public void mouseReleased(final MouseEvent e) {
     if (!this.mouseEventShouldBeForwarded(e)) {

@@ -212,11 +212,6 @@ public class ListField extends GuiComponent {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.gui.GuiComponent#render(java.awt.Graphics)
-   */
   @Override
   public void render(final Graphics2D g) {
     super.render(g);

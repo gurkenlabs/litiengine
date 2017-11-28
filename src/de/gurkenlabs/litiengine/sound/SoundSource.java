@@ -217,8 +217,7 @@ public class SoundSource {
       }
 
       this.initControls();
-      final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().sound().getSoundVolume();
-      SoundSource.this.setGain(initialGain);
+      this.initGain();
 
       SoundSource.this.updateControls(SoundSource.this.initialListenerLocation);
 
@@ -253,6 +252,11 @@ public class SoundSource {
       SoundSource.this.playing = false;
     }
 
+    private void initGain() {
+      final float initialGain = SoundSource.this.gain > 0 ? SoundSource.this.gain : Game.getConfiguration().sound().getSoundVolume();
+      SoundSource.this.setGain(initialGain);
+    }
+
     public void setCancelled(boolean cancelled) {
       this.cancelled = cancelled;
     }
@@ -270,6 +274,8 @@ public class SoundSource {
     private void restartDataLine() {
       SoundSource.this.dataLine.drain();
       this.loadDataLine();
+      this.initControls();
+      this.initGain();
       SoundSource.this.dataLine.start();
     }
 

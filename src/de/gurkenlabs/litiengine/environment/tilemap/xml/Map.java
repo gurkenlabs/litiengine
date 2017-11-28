@@ -105,11 +105,6 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   @XmlTransient
   private String path;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getImageLayers()
-   */
   @Override
   public List<IImageLayer> getImageLayers() {
     final List<IImageLayer> imageLayers = new CopyOnWriteArrayList<>();
@@ -146,11 +141,6 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return this.objectgroups;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getOrientation()
-   */
   @Override
   public MapOrientation getOrientation() {
     return MapOrientation.valueOf(this.orientation.toUpperCase());
@@ -162,21 +152,11 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return this.path;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getRenderorder()
-   */
   @Override
   public String getRenderorder() {
     return this.renderorder;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getShapeLayers()
-   */
   @Override
   public List<IMapObjectLayer> getMapObjectLayers() {
     final List<IMapObjectLayer> shapeLayers = new CopyOnWriteArrayList<>();
@@ -216,31 +196,16 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getSizeInPixles()
-   */
   @Override
   public Dimension getSizeInPixels() {
     return new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getSizeinTiles()
-   */
   @Override
   public Dimension getSizeinTiles() {
     return new Dimension(this.width, this.height);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getTileLayers()
-   */
   @Override
   public List<ITileLayer> getTileLayers() {
     final List<ITileLayer> lay = new ArrayList<>();
@@ -250,11 +215,6 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return lay;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getTilesets()
-   */
   @Override
   public List<ITileset> getTilesets() {
     final List<ITileset> tileSets = new ArrayList<>();
@@ -264,21 +224,11 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return tileSets;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getTileSize()
-   */
   @Override
   public Dimension getTileSize() {
     return new Dimension(this.tilewidth, this.tileheight);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMap#getVersion()
-   */
   @Override
   public double getVersion() {
     return this.version;

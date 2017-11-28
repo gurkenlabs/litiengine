@@ -66,12 +66,6 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
     this.deceleration = deceleration;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.entities.Entity#setMapLocation(java.awt.geom.Point2D)
-   */
   @Override
   public void setLocation(final Point2D position) {
     if (position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {

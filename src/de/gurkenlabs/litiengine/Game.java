@@ -181,6 +181,9 @@ public final class Game {
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     screenManager = scrMgr;
+
+    // init screens
+    getScreenManager().init(getConfiguration().graphics().getResolutionWidth(), getConfiguration().graphics().getResolutionHeight(), getConfiguration().graphics().isFullscreen());
     setCamera(new Camera());
 
     // init logging
@@ -204,8 +207,6 @@ public final class Game {
 
     getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
 
-    // init screens
-    getScreenManager().init(getConfiguration().graphics().getResolutionWidth(), getConfiguration().graphics().getResolutionHeight(), getConfiguration().graphics().isFullscreen());
     getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
 
     getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));

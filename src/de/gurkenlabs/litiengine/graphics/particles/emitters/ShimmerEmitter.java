@@ -28,11 +28,6 @@ public class ShimmerEmitter extends Emitter {
     super(originX, originY);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
-   */
   @Override
   public Particle createNewParticle() {
     final Random rand = new Random();
@@ -49,10 +44,6 @@ public class ShimmerEmitter extends Emitter {
       color = new Color(170, 255, 255, new Random().nextInt(155) + 100);
     }
 
-    return new ShimmerParticle(this.getBoundingBox(), size, size, color)
-        .setX(x)
-        .setY(y)
-        .setDeltaX(dx)
-        .setDeltaY(dy);
+    return new ShimmerParticle(this.getBoundingBox(), size, size, color).setX(x).setY(y).setDeltaX(dx).setDeltaY(dy);
   }
 }

@@ -117,7 +117,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     this.activated = true;
     this.activationTick = Game.getLoop().getTicks();
-    Game.getLoop().attach(this);
+    Game.getRenderLoop().attach(this);
   }
 
   /**
@@ -182,15 +182,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    */
   public int getMaxParticles() {
     return this.maxParticles;
-  }
-
-  /**
-   * Gets the origin.
-   *
-   * @return the origin
-   */
-  public Point2D getOrigin() {
-    return this.getLocation();
   }
 
   public int getParticleMaxTTL() {
@@ -339,11 +330,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.paused = !this.paused;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
   @Override
   public void update() {
     if (this.isPaused()) {
@@ -368,7 +354,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         continue;
       }
 
-      p.update(Game.getLoop(), this.getOrigin(), updateRatio);
+      p.update(this.getLocation(), updateRatio);
     }
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
@@ -465,7 +451,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   private void renderParticles(final Graphics2D g, final ParticleRenderType renderType) {
-    final Point2D origin = this.getOrigin();
+    final Point2D origin = this.getLocation();
     this.particles.forEach(particle -> {
       if (particle.getParticleRenderType() == renderType) {
         particle.render(g, origin);

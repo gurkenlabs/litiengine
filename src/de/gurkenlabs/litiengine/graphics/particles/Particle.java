@@ -371,32 +371,37 @@ public abstract class Particle implements ITimeToLive {
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
    */
-  public void update(final IGameLoop loop, final Point2D emitterOrigin, final float updateRatio) {
+  public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
-      this.aliveTick = loop.getTicks();
+      this.aliveTick = Game.getLoop().getTicks();
     }
 
-    this.aliveTime = loop.getDeltaTime(this.aliveTick);
+    this.aliveTime = Game.getLoop().getDeltaTime(this.aliveTick);
     if (this.timeToLiveReached()) {
       return;
     }
 
-    if (!(this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType()))) {
-      if (this.getDx() != 0) {
-        this.x += this.getDx() * updateRatio;
-      }
+    final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
+    this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
 
-      if (this.getDy() != 0) {
-        this.y += this.getDy() * updateRatio;
-      }
+    if (this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+      return;
+    }
 
-      if (this.getGravityX() != 0) {
-        this.dx += this.getGravityX() * updateRatio;
-      }
+    if (this.getDx() != 0) {
+      this.x += this.getDx() * updateRatio;
+    }
 
-      if (this.getGravityY() != 0) {
-        this.dy += this.getGravityY() * updateRatio;
-      }
+    if (this.getDy() != 0) {
+      this.y += this.getDy() * updateRatio;
+    }
+
+    if (this.getGravityX() != 0) {
+      this.dx += this.getGravityX() * updateRatio;
+    }
+
+    if (this.getGravityY() != 0) {
+      this.dy += this.getGravityY() * updateRatio;
     }
 
     if (this.getDeltaWidth() != 0) {
@@ -406,12 +411,9 @@ public abstract class Particle implements ITimeToLive {
     if (this.getDeltaHeight() != 0) {
       this.height += this.getDeltaHeight() * updateRatio;
     }
-
-    final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
-    this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
   }
 
   protected Point2D getRelativeLocation(final Point2D effectLocation) {
-    return new Point2D.Double(effectLocation.getX() + (int) this.getX() - this.getWidth() / 2, effectLocation.getY() + (int) this.getY() - this.getHeight() / 2);
+    return new Point2D.Double(effectLocation.getX() + this.getX() - this.getWidth() / 2.0, effectLocation.getY() + this.getY() - this.getHeight() / 2.0);
   }
 }

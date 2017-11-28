@@ -48,11 +48,6 @@ public class RenderLoop extends Thread implements ILoop {
     this.renderables.add(render);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Runnable#run()
-   */
   @Override
   public void run() {
     while (this.gameIsRunning) {

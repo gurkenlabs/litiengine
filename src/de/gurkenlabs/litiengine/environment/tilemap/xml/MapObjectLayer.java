@@ -39,11 +39,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   private transient boolean added;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShapeLayer#getShapes()
-   */
   @Override
   public List<IMapObject> getMapObjects() {
     if (!this.added) {
@@ -63,11 +58,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     this.objects.remove(mapObject);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.xml.Layer#getSizeInTiles()
-   */
   @Override
   public Dimension getSizeInTiles() {
     return new Dimension(this.getWidth(), this.getHeight());

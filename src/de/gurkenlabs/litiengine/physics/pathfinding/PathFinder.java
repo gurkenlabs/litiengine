@@ -27,13 +27,6 @@ public abstract class PathFinder implements IPathFinder {
     return new Path(start, target, path2D, points);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.physics.IPathFinder#applyPathMargin(de.gurkenlabs.liti.
-   * entities.Entity, java.awt.geom.Rectangle2D)
-   */
   protected Rectangle2D applyPathMargin(final ICollisionEntity entity, final Rectangle2D rectangle) {
     // calculate offset in order to prevent collision
     final double newX = rectangle.getX() - (entity.getCollisionBox().getWidth() * 0.5 + PATH_MARGIN);
@@ -43,14 +36,6 @@ public abstract class PathFinder implements IPathFinder {
     return new Rectangle2D.Double(newX, newY, newWidth, newHeight);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.physics.IPhysicsEngine#getFirstIntersectedCollisionBox(
-   * de.gurkenlabs.liti.entities.Entity, java.awt.geom.Point2D,
-   * java.awt.geom.Point2D)
-   */
   protected boolean intersectsWithAnyCollisionBox(final ICollisionEntity entity, final Point2D start, final Point2D target) {
     final List<Rectangle2D> allCollisionBoxes = Game.getPhysicsEngine().getAllCollisionBoxes();
 

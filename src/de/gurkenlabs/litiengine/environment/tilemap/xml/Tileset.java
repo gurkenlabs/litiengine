@@ -68,21 +68,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlElement(name = "tile")
   private final List<Tile> tiles = null;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see liti.map.ITileset#getFirstGridId()
-   */
   @Override
   public int getFirstGridId() {
     return this.firstgid;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.tiled.tmx.ITileset#getImage()
-   */
   @Override
   public IMapImage getImage() {
     return this.image;
@@ -101,11 +91,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.margin;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.tiled.tmx.ITileset#getName()
-   */
   @Override
   public String getName() {
     return this.name;
@@ -124,11 +109,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.spacing;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see liti.map.ITileset#getTileDimension()
-   */
   @Override
   public Dimension getTileDimension() {
     return new Dimension(this.getTileWidth(), this.getTileHeight());
