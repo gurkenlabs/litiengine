@@ -21,11 +21,6 @@ public class LightParticle extends RectangleFillParticle {
     this.minHeight = height;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
-   */
   @Override
   public void update(final Point2D origin, final float updateRatio) {
     super.update(origin, updateRatio);

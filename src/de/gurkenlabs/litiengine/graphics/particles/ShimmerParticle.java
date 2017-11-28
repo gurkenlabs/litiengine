@@ -40,11 +40,6 @@ public class ShimmerParticle extends RectangleFillParticle {
     return this.boundingBox;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Particle#update()
-   */
   @Override
   public void update(final Point2D emitterOrigin, final float updateRateFactor) {
     super.update(emitterOrigin, updateRateFactor);

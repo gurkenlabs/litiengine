@@ -18,12 +18,6 @@ import de.gurkenlabs.litiengine.net.messages.MessagePackage;
 public abstract class MessageHandler<T extends Serializable> implements IMessageHandler {
   private static final Logger log = Logger.getLogger(MessageHandler.class.getName());
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.net.messages.IMessageHandler#handle(byte[],
-   * java.net.InetAddress, int)
-   */
   @Override
   public void handle(final byte[] data, final InetAddress address, final int port) {
     final T message = new MessagePackage<T>(data).getObject();

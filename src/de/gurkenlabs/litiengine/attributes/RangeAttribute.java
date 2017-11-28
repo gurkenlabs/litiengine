@@ -54,11 +54,6 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     Collections.sort(this.getMaxModifiers());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.attributes.Attribute#getCurrentValue()
-   */
   @Override
   public T getCurrentValue() {
     final T current = this.applyModifiers(this.getBaseValue());
@@ -83,13 +78,6 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     return this.getCurrentValue().floatValue() / this.getMaxValue().floatValue();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.attributes.Attribute#modifyBaseValue(de.gurkenlabs.liti.
-   * attributes.AttributeModifier)
-   */
   @Override
   public void modifyBaseValue(final AttributeModifier<T> modifier) {
     this.setBaseValue(this.valueInRange(modifier.modify(this.getBaseValue())));

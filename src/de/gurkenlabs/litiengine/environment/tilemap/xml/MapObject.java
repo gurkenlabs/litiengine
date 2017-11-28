@@ -55,21 +55,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlElement(name = "polyline")
   private Polyline polyline;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShape#getDimension()
-   */
   @Override
   public Dimension getDimension() {
     return new Dimension(this.width, this.height);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShape#getGridId()
-   */
   @Override
   public int getGridId() {
     if (this.gid == null) {
@@ -79,41 +69,21 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.gid;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShape#getHitBox()
-   */
   @Override
   public Rectangle2D getBoundingBox() {
     return new Rectangle2D.Double(this.x, this.y, this.width, this.height);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShape#getId()
-   */
   @Override
   public int getId() {
     return this.id;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.IShape#getPosition()
-   */
   @Override
   public Point getLocation() {
     return new Point(this.x, this.y);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IShape#getName()
-   */
   @Override
   public String getName() {
     return this.name;

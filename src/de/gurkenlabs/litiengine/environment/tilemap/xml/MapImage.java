@@ -44,11 +44,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     return this.absolutPath;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ITileImage#getDimension()
-   */
   @Override
   public Dimension getDimension() {
     return new Dimension(this.getWidth(), this.getHeight());
@@ -63,31 +58,16 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
     return this.height;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMapImage#getSource()
-   */
   @Override
   public String getSource() {
     return this.source;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ITileImage#getSourceFile()
-   */
   @Override
   public File getSourceFile() {
     return new File(this.getSource());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.IMapImage#getTransparentColor()
-   */
   @Override
   public Color getTransparentColor() {
     if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {

@@ -494,11 +494,6 @@ public class Environment implements IEnvironment {
     return --localIdSequence;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.map.IMapContainer#getMap()
-   */
   @Override
   public IMap getMap() {
     return this.map;

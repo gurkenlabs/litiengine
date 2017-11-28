@@ -120,11 +120,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Runnable#run()
-   */
   @Override
   public void run() {
     while (this.gameIsRunning) {

@@ -92,12 +92,6 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
     this.setAngle(Direction.toAngle(facingDirection));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.entities.Entity#setMapLocation(java.awt.geom.Point2D)
-   */
   @Override
   public void setLocation(final Point2D position) {
     if (this.isDead() || position == null || GeometricUtilities.equals(position, this.getLocation(), 0.001)) {

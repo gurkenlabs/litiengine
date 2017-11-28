@@ -18,11 +18,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 public final class TmxMapLoader implements IMapLoader {
   private static final Logger log = Logger.getLogger(TmxMapLoader.class.getName());
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.level.ITmxParser#ParseMap(java.lang.String)
-   */
   @Override
   public IMap loadMap(final String path) {
     try {
@@ -64,5 +59,4 @@ public final class TmxMapLoader implements IMapLoader {
 
     return null;
   }
-
 }

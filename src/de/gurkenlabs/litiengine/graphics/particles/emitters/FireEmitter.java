@@ -43,11 +43,6 @@ public class FireEmitter extends Emitter {
     super(originX, originY);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#getOrigin()
-   */
   @Override
   public Point2D getLocation() {
     return new Point2D.Double(super.getLocation().getX(), super.getLocation().getY() + this.getHeight());
@@ -75,21 +70,11 @@ public class FireEmitter extends Emitter {
     this.addParticle(new RectangleFillParticle(size, size, color, life).setX(x).setDeltaX(dx).setDeltaY(dy).setDeltaIncY(gravityY));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#createNewParticle()
-   */
   @Override
   protected Particle createNewParticle() {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.particles.Emitter#spawnParticle()
-   */
   @Override
   protected void spawnParticle() {
 

@@ -28,22 +28,11 @@ public class TileLayer extends Layer implements ITileLayer {
 
   private transient Tile[][] tiles;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ILayer#getDimension()
-   */
   @Override
   public Dimension getSizeInTiles() {
     return new Dimension(this.getWidth(), this.getHeight());
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.tiled.tmx.ITileLayer#getTileByLoctaion(java.awt.geom.Point2D)
-   */
   @Override
   public ITile getTileByLoctaion(final Point2D location) {
     final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
@@ -65,11 +54,6 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.tiles[x][y];
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ILayer#getTiles()
-   */
   @Override
   public List<ITile> getTiles() {
     if (this.tileList != null) {

@@ -83,11 +83,6 @@ public class MessagePackage<T> extends Package {
     this.object = object;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.net.packages.Packet#getData()
-   */
   @Override
   public byte[] getData() {
     if (super.getData() != null && super.getData().length > 0) {

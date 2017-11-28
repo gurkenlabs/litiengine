@@ -330,11 +330,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.paused = !this.paused;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
   @Override
   public void update() {
     if (this.isPaused()) {

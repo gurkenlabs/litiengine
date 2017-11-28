@@ -130,11 +130,6 @@ public class ClientConnection implements Serializable {
     this.lastSignOfLife = lastSignOfLife;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return "Client(" + this.getId() + "): " + this.getIpAddress().getHostAddress() + ":" + this.getPort() + "; last sign of life: " + this.getLastSignOfLifeInMs() + "ms ago";

@@ -63,11 +63,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.consumeAlt = consume;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.awt.KeyEventDispatcher#dispatchKeyEvent(java.awt.event.KeyEvent)
-   */
   @Override
   public boolean dispatchKeyEvent(final KeyEvent e) {
     if (this.consumeAlt && e.getKeyCode() == KeyEvent.VK_ALT) {
@@ -145,13 +140,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyTypedConsumer.add(consumer);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.input.IKeyboard#registerForKeyDownEvents(de.gurkenlabs.
-   * liti.input.IKeyObserver)
-   */
   @Override
   public void registerForKeyEvents(final IKeyObserver observer) {
     if (this.keyObservers.contains(observer)) {
@@ -161,12 +149,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers.add(observer);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.input.IKeyboard#unregisterFromKeyDownEvents(de.
-   * gurkenlabs.liti.input.IKeyObserver)
-   */
   @Override
   public void unregisterFromKeyEvents(final IKeyObserver observer) {
     if (!this.keyObservers.contains(observer)) {
@@ -176,11 +158,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers.remove(observer);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
   @Override
   public void update() {
     this.executePressedKeys();

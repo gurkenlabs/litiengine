@@ -99,11 +99,6 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
       }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Thread#run()
-     */
     @Override
     public void run() {
       while (!this.isTerminated) {
@@ -120,9 +115,6 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
       }
     }
 
-    /**
-     * Terminate.
-     */
     @Override
     public void terminate() {
       this.isTerminated = true;

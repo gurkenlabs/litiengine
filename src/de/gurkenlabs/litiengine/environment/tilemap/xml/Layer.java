@@ -62,21 +62,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     return this.height;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.ILayer#getName()
-   */
   @Override
   public String getName() {
     return this.name;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.ILayer#getOpacity()
-   */
   @Override
   public float getOpacity() {
     if (this.opacity == null) {
@@ -85,11 +75,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     return this.opacity;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.ILayer#getPosition()
-   */
   @Override
   public Point getPosition() {
     return new Point(this.getOffsetX(), this.getOffsetY());
@@ -123,11 +108,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     return RenderType.NORMAL;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see liti.map.ILayer#getDimension()
-   */
   @Override
   public Dimension getSizeInTiles() {
     return new Dimension(this.getWidth(), this.getHeight());
@@ -151,11 +131,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     return this.order;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.tiled.tmx.ILayer#isVisible()
-   */
   @Override
   public boolean isVisible() {
     if (this.visible == null) {

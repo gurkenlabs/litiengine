@@ -50,21 +50,11 @@ public class CombatEntityVision implements IVision {
     this.visionDiameter = this.combatEntity.getAttributes().getVision().getCurrentValue() * 2;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#contains(int, int)
-   */
   @Override
   public boolean contains(final int x, final int y) {
     return this.contains(new Point2D.Double(x, y));
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#contains(java.awt.geom.Point2D)
-   */
   @Override
   public boolean contains(final Point2D point) {
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
@@ -76,11 +66,6 @@ public class CombatEntityVision implements IVision {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#getRenderVisionShape()
-   */
   @Override
   public Shape getRenderVisionShape() {
     if (this.renderVisionShape == null) {
@@ -90,11 +75,6 @@ public class CombatEntityVision implements IVision {
     return this.renderVisionShape;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#intersects(java.awt.Shape)
-   */
   @Override
   public boolean intersects(final Rectangle2D shape) {
     for (final ICombatEntity entity : this.environment.getCombatEntities()) {
@@ -127,12 +107,6 @@ public class CombatEntityVision implements IVision {
     g.setTransform(oldTransform);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.graphics.IVision#renderMinimapFogOfWar(java.awt.
-   * Graphics, float, int, int)
-   */
   @Override
   public void renderMinimapFogOfWar(final Graphics2D g, final float minimapScale, final int x, final int y) {
     final AffineTransform oldTransform = g.getTransform();

@@ -24,13 +24,6 @@ public abstract class MessageHandlerProvider implements IMessageHandlerProvider 
     this.initializeHandlers();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * de.gurkenlabs.liti.net.messages.IMessageHandlerProvider#getMessageHander(de
-   * .gurkenlabs.liti.net.messages.MessageType)
-   */
   @Override
   public List<IMessageHandler> getMessageHanders(final MessageType type) {
     if (this.getMessageHandlers().containsKey(type)) {

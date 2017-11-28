@@ -96,11 +96,6 @@ public class EntityNavigator implements IEntityNavigator {
     this.path = null;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see de.gurkenlabs.liti.core.IUpdateable#update()
-   */
   @Override
   public void update() {
     if (!this.isNavigating()) {

@@ -233,12 +233,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
    * @see ResizedEventEvent
    */
   private class ResizedEventListener extends ComponentAdapter {
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.awt.event.ComponentAdapter#componentResized(java.awt.event.
-     * ComponentEvent)
-     */
     @Override
     public void componentResized(final ComponentEvent evt) {
       resolution = getRenderComponent().getSize();
