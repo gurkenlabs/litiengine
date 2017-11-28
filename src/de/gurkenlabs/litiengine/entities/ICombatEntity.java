@@ -14,12 +14,15 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public CombatAttributes getAttributes();
 
-  // TODO: This could be refactored to be a shape which would allow for the game developer to decide what he wants to use.
+  // TODO: This could be refactored to be a shape which would allow for the game
+  // developer to decide what he wants to use.
   public Ellipse2D getHitBox();
 
   public ICombatEntity getTarget();
 
   public int getTeam();
+
+  public boolean hit(int damage);
 
   /**
    *
