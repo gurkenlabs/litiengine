@@ -143,7 +143,19 @@ public final class MapUtilities {
       return null;
     }
 
-    final Point tileLocation = getTile(map, location);
+    return getTopMostTile(getTile(map, location));
+  }
+
+  public static ITile getTopMostTile(final Point point) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return null;
+    }
+
+    return getTopMostTile(Game.getEnvironment().getMap(), point);
+  }
+
+  public static ITile getTopMostTile(final IMap map, final Point point) {
+    final Point tileLocation = point;
 
     ITile tile = null;
     for (final ITileLayer layer : map.getTileLayers()) {
