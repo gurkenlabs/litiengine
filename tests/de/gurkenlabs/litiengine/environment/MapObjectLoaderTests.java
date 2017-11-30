@@ -195,7 +195,7 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(entity.getMapId(), 111);
     Assert.assertEquals(entity.getName(), "testEmitter");
     Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 300, 0.0001);
 
     Emitter emitter = (Emitter) entity;
     Assert.assertTrue(emitter instanceof FireEmitter);
