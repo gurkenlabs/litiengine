@@ -50,6 +50,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     if (emitter != null) {
       emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+      emitter.setLocation(mapObject.getLocation());
       emitter.setMapId(mapObject.getId());
       emitter.setName(mapObject.getName());
 
