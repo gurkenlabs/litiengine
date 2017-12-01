@@ -17,6 +17,7 @@ public class ImageComponentList extends GuiComponent {
   private final int columns;
   private double xOffset;
   private double yOffset;
+  private boolean initialized;
 
   public ImageComponentList(final double x, final double y, final double width, final double height, final int rows, final int columns, final List<Image> images, final Spritesheet background) {
     super(x, y, width, height);
@@ -72,23 +73,27 @@ public class ImageComponentList extends GuiComponent {
   @Override
   public void prepare() {
 
-    int imageCount = -1;
+    if (!initialized) {
+      int imageCount = -1;
 
-    for (int j = 0; j < this.getRows(); j++) {
-      for (int i = 0; i < this.getColumns(); i++) {
-        Image img;
-        if (imageCount < this.getImages().size() - 1) {
-          imageCount++;
-          img = this.getImages().get(imageCount);
-        } else {
-          img = null;
+      for (int j = 0; j < this.getRows(); j++) {
+        for (int i = 0; i < this.getColumns(); i++) {
+          Image img;
+          if (imageCount < this.getImages().size() - 1) {
+            imageCount++;
+            img = this.getImages().get(imageCount);
+          } else {
+            img = null;
+          }
+          final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
+          this.cells.add(cell);
         }
-        final ImageComponent cell = this.createNewEntry(this.getX() + i * (this.columnWidth + this.xOffset), this.getY() + j * (this.rowHeight + this.yOffset), this.columnWidth, this.rowHeight, this.getBackground(), "", img);
-        this.cells.add(cell);
       }
+
+      this.getComponents().addAll(0, this.cells);
+      this.initialized = true;
     }
 
-    this.getComponents().addAll(0, this.cells);
     super.prepare();
   }
 

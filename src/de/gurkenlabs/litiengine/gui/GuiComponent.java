@@ -686,7 +686,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.visible = false;
     for (final GuiComponent childComp : this.getComponents()) {
       childComp.suspend();
-      this.getComponents().remove(childComp);
     }
   }
 
