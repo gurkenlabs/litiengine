@@ -40,13 +40,11 @@ public final class Sound {
    * methods {@link #find(String)} or {@link #load(String)} methods depending on
    * whether you already loaded the sound or not.
    * 
-   * @param path
-   *          The path to load the sound from.
+   * @param is
+   *          The input stream to load the sound from.
    */
-  private Sound(final String path) {
-    this.name = FileUtilities.getFileName(path);
-
-    final InputStream is = FileUtilities.getGameResource(path);
+  private Sound(InputStream is, String name) {
+    this.name = name;
 
     try {
       AudioInputStream in = AudioSystem.getAudioInputStream(is);
@@ -78,8 +76,15 @@ public final class Sound {
     if (name == null || name.isEmpty()) {
       return null;
     }
+    
+    final String fileName = FileUtilities.getFileName(name);
+    
+    if(!sounds.containsKey(fileName)) {      
+      log.log(Level.SEVERE, "Could not find sound {0} because it was not loaded..", new Object[] { name });
+      return null;
+    }
 
-    return sounds.get(FileUtilities.getFileName(name));
+    return sounds.get(fileName);
   }
 
   /**
@@ -97,7 +102,14 @@ public final class Sound {
       return sound;
     }
 
-    sound = new Sound(path);
+    final InputStream is = FileUtilities.getGameResource(path);
+    if (is == null) {
+
+      log.log(Level.SEVERE, "Could not load sound {0} because the game resource was not found.", new Object[] { path });
+      return null;
+    }
+
+    sound = new Sound(is, fileName);
     sounds.put(fileName, sound);
     return sound;
   }
