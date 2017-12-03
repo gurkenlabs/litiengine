@@ -824,7 +824,7 @@ public class Environment implements IEnvironment {
       RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getCamera().getViewPortLocation(0, 0));
     }
 
-    if (this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
+    if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
       RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getCamera().getViewPortLocation(0, 0));
     }
 
