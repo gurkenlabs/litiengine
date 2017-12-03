@@ -1,5 +1,5 @@
 package de.gurkenlabs.configuration;
 
 public enum Quality {
-  HIGH, LOW, MEDIUM, VERYHIGH
+  VERYLOW, LOW, MEDIUM, HIGH, VERYHIGH;
 }

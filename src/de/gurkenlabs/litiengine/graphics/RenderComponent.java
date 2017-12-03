@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
@@ -69,7 +70,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
 
     // hide default cursor
-    final BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage cursorImg = ImageProcessing.getCompatibleImage(16, 16);
     final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
     this.setCursor(blankCursor);
     this.setSize(size);

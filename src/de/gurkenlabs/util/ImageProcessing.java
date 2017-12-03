@@ -75,7 +75,7 @@ public class ImageProcessing {
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
 
-    final BufferedImage shadow = new BufferedImage(image.getWidth(), image.getHeight() + rotatedImage.getHeight(), image.getType());
+    final BufferedImage shadow = getCompatibleImage(image.getWidth(), image.getHeight() + rotatedImage.getHeight());
     final Graphics2D g2D = shadow.createGraphics();
     g2D.drawImage(rotatedImage, xOffset, yOffset, null);
     g2D.drawImage(image, 0, 0, null);
@@ -343,7 +343,7 @@ public class ImageProcessing {
   public static BufferedImage horizontalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
-    final BufferedImage dimg = new BufferedImage(w, h, img.getType());
+    final BufferedImage dimg = getCompatibleImage(w, h);
     final Graphics2D g = dimg.createGraphics();
     g.drawImage(img, 0, 0, w, h, w, 0, 0, h, null);
     g.dispose();
@@ -520,7 +520,7 @@ public class ImageProcessing {
   public static BufferedImage verticalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
-    final BufferedImage dimg = new BufferedImage(w, h, img.getType());
+    final BufferedImage dimg = getCompatibleImage(w, h);
     final Graphics2D g = dimg.createGraphics();
     g.drawImage(img, 0, 0 + h, w, -h, null);
     g.dispose();
