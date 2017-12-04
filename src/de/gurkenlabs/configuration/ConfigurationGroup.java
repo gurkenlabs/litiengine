@@ -131,8 +131,9 @@ public abstract class ConfigurationGroup {
         } else if (field.getType().equals(String[].class)) {
           properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
         } else if (field.getType() instanceof Class && field.getType().isEnum()) {
-          final String value = field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
-          properties.setProperty(this.getPrefix() + field.getName(), value);
+          Object val = field.get(this);
+          final String value = val == null && field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
+          properties.setProperty(this.getPrefix() + field.getName(), val != null ? val.toString() : value);
         }
       }
     } catch (final IllegalArgumentException | IllegalAccessException e) {
