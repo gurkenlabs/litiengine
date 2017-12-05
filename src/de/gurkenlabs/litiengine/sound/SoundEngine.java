@@ -31,7 +31,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void playMusic(final Sound sound) {
-    if (sound == null) {
+    if (sound == null || this.music != null && sound.equals(this.music.getSound())) {
       return;
     }
 
