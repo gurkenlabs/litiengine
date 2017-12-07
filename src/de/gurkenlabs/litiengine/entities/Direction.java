@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 public enum Direction {
   DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);
 
+  private final byte flagValue;
+
   public static Direction fromAngle(final double angle) {
     if (angle >= 0 && angle < 45) {
       return Direction.DOWN;
@@ -50,14 +52,30 @@ public enum Direction {
     }
   }
 
-  private final byte flagValue;
+  public byte getFlagValue() {
+    return this.flagValue;
+  }
 
   private Direction(final byte flagValue) {
     this.flagValue = flagValue;
   }
 
-  public byte getFlagValue() {
-    return this.flagValue;
+  public Direction getOpposite() {
+    switch (this) {
+    case RIGHT:
+      return LEFT;
+    case UP:
+      return DOWN;
+    case LEFT:
+      return RIGHT;
+    case DOWN:
+      return UP;
+    default:
+      return this;
+    }
   }
 
+  public float toAngle() {
+    return toAngle(this);
+  }
 }
