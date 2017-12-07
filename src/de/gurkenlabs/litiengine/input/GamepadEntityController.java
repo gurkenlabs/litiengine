@@ -15,6 +15,10 @@ public class GamepadEntityController<T extends IMovableEntity> extends Accelerat
 
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
     super(entity);
+    if (Input.getGamepad() != null) {
+      this.gamePadIndex = Input.getGamepad().getIndex();
+    }
+
     this.rotateWithRightStick = rotateWithRightStick;
     Input.gamepadManager().onGamepadAdded(pad -> {
       if (this.gamePadIndex == -1) {
