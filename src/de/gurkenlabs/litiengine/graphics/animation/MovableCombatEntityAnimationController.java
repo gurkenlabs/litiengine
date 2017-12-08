@@ -131,7 +131,7 @@ public class MovableCombatEntityAnimationController<T extends IMovableCombatEnti
     return animations;
   }
 
-  private Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
+  public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
     final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
     Spritesheet leftIdleSpritesheet = Spritesheet.load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
