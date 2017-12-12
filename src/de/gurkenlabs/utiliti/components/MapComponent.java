@@ -175,6 +175,7 @@ public class MapComponent extends EditorComponent {
     final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
     final Color COLOR_SHADOW_FILL = new Color(85, 130, 200, 15);
     final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
+    final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
     if (this.renderCollisionBoxes) {
       // render all entities
@@ -212,17 +213,17 @@ public class MapComponent extends EditorComponent {
             g.setColor(COLOR_SPAWNPOINT);
             RenderEngine.fillShape(g,
                 new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
-            RenderEngine.drawShape(g, mapObject.getBoundingBox());
+            RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
           } else if (type == MapObjectType.COLLISIONBOX) {
             g.setColor(COLOR_COLLISION_FILL);
             RenderEngine.fillShape(g, mapObject.getBoundingBox());
             g.setColor(COLOR_COLLISION_BORDER);
-            RenderEngine.drawShape(g, mapObject.getBoundingBox());
+            RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
           } else if (type == MapObjectType.STATICSHADOW) {
             g.setColor(COLOR_SHADOW_FILL);
             RenderEngine.fillShape(g, mapObject.getBoundingBox());
             g.setColor(COLOR_SHADOW_BORDER);
-            RenderEngine.drawShape(g, mapObject.getBoundingBox());
+            RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
           } else if (type == MapObjectType.LANE) {
             // render lane
 
@@ -236,7 +237,7 @@ public class MapComponent extends EditorComponent {
             }
 
             g.setColor(COLOR_LANE);
-            RenderEngine.drawShape(g, path);
+            RenderEngine.drawShape(g, path, shapeStroke);
             Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
             RenderEngine.fillShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
             RenderEngine.drawMapText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
@@ -260,7 +261,7 @@ public class MapComponent extends EditorComponent {
               g.setColor(COLOR_NOCOLLISION_BORDER);
             }
 
-            RenderEngine.drawShape(g, mapObject.getBoundingBox());
+            RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
           }
 
           // render collision boxes
@@ -288,7 +289,7 @@ public class MapComponent extends EditorComponent {
 
             RenderEngine.fillShape(g, collisionBox);
             g.setColor(collisionShapeColor);
-            RenderEngine.drawShape(g, collisionBox);
+            RenderEngine.drawShape(g, collisionBox, shapeStroke);
           }
           g.setColor(Color.WHITE);
           float textSize = 3 * zooms[this.currentZoomIndex];
@@ -304,7 +305,7 @@ public class MapComponent extends EditorComponent {
         g.setColor(COLOR_NEWOBJECT_FILL);
         RenderEngine.fillShape(g, newObject);
         g.setColor(COLOR_NEWOBJECT_BORDER);
-        RenderEngine.drawShape(g, newObject);
+        RenderEngine.drawShape(g, newObject, shapeStroke);
         g.setFont(g.getFont().deriveFont(Font.BOLD));
         RenderEngine.drawMapText(g, newObject.getWidth() + "", newObject.getX() + newObject.getWidth() / 2 - 3, newObject.getY() - 5);
         RenderEngine.drawMapText(g, newObject.getHeight() + "", newObject.getX() - 10, newObject.getY() + newObject.getHeight() / 2);
@@ -374,10 +375,8 @@ public class MapComponent extends EditorComponent {
     // render the grid
     if (this.renderGrid && Game.getCamera().getRenderScale() >= 1) {
 
-      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
       g.setColor(new Color(255, 255, 255, 100));
-      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
+      final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
       final double viewPortX = Math.max(0, Game.getCamera().getViewPort().getX());
       final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(),
           Game.getCamera().getViewPort().getMaxX());
@@ -394,8 +393,6 @@ public class MapComponent extends EditorComponent {
       for (int y = startY; y <= viewPortMaxY; y += gridSize) {
         RenderEngine.drawShape(g, new Line2D.Double(viewPortX, y, viewPortMaxX, y), stroke);
       }
-
-      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
     super.render(g);
