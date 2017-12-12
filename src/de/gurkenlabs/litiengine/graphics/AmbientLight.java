@@ -83,9 +83,7 @@ public class AmbientLight {
     g.dispose();
     this.image = img;
 
-    if (!Game.getInfo().getName().equals("utiLITI")) {
-      ImageCache.IMAGES.put(cacheKey, img);
-    }
+    ImageCache.IMAGES.put(cacheKey, img);
   }
 
   public int getAlpha() {
@@ -125,6 +123,7 @@ public class AmbientLight {
       sb.append(light.getLightShapeType());
       sb.append(light.getWidth());
       sb.append(light.getHeight());
+      sb.append(light.isActive());
     }
 
     sb.append(this.environment.getMap().getSizeInPixels());

@@ -111,4 +111,8 @@ public final class ImageCache {
     this.cache.put(key, value);
     return value;
   }
+
+  public int size() {
+    return this.cache.size();
+  }
 }
