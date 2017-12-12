@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -64,9 +65,10 @@ public class DebugRenderer {
   public static void renderMapDebugInfo(final Graphics2D g, final IMap map) {
     // draw collision boxes from shape layer
     if (Game.getConfiguration().debug().renderCollisionBoxes()) {
+      final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
       for (final Rectangle2D shape : Game.getPhysicsEngine().getStaticCollisionBoxes()) {
         g.setColor(Color.RED);
-        RenderEngine.drawShape(g, shape);
+        RenderEngine.drawShape(g, shape, shapeStroke);
       }
     }
 
