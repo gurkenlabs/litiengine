@@ -29,6 +29,7 @@ import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
@@ -118,6 +119,11 @@ public class EditorScreen extends Screen {
     Game.getCamera().updateFocus();
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().render(g);
+    }
+
+    if (ImageCache.IMAGES.size() > 200) {
+      ImageCache.IMAGES.clear();
+      System.out.println("cache cleared!");
     }
 
     if (this.currentResourceFile != null) {
