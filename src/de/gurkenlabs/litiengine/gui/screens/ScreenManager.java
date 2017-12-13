@@ -49,6 +49,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   private float resolutionScale = 1;
 
   private Dimension resolution;
+  private Point screenLocation;
 
   public ScreenManager(final String gameTitle) {
     super(gameTitle);
@@ -143,7 +144,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public Point getScreenLocation() {
-    return this.getLocationOnScreen();
+    if (this.screenLocation != null) {
+      return this.screenLocation;
+    }
+
+    this.screenLocation = this.getLocationOnScreen();
+    return this.screenLocation;
   }
 
   @Override
@@ -237,6 +243,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     public void componentResized(final ComponentEvent evt) {
       resolution = getRenderComponent().getSize();
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+    }
+
+    @Override
+    public void componentMoved(final ComponentEvent evt) {
+      screenLocation = null;
     }
   }
 

@@ -120,20 +120,22 @@ public class Mouse implements IMouse {
   @Override
   public void mouseClicked(final MouseEvent e) {
     this.setLocation(e);
-    this.mouseListeners.forEach(listener -> listener.mouseClicked(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseListeners.forEach(listener -> listener.mouseClicked(wrappedEvent));
 
     for (final Consumer<MouseEvent> cons : this.mouseClickedConsumer) {
-      cons.accept(e);
+      cons.accept(wrappedEvent);
     }
   }
 
   @Override
   public void mouseDragged(final MouseEvent e) {
     this.setLocation(e);
-    this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseMotionListeners.forEach(listener -> listener.mouseDragged(wrappedEvent));
 
     for (final Consumer<MouseEvent> cons : this.mouseDraggedConsumer) {
-      cons.accept(e);
+      cons.accept(wrappedEvent);
     }
   }
 
@@ -146,22 +148,25 @@ public class Mouse implements IMouse {
       this.setLocation(e);
     }
 
-    this.mouseListeners.forEach(listener -> listener.mouseEntered(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseListeners.forEach(listener -> listener.mouseEntered(wrappedEvent));
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
     this.setLocation(e);
-    this.mouseListeners.forEach(listener -> listener.mouseExited(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseListeners.forEach(listener -> listener.mouseExited(wrappedEvent));
   }
 
   @Override
   public void mouseMoved(final MouseEvent e) {
     this.setLocation(e);
-    this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseMotionListeners.forEach(listener -> listener.mouseMoved(wrappedEvent));
 
     for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
-      cons.accept(e);
+      cons.accept(wrappedEvent);
     }
   }
 
@@ -169,7 +174,8 @@ public class Mouse implements IMouse {
   public void mousePressed(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(true);
-    this.mouseListeners.forEach(listener -> listener.mousePressed(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseListeners.forEach(listener -> listener.mousePressed(wrappedEvent));
 
     if (SwingUtilities.isLeftMouseButton(e)) {
       this.isLeftMouseButtonDown = true;
@@ -180,7 +186,7 @@ public class Mouse implements IMouse {
     }
 
     for (final Consumer<MouseEvent> cons : this.mousePressedConsumer) {
-      cons.accept(e);
+      cons.accept(wrappedEvent);
     }
   }
 
@@ -188,7 +194,8 @@ public class Mouse implements IMouse {
   public void mouseReleased(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(false);
-    this.mouseListeners.forEach(listener -> listener.mouseReleased(this.createEvent(e)));
+    final MouseEvent wrappedEvent = this.createEvent(e);
+    this.mouseListeners.forEach(listener -> listener.mouseReleased(wrappedEvent));
 
     if (SwingUtilities.isLeftMouseButton(e)) {
       this.isLeftMouseButtonDown = false;
@@ -199,7 +206,7 @@ public class Mouse implements IMouse {
     }
 
     for (final Consumer<MouseEvent> cons : this.mouseReleasedConsumer) {
-      cons.accept(e);
+      cons.accept(wrappedEvent);
     }
   }
 
@@ -281,8 +288,9 @@ public class Mouse implements IMouse {
     this.lastLocation = adjustMouse;
 
     final MouseEvent mouseEvent = new MouseEvent(Game.getScreenManager().getRenderComponent(), MouseEvent.MOUSE_MOVED, 0, 0, (int) this.getLocation().getX(), (int) this.getLocation().getY(), 0, false, MouseEvent.NOBUTTON);
+    final MouseEvent wrappedEvent = this.createEvent(mouseEvent);
     for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
-      cons.accept(this.createEvent(mouseEvent));
+      cons.accept(wrappedEvent);
     }
   }
 

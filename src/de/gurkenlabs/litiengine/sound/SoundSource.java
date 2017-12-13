@@ -53,8 +53,8 @@ public class SoundSource {
 
   static {
     closeQueue = new SourceDataLineCloseQueue();
-    closeQueue.start();
     executorServie = Executors.newCachedThreadPool();
+    executorServie.execute(closeQueue);
   }
 
   protected SoundSource(final Sound sound) {
@@ -315,7 +315,7 @@ public class SoundSource {
     }
   }
 
-  private static class SourceDataLineCloseQueue extends Thread {
+  private static class SourceDataLineCloseQueue implements Runnable {
     private boolean isRunning = true;
     private final Queue<SourceDataLine> queue = new ConcurrentLinkedQueue<>();
 
@@ -336,7 +336,6 @@ public class SoundSource {
         try {
           Thread.sleep(50);
         } catch (final InterruptedException e) {
-          this.interrupt();
           log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
