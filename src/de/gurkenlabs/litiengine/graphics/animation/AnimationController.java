@@ -221,9 +221,7 @@ public class AnimationController implements IAnimationController {
     cacheKey.append(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
     cacheKey.append('_');
 
-    final StringBuilder effectsString = new StringBuilder();
-    this.getImageEffects().forEach(x -> effectsString.append(x.getName()));
-    cacheKey.append(effectsString.toString().hashCode());
+    this.getImageEffects().forEach(x -> cacheKey.append(x.getName().hashCode()));
     return cacheKey.toString();
   }
 
