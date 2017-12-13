@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
  */
 public class SoundSource {
   private static final Logger log = Logger.getLogger(SoundSource.class.getName());
+  private static final ExecutorService executorServie;
   protected static final SourceDataLineCloseQueue closeQueue;
 
   private SourceDataLine dataLine;
@@ -46,11 +49,12 @@ public class SoundSource {
 
   private final Sound sound;
 
-  private PlayThread thread;
+  private PlayRunnable runnable;
 
   static {
     closeQueue = new SourceDataLineCloseQueue();
     closeQueue.start();
+    executorServie = Executors.newCachedThreadPool();
   }
 
   protected SoundSource(final Sound sound) {
@@ -97,7 +101,7 @@ public class SoundSource {
   }
 
   public void interrupt() {
-    thread.setCancelled(true);
+    runnable.setCancelled(true);
   }
 
   /**
@@ -118,8 +122,8 @@ public class SoundSource {
 
     this.gain = gain;
     this.location = location;
-    thread = new PlayThread(loop);
-    thread.start();
+    this.runnable = new PlayRunnable(loop);
+    executorServie.execute(this.runnable);
     this.played = true;
   }
 
@@ -198,12 +202,12 @@ public class SoundSource {
     this.panControl.setValue(pan);
   }
 
-  private class PlayThread extends Thread {
+  private class PlayRunnable implements Runnable {
     private boolean loop;
 
     private boolean cancelled;
 
-    public PlayThread(final boolean loop) {
+    public PlayRunnable(final boolean loop) {
       this.loop = loop;
     }
 
