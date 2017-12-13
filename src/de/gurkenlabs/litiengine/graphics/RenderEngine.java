@@ -180,7 +180,6 @@ public final class RenderEngine implements IRenderEngine {
     t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
     g.setTransform(t);
-    g.setStroke(new BasicStroke(1 / Game.getCamera().getRenderScale()));
     g.fill(shape);
     g.setTransform(oldTransForm);
   }

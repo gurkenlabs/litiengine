@@ -18,9 +18,8 @@ public class RectangleFillParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getRelativeLocation(emitterOrigin);
     g.setColor(this.getColor());
 
-    RenderEngine.fillShape(g, new Rectangle2D.Float((float) renderLocation.getX(), (float) renderLocation.getY(), (float) this.getWidth(), (float) this.getHeight()));
+    RenderEngine.fillShape(g, new Rectangle2D.Float(this.getRelativeX(emitterOrigin.getX()), this.getRelativeY(emitterOrigin.getY()), (float) this.getWidth(), (float) this.getHeight()));
   }
 }

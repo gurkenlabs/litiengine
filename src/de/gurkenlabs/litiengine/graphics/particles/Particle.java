@@ -414,6 +414,14 @@ public abstract class Particle implements ITimeToLive {
   }
 
   protected Point2D getRelativeLocation(final Point2D effectLocation) {
-    return new Point2D.Double(effectLocation.getX() + this.getX() - this.getWidth() / 2.0, effectLocation.getY() + this.getY() - this.getHeight() / 2.0);
+    return new Point2D.Float(getRelativeX(effectLocation.getX()), getRelativeY(effectLocation.getY()));
+  }
+
+  protected float getRelativeX(double effectLocationX) {
+    return (float) (effectLocationX + this.getX() - this.getWidth() / 2.0);
+  }
+
+  protected float getRelativeY(double effectLocationY) {
+    return (float) (effectLocationY + this.getY() - this.getHeight() / 2.0);
   }
 }
