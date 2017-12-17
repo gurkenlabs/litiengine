@@ -90,7 +90,7 @@ public class ImageComponentList extends GuiComponent {
         }
       }
 
-      this.getComponents().addAll(0, this.cells);
+      this.getComponents().addAll(this.cells);
       this.initialized = true;
     }
 

@@ -377,6 +377,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.isHovered = true;
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getHoverConsumer().forEach(consumer -> consumer.accept(event));
+    if (this.getHoverSound() != null) {
+      Game.getSoundEngine().playSound(this.getHoverSound());
+    }
+
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
   }
 
@@ -504,12 +508,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   public void prepare() {
-    this.onHovered(e -> {
-      if (this.getHoverSound() != null) {
-        Game.getSoundEngine().playSound(this.getHoverSound());
-      }
-    });
-
     this.suspended = false;
     this.visible = true;
     Input.mouse().registerMouseListener(this);
