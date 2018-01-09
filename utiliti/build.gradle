@@ -1,17 +1,66 @@
+plugins {
+  id 'edu.sc.seis.launch4j' version '2.4.2'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
+
+archivesBaseName = "utiliti"
+version = "v0.4.8-alpha"
+
+
 sourceSets {
   main.java.srcDir "src"
   main.java.srcDir "resources"
 }
 
+dependencies {
+  compile  project(':')
+} 
+
 jar {
-    manifest {
-        attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
+  from {
+    configurations.runtime.collect {
+      it.isDirectory() ? it : zipTree(it)
     }
+    configurations.compile.collect {
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }  {
+     exclude 'META-INF/services/**'
+  }
+  
+  from('resources') { include '**/*' }
+  exclude '**/*.dll'
+  exclude '**/*.jnilib'
+  exclude '**/*.dylib'
+  exclude '**/*.so'
+  exclude 'junit**/**'
+  
+  manifest {
+    attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
+  }
 }
 
+launch4j {
+  mainClassName = 'de.gurkenlabs.utiliti.Program'
+  icon = 'pixel-icon-utiLITI.ico'
+  outputDir = 'libs'
+  outfile = archivesBaseName + '-v0.4.8-alpha.exe'
+  companyName = 'gurkenlabs.de'
+  version = '0.4.8'
+  textVersion = '0.4.8'
+  copyright = '2017 gurkenlabs.de'
+  jvmOptions = ['-Xms256m', '-Xmx1024m']
+}
 
-dependencies {
-   compile  project(':')
-} 
+task copyDistFiles(type: Copy) { 
+  def buildFolder = new File(buildDir, 'libs')
+  from('/dist/'){
+    include 'pixel-icon-utiliti.ico'
+  }
+  
+  into buildFolder
+}
+
+build.dependsOn copyDistFiles
