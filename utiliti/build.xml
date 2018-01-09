@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project utiLITI">
+    <!--ANT 1.7 is required -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+	<property name="dir.litienginebuildfile" value="F:\Repositories\litiengine" />
+    <property name="dir.jarfile" value="${dir.buildfile}/dist"/>
+	<property name="launch4j.dir" location="D:\Program Files (x86)\Launch4j" />
+	<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask"
+	    classpath="${launch4j.dir}/launch4j.jar
+	        :${launch4j.dir}/lib/xstream.jar">
+		</taskdef>
+	
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/utiLITI.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="de.gurkenlabs.utiliti.Program"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+            <fileset dir="${dir.litienginebuildfile}/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.litienginebuildfile}/lib/jinput.jar"/>
+        </jar>
+    	<launch4j configFile="${dir.buildfile}/dist/utiLITI-launch4j.xml" />
+    </target>
+</project>
