@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+sourceSets {
+  main.java.srcDir "src"
+  main.java.srcDir "resources"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'de.gurkenlabs.utiliti.Program'
+    }
+}
+
+
+dependencies {
+   compile  project(':')
+} 

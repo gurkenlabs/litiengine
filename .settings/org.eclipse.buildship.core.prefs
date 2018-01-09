@@ -1,9 +1,10 @@
-build.commands=org.eclipse.jdt.core.javabuilder
+#Tue Jan 09 19:10:01 CET 2018
 connection.arguments=
-connection.java.home=null
 connection.jvm.arguments=
+build.commands=org.eclipse.jdt.core.javabuilder
 connection.project.dir=
-derived.resources=.gradle,build
-eclipse.preferences.version=1
 natures=org.eclipse.jdt.core.javanature
+eclipse.preferences.version=1
+connection.java.home=null
+derived.resources=.gradle,build
 project.path=\:
