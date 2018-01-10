@@ -130,17 +130,9 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISION) != null) {
-      this.chckbxHasCollision.setSelected(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.COLLISION)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH) != null) {
-      this.spinnerWidth.setValue(Float.valueOf(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT) != null) {
-      this.spinnerHeight.setValue(Float.valueOf(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)));
-    }
+    this.chckbxHasCollision.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
+    this.spinnerWidth.setValue(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH));
+    this.spinnerHeight.setValue(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT));
 
     this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)));
     this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)));

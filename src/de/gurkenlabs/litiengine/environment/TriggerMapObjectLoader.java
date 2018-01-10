@@ -30,8 +30,6 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
     final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGERTARGETS);
     final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS);
-    final String oneTime = mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME);
-    final boolean oneTimeBool = oneTime != null && !oneTime.isEmpty() ? Boolean.valueOf(oneTime) : false;
 
     final Map<String, String> triggerArguments = new HashMap<>();
     for (final Property prop : mapObject.getAllCustomProperties()) {
@@ -40,7 +38,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       }
     }
 
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, oneTimeBool, triggerArguments);
+    final Trigger trigger = new Trigger(act, mapObject.getName(), message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGERONETIME), triggerArguments);
 
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {

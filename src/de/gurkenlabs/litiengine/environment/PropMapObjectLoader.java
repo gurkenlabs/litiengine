@@ -30,30 +30,16 @@ public class PropMapObjectLoader extends MapObjectLoader {
     final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
 
-    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE).isEmpty()) {
-      prop.setIndestructible(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
-    }
+    prop.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
+    prop.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
 
-    if (mapObject.getCustomProperty(MapObjectProperty.HEALTH) != null) {
-      AttributeModifier<Short> mod = new AttributeModifier<>(Modification.SET, Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH)));
-      prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
-      prop.getAttributes().getHealth().modifyBaseValue(mod);
-    }
+    AttributeModifier<Short> mod = new AttributeModifier<>(Modification.SET, mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
+    prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
+    prop.getAttributes().getHealth().modifyBaseValue(mod);
 
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISION) != null) {
-      prop.setCollision(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.COLLISION)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH) != null) {
-      prop.setCollisionBoxWidth(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT) != null) {
-      prop.setCollisionBoxHeight(Float.parseFloat(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW) != null) {
-      prop.setAddShadow(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW)));
-    }
+    prop.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH));
+    prop.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT));
+    prop.setAddShadow(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
 
     prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)));
     prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)));
@@ -62,10 +48,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
       prop.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperty.TEAM) != null) {
-      prop.setTeam(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.TEAM)));
-    }
-
+    prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
     prop.setName(mapObject.getName());
     return prop;
   }

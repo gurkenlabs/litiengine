@@ -145,21 +145,10 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     final Material material = mapObject.getCustomProperty(MapObjectProperty.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
-    if (mapObject.getCustomProperty(MapObjectProperty.HEALTH) != null) {
-      this.spinnerHealth.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.HEALTH)));
-    }
-    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null && !mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE).isEmpty()) {
-      this.chckbxIndestructible.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW) != null && !mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW).isEmpty()) {
-      this.chckbxShadow.setSelected(Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ADDSHADOW)));
-    }
-
-    String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
-    if (obstacle != null && !obstacle.isEmpty()) {
-      this.chckbxIsObstacle.setSelected(Boolean.valueOf(obstacle));
-    }
+    this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
+    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
+    this.chckbxShadow.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
+    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.OBSTACLE));
   }
 
   private void setupChangedListeners() {

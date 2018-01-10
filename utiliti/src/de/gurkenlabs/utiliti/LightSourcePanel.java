@@ -7,6 +7,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -22,7 +23,6 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.LightSource;
-import javax.swing.JCheckBox;
 
 public class LightSourcePanel extends PropertyPanel<IMapObject> {
   private final JTextField textFieldColor;
@@ -130,25 +130,13 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String brightness = mapObject.getCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS);
-    final String intensity = mapObject.getCustomProperty(MapObjectProperty.LIGHTINTENSITY);
     final String color = mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR);
     final String shape = mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE);
     final String active = mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE);
 
-    int bright = 0;
-    if (brightness != null) {
-      bright = Integer.parseInt(brightness);
-    }
-
-    int intens = 0;
-    if (intensity != null) {
-      intens = Integer.parseInt(intensity);
-    }
-
     boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
-    this.spinnerBrightness.setValue(bright);
-    this.spinnerIntensity.setValue(intens);
+    this.spinnerBrightness.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTBRIGHTNESS));
+    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY));
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);

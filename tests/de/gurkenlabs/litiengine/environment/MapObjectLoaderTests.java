@@ -40,16 +40,16 @@ public class MapObjectLoaderTests {
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     when(mapObject.getCustomProperty(MapObjectProperty.MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperty.HEALTH)).thenReturn("100");
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(true);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH)).thenReturn(100);
 
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn("100.0");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn("100.0");
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn(100.0f);
 
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
-    when(mapObject.getCustomProperty(MapObjectProperty.TEAM)).thenReturn("1");
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
     IEntity ent = loader.load(mapObject);
 
@@ -146,10 +146,10 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME)).thenReturn("decorSprite");
     when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)).thenReturn("200");
     when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
-    when(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION)).thenReturn("false");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn("100.0");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn("100.0");
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(false);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn(100.0f);
 
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
@@ -211,8 +211,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS)).thenReturn("100");
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTINTENSITY)).thenReturn("100");
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTBRIGHTNESS)).thenReturn(100);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY)).thenReturn(100);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR)).thenReturn("#ffffff");
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE)).thenReturn("true");
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);

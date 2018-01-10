@@ -142,13 +142,8 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
       this.comboBoxBehaviour.setSelectedItem(beh);
     }
 
-    if (mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY) != null) {
-      this.spinnerVelocity.setValue(Integer.parseInt(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)));
-    }
-
-    if (mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE) != null) {
-      this.chckbxAttackable.setSelected(!Boolean.valueOf(mapObject.getCustomProperty(MapObjectProperty.INDESTRUCTIBLE)));
-    }
+    this.spinnerVelocity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.DECORMOB_VELOCITY));
+    this.chckbxAttackable.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
   }
 
   private void setupChangedListeners() {

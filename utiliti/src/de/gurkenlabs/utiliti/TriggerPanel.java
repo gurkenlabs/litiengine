@@ -204,10 +204,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
       this.targetsModel.addRow(new Object[] { target });
     }
 
-    String oneTime = mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME);
-    if (oneTime != null) {
-      this.chckbxOneTimeOnly.setSelected(Boolean.valueOf(oneTime));
-    }
+    this.chckbxOneTimeOnly.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGERONETIME));
 
     final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION));
     this.comboBoxActivationType.setSelectedItem(act);

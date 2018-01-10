@@ -47,10 +47,7 @@ public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
-    if (obstacle != null && !obstacle.isEmpty()) {
-      this.chckbxIsObstacle.setSelected(Boolean.valueOf(obstacle));
-    }
+    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.OBSTACLE));
   }
 
   private void setupChangedListeners() {
