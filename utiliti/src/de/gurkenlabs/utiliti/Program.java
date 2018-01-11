@@ -16,8 +16,13 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -34,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -182,17 +188,21 @@ public class Program {
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
+    if (USER_PREFERNCES.getWidth() != 0 && USER_PREFERNCES.getHeight() != 0) {
+      window.setSize(USER_PREFERNCES.getWidth(), USER_PREFERNCES.getHeight());
+    }
+
     Canvas render = Game.getScreenManager().getRenderComponent();
     render.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
     window.remove(render);
     JPanel renderPane = new JPanel(new BorderLayout());
-    renderPane.setBorder(new LineBorder(Color.DARK_GRAY));
     renderPane.add(render);
+    renderPane.setMinimumSize(new Dimension(200, 0));
 
     JPanel contentPane = new JPanel(new BorderLayout());
 
     window.setContentPane(contentPane);
-    contentPane.add(renderPane, BorderLayout.CENTER);
+
     horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL);
     renderPane.add(horizontalScroll, BorderLayout.SOUTH);
     verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
@@ -200,10 +210,29 @@ public class Program {
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JPanel mapWrap = new JPanel(new BorderLayout());
+    mapWrap.setMinimumSize(new Dimension(200, 0));
     mapWrap.add(mapEditorPanel, BorderLayout.CENTER);
     mapWrap.add(mapSelectionPanel, BorderLayout.NORTH);
-    contentPane.add(mapWrap, BorderLayout.EAST);
 
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderPane, mapWrap);
+    split.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        USER_PREFERNCES.setWidth(window.getWidth());
+        USER_PREFERNCES.setHeight(window.getHeight());
+
+      }
+    });
+
+    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        USER_PREFERNCES.setMainSplitter(split.getDividerLocation());
+      }
+    });
+
+    contentPane.add(split, BorderLayout.CENTER);
+    split.setDividerLocation(USER_PREFERNCES.getMainSplitterPosition() != 0 ? USER_PREFERNCES.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
     // create basic icon menu
     JToolBar basicMenu = new JToolBar();
 

@@ -16,6 +16,9 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean compressFile;
   private boolean syncMaps;
   private int gridSize;
+  private int mainSplitter;
+  private int width;
+  private int height;
 
   private String lastGameFile;
   private String[] lastOpenedFiles;
@@ -133,5 +136,29 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setSyncMaps(boolean syncMaps) {
     this.syncMaps = syncMaps;
+  }
+
+  public int getMainSplitterPosition() {
+    return mainSplitter;
+  }
+
+  public void setMainSplitter(int mainSplitter) {
+    this.mainSplitter = mainSplitter;
+  }
+
+  public int getWidth() {
+    return width;
+  }
+
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public int getHeight() {
+    return height;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
   }
 }
