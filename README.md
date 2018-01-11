@@ -48,7 +48,7 @@ Nontheless, the LITIengine can of course already be used to make fully functioni
 * [JInput](https://github.com/jinput/jinput) for Gamepad support
 * [MP3 SPI](http://www.javazoom.net/mp3spi/mp3spi.html) for .mp3 support
 * [Ogg Vorbis SPI](http://www.javazoom.net/vorbisspi/vorbisspi.html) for .ogg support
-
+* [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporing the steamworks SDK
 
 ## Games made with LITIengine
 
