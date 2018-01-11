@@ -25,8 +25,8 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
   private JCheckBox chckbxHasCollision;
   JSpinner spinnerWidth;
   JSpinner spinnerHeight;
-  JComboBox comboBoxAlign;
-  JComboBox comboBoxValign;
+  JComboBox<Align> comboBoxAlign;
+  JComboBox<Valign> comboBoxValign;
 
   /**
    * Create the panel.
@@ -50,11 +50,11 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
     spinnerHeight = new JSpinner();
     spinnerHeight.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
 
-    comboBoxAlign = new JComboBox();
-    comboBoxAlign.setModel(new DefaultComboBoxModel(Align.values()));
+    comboBoxAlign = new JComboBox<>();
+    comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
 
-    comboBoxValign = new JComboBox();
-    comboBoxValign.setModel(new DefaultComboBoxModel(Valign.values()));
+    comboBoxValign = new JComboBox<>();
+    comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(

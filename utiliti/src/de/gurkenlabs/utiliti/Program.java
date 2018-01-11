@@ -178,9 +178,7 @@ public class Program {
   private static void setupMenu() {
     MenuBar menuBar = new MenuBar();
     JFrame window = ((JFrame) Game.getScreenManager());
-    Game.onTerminating(s -> {
-      return exit();
-    });
+    Game.onTerminating(s -> exit());
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
@@ -540,15 +538,11 @@ public class Program {
 
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
     compress.setState(USER_PREFERNCES.isCompressFile());
-    compress.addItemListener(e -> {
-      USER_PREFERNCES.setCompressFile(compress.getState());
-    });
+    compress.addItemListener(e -> USER_PREFERNCES.setCompressFile(compress.getState()));
 
     CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
     sync.setState(USER_PREFERNCES.isSyncMaps());
-    sync.addItemListener(e -> {
-      USER_PREFERNCES.setSyncMaps(sync.getState());
-    });
+    sync.addItemListener(e -> USER_PREFERNCES.setSyncMaps(sync.getState()));
 
     mnProject.add(properties);
     mnProject.add(compress);
