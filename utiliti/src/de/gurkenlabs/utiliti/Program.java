@@ -28,6 +28,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Locale;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -84,6 +85,7 @@ public class Program {
 
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
       e.printStackTrace();
     }
@@ -215,6 +217,7 @@ public class Program {
     mapWrap.add(mapSelectionPanel, BorderLayout.NORTH);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderPane, mapWrap);
+    split.setContinuousLayout(true);
     split.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(ComponentEvent e) {

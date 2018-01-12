@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -27,7 +29,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
 
-public class MapSelectionPanel extends JPanel {
+public class MapSelectionPanel extends JSplitPane {
   JList<String> list;
   JCheckBoxList listObjectLayers;
   DefaultListModel<String> model;
@@ -42,10 +44,12 @@ public class MapSelectionPanel extends JPanel {
    * Create the panel.
    */
   public MapSelectionPanel() {
-    setLayout(new BorderLayout(0, 0));
+    super(JSplitPane.HORIZONTAL_SPLIT);
+    setContinuousLayout(true);
 
     scrollPane = new JScrollPane();
-    add(scrollPane, BorderLayout.CENTER);
+    scrollPane.setMinimumSize(new Dimension(150, 0));
+    this.setLeftComponent(scrollPane);
 
     model = new DefaultListModel<>();
     layerModel = new DefaultListModel<>();
@@ -88,7 +92,8 @@ public class MapSelectionPanel extends JPanel {
     TitledBorder border2 = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_mapObjectLayers"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border2.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
     horizontalScrollPane.setViewportBorder(border2);
-    add(horizontalScrollPane, BorderLayout.SOUTH);
+    horizontalScrollPane.setMinimumSize(new Dimension(150, 0));
+    this.setRightComponent(horizontalScrollPane);
 
     listObjectLayers = new JCheckBoxList();
     listObjectLayers.setVisibleRowCount(5);
