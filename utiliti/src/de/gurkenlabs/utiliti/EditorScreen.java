@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -74,8 +76,11 @@ public class EditorScreen extends Screen {
   private long statusTick;
   private String currentStatus;
 
+  private final List<Map> changedMaps;
+
   private EditorScreen() {
     this.comps = new ArrayList<>();
+    this.changedMaps = new CopyOnWriteArrayList<>();
     this.spriteFiles = DEFAULT_SPRITESHEET_NAMES;
   }
 
@@ -383,6 +388,14 @@ public class EditorScreen extends Screen {
     this.statusTick = Game.getLoop().getTicks();
   }
 
+  public void mapChanged() {
+    if (this.changedMaps.contains(Game.getEnvironment().getMap())) {
+      return;
+    }
+
+    this.changedMaps.add((Map) Game.getEnvironment().getMap());
+  }
+
   private String saveGameFile(String target) {
     String saveFile = this.getGameFile().save(target, Program.USER_PREFERNCES.isCompressFile());
     Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
@@ -396,11 +409,12 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
+    this.changedMaps.clear();
     return saveFile;
   }
 
   private void saveMaps() {
-    for (Map map : this.getGameFile().getMaps()) {
+    for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
       for (String file : FileUtilities.findFiles(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         map.save(file);
         System.out.println("synchronized map '" + file + "'");
