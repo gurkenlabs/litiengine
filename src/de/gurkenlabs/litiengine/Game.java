@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.ICamera;
@@ -33,8 +34,8 @@ import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
   /***
-   * This flag indicates if the game currently supports debugging. This should
-   * be set to false for release builds.
+   * This flag indicates if the game currently supports debugging. This should be
+   * set to false for release builds.
    */
   public static boolean DEBUG = true;
   protected static long environmentLoadTick;
@@ -48,6 +49,7 @@ public final class Game {
   private static final IRenderEngine graphicsEngine;
   private static final GameInfo info;
   private static final List<IMap> maps;
+  private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
   private static final IPhysicsEngine physicsEngine;
   private static final ISoundEngine soundEngine;
@@ -77,6 +79,7 @@ public final class Game {
     entityControllerManager = new EntityControllerManager();
     info = new GameInfo();
     maps = new CopyOnWriteArrayList<>();
+    tilesets = new CopyOnWriteArrayList<>();
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
@@ -123,6 +126,10 @@ public final class Game {
 
   public static List<IMap> getMaps() {
     return maps;
+  }
+
+  public static List<ITileset> getTilesets() {
+    return tilesets;
   }
 
   public static GameMetrics getMetrics() {
@@ -238,13 +245,25 @@ public final class Game {
 
     log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
 
+    int tileCnt = 0;
+    for (final ITileset m : file.getTilesets()) {
+      if (getTilesets().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
+        continue;
+      }
+
+      getTilesets().add(m);
+      tileCnt++;
+    }
+
+    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
+
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final String spriteFile : file.getSpriteFiles()) {
       final List<Spritesheet> sprites = Spritesheet.load(GameDirectories.SPRITES + spriteFile);
       loadedSprites.addAll(sprites);
     }
 
-    for (final SpriteSheetInfo tileset : file.getTileSets()) {
+    for (final SpriteSheetInfo tileset : file.getSpriteSheets()) {
       final Spritesheet sprite = Spritesheet.load(tileset);
       loadedSprites.add(sprite);
     }

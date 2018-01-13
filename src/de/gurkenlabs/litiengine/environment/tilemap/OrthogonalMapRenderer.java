@@ -35,7 +35,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @return the cache key
    */
   public static String getCacheKey(final IMap map) {
-    return MessageFormat.format("map_{0}_version_{1}", map.getFileName(), map.getCustomProperty("version") != null ? map.getCustomProperty("version") : map.getVersion());
+    return MessageFormat.format("map_{0}", map.getFileName());
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {
@@ -222,15 +222,15 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       RenderEngine.renderImage(imageGraphics, tileTexture, x, y);
     });
 
-    ImageCache.MAPS.put(getCacheKey(map) + "_" + layer.getName(), bufferedImage);
+    ImageCache.MAPS.put(cacheKey, bufferedImage);
     return bufferedImage;
   }
 
   /**
-   * Renders the tiles from the specified layer that lie within the bounds of
-   * the viewport. This rendering of static tiles is cached when when the
-   * related graphics setting is enabled, which tremendously improves the
-   * rendering performance.
+   * Renders the tiles from the specified layer that lie within the bounds of the
+   * viewport. This rendering of static tiles is cached when when the related
+   * graphics setting is enabled, which tremendously improves the rendering
+   * performance.
    *
    * @param g
    * @param layer
@@ -276,6 +276,9 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     IntStream.range(startX, endX + 1).parallel().forEach(x -> {
       for (int y = startY; y <= endY; y++) {
         ITile tile = layer.getTile(x, y);
+        if (tile == null) {
+          continue;
+        }
 
         // always render tiles if the cache for static tiles is disabled or, in
         // case it is enabled: only render animation tiles here

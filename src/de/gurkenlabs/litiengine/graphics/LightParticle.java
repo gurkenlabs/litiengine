@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 
 public class LightParticle extends RectangleFillParticle {

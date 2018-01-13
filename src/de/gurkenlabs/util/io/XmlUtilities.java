@@ -1,11 +1,16 @@
 package de.gurkenlabs.util.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -22,10 +27,10 @@ public final class XmlUtilities {
   }
 
   /**
-   * Saves the xml, contained by the specified input with the custom
-   * indentation. If the input is the result of jaxb marshalling, make sure to
-   * set Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to
-   * work properly.
+   * Saves the xml, contained by the specified input with the custom indentation.
+   * If the input is the result of jaxb marshalling, make sure to set
+   * Marshaller.JAXB_FORMATTED_OUTPUT to false in order for this method to work
+   * properly.
    * 
    * @param input
    * @param fos
@@ -45,5 +50,23 @@ public final class XmlUtilities {
     } catch (TransformerFactoryConfigurationError | TransformerException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
+  }
+
+  public static <T> T readFromFile(Class<T> cls, String path) {
+    try {
+      final JAXBContext jaxbContext = JAXBContext.newInstance(cls);
+      final Unmarshaller um = jaxbContext.createUnmarshaller();
+
+      InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+      if (stream == null) {
+        stream = new FileInputStream(path);
+      }
+
+      return (T) um.unmarshal(stream);
+    } catch (final JAXBException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    return null;
   }
 }

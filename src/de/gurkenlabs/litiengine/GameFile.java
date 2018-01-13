@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.XmlUtilities;
 
@@ -47,11 +48,16 @@ public class GameFile implements Serializable {
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
-  private List<SpriteSheetInfo> tilesets;
+  private List<SpriteSheetInfo> spriteSheets;
+
+  @XmlElementWrapper(name = "tilesets")
+  @XmlElement(name = "tileset")
+  private List<Tileset> tilesets;
 
   public GameFile() {
-    this.tilesets = new ArrayList<>();
+    this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
+    this.tilesets = new ArrayList<>();
     this.spriteFiles = new String[] {};
   }
 
@@ -64,6 +70,9 @@ public class GameFile implements Serializable {
 
       for (final Map map : gameFile.getMaps()) {
         map.updateTileTerrain();
+        for (final Tileset tileset : map.getRawTileSets()) {
+          tileset.load(gameFile.getTilesets());
+        }
       }
 
       return gameFile;
@@ -85,7 +94,12 @@ public class GameFile implements Serializable {
   }
 
   @XmlTransient
-  public List<SpriteSheetInfo> getTileSets() {
+  public List<SpriteSheetInfo> getSpriteSheets() {
+    return this.spriteSheets;
+  }
+
+  @XmlTransient
+  public List<Tileset> getTilesets() {
     return this.tilesets;
   }
 
@@ -141,7 +155,7 @@ public class GameFile implements Serializable {
   }
 
   public void setTileSets(final List<SpriteSheetInfo> tileSets) {
-    this.tilesets = tileSets;
+    this.spriteSheets = tileSets;
   }
 
   private static GameFile getGameFileFromFile(String file) throws JAXBException, IOException {
@@ -166,13 +180,26 @@ public class GameFile implements Serializable {
   }
 
   void beforeMarshal(Marshaller m) {
-    List<SpriteSheetInfo> duplicates = new ArrayList<>();
-    for (SpriteSheetInfo sprite : this.getTileSets()) {
-      if (this.getTileSets().stream().anyMatch(x -> !x.equals(sprite) && x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
-        duplicates.add(sprite);
+    List<SpriteSheetInfo> distinctList = new ArrayList<>();
+    for (SpriteSheetInfo sprite : this.getSpriteSheets()) {
+      if (distinctList.stream().anyMatch(x -> x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
+        continue;
       }
+
+      distinctList.add(sprite);
     }
 
-    this.tilesets.removeAll(duplicates);
+    this.spriteSheets = distinctList;
+
+    List<Tileset> distinctTilesets = new ArrayList<>();
+    for (Tileset tileset : this.getTilesets()) {
+      if (distinctTilesets.stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
+        continue;
+      }
+
+      distinctTilesets.add(tileset);
+    }
+
+    this.tilesets = distinctTilesets;
   }
 }

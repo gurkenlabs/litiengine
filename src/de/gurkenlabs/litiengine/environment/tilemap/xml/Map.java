@@ -404,4 +404,19 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   public int compareTo(Map o) {
     return this.name.compareTo(o.name);
   }
+
+  public List<Tileset> getRawTileSets() {
+    return this.tilesets;
+  }
+
+  public List<Tileset> getExternalTilesets() {
+    List<Tileset> tilesets = new ArrayList<>();
+    for (Tileset set : this.getRawTileSets()) {
+      if (set.sourceTileset != null) {
+        tilesets.add(set.sourceTileset);
+      }
+    }
+
+    return tilesets;
+  }
 }

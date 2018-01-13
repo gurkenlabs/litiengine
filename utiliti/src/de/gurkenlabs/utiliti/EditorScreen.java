@@ -295,8 +295,8 @@ public class EditorScreen extends Screen {
       // 1. add sprite sheets from game file
       // 2. add sprite sheets from sprite files
       // 3. add sprite sheets by tile sets of all maps in the game file
-      this.loadSpriteSheets(this.getGameFile().getTileSets());
-      System.out.println(this.getGameFile().getTileSets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
+      this.loadSpriteSheets(this.getGameFile().getSpriteSheets());
+      System.out.println(this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
 
       this.loadSpriteFiles(this.getProjectPath(), this.getGameFile().getSpriteFiles());
       for (Map map : this.mapComponent.getMaps()) {
@@ -388,7 +388,7 @@ public class EditorScreen extends Screen {
     Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
     Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getTileSets().size()
+    System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size()
         + " tilesets to '" + this.currentResourceFile + "'");
     this.setCurrentStatus("saved gamefile");
 
@@ -462,6 +462,10 @@ public class EditorScreen extends Screen {
     List<SpriteSheetInfo> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {
+      if (tileSet.getImage() == null) {
+        continue;
+      }
+
       Spritesheet sprite = Spritesheet.find(tileSet.getImage().getSource());
       if (sprite == null) {
         sprite = Spritesheet.load(tileSet);
@@ -491,8 +495,8 @@ public class EditorScreen extends Screen {
 
     this.loadSpriteSheets(infos);
     for (SpriteSheetInfo info : infos) {
-      if (!this.getGameFile().getTileSets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
-        this.getGameFile().getTileSets().add(info);
+      if (!this.getGameFile().getSpriteSheets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
+        this.getGameFile().getSpriteSheets().add(info);
       }
     }
 

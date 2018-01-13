@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,12 +13,15 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.io.XmlUtilities;
 
 /**
  * The Class Tileset.
@@ -45,28 +49,34 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   /** The tilewidth. */
   @XmlAttribute
-  private int tilewidth;
+  private Integer tilewidth;
 
   /** The tileheight. */
   @XmlAttribute
-  private int tileheight;
+  private Integer tileheight;
 
   @XmlAttribute
-  private int tilecount;
+  private Integer tilecount;
 
   @XmlAttribute
-  private int columns;
+  private Integer columns;
 
   /** The spacing. */
   @XmlAttribute
   private Integer spacing;
 
+  @XmlAttribute
+  private String source;
+
   @XmlElementWrapper(name = "terraintypes")
   @XmlElement(name = "terrain")
-  private final List<Terrain> terrainTypes = null;
+  private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
-  private final List<Tile> tiles = null;
+  private List<Tile> tiles = null;
+
+  @XmlTransient
+  protected Tileset sourceTileset;
 
   @Override
   public int getFirstGridId() {
@@ -75,7 +85,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public IMapImage getImage() {
-    return this.image;
+    return this.sourceTileset != null ? this.sourceTileset.getImage() : this.image;
   }
 
   /**
@@ -84,6 +94,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the margin
    */
   public int getMargin() {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getMargin();
+    }
+
     if (this.margin == null) {
       return 0;
     }
@@ -93,7 +107,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public String getName() {
-    return this.name;
+    return this.sourceTileset != null ? this.sourceTileset.getName() : this.name;
   }
 
   /**
@@ -102,6 +116,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    * @return the spacing
    */
   public int getSpacing() {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getSpacing();
+    }
+
     if (this.spacing == null) {
       return 0;
     }
@@ -111,7 +129,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public Dimension getTileDimension() {
-    return new Dimension(this.getTileWidth(), this.getTileHeight());
+    return this.sourceTileset != null ? this.sourceTileset.getTileDimension() : new Dimension(this.getTileWidth(), this.getTileHeight());
   }
 
   /**
@@ -121,7 +139,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    */
   @Override
   public int getTileHeight() {
-    return this.tileheight;
+    return this.sourceTileset != null ? this.sourceTileset.getTileHeight() : this.tileheight;
   }
 
   /**
@@ -131,15 +149,28 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    */
   @Override
   public int getTileWidth() {
-    return this.tilewidth;
+    return this.sourceTileset != null ? this.sourceTileset.getTileWidth() : this.tilewidth;
   }
 
   public void setMapPath(final String path) {
+    if (this.sourceTileset != null) {
+      this.sourceTileset.setMapPath(path);
+      return;
+    }
+
+    if (this.image == null) {
+      return;
+    }
+
     this.image.setAbsolutPath(path);
   }
 
   @Override
   public List<ITerrain> getTerrainTypes() {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getTerrainTypes();
+    }
+
     List<ITerrain> types = new ArrayList<>();
     if (this.terrainTypes == null) {
       return types;
@@ -154,6 +185,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public ITerrain[] getTerrain(int tileId) {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getTerrain(tileId);
+    }
+
     ITerrain[] terrains = new ITerrain[4];
     if (this.tiles == null) {
       return terrains;
@@ -184,6 +219,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public ITileAnimation getAnimation(int tileId) {
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getAnimation(tileId);
+    }
+
     if (this.tiles == null) {
       return null;
     }
@@ -198,12 +237,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public int getColumns() {
-    return this.columns;
+    return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns;
   }
 
   @Override
   public int getTilecount() {
-    return this.tilecount;
+    return this.sourceTileset != null ? this.sourceTileset.getTilecount() : this.tilecount != null ? this.tilecount : 0;
   }
 
   @Override
@@ -218,11 +257,46 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return false;
     }
 
-    return lastGridId >= tileId;
+    return lastGridId >= tileId || this.sourceTileset != null && this.sourceTileset.containsTile(tileId);
+  }
+
+  public void loadFromSource(String basePath) {
+    if (this.source == null || this.source.isEmpty()) {
+      return;
+    }
+
+    this.sourceTileset = XmlUtilities.readFromFile(Tileset.class, basePath + "\\" + this.source);
+  }
+
+  public void load(List<Tileset> rawTilesets) {
+    if (this.source == null || this.source.isEmpty()) {
+      return;
+    }
+
+    for (Tileset set : rawTilesets) {
+      String fileName = FileUtilities.getFileName(this.source);
+      if (set.getName() != null && set.getName().equals(fileName)) {
+        this.sourceTileset = set;
+        break;
+      }
+    }
+  }
+
+  void beforeMarshal(Marshaller m) {
+    if (this.sourceTileset != null) {
+      this.tilewidth = null;
+      this.tileheight = null;
+      this.tilecount = null;
+      this.columns = null;
+    }
+
+    if (this.getAllCustomProperties() != null && this.getAllCustomProperties().isEmpty()) {
+      this.setCustomProperties(null);
+    }
   }
 
   @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.margin != null && this.margin == 0) {
       this.margin = null;
     }

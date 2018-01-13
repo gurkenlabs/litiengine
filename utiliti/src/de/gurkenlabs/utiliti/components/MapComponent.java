@@ -944,9 +944,10 @@ public class MapComponent extends EditorComponent {
       if (result == JFileChooser.APPROVE_OPTION) {
 
         final IMapLoader tmxLoader = new TmxMapLoader();
-        Map map = (Map) tmxLoader.loadMap(chooser.getSelectedFile().toString());
+        String mapPath = chooser.getSelectedFile().toString();
+        Map map = (Map) tmxLoader.loadMap(mapPath);
         if (map == null) {
-          System.out.println("could not load map from file '" + chooser.getSelectedFile().toString() + "'");
+          System.out.println("could not load map from file '" + mapPath + "'");
           return;
         }
 
@@ -982,20 +983,27 @@ public class MapComponent extends EditorComponent {
           Spritesheet sprite = Spritesheet.find(tileSet.getImage().getSource());
           if (sprite != null) {
             Spritesheet.remove(sprite.getName());
-            this.screen.getGameFile().getTileSets().removeIf(x -> x.getName().equals(sprite.getName()));
+            this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
           }
         }
 
         for (ITileset tileSet : map.getTilesets()) {
           Spritesheet sprite = Spritesheet.load(tileSet);
-          this.screen.getGameFile().getTileSets().add(new SpriteSheetInfo(sprite));
+          this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = RenderEngine.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-          this.screen.getGameFile().getTileSets().add(new SpriteSheetInfo(sprite));
+          this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
+
+        // remove old tilesets
+        for (ITileset tileset : map.getExternalTilesets()) {
+          this.screen.getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+        }
+
+        this.screen.getGameFile().getTilesets().addAll(map.getExternalTilesets());
 
         this.loadEnvironment(map);
         System.out.println("imported map '" + map.getFileName() + "'");
