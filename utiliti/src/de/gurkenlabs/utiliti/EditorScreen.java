@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.JDialog;
@@ -46,6 +48,7 @@ import de.gurkenlabs.utiliti.components.ProjectSettingsDialog;
 
 @ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {
+  private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
   private static final int STATUS_DURATION = 5000;
   private static final String DEFAULT_GAME_NAME = "game";
   private static final String[] DEFAULT_SPRITESHEET_NAMES = { "sprites.info", "game.sprites" };
@@ -126,7 +129,7 @@ public class EditorScreen extends Screen {
 
     if (ImageCache.IMAGES.size() > 200) {
       ImageCache.IMAGES.clear();
-      System.out.println("cache cleared!");
+      log.log(Level.INFO, "cache cleared!");
     }
 
     if (this.currentResourceFile != null) {
@@ -245,8 +248,8 @@ public class EditorScreen extends Screen {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
         this.changeComponent(ComponentType.MAP);
       }
-    } catch (IOException e1) {
-      e1.printStackTrace();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
 
     this.setCurrentStatus("created new project");
@@ -264,8 +267,8 @@ public class EditorScreen extends Screen {
       if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
         this.load(chooser.getSelectedFile());
       }
-    } catch (IOException e1) {
-      e1.printStackTrace();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
   }
 
@@ -276,12 +279,12 @@ public class EditorScreen extends Screen {
 
     try {
       if (!FileUtilities.getExtension(gameFile).equals(GameFile.FILE_EXTENSION)) {
-        System.out.println("unsupported file format '" + FileUtilities.getExtension(gameFile) + "'");
+        log.log(Level.SEVERE, "unsupported file format '" + FileUtilities.getExtension(gameFile) + "'");
         return;
       }
 
       if (!gameFile.exists()) {
-        System.out.println("gameFile '" + gameFile + "' doesn't exist");
+        log.log(Level.SEVERE, "gameFile '" + gameFile + "' doesn't exist");
         return;
       }
 
@@ -303,7 +306,7 @@ public class EditorScreen extends Screen {
       // 2. add sprite sheets from sprite files
       // 3. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets());
-      System.out.println(this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
+      log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
 
       this.loadSpriteFiles(this.getProjectPath(), this.getGameFile().getSpriteFiles());
       for (Map map : this.mapComponent.getMaps()) {
@@ -350,7 +353,7 @@ public class EditorScreen extends Screen {
           this.currentResourceFile = newFile;
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
       }
     } else {
       this.saveGameFile(this.currentResourceFile);
@@ -403,7 +406,7 @@ public class EditorScreen extends Screen {
     Program.userPreferences.setLastGameFile(this.currentResourceFile);
     Program.userPreferences.addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size()
+    log.log(Level.INFO, "saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size()
         + " tilesets to '" + this.currentResourceFile + "'");
     this.setCurrentStatus("saved gamefile");
 
@@ -419,7 +422,7 @@ public class EditorScreen extends Screen {
     for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
       for (String file : FileUtilities.findFiles(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         map.save(file);
-        System.out.println("synchronized map '" + file + "'");
+        log.log(Level.INFO, "synchronized map '" + file + "'");
       }
     }
   }
@@ -449,7 +452,7 @@ public class EditorScreen extends Screen {
           isEmitter = true;
         }
       } catch (SAXException | IOException | ParserConfigurationException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getLocalizedMessage(), e);
       }
 
       if (isEmitter) {
@@ -516,7 +519,7 @@ public class EditorScreen extends Screen {
       }
     }
 
-    System.out.println(cnt + " tilesets loaded from '" + map.getFileName() + "'");
+    log.log(Level.INFO, cnt + " tilesets loaded from '" + map.getFileName() + "'");
   }
 
   private void loadSpriteSheets(List<SpriteSheetInfo> infos) {

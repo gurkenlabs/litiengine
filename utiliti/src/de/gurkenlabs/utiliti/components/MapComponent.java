@@ -1180,11 +1180,12 @@ public class MapComponent extends EditorComponent {
   }
 
   private Rectangle2D getFocus() {
-    if (this.getFocusedMapObject() != null) {
-      return this.getFocusedMapObject().getBoundingBox();
+    final IMapObject focusedObject = this.getFocusedMapObject();
+    if (focusedObject == null) {
+      return null;
     }
 
-    return null;
+    return focusedObject.getBoundingBox();
   }
 
   private IMapObject getFocusedMapObject() {

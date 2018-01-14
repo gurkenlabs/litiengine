@@ -20,12 +20,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -76,6 +76,7 @@ public class Program {
   public static JScrollBar verticalScroll;
   public static TrayIcon trayIcon;
 
+  private static final Logger log = Logger.getLogger(Program.class.getName());
   private static Menu recentFiles;
   private static boolean isChanging;
 
@@ -85,7 +86,7 @@ public class Program {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
 
     Game.getInfo().setName("utiLITI");
@@ -106,7 +107,7 @@ public class Program {
       try {
         tray.add(trayIcon);
       } catch (AWTException e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getLocalizedMessage(), e);
       }
     }
 
@@ -144,7 +145,7 @@ public class Program {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         MenuItem fileButton = new MenuItem(recent);
         fileButton.addActionListener(a -> {
-          System.out.println("load " + fileButton.getLabel());
+          log.log(Level.INFO, "load " + fileButton.getLabel());
           EditorScreen.instance().load(new File(fileButton.getLabel()));
         });
 
@@ -221,16 +222,10 @@ public class Program {
       public void componentResized(ComponentEvent e) {
         userPreferences.setWidth(window.getWidth());
         userPreferences.setHeight(window.getHeight());
-
       }
     });
 
-    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        userPreferences.setMainSplitter(split.getDividerLocation());
-      }
-    });
+    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setMainSplitter(split.getDividerLocation()));
 
     contentPane.add(split, BorderLayout.CENTER);
     split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
@@ -617,6 +612,7 @@ public class Program {
             Game.getEnvironment().getAmbientLight().setColor(ambientColor);
           }
         } catch (final NumberFormatException nfe) {
+          log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
         }
 
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());

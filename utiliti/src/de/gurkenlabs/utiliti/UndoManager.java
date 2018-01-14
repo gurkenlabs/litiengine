@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -125,16 +126,16 @@ public class UndoManager {
       return;
     }
 
-    if (!this.changing.stream().anyMatch(x -> x.getId() == mapObject.getId())) {
+    Optional<IMapObject> trackedMapObject = this.changing.stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
+    if (!trackedMapObject.isPresent()) {
       // didn't track the changing event and therefore cannot provide an undo
       return;
     }
 
     this.ensureStackSize();
     this.currentIndex++;
-    IMapObject oldMapObject = this.changing.stream().filter(x -> x.getId() == mapObject.getId()).findFirst().get();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(oldMapObject)), clone(mapObject), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), clone(mapObject), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
