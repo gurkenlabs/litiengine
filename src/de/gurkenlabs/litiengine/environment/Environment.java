@@ -74,6 +74,7 @@ public class Environment implements IEnvironment {
   private final List<Consumer<IEnvironment>> initializedConsumers;
   private final List<Consumer<IEnvironment>> loadedConsumers;
   private final List<Consumer<IEntity>> entityAddedConsumers;
+  private final List<Consumer<IEntity>> entityRemovedConsumers;
   private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
 
@@ -152,6 +153,7 @@ public class Environment implements IEnvironment {
     this.initializedConsumers = new CopyOnWriteArrayList<>();
     this.loadedConsumers = new CopyOnWriteArrayList<>();
     this.entityAddedConsumers = new CopyOnWriteArrayList<>();
+    this.entityRemovedConsumers = new CopyOnWriteArrayList<>();
 
     this.spawnPoints = new CopyOnWriteArrayList<>();
 
@@ -673,6 +675,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void onEntityRemoved(Consumer<IEntity> consumer) {
+    this.entityRemovedConsumers.add(consumer);
+  }
+
+  @Override
   public void onEntityAdded(Consumer<IEntity> consumer) {
     this.entityAddedConsumers.add(consumer);
   }
@@ -760,6 +767,10 @@ public class Environment implements IEnvironment {
     }
 
     this.unload(entity);
+
+    for (Consumer<IEntity> cons : this.entityRemovedConsumers) {
+      cons.accept(entity);
+    }
   }
 
   @Override

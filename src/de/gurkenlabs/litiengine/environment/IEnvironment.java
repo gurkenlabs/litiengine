@@ -42,8 +42,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
-   * Searches for all combat entities whose hitBox intersect the specified
-   * shape.
+   * Searches for all combat entities whose hitBox intersect the specified shape.
    * 
    * @param shape
    *          The shape to check intersection for.
@@ -135,6 +134,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void loadFromMap(final int mapId);
 
   public void onEntityAdded(final Consumer<IEntity> consumer);
+
+  public void onEntityRemoved(final Consumer<IEntity> consumer);
 
   public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
 
