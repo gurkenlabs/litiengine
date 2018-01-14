@@ -23,16 +23,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private List<Spawnpoint> spawnpoints;
 
   public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
-    this(environment, interval, amount);
-    this.spawnpoints = spawnpoints;
-    loop.attach(this);
-  }
-
-  private EntitySpawner(final IEnvironment environment, final int interval, final int amount) {
     this.environment = environment;
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
+    this.spawnpoints = spawnpoints;
+    loop.attach(this);
   }
 
   @Override

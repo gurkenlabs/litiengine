@@ -2,8 +2,8 @@ package de.gurkenlabs.utiliti;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.function.Consumer;
@@ -104,7 +104,7 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
     }
   }
 
-  protected class MapObjectPropteryFocusListener implements FocusListener {
+  protected class MapObjectPropteryFocusListener extends FocusAdapter {
     private final Consumer<T> updateAction;
 
     MapObjectPropteryFocusListener(Consumer<T> updateAction) {
@@ -121,10 +121,6 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
       this.updateAction.accept(getDataSource());
       UndoManager.instance().mapObjectChanged(getDataSource());
       updateEnvironment();
-    }
-
-    @Override
-    public void focusGained(FocusEvent e) {
     }
   }
 

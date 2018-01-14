@@ -138,7 +138,7 @@ public class MapComponent extends EditorComponent {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
-    this.gridSize = Program.USER_PREFERNCES.getGridSize();
+    this.gridSize = Program.userPreferences.getGridSize();
   }
 
   public void onEditModeChanged(Consumer<Integer> cons) {
@@ -875,7 +875,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void setGridSize(int gridSize) {
-    Program.USER_PREFERNCES.setGridSize(gridSize);
+    Program.userPreferences.setGridSize(gridSize);
     this.gridSize = gridSize;
   }
 

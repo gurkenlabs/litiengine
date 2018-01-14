@@ -1,6 +1,5 @@
 package de.gurkenlabs.utiliti;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -14,7 +13,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -161,12 +159,14 @@ public class MapSelectionPanel extends JSplitPane {
 
   private static void addPopup(Component component, final JPopupMenu popup) {
     component.addMouseListener(new MouseAdapter() {
+      @Override
       public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) {
           showMenu(e);
         }
       }
 
+      @Override
       public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
           showMenu(e);

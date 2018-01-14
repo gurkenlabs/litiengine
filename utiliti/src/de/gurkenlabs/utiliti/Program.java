@@ -18,7 +18,6 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -48,7 +47,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.LineBorder;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -73,7 +71,7 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(-45));
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(45));
 
-  public static UserPreferenceConfiguration USER_PREFERNCES;
+  public static UserPreferenceConfiguration userPreferences;
   public static JScrollBar horizontalScroll;
   public static JScrollBar verticalScroll;
   public static TrayIcon trayIcon;
@@ -116,9 +114,9 @@ public class Program {
     Game.init();
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
-    USER_PREFERNCES = Game.getConfiguration().getConfigurationGroup("user_");
+    userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
     Game.getCamera().onZoomChanged(zoom -> {
-      USER_PREFERNCES.setZoom(zoom);
+      userPreferences.setZoom(zoom);
     });
 
     Game.getScreenManager().setIconImage(RenderEngine.getImage("pixel-icon-utility.png"));
@@ -135,14 +133,14 @@ public class Program {
     Input.keyboard().consumeAlt(true);
     handleArgs(args);
 
-    if (!EditorScreen.instance().fileLoaded() && USER_PREFERNCES.getLastGameFile() != null) {
-      EditorScreen.instance().load(new File(USER_PREFERNCES.getLastGameFile()));
+    if (!EditorScreen.instance().fileLoaded() && userPreferences.getLastGameFile() != null) {
+      EditorScreen.instance().load(new File(userPreferences.getLastGameFile()));
     }
   }
 
   public static void loadRecentFiles() {
     recentFiles.removeAll();
-    for (String recent : USER_PREFERNCES.getLastOpenedFiles()) {
+    for (String recent : userPreferences.getLastOpenedFiles()) {
       if (recent != null && !recent.isEmpty() && new File(recent).exists()) {
         MenuItem fileButton = new MenuItem(recent);
         fileButton.addActionListener(a -> {
@@ -190,8 +188,8 @@ public class Program {
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
-    if (USER_PREFERNCES.getWidth() != 0 && USER_PREFERNCES.getHeight() != 0) {
-      window.setSize(USER_PREFERNCES.getWidth(), USER_PREFERNCES.getHeight());
+    if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
+      window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
     }
 
     Canvas render = Game.getScreenManager().getRenderComponent();
@@ -221,8 +219,8 @@ public class Program {
     split.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(ComponentEvent e) {
-        USER_PREFERNCES.setWidth(window.getWidth());
-        USER_PREFERNCES.setHeight(window.getHeight());
+        userPreferences.setWidth(window.getWidth());
+        userPreferences.setHeight(window.getHeight());
 
       }
     });
@@ -230,12 +228,12 @@ public class Program {
     split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        USER_PREFERNCES.setMainSplitter(split.getDividerLocation());
+        userPreferences.setMainSplitter(split.getDividerLocation());
       }
     });
 
     contentPane.add(split, BorderLayout.CENTER);
-    split.setDividerLocation(USER_PREFERNCES.getMainSplitterPosition() != 0 ? USER_PREFERNCES.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
+    split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
     // create basic icon menu
     JToolBar basicMenu = new JToolBar();
 
@@ -512,29 +510,29 @@ public class Program {
     menuBar.add(mnView);
 
     CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
-    snapToGrid.setState(USER_PREFERNCES.isSnapGrid());
+    snapToGrid.setState(userPreferences.isSnapGrid());
     EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
     snapToGrid.addItemListener(e -> {
       EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
-      USER_PREFERNCES.setSnapGrid(snapToGrid.getState());
+      userPreferences.setSnapGrid(snapToGrid.getState());
     });
 
     CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
-    renderGrid.setState(USER_PREFERNCES.isShowGrid());
+    renderGrid.setState(userPreferences.isShowGrid());
     EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
     renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
     renderGrid.addItemListener(e -> {
       EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
-      USER_PREFERNCES.setShowGrid(renderGrid.getState());
+      userPreferences.setShowGrid(renderGrid.getState());
     });
 
     CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
-    renderCollision.setState(USER_PREFERNCES.isRenderBoundingBoxes());
+    renderCollision.setState(userPreferences.isRenderBoundingBoxes());
     EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
     renderCollision.addItemListener(e -> {
       EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
-      USER_PREFERNCES.setRenderBoundingBoxes(renderCollision.getState());
+      userPreferences.setRenderBoundingBoxes(renderCollision.getState());
     });
 
     MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
@@ -570,12 +568,12 @@ public class Program {
     properties.addActionListener(a -> EditorScreen.instance().setProjectSettings());
 
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
-    compress.setState(USER_PREFERNCES.isCompressFile());
-    compress.addItemListener(e -> USER_PREFERNCES.setCompressFile(compress.getState()));
+    compress.setState(userPreferences.isCompressFile());
+    compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
 
     CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
-    sync.setState(USER_PREFERNCES.isSyncMaps());
-    sync.addItemListener(e -> USER_PREFERNCES.setSyncMaps(sync.getState()));
+    sync.setState(userPreferences.isSyncMaps());
+    sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
 
     mnProject.add(properties);
     mnProject.add(compress);

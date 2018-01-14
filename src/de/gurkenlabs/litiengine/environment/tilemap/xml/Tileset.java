@@ -242,7 +242,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public int getTilecount() {
-    return this.sourceTileset != null ? this.sourceTileset.getTilecount() : this.tilecount != null ? this.tilecount : 0;
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.getTilecount();
+    }
+
+    return this.tilecount != null ? this.tilecount : 0;
   }
 
   @Override
@@ -282,6 +286,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
   }
 
+  @Override
   void beforeMarshal(Marshaller m) {
     if (this.sourceTileset != null) {
       this.tilewidth = null;

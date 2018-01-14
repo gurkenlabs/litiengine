@@ -53,11 +53,11 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
 
     JScrollPane scrollPane = new JScrollPane();
 
-    JButton button = new JButton("+");
-    button.addActionListener(a -> model.addRow(new Object[] { 0 }));
+    JButton buttonPlus = new JButton("+");
+    buttonPlus.addActionListener(a -> model.addRow(new Object[] { 0 }));
 
-    JButton button_1 = new JButton("-");
-    button_1.addActionListener(a -> {
+    JButton buttonMinus = new JButton("-");
+    buttonMinus.addActionListener(a -> {
       int[] rows = table.getSelectedRows();
       for (int i = 0; i < rows.length; i++) {
         model.removeRow(rows[i] - i);
@@ -101,11 +101,11 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
                     .addGroup(groupLayout.createSequentialGroup()
                         .addGap(4)
                         .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                            .addComponent(button_1, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buttonMinus, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
                             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
                                 .addComponent(button3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(button2, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE))
-                            .addComponent(button, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
+                            .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
                             .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
@@ -134,9 +134,9 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
                 .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
                     .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                         .addGap(3)
-                        .addComponent(button_1, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(267, Short.MAX_VALUE)));
 
     tableTargets = new JTable();

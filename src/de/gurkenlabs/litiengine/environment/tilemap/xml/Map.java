@@ -410,13 +410,13 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   }
 
   public List<Tileset> getExternalTilesets() {
-    List<Tileset> tilesets = new ArrayList<>();
+    List<Tileset> externalTilesets = new ArrayList<>();
     for (Tileset set : this.getRawTileSets()) {
       if (set.sourceTileset != null) {
-        tilesets.add(set.sourceTileset);
+        externalTilesets.add(set.sourceTileset);
       }
     }
 
-    return tilesets;
+    return externalTilesets;
   }
 }

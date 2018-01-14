@@ -53,15 +53,15 @@ public class EditorScreen extends Screen {
 
   private static final String GAME_FILE_NAME = "Game Resource File";
 
-  public static double padding, propertyWidth, valueWidth, rightValueX, rightPropertyX, leftPropertyX, leftValueX;
-
   public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
   public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
   public static final Color COMPONENTBACKGROUND_COLOR = new Color(100, 100, 100, 125);
 
   private static EditorScreen instance;
+
   private final List<EditorComponent> comps;
 
+  private double padding;
   private MapComponent mapComponent;
   private GameFile gameFile = new GameFile();
   private EditorComponent current;
@@ -85,7 +85,12 @@ public class EditorScreen extends Screen {
   }
 
   public static EditorScreen instance() {
-    return instance != null ? instance : (instance = new EditorScreen());
+    if (instance != null) {
+      return instance;
+    }
+
+    instance = new EditorScreen();
+    return instance;
   }
 
   public boolean fileLoaded() {
@@ -105,13 +110,6 @@ public class EditorScreen extends Screen {
   @Override
   public void prepare() {
     padding = this.getWidth() / 50;
-    propertyWidth = this.getWidth() * 3 / 20;
-    valueWidth = this.getWidth() / 20;
-    rightValueX = this.getWidth() - padding * 2 - valueWidth;
-    rightPropertyX = this.getWidth() - padding * 3 - valueWidth - propertyWidth;
-
-    leftPropertyX = padding;
-    leftValueX = leftPropertyX + padding;
 
     // init components
     this.mapComponent = new MapComponent(this);
@@ -179,6 +177,10 @@ public class EditorScreen extends Screen {
 
   public String getProjectPath() {
     return projectPath;
+  }
+
+  public double getPadding() {
+    return this.padding;
   }
 
   public void setProjectPath(String projectPath) {
@@ -286,8 +288,8 @@ public class EditorScreen extends Screen {
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
       this.gameFile = GameFile.load(gameFile.getPath());
-      Program.USER_PREFERNCES.setLastGameFile(gameFile.getPath());
-      Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
+      Program.userPreferences.setLastGameFile(gameFile.getPath());
+      Program.userPreferences.addOpenedFile(this.currentResourceFile);
       Program.loadRecentFiles();
       this.setProjectPath(FileUtilities.getParentDirPath(gameFile.getAbsolutePath()));
 
@@ -397,15 +399,15 @@ public class EditorScreen extends Screen {
   }
 
   private String saveGameFile(String target) {
-    String saveFile = this.getGameFile().save(target, Program.USER_PREFERNCES.isCompressFile());
-    Program.USER_PREFERNCES.setLastGameFile(this.currentResourceFile);
-    Program.USER_PREFERNCES.addOpenedFile(this.currentResourceFile);
+    String saveFile = this.getGameFile().save(target, Program.userPreferences.isCompressFile());
+    Program.userPreferences.setLastGameFile(this.currentResourceFile);
+    Program.userPreferences.addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
     System.out.println("saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size()
         + " tilesets to '" + this.currentResourceFile + "'");
     this.setCurrentStatus("saved gamefile");
 
-    if (Program.USER_PREFERNCES.isSyncMaps()) {
+    if (Program.userPreferences.isSyncMaps()) {
       this.saveMaps();
     }
 

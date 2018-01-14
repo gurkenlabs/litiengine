@@ -152,13 +152,9 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()));
-    }));
+    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
 
-    this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()));
-    }));
+    this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()))));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
@@ -170,13 +166,9 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
-    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()));
-    }));
+    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
 
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()));
-    }));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
   }
 
   private void loadAvailableProps() {
@@ -193,10 +185,10 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     }
 
     this.comboBoxSpriteSheets.removeAllItems();
-    for (String key : m.keySet()) {
+    for (Map.Entry<String, String> entry : m.entrySet()) {
       JLabel label = new JLabel();
-      label.setText(key);
-      String value = m.get(key);
+      label.setText(entry.getKey());
+      String value = m.get(entry.getValue());
       Spritesheet sprite = Spritesheet.find(value);
       if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
         BufferedImage img = sprite.getSprite(0);

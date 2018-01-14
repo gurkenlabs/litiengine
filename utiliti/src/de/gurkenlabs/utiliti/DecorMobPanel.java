@@ -172,10 +172,10 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     }
 
     this.comboBoxSpriteSheets.removeAllItems();
-    for (String key : m.keySet()) {
+    for (Map.Entry<String, String> entry : m.entrySet()) {
       JLabel label = new JLabel();
-      label.setText(key);
-      String value = m.get(key);
+      label.setText(entry.getKey());
+      String value = entry.getValue();
       Spritesheet sprite = Spritesheet.find(value);
       if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
         BufferedImage img = sprite.getSprite(0);

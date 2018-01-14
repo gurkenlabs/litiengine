@@ -14,8 +14,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Resources;
@@ -126,28 +124,24 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.model.addTableModelListener(new TableModelListener() {
-
-      @Override
-      public void tableChanged(TableModelEvent e) {
-        if (getDataSource() == null || isFocussing) {
-          return;
-        }
-
-        UndoManager.instance().mapObjectChanging(getDataSource());
-        List<String> setProperties = new ArrayList<>();
-        for (int row = 0; row < model.getRowCount(); row++) {
-          String name = (String) model.getValueAt(row, 0);
-          String value = (String) model.getValueAt(row, 1);
-          if (name != null && value != null && !name.isEmpty() && !value.isEmpty()) {
-            setProperties.add(name);
-            getDataSource().setCustomProperty(name, value);
-          }
-        }
-
-        getDataSource().getAllCustomProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
-        UndoManager.instance().mapObjectChanged(getDataSource());
+    this.model.addTableModelListener(e -> {
+      if (getDataSource() == null || isFocussing) {
+        return;
       }
+
+      UndoManager.instance().mapObjectChanging(getDataSource());
+      List<String> setProperties = new ArrayList<>();
+      for (int row = 0; row < model.getRowCount(); row++) {
+        String name = (String) model.getValueAt(row, 0);
+        String value = (String) model.getValueAt(row, 1);
+        if (name != null && value != null && !name.isEmpty() && !value.isEmpty()) {
+          setProperties.add(name);
+          getDataSource().setCustomProperty(name, value);
+        }
+      }
+
+      getDataSource().getAllCustomProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
+      UndoManager.instance().mapObjectChanged(getDataSource());
     });
   }
 }
