@@ -786,24 +786,25 @@ public class MapComponent extends EditorComponent {
 
   public void cut() {
     this.copiedMapObject = this.getFocusedMapObject();
-    UndoManager.instance().mapObjectDeleting(this.getFocusedMapObject());
-    this.delete(this.getFocusedMapObject());
+    UndoManager.instance().mapObjectDeleting(this.copiedMapObject);
+    this.delete(this.copiedMapObject);
   }
 
   public void delete() {
-    if (this.getFocusedMapObject() == null) {
+    final IMapObject deleteObject = this.getFocusedMapObject();
+    if (deleteObject == null) {
       return;
     }
 
     int n = JOptionPane.showConfirmDialog(
         null,
-        "Do you really want to delete the entity [" + this.getFocusedMapObject().getId() + "]",
+        "Do you really want to delete the entity [" + deleteObject.getId() + "]",
         "Delete Entity?",
         JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
-      UndoManager.instance().mapObjectDeleting(this.getFocusedMapObject());
-      this.delete(this.getFocusedMapObject());
+      UndoManager.instance().mapObjectDeleting(deleteObject);
+      this.delete(deleteObject);
     }
   }
 
@@ -850,7 +851,8 @@ public class MapComponent extends EditorComponent {
   }
 
   public void setFocus(IMapObject mapObject) {
-    if (mapObject != null && mapObject.equals(this.getFocusedMapObject()) || mapObject == null && this.getFocusedMapObject() == null) {
+    final IMapObject currentFocus = this.getFocusedMapObject();
+    if (mapObject != null && currentFocus != null && mapObject.equals(currentFocus) || mapObject == null && currentFocus == null) {
       return;
     }
 
@@ -868,7 +870,7 @@ public class MapComponent extends EditorComponent {
       this.focusedObjects.put(Game.getEnvironment().getMap().getFileName(), mapObject);
     }
     for (Consumer<IMapObject> cons : this.focusChangedConsumer) {
-      cons.accept(this.getFocusedMapObject());
+      cons.accept(mapObject);
     }
 
     this.updateTransformControls();
@@ -1230,14 +1232,15 @@ public class MapComponent extends EditorComponent {
   }
 
   private void handleTransform() {
-    if (this.getFocusedMapObject() == null || this.currentEditMode != EDITMODE_EDIT || currentTransform == TransformType.NONE) {
+    final IMapObject transformObject = this.getFocusedMapObject();
+    if (transformObject == null || this.currentEditMode != EDITMODE_EDIT || currentTransform == TransformType.NONE) {
       return;
     }
 
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
-      this.dragLocationMapObject = new Point2D.Double(this.getFocusedMapObject().getX(), this.getFocusedMapObject().getY());
-      this.dragSizeMapObject = new Dimension(this.getFocusedMapObject().getDimension());
+      this.dragLocationMapObject = new Point2D.Double(transformObject.getX(), transformObject.getY());
+      this.dragSizeMapObject = new Dimension(transformObject.getDimension());
       return;
     }
 
@@ -1293,29 +1296,29 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    this.getFocusedMapObject().setWidth(this.snapX(newWidth));
-    this.getFocusedMapObject().setHeight(this.snapY(newHeight));
-    this.getFocusedMapObject().setX(this.snapX(newX));
-    this.getFocusedMapObject().setY(this.snapY(newY));
+    transformObject.setWidth(this.snapX(newWidth));
+    transformObject.setHeight(this.snapY(newHeight));
+    transformObject.setX(this.snapX(newX));
+    transformObject.setY(this.snapY(newY));
 
-    Game.getEnvironment().reloadFromMap(this.getFocusedMapObject().getId());
-    if (MapObjectType.get(this.getFocusedMapObject().getType()) == MapObjectType.LIGHTSOURCE) {
+    Game.getEnvironment().reloadFromMap(transformObject.getId());
+    if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
+    EditorScreen.instance().getMapObjectPanel().bind(transformObject);
     this.updateTransformControls();
   }
 
   private void handleEntityDrag() {
-    // only handle drag i
-    if (this.getFocusedMapObject() == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
+    final IMapObject dragObject = this.getFocusedMapObject();
+    if (dragObject == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
       return;
     }
 
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
-      this.dragLocationMapObject = new Point2D.Double(this.getFocusedMapObject().getX(), this.getFocusedMapObject().getY());
+      this.dragLocationMapObject = new Point2D.Double(dragObject.getX(), dragObject.getY());
       return;
     }
 
@@ -1323,16 +1326,16 @@ public class MapComponent extends EditorComponent {
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newX = this.snapX(this.dragLocationMapObject.getX() + deltaX);
     double newY = this.snapY(this.dragLocationMapObject.getY() + deltaY);
-    this.getFocusedMapObject().setX((int) newX);
-    this.getFocusedMapObject().setY((int) newY);
+    dragObject.setX((int) newX);
+    dragObject.setY((int) newY);
 
-    Game.getEnvironment().reloadFromMap(this.getFocusedMapObject().getId());
-    if (MapObjectType.get(this.getFocusedMapObject().getType()) == MapObjectType.STATICSHADOW
-        || MapObjectType.get(this.getFocusedMapObject().getType()) == MapObjectType.LIGHTSOURCE) {
+    Game.getEnvironment().reloadFromMap(dragObject.getId());
+    if (MapObjectType.get(dragObject.getType()) == MapObjectType.STATICSHADOW
+        || MapObjectType.get(dragObject.getType()) == MapObjectType.LIGHTSOURCE) {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
+    EditorScreen.instance().getMapObjectPanel().bind(dragObject);
     this.updateTransformControls();
   }
 
@@ -1458,7 +1461,7 @@ public class MapComponent extends EditorComponent {
       return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getHeight());
     }
 
-    double snapped = (int) (y / this.gridSize) * this.gridSize;
+    int snapped = (int) (y / this.gridSize) * this.gridSize;
     return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
   }
 
