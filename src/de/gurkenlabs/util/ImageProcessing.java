@@ -259,8 +259,8 @@ public class ImageProcessing {
   }
 
   /**
-   * All pixels that are not transparent are replaced by a pixel of the
-   * specified flashColor.
+   * All pixels that are not transparent are replaced by a pixel of the specified
+   * flashColor.
    *
    * @param image
    *          the player image
@@ -416,9 +416,9 @@ public class ImageProcessing {
   }
 
   /**
-   * The specified image is scaled to a new dimension with the specified width
-   * and height. This method doesn't use anti aliasing for this process to keep
-   * the indy look.
+   * The specified image is scaled to a new dimension with the specified width and
+   * height. This method doesn't use anti aliasing for this process to keep the
+   * indy look.
    *
    * @param image
    *          the image
@@ -465,6 +465,15 @@ public class ImageProcessing {
     final Graphics2D g = (Graphics2D) newImg.getGraphics();
     g.drawImage(scaled, 0, 0, null);
     g.dispose();
+
+    if (newWidth != width || newHeight != height) {
+      final BufferedImage wrapperImage = getCompatibleImage(width, height);
+      final Graphics2D g2 = (Graphics2D) wrapperImage.getGraphics();
+      g2.drawImage(newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);
+      g2.dispose();
+      return wrapperImage;
+    }
+
     return newImg;
   }
 
