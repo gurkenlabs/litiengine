@@ -867,18 +867,19 @@ public class MapComponent extends EditorComponent {
     if (this.isMoving || this.isTransforming) {
       return;
     }
-
+    EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+    EditorScreen.instance().getMapSelectionPanel().focus(mapObject);
     if (mapObject == null) {
       this.focusedObjects.remove(Game.getEnvironment().getMap().getFileName());
     } else {
       this.focusedObjects.put(Game.getEnvironment().getMap().getFileName(), mapObject);
     }
+
     for (Consumer<IMapObject> cons : this.focusChangedConsumer) {
       cons.accept(mapObject);
     }
 
     this.updateTransformControls();
-    EditorScreen.instance().getMapObjectPanel().bind(mapObject);
   }
 
   public void setGridSize(int gridSize) {

@@ -5,10 +5,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -39,6 +41,7 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
@@ -51,6 +54,8 @@ import de.gurkenlabs.utiliti.components.JCheckBoxList;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MapSelectionPanel extends JSplitPane {
@@ -72,6 +77,8 @@ public class MapSelectionPanel extends JSplitPane {
   DefaultMutableTreeNode nodeTriggers;
   DefaultMutableTreeNode nodeSpawnpoints;
   DefaultMutableTreeNode nodeCollisionBoxes;
+
+  private boolean isFocussing;
 
   /**
    * Create the panel.
@@ -178,15 +185,20 @@ public class MapSelectionPanel extends JSplitPane {
 
     tree.addMouseListener(ml);
     tree.addTreeSelectionListener(e -> {
-      if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-        if (node.getUserObject() instanceof IEntity) {
-          IEntity ent = (IEntity) node.getUserObject();
-          IMapObject obj = Game.getEnvironment().getMap().getMapObject(ent.getMapId());
-          if (obj != null) {
-            EditorScreen.instance().getMapComponent().setFocus(obj);
+      this.isFocussing = true;
+      try {
+        if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+          if (node.getUserObject() instanceof IEntity) {
+            IEntity ent = (IEntity) node.getUserObject();
+            IMapObject obj = Game.getEnvironment().getMap().getMapObject(ent.getMapId());
+            if (obj != null) {
+              EditorScreen.instance().getMapComponent().setFocus(obj);
+            }
           }
         }
+      } finally {
+        this.isFocussing = false;
       }
     });
 
@@ -268,6 +280,64 @@ public class MapSelectionPanel extends JSplitPane {
 
   public int getSelectedLayerIndex() {
     return listObjectLayers.getSelectedIndex();
+  }
+
+  public void focus(final IMapObject mapObject) {
+    if (this.isFocussing) {
+      return;
+    }
+
+    if (mapObject == null) {
+      tree.clearSelection();
+      return;
+    }
+
+    switch (MapObjectType.get(mapObject.getType())) {
+    case PROP:
+      this.select(nodeProps, mapObject.getId());
+      break;
+    case TRIGGER:
+      this.select(nodeTriggers, mapObject.getId());
+      break;
+    case LIGHTSOURCE:
+      this.select(nodeLights, mapObject.getId());
+      break;
+    case SPAWNPOINT:
+      this.select(nodeSpawnpoints, mapObject.getId());
+      break;
+    case COLLISIONBOX:
+      this.select(nodeCollisionBoxes, mapObject.getId());
+      break;
+    default:
+      return;
+    }
+  }
+
+  private void select(DefaultMutableTreeNode parent, int mapId) {
+    Enumeration en = parent.depthFirstEnumeration();
+    while (en.hasMoreElements()) {
+
+      // Unfortunately the enumeration isn't genericised so we need to downcast
+      // when calling nextElement():
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+      IEntity ent = (IEntity) node.getUserObject();
+      if (ent.getMapId() == mapId) {
+        this.tree.setSelectionPath(new TreePath(node.getPath()));
+        TreePath path = this.tree.getSelectionPath();
+        if (path == null || !this.tree.isVisible()) {
+          return;
+        }
+
+        Rectangle bounds = this.tree.getPathBounds(path);
+        if (bounds == null) {
+          return;
+        }
+        // set the height to the visible height to force the node to top 
+        bounds.height = this.tree.getVisibleRect().height;
+        this.tree.scrollRectToVisible(bounds);
+        return;
+      }
+    }
   }
 
   private static void addPopup(Component component, final JPopupMenu popup) {
@@ -389,8 +459,8 @@ public class MapSelectionPanel extends JSplitPane {
 
       UIDefaults defaults = UIManager.getDefaults();
       label.setOpaque(true);
-      label.setBackground(hasFocus ? defaults.getColor("Tree.selectionBackground") : defaults.getColor("Tree.background"));
-      label.setForeground(hasFocus ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
+      label.setBackground(hasFocus || selected ? defaults.getColor("Tree.selectionBackground") : defaults.getColor("Tree.background"));
+      label.setForeground(hasFocus || selected ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
       label.setBorder(hasFocus ? this.focusBorder : this.normalBorder);
       label.setText(value.toString());
 
