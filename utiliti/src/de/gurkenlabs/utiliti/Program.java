@@ -210,10 +210,14 @@ public class Program {
     renderPane.add(verticalScroll, BorderLayout.EAST);
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    JPanel mapWrap = new JPanel(new BorderLayout());
+    JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     mapWrap.setMinimumSize(new Dimension(200, 0));
-    mapWrap.add(mapEditorPanel, BorderLayout.CENTER);
-    mapWrap.add(mapSelectionPanel, BorderLayout.NORTH);
+    mapWrap.setBottomComponent(mapEditorPanel);
+    mapWrap.setTopComponent(mapSelectionPanel);
+    mapWrap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setSelectionEditSplitter(mapWrap.getDividerLocation()));
+    if (userPreferences.getSelectionEditSplitter() != 0) {
+      mapWrap.setDividerLocation(userPreferences.getSelectionEditSplitter());
+    }
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderPane, mapWrap);
     split.setContinuousLayout(true);

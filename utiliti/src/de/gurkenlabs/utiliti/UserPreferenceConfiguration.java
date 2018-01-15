@@ -17,6 +17,8 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean syncMaps;
   private int gridSize;
   private int mainSplitter;
+  private int selectionEditSplitter;
+  private int mapPanelSplitter;
   private int width;
   private int height;
 
@@ -160,5 +162,21 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setHeight(int height) {
     this.height = height;
+  }
+
+  public int getSelectionEditSplitter() {
+    return selectionEditSplitter;
+  }
+
+  public void setSelectionEditSplitter(int selectionEditSplitter) {
+    this.selectionEditSplitter = selectionEditSplitter;
+  }
+
+  public int getMapPanelSplitter() {
+    return mapPanelSplitter;
+  }
+
+  public void setMapPanelSplitter(int mapPanelSplitter) {
+    this.mapPanelSplitter = mapPanelSplitter;
   }
 }

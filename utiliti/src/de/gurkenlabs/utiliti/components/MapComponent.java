@@ -764,7 +764,6 @@ public class MapComponent extends EditorComponent {
     }
 
     this.setFocus(mapObject);
-    EditorScreen.instance().getMapObjectPanel().bind(mapObject);
     this.setEditMode(EDITMODE_EDIT);
   }
 
@@ -821,8 +820,13 @@ public class MapComponent extends EditorComponent {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    EditorScreen.instance().getMapObjectPanel().bind(null);
     this.setFocus(null);
+  }
+
+  public void centerCameraOnFocus() {
+    if (this.getFocusedMapObject() != null) {
+      Game.getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
+    }
   }
 
   public void setEditMode(int editMode) {
@@ -874,6 +878,7 @@ public class MapComponent extends EditorComponent {
     }
 
     this.updateTransformControls();
+    EditorScreen.instance().getMapObjectPanel().bind(mapObject);
   }
 
   public void setGridSize(int gridSize) {
@@ -1364,9 +1369,7 @@ public class MapComponent extends EditorComponent {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> {
-      if (this.getFocusedMapObject() != null) {
-        Game.getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
-      }
+      this.centerCameraOnFocus();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {

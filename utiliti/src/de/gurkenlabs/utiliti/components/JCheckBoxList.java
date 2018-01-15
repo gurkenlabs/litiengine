@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -16,8 +15,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 @SuppressWarnings("serial")
 public class JCheckBoxList extends JList<JCheckBox> {
@@ -80,7 +77,7 @@ public class JCheckBoxList extends JList<JCheckBox> {
       newLabel.setFont(getFont());
       newLabel.setBorder(isSelected ? UIManager
           .getBorder("List.focusCellHighlightBorder") : noFocusBorder);
-      newLabel.setIcon(new ImageIcon(RenderEngine.getImage("object_cube-10x10.png")));
+      newLabel.setIcon(checkbox.getIcon());
 
       panel.add(newCheck, BorderLayout.WEST);
       panel.add(newLabel, BorderLayout.CENTER);
