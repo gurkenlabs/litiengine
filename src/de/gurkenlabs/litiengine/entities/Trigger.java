@@ -116,10 +116,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   /**
    * Allows to register functions that contain additional checks for the trigger
-   * activation. The return value of the function is considered the reason why
-   * the trigger cannot be activated. If the function returns anything else than
-   * null, the activation is cancelled and the result of the function is send to
-   * the activator entity.
+   * activation. The return value of the function is considered the reason why the
+   * trigger cannot be activated. If the function returns anything else than null,
+   * the activation is cancelled and the result of the function is send to the
+   * activator entity.
    * 
    * @param func
    */
@@ -197,7 +197,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   @Override
   public String toString() {
-    return "trigger: " + this.getName() + "[" + this.getMapId() + "]";
+    if (this.getName() != null) {
+      return "trigger: " + super.toString();
+    }
+
+    return super.toString();
   }
 
   @Override

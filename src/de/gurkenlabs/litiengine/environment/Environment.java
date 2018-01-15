@@ -30,6 +30,7 @@ import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -64,7 +65,6 @@ public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
-  private final Collection<CollisionBox> colliders;
   private final Map<Integer, ICombatEntity> combatEntities;
 
   private final Map<RenderType, Map<Integer, IEntity>> entities;
@@ -79,9 +79,11 @@ public class Environment implements IEnvironment {
   private final List<Consumer<Graphics2D>> mapRenderedConsumer;
 
   private final List<IRenderable> groundRenderable;
+  private final Collection<CollisionBox> colliders;
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
   private final Collection<Trigger> triggers;
+  private final Collection<Prop> props;
 
   private final List<MapArea> mapAreas;
 
@@ -146,6 +148,7 @@ public class Environment implements IEnvironment {
     this.triggers = new CopyOnWriteArrayList<>();
     this.mapAreas = new CopyOnWriteArrayList<>();
     this.staticShadows = new CopyOnWriteArrayList<>();
+    this.props = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
@@ -184,6 +187,10 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof IMovableEntity) {
       this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
+    }
+
+    if (entity instanceof Prop) {
+      this.props.add((Prop) entity);
     }
 
     if (entity instanceof CollisionBox) {
@@ -419,13 +426,12 @@ public class Environment implements IEnvironment {
 
   @Override
   public CollisionBox getCollisionBox(int mapId) {
-    for (final CollisionBox collider : this.getCollisionBoxes()) {
-      if (collider.getMapId() == mapId) {
-        return collider;
-      }
-    }
+    return getById(this.getCollisionBoxes(), mapId);
+  }
 
-    return null;
+  @Override
+  public CollisionBox getCollisionBox(String name) {
+    return getByName(this.getCollisionBoxes(), name);
   }
 
   @Override
@@ -525,28 +531,28 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Spawnpoint getSpawnpoint(final int mapId) {
-    for (final Spawnpoint m : this.getSpawnPoints()) {
-      if (m.getMapId() == mapId) {
-        return m;
-      }
-    }
+  public Collection<Prop> getProps() {
+    return this.props;
+  }
 
-    return null;
+  @Override
+  public Prop getProp(int mapId) {
+    return getById(this.getProps(), mapId);
+  }
+
+  @Override
+  public Prop getProp(String name) {
+    return getByName(this.getProps(), name);
+  }
+
+  @Override
+  public Spawnpoint getSpawnpoint(final int mapId) {
+    return getById(this.getSpawnPoints(), mapId);
   }
 
   @Override
   public Spawnpoint getSpawnpoint(final String name) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-
-    for (final Spawnpoint m : this.getSpawnPoints()) {
-      if (m.getName() != null && m.getName().equals(name)) {
-        return m;
-      }
-    }
-    return null;
+    return getByName(this.getSpawnPoints(), name);
   }
 
   @Override
@@ -573,27 +579,12 @@ public class Environment implements IEnvironment {
 
   @Override
   public Trigger getTrigger(final int mapId) {
-    for (final Trigger t : this.getTriggers()) {
-      if (t.getMapId() == mapId) {
-        return t;
-      }
-    }
-
-    return null;
+    return getById(this.getTriggers(), mapId);
   }
 
   @Override
   public Trigger getTrigger(final String name) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-
-    for (final Trigger t : this.getTriggers()) {
-      if (t.getName() != null && t.getName().equals(name)) {
-        return t;
-      }
-    }
-    return null;
+    return getByName(this.getTriggers(), name);
   }
 
   @Override
@@ -745,6 +736,10 @@ public class Environment implements IEnvironment {
       this.overlayRenderable.remove(emitter.getOverlayRenderable());
     }
 
+    if (entity instanceof Prop) {
+      this.props.remove(entity);
+    }
+
     if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
     }
@@ -893,6 +888,29 @@ public class Environment implements IEnvironment {
 
     final MapArea area = new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight());
     this.getAreas().add(area);
+  }
+
+  private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {
+    for (final T m : entities) {
+      if (m.getMapId() == mapId) {
+        return m;
+      }
+    }
+
+    return null;
+  }
+
+  private static <T extends IEntity> T getByName(Collection<T> entities, String name) {
+    if (name == null || name.isEmpty()) {
+      return null;
+    }
+
+    for (final T m : entities) {
+      if (m.getName() != null && m.getName().equals(name)) {
+        return m;
+      }
+    }
+    return null;
   }
 
   private void addAmbientLight() {

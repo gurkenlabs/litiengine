@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
@@ -74,9 +75,17 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public CollisionBox getCollisionBox(final int mapId);
 
+  public CollisionBox getCollisionBox(final String name);
+
   public Collection<StaticShadow> getStaticShadows();
 
   public Collection<ICombatEntity> getCombatEntities();
+
+  public Collection<Prop> getProps();
+
+  public Prop getProp(final int mapId);
+
+  public Prop getProp(final String name);
 
   public ICombatEntity getCombatEntity(final int mapId);
 
@@ -117,7 +126,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Spawnpoint getSpawnpoint(String name);
 
-  public List<Spawnpoint> getSpawnPoints();
+  public Collection<Spawnpoint> getSpawnPoints();
 
   public Trigger getTrigger(int mapId);
 

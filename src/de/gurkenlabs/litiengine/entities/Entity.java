@@ -218,4 +218,18 @@ public abstract class Entity implements IEntity {
   public void setAngle(final float angle) {
     this.angle = angle;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (this.getName() != null) {
+      sb.append(this.getName());
+    } else {
+      sb.append(this.getClass().getSimpleName());
+    }
+
+    sb.append(" #");
+    sb.append(this.getMapId());
+    return sb.toString();
+  }
 }

@@ -284,6 +284,27 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return mapObjects;
   }
 
+  @Override
+  public IMapObject getMapObject(int mapId) {
+    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+      return null;
+    }
+
+    for (IMapObjectLayer layer : this.getMapObjectLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      for (IMapObject mapObject : layer.getMapObjects()) {
+        if (mapObject != null && mapObject.getId() == mapId) {
+          return mapObject;
+        }
+      }
+    }
+
+    return null;
+  }
+
   public void setPath(final String path) {
     this.path = path;
     if (this.imagelayers != null && !this.imagelayers.isEmpty()) {
