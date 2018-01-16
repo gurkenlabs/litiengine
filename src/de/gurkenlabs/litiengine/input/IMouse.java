@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -21,6 +22,8 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public Point2D getLocation();
 
   public Point2D getMapLocation();
+
+  public Point getTile();
 
   public boolean isGrabMouse();
 
@@ -72,8 +75,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   public void registerMouseWheelListener(MouseWheelListener listener);
 
   /**
-   * If set to true, the mouse will be locked to the render component of the
-   * game.
+   * If set to true, the mouse will be locked to the render component of the game.
    * 
    * @param grab
    */

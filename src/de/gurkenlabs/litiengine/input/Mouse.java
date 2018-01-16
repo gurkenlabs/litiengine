@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.util.MathUtilities;
 
 /**
@@ -95,6 +96,11 @@ public class Mouse implements IMouse {
   @Override
   public Point2D getMapLocation() {
     return Game.getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getCamera().getRenderScale(), this.getLocation().getY() / Game.getCamera().getRenderScale()));
+  }
+
+  @Override
+  public Point getTile() {
+    return MapUtilities.getTile(this.getMapLocation());
   }
 
   @Override
