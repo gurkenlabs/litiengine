@@ -61,11 +61,11 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.setResizable(false);
     this.setBackground(Color.BLACK);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.addComponentListener(new ResizedEventListener());
     this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     final RenderComponent comp = new RenderComponent(Game.getConfiguration().graphics().getResolution());
     this.add(comp);
     this.renderCanvas = comp;
+    this.getRenderComponent().addComponentListener(new ResizedEventListener());
 
     this.addWindowStateListener(this);
     this.addWindowFocusListener(this);
@@ -231,10 +231,10 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   /**
    * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface,
-   * and the object created with that class is registered with a component using
-   * the component's <code>addResizedEventListener<code> method. When the
-   * resizedEvent event occurs, that object's appropriate method is invoked.
+   * interested in processing a resizedEvent event implements this interface, and
+   * the object created with that class is registered with a component using the
+   * component's <code>addResizedEventListener<code> method. When the resizedEvent
+   * event occurs, that object's appropriate method is invoked.
    *
    * @see ResizedEventEvent
    */
