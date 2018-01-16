@@ -1,5 +1,6 @@
 package de.gurkenlabs.utiliti;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -12,25 +13,34 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -44,19 +54,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MapSelectionPanel extends JSplitPane {
   JList<String> mapList;
@@ -77,8 +80,12 @@ public class MapSelectionPanel extends JSplitPane {
   DefaultMutableTreeNode nodeTriggers;
   DefaultMutableTreeNode nodeSpawnpoints;
   DefaultMutableTreeNode nodeCollisionBoxes;
+  DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
+  private JPanel panel;
+  private JTextField textField;
+  private JButton btnSearch;
 
   /**
    * Create the panel.
@@ -170,6 +177,14 @@ public class MapSelectionPanel extends JSplitPane {
           }
         });
 
+    entityNodes = new DefaultMutableTreeNode[] {
+        nodeProps,
+        nodeLights,
+        nodeTriggers,
+        nodeSpawnpoints,
+        nodeCollisionBoxes
+    };
+
     tree.setModel(entitiesTreeModel);
     tree.setCellRenderer(new CustomTreeCellRenderer());
     tree.setMaximumSize(new Dimension(0, 250));
@@ -203,6 +218,20 @@ public class MapSelectionPanel extends JSplitPane {
     });
 
     entityScrollPane.setViewportView(tree);
+
+    panel = new JPanel();
+    entityScrollPane.setColumnHeaderView(panel);
+    panel.setLayout(new BorderLayout(0, 0));
+
+    textField = new JTextField();
+    textField.addActionListener(e -> search());
+    panel.add(textField, BorderLayout.CENTER);
+    textField.setColumns(10);
+
+    btnSearch = new JButton("");
+    btnSearch.addActionListener(e -> search());
+    btnSearch.setIcon(new ImageIcon(RenderEngine.getImage("search.png")));
+    panel.add(btnSearch, BorderLayout.EAST);
     tabPane.setIconAt(0, new ImageIcon(RenderEngine.getImage("layer.png")));
     tabPane.setIconAt(1, new ImageIcon(RenderEngine.getImage("object_cube-10x10.png")));
     this.setRightComponent(tabPane);
@@ -294,50 +323,110 @@ public class MapSelectionPanel extends JSplitPane {
 
     switch (MapObjectType.get(mapObject.getType())) {
     case PROP:
-      this.select(nodeProps, mapObject.getId());
+      this.selectById(nodeProps, mapObject.getId());
       break;
     case TRIGGER:
-      this.select(nodeTriggers, mapObject.getId());
+      this.selectById(nodeTriggers, mapObject.getId());
       break;
     case LIGHTSOURCE:
-      this.select(nodeLights, mapObject.getId());
+      this.selectById(nodeLights, mapObject.getId());
       break;
     case SPAWNPOINT:
-      this.select(nodeSpawnpoints, mapObject.getId());
+      this.selectById(nodeSpawnpoints, mapObject.getId());
       break;
     case COLLISIONBOX:
-      this.select(nodeCollisionBoxes, mapObject.getId());
+      this.selectById(nodeCollisionBoxes, mapObject.getId());
       break;
     default:
       return;
     }
   }
 
-  private void select(DefaultMutableTreeNode parent, int mapId) {
+  private void search() {
+    if (this.textField.getText() == null || this.textField.getText().isEmpty()) {
+      return;
+    }
+
+    // if typed in name is an integer, try to find by id first
+    if (this.textField.getText().matches("-?\\d+")) {
+      int id = Integer.parseInt(this.textField.getText());
+      if (this.searchById(id)) {
+        return;
+      }
+    }
+
+    this.searchByName(this.textField.getText());
+  }
+
+  private boolean searchById(int id) {
+    for (DefaultMutableTreeNode node : this.entityNodes) {
+      if (this.selectById(node, id)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean searchByName(String name) {
+    for (DefaultMutableTreeNode node : this.entityNodes) {
+      if (this.selectByName(node, name)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean selectById(DefaultMutableTreeNode parent, int mapId) {
+    return this.select(parent, e -> e.getMapId() == mapId);
+  }
+
+  private boolean selectByName(DefaultMutableTreeNode parent, String name) {
+    if (name == null || name.isEmpty()) {
+      return false;
+    }
+
+    return this.select(parent, e -> e.getName() != null && (e.getName().contains(name) || e.getName().matches(name)));
+  }
+
+  private boolean select(DefaultMutableTreeNode parent, Predicate<IEntity> selectionPredicate) {
+    if (parent.getChildCount() == 0) {
+      return false;
+    }
+
     Enumeration en = parent.depthFirstEnumeration();
     while (en.hasMoreElements()) {
-
-      // Unfortunately the enumeration isn't genericised so we need to downcast
-      // when calling nextElement():
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+      if (!(node.getUserObject() instanceof IEntity)) {
+        continue;
+      }
+
       IEntity ent = (IEntity) node.getUserObject();
-      if (ent.getMapId() == mapId) {
-        this.tree.setSelectionPath(new TreePath(node.getPath()));
+      if (selectionPredicate.test(ent)) {
+        final TreePath newSelection = new TreePath(node.getPath());
+        if (this.tree.getSelectionPath() != null && this.tree.getSelectionPath().equals(newSelection)) {
+          continue;
+        }
+
+        this.tree.setSelectionPath(newSelection);
         TreePath path = this.tree.getSelectionPath();
         if (path == null || !this.tree.isVisible()) {
-          return;
+          return false;
         }
 
         Rectangle bounds = this.tree.getPathBounds(path);
         if (bounds == null) {
-          return;
+          return false;
         }
         // set the height to the visible height to force the node to top 
         bounds.height = this.tree.getVisibleRect().height;
         this.tree.scrollRectToVisible(bounds);
-        return;
+        return true;
       }
     }
+
+    return false;
   }
 
   private static void addPopup(Component component, final JPopupMenu popup) {
