@@ -19,6 +19,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private int mainSplitter;
   private int selectionEditSplitter;
   private int mapPanelSplitter;
+  private int bottomSplitter;
   private int width;
   private int height;
 
@@ -178,5 +179,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setMapPanelSplitter(int mapPanelSplitter) {
     this.mapPanelSplitter = mapPanelSplitter;
+  }
+
+  public int getBottomSplitter() {
+    return bottomSplitter;
+  }
+
+  public void setBottomSplitter(int bottomSplitter) {
+    this.bottomSplitter = bottomSplitter;
   }
 }

@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Font;
@@ -38,9 +39,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -93,22 +97,7 @@ public class Program {
     Game.getInfo().setSubTitle("litiengine creation kit");
     Game.getInfo().setVersion("v0.4.8-alpha");
 
-    // add system tray icon with popup menu
-    if (SystemTray.isSupported()) {
-      SystemTray tray = SystemTray.getSystemTray();
-      PopupMenu menu = new PopupMenu();
-      MenuItem exitItem = new MenuItem(Resources.get("menu_exit"));
-      exitItem.addActionListener(a -> Game.terminate());
-      menu.add(exitItem);
-
-      trayIcon = new TrayIcon(RenderEngine.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
-      trayIcon.setImageAutoSize(true);
-      try {
-        tray.add(trayIcon);
-      } catch (AWTException e) {
-        log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-      }
-    }
+    initSystemTray();
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init();
@@ -128,7 +117,7 @@ public class Program {
     Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
-    setupMenu();
+    setupInterface();
     Game.start();
     Input.mouse().setGrabMouse(false);
     Input.keyboard().consumeAlt(true);
@@ -152,6 +141,21 @@ public class Program {
         recentFiles.add(fileButton);
       }
     }
+  }
+
+  private static boolean exit() {
+    String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
+    int n = JOptionPane.showConfirmDialog(
+        null,
+        Resources.get("hud_saveProjectMessage") + "\n" + resourceFile,
+        Resources.get("hud_saveProject"),
+        JOptionPane.YES_NO_CANCEL_OPTION);
+
+    if (n == JOptionPane.YES_OPTION) {
+      EditorScreen.instance().save(false);
+    }
+
+    return n != JOptionPane.CANCEL_OPTION;
   }
 
   private static void handleArgs(String[] args) {
@@ -182,7 +186,7 @@ public class Program {
     }
   }
 
-  private static void setupMenu() {
+  private static void setupInterface() {
     MenuBar menuBar = new MenuBar();
     JFrame window = ((JFrame) Game.getScreenManager());
     Game.onTerminating(s -> exit());
@@ -219,7 +223,25 @@ public class Program {
       mapWrap.setDividerLocation(userPreferences.getSelectionEditSplitter());
     }
 
-    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, renderPane, mapWrap);
+    JPanel bottomPanel = new JPanel(new BorderLayout());
+    JTabbedPane bottomTab = new JTabbedPane();
+
+    bottomTab.addTab("Console", initConsole());
+    bottomTab.setIconAt(0, new ImageIcon(RenderEngine.getImage("console.png")));
+
+    bottomPanel.add(bottomTab, BorderLayout.CENTER);
+
+    JSplitPane rendersplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPane, bottomPanel);
+    if (userPreferences.getBottomSplitter() != 0) {
+      rendersplit.setDividerLocation(userPreferences.getBottomSplitter());
+    } else {
+      rendersplit.setDividerLocation((int) (window.getSize().height * 0.75));
+    }
+
+    rendersplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setBottomSplitter(rendersplit.getDividerLocation()));
+    rendersplit.setContinuousLayout(true);
+
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rendersplit, mapWrap);
     split.setContinuousLayout(true);
     split.addComponentListener(new ComponentAdapter() {
       @Override
@@ -233,7 +255,210 @@ public class Program {
 
     contentPane.add(split, BorderLayout.CENTER);
     split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
-    // create basic icon menu
+
+    JToolBar toolbar = initToolBar();
+    contentPane.add(toolbar, BorderLayout.NORTH);
+
+    EditorScreen.instance().setMapEditorPanel(mapEditorPanel);
+    EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
+
+    Menu mnFile = initFileMenu();
+    menuBar.add(mnFile);
+
+    Menu mnView = initViewMenu();
+    menuBar.add(mnView);
+
+    Menu mnProject = initProjectMenu();
+    menuBar.add(mnProject);
+
+    Menu mnMap = initMapMenu();
+    menuBar.add(mnMap);
+  }
+
+  private static Menu initFileMenu() {
+    Menu mnFile = new Menu(Resources.get("menu_file"));
+
+    MenuItem create = new MenuItem(Resources.get("menu_createProject"));
+    create.setShortcut(new MenuShortcut(KeyEvent.VK_N));
+    create.addActionListener(a -> EditorScreen.instance().create());
+
+    MenuItem load = new MenuItem(Resources.get("menu_loadProject"));
+    load.setShortcut(new MenuShortcut(KeyEvent.VK_O));
+    load.addActionListener(a -> EditorScreen.instance().load());
+
+    MenuItem save = new MenuItem(Resources.get("menu_save"));
+    save.setShortcut(new MenuShortcut(KeyEvent.VK_S));
+    save.addActionListener(a -> EditorScreen.instance().save(false));
+
+    MenuItem saveAs = new MenuItem(Resources.get("menu_saveAs"));
+    saveAs.addActionListener(a -> EditorScreen.instance().save(true));
+
+    MenuItem exit = new MenuItem(Resources.get("menu_exit"));
+    exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
+    exit.addActionListener(a -> Game.terminate());
+
+    mnFile.add(load);
+    mnFile.add(create);
+    mnFile.add(save);
+    mnFile.add(saveAs);
+    mnFile.addSeparator();
+    recentFiles = new Menu(Resources.get("menu_recentFiles"));
+    loadRecentFiles();
+    mnFile.add(recentFiles);
+    mnFile.addSeparator();
+    mnFile.add(exit);
+    return mnFile;
+  }
+
+  private static Menu initViewMenu() {
+    Menu mnView = new Menu(Resources.get("menu_view"));
+
+    CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
+    snapToGrid.setState(userPreferences.isSnapGrid());
+    EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
+    snapToGrid.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
+      userPreferences.setSnapGrid(snapToGrid.getState());
+    });
+
+    CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
+    renderGrid.setState(userPreferences.isShowGrid());
+    EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
+    renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
+    renderGrid.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
+      userPreferences.setShowGrid(renderGrid.getState());
+    });
+
+    CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
+    renderCollision.setState(userPreferences.isRenderBoundingBoxes());
+    EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
+    renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
+    renderCollision.addItemListener(e -> {
+      EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
+      userPreferences.setRenderBoundingBoxes(renderCollision.getState());
+    });
+
+    MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
+    setGrid.addActionListener(a -> {
+      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridSize());
+      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
+      if (option == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize());
+      }
+    });
+
+    MenuItem zoomIn = new MenuItem(Resources.get("menu_zoomIn"));
+    zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
+    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
+
+    MenuItem zoomOut = new MenuItem(Resources.get("menu_zoomOut"));
+    zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
+    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
+
+    mnView.add(snapToGrid);
+    mnView.add(renderGrid);
+    mnView.add(renderCollision);
+    mnView.add(setGrid);
+    mnView.addSeparator();
+    mnView.add(zoomIn);
+    mnView.add(zoomOut);
+
+    return mnView;
+  }
+
+  private static Menu initProjectMenu() {
+    Menu mnProject = new Menu(Resources.get("menu_project"));
+    MenuItem properties = new MenuItem(Resources.get("menu_properties"));
+    properties.addActionListener(a -> EditorScreen.instance().setProjectSettings());
+
+    CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
+    compress.setState(userPreferences.isCompressFile());
+    compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
+
+    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
+    sync.setState(userPreferences.isSyncMaps());
+    sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
+
+    mnProject.add(properties);
+    mnProject.add(compress);
+    mnProject.add(sync);
+
+    return mnProject;
+  }
+
+  private static Menu initMapMenu() {
+    Menu mnMap = new Menu(Resources.get("menu_map"));
+
+    MenuItem imp = new MenuItem(Resources.get("menu_import"));
+    imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
+
+    MenuItem exp = new MenuItem(Resources.get("menu_export"));
+    exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+
+    MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
+    del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
+
+    MenuItem mapProps = new MenuItem(Resources.get("menu_properties"));
+    mapProps.setShortcut(new MenuShortcut(KeyEvent.VK_M));
+    mapProps.addActionListener(a -> {
+      if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+        return;
+      }
+
+      MapPropertyPanel panel = new MapPropertyPanel();
+      panel.bind(Game.getEnvironment().getMap());
+
+      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
+      if (option == JOptionPane.OK_OPTION) {
+        panel.saveChanges();
+
+        final String colorProp = Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
+        try {
+          if (Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA) != null) {
+            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA));
+            Game.getEnvironment().getAmbientLight().setAlpha(alpha);
+          }
+
+          if (colorProp != null && !colorProp.isEmpty()) {
+            Color ambientColor = Color.decode(colorProp);
+            Game.getEnvironment().getAmbientLight().setColor(ambientColor);
+          }
+        } catch (final NumberFormatException nfe) {
+          log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
+        }
+
+        EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
+        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
+        EditorScreen.instance().mapChanged();
+      }
+    });
+
+    mnMap.add(imp);
+    mnMap.add(exp);
+    mnMap.add(del2);
+    mnMap.addSeparator();
+    mnMap.add(mapProps);
+
+    return mnMap;
+  }
+
+  private static Component initConsole() {
+    Logger root = Logger.getLogger("");
+    JTextPane consoleTextArea = new JTextPane();
+    JScrollPane consoleScrollPane = new JScrollPane();
+    consoleScrollPane.setViewportBorder(null);
+    consoleScrollPane.setViewportView(consoleTextArea);
+
+    consoleTextArea.setEditable(false);
+    consoleTextArea.setBackground(Color.DARK_GRAY);
+    consoleTextArea.setAutoscrolls(true);
+    root.addHandler(new ConsoleLogHandler(consoleTextArea));
+    return consoleScrollPane;
+  }
+
+  private static JToolBar initToolBar() {
+    // create basic icon toolbar
     JToolBar basicMenu = new JToolBar();
 
     JButton cr = new JButton();
@@ -453,10 +678,6 @@ public class Program {
       Game.getEnvironment().getAmbientLight().setColor(result);
     });
 
-    contentPane.add(basicMenu, BorderLayout.NORTH);
-
-    EditorScreen.instance().setMapEditorPanel(mapEditorPanel);
-    EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
     EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
       isChanging = true;
       colorButton.setEnabled(map != null);
@@ -470,180 +691,25 @@ public class Program {
       isChanging = false;
     });
 
-    // init file menu
-    Menu mnFile = new Menu(Resources.get("menu_file"));
-    menuBar.add(mnFile);
-
-    MenuItem create = new MenuItem(Resources.get("menu_createProject"));
-    create.setShortcut(new MenuShortcut(KeyEvent.VK_N));
-    create.addActionListener(a -> EditorScreen.instance().create());
-
-    MenuItem load = new MenuItem(Resources.get("menu_loadProject"));
-    load.setShortcut(new MenuShortcut(KeyEvent.VK_O));
-    load.addActionListener(a -> EditorScreen.instance().load());
-
-    MenuItem save = new MenuItem(Resources.get("menu_save"));
-    save.setShortcut(new MenuShortcut(KeyEvent.VK_S));
-    save.addActionListener(a -> EditorScreen.instance().save(false));
-
-    MenuItem saveAs = new MenuItem(Resources.get("menu_saveAs"));
-    saveAs.addActionListener(a -> EditorScreen.instance().save(true));
-
-    MenuItem exit = new MenuItem(Resources.get("menu_exit"));
-    exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
-    exit.addActionListener(a -> Game.terminate());
-
-    mnFile.add(load);
-    mnFile.add(create);
-    mnFile.add(save);
-    mnFile.add(saveAs);
-    mnFile.addSeparator();
-    recentFiles = new Menu(Resources.get("menu_recentFiles"));
-    loadRecentFiles();
-    mnFile.add(recentFiles);
-    mnFile.addSeparator();
-    mnFile.add(exit);
-
-    // init view menu
-    Menu mnView = new Menu(Resources.get("menu_view"));
-    menuBar.add(mnView);
-
-    CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
-    snapToGrid.setState(userPreferences.isSnapGrid());
-    EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
-    snapToGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
-      userPreferences.setSnapGrid(snapToGrid.getState());
-    });
-
-    CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
-    renderGrid.setState(userPreferences.isShowGrid());
-    EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
-    renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
-    renderGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
-      userPreferences.setShowGrid(renderGrid.getState());
-    });
-
-    CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
-    renderCollision.setState(userPreferences.isRenderBoundingBoxes());
-    EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
-    renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
-    renderCollision.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
-      userPreferences.setRenderBoundingBoxes(renderCollision.getState());
-    });
-
-    MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
-    setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridSize());
-      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
-      if (option == JOptionPane.OK_OPTION) {
-        EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize());
-      }
-    });
-
-    MenuItem zoomIn = new MenuItem(Resources.get("menu_zoomIn"));
-    zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
-    zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
-
-    MenuItem zoomOut = new MenuItem(Resources.get("menu_zoomOut"));
-    zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
-    zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
-
-    mnView.add(snapToGrid);
-    mnView.add(renderGrid);
-    mnView.add(renderCollision);
-    mnView.add(setGrid);
-    mnView.addSeparator();
-    mnView.add(zoomIn);
-    mnView.add(zoomOut);
-
-    // init project menu
-    Menu mnProject = new Menu(Resources.get("menu_project"));
-    menuBar.add(mnProject);
-
-    MenuItem properties = new MenuItem(Resources.get("menu_properties"));
-    properties.addActionListener(a -> EditorScreen.instance().setProjectSettings());
-
-    CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
-    compress.setState(userPreferences.isCompressFile());
-    compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
-
-    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
-    sync.setState(userPreferences.isSyncMaps());
-    sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
-
-    mnProject.add(properties);
-    mnProject.add(compress);
-    mnProject.add(sync);
-    // init map menu
-    Menu mnMap = new Menu(Resources.get("menu_map"));
-    menuBar.add(mnMap);
-
-    MenuItem imp = new MenuItem(Resources.get("menu_import"));
-    imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
-
-    MenuItem exp = new MenuItem(Resources.get("menu_export"));
-    exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
-
-    MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
-    del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
-
-    MenuItem mapProps = new MenuItem(Resources.get("menu_properties"));
-    mapProps.setShortcut(new MenuShortcut(KeyEvent.VK_M));
-    mapProps.addActionListener(a -> {
-      if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
-        return;
-      }
-
-      MapPropertyPanel panel = new MapPropertyPanel();
-      panel.bind(Game.getEnvironment().getMap());
-
-      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
-      if (option == JOptionPane.OK_OPTION) {
-        panel.saveChanges();
-
-        final String colorProp = Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
-        try {
-          if (Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA) != null) {
-            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA));
-            Game.getEnvironment().getAmbientLight().setAlpha(alpha);
-          }
-
-          if (colorProp != null && !colorProp.isEmpty()) {
-            Color ambientColor = Color.decode(colorProp);
-            Game.getEnvironment().getAmbientLight().setColor(ambientColor);
-          }
-        } catch (final NumberFormatException nfe) {
-          log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
-        }
-
-        EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
-        EditorScreen.instance().mapChanged();
-      }
-    });
-
-    mnMap.add(imp);
-    mnMap.add(exp);
-    mnMap.add(del2);
-    mnMap.addSeparator();
-    mnMap.add(mapProps);
+    return basicMenu;
   }
 
-  private static boolean exit() {
-    String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
-    int n = JOptionPane.showConfirmDialog(
-        null,
-        Resources.get("hud_saveProjectMessage") + "\n" + resourceFile,
-        Resources.get("hud_saveProject"),
-        JOptionPane.YES_NO_CANCEL_OPTION);
+  private static void initSystemTray() {
+    // add system tray icon with popup menu
+    if (SystemTray.isSupported()) {
+      SystemTray tray = SystemTray.getSystemTray();
+      PopupMenu menu = new PopupMenu();
+      MenuItem exitItem = new MenuItem(Resources.get("menu_exit"));
+      exitItem.addActionListener(a -> Game.terminate());
+      menu.add(exitItem);
 
-    if (n == JOptionPane.YES_OPTION) {
-      EditorScreen.instance().save(false);
+      trayIcon = new TrayIcon(RenderEngine.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
+      trayIcon.setImageAutoSize(true);
+      try {
+        tray.add(trayIcon);
+      } catch (AWTException e) {
+        log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+      }
     }
-
-    return n != JOptionPane.CANCEL_OPTION;
   }
 }

@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.BorderUIResource.TitledBorderUIResource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,6 +34,7 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -146,10 +149,13 @@ public class EditorScreen extends Screen {
     super.render(g);
 
     // render mouse/zoom and fps
-    g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD));
+
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
-    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10, Game.getScreenManager().getResolution().getHeight() - 40);
+    Point tile = Input.mouse().getTile();
+    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY()
+        + " tile: [" + tile.x + ", " + tile.y + "]"
+        + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10, Game.getScreenManager().getResolution().getHeight() - 40);
     RenderEngine.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
 
     // render status
