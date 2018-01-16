@@ -34,4 +34,17 @@ public class ArrayUtilitiesTests {
     Assert.assertArrayEquals(new int[] {}, nullString);
     Assert.assertArrayEquals(new int[] {}, emptyString);
   }
+
+  @Test
+  public void testCommaSeparatedStringFromIntegerArray() {
+    int[] intsArr = new int[] { 100, 200, 300, 1, 2, 3 };
+
+    String testStringWithInts = ArrayUtilities.getCommaSeparatedString(intsArr);
+    String testNull = ArrayUtilities.getCommaSeparatedString(null);
+    String testEmpty = ArrayUtilities.getCommaSeparatedString(new int[] {});
+
+    Assert.assertEquals("100,200,300,1,2,3", testStringWithInts);
+    Assert.assertNull(testNull);
+    Assert.assertEquals("", testEmpty);
+  }
 }

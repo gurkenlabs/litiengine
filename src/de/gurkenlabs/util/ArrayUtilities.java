@@ -46,6 +46,22 @@ public final class ArrayUtilities {
     return integers;
   }
 
+  public static String getCommaSeparatedString(int[] arr) {
+    if (arr == null) {
+      return null;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < arr.length; i++) {
+      sb.append(arr[i]);
+      if (i < arr.length - 1) {
+        sb.append(',');
+      }
+    }
+
+    return sb.toString();
+  }
+
   public static <T> T getRandom(T[] arr) {
     if (arr.length == 0) {
       return null;

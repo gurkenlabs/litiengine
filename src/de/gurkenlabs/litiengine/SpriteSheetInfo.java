@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
@@ -24,8 +25,14 @@ public class SpriteSheetInfo implements Serializable {
   @XmlAttribute(name = "name")
   private String name;
 
-  @XmlElement
+  @XmlAttribute(name = "path", required = false)
+  private String path;
+
+  @XmlElement(required = false)
   private String image;
+
+  @XmlElement(required = false)
+  private String keyframes;
 
   public SpriteSheetInfo() {
   }
@@ -35,6 +42,7 @@ public class SpriteSheetInfo implements Serializable {
     this.setHeight(sprite.getSpriteHeight());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage()));
     this.setName(sprite.getName());
+    this.setKeyframes(Spritesheet.getCustomKeyFrameDurations(sprite));
   }
 
   public SpriteSheetInfo(final String basepath, final String path, final int width, final int height) {
@@ -42,6 +50,13 @@ public class SpriteSheetInfo implements Serializable {
     this.setHeight(height);
     this.setName(FileUtilities.getFileName(path));
     this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + path)));
+  }
+
+  public SpriteSheetInfo(final String path, final int width, final int height) {
+    this.setWidth(width);
+    this.setHeight(height);
+    this.setName(FileUtilities.getFileName(path));
+    this.setPath(path);
   }
 
   @XmlTransient
@@ -60,8 +75,22 @@ public class SpriteSheetInfo implements Serializable {
   }
 
   @XmlTransient
+  public String getPath() {
+    return this.path;
+  }
+
+  @XmlTransient
   public int getWidth() {
     return this.width;
+  }
+
+  @XmlTransient
+  public int[] getKeyframes() {
+    if (this.keyframes == null || this.keyframes.isEmpty()) {
+      return new int[0];
+    }
+
+    return ArrayUtilities.getIntegerArray(this.keyframes);
   }
 
   public void setHeight(final int h) {
@@ -80,4 +109,11 @@ public class SpriteSheetInfo implements Serializable {
     this.width = w;
   }
 
+  public void setPath(final String path) {
+    this.path = path;
+  }
+
+  public void setKeyframes(int[] keyframes) {
+    this.keyframes = ArrayUtilities.getCommaSeparatedString(keyframes);
+  }
 }
