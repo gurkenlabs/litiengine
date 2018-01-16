@@ -92,7 +92,6 @@ public class Program {
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("litiengine creation kit");
     Game.getInfo().setVersion("v0.4.8-alpha");
-    Game.getInfo().setDefaultRenderScale(1.0f);
 
     // add system tray icon with popup menu
     if (SystemTray.isSupported()) {
@@ -113,6 +112,7 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init();
+    Game.getInfo().setDefaultRenderScale(1.0f);
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
