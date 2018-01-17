@@ -144,18 +144,18 @@ public class AmbientLight {
     // cut the light area where shadow Boxes are (this simulates light falling
     // into and out of rooms)
     for (final StaticShadow col : this.environment.getStaticShadows()) {
-      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBounds2D())) {
+      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
         continue;
       }
-      final Area boxInLight = new Area(col.getBounds2D());
+      final Area boxInLight = new Area(col.getBoundingBox());
       boxInLight.intersect(lightArea);
 
-      final Line2D[] bounds = GeometricUtilities.getLines(col.getBounds2D());
+      final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
       for (final Line2D line : bounds) {
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
         final Vector2D lightVector = new Vector2D(lightCenter, line.getP1());
 
-        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBounds2D().contains(light.getDimensionCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
+        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBoundingBox().contains(light.getDimensionCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
 
@@ -171,7 +171,7 @@ public class AmbientLight {
         shadowParallelogram.closePath();
 
         final Area shadowArea = new Area(shadowParallelogram);
-        if (light.getDimensionCenter().getY() < col.getBounds2D().getMaxY() && !col.getBounds2D().contains(light.getDimensionCenter())) {
+        if (light.getDimensionCenter().getY() < col.getBoundingBox().getMaxY() && !col.getBoundingBox().contains(light.getDimensionCenter())) {
           shadowArea.add(boxInLight);
         }
         shadowArea.intersect(lightArea);

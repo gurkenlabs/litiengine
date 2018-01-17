@@ -69,7 +69,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public MapArea getArea(String name);
 
-  public List<MapArea> getAreas();
+  public Collection<MapArea> getAreas();
 
   public Collection<CollisionBox> getCollisionBoxes();
 
@@ -78,6 +78,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public CollisionBox getCollisionBox(final String name);
 
   public Collection<StaticShadow> getStaticShadows();
+
+  public StaticShadow getStaticShadow(int mapId);
+
+  public StaticShadow getStaticShadow(String name);
 
   public Collection<ICombatEntity> getCombatEntities();
 

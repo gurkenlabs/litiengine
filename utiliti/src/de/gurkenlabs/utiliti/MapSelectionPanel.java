@@ -51,8 +51,10 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -80,6 +82,8 @@ public class MapSelectionPanel extends JSplitPane {
   DefaultMutableTreeNode nodeTriggers;
   DefaultMutableTreeNode nodeSpawnpoints;
   DefaultMutableTreeNode nodeCollisionBoxes;
+  DefaultMutableTreeNode nodeMapAreas;
+  DefaultMutableTreeNode nodeStaticShadows;
   DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
@@ -174,6 +178,10 @@ public class MapSelectionPanel extends JSplitPane {
             add(nodeSpawnpoints);
             nodeCollisionBoxes = new DefaultMutableTreeNode(Resources.get("panel_mapselection_collboxes"));
             add(nodeCollisionBoxes);
+            nodeMapAreas = new DefaultMutableTreeNode(Resources.get("panel_mapselection_areas"));
+            add(nodeMapAreas);
+            nodeStaticShadows = new DefaultMutableTreeNode(Resources.get("panel_mapselection_shadow"));
+            add(nodeStaticShadows);
           }
         });
 
@@ -182,7 +190,9 @@ public class MapSelectionPanel extends JSplitPane {
         nodeLights,
         nodeTriggers,
         nodeSpawnpoints,
-        nodeCollisionBoxes
+        nodeCollisionBoxes,
+        nodeMapAreas,
+        nodeStaticShadows,
     };
 
     tree.setModel(entitiesTreeModel);
@@ -337,6 +347,12 @@ public class MapSelectionPanel extends JSplitPane {
     case COLLISIONBOX:
       this.selectById(nodeCollisionBoxes, mapObject.getId());
       break;
+    case AREA:
+      this.selectById(nodeMapAreas, mapObject.getId());
+      break;
+    case STATICSHADOW:
+      this.selectById(nodeStaticShadows, mapObject.getId());
+      break;
     default:
       return;
     }
@@ -453,17 +469,17 @@ public class MapSelectionPanel extends JSplitPane {
 
   private void populateMapObjectTree() {
     this.nodeRoot.setUserObject(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"));
-    this.nodeLights.removeAllChildren();
-    this.nodeProps.removeAllChildren();
-    this.nodeTriggers.removeAllChildren();
-    this.nodeSpawnpoints.removeAllChildren();
-    this.nodeCollisionBoxes.removeAllChildren();
+    for (DefaultMutableTreeNode node : this.entityNodes) {
+      node.removeAllChildren();
+    }
 
     this.nodeLights.setUserObject(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"));
     this.nodeProps.setUserObject(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"));
     this.nodeTriggers.setUserObject(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"));
     this.nodeSpawnpoints.setUserObject(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"));
     this.nodeCollisionBoxes.setUserObject(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"));
+    this.nodeMapAreas.setUserObject(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"));
+    this.nodeStaticShadows.setUserObject(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"));
 
     for (LightSource light : Game.getEnvironment().getLightSources()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(light);
@@ -490,6 +506,16 @@ public class MapSelectionPanel extends JSplitPane {
       this.nodeCollisionBoxes.add(node);
     }
 
+    for (MapArea area : Game.getEnvironment().getAreas()) {
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(area);
+      this.nodeMapAreas.add(node);
+    }
+
+    for (StaticShadow shadow : Game.getEnvironment().getStaticShadows()) {
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(shadow);
+      this.nodeStaticShadows.add(node);
+    }
+
     entitiesTreeModel.reload();
   }
 
@@ -500,6 +526,8 @@ public class MapSelectionPanel extends JSplitPane {
     private final Icon TRIGGER_ICON = new ImageIcon(RenderEngine.getImage("trigger.png"));
     private final Icon SPAWMPOINT_ICON = new ImageIcon(RenderEngine.getImage("spawnpoint.png"));
     private final Icon COLLISIONBOX_ICON = new ImageIcon(RenderEngine.getImage("collisionbox.png"));
+    private final Icon MAPAREA_ICON = new ImageIcon(RenderEngine.getImage("maparea.png"));
+    private final Icon SHADOWBOX_ICON = new ImageIcon(RenderEngine.getImage("shadowbox.png"));
     private final Icon DEFAULT_ICON = new ImageIcon(RenderEngine.getImage("bullet.png"));
 
     private final JLabel label = new JLabel();
@@ -520,6 +548,10 @@ public class MapSelectionPanel extends JSplitPane {
         label.setIcon(SPAWMPOINT_ICON);
       } else if (value.equals(nodeCollisionBoxes)) {
         label.setIcon(COLLISIONBOX_ICON);
+      } else if (value.equals(nodeMapAreas)) {
+        label.setIcon(MAPAREA_ICON);
+      } else if (value.equals(nodeStaticShadows)) {
+        label.setIcon(SHADOWBOX_ICON);
       } else if (value instanceof DefaultMutableTreeNode) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
         if (node.getUserObject() instanceof Prop) {

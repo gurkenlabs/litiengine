@@ -38,7 +38,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
@@ -85,7 +84,7 @@ public class Environment implements IEnvironment {
   private final Collection<Trigger> triggers;
   private final Collection<Prop> props;
 
-  private final List<MapArea> mapAreas;
+  private final Collection<MapArea> mapAreas;
 
   private final Map<Integer, IMovableEntity> movableEntities;
   private final List<IRenderable> overlayRenderable;
@@ -136,6 +135,7 @@ public class Environment implements IEnvironment {
   private Environment() {
     this.entitiesByTag = new ConcurrentHashMap<>();
     this.entities = new ConcurrentHashMap<>();
+    this.entities.put(RenderType.NONE, new ConcurrentHashMap<>());
     this.entities.put(RenderType.GROUND, new ConcurrentHashMap<>());
     this.entities.put(RenderType.NORMAL, new ConcurrentHashMap<>());
     this.entities.put(RenderType.OVERLAY, new ConcurrentHashMap<>());
@@ -209,6 +209,12 @@ public class Environment implements IEnvironment {
       this.spawnPoints.add((Spawnpoint) entity);
     }
 
+    if (entity instanceof StaticShadow) {
+      this.staticShadows.add((StaticShadow) entity);
+    } else if (entity instanceof MapArea) {
+      this.mapAreas.add((MapArea) entity);
+    }
+
     for (String tag : entity.getTags()) {
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).add(entity);
@@ -260,6 +266,7 @@ public class Environment implements IEnvironment {
     this.getAreas().clear();
     this.getTriggers().clear();
 
+    this.entities.get(RenderType.NONE).clear();
     this.entities.get(RenderType.GROUND).clear();
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
@@ -345,6 +352,11 @@ public class Environment implements IEnvironment {
       return entity;
     }
 
+    entity = this.entities.get(RenderType.NONE).get(mapId);
+    if (entity != null) {
+      return entity;
+    }
+
     return null;
   }
 
@@ -367,6 +379,12 @@ public class Environment implements IEnvironment {
     }
 
     for (final IEntity entity : this.entities.get(RenderType.OVERLAY).values()) {
+      if (entity.getName() != null && entity.getName().equals(name)) {
+        return entity;
+      }
+    }
+
+    for (final IEntity entity : this.entities.get(RenderType.NONE).values()) {
       if (entity.getName() != null && entity.getName().equals(name)) {
         return entity;
       }
@@ -415,7 +433,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<MapArea> getAreas() {
+  public Collection<MapArea> getAreas() {
     return this.mapAreas;
   }
 
@@ -451,6 +469,7 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<IEntity> getEntities() {
     final ArrayList<IEntity> ent = new ArrayList<>();
+    ent.addAll(this.entities.get(RenderType.NONE).values());
     ent.addAll(this.entities.get(RenderType.GROUND).values());
     ent.addAll(this.entities.get(RenderType.NORMAL).values());
     ent.addAll(this.entities.get(RenderType.OVERLAY).values());
@@ -569,12 +588,14 @@ public class Environment implements IEnvironment {
     return this.staticShadows;
   }
 
-  public StaticShadow getStaticShadow(int mapID) {
-    StaticShadow shadow = null;
-    for (StaticShadow sh : this.getStaticShadows()) {
-      shadow = (sh.getMapId() == mapID) ? sh : null;
-    }
-    return shadow;
+  @Override
+  public StaticShadow getStaticShadow(int mapId) {
+    return getById(this.getStaticShadows(), mapId);
+  }
+
+  @Override
+  public StaticShadow getStaticShadow(String name) {
+    return getByName(this.getStaticShadows(), name);
   }
 
   @Override
@@ -864,30 +885,6 @@ public class Environment implements IEnvironment {
         return;
       }
     }
-
-    this.addStaticShadow(mapObject);
-    this.addMapArea(mapObject);
-  }
-
-  protected void addStaticShadow(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.STATICSHADOW) {
-      return;
-    }
-    double x = mapObject.getX();
-    double y = mapObject.getY();
-    double width = mapObject.getDimension().getWidth();
-    double height = mapObject.getDimension().getHeight();
-    final StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), x, y, width, height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE)));
-    this.getStaticShadows().add(shadow);
-  }
-
-  protected void addMapArea(final IMapObject mapObject) {
-    if (MapObjectType.get(mapObject.getType()) != MapObjectType.AREA) {
-      return;
-    }
-
-    final MapArea area = new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight());
-    this.getAreas().add(area);
   }
 
   private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {
@@ -940,8 +937,8 @@ public class Environment implements IEnvironment {
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
     for (final StaticShadow col : this.getStaticShadows()) {
-      final double shadowX = col.getX();
-      final double shadowY = col.getY();
+      final double shadowX = col.getLocation().getX();
+      final double shadowY = col.getLocation().getY();
       final double shadowWidth = col.getWidth();
       final double shadowHeight = col.getHeight();
 
@@ -1154,6 +1151,8 @@ public class Environment implements IEnvironment {
     registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
     registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
     registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.AREA, new MapAreaMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.STATICSHADOW, new StaticShadowMapObjectLoader());
   }
 
   /**

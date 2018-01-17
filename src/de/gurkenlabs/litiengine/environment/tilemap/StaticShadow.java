@@ -19,7 +19,7 @@ public class StaticShadow extends MapArea {
 
   private StaticShadowType shadowType;
 
-  public StaticShadow(int id, String name, double x, double y, double width, double height, StaticShadowType shadowType) {
+  public StaticShadow(int id, String name, double x, double y, float width, float height, StaticShadowType shadowType) {
     super(id, name, x, y, width, height);
     this.setShadowType(shadowType);
   }
