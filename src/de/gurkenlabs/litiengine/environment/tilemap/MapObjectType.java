@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 public enum MapObjectType {
-  AREA, COLLISIONBOX, CUSTOM, DECORMOB, EMITTER, LANE, LIGHTSOURCE, PROP, SPAWNPOINT, TRIGGER, STATICSHADOW;
+  AREA, COLLISIONBOX, CUSTOM, DECORMOB, EMITTER, PATH, LIGHTSOURCE, PROP, SPAWNPOINT, TRIGGER, STATICSHADOW;
 
   public static MapObjectType fromOrdinal(final int n) {
     return values()[n];

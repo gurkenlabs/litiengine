@@ -223,7 +223,7 @@ public class MapComponent extends EditorComponent {
             RenderEngine.fillShape(g, mapObject.getBoundingBox());
             g.setColor(COLOR_SHADOW_BORDER);
             RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
-          } else if (type == MapObjectType.LANE) {
+          } else if (type == MapObjectType.PATH) {
             // render lane
 
             if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().size() == 0) {
@@ -558,7 +558,7 @@ public class MapComponent extends EditorComponent {
             }
 
             MapObjectType type = MapObjectType.get(mapObject.getType());
-            if (type == MapObjectType.LANE) {
+            if (type == MapObjectType.PATH) {
               continue;
             }
 
@@ -685,7 +685,7 @@ public class MapComponent extends EditorComponent {
                 continue;
               }
               MapObjectType type = MapObjectType.get(mapObject.getType());
-              if (type == MapObjectType.LANE) {
+              if (type == MapObjectType.PATH) {
                 continue;
               }
 
