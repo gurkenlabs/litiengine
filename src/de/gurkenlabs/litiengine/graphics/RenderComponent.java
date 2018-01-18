@@ -15,21 +15,18 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.util.io.ImageSerializer;
 
 public class RenderComponent extends Canvas implements IRenderComponent {
   private static final Logger log = Logger.getLogger(RenderComponent.class.getName());
@@ -258,17 +255,13 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   private void saveScreenShot(final BufferedImage img) {
     try {
-      try {
-        final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-        final File folder = new File("./screenshots/");
-        if (!folder.exists()) {
-          folder.mkdirs();
-        }
-
-        ImageIO.write(img, "png", new File("./screenshots/" + timeStamp + ".png"));
-      } catch (final IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
+      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+      final File folder = new File("./screenshots/");
+      if (!folder.exists()) {
+        folder.mkdirs();
       }
+
+      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
     } finally {
       this.takeScreenShot = false;
     }

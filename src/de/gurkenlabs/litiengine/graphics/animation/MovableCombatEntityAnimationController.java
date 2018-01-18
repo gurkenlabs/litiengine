@@ -19,11 +19,12 @@ import de.gurkenlabs.util.ImageProcessing;
  * The spritesheet images need to be named according to the following
  * conventions in order to be automatically used by this controller:
  * <ul>
- * <li>{entity-name}-idle-{DIRECTION}.png</li>
- * <li>{entity-name}-walk-{DIRECTION}.png</li>
+ * <li>{entity-name}-idle-{DIRECTION}.{EXTENSION}</li>
+ * <li>{entity-name}-walk-{DIRECTION}.{EXTENSION}</li>
  * </ul>
  * Where {DIRECTION} refers to a value of the {@link Direction} enum and
- * {entity-name} refers to the name of the entity.
+ * {entity-name} refers to the name of the entity. {EXTENSION} refers to a value
+ * of the {@link de.gurkenlabs.litiengine.graphics.ImageFormat} enum.
  * 
  * @see de.gurkenlabs.litiengine.entities.IMovableCombatEntity
  * @see de.gurkenlabs.litiengine.entities.Direction

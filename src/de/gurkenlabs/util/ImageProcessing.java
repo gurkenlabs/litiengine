@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
@@ -239,14 +240,19 @@ public class ImageProcessing {
   }
 
   public static String encodeToString(final BufferedImage image) {
+    return encodeToString(image, ImageFormat.PNG);
+  }
+
+  public static String encodeToString(final BufferedImage image, ImageFormat imageFormat) {
     if (image == null) {
       return null;
     }
+
     String imageString = null;
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     try {
-      ImageIO.write(image, "png", bos);
+      ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
       final byte[] imageBytes = bos.toByteArray();
 
       imageString = Base64.getEncoder().encodeToString(imageBytes);

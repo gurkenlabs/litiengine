@@ -13,11 +13,11 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.net.UdpPacketReceiver;
 import de.gurkenlabs.util.ImageProcessing;
 
 public final class ImageSerializer {
-  public static final String FILE_FORMAT_PNG = "png";
 
   private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
 
@@ -49,6 +49,10 @@ public final class ImageSerializer {
   }
 
   public static void saveImage(final String fileName, final BufferedImage image) {
+    saveImage(fileName, image, ImageFormat.PNG);
+  }
+
+  public static void saveImage(final String fileName, final BufferedImage image, ImageFormat imageFormat) {
     try {
       final File file = new File(fileName);
       final String extension = FileUtilities.getExtension(fileName);
@@ -56,7 +60,7 @@ public final class ImageSerializer {
       if (canWriteFormat(extension)) {
         iter = ImageIO.getImageWritersByFormatName(extension);
       } else {
-        iter = ImageIO.getImageWritersByFormatName(FILE_FORMAT_PNG);
+        iter = ImageIO.getImageWritersByFormatName(imageFormat.toString());
       }
 
       final ImageWriter writer = iter.next();

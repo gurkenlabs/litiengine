@@ -56,6 +56,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -1051,8 +1052,9 @@ public class MapComponent extends EditorComponent {
         // the tilesets
         String dir = FileUtilities.getParentDirPath(newFile);
         for (ITileset tileSet : map.getTilesets()) {
+          ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
           ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(),
-              Spritesheet.find(tileSet.getImage().getSource()).getImage());
+              Spritesheet.find(tileSet.getImage().getSource()).getImage(), format);
         }
 
         System.out.println("exported " + map.getFileName() + " to " + newFile);

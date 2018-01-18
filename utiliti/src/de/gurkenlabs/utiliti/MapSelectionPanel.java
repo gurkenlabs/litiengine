@@ -578,8 +578,8 @@ public class MapSelectionPanel extends JSplitPane {
             propImag = ImageCache.IMAGES.get(cacheKey);
           } else {
 
-            final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase() + ".png";
-            final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase() + ".png";
+            final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
+            final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
             Spritesheet sprite = Spritesheet.find(name);
             if (sprite == null) {
               sprite = Spritesheet.find(fallbackName);

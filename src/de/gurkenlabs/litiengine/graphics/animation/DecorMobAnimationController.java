@@ -23,27 +23,27 @@ public class DecorMobAnimationController extends AnimationController {
   private static Animation[] createWalkAnimations(final DecorMob mob) {
 
     final List<Animation> anims = new ArrayList<>();
-    final Spritesheet walkUp = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-up.png");
+    final Spritesheet walkUp = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-up");
     if (walkUp != null) {
       anims.add(new Animation(walkUp, true));
     }
 
-    final Spritesheet walkDown = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-down.png");
+    final Spritesheet walkDown = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-down");
     if (walkDown != null) {
       anims.add(new Animation(walkDown, true));
     }
 
-    final Spritesheet walkLeft = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-left.png");
+    final Spritesheet walkLeft = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-left");
     if (walkLeft != null) {
       anims.add(new Animation(walkLeft, true));
     }
 
-    final Spritesheet walkRight = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-right.png");
+    final Spritesheet walkRight = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-walk-right");
     if (walkRight != null) {
       anims.add(new Animation(walkRight, true));
     }
 
-    final Spritesheet dead = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-dead.png");
+    final Spritesheet dead = Spritesheet.find(DECORMOBPREFIX + mob.getMobType().toLowerCase() + "-dead");
     if (dead != null) {
       anims.add(new Animation(dead, true));
     }
@@ -58,8 +58,8 @@ public class DecorMobAnimationController extends AnimationController {
       return null;
     }
 
-    final String path = DECORMOBPREFIX + mob.getMobType().toLowerCase() + ".png";
-    return Spritesheet.find(path);
+    final String name = DECORMOBPREFIX + mob.getMobType().toLowerCase();
+    return Spritesheet.find(name);
   }
 
   private final DecorMob mob;

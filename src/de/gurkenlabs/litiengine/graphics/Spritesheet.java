@@ -37,6 +37,8 @@ public final class Spritesheet {
 
   private final String name;
 
+  private final ImageFormat imageFormat;
+
   /** The rows. */
   private int rows;
 
@@ -52,6 +54,7 @@ public final class Spritesheet {
     this.name = FileUtilities.getFileName(path);
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
+    this.imageFormat = ImageFormat.get(FileUtilities.getExtension(path));
 
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
@@ -204,6 +207,10 @@ public final class Spritesheet {
 
   public BufferedImage getImage() {
     return this.image;
+  }
+
+  public ImageFormat getImageFormat() {
+    return this.imageFormat;
   }
 
   /**

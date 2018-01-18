@@ -29,14 +29,14 @@ public class PropAnimationController extends AnimationController {
     }
 
     final String propState = state.name().toLowerCase();
-    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState + ".png";
+    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState;
     Spritesheet sprite = Spritesheet.find(name);
 
     if (sprite != null) {
       return sprite;
     }
 
-    final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase() + ".png";
+    final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
     return Spritesheet.find(fallbackName);
   }
 
