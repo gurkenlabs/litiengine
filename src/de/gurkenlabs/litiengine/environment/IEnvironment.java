@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
 /**
  * The Interface IMapContainer.
@@ -70,6 +71,12 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public MapArea getArea(String name);
 
   public Collection<MapArea> getAreas();
+
+  public Collection<Emitter> getEmitters();
+
+  public Emitter getEmitter(int mapId);
+
+  public Emitter getEmitter(String name);
 
   public Collection<CollisionBox> getCollisionBoxes();
 

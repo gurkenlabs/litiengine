@@ -83,6 +83,7 @@ public class Environment implements IEnvironment {
   private final Collection<StaticShadow> staticShadows;
   private final Collection<Trigger> triggers;
   private final Collection<Prop> props;
+  private final Collection<Emitter> emitters;
 
   private final Collection<MapArea> mapAreas;
 
@@ -149,6 +150,7 @@ public class Environment implements IEnvironment {
     this.mapAreas = new CopyOnWriteArrayList<>();
     this.staticShadows = new CopyOnWriteArrayList<>();
     this.props = new CopyOnWriteArrayList<>();
+    this.emitters = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
@@ -179,6 +181,7 @@ public class Environment implements IEnvironment {
       Emitter emitter = (Emitter) entity;
       this.getGroundRenderables().add(emitter.getGroundRenderable());
       this.getOverlayRenderables().add(emitter.getOverlayRenderable());
+      this.emitters.add(emitter);
     }
 
     if (entity instanceof ICombatEntity) {
@@ -435,6 +438,21 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<MapArea> getAreas() {
     return this.mapAreas;
+  }
+
+  @Override
+  public Collection<Emitter> getEmitters() {
+    return this.emitters;
+  }
+
+  @Override
+  public Emitter getEmitter(int mapId) {
+    return getById(this.getEmitters(), mapId);
+  }
+
+  @Override
+  public Emitter getEmitter(String name) {
+    return getByName(this.getEmitters(), name);
   }
 
   @Override
@@ -755,6 +773,11 @@ public class Environment implements IEnvironment {
       Emitter emitter = (Emitter) entity;
       this.groundRenderable.remove(emitter.getGroundRenderable());
       this.overlayRenderable.remove(emitter.getOverlayRenderable());
+      this.emitters.remove(emitter);
+    }
+
+    if (entity instanceof MapArea) {
+      this.mapAreas.remove(entity);
     }
 
     if (entity instanceof Prop) {
@@ -774,6 +797,11 @@ public class Environment implements IEnvironment {
       this.triggers.remove(entity);
     }
 
+    if (entity instanceof StaticShadow) {
+      this.staticShadows.remove(entity);
+      this.addStaticShadows();
+    }
+
     if (entity instanceof IMovableEntity) {
       this.movableEntities.values().remove(entity);
     }
@@ -791,12 +819,6 @@ public class Environment implements IEnvironment {
 
   @Override
   public void remove(final int mapId) {
-    this.getSpawnPoints().removeIf(x -> x.getMapId() == mapId);
-    if (this.getStaticShadow(mapId) != null) {
-      this.getStaticShadows().remove(this.getStaticShadow(mapId));
-      this.addStaticShadows();
-      return;
-    }
     final IEntity ent = this.get(mapId);
     if (ent == null) {
       return;

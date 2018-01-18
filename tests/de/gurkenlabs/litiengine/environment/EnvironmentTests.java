@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
+// TODO: extend the tests by all default entity types and provide tests for the delete operation
 public class EnvironmentTests {
 
   @Test
