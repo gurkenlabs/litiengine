@@ -169,7 +169,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     this.setupControls();
     this.setupChangedListeners();
-    this.comboBoxType.setSelectedItem(MapObjectType.CUSTOM);
+    this.comboBoxType.setSelectedItem(MapObjectType.AREA);
   }
 
   public MapObjectType getObjectType() {
@@ -245,7 +245,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.spinnerWidth.setValue(0);
     this.spinnerHeight.setValue(0);
     if (this.getDataSource() == null) {
-      this.comboBoxType.setSelectedItem(MapObjectType.CUSTOM);
+      this.comboBoxType.setSelectedItem(MapObjectType.AREA);
     }
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
@@ -273,7 +273,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     comboBoxType.addItemListener(new MapObjectPropertyItemListener(m -> {
       MapObjectType type = (MapObjectType) comboBoxType.getSelectedItem();
       m.setType(type.toString());
-      textFieldCustomType.setVisible(type == MapObjectType.CUSTOM);
+      textFieldCustomType.setVisible(type == MapObjectType.AREA);
     }));
 
     comboBoxType.addItemListener(e -> {
