@@ -82,6 +82,7 @@ public class Program {
 
   private static final Logger log = Logger.getLogger(Program.class.getName());
   private static Menu recentFiles;
+  private static AssetPanel assetPanel;
   private static boolean isChanging;
 
   public static void main(String[] args) {
@@ -141,6 +142,10 @@ public class Program {
         recentFiles.add(fileButton);
       }
     }
+  }
+
+  public static AssetPanel getAssetPanel() {
+    return assetPanel;
   }
 
   private static boolean exit() {
@@ -226,8 +231,10 @@ public class Program {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
+    bottomTab.addTab("Assets", initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
-    bottomTab.setIconAt(0, new ImageIcon(RenderEngine.getImage("console.png")));
+    bottomTab.setIconAt(0, new ImageIcon(RenderEngine.getImage("asset.png")));
+    bottomTab.setIconAt(1, new ImageIcon(RenderEngine.getImage("console.png")));
 
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
@@ -369,8 +376,6 @@ public class Program {
 
   private static Menu initProjectMenu() {
     Menu mnProject = new Menu(Resources.get("menu_project"));
-    MenuItem properties = new MenuItem(Resources.get("menu_properties"));
-    properties.addActionListener(a -> EditorScreen.instance().setProjectSettings());
 
     CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
     compress.setState(userPreferences.isCompressFile());
@@ -380,7 +385,15 @@ public class Program {
     sync.setState(userPreferences.isSyncMaps());
     sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
 
-    mnProject.add(properties);
+    MenuItem importSpriteFile = new MenuItem(Resources.get("menu_assets_importSpriteFile"));
+    importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
+
+    MenuItem importSprite = new MenuItem(Resources.get("menu_assets_importSprite"));
+    importSprite.addActionListener(a -> EditorScreen.instance().importSprites());
+
+    mnProject.add(importSprite);
+    mnProject.add(importSpriteFile);
+    mnProject.addSeparator();
     mnProject.add(compress);
     mnProject.add(sync);
 
@@ -441,6 +454,21 @@ public class Program {
     mnMap.add(mapProps);
 
     return mnMap;
+  }
+
+  private static Component initAssetsComponent() {
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    AssetTree tree = new AssetTree();
+    split.setLeftComponent(tree);
+    assetPanel = new AssetPanel();
+
+    JScrollPane scrollPane = new JScrollPane(assetPanel);
+
+    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setAssetsSplitter(split.getDividerLocation()));
+    split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getAssetsSplitter() : 200);
+
+    split.setRightComponent(scrollPane);
+    return split;
   }
 
   private static Component initConsole() {

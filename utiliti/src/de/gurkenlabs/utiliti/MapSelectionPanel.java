@@ -15,13 +15,11 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -32,14 +30,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Game;
@@ -47,7 +41,6 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -56,42 +49,53 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
-  JList<String> mapList;
-  JCheckBoxList listObjectLayers;
-  DefaultListModel<String> model;
-  DefaultListModel<JCheckBox> layerModel;
-  JScrollPane mapScrollPane;
-  JScrollPane layerScrollPane;
-  JScrollPane entityScrollPane;
-  private JPopupMenu popupMenu;
-  private JMenuItem mntmExportMap;
-  private JMenuItem mntmDeleteMap;
-  private JTree tree;
-  DefaultTreeModel entitiesTreeModel;
-  DefaultMutableTreeNode nodeRoot;
-  DefaultMutableTreeNode nodeProps;
-  DefaultMutableTreeNode nodeLights;
-  DefaultMutableTreeNode nodeTriggers;
-  DefaultMutableTreeNode nodeSpawnpoints;
-  DefaultMutableTreeNode nodeCollisionBoxes;
-  DefaultMutableTreeNode nodeMapAreas;
-  DefaultMutableTreeNode nodeStaticShadows;
-  DefaultMutableTreeNode nodeEmitter;
-  DefaultMutableTreeNode[] entityNodes;
+  private static final long serialVersionUID = 1086539091850033448L;
+
+  private static final Icon PROP_ICON = new ImageIcon(RenderEngine.getImage("entity.png"));
+  private static final Icon FOLDER_ICON = new ImageIcon(RenderEngine.getImage("object_cube-10x10.png"));
+  private static final Icon LIGHT_ICON = new ImageIcon(RenderEngine.getImage("bulb.png"));
+  private static final Icon TRIGGER_ICON = new ImageIcon(RenderEngine.getImage("trigger.png"));
+  private static final Icon SPAWMPOINT_ICON = new ImageIcon(RenderEngine.getImage("spawnpoint.png"));
+  private static final Icon COLLISIONBOX_ICON = new ImageIcon(RenderEngine.getImage("collisionbox.png"));
+  private static final Icon MAPAREA_ICON = new ImageIcon(RenderEngine.getImage("maparea.png"));
+  private static final Icon SHADOWBOX_ICON = new ImageIcon(RenderEngine.getImage("shadowbox.png"));
+  private static final Icon EMITTER_ICON = new ImageIcon(RenderEngine.getImage("emitter.png"));
+
+  private final JList<String> mapList;
+  private final JCheckBoxList listObjectLayers;
+  private final DefaultListModel<String> model;
+  private final DefaultListModel<JCheckBox> layerModel;
+  private final JScrollPane mapScrollPane;
+  private final JScrollPane layerScrollPane;
+  private final JScrollPane entityScrollPane;
+  private final JPopupMenu popupMenu;
+  private final JMenuItem mntmExportMap;
+  private final JMenuItem mntmDeleteMap;
+
+  private final JPanel panel;
+  private final JTextField textField;
+  private final JButton btnSearch;
+  private final JTree tree;
+  private final DefaultTreeModel entitiesTreeModel;
+  private final DefaultMutableTreeNode nodeRoot;
+  private final DefaultMutableTreeNode nodeProps;
+  private final DefaultMutableTreeNode nodeLights;
+  private final DefaultMutableTreeNode nodeTriggers;
+  private final DefaultMutableTreeNode nodeSpawnpoints;
+  private final DefaultMutableTreeNode nodeCollisionBoxes;
+  private final DefaultMutableTreeNode nodeMapAreas;
+  private final DefaultMutableTreeNode nodeStaticShadows;
+  private final DefaultMutableTreeNode nodeEmitter;
+  private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
-  private JPanel panel;
-  private JTextField textField;
-  private JButton btnSearch;
 
   /**
    * Create the panel.
@@ -163,41 +167,40 @@ public class MapSelectionPanel extends JSplitPane {
     tabPane.setMaximumSize(new Dimension(0, 150));
 
     this.tree = new JTree();
-    this.entitiesTreeModel = new DefaultTreeModel(
-        this.nodeRoot = new DefaultMutableTreeNode(Resources.get("panel_mapselection_entities")) {
-          {
-            nodeProps = new DefaultMutableTreeNode(Resources.get("panel_mapselection_props"));
-            add(nodeProps);
-            nodeLights = new DefaultMutableTreeNode(Resources.get("panel_mapselection_lights"));
-            add(nodeLights);
-            nodeTriggers = new DefaultMutableTreeNode(Resources.get("panel_mapselection_triggers"));
-            add(nodeTriggers);
-            nodeSpawnpoints = new DefaultMutableTreeNode(Resources.get("panel_mapselection_spawnpoints"));
-            add(nodeSpawnpoints);
-            nodeCollisionBoxes = new DefaultMutableTreeNode(Resources.get("panel_mapselection_collboxes"));
-            add(nodeCollisionBoxes);
-            nodeMapAreas = new DefaultMutableTreeNode(Resources.get("panel_mapselection_areas"));
-            add(nodeMapAreas);
-            nodeStaticShadows = new DefaultMutableTreeNode(Resources.get("panel_mapselection_shadow"));
-            add(nodeStaticShadows);
-            nodeEmitter = new DefaultMutableTreeNode(Resources.get("panel_mapselection_emitter"));
-            add(nodeEmitter);
-          }
-        });
 
-    entityNodes = new DefaultMutableTreeNode[] {
-        nodeProps,
-        nodeLights,
-        nodeTriggers,
-        nodeSpawnpoints,
-        nodeCollisionBoxes,
-        nodeMapAreas,
-        nodeStaticShadows,
-        nodeEmitter,
+    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), FOLDER_ICON));
+    this.nodeProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_props"), PROP_ICON));
+    this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), LIGHT_ICON));
+    this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
+    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
+    this.nodeCollisionBoxes = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_collboxes"), COLLISIONBOX_ICON));
+    this.nodeMapAreas = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_areas"), MAPAREA_ICON));
+    this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), SHADOWBOX_ICON));
+    this.nodeEmitter = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_emitter"), EMITTER_ICON));
+
+    this.nodeRoot.add(nodeProps);
+    this.nodeRoot.add(nodeLights);
+    this.nodeRoot.add(nodeTriggers);
+    this.nodeRoot.add(nodeSpawnpoints);
+    this.nodeRoot.add(nodeCollisionBoxes);
+    this.nodeRoot.add(nodeMapAreas);
+    this.nodeRoot.add(nodeStaticShadows);
+    this.nodeRoot.add(nodeEmitter);
+    this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
+
+    this.entityNodes = new DefaultMutableTreeNode[] {
+        this.nodeProps,
+        this.nodeLights,
+        this.nodeTriggers,
+        this.nodeSpawnpoints,
+        this.nodeCollisionBoxes,
+        this.nodeMapAreas,
+        this.nodeStaticShadows,
+        this.nodeEmitter,
     };
 
-    tree.setModel(entitiesTreeModel);
-    tree.setCellRenderer(new CustomTreeCellRenderer());
+    tree.setModel(this.entitiesTreeModel);
+    tree.setCellRenderer(new IconTreeListRenderer());
     tree.setMaximumSize(new Dimension(0, 250));
     MouseListener ml = new MouseAdapter() {
       @Override
@@ -421,11 +424,20 @@ public class MapSelectionPanel extends JSplitPane {
     Enumeration en = parent.depthFirstEnumeration();
     while (en.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-      if (!(node.getUserObject() instanceof IEntity)) {
+      IEntity ent = null;
+      if (node.getUserObject() instanceof IconTreeListItem) {
+        IconTreeListItem iconItem = (IconTreeListItem) node.getUserObject();
+        if (iconItem.getUserObject() instanceof IEntity) {
+          ent = (IEntity) iconItem.getUserObject();
+        }
+      } else if (node.getUserObject() instanceof IEntity) {
+        ent = (IEntity) node.getUserObject();
+      }
+
+      if (ent == null) {
         continue;
       }
 
-      IEntity ent = (IEntity) node.getUserObject();
       if (selectionPredicate.test(ent)) {
         final TreePath newSelection = new TreePath(node.getPath());
         if (this.tree.getSelectionPath() != null && this.tree.getSelectionPath().equals(newSelection)) {
@@ -475,133 +487,60 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   private void populateMapObjectTree() {
-    this.nodeRoot.setUserObject(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"));
+    this.nodeRoot.setUserObject(new IconTreeListItem(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"), FOLDER_ICON));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
     }
 
-    this.nodeLights.setUserObject(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"));
-    this.nodeProps.setUserObject(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"));
-    this.nodeTriggers.setUserObject(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"));
-    this.nodeSpawnpoints.setUserObject(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"));
-    this.nodeCollisionBoxes.setUserObject(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"));
-    this.nodeMapAreas.setUserObject(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"));
-    this.nodeStaticShadows.setUserObject(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"));
-    this.nodeEmitter.setUserObject(Game.getEnvironment().getEmitters().size() + " " + Resources.get("panel_mapselection_emitter"));
+    this.nodeLights.setUserObject(new IconTreeListItem(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"), LIGHT_ICON));
+    this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), PROP_ICON));
+    this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
+    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
+    this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), COLLISIONBOX_ICON));
+    this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"), MAPAREA_ICON));
+    this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"), SHADOWBOX_ICON));
+    this.nodeEmitter.setUserObject(new IconTreeListItem(Game.getEnvironment().getEmitters().size() + " " + Resources.get("panel_mapselection_emitter"), EMITTER_ICON));
 
     for (LightSource light : Game.getEnvironment().getLightSources()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(light);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(light));
       this.nodeLights.add(node);
     }
 
     for (Prop prop : Game.getEnvironment().getProps()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(prop);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
       this.nodeProps.add(node);
     }
 
     for (Trigger trigger : Game.getEnvironment().getTriggers()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(trigger);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(trigger));
       this.nodeTriggers.add(node);
     }
 
     for (Spawnpoint spawn : Game.getEnvironment().getSpawnPoints()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(spawn);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(spawn));
       this.nodeSpawnpoints.add(node);
     }
 
     for (CollisionBox coll : Game.getEnvironment().getCollisionBoxes()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(coll);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(coll));
       this.nodeCollisionBoxes.add(node);
     }
 
     for (MapArea area : Game.getEnvironment().getAreas()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(area);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(area));
       this.nodeMapAreas.add(node);
     }
 
     for (StaticShadow shadow : Game.getEnvironment().getStaticShadows()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(shadow);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(shadow));
       this.nodeStaticShadows.add(node);
     }
 
     for (Emitter emitter : Game.getEnvironment().getEmitters()) {
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode(emitter);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(emitter));
       this.nodeEmitter.add(node);
     }
 
-    entitiesTreeModel.reload();
-  }
-
-  private class CustomTreeCellRenderer implements TreeCellRenderer {
-    private final Icon PROP_ICON = new ImageIcon(RenderEngine.getImage("entity.png"));
-    private final Icon FOLDER_ICON = new ImageIcon(RenderEngine.getImage("object_cube-10x10.png"));
-    private final Icon LIGHT_ICON = new ImageIcon(RenderEngine.getImage("bulb.png"));
-    private final Icon TRIGGER_ICON = new ImageIcon(RenderEngine.getImage("trigger.png"));
-    private final Icon SPAWMPOINT_ICON = new ImageIcon(RenderEngine.getImage("spawnpoint.png"));
-    private final Icon COLLISIONBOX_ICON = new ImageIcon(RenderEngine.getImage("collisionbox.png"));
-    private final Icon MAPAREA_ICON = new ImageIcon(RenderEngine.getImage("maparea.png"));
-    private final Icon SHADOWBOX_ICON = new ImageIcon(RenderEngine.getImage("shadowbox.png"));
-    private final Icon EMITTER_ICON = new ImageIcon(RenderEngine.getImage("emitter.png"));
-    private final Icon DEFAULT_ICON = new ImageIcon(RenderEngine.getImage("bullet.png"));
-
-    private final JLabel label = new JLabel();
-    private final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
-    private final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
-
-    @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-      if (value.equals(nodeProps)) {
-        label.setIcon(PROP_ICON);
-      } else if (value.equals(nodeLights)) {
-        label.setIcon(LIGHT_ICON);
-      } else if (value.equals(nodeRoot)) {
-        label.setIcon(FOLDER_ICON);
-      } else if (value.equals(nodeTriggers)) {
-        label.setIcon(TRIGGER_ICON);
-      } else if (value.equals(nodeSpawnpoints)) {
-        label.setIcon(SPAWMPOINT_ICON);
-      } else if (value.equals(nodeCollisionBoxes)) {
-        label.setIcon(COLLISIONBOX_ICON);
-      } else if (value.equals(nodeMapAreas)) {
-        label.setIcon(MAPAREA_ICON);
-      } else if (value.equals(nodeStaticShadows)) {
-        label.setIcon(SHADOWBOX_ICON);
-      } else if (value.equals(nodeEmitter)) {
-        label.setIcon(EMITTER_ICON);
-      } else if (value instanceof DefaultMutableTreeNode) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-        if (node.getUserObject() instanceof Prop) {
-          Prop prop = (Prop) node.getUserObject();
-          String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getName() + "-" + prop.getMapId() + "-tree";
-          BufferedImage propImag;
-          if (ImageCache.IMAGES.containsKey(cacheKey)) {
-            propImag = ImageCache.IMAGES.get(cacheKey);
-          } else {
-
-            final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
-            final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
-            Spritesheet sprite = Spritesheet.find(name);
-            if (sprite == null) {
-              sprite = Spritesheet.find(fallbackName);
-            }
-            propImag = ImageProcessing.scaleImage(sprite.getSprite(0), 16, 16, true);
-            ImageCache.IMAGES.put(cacheKey, propImag);
-          }
-
-          label.setIcon(new ImageIcon(propImag));
-        } else {
-          label.setIcon(DEFAULT_ICON);
-        }
-      }
-
-      UIDefaults defaults = UIManager.getDefaults();
-      label.setOpaque(true);
-      label.setBackground(hasFocus || selected ? defaults.getColor("Tree.selectionBackground") : defaults.getColor("Tree.background"));
-      label.setForeground(hasFocus || selected ? defaults.getColor("Tree.selectionForeground") : defaults.getColor("Tree.foreground"));
-      label.setBorder(hasFocus ? this.focusBorder : this.normalBorder);
-      label.setText(value.toString());
-
-      return label;
-    }
+    this.entitiesTreeModel.reload();
   }
 }

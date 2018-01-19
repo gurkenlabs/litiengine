@@ -38,6 +38,12 @@ public final class ImageCache {
     this.cache = new ConcurrentHashMap<>();
   }
 
+  public static void clearAll() {
+    IMAGES.clear();
+    SPRITES.clear();
+    MAPS.clear();
+  }
+
   public void clear() {
     this.cache.clear();
   }

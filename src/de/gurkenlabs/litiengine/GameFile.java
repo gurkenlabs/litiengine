@@ -42,10 +42,6 @@ public class GameFile implements Serializable {
   @XmlElement(name = "map")
   private List<Map> maps;
 
-  @XmlElementWrapper(name = "spriteFiles")
-  @XmlElement(name = "spritefile")
-  private String[] spriteFiles;
-
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
   private List<SpriteSheetInfo> spriteSheets;
@@ -58,7 +54,6 @@ public class GameFile implements Serializable {
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
     this.tilesets = new ArrayList<>();
-    this.spriteFiles = new String[] {};
   }
 
   public static GameFile load(final String file) {
@@ -86,11 +81,6 @@ public class GameFile implements Serializable {
   @XmlTransient
   public List<Map> getMaps() {
     return this.maps;
-  }
-
-  @XmlTransient
-  public String[] getSpriteFiles() {
-    return this.spriteFiles;
   }
 
   @XmlTransient
@@ -148,10 +138,6 @@ public class GameFile implements Serializable {
     }
 
     return newFile.toString();
-  }
-
-  public void setSpriteFiles(final String[] spriteFiles) {
-    this.spriteFiles = spriteFiles;
   }
 
   public void setTileSets(final List<SpriteSheetInfo> tileSets) {

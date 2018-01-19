@@ -47,7 +47,7 @@ public final class ArrayUtilities {
   }
 
   public static String getCommaSeparatedString(int[] arr) {
-    if (arr == null) {
+    if (arr == null || arr.length == 0) {
       return null;
     }
 

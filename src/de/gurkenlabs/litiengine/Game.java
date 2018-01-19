@@ -258,15 +258,12 @@ public final class Game {
     log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (final String spriteFile : file.getSpriteFiles()) {
-      final List<Spritesheet> sprites = Spritesheet.load(GameDirectories.SPRITES + spriteFile);
-      loadedSprites.addAll(sprites);
-    }
-
     for (final SpriteSheetInfo tileset : file.getSpriteSheets()) {
       final Spritesheet sprite = Spritesheet.load(tileset);
       loadedSprites.add(sprite);
     }
+
+    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
 
     int spriteload = 0;
     for (final Spritesheet s : loadedSprites) {

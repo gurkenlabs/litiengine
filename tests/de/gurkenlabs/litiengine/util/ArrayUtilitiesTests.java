@@ -45,6 +45,6 @@ public class ArrayUtilitiesTests {
 
     Assert.assertEquals("100,200,300,1,2,3", testStringWithInts);
     Assert.assertNull(testNull);
-    Assert.assertEquals("", testEmpty);
+    Assert.assertNull(testEmpty);
   }
 }

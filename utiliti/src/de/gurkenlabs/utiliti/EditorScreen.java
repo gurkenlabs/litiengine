@@ -9,14 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -35,6 +33,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
@@ -45,17 +44,17 @@ import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
-import de.gurkenlabs.utiliti.components.ProjectSettingsDialog;
 
 @ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {
   private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
   private static final int STATUS_DURATION = 5000;
   private static final String DEFAULT_GAME_NAME = "game";
-  private static final String[] DEFAULT_SPRITESHEET_NAMES = { "sprites.info", "game.sprites" };
   private static final String NEW_GAME_STRING = "NEW GAME *";
 
   private static final String GAME_FILE_NAME = "Game Resource File";
+  private static final String SPRITE_FILE_NAME = "Sprite Info File";
+  private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
 
   public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
   public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
@@ -70,7 +69,6 @@ public class EditorScreen extends Screen {
   private GameFile gameFile = new GameFile();
   private EditorComponent current;
   private String projectPath;
-  private String[] spriteFiles;
   private String currentResourceFile;
 
   private MapObjectPanel mapEditorPanel;
@@ -85,7 +83,6 @@ public class EditorScreen extends Screen {
   private EditorScreen() {
     this.comps = new ArrayList<>();
     this.changedMaps = new CopyOnWriteArrayList<>();
-    this.spriteFiles = DEFAULT_SPRITESHEET_NAMES;
   }
 
   public static EditorScreen instance() {
@@ -99,16 +96,6 @@ public class EditorScreen extends Screen {
 
   public boolean fileLoaded() {
     return this.currentResourceFile != null;
-  }
-
-  public void setProjectSettings() {
-    ProjectSettingsDialog dialog = new ProjectSettingsDialog();
-    dialog.set(Arrays.asList(this.spriteFiles != null ? this.spriteFiles : DEFAULT_SPRITESHEET_NAMES));
-    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    dialog.setModal(true);
-    dialog.setVisible(true);
-
-    this.spriteFiles = dialog.getSpritefileNames();
   }
 
   @Override
@@ -226,17 +213,13 @@ public class EditorScreen extends Screen {
 
       // set up project settings
       this.setProjectPath(chooser.getSelectedFile().getCanonicalPath());
-      this.setProjectSettings();
 
       // load all maps in the directory
       this.mapComponent.loadMaps(this.getProjectPath());
       this.currentResourceFile = null;
       this.gameFile = new GameFile();
 
-      // load sprite sheets from different sources:
-      // 1. add sprite sheets from sprite files
-      // 2. add sprite sheets by tile sets of all maps in the project director
-      this.loadSpriteFiles(this.getProjectPath(), this.spriteFiles);
+      // add sprite sheets by tile sets of all maps in the project director
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
@@ -277,6 +260,7 @@ public class EditorScreen extends Screen {
   }
 
   public void load(File gameFile) {
+    final long current = System.nanoTime();
     Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
@@ -300,19 +284,16 @@ public class EditorScreen extends Screen {
       Program.loadRecentFiles();
       this.setProjectPath(FileUtilities.getParentDirPath(gameFile.getAbsolutePath()));
 
-      this.spriteFiles = this.gameFile.getSpriteFiles();
-
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
 
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
-      // 2. add sprite sheets from sprite files
-      // 3. add sprite sheets by tile sets of all maps in the game file
+      // 2. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets());
+
       log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
 
-      this.loadSpriteFiles(this.getProjectPath(), this.getGameFile().getSpriteFiles());
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
@@ -329,7 +310,66 @@ public class EditorScreen extends Screen {
       }
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - current) / 1000000.0 });
       this.setCurrentStatus("gamefile loaded");
+    }
+  }
+
+  public void importSpriteFile() {
+    JFileChooser chooser;
+
+    try {
+      chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
+
+      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, SpriteSheetInfo.FILE_EXTENSION);
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        File spriteFile = chooser.getSelectedFile();
+        if (spriteFile == null) {
+          return;
+        }
+
+        List<Spritesheet> loaded = Spritesheet.load(spriteFile.toString());
+        List<SpriteSheetInfo> infos = new ArrayList<>();
+        for (Spritesheet sprite : loaded) {
+          SpriteSheetInfo info = new SpriteSheetInfo(sprite);
+          infos.add(info);
+          this.gameFile.getSpriteSheets().add(info);
+        }
+
+        this.loadSpriteSheets(infos);
+        ImageCache.clearAll();
+        this.getMapComponent().reloadEnvironment();
+      }
+
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    }
+  }
+
+  public void importSprites() {
+    JFileChooser chooser;
+
+    try {
+      chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
+
+      FileFilter filter = new FileNameExtensionFilter(SPRITESHEET_FILE_NAME, ImageFormat.getAllExtensions());
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      chooser.setMultiSelectionEnabled(true);
+      if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        for (File spriteFile : chooser.getSelectedFiles()) {
+          if (spriteFile == null) {
+            return;
+          }
+
+          // TODO: Implement this
+        }
+      }
+
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
   }
 
@@ -424,7 +464,7 @@ public class EditorScreen extends Screen {
 
   private void saveMaps() {
     for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
-      for (String file : FileUtilities.findFiles(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
+      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         map.save(file);
         log.log(Level.INFO, "synchronized map '" + file + "'");
       }
@@ -436,8 +476,6 @@ public class EditorScreen extends Screen {
    * different components and updates the game file object.
    */
   private void updateGameFile() {
-    this.getGameFile().setSpriteFiles(this.spriteFiles);
-
     this.getGameFile().getMaps().clear();
     for (Map map : this.mapComponent.getMaps()) {
       this.getGameFile().getMaps().add(map);
@@ -445,7 +483,7 @@ public class EditorScreen extends Screen {
   }
 
   private void loadCustomEmitters(String projectPath) {
-    for (String xmlFile : FileUtilities.findFiles(new ArrayList<>(), Paths.get(projectPath), "xml")) {
+    for (String xmlFile : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "xml")) {
       boolean isEmitter = false;
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
       try {
@@ -462,22 +500,6 @@ public class EditorScreen extends Screen {
       if (isEmitter) {
         CustomEmitter.load(xmlFile);
       }
-    }
-  }
-
-  private void loadSpriteFiles(String projectPath, String[] spriteInfoFiles) {
-    for (String spriteFile : FileUtilities.findFiles(new ArrayList<>(), Paths.get(projectPath), spriteInfoFiles)) {
-      if (spriteFile == null || spriteFile.isEmpty()) {
-        continue;
-      }
-
-      List<Spritesheet> loaded = Spritesheet.load(spriteFile, projectPath + "\\resources\\");
-      List<SpriteSheetInfo> infos = new ArrayList<>();
-      for (Spritesheet sprite : loaded) {
-        infos.add(new SpriteSheetInfo(sprite));
-      }
-
-      this.loadSpriteSheets(infos);
     }
   }
 

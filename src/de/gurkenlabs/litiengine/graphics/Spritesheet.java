@@ -140,10 +140,6 @@ public final class Spritesheet {
     return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
   }
 
-  public static List<Spritesheet> load(final String spriteInfoFile) {
-    return load(spriteInfoFile, "");
-  }
-
   /**
    * The sprite info file must be located under the GameInfo#getSpritesDirectory()
    * directory.
@@ -151,7 +147,7 @@ public final class Spritesheet {
    * @param spriteInfoFile
    * @return
    */
-  public static List<Spritesheet> load(final String spriteInfoFile, final String gameDirectory) {
+  public static List<Spritesheet> load(final String spriteInfoFile) {
 
     final ArrayList<Spritesheet> sprites = new ArrayList<>();
     final InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
@@ -177,7 +173,7 @@ public final class Spritesheet {
           continue;
         }
 
-        getSpriteSheetFromSpriteInfoLine(gameDirectory, sprites, items, parts);
+        getSpriteSheetFromSpriteInfoLine(FileUtilities.getParentDirPath(spriteInfoFile), sprites, items, parts);
       }
 
       log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { sprites.size(), spriteInfoFile });
@@ -300,9 +296,9 @@ public final class Spritesheet {
     this.updateRowsAndCols();
   }
 
-  private static void getSpriteSheetFromSpriteInfoLine(String gameDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
+  private static void getSpriteSheetFromSpriteInfoLine(String baseDirectory, ArrayList<Spritesheet> sprites, List<String> items, String[] parts) {
     try {
-      final String name = gameDirectory + GameDirectories.SPRITES + items.get(0);
+      final String name = baseDirectory + items.get(0);
 
       final int width = Integer.parseInt(items.get(1));
       final int height = Integer.parseInt(items.get(2));

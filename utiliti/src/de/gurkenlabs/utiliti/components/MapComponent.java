@@ -399,7 +399,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void loadMaps(String projectPath) {
-    final List<String> files = FileUtilities.findFiles(new ArrayList<>(), Paths.get(projectPath), "tmx");
+    final List<String> files = FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "tmx");
     System.out.println(files.size() + " maps found in folder " + projectPath);
     final List<Map> maps = new ArrayList<>();
     for (final String mapFile : files) {
@@ -755,6 +755,14 @@ public class MapComponent extends EditorComponent {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  public void reloadEnvironment() {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return;
+    }
+
+    this.loadEnvironment((Map) Game.getEnvironment().getMap());
   }
 
   public void add(IMapObject mapObject, IMapObjectLayer layer) {

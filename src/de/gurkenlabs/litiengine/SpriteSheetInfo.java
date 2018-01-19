@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine;
 
 import java.io.Serializable;
 
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,6 +17,7 @@ import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "sprite")
 public class SpriteSheetInfo implements Serializable {
+  public static final String FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
   private int width;
@@ -116,5 +118,11 @@ public class SpriteSheetInfo implements Serializable {
 
   public void setKeyframes(int[] keyframes) {
     this.keyframes = ArrayUtilities.getCommaSeparatedString(keyframes);
+  }
+
+  void beforeMarshal(Marshaller m) {
+    if (this.keyframes != null && this.keyframes.isEmpty()) {
+      this.keyframes = null;
+    }
   }
 }

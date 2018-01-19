@@ -74,12 +74,6 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
   }
 
-  void beforeMarshal(Marshaller m) {
-    if (this.properties != null && this.properties.isEmpty()) {
-      this.properties = null;
-    }
-  }
-
   @Override
   public int getCustomPropertyInt(String name) {
     String value = this.getCustomProperty(name);
@@ -118,5 +112,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
 
     return Double.valueOf(value);
+  }
+
+  void beforeMarshal(Marshaller m) {
+    if (this.properties != null && this.properties.isEmpty()) {
+      this.properties = null;
+    }
   }
 }

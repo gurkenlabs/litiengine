@@ -40,7 +40,7 @@ public final class FileUtilities {
     return true;
   }
 
-  public static List<String> findFiles(final List<String> fileNames, final Path dir, final String extension) {
+  public static List<String> findFilesByExtension(final List<String> fileNames, final Path dir, final String extension) {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
       for (final Path path : stream) {
         if (path.toFile().isDirectory()) {
@@ -48,7 +48,7 @@ public final class FileUtilities {
             continue;
           }
 
-          findFiles(fileNames, path, extension);
+          findFilesByExtension(fileNames, path, extension);
         } else if (path.toAbsolutePath().toString().endsWith(extension)) {
           fileNames.add(path.toAbsolutePath().toString());
         }
@@ -165,7 +165,7 @@ public final class FileUtilities {
 
   public static String getParentDirPath(final String fileOrDirPath) {
     if (fileOrDirPath.contains(File.separator)) {
-      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(File.separatorChar, fileOrDirPath.length()));
+      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(File.separatorChar) + 1);
     } else if (fileOrDirPath.contains("/")) {
       return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf('/') + 1);
     }
