@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 
 public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
@@ -20,13 +21,10 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
     }
 
-    final String obstacle = mapObject.getCustomProperty(MapObjectProperty.OBSTACLE);
-    boolean isObstacle = true;
-    if (obstacle != null && !obstacle.isEmpty()) {
-      isObstacle = Boolean.valueOf(obstacle);
-    }
+    boolean isObstacle = mapObject.getCustomPropertyBool(MapObjectProperty.OBSTACLE, true);
+    boolean isObstructingLight = mapObject.getCustomPropertyBool(MapObjectProperty.OBSTRUCTINGLIGHTS);
 
-    final CollisionBox col = new CollisionBox(isObstacle);
+    final CollisionBox col = new CollisionBox(isObstacle, isObstructingLight);
     col.setLocation(mapObject.getLocation());
     col.setSize(mapObject.getWidth(), mapObject.getHeight());
     col.setCollisionBoxWidth(col.getWidth());
@@ -36,6 +34,11 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(col);
+
+    if (isObstructingLight) {
+      entities.add(new StaticShadow(col));
+    }
+
     return entities;
   }
 }

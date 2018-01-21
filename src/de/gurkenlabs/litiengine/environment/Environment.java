@@ -786,6 +786,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
+      this.staticShadows.removeIf(x -> x.getOrigin() != null && x.getOrigin().equals(entity));
     }
 
     if (entity instanceof LightSource) {

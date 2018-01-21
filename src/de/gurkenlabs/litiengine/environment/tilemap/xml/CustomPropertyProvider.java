@@ -76,9 +76,14 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public int getCustomPropertyInt(String name) {
+    return this.getCustomPropertyInt(name, 0);
+  }
+
+  @Override
+  public int getCustomPropertyInt(String name, int defaultValue) {
     String value = this.getCustomProperty(name);
     if (value == null || value.isEmpty()) {
-      return 0;
+      return defaultValue;
     }
 
     return Integer.parseInt(value);
@@ -86,9 +91,14 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public boolean getCustomPropertyBool(String name) {
+    return this.getCustomPropertyBool(name, false);
+  }
+
+  @Override
+  public boolean getCustomPropertyBool(String name, boolean defaultValue) {
     String value = this.getCustomProperty(name);
     if (value == null || value.isEmpty()) {
-      return false;
+      return defaultValue;
     }
 
     return Boolean.valueOf(value);
@@ -96,9 +106,14 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public float getCustomPropertyFloat(String name) {
+    return this.getCustomPropertyFloat(name, 0);
+  }
+
+  @Override
+  public float getCustomPropertyFloat(String name, float defaultValue) {
     String value = this.getCustomProperty(name);
     if (value == null || value.isEmpty()) {
-      return 0;
+      return defaultValue;
     }
 
     return Float.valueOf(value);
@@ -106,9 +121,14 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public double getCustomPropertyDouble(String name) {
+    return this.getCustomPropertyDouble(name, 0);
+  }
+
+  @Override
+  public double getCustomPropertyDouble(String name, double defaultValue) {
     String value = this.getCustomProperty(name);
     if (value == null || value.isEmpty()) {
-      return 0;
+      return defaultValue;
     }
 
     return Double.valueOf(value);
