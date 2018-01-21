@@ -17,10 +17,10 @@ public class CustomEntityEmitter extends CustomEmitter implements IEntityEmitter
     super(entity.getLocation().getX(), entity.getLocation().getY(), emitterXml);
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
-    this.getEmitterData().getX().setMinValue(0);
-    this.getEmitterData().getX().setMaxValue(this.getWidth());
-    this.getEmitterData().getY().setMinValue(0);
-    this.getEmitterData().getY().setMaxValue(this.getHeight());
+    this.getEmitterData().getParticleX().setMinValue(0);
+    this.getEmitterData().getParticleX().setMaxValue(this.getWidth());
+    this.getEmitterData().getParticleY().setMinValue(0);
+    this.getEmitterData().getParticleY().setMaxValue(this.getHeight());
   }
 
   @Override

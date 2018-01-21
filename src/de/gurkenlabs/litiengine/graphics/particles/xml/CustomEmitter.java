@@ -66,6 +66,10 @@ public class CustomEmitter extends Emitter {
 
   private CustomEmitterData emitterData;
 
+  public CustomEmitter(final double originX, final double originY) {
+    super(originX, originY);
+  }
+
   public CustomEmitter(final double originX, final double originY, final String emitterXml) {
     super(originX, originY);
 
@@ -94,6 +98,10 @@ public class CustomEmitter extends Emitter {
     return this.emitterData;
   }
 
+  public void setEmitterData(CustomEmitterData newData) {
+    this.emitterData = newData;
+  }
+
   @Override
   protected Particle createNewParticle() {
     float x;
@@ -107,8 +115,8 @@ public class CustomEmitter extends Emitter {
     float deltaWidth;
     float deltaHeight;
 
-    x = this.getEmitterData().getX().get();
-    y = this.getEmitterData().getY().get();
+    x = this.getEmitterData().getParticleX().get();
+    y = this.getEmitterData().getParticleY().get();
     deltaX = this.getEmitterData().getDeltaX().get();
     deltaY = this.getEmitterData().getDeltaY().get();
     gravityX = this.getEmitterData().getGravityX().get();

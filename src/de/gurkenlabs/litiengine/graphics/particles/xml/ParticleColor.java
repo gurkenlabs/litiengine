@@ -68,4 +68,8 @@ public class ParticleColor {
     return new Color(this.getRed(), this.getGreen(), this.getBlue(), this.getAlpha());
   }
 
+  public String toHexString() {
+    return "#" + Integer.toHexString(this.toColor().getRGB()).substring(2);
+  }
+
 }
