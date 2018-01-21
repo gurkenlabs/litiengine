@@ -44,7 +44,7 @@ public class AssetPanel extends JPanel {
         icon = new ImageIcon(ImageProcessing.scaleImage(sprite.getSprite(0), 64, 64, true));
       }
 
-      AssetPanelItem test = new AssetPanelItem(icon, info.getName());
+      AssetPanelItem test = new AssetPanelItem(icon, info.getName(), info);
       this.add(test);
       test.validate();
     }

@@ -17,6 +17,13 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+
 public class AssetPanelItem extends JPanel {
   private static final long serialVersionUID = 3857716676105299144L;
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
@@ -25,7 +32,10 @@ public class AssetPanelItem extends JPanel {
   private final JLabel iconLabel;
   private final JTextField textField;
 
-  public AssetPanelItem() {
+  private final Object origin;
+
+  public AssetPanelItem(Object origin) {
+    this.origin = origin;
     this.setBackground(Color.DARK_GRAY);
     this.setBorder(normalBorder);
     addFocusListener(new FocusAdapter() {
@@ -63,6 +73,40 @@ public class AssetPanelItem extends JPanel {
     });
     add(this.iconLabel, BorderLayout.CENTER);
 
+    this.iconLabel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+
+          // TODO: experimental code... this needs to be refactored with issue #66
+          if (getOrigin() instanceof SpriteSheetInfo) {
+            SpriteSheetInfo info = (SpriteSheetInfo) getOrigin();
+            String propName = Prop.getNameBySpriteName(info.getName());
+            if (propName == null) {
+              return;
+            }
+
+            MapObject mo = new MapObject();
+            mo.setType(MapObjectType.PROP.name());
+            mo.setX((int) Game.getCamera().getFocus().getX());
+            mo.setY((int) Game.getCamera().getFocus().getY());
+            mo.setWidth((int) info.getWidth());
+            mo.setHeight((int) info.getHeight());
+            mo.setId(Game.getEnvironment().getNextMapId());
+            mo.setName("");
+            mo.setCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH, (info.getWidth() * 0.4) + "");
+            mo.setCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT, (info.getHeight() * 0.4) + "");
+            mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
+            mo.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, "false");
+            mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
+            mo.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, propName);
+
+            EditorScreen.instance().getMapComponent().add(mo);
+          }
+        }
+      }
+    });
+
     this.textField = new JTextField();
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
@@ -75,10 +119,14 @@ public class AssetPanelItem extends JPanel {
     this.setMinimumSize(new Dimension(this.iconLabel.getWidth(), this.iconLabel.getHeight() + this.textField.getHeight()));
   }
 
-  public AssetPanelItem(Icon icon, String text) {
-    this();
+  public AssetPanelItem(Icon icon, String text, Object origin) {
+    this(origin);
     this.iconLabel.setHorizontalAlignment(JLabel.CENTER);
     this.iconLabel.setIcon(icon);
     this.textField.setText(text);
+  }
+
+  public Object getOrigin() {
+    return this.origin;
   }
 }

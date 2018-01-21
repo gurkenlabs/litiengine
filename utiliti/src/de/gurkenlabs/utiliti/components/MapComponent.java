@@ -748,6 +748,10 @@ public class MapComponent extends EditorComponent {
     this.loadEnvironment((Map) Game.getEnvironment().getMap());
   }
 
+  public void add(IMapObject mapObject) {
+    this.add(mapObject, getCurrentLayer());
+  }
+
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
     layer.addMapObject(mapObject);
     Game.getEnvironment().loadFromMap(mapObject.getId());
@@ -757,6 +761,7 @@ public class MapComponent extends EditorComponent {
 
     this.setFocus(mapObject);
     this.setEditMode(EDITMODE_EDIT);
+    UndoManager.instance().mapObjectAdded(mapObject);
   }
 
   public void copy() {
@@ -1077,8 +1082,7 @@ public class MapComponent extends EditorComponent {
     mo.setName(obj.getName());
     mo.setCustomProperties(obj.getAllCustomProperties());
 
-    this.add(mo, getCurrentLayer());
-    UndoManager.instance().mapObjectAdded(mo);
+    this.add(mo);
     return mo;
   }
 
@@ -1139,8 +1143,7 @@ public class MapComponent extends EditorComponent {
       break;
     }
 
-    this.add(mo, getCurrentLayer());
-    UndoManager.instance().mapObjectAdded(mo);
+    this.add(mo);
     return mo;
   }
 
