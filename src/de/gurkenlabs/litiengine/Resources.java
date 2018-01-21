@@ -1,12 +1,22 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.util.io.FileUtilities;
 
 public final class Resources {
   public static final String LOCALIZATION_RESOURCE_FOLDER = "localization/";
@@ -56,5 +66,51 @@ public final class Resources {
     }
 
     return key;
+  }
+
+  public static BufferedImage getImage(final String absolutPath) {
+    return getImage(absolutPath, false);
+  }
+
+  /**
+   * Gets the image by the specified relative path. This method supports both,
+   * loading images from a folder and loading them from the resources.
+   *
+   * @param absolutPath
+   *          the image
+   * @return the image
+   */
+  public static BufferedImage getImage(final String absolutPath, final boolean forceLoad) {
+    if (absolutPath == null || absolutPath.isEmpty()) {
+      return null;
+    }
+
+    final String cacheKey = Integer.toString(absolutPath.hashCode());
+    if (!forceLoad && ImageCache.IMAGES.containsKey(cacheKey)) {
+      return ImageCache.IMAGES.get(cacheKey);
+    }
+
+    // try to get image from resource folder first and as a fallback get it from
+    // a normal folder
+    BufferedImage img = null;
+    final InputStream imageFile = FileUtilities.getGameResource(absolutPath);
+    if (imageFile != null) {
+      try {
+        img = ImageIO.read(imageFile);
+      } catch (final IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+        return null;
+      }
+    }
+
+    if (img == null) {
+      return null;
+    }
+
+    final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
+    compatibleImg.createGraphics().drawImage(img, 0, 0, null);
+
+    ImageCache.IMAGES.put(cacheKey, compatibleImg);
+    return compatibleImg;
   }
 }

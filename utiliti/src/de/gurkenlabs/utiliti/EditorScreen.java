@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameFile;
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -138,9 +139,8 @@ public class EditorScreen extends Screen {
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
-    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY()
-        + " tile: [" + tile.x + ", " + tile.y + "]"
-        + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10, Game.getScreenManager().getResolution().getHeight() - 40);
+    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
+        Game.getScreenManager().getResolution().getHeight() - 40);
     RenderEngine.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
 
     // render status
@@ -450,8 +450,7 @@ public class EditorScreen extends Screen {
     Program.userPreferences.setLastGameFile(this.currentResourceFile);
     Program.userPreferences.addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    log.log(Level.INFO, "saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size()
-        + " tilesets to '" + this.currentResourceFile + "'");
+    log.log(Level.INFO, "saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size() + " tilesets to '" + this.currentResourceFile + "'");
     this.setCurrentStatus("saved gamefile");
 
     if (Program.userPreferences.isSyncMaps()) {
@@ -526,7 +525,7 @@ public class EditorScreen extends Screen {
     for (IImageLayer imageLayer : map.getImageLayers()) {
       Spritesheet sprite = Spritesheet.find(imageLayer.getImage().getSource());
       if (sprite == null) {
-        BufferedImage img = RenderEngine.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+        BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
 
         sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
         if (sprite == null) {

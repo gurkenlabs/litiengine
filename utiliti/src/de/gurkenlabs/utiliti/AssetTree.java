@@ -11,14 +11,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 
 public class AssetTree extends JTree {
   private static final long serialVersionUID = -1889916538755378262L;
-  private static final Icon ASSET_ICON = new ImageIcon(RenderEngine.getImage("asset.png"));
-  private static final Icon SPRITESHEET_ICON = new ImageIcon(RenderEngine.getImage("spritesheet.png"));
-  private static final Icon PROP_ICON = new ImageIcon(RenderEngine.getImage("entity.png"));
-  private static final Icon MISC_ICON = new ImageIcon(RenderEngine.getImage("misc.png"));
+  private static final Icon ASSET_ICON = new ImageIcon(Resources.getImage("asset.png"));
+  private static final Icon SPRITESHEET_ICON = new ImageIcon(Resources.getImage("spritesheet.png"));
+  private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
+  private static final Icon MISC_ICON = new ImageIcon(Resources.getImage("misc.png"));
 
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;

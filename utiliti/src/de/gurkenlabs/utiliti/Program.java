@@ -56,7 +56,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.ImageProcessing;
@@ -110,7 +109,7 @@ public class Program {
       userPreferences.setZoom(zoom);
     });
 
-    Game.getScreenManager().setIconImage(RenderEngine.getImage("pixel-icon-utility.png"));
+    Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
 
     Game.getScreenManager().addScreen(EditorScreen.instance());
     Game.getScreenManager().displayScreen("EDITOR");
@@ -150,11 +149,7 @@ public class Program {
 
   private static boolean exit() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
-    int n = JOptionPane.showConfirmDialog(
-        null,
-        Resources.get("hud_saveProjectMessage") + "\n" + resourceFile,
-        Resources.get("hud_saveProject"),
-        JOptionPane.YES_NO_CANCEL_OPTION);
+    int n = JOptionPane.showConfirmDialog(null, Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
       EditorScreen.instance().save(false);
@@ -233,8 +228,8 @@ public class Program {
 
     bottomTab.addTab("Assets", initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
-    bottomTab.setIconAt(0, new ImageIcon(RenderEngine.getImage("asset.png")));
-    bottomTab.setIconAt(1, new ImageIcon(RenderEngine.getImage("console.png")));
+    bottomTab.setIconAt(0, new ImageIcon(Resources.getImage("asset.png")));
+    bottomTab.setIconAt(1, new ImageIcon(Resources.getImage("console.png")));
 
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
@@ -490,29 +485,29 @@ public class Program {
     JToolBar basicMenu = new JToolBar();
 
     JButton cr = new JButton();
-    cr.setIcon(new ImageIcon(RenderEngine.getImage("button-create.png")));
+    cr.setIcon(new ImageIcon(Resources.getImage("button-create.png")));
     basicMenu.add(cr);
     cr.addActionListener(a -> EditorScreen.instance().create());
 
     JButton op = new JButton();
-    op.setIcon(new ImageIcon(RenderEngine.getImage("button-load.png")));
+    op.setIcon(new ImageIcon(Resources.getImage("button-load.png")));
     basicMenu.add(op);
     op.addActionListener(a -> EditorScreen.instance().load());
 
     JButton sv = new JButton();
-    sv.setIcon(new ImageIcon(RenderEngine.getImage("button-save.png")));
+    sv.setIcon(new ImageIcon(Resources.getImage("button-save.png")));
     basicMenu.add(sv);
     sv.addActionListener(a -> EditorScreen.instance().save(false));
 
     basicMenu.addSeparator();
 
     JButton undo = new JButton();
-    undo.setIcon(new ImageIcon(RenderEngine.getImage("button-undo.png")));
+    undo.setIcon(new ImageIcon(Resources.getImage("button-undo.png")));
     basicMenu.add(undo);
     undo.addActionListener(a -> UndoManager.instance().undo());
 
     JButton redo = new JButton();
-    redo.setIcon(new ImageIcon(RenderEngine.getImage("button-redo.png")));
+    redo.setIcon(new ImageIcon(Resources.getImage("button-redo.png")));
     basicMenu.add(redo);
 
     undo.setEnabled(false);
@@ -521,15 +516,15 @@ public class Program {
     basicMenu.addSeparator();
 
     JToggleButton place = new JToggleButton();
-    place.setIcon(new ImageIcon(RenderEngine.getImage("button-placeobject.png")));
+    place.setIcon(new ImageIcon(Resources.getImage("button-placeobject.png")));
     basicMenu.add(place);
 
     JToggleButton ed = new JToggleButton();
-    ed.setIcon(new ImageIcon(RenderEngine.getImage("button-edit.png")));
+    ed.setIcon(new ImageIcon(Resources.getImage("button-edit.png")));
     ed.setSelected(true);
 
     JToggleButton mv = new JToggleButton();
-    mv.setIcon(new ImageIcon(RenderEngine.getImage("button-move.png")));
+    mv.setIcon(new ImageIcon(Resources.getImage("button-move.png")));
     mv.setEnabled(false);
 
     ed.addActionListener(a -> {
@@ -596,14 +591,14 @@ public class Program {
     });
 
     JButton del = new JButton();
-    del.setIcon(new ImageIcon(RenderEngine.getImage("button-delete.png")));
+    del.setIcon(new ImageIcon(Resources.getImage("button-delete.png")));
     basicMenu.add(del);
     del.setEnabled(false);
     del.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
 
     // copy
     JButton cop = new JButton();
-    cop.setIcon(new ImageIcon(RenderEngine.getImage("button-copy.png")));
+    cop.setIcon(new ImageIcon(Resources.getImage("button-copy.png")));
     basicMenu.add(cop);
     cop.setEnabled(false);
     ActionListener copyAction = a -> EditorScreen.instance().getMapComponent().copy();
@@ -614,7 +609,7 @@ public class Program {
 
     // paste
     JButton paste = new JButton();
-    paste.setIcon(new ImageIcon(RenderEngine.getImage("button-paste.png")));
+    paste.setIcon(new ImageIcon(Resources.getImage("button-paste.png")));
     basicMenu.add(paste);
     ActionListener pasteAction = a -> EditorScreen.instance().getMapComponent().paste();
     paste.addActionListener(pasteAction);
@@ -624,7 +619,7 @@ public class Program {
 
     // cut
     JButton cut = new JButton();
-    cut.setIcon(new ImageIcon(RenderEngine.getImage("button-cut.png")));
+    cut.setIcon(new ImageIcon(Resources.getImage("button-cut.png")));
     basicMenu.add(cut);
     cut.setEnabled(false);
     ActionListener cutAction = a -> EditorScreen.instance().getMapComponent().cut();
@@ -657,7 +652,7 @@ public class Program {
     basicMenu.addSeparator();
 
     JLabel alphaLabel = new JLabel();
-    alphaLabel.setIcon(new ImageIcon(RenderEngine.getImage("button-alpha.png")));
+    alphaLabel.setIcon(new ImageIcon(Resources.getImage("button-alpha.png")));
     basicMenu.add(alphaLabel);
     basicMenu.add(Box.createHorizontalStrut(5));
 
@@ -679,7 +674,7 @@ public class Program {
 
     basicMenu.add(Box.createHorizontalStrut(10));
     JButton colorButton = new JButton();
-    colorButton.setIcon(new ImageIcon(RenderEngine.getImage("button-color.png")));
+    colorButton.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
     colorButton.setEnabled(false);
 
     basicMenu.add(colorButton);
@@ -731,7 +726,7 @@ public class Program {
       exitItem.addActionListener(a -> Game.terminate());
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(RenderEngine.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
+      trayIcon = new TrayIcon(Resources.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);

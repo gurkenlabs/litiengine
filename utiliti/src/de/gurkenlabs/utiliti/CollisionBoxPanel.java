@@ -6,13 +6,13 @@ import java.awt.Font;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
   JCheckBox chckbxIsObstacle;

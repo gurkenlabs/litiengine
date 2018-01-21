@@ -9,15 +9,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class AssetPanel extends JPanel {
   private static final long serialVersionUID = 140092523457098565L;
   private static final int COLUMNS = 10;
-  private static final Icon emptyDoc = new ImageIcon(RenderEngine.getImage("document_64.png"));
+  private static final Icon emptyDoc = new ImageIcon(Resources.getImage("document_64.png"));
   private final GridLayout gridLayout;
 
   public AssetPanel() {
