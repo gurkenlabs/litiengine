@@ -30,7 +30,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     Emitter emitter;
     final String emitterType = mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE);
     if (emitterType == null || emitterType.isEmpty()) {
-      return null;
+      return super.load(mapObject);
     }
 
     switch (emitterType) {
