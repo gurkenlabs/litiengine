@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Color;
+import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -15,7 +16,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
@@ -49,6 +50,8 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     light.setMapId(mapObject.getId());
     light.setName(mapObject.getName());
 
-    return light;
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(light);
+    return entities;
   }
 }

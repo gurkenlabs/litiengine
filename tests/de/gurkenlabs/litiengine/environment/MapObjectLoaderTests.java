@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.Collection;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,15 +53,18 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
     when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
-    IEntity ent = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
 
-    Assert.assertNotNull(ent);
-    Assert.assertEquals(ent.getMapId(), 111);
-    Assert.assertEquals(ent.getName(), "testProp");
-    Assert.assertEquals(ent.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(ent.getLocation().getY(), 100, 0.0001);
+    IEntity entity = entities.stream().findFirst().get();
+    Assert.assertNotNull(entity);
+    Assert.assertEquals(entity.getMapId(), 111);
+    Assert.assertEquals(entity.getName(), "testProp");
+    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
-    Prop prop = (Prop) ent;
+    Prop prop = (Prop) entity;
     Assert.assertEquals(prop.getMaterial(), Material.PLASTIC);
     Assert.assertTrue(prop.isIndestructible());
     Assert.assertTrue(prop.hasCollision());
@@ -85,7 +90,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(200);
     when(mapObject.getHeight()).thenReturn(200);
 
-    IEntity entity = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
+
+    IEntity entity = entities.stream().findFirst().get();
 
     Assert.assertNotNull(entity);
     Assert.assertEquals(entity.getMapId(), 111);
@@ -115,7 +124,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME)).thenReturn("false");
 
-    IEntity entity = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
+
+    IEntity entity = entities.stream().findFirst().get();
 
     Assert.assertNotNull(entity);
     Assert.assertEquals(entity.getMapId(), 111);
@@ -154,7 +167,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
 
-    IEntity entity = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
+
+    IEntity entity = entities.stream().findFirst().get();
 
     Assert.assertNotNull(entity);
     Assert.assertEquals(entity.getMapId(), 111);
@@ -189,7 +206,11 @@ public class MapObjectLoaderTests {
 
     when(mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE)).thenReturn("fire");
 
-    IEntity entity = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
+
+    IEntity entity = entities.stream().findFirst().get();
 
     Assert.assertNotNull(entity);
     Assert.assertEquals(entity.getMapId(), 111);
@@ -217,7 +238,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE)).thenReturn("true");
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);
 
-    IEntity entity = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(mapObject);
+    Optional<IEntity> opt = entities.stream().findFirst();
+    Assert.assertTrue(opt.isPresent());
+
+    IEntity entity = entities.stream().findFirst().get();
 
     Assert.assertNotNull(entity);
     Assert.assertEquals(entity.getMapId(), 111);

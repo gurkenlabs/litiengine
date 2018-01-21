@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.Collection;
+
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -13,7 +15,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.COLLISIONBOX) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
     }
@@ -32,6 +34,8 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
     col.setMapId(mapObject.getId());
     col.setName(mapObject.getName());
 
-    return col;
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(col);
+    return entities;
   }
 }

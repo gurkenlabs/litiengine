@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.Collection;
+
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Game;
@@ -17,7 +19,7 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + DecorMobMapObjectLoader.class);
     }
@@ -45,6 +47,8 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
     mob.setMapId(mapObject.getId());
     mob.setName(mapObject.getName());
 
-    return mob;
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(mob);
+    return entities;
   }
 }

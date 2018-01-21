@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Point;
+import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -16,7 +17,7 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.SPAWNPOINT) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + SpawnpointMapObjectLoader.class);
     }
@@ -29,6 +30,8 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
     spawn.setSpawnType(spawnType);
 
-    return spawn;
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(spawn);
+    return entities;
   }
 }

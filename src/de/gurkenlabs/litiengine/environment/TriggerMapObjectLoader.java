@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + TriggerMapObjectLoader.class);
     }
@@ -56,6 +57,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
 
-    return trigger;
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(trigger);
+    return entities;
   }
 }

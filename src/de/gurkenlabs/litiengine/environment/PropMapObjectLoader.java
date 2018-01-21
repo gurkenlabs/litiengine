@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.Collection;
+
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -18,7 +20,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public IEntity load(IMapObject mapObject) {
+  public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.PROP) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + PropMapObjectLoader.class);
     }
@@ -50,7 +52,10 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
     prop.setName(mapObject.getName());
-    return prop;
+
+    Collection<IEntity> entities = super.load(mapObject);
+    entities.add(prop);
+    return entities;
   }
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
