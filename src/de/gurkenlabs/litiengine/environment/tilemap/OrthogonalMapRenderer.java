@@ -102,7 +102,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       return ImageCache.MAPS.get(getCacheKey(map));
     }
 
-    final BufferedImage img = RenderEngine.createCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {

@@ -216,7 +216,7 @@ public final class Game {
 
     getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
 
-    getScreenManager().setIconImage(RenderEngine.getImage("litiengine-icon.png"));
+    getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
 
     // init inputs
     Input.init();

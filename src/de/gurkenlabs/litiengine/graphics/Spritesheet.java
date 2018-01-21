@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.GameDirectories;
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.util.ImageProcessing;
@@ -63,11 +64,11 @@ public final class Spritesheet {
   }
 
   private Spritesheet(final ITileset tileset) {
-    this(RenderEngine.getImage(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
+    this(Resources.getImage(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
   private Spritesheet(final String path, final int spriteWidth, final int spriteHeight) {
-    this(RenderEngine.getImage(path, true), path, spriteWidth, spriteHeight);
+    this(Resources.getImage(path, true), path, spriteWidth, spriteHeight);
   }
 
   public static Collection<Spritesheet> getSpritesheets() {

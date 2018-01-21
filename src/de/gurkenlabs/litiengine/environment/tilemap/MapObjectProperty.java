@@ -36,6 +36,8 @@ public final class MapObjectProperty {
   public static final String MOBTYPE = "mobType";
 
   public static final String OBSTACLE = "isObstacle";
+  public static final String OBSTRUCTINGLIGHTS = "isObstructingLight";
+
   // terrain
   public static final String REFLECTION = "reflection";
   // collision box

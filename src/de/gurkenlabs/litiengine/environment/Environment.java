@@ -786,6 +786,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
+      this.staticShadows.removeIf(x -> x.getOrigin() != null && x.getOrigin().equals(entity));
     }
 
     if (entity instanceof LightSource) {
@@ -901,10 +902,11 @@ public class Environment implements IEnvironment {
 
   protected void addMapObject(final IMapObject mapObject) {
     if (mapObjectLoaders.containsKey(mapObject.getType())) {
-      IEntity entity = mapObjectLoaders.get(mapObject.getType()).load(mapObject);
-      if (entity != null) {
-        this.add(entity);
-        return;
+      Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(mapObject);
+      for (IEntity entity : loadedEntities) {
+        if (entity != null) {
+          this.add(entity);
+        }
       }
     }
   }

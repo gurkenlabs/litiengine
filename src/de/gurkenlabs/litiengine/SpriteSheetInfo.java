@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.ImageProcessing;
@@ -52,7 +51,7 @@ public class SpriteSheetInfo implements Serializable {
     this.setWidth(width);
     this.setHeight(height);
     this.setName(FileUtilities.getFileName(path));
-    this.setImage(ImageProcessing.encodeToString(RenderEngine.getImage(basepath + path), ImageFormat.get(FileUtilities.getExtension(path))));
+    this.setImage(ImageProcessing.encodeToString(Resources.getImage(basepath + path), ImageFormat.get(FileUtilities.getExtension(path))));
   }
 
   public SpriteSheetInfo(final String path, final int width, final int height) {

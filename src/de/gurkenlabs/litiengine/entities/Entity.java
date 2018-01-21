@@ -222,7 +222,7 @@ public abstract class Entity implements IEntity {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (this.getName() != null) {
+    if (this.getName() != null && !this.getName().isEmpty()) {
       sb.append(this.getName());
     } else {
       sb.append(this.getClass().getSimpleName());

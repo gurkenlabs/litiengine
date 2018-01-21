@@ -50,7 +50,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.LightSource;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.components.JCheckBoxList;
@@ -58,15 +57,15 @@ import de.gurkenlabs.utiliti.components.JCheckBoxList;
 public class MapSelectionPanel extends JSplitPane {
   private static final long serialVersionUID = 1086539091850033448L;
 
-  private static final Icon PROP_ICON = new ImageIcon(RenderEngine.getImage("entity.png"));
-  private static final Icon FOLDER_ICON = new ImageIcon(RenderEngine.getImage("object_cube-10x10.png"));
-  private static final Icon LIGHT_ICON = new ImageIcon(RenderEngine.getImage("bulb.png"));
-  private static final Icon TRIGGER_ICON = new ImageIcon(RenderEngine.getImage("trigger.png"));
-  private static final Icon SPAWMPOINT_ICON = new ImageIcon(RenderEngine.getImage("spawnpoint.png"));
-  private static final Icon COLLISIONBOX_ICON = new ImageIcon(RenderEngine.getImage("collisionbox.png"));
-  private static final Icon MAPAREA_ICON = new ImageIcon(RenderEngine.getImage("maparea.png"));
-  private static final Icon SHADOWBOX_ICON = new ImageIcon(RenderEngine.getImage("shadowbox.png"));
-  private static final Icon EMITTER_ICON = new ImageIcon(RenderEngine.getImage("emitter.png"));
+  private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
+  private static final Icon FOLDER_ICON = new ImageIcon(Resources.getImage("object_cube-10x10.png"));
+  private static final Icon LIGHT_ICON = new ImageIcon(Resources.getImage("bulb.png"));
+  private static final Icon TRIGGER_ICON = new ImageIcon(Resources.getImage("trigger.png"));
+  private static final Icon SPAWMPOINT_ICON = new ImageIcon(Resources.getImage("spawnpoint.png"));
+  private static final Icon COLLISIONBOX_ICON = new ImageIcon(Resources.getImage("collisionbox.png"));
+  private static final Icon MAPAREA_ICON = new ImageIcon(Resources.getImage("maparea.png"));
+  private static final Icon SHADOWBOX_ICON = new ImageIcon(Resources.getImage("shadowbox.png"));
+  private static final Icon EMITTER_ICON = new ImageIcon(Resources.getImage("emitter.png"));
 
   private final JList<String> mapList;
   private final JCheckBoxList listObjectLayers;
@@ -138,13 +137,13 @@ public class MapSelectionPanel extends JSplitPane {
     addPopup(mapList, popupMenu);
 
     mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
-    mntmExportMap.setIcon(new ImageIcon(RenderEngine.getImage("button-map-exportx16.png")));
+    mntmExportMap.setIcon(new ImageIcon(Resources.getImage("button-map-exportx16.png")));
     mntmExportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
     popupMenu.add(mntmExportMap);
 
     mntmDeleteMap = new JMenuItem(Resources.get("hud_deleteMap"));
-    mntmDeleteMap.setIcon(new ImageIcon(RenderEngine.getImage("button-deletex16.png")));
+    mntmDeleteMap.setIcon(new ImageIcon(Resources.getImage("button-deletex16.png")));
     mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
     popupMenu.add(mntmDeleteMap);
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -188,16 +187,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeRoot.add(nodeEmitter);
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
-    this.entityNodes = new DefaultMutableTreeNode[] {
-        this.nodeProps,
-        this.nodeLights,
-        this.nodeTriggers,
-        this.nodeSpawnpoints,
-        this.nodeCollisionBoxes,
-        this.nodeMapAreas,
-        this.nodeStaticShadows,
-        this.nodeEmitter,
-    };
+    this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
 
     tree.setModel(this.entitiesTreeModel);
     tree.setCellRenderer(new IconTreeListRenderer());
@@ -244,10 +234,10 @@ public class MapSelectionPanel extends JSplitPane {
 
     btnSearch = new JButton("");
     btnSearch.addActionListener(e -> search());
-    btnSearch.setIcon(new ImageIcon(RenderEngine.getImage("search.png")));
+    btnSearch.setIcon(new ImageIcon(Resources.getImage("search.png")));
     panel.add(btnSearch, BorderLayout.EAST);
-    tabPane.setIconAt(0, new ImageIcon(RenderEngine.getImage("layer.png")));
-    tabPane.setIconAt(1, new ImageIcon(RenderEngine.getImage("object_cube-10x10.png")));
+    tabPane.setIconAt(0, new ImageIcon(Resources.getImage("layer.png")));
+    tabPane.setIconAt(1, new ImageIcon(Resources.getImage("object_cube-10x10.png")));
     this.setRightComponent(tabPane);
 
     listObjectLayers = new JCheckBoxList();
@@ -454,7 +444,7 @@ public class MapSelectionPanel extends JSplitPane {
         if (bounds == null) {
           return false;
         }
-        // set the height to the visible height to force the node to top 
+        // set the height to the visible height to force the node to top
         bounds.height = this.tree.getVisibleRect().height;
         this.tree.scrollRectToVisible(bounds);
         return true;

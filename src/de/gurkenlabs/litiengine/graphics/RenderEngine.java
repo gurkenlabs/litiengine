@@ -3,19 +3,13 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -23,11 +17,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
@@ -37,8 +28,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
 
 /**
  * The Class GraphicsEngine.
@@ -71,13 +60,6 @@ public final class RenderEngine implements IRenderEngine {
     this.entityComparator = new EntityYComparator();
 
     this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
-  }
-
-  public static BufferedImage createCompatibleImage(final int width, final int height) {
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    return config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
   /**
@@ -182,52 +164,6 @@ public final class RenderEngine implements IRenderEngine {
     g.setTransform(t);
     g.fill(shape);
     g.setTransform(oldTransForm);
-  }
-
-  public static BufferedImage getImage(final String absolutPath) {
-    return getImage(absolutPath, false);
-  }
-
-  /**
-   * Gets the image by the specified relative path. This method supports both,
-   * loading images from a folder and loading them from the resources.
-   *
-   * @param absolutPath
-   *          the image
-   * @return the image
-   */
-  public static BufferedImage getImage(final String absolutPath, final boolean forceLoad) {
-    if (absolutPath == null || absolutPath.isEmpty()) {
-      return null;
-    }
-
-    final String cacheKey = Integer.toString(absolutPath.hashCode());
-    if (!forceLoad && ImageCache.IMAGES.containsKey(cacheKey)) {
-      return ImageCache.IMAGES.get(cacheKey);
-    }
-
-    // try to get image from resource folder first and as a fallback get it from
-    // a normal folder
-    BufferedImage img = null;
-    final InputStream imageFile = FileUtilities.getGameResource(absolutPath);
-    if (imageFile != null) {
-      try {
-        img = ImageIO.read(imageFile);
-      } catch (final IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        return null;
-      }
-    }
-
-    if (img == null) {
-      return null;
-    }
-
-    final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
-    compatibleImg.createGraphics().drawImage(img, 0, 0, null);
-
-    ImageCache.IMAGES.put(cacheKey, compatibleImg);
-    return compatibleImg;
   }
 
   public static void renderImage(final Graphics2D g, final Image image, final double x, final double y) {

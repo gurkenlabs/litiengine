@@ -15,15 +15,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
-  public static final Icon DEFAULT_NODE_ICON = new ImageIcon(RenderEngine.getImage("bullet.png"));
+  public static final Icon DEFAULT_NODE_ICON = new ImageIcon(Resources.getImage("bullet.png"));
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 

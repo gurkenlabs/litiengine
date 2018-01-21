@@ -72,15 +72,7 @@ import de.gurkenlabs.utiliti.UndoManager;
 
 public class MapComponent extends EditorComponent {
   public enum TransformType {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    UPLEFT,
-    UPRIGHT,
-    DOWNLEFT,
-    DOWNRIGHT,
-    NONE
+    UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE
   }
 
   private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
@@ -200,8 +192,7 @@ public class MapComponent extends EditorComponent {
           }
           String objectName = mapObject.getName();
           if (objectName != null && !objectName.isEmpty()) {
-            Rectangle2D nameBackground = new Rectangle2D.Double(mapObject.getX(), mapObject.getBoundingBox().getMaxY() - 3,
-                mapObject.getDimension().getWidth(), 3);
+            Rectangle2D nameBackground = new Rectangle2D.Double(mapObject.getX(), mapObject.getBoundingBox().getMaxY() - 3, mapObject.getDimension().getWidth(), 3);
             g.setColor(COLOR_NAME_FILL);
             RenderEngine.fillShape(g, nameBackground);
           }
@@ -211,8 +202,7 @@ public class MapComponent extends EditorComponent {
           // render spawn points
           if (type == MapObjectType.SPAWNPOINT) {
             g.setColor(COLOR_SPAWNPOINT);
-            RenderEngine.fillShape(g,
-                new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
+            RenderEngine.fillShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
             RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
           } else if (type == MapObjectType.COLLISIONBOX) {
             g.setColor(COLOR_COLLISION_FILL);
@@ -284,8 +274,7 @@ public class MapComponent extends EditorComponent {
               e.printStackTrace();
             }
             g.setColor(collisionColor);
-            Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(),
-                mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
+            Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
             RenderEngine.fillShape(g, collisionBox);
             g.setColor(collisionShapeColor);
@@ -326,8 +315,7 @@ public class MapComponent extends EditorComponent {
           RenderEngine.drawMapText(g, rect.getHeight() + "", rect.getX() - 10, rect.getY() + rect.getHeight() / 2);
         }
         g.setColor(new Color(0, 130, 152, 150));
-        RenderEngine.drawShape(g, rect,
-            new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
+        RenderEngine.drawShape(g, rect, new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
       }
       break;
     }
@@ -358,13 +346,11 @@ public class MapComponent extends EditorComponent {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera()
-          .getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(COLOR_FOCUS_BORDER);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2,
-          loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
+      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
       if (MapObjectType.get(focusedMapObject.getType()) == MapObjectType.TRIGGER) {
         g.setColor(COLOR_NOCOLLISION_BORDER);
         g.setFont(Program.TEXT_FONT.deriveFont(11f));
@@ -378,12 +364,10 @@ public class MapComponent extends EditorComponent {
       g.setColor(new Color(255, 255, 255, 100));
       final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
       final double viewPortX = Math.max(0, Game.getCamera().getViewPort().getX());
-      final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(),
-          Game.getCamera().getViewPort().getMaxX());
+      final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(), Game.getCamera().getViewPort().getMaxX());
 
       final double viewPortY = Math.max(0, Game.getCamera().getViewPort().getY());
-      final double viewPortMaxY = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getHeight(),
-          Game.getCamera().getViewPort().getMaxY());
+      final double viewPortMaxY = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getHeight(), Game.getCamera().getViewPort().getMaxY());
       final int startX = Math.max(0, (int) (viewPortX / gridSize) * gridSize);
       final int startY = Math.max(0, (int) (viewPortY / gridSize) * gridSize);
       for (int x = startX; x <= viewPortMaxX; x += gridSize) {
@@ -494,8 +478,7 @@ public class MapComponent extends EditorComponent {
       }
       for (TransformType type : this.transformRects.keySet()) {
         Rectangle2D rect = this.transformRects.get(type);
-        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4,
-            rect.getHeight() * 4);
+        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
         if (hoverrect.contains(Input.mouse().getMapLocation())) {
           hovered = true;
           if (type == TransformType.DOWN || type == TransformType.UP) {
@@ -785,9 +768,7 @@ public class MapComponent extends EditorComponent {
       int x = (int) Input.mouse().getMapLocation().getX();
       int y = (int) Input.mouse().getMapLocation().getY();
 
-      this.newObject = new Rectangle(x, y,
-          (int) this.copiedMapObject.getDimension().getWidth(),
-          (int) this.copiedMapObject.getDimension().getHeight());
+      this.newObject = new Rectangle(x, y, (int) this.copiedMapObject.getDimension().getWidth(), (int) this.copiedMapObject.getDimension().getHeight());
       this.copyMapObject(this.copiedMapObject);
     }
   }
@@ -804,11 +785,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(
-        null,
-        "Do you really want to delete the entity [" + deleteObject.getId() + "]",
-        "Delete Entity?",
-        JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(null, "Do you really want to delete the entity [" + deleteObject.getId() + "]", "Delete Entity?", JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
       UndoManager.instance().mapObjectDeleting(deleteObject);
@@ -824,8 +801,7 @@ public class MapComponent extends EditorComponent {
     MapObjectType type = MapObjectType.valueOf(mapObject.getType());
     Game.getEnvironment().getMap().removeMapObject(mapObject.getId());
     Game.getEnvironment().remove(mapObject.getId());
-    if (type == MapObjectType.STATICSHADOW ||
-        type == MapObjectType.LIGHTSOURCE) {
+    if (type == MapObjectType.STATICSHADOW || type == MapObjectType.LIGHTSOURCE) {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
@@ -907,8 +883,7 @@ public class MapComponent extends EditorComponent {
       if (trans == TransformType.NONE) {
         continue;
       }
-      Rectangle2D transRect = new Rectangle2D.Double(this.getTransX(trans, focus), this.getTransY(trans, focus), this.currentTransformRectSize,
-          this.currentTransformRectSize);
+      Rectangle2D transRect = new Rectangle2D.Double(this.getTransX(trans, focus), this.getTransY(trans, focus), this.currentTransformRectSize, this.currentTransformRectSize);
       this.transformRects.put(trans, transRect);
     }
   }
@@ -922,11 +897,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(
-        null,
-        Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(),
-        Resources.get("hud_deleteMap"),
-        JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(null, Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
 
     if (n != JOptionPane.YES_OPTION) {
       return;
@@ -970,7 +941,8 @@ public class MapComponent extends EditorComponent {
 
         if (map.getMapObjectLayers().size() == 0) {
 
-          // make sure there's a map object layer on the map because we need one to add any kind of entities
+          // make sure there's a map object layer on the map because we need one to add
+          // any kind of entities
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
           map.addMapObjectLayer(layer);
@@ -978,11 +950,7 @@ public class MapComponent extends EditorComponent {
 
         Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
         if (current.isPresent()) {
-          int n = JOptionPane.showConfirmDialog(
-              null,
-              "Do you really want to replace the existing map '" + map.getFileName() + "' ?",
-              "Replace Map",
-              JOptionPane.YES_NO_OPTION);
+          int n = JOptionPane.showConfirmDialog(null, "Do you really want to replace the existing map '" + map.getFileName() + "' ?", "Replace Map", JOptionPane.YES_NO_OPTION);
 
           if (n == JOptionPane.YES_OPTION) {
             this.getMaps().remove(current.get());
@@ -1010,7 +978,7 @@ public class MapComponent extends EditorComponent {
         }
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
-          BufferedImage img = RenderEngine.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+          BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
           this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
@@ -1061,8 +1029,7 @@ public class MapComponent extends EditorComponent {
         String dir = FileUtilities.getParentDirPath(newFile);
         for (ITileset tileSet : map.getTilesets()) {
           ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
-          ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(),
-              Spritesheet.find(tileSet.getImage().getSource()).getImage(), format);
+          ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Spritesheet.find(tileSet.getImage().getSource()).getImage(), format);
         }
 
         System.out.println("exported " + map.getFileName() + " to " + newFile);
@@ -1347,8 +1314,7 @@ public class MapComponent extends EditorComponent {
     dragObject.setY((int) newY);
 
     Game.getEnvironment().reloadFromMap(dragObject.getId());
-    if (MapObjectType.get(dragObject.getType()) == MapObjectType.STATICSHADOW
-        || MapObjectType.get(dragObject.getType()) == MapObjectType.LIGHTSOURCE) {
+    if (MapObjectType.get(dragObject.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(dragObject.getType()) == MapObjectType.LIGHTSOURCE) {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 

@@ -17,11 +17,19 @@ public interface ICustomPropertyProvider {
 
   public int getCustomPropertyInt(String name);
 
+  public int getCustomPropertyInt(String name, int defaultValue);
+
   public boolean getCustomPropertyBool(String name);
+
+  public boolean getCustomPropertyBool(String name, boolean defaultValue);
 
   public float getCustomPropertyFloat(String name);
 
+  public float getCustomPropertyFloat(String name, float defaultValue);
+
   public double getCustomPropertyDouble(String name);
+
+  public double getCustomPropertyDouble(String name, double defaultValue);
 
   public void setCustomProperty(String name, String value);
 
