@@ -11,6 +11,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.entities.Prop;
 
 public class AssetTree extends JTree {
   private static final long serialVersionUID = -1889916538755378262L;
@@ -60,9 +61,9 @@ public class AssetTree extends JTree {
     final TreePath propPath = new TreePath(this.nodeSpriteProps.getPath());
     final TreePath miscPath = new TreePath(this.nodeSpriteMisc.getPath());
     if (selectedPath != null && this.getSelectionPath().equals(propPath)) {
-      Program.getAssetPanel().load(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains("prop-")).collect(Collectors.toList()));
+      Program.getAssetPanel().load(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));
     } else if (selectedPath != null && getSelectionPath().equals(miscPath)) {
-      Program.getAssetPanel().load(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains("prop-")).collect(Collectors.toList()));
+      Program.getAssetPanel().load(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));
     }
   }
 }

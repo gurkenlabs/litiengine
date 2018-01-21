@@ -24,6 +24,7 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Material;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -66,45 +67,28 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
     chckbxShadow = new JCheckBox("shadow");
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxMaterial, 0, 365, Short.MAX_VALUE)
-                    .addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-                        .addComponent(chckbxIsObstacle, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(chckbxIndestructible, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap()));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxMaterial, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(chckbxIndestructible)
-                .addPreferredGap(ComponentPlacement.UNRELATED)
-                .addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(138, Short.MAX_VALUE)));
+    groupLayout
+        .setHorizontalGroup(
+            groupLayout
+                .createParallelGroup(
+                    Alignment.LEADING)
+                .addGroup(
+                    groupLayout.createSequentialGroup().addContainerGap()
+                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblSprite,
+                            GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addGroup(
+                            groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxMaterial, 0, 365, Short.MAX_VALUE)
+                                .addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+                                    .addComponent(chckbxIsObstacle, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(chckbxIndestructible, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap()));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxMaterial, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxIndestructible).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
+            .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addContainerGap(138, Short.MAX_VALUE)));
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
@@ -175,12 +159,14 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
-      if (spriteName.startsWith("prop-")) {
-        String[] parts = spriteName.split("-");
-        String propName = parts[1];
-        if (!m.containsKey(propName)) {
-          m.put(propName, spriteName);
-        }
+      String propName = Prop.getNameBySpriteName(spriteName);
+
+      if (propName == null) {
+        continue;
+      }
+
+      if (!m.containsKey(propName)) {
+        m.put(propName, spriteName);
       }
     }
 
@@ -206,8 +192,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   class MyComboRenderer implements ListCellRenderer {
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value,
-        int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       if (value != null) {
         return (JLabel) value;
       }

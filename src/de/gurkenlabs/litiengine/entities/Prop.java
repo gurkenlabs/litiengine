@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
  * The Class Destructable.
  */
 public class Prop extends CombatEntity {
+  public static final String SPRITESHEET_PREFIX = "prop-";
   private Material material;
   private String spritesheetName;
   private boolean isObstacle;
@@ -23,6 +24,19 @@ public class Prop extends CombatEntity {
     this.material = mat;
     this.setLocation(location);
     this.updateAnimationController();
+  }
+
+  public static String getNameBySpriteName(String spriteName) {
+    if (spriteName == null || spriteName.isEmpty()) {
+      return spriteName;
+    }
+
+    if (!spriteName.toLowerCase().startsWith(SPRITESHEET_PREFIX)) {
+      return null;
+    }
+
+    String[] parts = spriteName.split("-");
+    return parts[1];
   }
 
   public Material getMaterial() {

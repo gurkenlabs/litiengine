@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 
 public class UndoManager {
-  private static final int MAX_STACK_SIZE = 10;
+  private static final int MAX_STACK_SIZE = 100;
   private UndoState[] undoStack;
   private List<IMapObject> changing;
   private int currentIndex = -1;
@@ -69,7 +69,7 @@ public class UndoManager {
   }
 
   public void redo() {
-    if (this.undoStack[this.currentIndex + 1] == null) {
+    if (this.undoStack.length - 1 == this.currentIndex || this.undoStack[this.currentIndex + 1] == null) {
       return;
     }
 
@@ -114,7 +114,8 @@ public class UndoManager {
     }
 
     if (this.changing.contains(mapObject)) {
-      // the old state is already tracked, while multiple changes are carried out, we don't want to track the steps in between
+      // the old state is already tracked, while multiple changes are carried out, we
+      // don't want to track the steps in between
       return;
     }
 
@@ -228,9 +229,7 @@ public class UndoManager {
   }
 
   private enum OperationType {
-    CHANGE,
-    ADD,
-    DELETE
+    CHANGE, ADD, DELETE
   }
 
   public class UndoState {
