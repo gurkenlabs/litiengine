@@ -20,7 +20,6 @@ public final class MapObjectProperty {
   public static final String DECORMOB_BEHAVIOUR = "decormob-behaviour";
 
   public static final String DECORMOB_VELOCITY = "decormob-velocity";
-  public static final String EMITTERTYPE = "emitterType";
   public static final String FRICTION = "friction";
   public static final String HEALTH = "health";
   public static final String INDESTRUCTIBLE = "indestructible";
@@ -58,6 +57,32 @@ public final class MapObjectProperty {
 
   public static final String TRIGGERONETIME = "triggerOneTime";
   public static final String TRIGGERTARGETS = "triggerTarget";
+
+  public static final String EMITTERCOLORS = "emitterColors";
+  public static final String EMITTERCOLORPROBABILITIES = "emitterColorProbabilities";
+  public static final String EMITTERSPAWNRATE = "emitterSpawnRate";
+  public static final String EMITTERSPAWNAMOUNT = "emitterSpawnAmount";
+  public static final String EMITTERUPDATEDELAY = "emitterUpdateDelay";
+  public static final String EMITTERTIMETOLIVE = "emitterTimeToLive";
+  public static final String EMITTERMAXPARTICLES = "emitterMaxParticles";
+  public static final String EMITTERPARTICLETYPE = "emitterParticleType";
+  public static final String EMITTERCOLORDEVIATION = "emitterColorDeviation";
+  public static final String EMITTERALPHADEVIATION = "emitterAlphaDeviation";
+  
+  public static final String PARTICLEDELTAX = "particleDeltaX";
+  public static final String PARTICLEDELTAY = "particleDeltaY";
+  public static final String PARTICLEGRAVITYX = "particleGravityX";
+  public static final String PARTICLEGRAVITYY = "particleGravityY";
+  public static final String PARTICLESTARTWIDTH = "particleStartWidth";
+  public static final String PARTICLESTARTHEIGHT = "particleStartHeight";
+  public static final String PARTICLEDELTAWIDTH = "particleDeltaWidth";
+  public static final String PARTICLEDELTAHEIGHT = "particleDeltaHeight";
+  public static final String PARTICLESPRITETYPE = "particleSpriteType";
+  public static final String PARTICLESPRITE = "particleSprite";
+  public static final String PARTICLESTATICPHYSICS = "particleStaticPhysics";
+  public static final String PARTICLETEXT = "particleText";
+
+
 
   private static List<Field> availableProperties = new ArrayList<>();
 

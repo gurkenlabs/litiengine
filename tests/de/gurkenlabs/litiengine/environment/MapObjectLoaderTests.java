@@ -204,7 +204,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE)).thenReturn("fire");
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();

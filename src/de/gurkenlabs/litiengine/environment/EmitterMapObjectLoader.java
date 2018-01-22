@@ -18,8 +18,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
   }
 
   /***
-   * TODO 04.10.2017: refactor this implementation because the hard coded emitter
-   * types are not a proper approach.
+   * TODO 04.10.2017: refactor this implementation because the hard coded
+   * emitter types are not a proper approach.
    */
   @Override
   public Collection<IEntity> load(IMapObject mapObject) {
@@ -27,35 +27,12 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + EmitterMapObjectLoader.class);
     }
 
-    Emitter emitter;
-    final String emitterType = mapObject.getCustomProperty(MapObjectProperty.EMITTERTYPE);
-    if (emitterType == null || emitterType.isEmpty()) {
-      return super.load(mapObject);
-    }
+    CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
 
-    switch (emitterType) {
-    case "fire":
-      emitter = new FireEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    case "shimmer":
-      emitter = new ShimmerEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
-      break;
-    default:
-      emitter = null;
-      break;
-    }
-
-    // try to load custom emitter
-    if (emitter == null && emitterType.endsWith(".xml")) {
-      emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y, emitterType);
-    }
-
-    if (emitter != null) {
-      emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-      emitter.setLocation(mapObject.getLocation());
-      emitter.setMapId(mapObject.getId());
-      emitter.setName(mapObject.getName());
-    }
+    emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
+    emitter.setLocation(mapObject.getLocation());
+    emitter.setMapId(mapObject.getId());
+    emitter.setName(mapObject.getName());
 
     Collection<IEntity> entities = super.load(mapObject);
     if (emitter != null) {
