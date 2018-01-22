@@ -189,13 +189,13 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
   }
 
-  class MyComboRenderer implements ListCellRenderer {
-
+  class MyComboRenderer implements ListCellRenderer<JLabel> {
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends JLabel> list, JLabel value, int index, boolean isSelected, boolean cellHasFocus) {
       if (value != null) {
-        return (JLabel) value;
+        return value;
       }
+
       return new JLabel();
     }
   }

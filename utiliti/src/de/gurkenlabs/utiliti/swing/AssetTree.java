@@ -16,7 +16,6 @@ import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 
 public class AssetTree extends JTree {
-  private static final long serialVersionUID = -1889916538755378262L;
   private static final Icon ASSET_ICON = new ImageIcon(Resources.getImage("asset.png"));
   private static final Icon SPRITESHEET_ICON = new ImageIcon(Resources.getImage("spritesheet.png"));
   private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));

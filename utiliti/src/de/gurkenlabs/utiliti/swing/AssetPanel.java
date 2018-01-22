@@ -15,7 +15,6 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class AssetPanel extends JPanel {
-  private static final long serialVersionUID = 140092523457098565L;
   private static final int COLUMNS = 10;
   private static final Icon emptyDoc = new ImageIcon(Resources.getImage("document_64.png"));
   private final GridLayout gridLayout;

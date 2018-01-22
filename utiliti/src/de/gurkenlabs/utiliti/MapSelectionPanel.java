@@ -57,8 +57,6 @@ import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
-  private static final long serialVersionUID = 1086539091850033448L;
-
   private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
   private static final Icon FOLDER_ICON = new ImageIcon(Resources.getImage("object_cube-10x10.png"));
   private static final Icon LIGHT_ICON = new ImageIcon(Resources.getImage("bulb.png"));

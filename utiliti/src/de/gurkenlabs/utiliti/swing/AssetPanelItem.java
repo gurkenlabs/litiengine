@@ -39,7 +39,6 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 
 public class AssetPanelItem extends JPanel {
-  private static final long serialVersionUID = 3857716676105299144L;
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
