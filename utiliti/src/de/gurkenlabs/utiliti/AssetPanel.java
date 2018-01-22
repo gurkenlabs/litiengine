@@ -28,6 +28,8 @@ public class AssetPanel extends JPanel {
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
     this.setBackground(Color.DARK_GRAY);
+
+    // TODO: implement support for arrow keys to change focus
   }
 
   public void load(List<SpriteSheetInfo> infos) {

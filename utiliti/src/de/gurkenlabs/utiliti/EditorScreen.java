@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
@@ -339,8 +341,6 @@ public class EditorScreen extends Screen {
         }
 
         this.loadSpriteSheets(infos);
-        ImageCache.clearAll();
-        this.getMapComponent().reloadEnvironment();
       }
 
     } catch (IOException e) {
@@ -349,6 +349,7 @@ public class EditorScreen extends Screen {
   }
 
   public void importSprites() {
+
     JFileChooser chooser;
 
     try {
@@ -359,18 +360,39 @@ public class EditorScreen extends Screen {
       chooser.addChoosableFileFilter(filter);
       chooser.setMultiSelectionEnabled(true);
       if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-        for (File spriteFile : chooser.getSelectedFiles()) {
-          if (spriteFile == null) {
-            return;
-          }
-
-          // TODO: Implement this
+        SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(chooser.getSelectedFiles());
+        int option = JOptionPane.showConfirmDialog(null, spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option != JOptionPane.OK_OPTION) {
+          return;
         }
-      }
 
-    } catch (IOException e) {
+        final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
+        for (SpriteSheetInfo spriteFile : sprites) {
+          this.gameFile.getSpriteSheets().add(spriteFile);
+        }
+
+        this.loadSpriteSheets(sprites);
+      }
+    } catch (
+
+    IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
+  }
+
+  public void loadSpriteSheets(Collection<SpriteSheetInfo> infos) {
+    for (SpriteSheetInfo info : infos) {
+      Spritesheet.remove(info.getName());
+      if (info.getHeight() == 0 && info.getWidth() == 0) {
+        continue;
+      }
+
+      Spritesheet.load(info);
+    }
+
+    ImageCache.clearAll();
+    this.getMapComponent().reloadEnvironment();
+    Program.getAssetTree().forceUpdate();
   }
 
   public void save(boolean selectFile) {
@@ -545,15 +567,5 @@ public class EditorScreen extends Screen {
     }
 
     log.log(Level.INFO, cnt + " tilesets loaded from '" + map.getFileName() + "'");
-  }
-
-  private void loadSpriteSheets(List<SpriteSheetInfo> infos) {
-    for (SpriteSheetInfo info : infos) {
-      if (info.getHeight() == 0 && info.getWidth() == 0) {
-        continue;
-      }
-
-      Spritesheet.load(info);
-    }
   }
 }

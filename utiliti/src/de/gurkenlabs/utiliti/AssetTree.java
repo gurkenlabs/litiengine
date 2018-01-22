@@ -50,6 +50,10 @@ public class AssetTree extends JTree {
     });
   }
 
+  public void forceUpdate() {
+    loadAssetsOfCurrentSelection(this.getSelectionPath());
+  }
+
   @Override
   protected void setExpandedState(TreePath path, boolean state) {
     if (state) {

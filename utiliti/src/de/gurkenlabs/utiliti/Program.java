@@ -82,6 +82,7 @@ public class Program {
   private static final Logger log = Logger.getLogger(Program.class.getName());
   private static Menu recentFiles;
   private static AssetPanel assetPanel;
+  private static AssetTree assetTree;
   private static boolean isChanging;
 
   public static void main(String[] args) {
@@ -145,6 +146,10 @@ public class Program {
 
   public static AssetPanel getAssetPanel() {
     return assetPanel;
+  }
+
+  public static AssetTree getAssetTree() {
+    return assetTree;
   }
 
   private static boolean exit() {
@@ -453,8 +458,8 @@ public class Program {
 
   private static Component initAssetsComponent() {
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    AssetTree tree = new AssetTree();
-    split.setLeftComponent(tree);
+    assetTree = new AssetTree();
+    split.setLeftComponent(assetTree);
     assetPanel = new AssetPanel();
 
     JScrollPane scrollPane = new JScrollPane(assetPanel);
