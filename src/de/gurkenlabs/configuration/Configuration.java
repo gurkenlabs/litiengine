@@ -108,7 +108,7 @@ public class Configuration {
 
   private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {
     try {
-      final Properties groupProperties = new Properties();
+      final Properties groupProperties = new CleanProperties();
       group.storeProperties(groupProperties);
       groupProperties.store(out, group.getPrefix() + "SETTINGS");
       out.flush();

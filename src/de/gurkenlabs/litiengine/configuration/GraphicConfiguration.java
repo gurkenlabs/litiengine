@@ -12,7 +12,7 @@ import de.gurkenlabs.configuration.Quality;
  * The Class GraphicSettings contains all settings that allow to influence the
  * appearance of the game.
  */
-@ConfigurationGroupInfo(prefix = "GRAPHIC_")
+@ConfigurationGroupInfo(prefix = "gfx_")
 public class GraphicConfiguration extends ConfigurationGroup {
 
   /** The fullscreen. */

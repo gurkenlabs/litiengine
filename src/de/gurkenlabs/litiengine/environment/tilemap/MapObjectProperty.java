@@ -68,7 +68,7 @@ public final class MapObjectProperty {
   public static final String EMITTERPARTICLETYPE = "emitterParticleType";
   public static final String EMITTERCOLORDEVIATION = "emitterColorDeviation";
   public static final String EMITTERALPHADEVIATION = "emitterAlphaDeviation";
-  
+
   public static final String PARTICLEDELTAX = "particleDeltaX";
   public static final String PARTICLEDELTAY = "particleDeltaY";
   public static final String PARTICLEGRAVITYX = "particleGravityX";
@@ -81,8 +81,6 @@ public final class MapObjectProperty {
   public static final String PARTICLESPRITE = "particleSprite";
   public static final String PARTICLESTATICPHYSICS = "particleStaticPhysics";
   public static final String PARTICLETEXT = "particleText";
-
-
 
   private static List<Field> availableProperties = new ArrayList<>();
 

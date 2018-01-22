@@ -6,7 +6,7 @@ import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 /**
  * The Class SoundSettings.
  */
-@ConfigurationGroupInfo(prefix = "SOUND_")
+@ConfigurationGroupInfo(prefix = "sfx_")
 public class SoundConfiguration extends ConfigurationGroup {
 
   private float musicVolume;

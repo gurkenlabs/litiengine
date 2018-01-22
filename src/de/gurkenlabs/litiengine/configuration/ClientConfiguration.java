@@ -8,7 +8,7 @@ import de.gurkenlabs.configuration.ConfigurationGroupInfo;
 /**
  * The client configuration contains client specific configuration elements.
  */
-@ConfigurationGroupInfo(prefix = "CLIENT_")
+@ConfigurationGroupInfo(prefix = "cl_")
 public class ClientConfiguration extends ConfigurationGroup {
 
   private String country;
