@@ -125,20 +125,24 @@ public final class Spritesheet {
   }
 
   public static Spritesheet load(final SpriteSheetInfo info) {
+    Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
       if (info.getPath() == null || info.getPath().isEmpty()) {
         log.log(Level.SEVERE, "Sprite '{0}' could not be loaded because neither an image nor a path is defined.", new Object[] { info.getName() });
         return null;
       }
 
-      Spritesheet sprite = Spritesheet.load(GameDirectories.SPRITES + info.getPath(), info.getWidth(), info.getHeight());
-      if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
-        customKeyFrameDurations.put(sprite.getName().toLowerCase(), info.getKeyframes());
-      }
+      sprite = Spritesheet.load(info.getPath(), info.getWidth(), info.getHeight());
 
-      return sprite;
+    } else {
+      sprite = Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
     }
-    return Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
+
+    if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
+      customKeyFrameDurations.put(sprite.getName().toLowerCase(), info.getKeyframes());
+    }
+
+    return sprite;
   }
 
   /**
