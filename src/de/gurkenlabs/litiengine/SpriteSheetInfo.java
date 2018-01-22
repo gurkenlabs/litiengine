@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 import javax.xml.bind.Marshaller;
@@ -37,28 +38,34 @@ public class SpriteSheetInfo implements Serializable {
   private String keyframes;
 
   public SpriteSheetInfo() {
+    // keep empty constructor for serialization
   }
 
   public SpriteSheetInfo(final Spritesheet sprite) {
-    this.setWidth(sprite.getSpriteWidth());
-    this.setHeight(sprite.getSpriteHeight());
+    this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage(), sprite.getImageFormat()));
-    this.setName(sprite.getName());
     this.setKeyframes(Spritesheet.getCustomKeyFrameDurations(sprite));
   }
 
   public SpriteSheetInfo(final String basepath, final String path, final int width, final int height) {
-    this.setWidth(width);
-    this.setHeight(height);
-    this.setName(FileUtilities.getFileName(path));
+    this(width, height, FileUtilities.getFileName(path));
     this.setImage(ImageProcessing.encodeToString(Resources.getImage(basepath + path), ImageFormat.get(FileUtilities.getExtension(path))));
   }
 
   public SpriteSheetInfo(final String path, final int width, final int height) {
+    this(width, height, FileUtilities.getFileName(path));
+    this.setPath(path);
+  }
+
+  public SpriteSheetInfo(final BufferedImage image, String name, final int width, final int height) {
+    this(width, height, name);
+    this.setImage(ImageProcessing.encodeToString(image));
+  }
+
+  private SpriteSheetInfo(int width, int height, String name) {
     this.setWidth(width);
     this.setHeight(height);
-    this.setName(FileUtilities.getFileName(path));
-    this.setPath(path);
+    this.setName(name);
   }
 
   @XmlTransient
