@@ -298,7 +298,7 @@ public class SpritesheetImportPanel extends JPanel {
     }
 
     private SpriteFileWrapper(BufferedImage image, String name) {
-      this.icon = new ImageIcon(image);
+      this.icon = new ImageIcon(ImageProcessing.scaleImage(image, 280, 128, true));
       this.image = image;
       this.width = this.image.getWidth();
       this.height = this.image.getHeight();
