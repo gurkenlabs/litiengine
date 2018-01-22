@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +81,9 @@ public class CustomEmitterData {
 
   @XmlAttribute
   private int width;
+  
+  @XmlAttribute
+  private ParticleParameter colorDeviation;
 
   @XmlElement
   private ParticleParameter x;
@@ -188,6 +192,16 @@ public class CustomEmitterData {
   }
 
   @XmlTransient
+  public ParticleParameter getParticleX() {
+    return this.x;
+  }
+
+  @XmlTransient
+  public ParticleParameter getParticleY() {
+    return this.y;
+  }
+  
+  @XmlTransient
   public int getSpawnAmount() {
     return this.spawnAmount;
   }
@@ -208,16 +222,6 @@ public class CustomEmitterData {
   }
 
   @XmlTransient
-  public ParticleParameter getX() {
-    return this.x;
-  }
-
-  @XmlTransient
-  public ParticleParameter getY() {
-    return this.y;
-  }
-
-  @XmlTransient
   public boolean isApplyingStaticPhysics() {
     return this.applyStaticPhysics;
   }
@@ -228,6 +232,12 @@ public class CustomEmitterData {
 
   public void setColors(final List<ParticleColor> colors) {
     this.colors = colors;
+  }
+
+  public void setColor(Color color) {
+    List<ParticleColor> tmpList = new ArrayList<>();
+    tmpList.add(new ParticleColor(color));
+    this.colors = tmpList;
   }
 
   public void setDeltaHeight(final ParticleParameter deltaHeight) {
@@ -310,11 +320,11 @@ public class CustomEmitterData {
     this.width = width;
   }
 
-  public void setX(final ParticleParameter x) {
+  public void setParticleX(final ParticleParameter x) {
     this.x = x;
   }
 
-  public void setY(final ParticleParameter y) {
+  public void setParticleY(final ParticleParameter y) {
     this.y = y;
   }
 
