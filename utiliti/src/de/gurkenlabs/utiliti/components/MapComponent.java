@@ -759,6 +759,7 @@ public class MapComponent extends EditorComponent {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
+    Game.getScreenManager().getRenderComponent().requestFocus();
     this.setFocus(mapObject);
     this.setEditMode(EDITMODE_EDIT);
     UndoManager.instance().mapObjectAdded(mapObject);

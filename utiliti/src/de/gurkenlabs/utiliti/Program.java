@@ -203,6 +203,7 @@ public class Program {
     }
 
     Canvas render = Game.getScreenManager().getRenderComponent();
+    render.setFocusable(true);
     render.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
     window.remove(render);
     JPanel renderPane = new JPanel(new BorderLayout());

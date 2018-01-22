@@ -194,7 +194,7 @@ public class MapSelectionPanel extends JSplitPane {
     tree.setMaximumSize(new Dimension(0, 250));
     MouseListener ml = new MouseAdapter() {
       @Override
-      public void mousePressed(MouseEvent e) {
+      public void mouseClicked(MouseEvent e) {
         int selRow = tree.getRowForLocation(e.getX(), e.getY());
         if (selRow != -1 && e.getClickCount() == 2) {
           EditorScreen.instance().getMapComponent().centerCameraOnFocus();
@@ -208,11 +208,13 @@ public class MapSelectionPanel extends JSplitPane {
       try {
         if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-          if (node.getUserObject() instanceof IEntity) {
-            IEntity ent = (IEntity) node.getUserObject();
-            IMapObject obj = Game.getEnvironment().getMap().getMapObject(ent.getMapId());
-            if (obj != null) {
-              EditorScreen.instance().getMapComponent().setFocus(obj);
+          if (node.getUserObject() instanceof IconTreeListItem) {
+            IconTreeListItem item = (IconTreeListItem) node.getUserObject();
+            if (item.getUserObject() instanceof IEntity) {
+              IMapObject obj = Game.getEnvironment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
+              if (obj != null) {
+                EditorScreen.instance().getMapComponent().setFocus(obj);
+              }
             }
           }
         }

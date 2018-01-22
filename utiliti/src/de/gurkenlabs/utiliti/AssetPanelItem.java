@@ -117,7 +117,7 @@ public class AssetPanelItem extends JPanel {
 
     this.iconLabel.addMouseListener(new MouseAdapter() {
       @Override
-      public void mousePressed(MouseEvent e) {
+      public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
 
           // TODO: experimental code... this needs to be refactored with issue #66
@@ -144,6 +144,7 @@ public class AssetPanelItem extends JPanel {
             mo.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, propName);
 
             EditorScreen.instance().getMapComponent().add(mo);
+            e.consume();
           }
         }
       }
