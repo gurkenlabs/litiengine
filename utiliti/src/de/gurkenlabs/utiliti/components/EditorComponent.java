@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.utiliti.EditorScreen;
 
-public class EditorComponent extends GuiComponent {
+public abstract class EditorComponent extends GuiComponent {
 
   public enum ComponentType {
     MAP
@@ -24,5 +24,4 @@ public class EditorComponent extends GuiComponent {
   public void setComponentType(ComponentType componentType) {
     this.componentType = componentType;
   }
-
 }

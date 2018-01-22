@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Dimension;
 import java.util.stream.Collectors;
@@ -12,6 +12,8 @@ import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Program;
 
 public class AssetTree extends JTree {
   private static final long serialVersionUID = -1889916538755378262L;

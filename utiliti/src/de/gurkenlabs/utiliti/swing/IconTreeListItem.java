@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing;
 
 import javax.swing.Icon;
 

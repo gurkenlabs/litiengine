@@ -47,6 +47,8 @@ import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 @ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {

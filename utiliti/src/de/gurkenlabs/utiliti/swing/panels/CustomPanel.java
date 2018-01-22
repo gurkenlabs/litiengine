@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
+import de.gurkenlabs.utiliti.UndoManager;
 
 public class CustomPanel extends PropertyPanel<IMapObject> {
   private JTable tableCustomProperties;

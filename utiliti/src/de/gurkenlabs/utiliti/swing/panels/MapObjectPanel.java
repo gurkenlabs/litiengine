@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -23,6 +23,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.utiliti.EditorScreen;
 
 public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final Map<MapObjectType, PropertyPanel<IMapObject>> panels;

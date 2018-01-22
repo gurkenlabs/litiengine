@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,7 +28,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Game;
@@ -38,6 +37,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
+import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Program;
 
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   DefaultTableModel model;

@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.components;
+package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.awt.Font;
 import java.text.NumberFormat;

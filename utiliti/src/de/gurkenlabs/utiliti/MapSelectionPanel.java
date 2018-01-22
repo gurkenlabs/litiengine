@@ -52,7 +52,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.utiliti.components.JCheckBoxList;
+import de.gurkenlabs.utiliti.swing.IconTreeListItem;
+import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
+import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
   private static final long serialVersionUID = 1086539091850033448L;

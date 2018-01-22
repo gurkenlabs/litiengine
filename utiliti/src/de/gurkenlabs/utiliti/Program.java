@@ -59,9 +59,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.utiliti.components.GridEditPanel;
 import de.gurkenlabs.utiliti.components.MapComponent;
-import de.gurkenlabs.utiliti.components.MapPropertyPanel;
+import de.gurkenlabs.utiliti.swing.AssetPanel;
+import de.gurkenlabs.utiliti.swing.AssetTree;
+import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
+import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
+import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);

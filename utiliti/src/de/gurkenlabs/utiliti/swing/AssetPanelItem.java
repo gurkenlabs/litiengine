@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,6 +34,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 
 public class AssetPanelItem extends JPanel {
   private static final long serialVersionUID = 3857716676105299144L;

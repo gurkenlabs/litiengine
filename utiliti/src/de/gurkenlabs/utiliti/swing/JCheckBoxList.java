@@ -1,4 +1,4 @@
-package de.gurkenlabs.utiliti.components;
+package de.gurkenlabs.utiliti.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
