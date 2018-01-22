@@ -204,7 +204,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     Assert.assertTrue(opt.isPresent());
@@ -215,10 +214,7 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(entity.getMapId(), 111);
     Assert.assertEquals(entity.getName(), "testEmitter");
     Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 300, 0.0001);
-
-    Emitter emitter = (Emitter) entity;
-    Assert.assertTrue(emitter instanceof FireEmitter);
+    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
   }
 
   @Test

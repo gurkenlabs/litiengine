@@ -191,6 +191,7 @@ public final class Spritesheet {
 
   public static void remove(final String path) {
     spritesheets.values().removeIf(x -> x.getName().equals(path));
+    customKeyFrameDurations.remove(path);
   }
 
   /**
