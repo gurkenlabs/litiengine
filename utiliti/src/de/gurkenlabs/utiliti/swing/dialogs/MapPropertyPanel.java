@@ -60,7 +60,7 @@ public class MapPropertyPanel extends JPanel {
 
     JButton button = new JButton("...");
     button.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(null, "Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
+      Color result = JColorChooser.showDialog(this, "Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
       if (result == null) {
         return;
       }

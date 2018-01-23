@@ -557,7 +557,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(null, "Do you really want to delete the entity [" + deleteObject.getId() + "]", "Delete Entity?", JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the entity [" + deleteObject.getId() + "]", "Delete Entity?", JOptionPane.YES_NO_OPTION);
 
     if (n == JOptionPane.OK_OPTION) {
       UndoManager.instance().mapObjectDeleting(deleteObject);
@@ -669,7 +669,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(null, Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
 
     if (n != JOptionPane.YES_OPTION) {
       return;
@@ -700,7 +700,7 @@ public class MapComponent extends EditorComponent {
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
 
-      int result = chooser.showOpenDialog(null);
+      int result = chooser.showOpenDialog(Game.getScreenManager().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
 
         final IMapLoader tmxLoader = new TmxMapLoader();
@@ -722,7 +722,7 @@ public class MapComponent extends EditorComponent {
 
         Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
         if (current.isPresent()) {
-          int n = JOptionPane.showConfirmDialog(null, "Do you really want to replace the existing map '" + map.getFileName() + "' ?", "Replace Map", JOptionPane.YES_NO_OPTION);
+          int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to replace the existing map '" + map.getFileName() + "' ?", "Replace Map", JOptionPane.YES_NO_OPTION);
 
           if (n == JOptionPane.YES_OPTION) {
             this.getMaps().remove(current.get());
@@ -792,7 +792,7 @@ public class MapComponent extends EditorComponent {
       chooser.addChoosableFileFilter(filter);
       chooser.setSelectedFile(new File(map.getFileName() + "." + Map.FILE_EXTENSION));
 
-      int result = chooser.showSaveDialog(null);
+      int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
         String newFile = map.save(chooser.getSelectedFile().toString());
 

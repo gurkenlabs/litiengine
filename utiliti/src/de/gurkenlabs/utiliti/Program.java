@@ -157,13 +157,13 @@ public class Program {
 
   private static boolean exit() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
-    int n = JOptionPane.showConfirmDialog(null, Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
       EditorScreen.instance().save(false);
     }
 
-    return n != JOptionPane.CANCEL_OPTION;
+    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
   }
 
   private static void handleArgs(String[] args) {
@@ -353,7 +353,7 @@ public class Program {
     MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridSize());
-      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_gridSettings"), JOptionPane.DEFAULT_OPTION);
       if (option == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize());
       }
@@ -426,7 +426,7 @@ public class Program {
       MapPropertyPanel panel = new MapPropertyPanel();
       panel.bind(Game.getEnvironment().getMap());
 
-      int option = JOptionPane.showConfirmDialog(null, panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
@@ -698,7 +698,7 @@ public class Program {
         return;
       }
 
-      Color result = JColorChooser.showDialog(null, "Select an ambient color.", colorText.getText() != null && colorText.getText().length() > 0 ? Color.decode(colorText.getText()) : null);
+      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), "Select an ambient color.", colorText.getText() != null && colorText.getText().length() > 0 ? Color.decode(colorText.getText()) : null);
       if (result == null) {
         return;
       }

@@ -207,7 +207,7 @@ public class EditorScreen extends Screen {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
       chooser.setDialogTitle("Select the java project folder");
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
         return;
       }
 
@@ -257,7 +257,7 @@ public class EditorScreen extends Screen {
       FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameFile.FILE_EXTENSION);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
-      if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         this.load(chooser.getSelectedFile());
       }
     } catch (IOException e) {
@@ -330,7 +330,7 @@ public class EditorScreen extends Screen {
       FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, SpriteSheetInfo.FILE_EXTENSION);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
-      if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         File spriteFile = chooser.getSelectedFile();
         if (spriteFile == null) {
           return;
@@ -363,9 +363,9 @@ public class EditorScreen extends Screen {
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
       chooser.setMultiSelectionEnabled(true);
-      if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(chooser.getSelectedFiles());
-        int option = JOptionPane.showConfirmDialog(null, spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (option != JOptionPane.OK_OPTION) {
           return;
         }
@@ -420,7 +420,7 @@ public class EditorScreen extends Screen {
         chooser.addChoosableFileFilter(filter);
         chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + GameFile.FILE_EXTENSION));
 
-        int result = chooser.showSaveDialog(null);
+        int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
         if (result == JFileChooser.APPROVE_OPTION) {
           String newFile = this.saveGameFile(chooser.getSelectedFile().toString());
           this.currentResourceFile = newFile;

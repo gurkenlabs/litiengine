@@ -65,56 +65,25 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     checkBoxIsActive.setSelected(true);
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(spinnerBrightness, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(lblIntensity, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                        .addGap(4)
-                        .addComponent(spinnerIntensity, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addComponent(lblColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(btnSelectColor, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
-                    .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-                        .addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                            .addComponent(checkBoxIsActive)
-                            .addComponent(comboBoxLightShape, 0, 365, Short.MAX_VALUE))))
-                .addContainerGap()));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spinnerBrightness, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(7)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addGap(3)
-                        .addComponent(lblIntensity, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(spinnerIntensity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblColor, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldColor, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSelectColor))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxLightShape, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(checkBoxIsActive)
-                .addContainerGap(153, Short.MAX_VALUE)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addContainerGap()
+            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+                .addGroup(groupLayout.createSequentialGroup().addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(spinnerBrightness, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
+                .addGroup(groupLayout.createSequentialGroup().addComponent(lblIntensity, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addGap(4).addComponent(spinnerIntensity, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
+                .addGroup(groupLayout.createSequentialGroup().addComponent(lblColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(btnSelectColor, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldColor, GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
+                .addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(checkBoxIsActive).addComponent(comboBoxLightShape, 0, 365, Short.MAX_VALUE))))
+            .addContainerGap()));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerBrightness, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(7)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(3).addComponent(lblIntensity, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)).addComponent(spinnerIntensity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblColor, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(textFieldColor, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(btnSelectColor))
+            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblShape, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxLightShape, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED).addComponent(checkBoxIsActive).addContainerGap(153, Short.MAX_VALUE)));
     setLayout(groupLayout);
 
     this.setupChangedListeners();
@@ -144,7 +113,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), Color.decode(textFieldColor.getText()));
+      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), Resources.get("panel_selectAmbientColor"), Color.decode(textFieldColor.getText()));
       if (result == null) {
         return;
       }

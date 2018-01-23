@@ -162,7 +162,7 @@ public class AssetPanelItem extends JPanel {
     btnEdit.setToolTipText("Edit Asset");
     btnEdit.addActionListener(e -> {
       SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpriteSheetInfo) this.getOrigin());
-      int option = JOptionPane.showConfirmDialog(null, spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
         return;
       }
@@ -213,7 +213,7 @@ public class AssetPanelItem extends JPanel {
   private void deleteAsset() {
     if (getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) getOrigin();
-      int n = JOptionPane.showConfirmDialog(null, "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
+      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());

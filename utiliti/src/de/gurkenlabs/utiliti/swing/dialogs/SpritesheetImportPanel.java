@@ -296,7 +296,7 @@ public class SpritesheetImportPanel extends JPanel {
       this.spriteWidth = info.getWidth();
       this.spriteHeight = info.getHeight();
 
-      if (info.getKeyframes() != null) {
+      if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
         this.keyFrames = info.getKeyframes();
         this.updateGridImage();
       } else {

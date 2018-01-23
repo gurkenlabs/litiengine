@@ -546,7 +546,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
+      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
       if (result == null) {
         return;
       }
