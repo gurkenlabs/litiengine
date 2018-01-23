@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -10,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -37,7 +39,6 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
-import java.awt.GridLayout;
 
 public class AssetPanelItem extends JPanel {
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
@@ -169,8 +170,19 @@ public class AssetPanelItem extends JPanel {
 
       final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
       for (SpriteSheetInfo spriteFile : sprites) {
+        int index = -1;
+        Optional<SpriteSheetInfo> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
+        if (old.isPresent()) {
+          index = EditorScreen.instance().getGameFile().getSpriteSheets().indexOf(old.get());
+          EditorScreen.instance().getGameFile().getSpriteSheets().remove(index);
+        }
+
         EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
-        EditorScreen.instance().getGameFile().getSpriteSheets().add(spriteFile);
+        if (index != -1) {
+          EditorScreen.instance().getGameFile().getSpriteSheets().add(index, spriteFile);
+        } else {
+          EditorScreen.instance().getGameFile().getSpriteSheets().add(spriteFile);
+        }
       }
 
       // TODO: in case the asset has been renamed: update all props that uses the
