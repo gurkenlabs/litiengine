@@ -780,6 +780,10 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
+    this.exportMap(map);
+  }
+
+  public void exportMap(Map map) {
     JFileChooser chooser;
     try {
       String source = EditorScreen.instance().getProjectPath();

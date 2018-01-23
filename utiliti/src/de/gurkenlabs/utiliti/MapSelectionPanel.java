@@ -138,7 +138,9 @@ public class MapSelectionPanel extends JSplitPane {
 
     mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
     mntmExportMap.setIcon(new ImageIcon(Resources.getImage("button-map-exportx16.png")));
-    mntmExportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
+    mntmExportMap.addActionListener(a -> {
+      EditorScreen.instance().getMapComponent().exportMap((Map) a.getSource());
+    });
 
     popupMenu.add(mntmExportMap);
 
@@ -460,11 +462,12 @@ public class MapSelectionPanel extends JSplitPane {
     return false;
   }
 
-  private static void addPopup(Component component, final JPopupMenu popup) {
-    component.addMouseListener(new MouseAdapter() {
+  private static void addPopup(JList<String> mapList, final JPopupMenu popup) {
+    mapList.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) {
+          mapList.setSelectedIndex(mapList.locationToIndex(e.getPoint()));
           showMenu(e);
         }
       }
@@ -472,6 +475,7 @@ public class MapSelectionPanel extends JSplitPane {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
+          mapList.setSelectedIndex(mapList.locationToIndex(e.getPoint()));
           showMenu(e);
         }
       }
