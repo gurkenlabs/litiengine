@@ -376,11 +376,11 @@ public class SpritesheetImportPanel extends JPanel {
       g.drawImage(scaled, 0, 0, null);
       g.setColor(new Color(255, 0, 0, 180));
       for (int i = 1; i < cols; i++) {
-        g.drawLine(i * scaledWidth, 0, i * scaledWidth, img.getHeight() - 1);
+        g.drawLine(i * scaledWidth, 0, i * scaledWidth, scaled.getHeight() - 1);
       }
 
       for (int i = 1; i < rows; i++) {
-        g.drawLine(0, i * scaledHeight, img.getWidth() - 1, i * scaledHeight);
+        g.drawLine(0, i * scaledHeight, scaled.getWidth() - 1, i * scaledHeight);
       }
 
       g.drawRect(0, 0, scaled.getWidth() - 1, scaled.getHeight() - 1);

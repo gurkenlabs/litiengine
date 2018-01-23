@@ -476,7 +476,7 @@ public class ImageProcessing {
     g.drawImage(scaled, 0, 0, null);
     g.dispose();
 
-    if (fill && newWidth != width || newHeight != height) {
+    if (fill && (newWidth != width || newHeight != height)) {
       final BufferedImage wrapperImage = getCompatibleImage(width, height);
       final Graphics2D g2 = (Graphics2D) wrapperImage.getGraphics();
       g2.drawImage(newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);
