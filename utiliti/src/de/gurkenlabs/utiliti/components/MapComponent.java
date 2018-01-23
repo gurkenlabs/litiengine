@@ -116,6 +116,7 @@ public class MapComponent extends EditorComponent {
   private final EditorScreen screen;
 
   private boolean isLoading;
+  private boolean initialized;
 
   public MapComponent(final EditorScreen screen) {
     super(ComponentType.MAP);
@@ -462,243 +463,8 @@ public class MapComponent extends EditorComponent {
     });
 
     this.setupControls();
-
     super.prepare();
-    this.onMouseMoved(e -> {
-
-      if (this.getFocus() == null) {
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-        currentTransform = TransformType.NONE;
-        return;
-      }
-
-      boolean hovered = false;
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        return;
-      }
-      for (TransformType type : this.transformRects.keySet()) {
-        Rectangle2D rect = this.transformRects.get(type);
-        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
-        if (hoverrect.contains(Input.mouse().getMapLocation())) {
-          hovered = true;
-          if (type == TransformType.DOWN || type == TransformType.UP) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
-          } else if (type == TransformType.UPLEFT || type == TransformType.DOWNRIGHT) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
-          } else if (type == TransformType.UPRIGHT || type == TransformType.DOWNLEFT) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
-          } else {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
-          }
-
-          currentTransform = type;
-          break;
-        }
-      }
-
-      if (!hovered) {
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-        currentTransform = TransformType.NONE;
-      }
-    });
-
-    this.onMousePressed(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        this.startPoint = Input.mouse().getMapLocation();
-        break;
-      case EDITMODE_MOVE:
-        break;
-      case EDITMODE_EDIT:
-        if (this.isMoving || this.currentTransform != TransformType.NONE) {
-          return;
-        }
-
-        final Point2D mouse = Input.mouse().getMapLocation();
-        this.startPoint = mouse;
-        boolean somethingIsFocused = false;
-        boolean currentObjectFocused = false;
-
-        for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
-          if (layer == null) {
-            continue;
-          }
-
-          if (somethingIsFocused) {
-            break;
-          }
-
-          if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
-            continue;
-          }
-
-          for (IMapObject mapObject : layer.getMapObjects()) {
-            if (mapObject == null) {
-              continue;
-            }
-
-            MapObjectType type = MapObjectType.get(mapObject.getType());
-            if (type == MapObjectType.PATH) {
-              continue;
-            }
-
-            if (mapObject.getBoundingBox().contains(mouse)) {
-              if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
-                currentObjectFocused = true;
-                continue;
-              }
-
-              this.setFocus(mapObject);
-              EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-              somethingIsFocused = true;
-              break;
-            }
-          }
-        }
-
-        if (!somethingIsFocused && !currentObjectFocused) {
-          this.setFocus(null);
-          EditorScreen.instance().getMapObjectPanel().bind(null);
-        }
-        break;
-      }
-    });
-
-    this.onMouseDragged(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        if (startPoint == null) {
-          return;
-        }
-
-        newObject = this.getCurrentMouseSelectionArea();
-        break;
-      case EDITMODE_EDIT:
-        if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-          if (!this.isMoving) {
-            this.isMoving = true;
-
-            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-          }
-
-          this.handleEntityDrag();
-          return;
-        } else if (this.currentTransform != TransformType.NONE) {
-          if (!this.isTransforming) {
-            this.isTransforming = true;
-            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-          }
-
-          this.handleTransform();
-          return;
-        }
-        break;
-      case EDITMODE_MOVE:
-        if (!this.isMoving) {
-          this.isMoving = true;
-          UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-        }
-
-        this.handleEntityDrag();
-        break;
-      }
-    });
-
-    this.onMouseReleased(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      this.dragPoint = null;
-      this.dragLocationMapObject = null;
-      this.dragSizeMapObject = null;
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        if (this.newObject == null) {
-          break;
-        }
-        IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
-        this.newObject = null;
-        this.setFocus(mo);
-        EditorScreen.instance().getMapObjectPanel().bind(mo);
-        this.setEditMode(EDITMODE_EDIT);
-        break;
-      case EDITMODE_MOVE:
-
-        if (this.isMoving) {
-          this.isMoving = false;
-          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
-        }
-
-        break;
-      case EDITMODE_EDIT:
-        if (this.isMoving || this.isTransforming) {
-          this.isMoving = false;
-          this.isTransforming = false;
-          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
-        }
-
-        if (this.startPoint == null) {
-          return;
-        }
-
-        Rectangle2D rect = this.getCurrentMouseSelectionArea();
-        if (rect.getHeight() > 0 && rect.getWidth() > 0) {
-
-          boolean somethingIsFocused = false;
-          for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
-            if (layer == null) {
-              continue;
-            }
-
-            if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
-              continue;
-            }
-
-            for (IMapObject mapObject : layer.getMapObjects()) {
-              if (mapObject == null) {
-                continue;
-              }
-              MapObjectType type = MapObjectType.get(mapObject.getType());
-              if (type == MapObjectType.PATH) {
-                continue;
-              }
-
-              if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
-                continue;
-              }
-
-              this.setFocus(mapObject);
-              if (mapObject.equals(this.getFocusedMapObject())) {
-                somethingIsFocused = true;
-                continue;
-              }
-
-              EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-              somethingIsFocused = true;
-              break;
-            }
-          }
-
-          if (!somethingIsFocused) {
-            this.setFocus(null);
-            EditorScreen.instance().getMapObjectPanel().bind(null);
-          }
-        }
-        break;
-      }
-
-      this.startPoint = null;
-    });
+    this.setupMouseControls();
   }
 
   public void loadEnvironment(Map map) {
@@ -1331,6 +1097,10 @@ public class MapComponent extends EditorComponent {
   }
 
   private void setupControls() {
+    if (this.initialized) {
+      return;
+    }
+
     Input.keyboard().onKeyReleased(KeyEvent.VK_ADD, e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
@@ -1430,6 +1200,250 @@ public class MapComponent extends EditorComponent {
 
       Program.verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
     });
+  }
+
+  private void setupMouseControls() {
+    if (this.initialized) {
+      return;
+    }
+
+    this.onMouseMoved(e -> {
+
+      if (this.getFocus() == null) {
+        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+        currentTransform = TransformType.NONE;
+        return;
+      }
+
+      boolean hovered = false;
+      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+        return;
+      }
+      for (TransformType type : this.transformRects.keySet()) {
+        Rectangle2D rect = this.transformRects.get(type);
+        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
+        if (hoverrect.contains(Input.mouse().getMapLocation())) {
+          hovered = true;
+          if (type == TransformType.DOWN || type == TransformType.UP) {
+            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
+          } else if (type == TransformType.UPLEFT || type == TransformType.DOWNRIGHT) {
+            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
+          } else if (type == TransformType.UPRIGHT || type == TransformType.DOWNLEFT) {
+            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
+          } else {
+            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
+          }
+
+          currentTransform = type;
+          break;
+        }
+      }
+
+      if (!hovered) {
+        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+        currentTransform = TransformType.NONE;
+      }
+    });
+
+    this.onMousePressed(e -> {
+      if (!this.hasFocus()) {
+        return;
+      }
+
+      switch (this.currentEditMode) {
+      case EDITMODE_CREATE:
+        this.startPoint = Input.mouse().getMapLocation();
+        break;
+      case EDITMODE_MOVE:
+        break;
+      case EDITMODE_EDIT:
+        if (this.isMoving || this.currentTransform != TransformType.NONE) {
+          return;
+        }
+
+        final Point2D mouse = Input.mouse().getMapLocation();
+        this.startPoint = mouse;
+        boolean somethingIsFocused = false;
+        boolean currentObjectFocused = false;
+
+        for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
+          if (layer == null) {
+            continue;
+          }
+
+          if (somethingIsFocused) {
+            break;
+          }
+
+          if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+            continue;
+          }
+
+          for (IMapObject mapObject : layer.getMapObjects()) {
+            if (mapObject == null) {
+              continue;
+            }
+
+            MapObjectType type = MapObjectType.get(mapObject.getType());
+            if (type == MapObjectType.PATH) {
+              continue;
+            }
+
+            if (mapObject.getBoundingBox().contains(mouse)) {
+              if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+                currentObjectFocused = true;
+                continue;
+              }
+
+              this.setFocus(mapObject);
+              EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+              somethingIsFocused = true;
+              break;
+            }
+          }
+        }
+
+        if (!somethingIsFocused && !currentObjectFocused) {
+          this.setFocus(null);
+          EditorScreen.instance().getMapObjectPanel().bind(null);
+        }
+        break;
+      }
+    });
+
+    this.onMouseDragged(e -> {
+      if (!this.hasFocus()) {
+        return;
+      }
+
+      switch (this.currentEditMode) {
+      case EDITMODE_CREATE:
+        if (startPoint == null) {
+          return;
+        }
+
+        newObject = this.getCurrentMouseSelectionArea();
+        break;
+      case EDITMODE_EDIT:
+        if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+          if (!this.isMoving) {
+            this.isMoving = true;
+
+            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+          }
+
+          this.handleEntityDrag();
+          return;
+        } else if (this.currentTransform != TransformType.NONE) {
+          if (!this.isTransforming) {
+            this.isTransforming = true;
+            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+          }
+
+          this.handleTransform();
+          return;
+        }
+        break;
+      case EDITMODE_MOVE:
+        if (!this.isMoving) {
+          this.isMoving = true;
+          UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+        }
+
+        this.handleEntityDrag();
+        break;
+      }
+    });
+
+    this.onMouseReleased(e -> {
+      if (!this.hasFocus()) {
+        return;
+      }
+
+      this.dragPoint = null;
+      this.dragLocationMapObject = null;
+      this.dragSizeMapObject = null;
+
+      switch (this.currentEditMode) {
+      case EDITMODE_CREATE:
+        if (this.newObject == null) {
+          break;
+        }
+        IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
+        this.newObject = null;
+        this.setFocus(mo);
+        EditorScreen.instance().getMapObjectPanel().bind(mo);
+        this.setEditMode(EDITMODE_EDIT);
+        break;
+      case EDITMODE_MOVE:
+
+        if (this.isMoving) {
+          this.isMoving = false;
+          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+        }
+
+        break;
+      case EDITMODE_EDIT:
+        if (this.isMoving || this.isTransforming) {
+          this.isMoving = false;
+          this.isTransforming = false;
+          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+        }
+
+        if (this.startPoint == null) {
+          return;
+        }
+
+        Rectangle2D rect = this.getCurrentMouseSelectionArea();
+        if (rect.getHeight() > 0 && rect.getWidth() > 0) {
+
+          boolean somethingIsFocused = false;
+          for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
+            if (layer == null) {
+              continue;
+            }
+
+            if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+              continue;
+            }
+
+            for (IMapObject mapObject : layer.getMapObjects()) {
+              if (mapObject == null) {
+                continue;
+              }
+              MapObjectType type = MapObjectType.get(mapObject.getType());
+              if (type == MapObjectType.PATH) {
+                continue;
+              }
+
+              if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
+                continue;
+              }
+
+              this.setFocus(mapObject);
+              if (mapObject.equals(this.getFocusedMapObject())) {
+                somethingIsFocused = true;
+                continue;
+              }
+
+              EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+              somethingIsFocused = true;
+              break;
+            }
+          }
+
+          if (!somethingIsFocused) {
+            this.setFocus(null);
+            EditorScreen.instance().getMapObjectPanel().bind(null);
+          }
+        }
+        break;
+      }
+
+      this.startPoint = null;
+    });
+
+    this.initialized = true;
   }
 
   private int snapX(double x) {
