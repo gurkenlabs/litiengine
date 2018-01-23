@@ -439,6 +439,10 @@ public class ImageProcessing {
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
+    return scaleImage(image, width, height, keepRatio, true);
+  }
+
+  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -472,7 +476,7 @@ public class ImageProcessing {
     g.drawImage(scaled, 0, 0, null);
     g.dispose();
 
-    if (newWidth != width || newHeight != height) {
+    if (fill && newWidth != width || newHeight != height) {
       final BufferedImage wrapperImage = getCompatibleImage(width, height);
       final Graphics2D g2 = (Graphics2D) wrapperImage.getGraphics();
       g2.drawImage(newImg, (int) ((width - newWidth) / 2.0), (int) ((height - newHeight) / 2.0), null);

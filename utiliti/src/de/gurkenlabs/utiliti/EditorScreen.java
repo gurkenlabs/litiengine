@@ -228,6 +228,8 @@ public class EditorScreen extends Screen {
         this.loadSpriteSheets(map);
       }
 
+      Program.getAssetTree().forceUpdate();
+
       // load custom emitter files
       this.loadCustomEmitters(this.getProjectPath());
 
@@ -294,7 +296,7 @@ public class EditorScreen extends Screen {
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
       // 2. add sprite sheets by tile sets of all maps in the game file
-      this.loadSpriteSheets(this.getGameFile().getSpriteSheets());
+      this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
 
       log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
 
@@ -342,7 +344,7 @@ public class EditorScreen extends Screen {
           this.gameFile.getSpriteSheets().add(info);
         }
 
-        this.loadSpriteSheets(infos);
+        this.loadSpriteSheets(infos, true);
       }
 
     } catch (IOException e) {
@@ -373,7 +375,7 @@ public class EditorScreen extends Screen {
           this.gameFile.getSpriteSheets().add(spriteFile);
         }
 
-        this.loadSpriteSheets(sprites);
+        this.loadSpriteSheets(sprites, true);
       }
     } catch (
 
@@ -382,7 +384,7 @@ public class EditorScreen extends Screen {
     }
   }
 
-  public void loadSpriteSheets(Collection<SpriteSheetInfo> infos) {
+  public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
     for (SpriteSheetInfo info : infos) {
       Spritesheet.remove(info.getName());
       if (info.getHeight() == 0 && info.getWidth() == 0) {
@@ -394,7 +396,10 @@ public class EditorScreen extends Screen {
 
     ImageCache.clearAll();
     this.getMapComponent().reloadEnvironment();
-    Program.getAssetTree().forceUpdate();
+
+    if (forceAssetTreeUpdate) {
+      Program.getAssetTree().forceUpdate();
+    }
   }
 
   public void save(boolean selectFile) {
@@ -561,7 +566,7 @@ public class EditorScreen extends Screen {
       cnt++;
     }
 
-    this.loadSpriteSheets(infos);
+    this.loadSpriteSheets(infos, false);
     for (SpriteSheetInfo info : infos) {
       if (!this.getGameFile().getSpriteSheets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
         this.getGameFile().getSpriteSheets().add(info);

@@ -105,6 +105,12 @@ public class AssetPanelItem extends JPanel {
     setLayout(new BorderLayout(0, 0));
     this.setFocusable(true);
     this.setRequestFocusEnabled(true);
+    this.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        requestFocus();
+      }
+    });
 
     this.iconLabel = new JLabel("");
     this.iconLabel.setSize(64, 64);
@@ -185,7 +191,7 @@ public class AssetPanelItem extends JPanel {
 
       // TODO: in case the asset has been renamed: update all props that uses the
       // asset to use the new name (assets are treated as reference by name)
-      EditorScreen.instance().loadSpriteSheets(EditorScreen.instance().getGameFile().getSpriteSheets());
+      EditorScreen.instance().loadSpriteSheets(EditorScreen.instance().getGameFile().getSpriteSheets(), true);
     });
     btnEdit.setPreferredSize(new Dimension(16, 16));
     btnEdit.setOpaque(false);

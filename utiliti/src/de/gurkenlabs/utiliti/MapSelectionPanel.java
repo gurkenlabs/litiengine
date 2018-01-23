@@ -291,6 +291,10 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   private void initLayerControl() {
+    if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
+      this.mapList.setSelectedIndex(0);
+    }
+
     Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
     layerModel.clear();
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {

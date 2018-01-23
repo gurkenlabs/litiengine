@@ -1,9 +1,11 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
@@ -129,6 +131,7 @@ public class SpritesheetImportPanel extends JPanel {
 
       fileList.getSelectedValue().setSpriteWidth((int) this.spinnerWidth.getValue());
       this.updateKeyframeTable(fileList.getSelectedValue());
+      this.labelImage.setIcon(fileList.getSelectedValue().getIcon());
     });
 
     JLabel lblSpriteheight = new JLabel("spriteheight:");
@@ -142,6 +145,7 @@ public class SpritesheetImportPanel extends JPanel {
 
       fileList.getSelectedValue().setSpriteHeight((int) this.spinnerHeight.getValue());
       this.updateKeyframeTable(fileList.getSelectedValue());
+      this.labelImage.setIcon(fileList.getSelectedValue().getIcon());
     });
 
     JLabel lblNewLabel = new JLabel("width:");
@@ -268,8 +272,10 @@ public class SpritesheetImportPanel extends JPanel {
   }
 
   private class SpriteFileWrapper {
+    private final int MAX_WIDTH_ICON = 280;
+    private final int MAX_HEIGHT_ICON = 128;
     private final BufferedImage image;
-    private final ImageIcon icon;
+    private ImageIcon icon;
     private int[] keyFrames;
     private final int width;
     private final int height;
@@ -282,7 +288,7 @@ public class SpritesheetImportPanel extends JPanel {
       this(Resources.getImage(file.getAbsolutePath()), FileUtilities.getFileName(file.getName()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
-      this.updateKeyFrames();
+      this.updateSprite();
     }
 
     public SpriteFileWrapper(SpriteSheetInfo info) {
@@ -292,13 +298,13 @@ public class SpritesheetImportPanel extends JPanel {
 
       if (info.getKeyframes() != null) {
         this.keyFrames = info.getKeyframes();
+        this.updateGridImage();
       } else {
-        this.updateKeyFrames();
+        this.updateSprite();
       }
     }
 
     private SpriteFileWrapper(BufferedImage image, String name) {
-      this.icon = new ImageIcon(ImageProcessing.scaleImage(image, 280, 128, true));
       this.image = image;
       this.width = this.image.getWidth();
       this.height = this.image.getHeight();
@@ -335,24 +341,52 @@ public class SpritesheetImportPanel extends JPanel {
 
     public void setSpriteWidth(int spriteWidth) {
       this.spriteWidth = spriteWidth;
-      this.updateKeyFrames();
+      this.updateSprite();
     }
 
     public void setSpriteHeight(int spriteHeight) {
       this.spriteHeight = spriteHeight;
-      this.updateKeyFrames();
+      this.updateSprite();
     }
 
     public void setName(String name) {
       this.name = name;
     }
 
-    public void updateKeyFrames() {
+    public void updateSprite() {
       int totalSprites = (this.getWidth() / this.getSpriteWidth()) * (this.getHeight() / this.getSpriteHeight());
       this.keyFrames = new int[totalSprites];
       for (int i = 0; i < totalSprites; i++) {
         this.keyFrames[i] = Animation.DEFAULT_FRAME_DURATION;
       }
+
+      this.updateGridImage();
+    }
+
+    private void updateGridImage() {
+      BufferedImage scaled = ImageProcessing.scaleImage(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
+      BufferedImage img = ImageProcessing.getCompatibleImage(scaled.getWidth() + 1, scaled.getHeight() + 1);
+      int cols = this.getWidth() / this.getSpriteWidth();
+      int rows = this.getHeight() / this.getSpriteHeight();
+
+      int scaledWidth = scaled.getWidth() / cols;
+      int scaledHeight = scaled.getHeight() / rows;
+
+      Graphics2D g = (Graphics2D) img.getGraphics();
+      g.drawImage(scaled, 0, 0, null);
+      g.setColor(new Color(255, 0, 0, 180));
+      for (int i = 1; i < cols; i++) {
+        g.drawLine(i * scaledWidth, 0, i * scaledWidth, img.getHeight() - 1);
+      }
+
+      for (int i = 1; i < rows; i++) {
+        g.drawLine(0, i * scaledHeight, img.getWidth() - 1, i * scaledHeight);
+      }
+
+      g.drawRect(0, 0, scaled.getWidth() - 1, scaled.getHeight() - 1);
+
+      g.dispose();
+      this.icon = new ImageIcon(img);
     }
 
     public SpriteSheetInfo createSpritesheetInfo() {
