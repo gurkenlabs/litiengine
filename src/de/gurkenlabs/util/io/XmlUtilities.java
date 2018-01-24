@@ -1,6 +1,8 @@
 package de.gurkenlabs.util.io;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -69,4 +72,40 @@ public final class XmlUtilities {
 
     return null;
   }
+
+  public static <T> String save(T object, String fileName, String extension) {
+    if (fileName == null || fileName.isEmpty()) {
+      return null;
+    }
+
+    String fileNameWithExtension = fileName;
+    if (!fileNameWithExtension.endsWith("." + extension)) {
+      fileNameWithExtension += "." + extension;
+    }
+
+    File newFile = new File(fileNameWithExtension);
+
+    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
+      JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+      Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+      // first: marshal to byte array
+      jaxbMarshaller.marshal(object, out);
+      out.flush();
+
+      // second: postprocess xml and then write it to the file
+      XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+      out.close();
+
+      jaxbMarshaller.marshal(object, out);
+    } catch (JAXBException | IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    return newFile.toString();
+  }
+
 }

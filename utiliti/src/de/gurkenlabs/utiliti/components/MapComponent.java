@@ -55,6 +55,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -66,6 +67,7 @@ import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.ImageSerializer;
+import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
@@ -798,7 +800,7 @@ public class MapComponent extends EditorComponent {
 
       int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
-        String newFile = map.save(chooser.getSelectedFile().toString());
+        String newFile = XmlUtilities.save(map, chooser.getSelectedFile().toString(), Map.FILE_EXTENSION);
 
         // save all tilesets manually because a map has a relative reference to
         // the tilesets
@@ -806,6 +808,11 @@ public class MapComponent extends EditorComponent {
         for (ITileset tileSet : map.getTilesets()) {
           ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
           ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Spritesheet.find(tileSet.getImage().getSource()).getImage(), format);
+
+          Tileset tile = (Tileset) tileSet;
+          if (tile.isExternal()) {
+            tile.saveSource(dir);
+          }
         }
 
         System.out.println("exported " + map.getFileName() + " to " + newFile);

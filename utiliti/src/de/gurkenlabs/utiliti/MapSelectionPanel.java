@@ -139,7 +139,7 @@ public class MapSelectionPanel extends JSplitPane {
     mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
     mntmExportMap.setIcon(new ImageIcon(Resources.getImage("button-map-exportx16.png")));
     mntmExportMap.addActionListener(a -> {
-      EditorScreen.instance().getMapComponent().exportMap((Map) a.getSource());
+      EditorScreen.instance().getMapComponent().exportMap();
     });
 
     popupMenu.add(mntmExportMap);

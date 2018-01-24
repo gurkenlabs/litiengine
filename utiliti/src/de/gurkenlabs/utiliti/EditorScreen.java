@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -493,8 +494,8 @@ public class EditorScreen extends Screen {
   private void saveMaps() {
     for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
-        map.save(file);
-        log.log(Level.INFO, "synchronized map '" + file + "'");
+        String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
+        log.log(Level.INFO, "synchronized map '" + newFile + "'");
       }
     }
   }

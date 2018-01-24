@@ -29,6 +29,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
+  public static final String FILE_EXTENSION = "tsx";
   private static final long serialVersionUID = 1711536300667154031L;
 
   /** The firstgid. */
@@ -270,6 +271,18 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
 
     this.sourceTileset = XmlUtilities.readFromFile(Tileset.class, basePath + "\\" + this.source);
+  }
+
+  public void saveSource(String basePath) {
+    if (this.sourceTileset == null) {
+      return;
+    }
+
+    XmlUtilities.save(this.sourceTileset, basePath + "\\" + this.source, FILE_EXTENSION);
+  }
+
+  public boolean isExternal() {
+    return this.source != null;
   }
 
   public void load(List<Tileset> rawTilesets) {

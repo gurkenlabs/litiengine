@@ -2,23 +2,14 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,7 +25,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.util.io.XmlUtilities;
 
 /**
  * The Class Map.
@@ -42,10 +32,8 @@ import de.gurkenlabs.util.io.XmlUtilities;
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
-
-  private static final long serialVersionUID = 402776584608365440L;
-  private static final Logger log = Logger.getLogger(Map.class.getName());
   public static final String FILE_EXTENSION = "tmx";
+  private static final long serialVersionUID = 402776584608365440L;
 
   /** The version. */
   @XmlAttribute
@@ -334,41 +322,6 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
         tile.setTerrains(MapUtilities.getTerrain(this, tile.getGridId()));
       }
     }
-  }
-
-  public String save(String fileName) {
-    if (fileName == null || fileName.isEmpty()) {
-      return null;
-    }
-
-    String fileNameWithExtension = fileName;
-    if (!fileNameWithExtension.endsWith("." + FILE_EXTENSION)) {
-      fileNameWithExtension += "." + FILE_EXTENSION;
-    }
-
-    File newFile = new File(fileNameWithExtension);
-
-    try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
-      JAXBContext jaxbContext = JAXBContext.newInstance(Map.class);
-      Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-      jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-      // first: marshal to byte array
-      jaxbMarshaller.marshal(this, out);
-      out.flush();
-
-      // second: postprocess xml and then write it to the file
-      XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
-      out.close();
-
-      jaxbMarshaller.marshal(this, out);
-    } catch (JAXBException | IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-
-    return newFile.toString();
   }
 
   @Override
