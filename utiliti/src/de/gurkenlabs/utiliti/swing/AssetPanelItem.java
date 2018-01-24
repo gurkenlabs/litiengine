@@ -10,14 +10,19 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +31,8 @@ import javax.swing.KeyStroke;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -33,22 +40,28 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 
 public class AssetPanelItem extends JPanel {
+  private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
   private final JLabel iconLabel;
   private final JTextField textField;
+  private final JPanel buttonPanel;
   private final JButton btnEdit;
   private final JButton btnDelete;
   private final JButton btnAdd;
+  private final JButton btnExport;
 
   private final Object origin;
 
@@ -78,10 +91,19 @@ public class AssetPanelItem extends JPanel {
         setForeground(defaults.getColor("Tree.selectionForeground"));
         textField.setForeground(defaults.getColor("Tree.selectionForeground"));
         setBorder(focusBorder);
+
+        // TODO: We might need to provide multiple JPanels that contain the buttons for
+        // a certain usage and swap them out
         if (getOrigin() instanceof SpriteSheetInfo) {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
+          btnExport.setVisible(false);
+        } else if (getOrigin() instanceof Tileset) {
+          btnEdit.setVisible(false);
+          btnAdd.setVisible(false);
+          btnDelete.setVisible(false);
+          btnExport.setVisible(true);
         }
       }
 
@@ -92,11 +114,11 @@ public class AssetPanelItem extends JPanel {
         setForeground(defaults.getColor("Tree.foreground"));
         textField.setForeground(Color.LIGHT_GRAY);
         setBorder(normalBorder);
-        if (getOrigin() instanceof SpriteSheetInfo) {
-          btnEdit.setVisible(false);
-          btnAdd.setVisible(false);
-          btnDelete.setVisible(false);
-        }
+
+        btnEdit.setVisible(false);
+        btnAdd.setVisible(false);
+        btnDelete.setVisible(false);
+        btnExport.setVisible(false);
       }
     });
 
@@ -142,11 +164,12 @@ public class AssetPanelItem extends JPanel {
 
     this.setMinimumSize(new Dimension(this.iconLabel.getWidth(), this.iconLabel.getHeight() + this.textField.getHeight()));
 
-    JPanel panel = new JPanel(new GridLayout(1, 2, 0, 0));
-    panel.setPreferredSize(new Dimension(54, 20));
-    panel.setMinimumSize(new Dimension(54, 20));
-    panel.setOpaque(false);
-    add(panel, BorderLayout.EAST);
+    GridLayout buttonGridLayout = new GridLayout(0, 4, 0, 0);
+    buttonPanel = new JPanel(buttonGridLayout);
+    buttonPanel.setPreferredSize(new Dimension(64, 20));
+    buttonPanel.setMinimumSize(new Dimension(64, 20));
+    buttonPanel.setOpaque(false);
+    add(buttonPanel, BorderLayout.EAST);
 
     btnAdd = new JButton("");
     btnAdd.setToolTipText("Add Entity");
@@ -206,9 +229,20 @@ public class AssetPanelItem extends JPanel {
     btnDelete.setIcon(new ImageIcon(Resources.getImage("button-deletex12.png")));
     btnDelete.setVisible(false);
 
-    panel.add(btnAdd);
-    panel.add(btnEdit);
-    panel.add(btnDelete);
+    btnExport = new JButton("");
+    btnExport.setToolTipText("Export Tileset");
+    btnExport.addActionListener(e -> this.exportTileset());
+    btnExport.setMaximumSize(new Dimension(16, 16));
+    btnExport.setMinimumSize(new Dimension(16, 16));
+    btnExport.setPreferredSize(new Dimension(16, 16));
+    btnExport.setOpaque(false);
+    btnExport.setIcon(new ImageIcon(Resources.getImage("export.png")));
+    btnExport.setVisible(false);
+
+    buttonPanel.add(btnAdd);
+    buttonPanel.add(btnEdit);
+    buttonPanel.add(btnDelete);
+    buttonPanel.add(btnExport);
   }
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
@@ -267,6 +301,32 @@ public class AssetPanelItem extends JPanel {
     }
 
     return false;
+  }
+
+  private void exportTileset() {
+    if (this.getOrigin() instanceof Tileset) {
+      Tileset tileset = (Tileset) this.getOrigin();
+      JFileChooser chooser;
+      try {
+        String source = EditorScreen.instance().getProjectPath();
+        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        chooser.setDialogTitle("Export Tileset");
+        FileFilter filter = new FileNameExtensionFilter("tsx - Tileset XML", Tileset.FILE_EXTENSION);
+        chooser.setFileFilter(filter);
+        chooser.addChoosableFileFilter(filter);
+        chooser.setSelectedFile(new File(tileset.getName() + "." + Tileset.FILE_EXTENSION));
+
+        int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+        if (result == JFileChooser.APPROVE_OPTION) {
+          String newFile = XmlUtilities.save(tileset, chooser.getSelectedFile().toString(), Tileset.FILE_EXTENSION);
+          log.log(Level.INFO, "exported tileset {0} to {1}", new Object[] { tileset.getName(), newFile });
+        }
+      } catch (IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
   }
 
   private boolean canAdd() {
