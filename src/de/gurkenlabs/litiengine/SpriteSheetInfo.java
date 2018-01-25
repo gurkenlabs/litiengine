@@ -2,18 +2,14 @@ package de.gurkenlabs.litiengine;
 
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
-
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "sprite")
 public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo> {
@@ -27,9 +23,6 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
 
   @XmlAttribute(name = "name")
   private String name;
-
-  @XmlAttribute(name = "path", required = false)
-  private String path;
 
   @XmlElement(required = false)
   private String image;
@@ -45,16 +38,6 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage(), sprite.getImageFormat()));
     this.setKeyframes(Spritesheet.getCustomKeyFrameDurations(sprite));
-  }
-
-  public SpriteSheetInfo(final String basepath, final String path, final int width, final int height) {
-    this(width, height, FileUtilities.getFileName(path));
-    this.setImage(ImageProcessing.encodeToString(Resources.getImage(basepath + path), ImageFormat.get(FileUtilities.getExtension(path))));
-  }
-
-  public SpriteSheetInfo(final String path, final int width, final int height) {
-    this(width, height, FileUtilities.getFileName(path));
-    this.setPath(path);
   }
 
   public SpriteSheetInfo(final BufferedImage image, String name, final int width, final int height) {
@@ -101,11 +84,6 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
   }
 
   @XmlTransient
-  public String getPath() {
-    return this.path;
-  }
-
-  @XmlTransient
   public int getWidth() {
     return this.width;
   }
@@ -133,10 +111,6 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
 
   public void setWidth(final int w) {
     this.width = w;
-  }
-
-  public void setPath(final String path) {
-    this.path = path;
   }
 
   public void setKeyframes(int[] keyframes) {

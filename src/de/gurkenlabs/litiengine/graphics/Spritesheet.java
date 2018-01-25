@@ -126,13 +126,8 @@ public final class Spritesheet {
   public static Spritesheet load(final SpriteSheetInfo info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
-      if (info.getPath() == null || info.getPath().isEmpty()) {
-        log.log(Level.SEVERE, "Sprite '{0}' could not be loaded because neither an image nor a path is defined.", new Object[] { info.getName() });
-        return null;
-      }
-
-      sprite = Spritesheet.load(info.getPath(), info.getWidth(), info.getHeight());
-
+      log.log(Level.SEVERE, "Sprite '{0}' could not be loaded because no image is defined.", new Object[] { info.getName() });
+      return null;
     } else {
       sprite = Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
     }
