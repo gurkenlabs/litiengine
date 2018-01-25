@@ -15,6 +15,8 @@ public interface ICustomPropertyProvider {
    */
   public String getCustomProperty(String name);
 
+  public String getCustomProperty(String name, String defaultValue);
+
   public int getCustomPropertyInt(String name);
 
   public int getCustomPropertyInt(String name, int defaultValue);

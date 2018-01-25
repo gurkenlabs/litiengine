@@ -41,7 +41,7 @@ public class EnvironmentTests {
 
     Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
 
-    LightSource testLight = new LightSource(100, 100, Color.WHITE, LightSource.ELLIPSE, true);
+    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
     testLight.setMapId(999);
 
     CollisionBox testCollider = new CollisionBox(true);

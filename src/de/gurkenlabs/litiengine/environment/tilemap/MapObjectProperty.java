@@ -25,7 +25,7 @@ public final class MapObjectProperty {
   public static final String INDESTRUCTIBLE = "indestructible";
 
   // light source
-  public static final String LIGHTBRIGHTNESS = "lightBrightness";
+  public static final String LIGHTALPHA = "lightBrightness";
   public static final String LIGHTCOLOR = "lightColor";
   public static final String LIGHTINTENSITY = "lightIntensity";
   public static final String LIGHTSHAPE = "lightShape";
@@ -41,6 +41,8 @@ public final class MapObjectProperty {
   public static final String REFLECTION = "reflection";
   // collision box
   public static final String SHADOWTYPE = "shadowType";
+  public static final String SHADOWOFFSET = "shadowOffset";
+
   public static final String SPRITESHEETNAME = "spritesheetName";
   public static final String PROP_ADDSHADOW = "addShadow";
 

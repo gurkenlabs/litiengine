@@ -22,6 +22,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public String getCustomProperty(final String name) {
+    return this.getCustomProperty(name, null);
+  }
+
+  @Override
+  public String getCustomProperty(String name, String defaultValue) {
     if (this.properties != null && this.properties.stream().anyMatch(x -> x.getName().equals(name))) {
       Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
       if (opt.isPresent()) {
@@ -29,7 +34,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
       }
     }
 
-    return null;
+    return defaultValue;
   }
 
   @Override

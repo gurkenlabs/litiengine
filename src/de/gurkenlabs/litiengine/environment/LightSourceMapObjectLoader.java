@@ -21,7 +21,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
 
-    final int brightness = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTBRIGHTNESS);
+    final int alpha = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTALPHA);
     final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY);
     final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR);
     final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE);
@@ -44,7 +44,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       lightType = LightSource.ELLIPSE;
     }
     boolean lightOn = mapObjectLightOn == null || mapObjectLightOn.isEmpty() ? true : Boolean.parseBoolean(mapObjectLightOn);
-    final LightSource light = new LightSource(brightness, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), brightness), lightType, lightOn);
+    final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, lightOn);
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());

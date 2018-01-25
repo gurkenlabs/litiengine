@@ -955,86 +955,103 @@ public class Environment implements IEnvironment {
   }
 
   private void addStaticShadows() {
-    final int shadowOffset = 10;
+    final String alpha = this.getMap().getCustomProperty(MapProperty.SHADOWALPHA);
+    final String color = this.getMap().getCustomProperty(MapProperty.SHADOWCOLOR);
+    int shadowAlpha = StaticShadow.DEFAULT_ALPHA;
+    Color solidColor = StaticShadow.DEFAULT_COLOR;
+    try {
+      if (alpha != null && !alpha.isEmpty()) {
+        shadowAlpha = (int) Double.parseDouble(alpha);
+      }
+
+      if (color != null && !color.isEmpty()) {
+        solidColor = Color.decode(color);
+      }
+    } catch (final NumberFormatException e) {
+      log.log(Level.WARNING, e.getMessage(), e);
+    }
+
+    final Color shadowColor = new Color(solidColor.getRed(), solidColor.getGreen(), solidColor.getBlue(), shadowAlpha);
+
     final List<Path2D> newStaticShadows = new ArrayList<>();
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
-    for (final StaticShadow col : this.getStaticShadows()) {
-      final double shadowX = col.getLocation().getX();
-      final double shadowY = col.getLocation().getY();
-      final double shadowWidth = col.getWidth();
-      final double shadowHeight = col.getHeight();
+    for (final StaticShadow shadow : this.getStaticShadows()) {
+      final double shadowX = shadow.getLocation().getX();
+      final double shadowY = shadow.getLocation().getY();
+      final double shadowWidth = shadow.getWidth();
+      final double shadowHeight = shadow.getHeight();
 
-      final StaticShadowType shadowType = col.getShadowType();
+      final StaticShadowType shadowType = shadow.getShadowType();
 
       final Path2D parallelogram = new Path2D.Double();
       if (shadowType.equals(StaticShadowType.DOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.DOWNLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.DOWNRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.LEFTRIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHTLEFT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHT)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.RIGHTDOWN)) {
         parallelogram.moveTo(shadowX, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY);
         parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadowOffset);
-        parallelogram.lineTo(shadowX + shadowOffset / 2.0, shadowY + shadowHeight + shadowOffset);
+        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
+        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
         parallelogram.lineTo(shadowX, shadowY + shadowHeight);
         parallelogram.closePath();
       } else if (shadowType.equals(StaticShadowType.NOOFFSET)) {
@@ -1052,7 +1069,7 @@ public class Environment implements IEnvironment {
 
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
-    g.setColor(new Color(0, 0, 0, 75));
+    g.setColor(shadowColor);
 
     final Area ar = new Area();
     for (final Path2D staticShadow : newStaticShadows) {

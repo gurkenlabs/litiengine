@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import java.awt.Color;
+
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 
 public class StaticShadow extends MapArea {
@@ -19,19 +21,26 @@ public class StaticShadow extends MapArea {
     }
   }
 
+  public static final int DEFAULT_ALPHA = 75;
+  public static final Color DEFAULT_COLOR = Color.BLACK;
+  public static final int DEFAULT_OFFSET = 10;
+
   private StaticShadowType shadowType;
+  private int shadowOffset;
   private final CollisionBox origin;
 
   public StaticShadow(int id, String name, double x, double y, float width, float height, StaticShadowType shadowType) {
     super(id, name, x, y, width, height);
     this.setShadowType(shadowType);
     this.origin = null;
+    this.shadowOffset = DEFAULT_OFFSET;
   }
 
   public StaticShadow(CollisionBox box) {
     super(-1, null, box.getLocation().getX(), box.getLocation().getY(), box.getWidth(), box.getHeight());
     this.setShadowType(StaticShadowType.NONE);
     this.origin = box;
+    this.shadowOffset = DEFAULT_OFFSET;
   }
 
   public StaticShadowType getShadowType() {
@@ -53,5 +62,13 @@ public class StaticShadow extends MapArea {
     }
 
     return "[" + this.getOrigin().toString() + "] -> " + super.toString();
+  }
+
+  public int getOffset() {
+    return shadowOffset;
+  }
+
+  public void setOffset(int shadowOffset) {
+    this.shadowOffset = shadowOffset;
   }
 }

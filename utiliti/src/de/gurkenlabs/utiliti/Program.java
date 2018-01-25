@@ -435,7 +435,7 @@ public class Program {
       MapPropertyPanel panel = new MapPropertyPanel();
       panel.bind(Game.getEnvironment().getMap());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
@@ -669,10 +669,13 @@ public class Program {
 
     basicMenu.addSeparator();
 
-    JLabel alphaLabel = new JLabel();
-    alphaLabel.setIcon(new ImageIcon(Resources.getImage("button-alpha.png")));
-    basicMenu.add(alphaLabel);
-    basicMenu.add(Box.createHorizontalStrut(5));
+    JButton colorButton = new JButton();
+    colorButton.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
+    colorButton.setEnabled(false);
+
+    JTextField colorText = new JTextField();
+    colorText.setEnabled(false);
+    colorText.setMaximumSize(new Dimension(50, 50));
 
     JSpinner spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
@@ -688,32 +691,26 @@ public class Program {
       Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
     });
 
-    basicMenu.add(spinnerAmbientAlpha);
-
-    basicMenu.add(Box.createHorizontalStrut(10));
-    JButton colorButton = new JButton();
-    colorButton.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
-    colorButton.setEnabled(false);
-
-    basicMenu.add(colorButton);
-    basicMenu.add(Box.createHorizontalStrut(5));
-    JTextField colorText = new JTextField();
-    colorText.setEnabled(false);
-    colorText.setMaximumSize(new Dimension(50, 50));
-    basicMenu.add(colorText);
-
     colorButton.addActionListener(a -> {
       if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
         return;
       }
 
-      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), "Select an ambient color.", colorText.getText() != null && colorText.getText().length() > 0 ? Color.decode(colorText.getText()) : null);
+      Color color = null;
+      if (colorText.getText() != null && !colorText.getText().isEmpty()) {
+        Color solid = Color.decode(colorText.getText());
+        color = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) spinnerAmbientAlpha.getValue());
+      }
+
+      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), "Select an ambient color.", color);
       if (result == null) {
         return;
       }
 
       String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
       colorText.setText(h);
+
+      spinnerAmbientAlpha.setValue(result.getAlpha());
 
       Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
       Game.getEnvironment().getAmbientLight().setColor(result);
@@ -731,6 +728,12 @@ public class Program {
       }
       isChanging = false;
     });
+
+    basicMenu.add(colorButton);
+    basicMenu.add(Box.createHorizontalStrut(5));
+    basicMenu.add(colorText);
+    basicMenu.add(Box.createHorizontalStrut(5));
+    basicMenu.add(spinnerAmbientAlpha);
 
     return basicMenu;
   }

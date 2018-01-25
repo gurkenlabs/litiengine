@@ -114,7 +114,6 @@ public class AmbientLight {
     sb.append(this.getAlpha());
 
     for (final LightSource light : this.environment.getLightSources()) {
-      sb.append(light.getBrightness());
       sb.append(light.getIntensity());
       sb.append(light.getColor());
       sb.append(light.getLocation());
@@ -184,7 +183,7 @@ public class AmbientLight {
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
     final Area lightRadiusArea = new Area(light.getLightShape());
-    final Color[] transColors = new Color[] { new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getBrightness()), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
+    final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
     try {
       g.setPaint(new RadialGradientPaint(new Point2D.Double(lightRadiusArea.getBounds2D().getCenterX(), lightRadiusArea.getBounds2D().getCenterY()), (float) (lightRadiusArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
     } catch (final Exception e) {

@@ -49,8 +49,6 @@ public class LightSource extends Entity implements IRenderable {
   private static final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
 
   private boolean activated;
-  /** The brightness. */
-  private int brightness;
 
   /** The color. */
   private Color color;
@@ -71,12 +69,11 @@ public class LightSource extends Entity implements IRenderable {
    * @param lightColor
    *          the light color
    */
-  public LightSource(final int brightness, final int intensity, final Color lightColor, final String shapeType, boolean activated) {
+  public LightSource(final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();
     this.color = lightColor;
     this.intensity = intensity;
 
-    this.setBrightness(brightness);
     this.lightShapeType = shapeType;
     this.activated = activated;
   }
@@ -87,15 +84,6 @@ public class LightSource extends Entity implements IRenderable {
 
   public void deactivate() {
     this.activated = false;
-  }
-
-  /**
-   * Gets the brightness.
-   *
-   * @return the brightness
-   */
-  public int getBrightness() {
-    return this.activated ? this.brightness : 0;
   }
 
   /**
@@ -137,16 +125,6 @@ public class LightSource extends Entity implements IRenderable {
     if (Game.getConfiguration().graphics().renderDynamicShadows()) {
       this.renderShadows(g);
     }
-  }
-
-  /**
-   * Sets the brightness.
-   *
-   * @param brightness
-   *          the new brightness
-   */
-  public void setBrightness(final int brightness) {
-    this.brightness = brightness;
   }
 
   public void setColor(final Color result) {

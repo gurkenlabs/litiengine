@@ -225,7 +225,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTBRIGHTNESS)).thenReturn(100);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTALPHA)).thenReturn(100);
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY)).thenReturn(100);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR)).thenReturn("#ffffff");
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE)).thenReturn("true");
@@ -248,7 +248,7 @@ public class MapObjectLoaderTests {
     Assert.assertEquals(Color.WHITE.getRed(), light.getColor().getRed());
     Assert.assertEquals(Color.WHITE.getBlue(), light.getColor().getBlue());
     Assert.assertEquals(Color.WHITE.getGreen(), light.getColor().getGreen());
-    Assert.assertEquals(100, light.getBrightness());
+    Assert.assertEquals(100, light.getColor().getAlpha());
     Assert.assertEquals(100, light.getIntensity());
     Assert.assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
   }

@@ -22,7 +22,12 @@ public class StaticShadowMapObjectLoader extends MapObjectLoader {
     }
 
     Collection<IEntity> entities = super.load(mapObject);
-    entities.add(new StaticShadow(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().width, mapObject.getDimension().height, StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE))));
+    StaticShadowType type = StaticShadowType.get(mapObject.getCustomProperty(MapObjectProperty.SHADOWTYPE));
+    int offset = mapObject.getCustomPropertyInt(MapObjectProperty.SHADOWOFFSET, StaticShadow.DEFAULT_OFFSET);
+
+    StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().width, mapObject.getDimension().height, type);
+    shadow.setOffset(offset);
+    entities.add(shadow);
     return entities;
   }
 }

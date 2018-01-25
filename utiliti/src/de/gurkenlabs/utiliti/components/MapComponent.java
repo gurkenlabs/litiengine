@@ -929,7 +929,7 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, MovementBehavior.IDLE.toString());
       break;
     case LIGHTSOURCE:
-      mo.setCustomProperty(MapObjectProperty.LIGHTBRIGHTNESS, "180");
+      mo.setCustomProperty(MapObjectProperty.LIGHTALPHA, "180");
       mo.setCustomProperty(MapObjectProperty.LIGHTCOLOR, "#ffffff");
       mo.setCustomProperty(MapObjectProperty.LIGHTSHAPE, LightSource.ELLIPSE);
       mo.setCustomProperty(MapObjectProperty.LIGHTACTIVE, "true");
