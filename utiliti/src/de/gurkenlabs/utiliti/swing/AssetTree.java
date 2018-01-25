@@ -71,11 +71,14 @@ public class AssetTree extends JTree {
   }
 
   private void loadAssetsOfCurrentSelection(TreePath selectedPath) {
+    final TreePath spritePath = new TreePath(this.nodeSpritesheets.getPath());
     final TreePath propPath = new TreePath(this.nodeSpriteProps.getPath());
     final TreePath miscPath = new TreePath(this.nodeSpriteMisc.getPath());
     final TreePath tilesetPath = new TreePath(this.nodeTileSets.getPath());
 
-    if (selectedPath != null && this.getSelectionPath().equals(propPath)) {
+    if (selectedPath != null && this.getSelectionPath().equals(spritePath)) {
+      Program.getAssetPanel().loadSprites(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));
+    } else if (selectedPath != null && this.getSelectionPath().equals(propPath)) {
       Program.getAssetPanel().loadSprites(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));
     } else if (selectedPath != null && getSelectionPath().equals(miscPath)) {
       Program.getAssetPanel().loadSprites(EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));

@@ -40,11 +40,12 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.util.io.ImageSerializer;
 import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
@@ -98,7 +99,7 @@ public class AssetPanelItem extends JPanel {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
-          btnExport.setVisible(false);
+          btnExport.setVisible(true);
         } else if (getOrigin() instanceof Tileset) {
           btnEdit.setVisible(false);
           btnAdd.setVisible(false);
@@ -230,8 +231,8 @@ public class AssetPanelItem extends JPanel {
     btnDelete.setVisible(false);
 
     btnExport = new JButton("");
-    btnExport.setToolTipText("Export Tileset");
-    btnExport.addActionListener(e -> this.exportTileset());
+    btnExport.setToolTipText("Export Asset");
+    btnExport.addActionListener(e -> this.export());
     btnExport.setMaximumSize(new Dimension(16, 16));
     btnExport.setMinimumSize(new Dimension(16, 16));
     btnExport.setPreferredSize(new Dimension(16, 16));
@@ -301,6 +302,65 @@ public class AssetPanelItem extends JPanel {
     }
 
     return false;
+  }
+
+  private void export() {
+    if (this.getOrigin() instanceof Tileset) {
+      this.exportTileset();
+      return;
+    } else if (this.getOrigin() instanceof SpriteSheetInfo) {
+      this.exportSpritesheet();
+      return;
+    }
+  }
+
+  private void exportSpritesheet() {
+    if (this.getOrigin() instanceof SpriteSheetInfo) {
+      SpriteSheetInfo spriteSheetInfo = (SpriteSheetInfo) this.getOrigin();
+
+      Spritesheet sprite = Spritesheet.find(spriteSheetInfo.getName());
+      if (sprite == null) {
+        return;
+      }
+
+      ImageFormat format = sprite.getImageFormat() != ImageFormat.UNDEFINED ? sprite.getImageFormat() : ImageFormat.PNG;
+
+      Object[] options = { ".xml", format.toExtension() };
+      int answer = JOptionPane.showOptionDialog(Game.getScreenManager().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+      try {
+        JFileChooser chooser;
+        String source = EditorScreen.instance().getProjectPath();
+        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        chooser.setDialogTitle("Export Spritesheet");
+        if (answer == 0) {
+          FileFilter filter = new FileNameExtensionFilter(".xml - Spritesheet XML", "xml");
+          chooser.setFileFilter(filter);
+          chooser.addChoosableFileFilter(filter);
+          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + ".xml"));
+          int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+          if (result == JFileChooser.APPROVE_OPTION) {
+            String newFile = XmlUtilities.save(spriteSheetInfo, chooser.getSelectedFile().toString(), "xml");
+            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), newFile });
+          }
+        } else if (answer == 1) {
+          FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
+          chooser.setFileFilter(filter);
+          chooser.addChoosableFileFilter(filter);
+          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toExtension()));
+
+          int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+          if (result == JFileChooser.APPROVE_OPTION) {
+            ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
+            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile().toString() });
+          }
+        }
+      } catch (IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
   }
 
   private void exportTileset() {

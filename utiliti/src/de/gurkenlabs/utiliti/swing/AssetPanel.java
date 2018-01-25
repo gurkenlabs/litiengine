@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -35,6 +36,7 @@ public class AssetPanel extends JPanel {
 
   public void loadSprites(List<SpriteSheetInfo> infos) {
     this.load(infos, () -> {
+      Collections.sort(infos);
       for (SpriteSheetInfo info : infos) {
         Icon icon;
         Spritesheet sprite = Spritesheet.find(info.getName());
@@ -54,6 +56,7 @@ public class AssetPanel extends JPanel {
 
   public void loadTilesets(List<Tileset> tilesets) {
     this.load(tilesets, () -> {
+      Collections.sort(tilesets);
       for (Tileset tileset : tilesets) {
         AssetPanelItem panelItem = new AssetPanelItem(tilesetIcon, tileset.getName(), tileset);
         this.add(panelItem);

@@ -328,7 +328,7 @@ public class EditorScreen extends Screen {
     try {
       chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
 
-      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, SpriteSheetInfo.FILE_EXTENSION);
+      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, SpriteSheetInfo.PLAIN_TEXT_FILE_EXTENSION);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
       if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {

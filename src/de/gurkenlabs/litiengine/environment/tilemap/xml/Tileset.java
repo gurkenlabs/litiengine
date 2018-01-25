@@ -28,7 +28,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
  */
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Tileset extends CustomPropertyProvider implements ITileset {
+public class Tileset extends CustomPropertyProvider implements ITileset, Comparable<Tileset> {
   public static final String FILE_EXTENSION = "tsx";
   private static final long serialVersionUID = 1711536300667154031L;
 
@@ -78,6 +78,23 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @XmlTransient
   protected Tileset sourceTileset;
+
+  @Override
+  public int compareTo(Tileset obj) {
+    if (obj == null) {
+      return 1;
+    }
+
+    if (this.getName() == null) {
+      if (obj.getName() == null) {
+        return 0;
+      }
+
+      return -1;
+    }
+
+    return this.getName().compareTo(obj.getName());
+  }
 
   @Override
   public int getFirstGridId() {

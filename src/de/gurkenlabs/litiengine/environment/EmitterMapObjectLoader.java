@@ -4,11 +4,7 @@ import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.FireEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.ShimmerEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {

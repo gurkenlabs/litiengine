@@ -16,8 +16,8 @@ import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.io.FileUtilities;
 
 @XmlRootElement(name = "sprite")
-public class SpriteSheetInfo implements Serializable {
-  public static final String FILE_EXTENSION = "info";
+public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo> {
+  public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
   private int width;
@@ -66,6 +66,23 @@ public class SpriteSheetInfo implements Serializable {
     this.setWidth(width);
     this.setHeight(height);
     this.setName(name);
+  }
+
+  @Override
+  public int compareTo(SpriteSheetInfo obj) {
+    if (obj == null) {
+      return 1;
+    }
+
+    if (this.getName() == null) {
+      if (obj.getName() == null) {
+        return 0;
+      }
+
+      return -1;
+    }
+
+    return this.getName().compareTo(obj.getName());
   }
 
   @XmlTransient
