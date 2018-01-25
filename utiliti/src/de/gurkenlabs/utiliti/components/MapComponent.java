@@ -423,6 +423,18 @@ public class MapComponent extends EditorComponent {
     return this.gridSize;
   }
 
+  public IMapObject getFocusedMapObject() {
+    if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
+      return this.focusedObjects.get(Game.getEnvironment().getMap().getFileName());
+    }
+
+    return null;
+  }
+
+  public IMapObject getCopiedMapObject() {
+    return this.copiedMapObject;
+  }
+
   @Override
   public void prepare() {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
@@ -542,6 +554,12 @@ public class MapComponent extends EditorComponent {
       int x = (int) Input.mouse().getMapLocation().getX();
       int y = (int) Input.mouse().getMapLocation().getY();
 
+      this.paste(x, y);
+    }
+  }
+
+  public void paste(int x, int y) {
+    if (this.copiedMapObject != null) {
       this.newObject = new Rectangle(x, y, (int) this.copiedMapObject.getDimension().getWidth(), (int) this.copiedMapObject.getDimension().getHeight());
       this.copyMapObject(this.copiedMapObject);
     }
@@ -950,14 +968,6 @@ public class MapComponent extends EditorComponent {
     }
 
     return focusedObject.getBoundingBox();
-  }
-
-  private IMapObject getFocusedMapObject() {
-    if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-      return this.focusedObjects.get(Game.getEnvironment().getMap().getFileName());
-    }
-
-    return null;
   }
 
   private double getTransX(TransformType type, Rectangle2D focus) {

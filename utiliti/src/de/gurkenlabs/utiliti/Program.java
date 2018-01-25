@@ -20,6 +20,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -36,8 +38,10 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -49,6 +53,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -86,11 +91,13 @@ public class Program {
   private static Menu recentFiles;
   private static AssetPanel assetPanel;
   private static AssetTree assetTree;
+  private static JPopupMenu canvasPopup;
   private static boolean isChanging;
 
   public static void main(String[] args) {
 
     try {
+      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -205,13 +212,15 @@ public class Program {
       window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
     }
 
-    Canvas render = Game.getScreenManager().getRenderComponent();
-    render.setFocusable(true);
-    render.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
-    window.remove(render);
+    Canvas canvas = Game.getScreenManager().getRenderComponent();
+    canvas.setFocusable(true);
+    canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
+    window.remove(canvas);
     JPanel renderPane = new JPanel(new BorderLayout());
-    renderPane.add(render);
+    renderPane.add(canvas);
     renderPane.setMinimumSize(new Dimension(200, 0));
+
+    initCanvasPopupMenu(canvas);
 
     JPanel contentPane = new JPanel(new BorderLayout());
 
@@ -724,6 +733,50 @@ public class Program {
     });
 
     return basicMenu;
+  }
+
+  private static void initCanvasPopupMenu(Canvas canvas) {
+    canvasPopup = new JPopupMenu();
+    JMenuItem delete = new JMenuItem("Delete Entity", new ImageIcon(Resources.getImage("button-deletex16.png")));
+    delete.addActionListener(e -> EditorScreen.instance().getMapComponent().delete());
+    delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    delete.setEnabled(false);
+
+    JMenuItem copy = new JMenuItem("Copy Entity", new ImageIcon(Resources.getImage("button-copyx16.png")));
+    copy.addActionListener(e -> EditorScreen.instance().getMapComponent().copy());
+    copy.setEnabled(false);
+    copy.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.CTRL_MASK));
+
+    JMenuItem cut = new JMenuItem("Cut Entity", new ImageIcon(Resources.getImage("button-cutx16.png")));
+    cut.addActionListener(e -> EditorScreen.instance().getMapComponent().cut());
+    cut.setEnabled(false);
+    cut.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Event.CTRL_MASK));
+
+    JMenuItem paste = new JMenuItem("Paste Entity", new ImageIcon(Resources.getImage("button-pastex16.png")));
+    paste.addActionListener(e -> EditorScreen.instance().getMapComponent().paste());
+    paste.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Event.CTRL_MASK));
+
+    canvasPopup.add(paste);
+    canvasPopup.addSeparator();
+    canvasPopup.add(copy);
+    canvasPopup.add(cut);
+    canvasPopup.add(delete);
+
+    EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
+      copy.setEnabled(mo != null);
+      cut.setEnabled(mo != null);
+      delete.setEnabled(mo != null);
+    });
+
+    canvas.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+          paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedMapObject() != null);
+          canvasPopup.show(canvas, e.getX(), e.getY());
+        }
+      }
+    });
   }
 
   private static void initSystemTray() {
