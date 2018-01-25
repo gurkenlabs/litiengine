@@ -15,7 +15,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,6 +38,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   DefaultTableModel model;
@@ -546,7 +546,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
+      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
       if (result == null) {
         return;
       }

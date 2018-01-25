@@ -6,7 +6,6 @@ import java.awt.Font;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,6 +23,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 public class MapPropertyPanel extends JPanel {
 
@@ -63,7 +63,8 @@ public class MapPropertyPanel extends JPanel {
 
     JButton button = new JButton("...");
     button.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(this, "Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
+
+      Color result = ColorChooser.showRgbDialog("Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
       if (result == null) {
         return;
       }
@@ -141,7 +142,8 @@ public class MapPropertyPanel extends JPanel {
 
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(this, "Select a shadow color.", Color.decode(textFieldShadowColor.getText()));
+
+      Color result = ColorChooser.showRgbDialog("Select an ambient color.", Color.decode(textFieldShadowColor.getText()));
       if (result == null) {
         return;
       }

@@ -8,7 +8,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
@@ -23,6 +22,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.LightSource;
+import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 public class LightSourcePanel extends PropertyPanel<IMapObject> {
   private final JTextField textFieldColor;
@@ -114,7 +114,8 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
     btnSelectColor.addActionListener(a -> {
       Color solid = Color.decode(textFieldColor.getText());
       Color current = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) this.spinnerBrightness.getValue());
-      Color result = JColorChooser.showDialog(Game.getScreenManager().getRenderComponent(), Resources.get("panel_selectAmbientColor"), current);
+
+      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectAmbientColor"), current);
       if (result == null) {
         return;
       }
