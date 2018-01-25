@@ -36,13 +36,13 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
 
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)), velocity);
 
-    mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
+    mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
     mob.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
-    mob.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH));
-    mob.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT));
+    mob.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
+    mob.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
-    mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)));
-    mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)));
+    mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
+    mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
     mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
     mob.setMapId(mapObject.getId());
     mob.setName(mapObject.getName());

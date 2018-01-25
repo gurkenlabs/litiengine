@@ -26,11 +26,11 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + TriggerMapObjectLoader.class);
     }
 
-    final String message = mapObject.getCustomProperty(MapObjectProperty.TRIGGERMESSAGE);
+    final String message = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE);
 
-    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION)) : TriggerActivation.COLLISION;
-    final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGERTARGETS);
-    final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS);
+    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
+    final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
+    final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
 
     final Map<String, String> triggerArguments = new HashMap<>();
     for (final Property prop : mapObject.getAllCustomProperties()) {
@@ -39,7 +39,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       }
     }
 
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGERONETIME), triggerArguments);
+    final Trigger trigger = new Trigger(act, mapObject.getName(), message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
 
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {

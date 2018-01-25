@@ -45,12 +45,12 @@ public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.OBSTACLE));
-    this.chckbxIsObstructingLights.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.OBSTRUCTINGLIGHTS));
+    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
+    this.chckbxIsObstructingLights.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
 
   private void setupChangedListeners() {
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
-    this.chckbxIsObstructingLights.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.OBSTRUCTINGLIGHTS, Boolean.toString(chckbxIsObstructingLights.isSelected()))));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
+    this.chckbxIsObstructingLights.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS, Boolean.toString(chckbxIsObstructingLights.isSelected()))));
   }
 }

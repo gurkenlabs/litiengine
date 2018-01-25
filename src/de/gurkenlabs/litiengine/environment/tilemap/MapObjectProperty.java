@@ -9,80 +9,77 @@ import java.util.logging.Logger;
 
 public final class MapObjectProperty {
   private static final Logger log = Logger.getLogger(MapObjectProperty.class.getName());
+  // collision entity
   public static final String COLLISION = "collision";
-  public static final String COLLISIONALGIN = "collisionAlign";
+  public static final String COLLISION_ALGIN = "collisionAlign";
+  public static final String COLLISION_VALGIN = "collisionValign";
 
-  public static final String COLLISIONBOXHEIGHT = "collisionboxHeightFactor";
-  public static final String COLLISIONBOXWIDTH = "collisionboxWidthFactor";
-  public static final String COLLISIONVALGIN = "collisionValign";
-  public static final String CUSTOM_MAPOBJECT_TYPE = "customMapObjectType";
+  // collision box
+  public static final String COLLISIONBOX_HEIGHT = "collisionboxHeightFactor";
+  public static final String COLLISIONBOX_WIDTH = "collisionboxWidthFactor";
+  public static final String COLLISIONBOX_OBSTRUCTINGLIGHTS = "isObstructingLight";
+
+  // general entity stuff
+  public static final String HEALTH = "health";
+  public static final String SPRITESHEETNAME = "spritesheetName";
+  public static final String TEAM = "team";
+
   // decor mob
   public static final String DECORMOB_BEHAVIOUR = "decormob-behaviour";
-
   public static final String DECORMOB_VELOCITY = "decormob-velocity";
-  public static final String FRICTION = "friction";
-  public static final String HEALTH = "health";
-  public static final String INDESTRUCTIBLE = "indestructible";
+
+  // props
+  public static final String PROP_INDESTRUCTIBLE = "indestructible";
+  public static final String PROP_MATERIAL = "material";
+  public static final String PROP_OBSTACLE = "isObstacle";
+  public static final String PROP_ADDSHADOW = "addShadow";
 
   // light source
-  public static final String LIGHTALPHA = "lightBrightness";
-  public static final String LIGHTCOLOR = "lightColor";
-  public static final String LIGHTINTENSITY = "lightIntensity";
-  public static final String LIGHTSHAPE = "lightShape";
-  public static final String LIGHTACTIVE = "lightActive";
+  public static final String LIGHT_ALPHA = "lightBrightness";
+  public static final String LIGHT_COLOR = "lightColor";
+  public static final String LIGHT_INTENSITY = "lightIntensity";
+  public static final String LIGHT_SHAPE = "lightShape";
+  public static final String LIGHT_ACTIVE = "lightActive";
 
-  public static final String MATERIAL = "material";
-  public static final String MOBTYPE = "mobType";
-
-  public static final String OBSTACLE = "isObstacle";
-  public static final String OBSTRUCTINGLIGHTS = "isObstructingLight";
-
-  // terrain
-  public static final String REFLECTION = "reflection";
-  // collision box
-  public static final String SHADOWTYPE = "shadowType";
-  public static final String SHADOWOFFSET = "shadowOffset";
-
-  public static final String SPRITESHEETNAME = "spritesheetName";
-  public static final String PROP_ADDSHADOW = "addShadow";
+  // static shadow
+  public static final String SHADOW_TYPE = "shadowType";
+  public static final String SHADOW_OFFSET = "shadowOffset";
 
   // spawnpoint
   public static final String SPAWN_TYPE = "spawnType";
   public static final String SPAWN_DIRECTION = "spawnDirection";
 
-  public static final String TEAM = "team";
-  public static final String TRIGGERACTIVATION = "triggerActivation";
-
-  public static final String TRIGGERACTIVATORS = "triggerActivators";
   // trigger
-  public static final String TRIGGERMESSAGE = "triggermessage";
+  public static final String TRIGGER_ACTIVATION = "triggerActivation";
+  public static final String TRIGGER_MESSAGE = "triggermessage";
+  public static final String TRIGGER_ONETIME = "triggerOneTime";
+  public static final String TRIGGER_ACTIVATORS = "triggerActivators";
+  public static final String TRIGGER_TARGETS = "triggerTarget";
 
-  public static final String TRIGGERONETIME = "triggerOneTime";
-  public static final String TRIGGERTARGETS = "triggerTarget";
+  // emitter
+  public static final String EMITTER_COLORS = "emitterColors";
+  public static final String EMITTER_COLORPROBABILITIES = "emitterColorProbabilities";
+  public static final String EMITTER_SPAWNRATE = "emitterSpawnRate";
+  public static final String EMITTER_SPAWNAMOUNT = "emitterSpawnAmount";
+  public static final String EMITTER_UPDATEDELAY = "emitterUpdateDelay";
+  public static final String EMITTER_TIMETOLIVE = "emitterTimeToLive";
+  public static final String EMITTER_MAXPARTICLES = "emitterMaxParticles";
+  public static final String EMITTER_PARTICLETYPE = "emitterParticleType";
+  public static final String EMITTER_COLORDEVIATION = "emitterColorDeviation";
+  public static final String EMITTER_ALPHADEVIATION = "emitterAlphaDeviation";
 
-  public static final String EMITTERCOLORS = "emitterColors";
-  public static final String EMITTERCOLORPROBABILITIES = "emitterColorProbabilities";
-  public static final String EMITTERSPAWNRATE = "emitterSpawnRate";
-  public static final String EMITTERSPAWNAMOUNT = "emitterSpawnAmount";
-  public static final String EMITTERUPDATEDELAY = "emitterUpdateDelay";
-  public static final String EMITTERTIMETOLIVE = "emitterTimeToLive";
-  public static final String EMITTERMAXPARTICLES = "emitterMaxParticles";
-  public static final String EMITTERPARTICLETYPE = "emitterParticleType";
-  public static final String EMITTERCOLORDEVIATION = "emitterColorDeviation";
-  public static final String EMITTERALPHADEVIATION = "emitterAlphaDeviation";
-
-  public static final String PARTICLEDELTAX = "particleDeltaX";
-  public static final String PARTICLEDELTAY = "particleDeltaY";
-  public static final String PARTICLEGRAVITYX = "particleGravityX";
-  public static final String PARTICLEGRAVITYY = "particleGravityY";
-  public static final String PARTICLESTARTWIDTH = "particleStartWidth";
-  public static final String PARTICLESTARTHEIGHT = "particleStartHeight";
-  public static final String PARTICLEDELTAWIDTH = "particleDeltaWidth";
-  public static final String PARTICLEDELTAHEIGHT = "particleDeltaHeight";
-  public static final String PARTICLESPRITETYPE = "particleSpriteType";
-  public static final String PARTICLESPRITE = "particleSprite";
-  public static final String PARTICLESTATICPHYSICS = "particleStaticPhysics";
-  public static final String PARTICLETEXT = "particleText";
+  public static final String PARTICLE_DELTAX = "particleDeltaX";
+  public static final String PARTICLE_DELTAY = "particleDeltaY";
+  public static final String PARTICLE_GRAVITYX = "particleGravityX";
+  public static final String PARTICLE_GRAVITYY = "particleGravityY";
+  public static final String PARTICLE_STARTWIDTH = "particleStartWidth";
+  public static final String PARTICLE_STARTHEIGHT = "particleStartHeight";
+  public static final String PARTICLE_DELTAWIDTH = "particleDeltaWidth";
+  public static final String PARTICLE_DELTAHEIGHT = "particleDeltaHeight";
+  public static final String PARTICLE_SPRITETYPE = "particleSpriteType";
+  public static final String PARTICLE_SPRITE = "particleSprite";
+  public static final String PARTICLE_STATICPHYSICS = "particleStaticPhysics";
+  public static final String PARTICLE_TEXT = "particleText";
 
   private static List<Field> availableProperties = new ArrayList<>();
 

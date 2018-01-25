@@ -559,27 +559,27 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
         for (ParticleColor color : colors) {
           colorString.append(color.toHexString() + ",");
         }
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTERCOLORS, colorString.toString());
+        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_COLORS, colorString.toString());
       }
     });
 
     spinnerSpawnRate.addChangeListener(v -> {
       if (this.getDataSource() != null) {
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTERSPAWNRATE, ((Integer) spinnerSpawnRate.getValue()).toString());
+        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_SPAWNRATE, ((Integer) spinnerSpawnRate.getValue()).toString());
         Game.getEnvironment().reloadFromMap(this.getDataSource().getId());
       }
     });
 
     spinnerSpawnAmount.addChangeListener(v -> {
       if (this.getDataSource() != null) {
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTERSPAWNAMOUNT, ((Integer) spinnerSpawnAmount.getValue()).toString());
+        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_SPAWNAMOUNT, ((Integer) spinnerSpawnAmount.getValue()).toString());
         Game.getEnvironment().reloadFromMap(this.getDataSource().getId());
       }
     });
 
     spinnerUpdateDelay.addChangeListener(v -> {
       if (this.getDataSource() != null) {
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTERUPDATEDELAY, ((Integer) spinnerUpdateDelay.getValue()).toString());
+        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_UPDATEDELAY, ((Integer) spinnerUpdateDelay.getValue()).toString());
         Game.getEnvironment().reloadFromMap(this.getDataSource().getId());
       }
     });
@@ -589,7 +589,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
         if (rdbtnLockDeltaY.isSelected()) {
 
         }
-        this.getDataSource().setCustomProperty(MapObjectProperty.PARTICLEDELTAY, ((Integer) spinnerMinDeltaY.getValue()).toString());
+        this.getDataSource().setCustomProperty(MapObjectProperty.PARTICLE_DELTAY, ((Integer) spinnerMinDeltaY.getValue()).toString());
         Game.getEnvironment().reloadFromMap(this.getDataSource().getId());
       }
     });

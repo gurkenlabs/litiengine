@@ -259,10 +259,10 @@ public class MapComponent extends EditorComponent {
 
           // render collision boxes
           String coll = mapObject.getCustomProperty(MapObjectProperty.COLLISION);
-          final String collisionBoxWidthFactor = mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH);
-          final String collisionBoxHeightFactor = mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT);
-          final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN));
-          final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN));
+          final String collisionBoxWidthFactor = mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH);
+          final String collisionBoxHeightFactor = mapObject.getCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT);
+          final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN));
+          final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN));
 
           if (coll != null && collisionBoxWidthFactor != null && collisionBoxHeightFactor != null) {
             boolean collision = Boolean.valueOf(coll);
@@ -915,24 +915,24 @@ public class MapComponent extends EditorComponent {
 
     switch (type) {
     case PROP:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH, (this.newObject.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT, (this.newObject.getHeight() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObject.getWidth() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObject.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
-      mo.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, "false");
+      mo.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, "false");
       mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
       break;
     case DECORMOB:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOXWIDTH, (this.newObject.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOXHEIGHT, (this.newObject.getHeight() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObject.getWidth() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObject.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "false");
       mo.setCustomProperty(MapObjectProperty.DECORMOB_VELOCITY, "2");
       mo.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, MovementBehavior.IDLE.toString());
       break;
     case LIGHTSOURCE:
-      mo.setCustomProperty(MapObjectProperty.LIGHTALPHA, "180");
-      mo.setCustomProperty(MapObjectProperty.LIGHTCOLOR, "#ffffff");
-      mo.setCustomProperty(MapObjectProperty.LIGHTSHAPE, LightSource.ELLIPSE);
-      mo.setCustomProperty(MapObjectProperty.LIGHTACTIVE, "true");
+      mo.setCustomProperty(MapObjectProperty.LIGHT_ALPHA, "180");
+      mo.setCustomProperty(MapObjectProperty.LIGHT_COLOR, "#ffffff");
+      mo.setCustomProperty(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
+      mo.setCustomProperty(MapObjectProperty.LIGHT_ACTIVE, "true");
       break;
     case SPAWNPOINT:
     default:

@@ -143,7 +143,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     }
 
     this.spinnerVelocity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.DECORMOB_VELOCITY));
-    this.chckbxAttackable.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
+    this.chckbxAttackable.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
   }
 
   private void setupChangedListeners() {
@@ -155,7 +155,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxBehaviour.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, this.comboBoxBehaviour.getSelectedItem().toString())));
     this.spinnerVelocity.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.DECORMOB_VELOCITY, this.spinnerVelocity.getValue().toString())));
-    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()))));
+    this.chckbxAttackable.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, Boolean.toString(!this.chckbxAttackable.isSelected()))));
   }
 
   private void loadAvailableDecorMobs() {

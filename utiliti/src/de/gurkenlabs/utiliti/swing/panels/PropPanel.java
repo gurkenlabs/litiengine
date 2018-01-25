@@ -126,23 +126,23 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       }
     }
 
-    final Material material = mapObject.getCustomProperty(MapObjectProperty.MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.MATERIAL));
+    final Material material = mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
     this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
-    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE));
+    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
     this.chckbxShadow.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
-    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.OBSTACLE));
+    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
   }
 
   private void setupChangedListeners() {
-    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
+    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
 
     this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()))));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
-      m.setCustomProperty(MapObjectProperty.MATERIAL, material.toString());
+      m.setCustomProperty(MapObjectProperty.PROP_MATERIAL, material.toString());
     }));
 
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
@@ -152,7 +152,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
     this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
 
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
   }
 
   private void loadAvailableProps() {

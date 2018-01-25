@@ -98,13 +98,13 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String color = mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR);
-    final String shape = mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE);
-    final String active = mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE);
+    final String color = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
+    final String shape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
+    final String active = mapObject.getCustomProperty(MapObjectProperty.LIGHT_ACTIVE);
 
     boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
-    this.spinnerBrightness.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTALPHA));
-    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY));
+    this.spinnerBrightness.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA));
+    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY));
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
@@ -123,29 +123,29 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
       textFieldColor.setText(h);
       this.spinnerBrightness.setValue(result.getAlpha());
       if (getDataSource() != null) {
-        getDataSource().setCustomProperty(MapObjectProperty.LIGHTCOLOR, h);
+        getDataSource().setCustomProperty(MapObjectProperty.LIGHT_COLOR, h);
         Game.getEnvironment().reloadFromMap(getDataSource().getId());
         Game.getEnvironment().getAmbientLight().createImage();
       }
     });
 
     spinnerBrightness.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperty.LIGHTALPHA, spinnerBrightness.getValue().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHT_ALPHA, spinnerBrightness.getValue().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setCustomProperty(MapObjectProperty.LIGHTINTENSITY, spinnerIntensity.getValue().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.LIGHTSHAPE, comboBoxLightShape.getSelectedItem().toString());
+      m.setCustomProperty(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
       Game.getEnvironment().getAmbientLight().createImage();
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.LIGHTACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
+      m.setCustomProperty(MapObjectProperty.LIGHT_ACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
       Game.getEnvironment().getAmbientLight().createImage();
     }));
   }

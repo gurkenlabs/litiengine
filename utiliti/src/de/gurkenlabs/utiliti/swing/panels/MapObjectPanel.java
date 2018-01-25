@@ -20,7 +20,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.utiliti.EditorScreen;
@@ -39,7 +38,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final JSpinner spinnerWidth;
   private final JSpinner spinnerHeight;
   private final JLabel labelEntityID;
-  private JTextField textFieldCustomType;
 
   /**
    * Create the panel.
@@ -92,76 +90,32 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     componentPanel = new JPanel();
     componentPanel.setBorder(null);
-
-    textFieldCustomType = new JTextField();
-    textFieldCustomType.setColumns(10);
-    textFieldCustomType.setVisible(false);
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addGap(72)
-                        .addComponent(textFieldCustomType, GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-                            .addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblName, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblX, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                            .addComponent(labelEntityID)
-                            .addGroup(groupLayout.createSequentialGroup()
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                    .addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                                    .addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-                                    .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
-                                .addGap(0)
-                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                    .addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
-                                    .addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)))
-                            .addComponent(comboBoxType, 0, 167, Short.MAX_VALUE)
-                            .addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))))
-                .addGap(6))
-            .addComponent(componentPanel, GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNewLabel)
-                    .addComponent(labelEntityID))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblX)
-                    .addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblYcoordinate)
-                    .addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false)
-                    .addComponent(lblName, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(textFieldCustomType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(componentPanel, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addContainerGap()
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblName, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(labelEntityID)
+                .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerWidth, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE).addComponent(spinnerX, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE).addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)).addGap(0)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE).addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)))
+                .addComponent(comboBoxType, 0, 372, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
+            .addGap(6))
+        .addComponent(componentPanel, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblNewLabel).addComponent(labelEntityID)).addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblYcoordinate).addComponent(spinnerY, GroupLayout.PREFERRED_SIZE,
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false).addComponent(lblName, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(32)
+            .addComponent(componentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
     componentPanel.setLayout(new BorderLayout(0, 0));
     collWrapper.setLayout(new BorderLayout());
     componentPanel.add(this.collWrapper, BorderLayout.NORTH);
@@ -251,7 +205,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.textFieldName.setText("");
     this.labelEntityID.setText("####");
     this.comboBoxType.setEnabled(true);
-    this.textFieldCustomType.setText("");
   }
 
   @Override
@@ -263,8 +216,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     MapObjectType type = MapObjectType.get(mapObject.getType());
     this.comboBoxType.setSelectedItem(type);
-    String customType = mapObject.getCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE);
-    this.textFieldCustomType.setText(customType);
     this.textFieldName.setText(mapObject.getName());
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.comboBoxType.setEnabled(false);
@@ -274,17 +225,12 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     comboBoxType.addItemListener(new MapObjectPropertyItemListener(m -> {
       MapObjectType type = (MapObjectType) comboBoxType.getSelectedItem();
       m.setType(type.toString());
-      textFieldCustomType.setVisible(type == MapObjectType.AREA);
     }));
 
     comboBoxType.addItemListener(e -> {
       MapObjectType type = (MapObjectType) comboBoxType.getSelectedItem();
       switchPanel(type);
     });
-
-    this.textFieldCustomType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
-
-    this.textFieldCustomType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.CUSTOM_MAPOBJECT_TYPE, textFieldCustomType.getText())));
 
     this.textFieldName.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setName(textFieldName.getText())));
 

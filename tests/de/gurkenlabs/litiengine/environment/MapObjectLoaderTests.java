@@ -39,16 +39,16 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperty.MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(true);
     when(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH)).thenReturn(100);
 
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn(100.0f);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
 
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
     when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
     Collection<IEntity> entities = loader.load(mapObject);
@@ -116,11 +116,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERMESSAGE)).thenReturn("message");
-    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
-    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERTARGETS)).thenReturn("1,2,3");
-    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERACTIVATORS)).thenReturn("4,5,6");
-    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGERONETIME)).thenReturn("false");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
+    when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -157,13 +157,13 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME)).thenReturn("decorSprite");
     when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)).thenReturn("200");
     when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(false);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXWIDTH)).thenReturn(100.0f);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOXHEIGHT)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
 
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISIONVALGIN)).thenReturn("MIDDLE");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -225,11 +225,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTALPHA)).thenReturn(100);
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHTINTENSITY)).thenReturn(100);
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTCOLOR)).thenReturn("#ffffff");
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTACTIVE)).thenReturn("true");
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHTSHAPE)).thenReturn(LightSource.ELLIPSE);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY)).thenReturn(100);
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR)).thenReturn("#ffffff");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_ACTIVE)).thenReturn("true");
+    when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
