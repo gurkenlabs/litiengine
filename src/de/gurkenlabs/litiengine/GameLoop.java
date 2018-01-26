@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
+public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private static int executionIndex = -1;
 
   private final List<TimedAction> actions;
   private final int updateRate;
   private final List<Consumer<Integer>> upsTrackedConsumer;
-  private final List<IUpdateable> updatables;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
@@ -27,25 +25,11 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   private int updateCount;
 
   public GameLoop(final int updateRate) {
-    this.updatables = new CopyOnWriteArrayList<>();
+    super();
     this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
     this.setTimeScale(1.0F);
-  }
-
-  @Override
-  public void attach(final IUpdateable updatable) {
-    if (updatable == null) {
-      return;
-    }
-
-    if (this.updatables.contains(updatable)) {
-      log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] { updatable });
-      return;
-    }
-
-    this.updatables.add(updatable);
   }
 
   @Override
@@ -61,11 +45,6 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
   @Override
   public long convertToTicks(final int ms) {
     return (long) (this.updateRate / 1000.0 * ms);
-  }
-
-  @Override
-  public void detach(final IUpdateable updatable) {
-    this.updatables.remove(updatable);
   }
 
   @Override
@@ -129,16 +108,7 @@ public class GameLoop extends Thread implements IGameLoop, AutoCloseable {
 
       if (this.getTimeScale() > 0) {
         ++this.totalTicks;
-        this.updatables.forEach(updatable -> {
-          try {
-            if (updatable != null) {
-              updatable.update();
-            }
-          } catch (final Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-          }
-        });
-
+        this.update();
         this.executeTimedActions();
       }
 
