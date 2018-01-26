@@ -64,8 +64,6 @@ public class LightSource extends Entity implements IRenderable {
   /**
    * Instantiates a new light source.
    *
-   * @param brightness
-   *          the brightness
    * @param lightColor
    *          the light color
    */
