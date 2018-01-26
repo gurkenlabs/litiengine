@@ -114,7 +114,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
             .addPreferredGap(ComponentPlacement.RELATED)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false).addComponent(lblName, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(32)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(10)
             .addComponent(componentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
     componentPanel.setLayout(new BorderLayout(0, 0));
     collWrapper.setLayout(new BorderLayout());

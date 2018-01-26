@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -14,10 +13,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JSpinner;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -29,6 +26,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<JLabel> comboBoxSpriteSheets;
@@ -59,7 +57,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     JLabel lblSprite = new JLabel(Resources.get("panel_sprite"));
 
     comboBoxSpriteSheets = new JComboBox<>();
-    comboBoxSpriteSheets.setRenderer(new MyComboRenderer());
+    comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
     chckbxIndestructible = new JCheckBox(Resources.get("panel_destructible"));
 
@@ -185,18 +183,6 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       }
 
       this.comboBoxSpriteSheets.addItem(label);
-    }
-
-  }
-
-  class MyComboRenderer implements ListCellRenderer<JLabel> {
-    @Override
-    public Component getListCellRendererComponent(JList<? extends JLabel> list, JLabel value, int index, boolean isSelected, boolean cellHasFocus) {
-      if (value != null) {
-        return value;
-      }
-
-      return new JLabel();
     }
   }
 }
