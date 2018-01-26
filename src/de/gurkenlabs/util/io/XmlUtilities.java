@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +28,13 @@ import javax.xml.transform.stream.StreamResult;
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
 
+  private static final Map<Class<?>, JAXBContext> jaxbContexts;
+
   private XmlUtilities() {
+  }
+
+  static {
+    jaxbContexts = new ConcurrentHashMap<>();
   }
 
   /**
@@ -55,9 +63,30 @@ public final class XmlUtilities {
     }
   }
 
+  public static <T> JAXBContext getContext(Class<T> cls) {
+    try {
+      final JAXBContext jaxbContext;
+      if (jaxbContexts.containsKey(cls)) {
+        jaxbContext = jaxbContexts.get(cls);
+      } else {
+        jaxbContext = JAXBContext.newInstance(cls);
+        jaxbContexts.put(cls, jaxbContext);
+      }
+      return jaxbContext;
+    } catch (final JAXBException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    return null;
+  }
+
   public static <T> T readFromFile(Class<T> cls, String path) {
     try {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(cls);
+      final JAXBContext jaxbContext = getContext(cls);
+      if (jaxbContext == null) {
+        return null;
+      }
+
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
       InputStream stream = ClassLoader.getSystemResourceAsStream(path);
@@ -86,7 +115,11 @@ public final class XmlUtilities {
     File newFile = new File(fileNameWithExtension);
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
-      JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+      JAXBContext jaxbContext = getContext(object.getClass());
+      if (jaxbContext == null) {
+        return null;
+      }
+
       Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 

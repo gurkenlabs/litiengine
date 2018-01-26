@@ -247,12 +247,12 @@ public final class Game {
     log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
 
     int tileCnt = 0;
-    for (final ITileset m : file.getTilesets()) {
-      if (getTilesets().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
+    for (final ITileset tileset : file.getTilesets()) {
+      if (getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
         continue;
       }
 
-      getTilesets().add(m);
+      getTilesets().add(tileset);
       tileCnt++;
     }
 

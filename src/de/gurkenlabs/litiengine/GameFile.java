@@ -63,12 +63,12 @@ public class GameFile implements Serializable {
         return null;
       }
 
-      for (final Map map : gameFile.getMaps()) {
+      gameFile.getMaps().parallelStream().forEach(map -> {
         map.updateTileTerrain();
         for (final Tileset tileset : map.getRawTileSets()) {
           tileset.load(gameFile.getTilesets());
         }
-      }
+      });
 
       return gameFile;
     } catch (final JAXBException | IOException e) {
@@ -111,7 +111,7 @@ public class GameFile implements Serializable {
     Collections.sort(this.getMaps());
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
+      final JAXBContext jaxbContext = XmlUtilities.getContext(GameFile.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -145,7 +145,7 @@ public class GameFile implements Serializable {
   }
 
   private static GameFile getGameFileFromFile(String file) throws JAXBException, IOException {
-    final JAXBContext jaxbContext = JAXBContext.newInstance(GameFile.class);
+    final JAXBContext jaxbContext = XmlUtilities.getContext(GameFile.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = FileUtilities.getGameResource(file)) {
 
@@ -155,13 +155,7 @@ public class GameFile implements Serializable {
     } catch (final ZipException e) {
 
       // if it fails to load the compressed file, get it from plain XML
-      InputStream stream = null;
-      stream = FileUtilities.getGameResource(file);
-      if (stream == null) {
-        return null;
-      }
-
-      return (GameFile) um.unmarshal(stream);
+      return XmlUtilities.readFromFile(GameFile.class, file);
     }
   }
 

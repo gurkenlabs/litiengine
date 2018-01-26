@@ -286,6 +286,7 @@ public class EditorScreen extends Screen {
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
       this.gameFile = GameFile.load(gameFile.getPath());
+
       Program.userPreferences.setLastGameFile(gameFile.getPath());
       Program.userPreferences.addOpenedFile(this.currentResourceFile);
       Program.loadRecentFiles();
@@ -299,7 +300,7 @@ public class EditorScreen extends Screen {
       // 2. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
 
-      log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " tilesheets loaded from '" + this.currentResourceFile + "'");
+      log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " spritesheets loaded from '" + this.currentResourceFile + "'");
 
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
@@ -386,14 +387,14 @@ public class EditorScreen extends Screen {
   }
 
   public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
-    for (SpriteSheetInfo info : infos) {
+    infos.parallelStream().forEach(info -> {
       Spritesheet.remove(info.getName());
       if (info.getHeight() == 0 && info.getWidth() == 0) {
-        continue;
+        return;
       }
 
       Spritesheet.load(info);
-    }
+    });
 
     ImageCache.clearAll();
     this.getMapComponent().reloadEnvironment();
@@ -536,7 +537,7 @@ public class EditorScreen extends Screen {
     List<SpriteSheetInfo> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {
-      if (tileSet.getImage() == null) {
+      if (tileSet.getImage() == null || Spritesheet.find(tileSet.getName()) != null) {
         continue;
       }
 
@@ -574,6 +575,8 @@ public class EditorScreen extends Screen {
       }
     }
 
-    log.log(Level.INFO, cnt + " tilesets loaded from '" + map.getFileName() + "'");
+    if (cnt > 0) {
+      log.log(Level.INFO, cnt + " tilesets loaded from '" + map.getFileName() + "'");
+    }
   }
 }

@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
 import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.util.io.XmlUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
@@ -41,27 +42,13 @@ public class CustomEmitter extends Emitter {
       return loadedCustomEmitters.get(name);
     }
 
-    try {
-      final JAXBContext jaxbContext = JAXBContext.newInstance(CustomEmitterData.class);
-      final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-      if (!new File(emitterXml).exists()) {
-        emitterXml = Paths.get(GameDirectories.EMITTERS, emitterXml).toString();
-      }
-
-      final InputStream xml = FileUtilities.getGameResource(emitterXml);
-      if (xml == null) {
-        return null;
-      }
-
-      final CustomEmitterData loaded = (CustomEmitterData) jaxbUnmarshaller.unmarshal(xml);
-      loadedCustomEmitters.put(name, loaded);
-      return loaded;
-    } catch (final JAXBException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    final CustomEmitterData loaded = XmlUtilities.readFromFile(CustomEmitterData.class, emitterXml);
+    if (loaded == null) {
+      return null;
     }
 
-    return null;
+    loadedCustomEmitters.put(name, loaded);
+    return loaded;
   }
 
   private CustomEmitterData emitterData;
