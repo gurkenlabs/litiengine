@@ -81,7 +81,7 @@ public class SoundSource implements Runnable {
   }
 
   public void dispose() {
-    this.interrupt();
+    this.cancel();
 
     if (this.dataLine != null) {
       closeQueue.enqueue(this.dataLine);
@@ -104,10 +104,6 @@ public class SoundSource implements Runnable {
    */
   public void play() {
     this.play(false, null, -1);
-  }
-
-  public void interrupt() {
-    this.cancel();
   }
 
   /**

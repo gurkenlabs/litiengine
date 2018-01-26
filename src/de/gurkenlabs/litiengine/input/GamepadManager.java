@@ -15,20 +15,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameLoop;
-import de.gurkenlabs.litiengine.IGameLoop;
-import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
-public class GamepadManager implements IGamepadManager, IUpdateable {
+public class GamepadManager implements IGamepadManager {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
-  private static final int GAMEPAD_UPDATE_DELAY = 1000;
   private int defaultgamePadIndex = -1;
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
   private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
-  private final IGameLoop loop;
 
   private final Map<String, List<Consumer<Float>>> componentPollConsumer;
 
@@ -38,10 +33,11 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
   private final List<BiConsumer<String, Float>> pressedConsumer;
 
+  private final Thread hotPlugThread;
+
   private boolean handleHotPluggedControllers;
 
   public GamepadManager() {
-    this.loop = new GameLoop(1000 / GAMEPAD_UPDATE_DELAY);
     this.gamepadRemovedConsumer = new CopyOnWriteArrayList<>();
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.componentPollConsumer = new ConcurrentHashMap<>();
@@ -49,9 +45,20 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
     this.pollConsumer = new CopyOnWriteArrayList<>();
     this.pressedConsumer = new CopyOnWriteArrayList<>();
 
-    this.loop.attach(this);
+    this.hotPlugThread = new Thread(() -> {
+      while (true) {
+        this.updateGamepads();
+
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          break;
+        }
+      }
+    });
+
     Game.onTerminating(s -> {
-      this.loop.terminate();
+      hotPlugThread.interrupt();
       return true;
     });
 
@@ -126,7 +133,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
 
   @Override
   public void start() {
-    this.loop.start();
+    this.hotPlugThread.start();
   }
 
   @Override
@@ -141,12 +148,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
       totalWait++;
     }
 
-    this.loop.terminate();
-  }
-
-  @Override
-  public void update() {
-    this.updateGamepads();
+    this.hotPlugThread.interrupt();
   }
 
   protected static void addComponentConsumer(Map<String, List<Consumer<Float>>> consumerList, String identifier, Consumer<Float> consumer) {
@@ -160,8 +162,8 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
   /**
    * In JInput it is not possible to get newly added controllers or detached
    * controllers because it will never update its controllers. If you would
-   * restart the application it would work... so we just reset the environment
-   * via reflection and it'll do it ;).
+   * restart the application it would work... so we just reset the environment via
+   * reflection and it'll do it ;).
    */
   private void hackTheShitOutOfJInputBecauseItSucksHard() {
     try {
@@ -177,12 +179,6 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
         final String name = thread.getClass().getName();
         if (name.equals("net.java.games.input.RawInputEventQueue$QueueThread")) {
           thread.interrupt();
-          try {
-            thread.join();
-          } catch (final InterruptedException e) {
-            log.log(Level.WARNING, e.getMessage(), e);
-            thread.interrupt();
-          }
         }
       }
 
@@ -242,7 +238,7 @@ public class GamepadManager implements IGamepadManager, IUpdateable {
         }
       }
     } catch (IllegalStateException e) {
-      this.loop.terminate();
+      this.hotPlugThread.interrupt();
     } finally {
       this.handleHotPluggedControllers = false;
     }
