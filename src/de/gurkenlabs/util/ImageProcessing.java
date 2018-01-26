@@ -152,6 +152,19 @@ public class ImageProcessing {
     return bimage;
   }
 
+  public static boolean isEmpty(final BufferedImage image) {
+    for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = 0; x < image.getWidth(); x++) {
+        final int pixel = image.getRGB(x, y);
+        if (pixel >> 24 != 0x00) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Crops a sub image from the specified image.
    *

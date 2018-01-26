@@ -18,7 +18,7 @@ import de.gurkenlabs.util.ImageProcessing;
 
 public class AssetPanel extends JPanel {
   private static final int COLUMNS = 10;
-  private static final Icon emptyDoc = new ImageIcon(Resources.getImage("document_64.png"));
+  private static final Icon imageIcon = new ImageIcon(Resources.getImage("document-img.png"));
   private static final Icon tilesetIcon = new ImageIcon(Resources.getImage("document-tsx.png"));
   private final GridLayout gridLayout;
 
@@ -41,8 +41,8 @@ public class AssetPanel extends JPanel {
         Icon icon;
         Spritesheet sprite = Spritesheet.find(info.getName());
 
-        if (sprite == null) {
-          icon = emptyDoc;
+        if (sprite == null || sprite.getSprite(0) == null) {
+          icon = null;
         } else {
           icon = new ImageIcon(ImageProcessing.scaleImage(sprite.getSprite(0), 64, 64, true));
         }

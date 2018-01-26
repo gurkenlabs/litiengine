@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -268,8 +269,10 @@ public final class Game {
     int spriteload = 0;
     for (final Spritesheet s : loadedSprites) {
       for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
-        s.getSprite(i);
-        spriteload++;
+        BufferedImage sprite = s.getSprite(i);
+        if (sprite != null) {
+          spriteload++;
+        }
       }
     }
 

@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * The Class ImageCache.
@@ -28,6 +30,8 @@ public final class ImageCache {
   /** The cache. */
   private final ConcurrentHashMap<String, BufferedImage> cache;
 
+  private final List<Consumer<ImageCache>> clearConsumers;
+
   /**
    * Instantiates a new image cache.
    *
@@ -36,6 +40,7 @@ public final class ImageCache {
    */
   private ImageCache() {
     this.cache = new ConcurrentHashMap<>();
+    this.clearConsumers = new CopyOnWriteArrayList<>();
   }
 
   public static void clearAll() {
@@ -48,6 +53,10 @@ public final class ImageCache {
     this.cache.clear();
   }
 
+  public void onCleared(Consumer<ImageCache> cons) {
+    this.clearConsumers.add(cons);
+  }
+
   public void clear(final String regex) {
     List<String> remove = new ArrayList<>();
     for (String key : this.cache.keySet()) {
@@ -58,6 +67,10 @@ public final class ImageCache {
 
     for (String key : remove) {
       this.cache.remove(key);
+    }
+
+    for (Consumer<ImageCache> cons : this.clearConsumers) {
+      cons.accept(this);
     }
   }
 

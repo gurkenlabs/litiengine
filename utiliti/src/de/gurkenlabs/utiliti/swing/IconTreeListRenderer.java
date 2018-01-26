@@ -76,7 +76,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         sprite = Spritesheet.find(fallbackName);
       }
 
-      if (sprite == null) {
+      if (sprite == null || sprite.getSprite(0) == null) {
         return null;
       }
 

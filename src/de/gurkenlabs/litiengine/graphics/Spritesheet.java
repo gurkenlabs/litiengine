@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ public final class Spritesheet {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
+  private final List<Integer> emptySprites;
   private int columns;
 
   private final int hashCode;
@@ -49,6 +51,7 @@ public final class Spritesheet {
   private int spriteWidth;
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+    this.emptySprites = new CopyOnWriteArrayList<>();
     this.image = image;
 
     this.name = FileUtilities.getFileName(path);
@@ -60,6 +63,8 @@ public final class Spritesheet {
     this.updateRowsAndCols();
 
     spritesheets.put(this.name.toLowerCase(), this);
+
+    ImageCache.SPRITES.onCleared(cache -> this.emptySprites.clear());
   }
 
   private Spritesheet(final ITileset tileset) {
@@ -224,6 +229,10 @@ public final class Spritesheet {
   }
 
   public BufferedImage getSprite(final int index) {
+    if (this.emptySprites.contains(index)) {
+      return null;
+    }
+
     final String imageCacheKey = MessageFormat.format("{0}_{1}", this.hashCode, index);
     if (ImageCache.SPRITES.containsKey(imageCacheKey)) {
       return ImageCache.SPRITES.get(imageCacheKey);
@@ -237,6 +246,11 @@ public final class Spritesheet {
     final Point position = this.getLocation(index);
     try {
       final BufferedImage smallImage = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
+      if (ImageProcessing.isEmpty(smallImage)) {
+        emptySprites.add(index);
+        return null;
+      }
+
       ImageCache.SPRITES.put(imageCacheKey, smallImage);
       return smallImage;
     } catch (final RasterFormatException rfe) {
