@@ -38,6 +38,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final boolean isOneTimeTrigger;
   private String message;
   private final List<Integer> targets;
+  private int cooldown;
+  private long lastActivation;
 
   private boolean isActivated;
 
@@ -94,6 +96,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public List<Integer> getTargets() {
     return this.targets;
+  }
+
+  public int getCooldown() {
+    return this.cooldown;
   }
 
   /**
@@ -169,7 +175,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       }
     }
 
-    return null;
+    return super.sendMessage(sender, message);
   }
 
   public void setMessage(final String message) {
@@ -193,6 +199,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.setCollisionBoxWidth(width);
     this.setCollisionBoxHeight(height);
     super.setSize(width, height);
+  }
+
+  public void setCooldown(int cooldown) {
+    this.cooldown = cooldown;
   }
 
   @Override
@@ -242,6 +252,10 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return false;
     }
 
+    if (this.cooldown > 0 && Game.getLoop().getDeltaTime(this.lastActivation) < this.cooldown) {
+      return false;
+    }
+
     this.isActivated = true;
     List<Integer> triggerTargets = this.getTargets(tar);
 
@@ -274,6 +288,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       Game.getEnvironment().remove(this);
     }
 
+    this.lastActivation = Game.getLoop().getTicks();
     return true;
   }
 

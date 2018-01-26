@@ -58,6 +58,7 @@ public final class MapObjectProperty {
   public static final String TRIGGER_ONETIME = "triggerOneTime";
   public static final String TRIGGER_ACTIVATORS = "triggerActivators";
   public static final String TRIGGER_TARGETS = "triggerTarget";
+  public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
   // emitter
   public static final String EMITTER_COLORS = "emitterColors";

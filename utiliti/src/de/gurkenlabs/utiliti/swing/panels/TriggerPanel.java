@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -25,15 +27,15 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.util.ArrayUtilities;
-import java.awt.Insets;
 
 public class TriggerPanel extends PropertyPanel<IMapObject> {
   private JTextField textFieldMessage;
-  DefaultTableModel model;
-  DefaultTableModel targetsModel;
-  JComboBox<TriggerActivation> comboBoxActivationType;
+  private DefaultTableModel model;
+  private DefaultTableModel targetsModel;
+  private JComboBox<TriggerActivation> comboBoxActivationType;
+  private JSpinner spinnerCooldown;
 
-  JCheckBox chckbxOneTimeOnly;
+  private JCheckBox chckbxOneTimeOnly;
   private JTable table;
   private JTable tableTargets;
 
@@ -82,6 +84,10 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
       }
     });
 
+    spinnerCooldown = new JSpinner();
+
+    JLabel lblCooldown = new JLabel("cooldown");
+
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
         .addGroup(groupLayout.createSequentialGroup().addContainerGap()
@@ -92,11 +98,17 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
                         .addGroup(groupLayout.createSequentialGroup().addComponent(lblActivation, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxOneTimeOnly, GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE).addComponent(comboBoxActivationType, 0, 365, Short.MAX_VALUE))))
                     .addGap(10))
-                .addGroup(groupLayout.createSequentialGroup().addGap(4)
+                .addGroup(groupLayout.createSequentialGroup()
                     .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(button3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(button2, GroupLayout.PREFERRED_SIZE, 37, Short.MAX_VALUE))
-                        .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE).addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE).addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)).addContainerGap()))));
+                        .addGroup(groupLayout.createSequentialGroup().addGap(4)
+                            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false).addComponent(button3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(button2, GroupLayout.PREFERRED_SIZE, 37, Short.MAX_VALUE))
+                                .addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE).addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lblCooldown, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addGap(10).addComponent(spinnerCooldown, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)).addGroup(Alignment.LEADING,
+                        groupLayout.createSequentialGroup().addGap(10).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(scrollPane1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE))))
+                    .addContainerGap()))));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblShadowType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(textFieldMessage, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED)
@@ -104,9 +116,12 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
             .addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxOneTimeOnly).addPreferredGap(ComponentPlacement.RELATED)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(scrollPane1, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
                 .addGroup(groupLayout.createSequentialGroup().addComponent(button2, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addGap(4).addComponent(button3, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)))
-            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
                 .addGroup(groupLayout.createSequentialGroup().addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addGap(4).addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)))
-            .addContainerGap(73, Short.MAX_VALUE)));
+            .addPreferredGap(ComponentPlacement.RELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerCooldown, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblCooldown, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+            .addContainerGap(47, Short.MAX_VALUE)));
 
     tableTargets = new JTable();
     tableTargets.getTableHeader().setReorderingAllowed(false);
@@ -148,6 +163,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     this.model.setRowCount(0);
     this.targetsModel.setRowCount(0);
     this.chckbxOneTimeOnly.setSelected(false);
+    this.spinnerCooldown.setValue(0);
   }
 
   @Override
@@ -168,6 +184,8 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     for (int activator : ArrayUtilities.getIntegerArray(activators)) {
       this.model.addRow(new Object[] { activator });
     }
+
+    this.spinnerCooldown.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
   }
 
   private void setupChangedListeners() {
@@ -211,5 +229,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
 
       getDataSource().setCustomProperty(MapObjectProperty.TRIGGER_TARGETS, String.join(",", targets));
     });
+
+    this.spinnerCooldown.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.TRIGGER_COOLDOWN, Integer.toString((int) this.spinnerCooldown.getValue()))));
   }
 }

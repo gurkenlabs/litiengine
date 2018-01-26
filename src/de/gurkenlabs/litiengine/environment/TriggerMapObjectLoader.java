@@ -57,6 +57,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
 
+    trigger.setCooldown(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
+
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(trigger);
     return entities;
