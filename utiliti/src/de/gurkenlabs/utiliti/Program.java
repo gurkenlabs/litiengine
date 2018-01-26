@@ -218,7 +218,7 @@ public class Program {
     window.remove(canvas);
     JPanel renderPane = new JPanel(new BorderLayout());
     renderPane.add(canvas);
-    renderPane.setMinimumSize(new Dimension(200, 0));
+    renderPane.setMinimumSize(new Dimension(300, 0));
 
     initCanvasPopupMenu(canvas);
 
@@ -233,7 +233,7 @@ public class Program {
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    mapWrap.setMinimumSize(new Dimension(200, 0));
+    mapWrap.setMinimumSize(new Dimension(300, 0));
     mapWrap.setBottomComponent(mapEditorPanel);
     mapWrap.setTopComponent(mapSelectionPanel);
     mapWrap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setSelectionEditSplitter(mapWrap.getDividerLocation()));
