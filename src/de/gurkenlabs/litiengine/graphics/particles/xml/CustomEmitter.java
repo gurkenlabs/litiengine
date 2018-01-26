@@ -1,19 +1,10 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import de.gurkenlabs.litiengine.GameDirectories;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;

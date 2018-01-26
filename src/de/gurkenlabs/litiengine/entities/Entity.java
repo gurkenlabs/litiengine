@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -15,6 +17,7 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  */
 @EntityInfo
 public abstract class Entity implements IEntity {
+  private final List<MessageAction> messageActions;
   private final List<String> tags;
 
   /** The direction. */
@@ -39,6 +42,7 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
+    this.messageActions = new CopyOnWriteArrayList<>();
     this.tags = new CopyOnWriteArrayList<>();
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
@@ -132,6 +136,10 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
+    for (MessageAction action : this.messageActions.stream().filter(x -> x.getMessage().equals(message)).collect(Collectors.toList())) {
+      action.execute(sender);
+    }
+
     return null;
   }
 
@@ -231,5 +239,28 @@ public abstract class Entity implements IEntity {
     sb.append(" #");
     sb.append(this.getMapId());
     return sb.toString();
+  }
+
+  @Override
+  public void registerMessageAction(String message, Consumer<MessageArgs> action) {
+    this.messageActions.add(new MessageAction(message, action));
+  }
+
+  private class MessageAction {
+    private final String message;
+    private final Consumer<MessageArgs> action;
+
+    public MessageAction(String message, Consumer<MessageArgs> action) {
+      this.message = message;
+      this.action = action;
+    }
+
+    public void execute(Object sender) {
+      this.action.accept(new MessageArgs(Entity.this, sender, getMessage()));
+    }
+
+    public String getMessage() {
+      return this.message;
+    }
   }
 }

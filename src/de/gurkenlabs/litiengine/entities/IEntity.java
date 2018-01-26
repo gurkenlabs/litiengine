@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
@@ -34,6 +35,8 @@ public interface IEntity {
   public float getWidth();
 
   public String sendMessage(Object sender, String message);
+
+  public void registerMessageAction(String message, Consumer<MessageArgs> action);
 
   public void setHeight(float height);
 

@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.entities.IEntity;

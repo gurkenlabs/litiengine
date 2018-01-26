@@ -22,12 +22,12 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
-import de.gurkenlabs.litiengine.entities.Rotation;
 
 public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<JLabel> comboBoxSpriteSheets;
