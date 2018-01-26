@@ -27,6 +27,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
+import de.gurkenlabs.litiengine.entities.Rotation;
 
 public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<JLabel> comboBoxSpriteSheets;
@@ -35,6 +36,9 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxShadow;
+  private JComboBox<Material> comboBoxRotation;
+  private JCheckBox checkBoxHorizontalFlip;
+  private JCheckBox checkBoxVerticalFlip;
 
   /**
    * Create the panel.
@@ -64,29 +68,41 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
 
     chckbxShadow = new JCheckBox("shadow");
+
+    comboBoxRotation = new JComboBox<Material>();
+    comboBoxRotation.setModel(new DefaultComboBoxModel(Rotation.values()));
+
+    JLabel lblRotation = new JLabel("rotation");
+
+    checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
+    checkBoxVerticalFlip = new JCheckBox("vertical flip");
+
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout
         .setHorizontalGroup(
-            groupLayout
-                .createParallelGroup(
-                    Alignment.LEADING)
-                .addGroup(
-                    groupLayout.createSequentialGroup().addContainerGap()
-                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblSprite,
-                            GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(
-                            groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxMaterial, 0, 365, Short.MAX_VALUE)
-                                .addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE).addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-                                    .addComponent(chckbxIsObstacle, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(chckbxIndestructible, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap()));
+            groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup().addContainerGap()
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(
+                        ComponentPlacement.RELATED)
+                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(groupLayout.createSequentialGroup()
+                            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+                                .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxIsObstacle).addComponent(chckbxIndestructible, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(checkBoxHorizontalFlip).addComponent(checkBoxVerticalFlip, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))))
+                            .addGap(10))
+                        .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(comboBoxMaterial, 0, 276, Short.MAX_VALUE).addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboBoxSpriteSheets, 0, 276, Short.MAX_VALUE).addComponent(comboBoxRotation, 0, 276, Short.MAX_VALUE)).addGap(5)))));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxMaterial, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxIndestructible).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
-            .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addContainerGap(138, Short.MAX_VALUE)));
+            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxRotation, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(chckbxIndestructible, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxHorizontalFlip))
+            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxVerticalFlip)).addPreferredGap(ComponentPlacement.UNRELATED)
+            .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addContainerGap()));
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
@@ -108,6 +124,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     this.chckbxIsObstacle.setSelected(false);
     this.chckbxShadow.setSelected(false);
     this.comboBoxMaterial.setSelectedItem(Material.UNDEFINED);
+    this.comboBoxRotation.setSelectedItem(Rotation.NONE);
     this.spinnerHealth.setValue(0);
     this.comboBoxSpriteSheets.setSelectedItem(null);
   }
@@ -127,20 +144,29 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     final Material material = mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
+    final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
+    this.comboBoxRotation.setSelectedItem(rotation);
+
     this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
     this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
     this.chckbxShadow.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
     this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
+    this.checkBoxHorizontalFlip.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+    this.checkBoxVerticalFlip.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
   }
 
   private void setupChangedListeners() {
     this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
-
     this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()))));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
       m.setCustomProperty(MapObjectProperty.PROP_MATERIAL, material.toString());
+    }));
+
+    this.comboBoxRotation.addActionListener(new MapObjectPropertyActionListener(m -> {
+      Rotation rotation = (Rotation) this.comboBoxRotation.getSelectedItem();
+      m.setCustomProperty(MapObjectProperty.PROP_ROTATION, rotation.toString());
     }));
 
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
@@ -149,8 +175,10 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     }));
 
     this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
-
     this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
+
+    this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_FLIPHORIZONTALLY, Boolean.toString(checkBoxHorizontalFlip.isSelected()))));
+    this.checkBoxVerticalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_FLIPVERTICALLY, Boolean.toString(checkBoxVerticalFlip.isSelected()))));
   }
 
   private void loadAvailableProps() {

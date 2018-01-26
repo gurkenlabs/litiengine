@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.geom.GeometricUtilities;
@@ -413,12 +414,16 @@ public class ImageProcessing {
     return x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00;
   }
 
+  public static BufferedImage rotate(final BufferedImage bufferedImage, final Rotation rotation) {
+    return rotate(bufferedImage, rotation.getRadians());
+  }
+
   public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
 
     final AffineTransform tx = new AffineTransform();
     tx.rotate(radians, bufferedImage.getWidth() / 2.0, bufferedImage.getHeight() / 2.0);
 
-    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     return op.filter(bufferedImage, null);
   }
 

@@ -1,10 +1,12 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
@@ -62,12 +64,31 @@ public class PropAnimationController extends AnimationController {
     String cacheKey = this.buildCurrentCacheKey();
     cacheKey += "_" + this.prop.isAddShadow();
     cacheKey += "_" + this.prop.getState();
+    cacheKey += "_" + this.prop.getSpriteRotation();
+    cacheKey += "_" + this.prop.flipHorizontally();
+    cacheKey += "_" + this.prop.flipVertically();
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
 
-    final BufferedImage currentImage = super.getCurrentSprite();
-    if (currentImage == null || !prop.isAddShadow()) {
+    BufferedImage currentImage = super.getCurrentSprite();
+    if (currentImage == null) {
+      return null;
+    }
+
+    if (prop.getSpriteRotation() != Rotation.NONE) {
+      currentImage = ImageProcessing.rotate(currentImage, prop.getSpriteRotation());
+    }
+
+    if (prop.flipHorizontally()) {
+      currentImage = ImageProcessing.horizontalFlip(currentImage);
+    }
+
+    if (prop.flipVertically()) {
+      currentImage = ImageProcessing.verticalFlip(currentImage);
+    }
+
+    if (!prop.isAddShadow()) {
       return currentImage;
     }
 
@@ -75,6 +96,7 @@ public class PropAnimationController extends AnimationController {
     final int ShadowYOffset = currentImage.getHeight();
     final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
     ImageCache.SPRITES.put(cacheKey, shadow);
+
     return shadow;
   }
 

@@ -33,6 +33,9 @@ public final class MapObjectProperty {
   public static final String PROP_MATERIAL = "material";
   public static final String PROP_OBSTACLE = "isObstacle";
   public static final String PROP_ADDSHADOW = "addShadow";
+  public static final String PROP_ROTATION = "rotationSprite";
+  public static final String PROP_FLIPHORIZONTALLY = "flipHorizontally";
+  public static final String PROP_FLIPVERTICALLY = "flipVertically";
 
   // light source
   public static final String LIGHT_ALPHA = "lightBrightness";

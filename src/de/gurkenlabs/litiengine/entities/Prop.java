@@ -14,12 +14,16 @@ public class Prop extends CombatEntity {
   private String spritesheetName;
   private boolean isObstacle;
   private boolean addShadow;
+  private boolean flipHorizontally;
+  private boolean flipVertically;
+  private Rotation rotation;
 
   /**
    * Instantiates a new destructible.
    */
   public Prop(final Point2D location, final String spritesheetName, final Material mat) {
     super();
+    this.rotation = Rotation.NONE;
     this.spritesheetName = spritesheetName;
     this.material = mat;
     this.setLocation(location);
@@ -93,5 +97,29 @@ public class Prop extends CombatEntity {
 
   public void setAddShadow(boolean addShadow) {
     this.addShadow = addShadow;
+  }
+
+  public Rotation getSpriteRotation() {
+    return rotation;
+  }
+
+  public void setSpriteRotation(Rotation spriteRotation) {
+    this.rotation = spriteRotation;
+  }
+
+  public boolean flipHorizontally() {
+    return flipHorizontally;
+  }
+
+  public void setFlipHorizontally(boolean flipHorizontally) {
+    this.flipHorizontally = flipHorizontally;
+  }
+
+  public boolean flipVertically() {
+    return flipVertically;
+  }
+
+  public void setFlipVertically(boolean flipVertically) {
+    this.flipVertically = flipVertically;
   }
 }

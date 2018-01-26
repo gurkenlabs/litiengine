@@ -9,6 +9,7 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -32,6 +33,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
     final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), material);
     prop.setMapId(mapObject.getId());
 
+    final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
+    prop.setSpriteRotation(rotation);
+
     prop.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
     prop.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
 
@@ -42,6 +46,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
     prop.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
     prop.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
     prop.setAddShadow(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
+
+    prop.setFlipHorizontally(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+    prop.setFlipVertically(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
 
     prop.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
     prop.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
