@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,13 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CustomEmitterData {
+public class EmitterData implements Serializable, Comparable<EmitterData> {
+  private static final long serialVersionUID = 50238884097993529L;
+
   @XmlElement
   private boolean applyStaticPhysics;
 
@@ -81,8 +86,8 @@ public class CustomEmitterData {
 
   @XmlAttribute
   private int width;
-  
-  @XmlAttribute
+
+  @XmlElement
   private ParticleParameter colorDeviation;
 
   @XmlElement
@@ -91,7 +96,7 @@ public class CustomEmitterData {
   @XmlElement
   private ParticleParameter y;
 
-  public CustomEmitterData() {
+  public EmitterData() {
     this.colors = new ArrayList<>();
     this.x = new ParticleParameter();
     this.y = new ParticleParameter();
@@ -104,6 +109,23 @@ public class CustomEmitterData {
     this.deltaWidth = new ParticleParameter();
     this.deltaHeight = new ParticleParameter();
     this.updateRate = 30;
+  }
+
+  @Override
+  public int compareTo(EmitterData obj) {
+    if (obj == null) {
+      return 1;
+    }
+
+    if (this.getName() == null) {
+      if (obj.getName() == null) {
+        return 0;
+      }
+
+      return -1;
+    }
+
+    return this.getName().compareTo(obj.getName());
   }
 
   @XmlTransient
@@ -200,7 +222,7 @@ public class CustomEmitterData {
   public ParticleParameter getParticleY() {
     return this.y;
   }
-  
+
   @XmlTransient
   public int getSpawnAmount() {
     return this.spawnAmount;

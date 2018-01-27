@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D;
  * vaious things for an engine. e.g. it can be used to define static collision
  * boxes or other special regions on the map.
  */
-public interface IMapObject extends ICustomPropertyProvider {
+public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObject> {
 
   /**
    * Gets the dimension.

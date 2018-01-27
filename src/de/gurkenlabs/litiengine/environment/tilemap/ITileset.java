@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * The Interface ITileset.
  */
-public interface ITileset extends ICustomPropertyProvider {
+public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> {
 
   /**
    * Gets the first grid id.

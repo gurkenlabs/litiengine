@@ -402,10 +402,14 @@ public class Program {
     importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
 
     MenuItem importSprite = new MenuItem(Resources.get("menu_assets_importSprite"));
-    importSprite.addActionListener(a -> EditorScreen.instance().importSprites());
+    importSprite.addActionListener(a -> EditorScreen.instance().importSpritesheets());
+
+    MenuItem importEmitters = new MenuItem(Resources.get("menu_assets_importEmitters"));
+    importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
     mnProject.add(importSprite);
     mnProject.add(importSpriteFile);
+    mnProject.add(importEmitters);
     mnProject.addSeparator();
     mnProject.add(compress);
     mnProject.add(sync);

@@ -61,28 +61,58 @@ public final class MapObjectProperty {
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
   // emitter
+  /***
+   * The emitter name refers to the name of an emitter instance from either the
+   * GameFile or a manually loaded emitter XML.
+   */
+  public static final String EMITTER_NAME = "emitterName";
+
+  // These prop information will be held by the emitter xml file and not by the
+  // XML object.
+  @Deprecated()
   public static final String EMITTER_COLORS = "emitterColors";
+  @Deprecated()
   public static final String EMITTER_COLORPROBABILITIES = "emitterColorProbabilities";
+  @Deprecated()
   public static final String EMITTER_SPAWNRATE = "emitterSpawnRate";
+  @Deprecated()
   public static final String EMITTER_SPAWNAMOUNT = "emitterSpawnAmount";
+  @Deprecated()
   public static final String EMITTER_UPDATEDELAY = "emitterUpdateDelay";
+  @Deprecated()
   public static final String EMITTER_TIMETOLIVE = "emitterTimeToLive";
+  @Deprecated()
   public static final String EMITTER_MAXPARTICLES = "emitterMaxParticles";
+  @Deprecated()
   public static final String EMITTER_PARTICLETYPE = "emitterParticleType";
+  @Deprecated()
   public static final String EMITTER_COLORDEVIATION = "emitterColorDeviation";
+  @Deprecated()
   public static final String EMITTER_ALPHADEVIATION = "emitterAlphaDeviation";
 
+  @Deprecated()
   public static final String PARTICLE_DELTAX = "particleDeltaX";
+  @Deprecated()
   public static final String PARTICLE_DELTAY = "particleDeltaY";
+  @Deprecated()
   public static final String PARTICLE_GRAVITYX = "particleGravityX";
+  @Deprecated()
   public static final String PARTICLE_GRAVITYY = "particleGravityY";
+  @Deprecated()
   public static final String PARTICLE_STARTWIDTH = "particleStartWidth";
+  @Deprecated()
   public static final String PARTICLE_STARTHEIGHT = "particleStartHeight";
+  @Deprecated()
   public static final String PARTICLE_DELTAWIDTH = "particleDeltaWidth";
+  @Deprecated()
   public static final String PARTICLE_DELTAHEIGHT = "particleDeltaHeight";
+  @Deprecated()
   public static final String PARTICLE_SPRITETYPE = "particleSpriteType";
+  @Deprecated()
   public static final String PARTICLE_SPRITE = "particleSprite";
+  @Deprecated()
   public static final String PARTICLE_STATICPHYSICS = "particleStaticPhysics";
+  @Deprecated()
   public static final String PARTICLE_TEXT = "particleText";
 
   private static List<Field> availableProperties = new ArrayList<>();

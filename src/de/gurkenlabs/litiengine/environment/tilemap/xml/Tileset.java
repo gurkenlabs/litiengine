@@ -28,7 +28,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
  */
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Tileset extends CustomPropertyProvider implements ITileset, Comparable<Tileset> {
+public class Tileset extends CustomPropertyProvider implements ITileset {
   public static final String FILE_EXTENSION = "tsx";
   private static final long serialVersionUID = 1711536300667154031L;
 
@@ -80,7 +80,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset, Compara
   protected Tileset sourceTileset;
 
   @Override
-  public int compareTo(Tileset obj) {
+  public int compareTo(ITileset obj) {
     if (obj == null) {
       return 1;
     }

@@ -21,19 +21,19 @@ import de.gurkenlabs.util.io.XmlUtilities;
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
   private static final Logger log = Logger.getLogger(CustomEmitter.class.getName());
-  private static final Map<String, CustomEmitterData> loadedCustomEmitters;
+  private static final Map<String, EmitterData> loadedCustomEmitters;
 
   static {
     loadedCustomEmitters = new ConcurrentHashMap<>();
   }
 
-  public static CustomEmitterData load(String emitterXml) {
+  public static EmitterData load(String emitterXml) {
     final String name = FileUtilities.getFileName(emitterXml);
     if (loadedCustomEmitters.containsKey(name)) {
       return loadedCustomEmitters.get(name);
     }
 
-    final CustomEmitterData loaded = XmlUtilities.readFromFile(CustomEmitterData.class, emitterXml);
+    final EmitterData loaded = XmlUtilities.readFromFile(EmitterData.class, emitterXml);
     if (loaded == null) {
       return null;
     }
@@ -42,7 +42,7 @@ public class CustomEmitter extends Emitter {
     return loaded;
   }
 
-  private CustomEmitterData emitterData;
+  private EmitterData emitterData;
 
   public CustomEmitter(final double originX, final double originY) {
     super(originX, originY);
@@ -72,11 +72,11 @@ public class CustomEmitter extends Emitter {
     }
   }
 
-  public CustomEmitterData getEmitterData() {
+  public EmitterData getEmitterData() {
     return this.emitterData;
   }
 
-  public void setEmitterData(CustomEmitterData newData) {
+  public void setEmitterData(EmitterData newData) {
     this.emitterData = newData;
   }
 

@@ -12,14 +12,17 @@ import javax.swing.border.EmptyBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class AssetPanel extends JPanel {
   private static final int COLUMNS = 10;
   private static final Icon imageIcon = new ImageIcon(Resources.getImage("document-img.png"));
   private static final Icon tilesetIcon = new ImageIcon(Resources.getImage("document-tsx.png"));
+  private static final Icon emitterIcon = new ImageIcon(Resources.getImage("document-emitter.png"));
   private final GridLayout gridLayout;
 
   public AssetPanel() {
@@ -59,6 +62,28 @@ public class AssetPanel extends JPanel {
       Collections.sort(tilesets);
       for (Tileset tileset : tilesets) {
         AssetPanelItem panelItem = new AssetPanelItem(tilesetIcon, tileset.getName(), tileset);
+        this.add(panelItem);
+        panelItem.validate();
+      }
+    });
+  }
+
+  public void loadEmitters(List<EmitterData> emitters) {
+    this.load(emitters, () -> {
+      Collections.sort(emitters);
+      for (EmitterData emitter : emitters) {
+        AssetPanelItem panelItem = new AssetPanelItem(emitterIcon, emitter.getName(), emitter);
+        this.add(panelItem);
+        panelItem.validate();
+      }
+    });
+  }
+
+  public void loadBlueprints(List<MapObject> blueprints) {
+    this.load(blueprints, () -> {
+      Collections.sort(blueprints);
+      for (MapObject blueprint : blueprints) {
+        AssetPanelItem panelItem = new AssetPanelItem(emitterIcon, blueprint.getName(), blueprint);
         this.add(panelItem);
         panelItem.validate();
       }

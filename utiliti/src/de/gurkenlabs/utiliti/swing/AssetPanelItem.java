@@ -45,6 +45,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.io.ImageSerializer;
 import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
@@ -104,6 +105,11 @@ public class AssetPanelItem extends JPanel {
           btnEdit.setVisible(false);
           btnAdd.setVisible(false);
           btnDelete.setVisible(false);
+          btnExport.setVisible(true);
+        } else if (getOrigin() instanceof EmitterData) {
+          btnEdit.setVisible(true);
+          btnAdd.setVisible(true);
+          btnDelete.setVisible(true);
           btnExport.setVisible(true);
         }
       }
@@ -186,6 +192,9 @@ public class AssetPanelItem extends JPanel {
     btnEdit = new JButton("");
     btnEdit.setToolTipText("Edit Asset");
     btnEdit.addActionListener(e -> {
+      if (!(this.getOrigin() instanceof SpriteSheetInfo)) {
+        return;
+      }
       SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpriteSheetInfo) this.getOrigin());
       int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
@@ -270,6 +279,16 @@ public class AssetPanelItem extends JPanel {
 
         Program.getAssetTree().forceUpdate();
       }
+    } else if (getOrigin() instanceof EmitterData) {
+      EmitterData emitter = (EmitterData) getOrigin();
+      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]?\n Entities that use the emitter won't be rendered anymore!", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
+
+      if (n == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
+        EditorScreen.instance().getMapComponent().reloadEnvironment();
+
+        Program.getAssetTree().forceUpdate();
+      }
     }
   }
 
@@ -299,6 +318,9 @@ public class AssetPanelItem extends JPanel {
 
       EditorScreen.instance().getMapComponent().add(mo);
       return true;
+    } else if (this.getOrigin() instanceof EmitterData) {
+      // TODO @matthias: implement this when the emitter tool is fully integrated and
+      // there is a way to add a map object from EmitterData
     }
 
     return false;
@@ -310,6 +332,9 @@ public class AssetPanelItem extends JPanel {
       return;
     } else if (this.getOrigin() instanceof SpriteSheetInfo) {
       this.exportSpritesheet();
+      return;
+    } else if (this.getOrigin() instanceof EmitterData) {
+      this.exportEmitter();
       return;
     }
   }
@@ -382,6 +407,32 @@ public class AssetPanelItem extends JPanel {
         if (result == JFileChooser.APPROVE_OPTION) {
           String newFile = XmlUtilities.save(tileset, chooser.getSelectedFile().toString(), Tileset.FILE_EXTENSION);
           log.log(Level.INFO, "exported tileset {0} to {1}", new Object[] { tileset.getName(), newFile });
+        }
+      } catch (IOException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
+  }
+
+  private void exportEmitter() {
+    if (this.getOrigin() instanceof EmitterData) {
+      EmitterData emitter = (EmitterData) this.getOrigin();
+      JFileChooser chooser;
+      try {
+        String source = EditorScreen.instance().getProjectPath();
+        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        chooser.setDialogTitle("Export Emitter");
+        FileFilter filter = new FileNameExtensionFilter("Emitter XML", "xml");
+        chooser.setFileFilter(filter);
+        chooser.addChoosableFileFilter(filter);
+        chooser.setSelectedFile(new File(emitter.getName() + ".xml"));
+
+        int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+        if (result == JFileChooser.APPROVE_OPTION) {
+          String newFile = XmlUtilities.save(emitter, chooser.getSelectedFile().toString(), "xml");
+          log.log(Level.INFO, "exported emitter {0} to {1}", new Object[] { emitter.getName(), newFile });
         }
       } catch (IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
