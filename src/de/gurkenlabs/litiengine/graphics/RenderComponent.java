@@ -143,7 +143,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
       screen.render(g);
       final Rectangle rect = new Rectangle(this.getLocationOnScreen().x, this.getLocationOnScreen().y, this.getWidth(), this.getHeight());
-      if (this.cursorImage != null && (Input.mouse().isGrabMouse() || rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
+      if (this.cursorImage != null && (Input.mouse().isGrabMouse() || MouseInfo.getPointerInfo() != null && rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
         final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
         RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
       }

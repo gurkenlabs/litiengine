@@ -54,6 +54,7 @@ import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
+import java.awt.Insets;
 
 public class MapSelectionPanel extends JSplitPane {
   private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
@@ -236,6 +237,8 @@ public class MapSelectionPanel extends JSplitPane {
     textField.setColumns(10);
 
     btnSearch = new JButton("");
+    btnSearch.setOpaque(false);
+    btnSearch.setMargin(new Insets(2, 2, 2, 2));
     btnSearch.addActionListener(e -> search());
     btnSearch.setIcon(new ImageIcon(Resources.getImage("search.png")));
     panel.add(btnSearch, BorderLayout.EAST);
