@@ -378,6 +378,7 @@ public class EditorScreen extends Screen {
         final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
         for (SpriteSheetInfo spriteFile : sprites) {
           this.gameFile.getSpriteSheets().add(spriteFile);
+          log.log(Level.INFO, "imported spritesheet {0}", new Object[] { spriteFile.getName() });
         }
 
         this.loadSpriteSheets(sprites, true);
@@ -407,6 +408,7 @@ public class EditorScreen extends Screen {
         }
 
         this.gameFile.getEmitters().add(emitter);
+        log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] { emitter.getName(), file.toString() });
       }
     });
   }
@@ -429,6 +431,7 @@ public class EditorScreen extends Screen {
         }
 
         this.gameFile.getBluePrints().add(blueprint);
+        log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file.toString() });
       }
     });
   }

@@ -51,9 +51,9 @@ public class AssetTree extends JTree {
     this.nodeSpritesheets.add(this.nodeSpriteMisc);
 
     this.nodeRoot.add(this.nodeSpritesheets);
-    this.nodeRoot.add(this.nodeTileSets);
     this.nodeRoot.add(this.nodeEmitters);
     this.nodeRoot.add(this.nodeBlueprints);
+    this.nodeRoot.add(this.nodeTileSets);
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
