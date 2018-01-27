@@ -35,6 +35,7 @@ import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -49,6 +50,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
@@ -62,7 +64,6 @@ public class EditorScreen extends Screen {
   private static final String GAME_FILE_NAME = "Game Resource File";
   private static final String SPRITE_FILE_NAME = "Sprite Info File";
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
-  private static final String EMITTER_FILE_NAME = "Emitter XML";
 
   public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
   public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
@@ -389,42 +390,47 @@ public class EditorScreen extends Screen {
   }
 
   public void importEmitters() {
+    XmlImportDialog.importXml("Emitter", files -> {
+      for (File file : files) {
+        EmitterData emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
+        if (emitter == null) {
+          continue;
+        }
 
-    JFileChooser chooser;
-
-    try {
-      chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
-
-      FileFilter filter = new FileNameExtensionFilter(EMITTER_FILE_NAME, "xml");
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      chooser.setMultiSelectionEnabled(true);
-      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
-        for (File file : chooser.getSelectedFiles()) {
-          EmitterData emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
-          if (emitter == null) {
+        if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
+          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "An emitter with the name '" + emitter.getName() + "' already existing. Do you want to replace it?", "Replace existing Emitter?", JOptionPane.YES_NO_OPTION);
+          if (result == JOptionPane.NO_OPTION) {
             continue;
           }
 
-          if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-            int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "An emitter with the name '" + emitter.getName() + "' already existing. Do you want to replace it?", "Replace existing Emitter?", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.NO_OPTION) {
-              continue;
-            }
-
-            this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
-          }
-
-          this.gameFile.getEmitters().add(emitter);
+          this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
         }
 
-        Program.getAssetTree().forceUpdate();
+        this.gameFile.getEmitters().add(emitter);
       }
-    } catch (
+    });
+  }
 
-    IOException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
+  public void importBlueprints() {
+    XmlImportDialog.importXml("Blueprint", files -> {
+      for (File file : files) {
+        MapObject blueprint = XmlUtilities.readFromFile(MapObject.class, file.toString());
+        if (blueprint == null) {
+          continue;
+        }
+
+        if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
+          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "A blueprint with the name '" + blueprint.getName() + "' already existing. Do you want to replace it?", "Replace existing Blueprint?", JOptionPane.YES_NO_OPTION);
+          if (result == JOptionPane.NO_OPTION) {
+            continue;
+          }
+
+          this.gameFile.getBluePrints().removeIf(x -> x.getName().equals(blueprint.getName()));
+        }
+
+        this.gameFile.getBluePrints().add(blueprint);
+      }
+    });
   }
 
   public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {

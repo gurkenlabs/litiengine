@@ -407,9 +407,13 @@ public class Program {
     MenuItem importEmitters = new MenuItem(Resources.get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
+    MenuItem importBlueprints = new MenuItem(Resources.get("menu_assets_importBlueprints"));
+    importBlueprints.addActionListener(a -> EditorScreen.instance().importBlueprints());
+
     mnProject.add(importSprite);
     mnProject.add(importSpriteFile);
     mnProject.add(importEmitters);
+    mnProject.add(importBlueprints);
     mnProject.addSeparator();
     mnProject.add(compress);
     mnProject.add(sync);
@@ -763,16 +767,23 @@ public class Program {
     paste.addActionListener(e -> EditorScreen.instance().getMapComponent().paste());
     paste.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Event.CTRL_MASK));
 
+    JMenuItem blueprint = new JMenuItem("Define Blueprint", new ImageIcon(Resources.getImage("blueprint.png")));
+    blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
+    blueprint.setEnabled(false);
+
     canvasPopup.add(paste);
     canvasPopup.addSeparator();
     canvasPopup.add(copy);
     canvasPopup.add(cut);
     canvasPopup.add(delete);
+    canvasPopup.addSeparator();
+    canvasPopup.add(blueprint);
 
     EditorScreen.instance().getMapComponent().onFocusChanged(mo -> {
       copy.setEnabled(mo != null);
       cut.setEnabled(mo != null);
       delete.setEnabled(mo != null);
+      blueprint.setEnabled(mo != null);
     });
 
     canvas.addMouseListener(new MouseAdapter() {

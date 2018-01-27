@@ -600,6 +600,27 @@ public class MapComponent extends EditorComponent {
     this.setFocus(null);
   }
 
+  public void defineBlueprint() {
+    if (this.getFocusedMapObject() == null) {
+      return;
+    }
+
+    String name = this.getFocusedMapObject().getName();
+    if (name == null) {
+      name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), "Name:", "Enter blueprint name", JOptionPane.PLAIN_MESSAGE);
+      if (name == null || name.isEmpty()) {
+        return;
+      }
+    }
+
+    // TODO: this needs to work on the current selection as soon as we implement
+    // multi selection
+    MapObject blueprint = new MapObject((MapObject) this.getFocusedMapObject());
+    blueprint.setName(name);
+    EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
+    Program.getAssetTree().forceUpdate();
+  }
+
   public void centerCameraOnFocus() {
     if (this.getFocusedMapObject() != null) {
       Game.getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));

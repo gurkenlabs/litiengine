@@ -47,7 +47,6 @@ import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.io.ImageSerializer;
-import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
@@ -81,7 +80,6 @@ public class AssetPanelItem extends JPanel {
     this.getActionMap().put("deleteAsset", new AbstractAction() {
       public void actionPerformed(ActionEvent ae) {
         deleteAsset();
-
       }
     });
 
@@ -108,6 +106,11 @@ public class AssetPanelItem extends JPanel {
           btnExport.setVisible(true);
         } else if (getOrigin() instanceof EmitterData) {
           btnEdit.setVisible(true);
+          btnAdd.setVisible(true);
+          btnDelete.setVisible(true);
+          btnExport.setVisible(true);
+        } else if (getOrigin() instanceof MapObject) {
+          btnEdit.setVisible(false);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
           btnExport.setVisible(true);
@@ -249,8 +252,8 @@ public class AssetPanelItem extends JPanel {
     btnExport.setIcon(new ImageIcon(Resources.getImage("export.png")));
     btnExport.setVisible(false);
 
-    buttonPanel.add(btnAdd);
     buttonPanel.add(btnEdit);
+    buttonPanel.add(btnAdd);
     buttonPanel.add(btnDelete);
     buttonPanel.add(btnExport);
   }
@@ -289,6 +292,13 @@ public class AssetPanelItem extends JPanel {
 
         Program.getAssetTree().forceUpdate();
       }
+    } else if (getOrigin() instanceof MapObject) {
+      MapObject mapObject = (MapObject) getOrigin();
+      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the blueprint [" + mapObject.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
+      if (n == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
+        Program.getAssetTree().forceUpdate();
+      }
     }
   }
 
@@ -321,6 +331,14 @@ public class AssetPanelItem extends JPanel {
     } else if (this.getOrigin() instanceof EmitterData) {
       // TODO @matthias: implement this when the emitter tool is fully integrated and
       // there is a way to add a map object from EmitterData
+    } else if (this.getOrigin() instanceof MapObject) {
+      MapObject blueprint = (MapObject) this.getOrigin();
+      MapObject newMapObject = new MapObject(blueprint);
+      newMapObject.setId(Game.getEnvironment().getNextMapId());
+      newMapObject.setX((int) Game.getCamera().getFocus().getX());
+      newMapObject.setY((int) Game.getCamera().getFocus().getY());
+
+      EditorScreen.instance().getMapComponent().add(newMapObject);
     }
 
     return false;
@@ -335,6 +353,9 @@ public class AssetPanelItem extends JPanel {
       return;
     } else if (this.getOrigin() instanceof EmitterData) {
       this.exportEmitter();
+      return;
+    } else if (this.getOrigin() instanceof MapObject) {
+      this.exportMapObject();
       return;
     }
   }
@@ -361,15 +382,7 @@ public class AssetPanelItem extends JPanel {
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setDialogTitle("Export Spritesheet");
         if (answer == 0) {
-          FileFilter filter = new FileNameExtensionFilter(".xml - Spritesheet XML", "xml");
-          chooser.setFileFilter(filter);
-          chooser.addChoosableFileFilter(filter);
-          chooser.setSelectedFile(new File(spriteSheetInfo.getName() + ".xml"));
-          int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
-          if (result == JFileChooser.APPROVE_OPTION) {
-            String newFile = XmlUtilities.save(spriteSheetInfo, chooser.getSelectedFile().toString(), "xml");
-            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), newFile });
-          }
+          XmlExportDialog.export(spriteSheetInfo, "Spritesheet", spriteSheetInfo.getName());
         } else if (answer == 1) {
           FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Image", format.toString());
           chooser.setFileFilter(filter);
@@ -389,55 +402,30 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportTileset() {
-    if (this.getOrigin() instanceof Tileset) {
-      Tileset tileset = (Tileset) this.getOrigin();
-      JFileChooser chooser;
-      try {
-        String source = EditorScreen.instance().getProjectPath();
-        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        chooser.setDialogTitle("Export Tileset");
-        FileFilter filter = new FileNameExtensionFilter("tsx - Tileset XML", Tileset.FILE_EXTENSION);
-        chooser.setFileFilter(filter);
-        chooser.addChoosableFileFilter(filter);
-        chooser.setSelectedFile(new File(tileset.getName() + "." + Tileset.FILE_EXTENSION));
-
-        int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
-        if (result == JFileChooser.APPROVE_OPTION) {
-          String newFile = XmlUtilities.save(tileset, chooser.getSelectedFile().toString(), Tileset.FILE_EXTENSION);
-          log.log(Level.INFO, "exported tileset {0} to {1}", new Object[] { tileset.getName(), newFile });
-        }
-      } catch (IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-      }
+    if (!(this.getOrigin() instanceof Tileset)) {
+      return;
     }
+
+    Tileset tileset = (Tileset) this.getOrigin();
+    XmlExportDialog.export(tileset, "Tileset", tileset.getName(), Tileset.FILE_EXTENSION);
   }
 
   private void exportEmitter() {
-    if (this.getOrigin() instanceof EmitterData) {
-      EmitterData emitter = (EmitterData) this.getOrigin();
-      JFileChooser chooser;
-      try {
-        String source = EditorScreen.instance().getProjectPath();
-        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        chooser.setDialogTitle("Export Emitter");
-        FileFilter filter = new FileNameExtensionFilter("Emitter XML", "xml");
-        chooser.setFileFilter(filter);
-        chooser.addChoosableFileFilter(filter);
-        chooser.setSelectedFile(new File(emitter.getName() + ".xml"));
-
-        int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
-        if (result == JFileChooser.APPROVE_OPTION) {
-          String newFile = XmlUtilities.save(emitter, chooser.getSelectedFile().toString(), "xml");
-          log.log(Level.INFO, "exported emitter {0} to {1}", new Object[] { emitter.getName(), newFile });
-        }
-      } catch (IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-      }
+    if (!(this.getOrigin() instanceof EmitterData)) {
+      return;
     }
+
+    EmitterData emitter = (EmitterData) this.getOrigin();
+    XmlExportDialog.export(emitter, "Emitter", emitter.getName());
+  }
+
+  private void exportMapObject() {
+    if (!(this.getOrigin() instanceof MapObject)) {
+      return;
+    }
+
+    MapObject mapObject = (MapObject) this.getOrigin();
+    XmlExportDialog.export(mapObject, "Mapobject", mapObject.getName());
   }
 
   private boolean canAdd() {
@@ -448,6 +436,10 @@ public class AssetPanelItem extends JPanel {
         return false;
       }
 
+      return true;
+    }
+
+    if (this.getOrigin() instanceof MapObject) {
       return true;
     }
 

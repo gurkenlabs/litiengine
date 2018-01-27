@@ -55,6 +55,21 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlElement(name = "polyline")
   private Polyline polyline;
 
+  public MapObject() {
+  }
+
+  public MapObject(MapObject mapObject) {
+    this.gid = mapObject.gid;
+    this.height = mapObject.height;
+    this.width = mapObject.width;
+    this.name = mapObject.name;
+    this.polyline = mapObject.polyline;
+    this.type = mapObject.type;
+    this.x = mapObject.x;
+    this.y = mapObject.y;
+    this.setCustomProperties(mapObject.getAllCustomProperties());
+  }
+
   @Override
   public int compareTo(IMapObject obj) {
     if (obj == null) {

@@ -23,6 +23,7 @@ public class AssetPanel extends JPanel {
   private static final Icon imageIcon = new ImageIcon(Resources.getImage("document-img.png"));
   private static final Icon tilesetIcon = new ImageIcon(Resources.getImage("document-tsx.png"));
   private static final Icon emitterIcon = new ImageIcon(Resources.getImage("document-emitter.png"));
+  private static final Icon blueprintIcon = new ImageIcon(Resources.getImage("document-blueprint.png"));
   private final GridLayout gridLayout;
 
   public AssetPanel() {
@@ -83,7 +84,7 @@ public class AssetPanel extends JPanel {
     this.load(blueprints, () -> {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
-        AssetPanelItem panelItem = new AssetPanelItem(emitterIcon, blueprint.getName(), blueprint);
+        AssetPanelItem panelItem = new AssetPanelItem(blueprintIcon, blueprint.getName(), blueprint);
         this.add(panelItem);
         panelItem.validate();
       }
