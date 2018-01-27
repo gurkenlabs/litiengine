@@ -77,25 +77,43 @@ public class MapComponent extends EditorComponent {
     UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE
   }
 
-  private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
-  private static final int TRANSFORM_RECT_SIZE = 6;
-  private static final int BASE_SCROLL_SPEED = 50;
-  private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
-  private final java.util.Map<TransformType, Rectangle2D> transformRects;
-  private TransformType currentTransform;
-
   public static final int EDITMODE_CREATE = 0;
   public static final int EDITMODE_EDIT = 1;
   public static final int EDITMODE_MOVE = 2;
+  private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
+  private static final String DEFAULT_MAPOBJECTLAYER_NAME = "default";
+  private static final int TRANSFORM_RECT_SIZE = 6;
+  private static final int BASE_SCROLL_SPEED = 50;
+
+  private static final Color DEFAULT_COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
+  private static final Color COLOR_NAME_FILL = new Color(0, 0, 0, 60);
+  private static final Color COLOR_FOCUS_FILL = new Color(0, 0, 0, 50);
+  private static final Color COLOR_FOCUS_BORDER = Color.BLACK;
+  private static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
+  private static final Color COLOR_NOCOLLISION_FILL = new Color(255, 100, 0, 15);
+  private static final Color COLOR_COLLISION_BORDER = Color.RED;
+  private static final Color COLOR_NOCOLLISION_BORDER = Color.ORANGE;
+  private static final Color COLOR_SPAWNPOINT = Color.GREEN;
+  private static final Color COLOR_LANE = Color.YELLOW;
+  private static final Color COLOR_NEWOBJECT_FILL = new Color(0, 255, 0, 50);
+  private static final Color COLOR_NEWOBJECT_BORDER = Color.GREEN.darker();
+  private static final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
+  private static final Color COLOR_SHADOW_FILL = new Color(85, 130, 200, 15);
+  private static final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
+
+  private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
+  private final java.util.Map<TransformType, Rectangle2D> transformRects;
+
   private final List<Consumer<Integer>> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<Map>> mapLoadedConsumer;
-  private int currentEditMode = EDITMODE_EDIT;
-  private static final float[] zooms = new float[] { 0.1f, 0.25f, 0.5f, 1, 1.5f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 16f, 32f, 50f, 80f, 100f };
-  private int currentZoomIndex = 7;
-
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
+
+  private int currentEditMode = EDITMODE_EDIT;
+  private TransformType currentTransform;
+
+  private int currentZoomIndex = 7;
 
   private final List<Map> maps;
 
@@ -155,21 +173,8 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    Color COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
-    Color COLOR_NAME_FILL = new Color(0, 0, 0, 60);
-    final Color COLOR_FOCUS_FILL = new Color(0, 0, 0, 50);
-    final Color COLOR_FOCUS_BORDER = Color.BLACK;
-    final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
-    final Color COLOR_NOCOLLISION_FILL = new Color(255, 100, 0, 15);
-    final Color COLOR_COLLISION_BORDER = Color.RED;
-    final Color COLOR_NOCOLLISION_BORDER = Color.ORANGE;
-    final Color COLOR_SPAWNPOINT = Color.GREEN;
-    final Color COLOR_LANE = Color.YELLOW;
-    final Color COLOR_NEWOBJECT_FILL = new Color(0, 255, 0, 50);
-    final Color COLOR_NEWOBJECT_BORDER = Color.GREEN.darker();
-    final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
-    final Color COLOR_SHADOW_FILL = new Color(85, 130, 200, 15);
-    final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
+    Color colorBoundingBoxFill = DEFAULT_COLOR_BOUNDING_BOX_FILL;
+
     final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
     if (this.renderCollisionBoxes) {
@@ -184,9 +189,9 @@ public class MapComponent extends EditorComponent {
         }
 
         if (layer.getColor() != null) {
-          COLOR_BOUNDING_BOX_FILL = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
+          colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
         } else {
-          COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
+          colorBoundingBoxFill = new Color(0, 0, 0, 35);
         }
 
         for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -239,7 +244,7 @@ public class MapComponent extends EditorComponent {
           // render bounding boxes
           final IMapObject focusedMapObject = this.getFocusedMapObject();
           if (focusedMapObject == null || mapObject.getId() != focusedMapObject.getId()) {
-            g.setColor(COLOR_BOUNDING_BOX_FILL);
+            g.setColor(colorBoundingBoxFill);
 
             // don't fill rect for lightsource because it is important to judge
             // the color
