@@ -142,7 +142,7 @@ public class MapComponent extends EditorComponent {
 
   private final EditorScreen screen;
 
-  private boolean isLoading;
+  private boolean loading;
   private boolean initialized;
 
   public MapComponent(final EditorScreen screen) {
@@ -160,7 +160,7 @@ public class MapComponent extends EditorComponent {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
-    this.gridSize = Program.userPreferences.getGridSize();
+    this.gridSize = Program.getUserPreferences().getGridSize();
   }
 
   public void onEditModeChanged(Consumer<Integer> cons) {
@@ -276,26 +276,13 @@ public class MapComponent extends EditorComponent {
     return this.copiedMapObject;
   }
 
+  public boolean isLoading() {
+    return this.loading;
+  }
+
   @Override
   public void prepare() {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
-    Program.horizontalScroll.addAdjustmentListener(e -> {
-      if (isLoading) {
-        return;
-      }
-
-      Point2D newFocus = new Point2D.Double(Program.horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
-      Game.getCamera().setFocus(newFocus);
-    });
-
-    Program.verticalScroll.addAdjustmentListener(e -> {
-      if (isLoading) {
-        return;
-      }
-      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), Program.verticalScroll.getValue());
-      Game.getCamera().setFocus(newFocus);
-    });
-
     Game.getScreenManager().getRenderComponent().addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
@@ -309,7 +296,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void loadEnvironment(Map map) {
-    this.isLoading = true;
+    this.loading = true;
     try {
       if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
         double x = Game.getCamera().getFocus().getX();
@@ -333,7 +320,7 @@ public class MapComponent extends EditorComponent {
       env.init();
       Game.loadEnvironment(env);
 
-      this.updateScrollBars();
+      Program.updateScrollBars();
 
       EditorScreen.instance().getMapSelectionPanel().setSelection(map.getFileName());
       EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
@@ -343,7 +330,7 @@ public class MapComponent extends EditorComponent {
       }
 
     } finally {
-      this.isLoading = false;
+      this.loading = false;
     }
   }
 
@@ -544,7 +531,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void setGridSize(int gridSize) {
-    Program.userPreferences.setGridSize(gridSize);
+    Program.getUserPreferences().setGridSize(gridSize);
     this.gridSize = gridSize;
   }
 
@@ -1095,7 +1082,7 @@ public class MapComponent extends EditorComponent {
           Game.getCamera().setFocus(newFocus);
         }
 
-        Program.horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
+        Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewPort().getCenterX());
         return;
       }
 
@@ -1118,7 +1105,7 @@ public class MapComponent extends EditorComponent {
         Game.getCamera().setFocus(newFocus);
       }
 
-      Program.verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
+      Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewPort().getCenterY());
     });
   }
 
@@ -1388,15 +1375,6 @@ public class MapComponent extends EditorComponent {
 
     int snapped = (int) (y / this.gridSize) * this.gridSize;
     return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
-  }
-
-  private void updateScrollBars() {
-    Program.horizontalScroll.setMinimum(0);
-    Program.horizontalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().width);
-    Program.verticalScroll.setMinimum(0);
-    Program.verticalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().height);
-    Program.horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
-    Program.verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
   }
 
   private boolean hasFocus() {

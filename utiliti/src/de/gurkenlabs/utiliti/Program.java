@@ -22,6 +22,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -82,10 +83,10 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(-45));
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(45));
 
-  public static UserPreferenceConfiguration userPreferences;
-  public static JScrollBar horizontalScroll;
-  public static JScrollBar verticalScroll;
-  public static TrayIcon trayIcon;
+  private static UserPreferenceConfiguration userPreferences;
+  private static JScrollBar horizontalScroll;
+  private static JScrollBar verticalScroll;
+  private static TrayIcon trayIcon;
 
   private static final Logger log = Logger.getLogger(Program.class.getName());
   private static Menu recentFiles;
@@ -162,6 +163,31 @@ public class Program {
     return assetTree;
   }
 
+  public static JScrollBar getHorizontalScrollBar() {
+    return horizontalScroll;
+  }
+
+  public static JScrollBar getVerticalcrollBar() {
+    return verticalScroll;
+  }
+
+  public static TrayIcon getTrayIcon() {
+    return trayIcon;
+  }
+
+  public static UserPreferenceConfiguration getUserPreferences() {
+    return userPreferences;
+  }
+
+  public static void updateScrollBars() {
+    horizontalScroll.setMinimum(0);
+    horizontalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().width);
+    verticalScroll.setMinimum(0);
+    verticalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().height);
+    horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
+    verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
+  }
+
   private static boolean exit() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
     int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
@@ -230,6 +256,24 @@ public class Program {
     renderPane.add(horizontalScroll, BorderLayout.SOUTH);
     verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
     renderPane.add(verticalScroll, BorderLayout.EAST);
+
+    horizontalScroll.addAdjustmentListener(e -> {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
+        return;
+      }
+
+      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
+      Game.getCamera().setFocus(newFocus);
+    });
+
+    verticalScroll.addAdjustmentListener(e -> {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
+        return;
+      }
+      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), verticalScroll.getValue());
+      Game.getCamera().setFocus(newFocus);
+    });
+
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

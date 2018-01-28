@@ -36,7 +36,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -133,10 +132,10 @@ public class EditorScreen extends Screen {
     if (this.currentResourceFile != null) {
       Game.getScreenManager().setTitle(Game.getInfo().getName() + " " + Game.getInfo().getVersion() + " - " + this.currentResourceFile);
       String mapName = Game.getEnvironment() != null && Game.getEnvironment().getMap() != null ? "\nMap: " + Game.getEnvironment().getMap().getName() : "";
-      Program.trayIcon.setToolTip(Game.getInfo().getName() + " " + Game.getInfo().getVersion() + "\n" + this.currentResourceFile + mapName);
+      Program.getTrayIcon().setToolTip(Game.getInfo().getName() + " " + Game.getInfo().getVersion() + "\n" + this.currentResourceFile + mapName);
     } else if (this.getProjectPath() != null) {
       Game.getScreenManager().setTitle(Game.getInfo().toString() + " - " + NEW_GAME_STRING);
-      Program.trayIcon.setToolTip(Game.getInfo().toString() + "\n" + NEW_GAME_STRING);
+      Program.getTrayIcon().setToolTip(Game.getInfo().toString() + "\n" + NEW_GAME_STRING);
     } else {
       Game.getScreenManager().setTitle(Game.getInfo().toString());
     }
@@ -291,8 +290,8 @@ public class EditorScreen extends Screen {
       this.currentResourceFile = gameFile.getPath();
       this.gameFile = GameFile.load(gameFile.getPath());
 
-      Program.userPreferences.setLastGameFile(gameFile.getPath());
-      Program.userPreferences.addOpenedFile(this.currentResourceFile);
+      Program.getUserPreferences().setLastGameFile(gameFile.getPath());
+      Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
       Program.loadRecentFiles();
       this.setProjectPath(FileUtilities.getParentDirPath(gameFile.getAbsolutePath()));
 
@@ -528,14 +527,14 @@ public class EditorScreen extends Screen {
   }
 
   private String saveGameFile(String target) {
-    String saveFile = this.getGameFile().save(target, Program.userPreferences.isCompressFile());
-    Program.userPreferences.setLastGameFile(this.currentResourceFile);
-    Program.userPreferences.addOpenedFile(this.currentResourceFile);
+    String saveFile = this.getGameFile().save(target, Program.getUserPreferences().isCompressFile());
+    Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
+    Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
     log.log(Level.INFO, "saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size() + " tilesets to '" + this.currentResourceFile + "'");
     this.setCurrentStatus("saved gamefile");
 
-    if (Program.userPreferences.isSyncMaps()) {
+    if (Program.getUserPreferences().isSyncMaps()) {
       this.saveMaps();
     }
 
