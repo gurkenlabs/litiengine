@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
+@SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
 
   private JTextField textFieldDescription;
@@ -130,15 +131,15 @@ public class MapPropertyPanel extends JPanel {
     JLabel lblStaticShadows = new JLabel("Static Shadows");
     lblStaticShadows.setFont(null);
 
-    JLabel label_2 = new JLabel("alpha");
-    label_2.setFont(null);
+    JLabel labelAlpha = new JLabel("alpha");
+    labelAlpha.setFont(null);
 
     spinnerShadow = new JSpinner();
     spinnerShadow.setModel(new SpinnerNumberModel(0, 0, 255, 1));
     spinnerShadow.setFont(null);
 
-    JLabel label_3 = new JLabel("color");
-    label_3.setFont(null);
+    JLabel labelColor = new JLabel("color");
+    labelColor.setFont(null);
 
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {
@@ -173,8 +174,8 @@ public class MapPropertyPanel extends JPanel {
                         .addGroup(glContentPanel.createSequentialGroup().addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addGap(10).addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
                         .addComponent(lblStaticShadows, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-                        .addGroup(glContentPanel.createSequentialGroup().addComponent(label_2, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
-                        .addGroup(glContentPanel.createSequentialGroup().addComponent(label_3, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(glContentPanel.createSequentialGroup().addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(glContentPanel.createSequentialGroup().addComponent(labelColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldShadowColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)))
                     .addGap(33).addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addGroup(glContentPanel.createSequentialGroup().addComponent(lblLayers, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED, 132, Short.MAX_VALUE))
                         .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE).addGroup(glContentPanel.createSequentialGroup().addComponent(buttonPlus).addGap(2).addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))))
@@ -192,11 +193,11 @@ public class MapPropertyPanel extends JPanel {
                     .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(label,
                         GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED).addComponent(lblStaticShadows).addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(label_2, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                 .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED)
             .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(buttonMinus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(buttonPlus, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(label_3, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+                .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(labelColor, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
                 .addComponent(textFieldShadowColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
             .addContainerGap(23, Short.MAX_VALUE)));
 

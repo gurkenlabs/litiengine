@@ -60,7 +60,6 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  // emitter
   /***
    * The emitter name refers to the name of an emitter instance from either the
    * GameFile or a manually loaded emitter XML.
@@ -68,7 +67,7 @@ public final class MapObjectProperty {
   public static final String EMITTER_NAME = "emitterName";
 
   // These prop information will be held by the emitter xml file and not by the
-  // XML object.
+  // map object.
   @Deprecated()
   public static final String EMITTER_COLORS = "emitterColors";
   @Deprecated()
