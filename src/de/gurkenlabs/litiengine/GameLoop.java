@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
@@ -122,7 +123,8 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
-        this.interrupt();
+        log.log(Level.SEVERE, e.getMessage(), e);
+        Thread.currentThread().interrupt();
         break;
       }
 

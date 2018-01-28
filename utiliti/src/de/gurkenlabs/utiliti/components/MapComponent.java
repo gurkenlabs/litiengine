@@ -206,6 +206,9 @@ public class MapComponent extends EditorComponent {
       final Point2D start = this.startPoint;
       if (start != null && !Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         final Rectangle2D rect = this.getCurrentMouseSelectionArea();
+        if (rect == null) {
+          break;
+        }
 
         g.setColor(new Color(0, 130, 152, 30));
         RenderEngine.fillShape(g, rect);
@@ -462,7 +465,12 @@ public class MapComponent extends EditorComponent {
 
   public void centerCameraOnFocus() {
     if (this.getFocusedMapObject() != null) {
-      Game.getCamera().setFocus(new Point2D.Double(this.getFocus().getCenterX(), this.getFocus().getCenterY()));
+      final Rectangle2D focus = this.getFocus();
+      if (focus == null) {
+        return;
+      }
+
+      Game.getCamera().setFocus(new Point2D.Double(focus.getCenterX(), focus.getCenterY()));
     }
   }
 

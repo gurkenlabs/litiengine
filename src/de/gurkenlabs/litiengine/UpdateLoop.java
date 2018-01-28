@@ -14,6 +14,11 @@ public abstract class UpdateLoop extends Thread implements ILoop {
   }
 
   @Override
+  public void run() {
+    // nothing to do for now in the base implementation
+  }
+
+  @Override
   public void attach(final IUpdateable updatable) {
     if (updatable == null) {
       return;

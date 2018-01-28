@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Comparable<EmitterData> {
