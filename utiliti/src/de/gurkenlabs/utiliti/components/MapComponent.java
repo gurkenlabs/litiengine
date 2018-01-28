@@ -7,10 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -22,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -138,9 +136,9 @@ public class MapComponent extends EditorComponent {
   private IMapObject copiedMapObject;
   private int gridSize;
 
-  public boolean snapToGrid = true;
-  public boolean renderGrid = false;
-  public boolean renderCollisionBoxes = true;
+  private boolean snapToGrid = true;
+  private boolean renderGrid = false;
+  private boolean renderCollisionBoxes = true;
 
   private final EditorScreen screen;
 
@@ -222,6 +220,8 @@ public class MapComponent extends EditorComponent {
         RenderEngine.drawShape(g, rect, new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
       }
       break;
+    default:
+      break;
     }
 
     this.renderGrid(g);
@@ -234,28 +234,23 @@ public class MapComponent extends EditorComponent {
   public void loadMaps(String projectPath) {
     final List<String> files = FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "tmx");
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
-    final List<Map> maps = new ArrayList<>();
+    final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
       final IMapLoader tmxLoader = new TmxMapLoader();
       Map map = (Map) tmxLoader.loadMap(mapFile);
-      maps.add(map);
+      loadedMaps.add(map);
       log.log(Level.INFO, "map found: {0}", new Object[] { map.getFileName() });
     }
 
-    this.loadMaps(maps);
+    this.loadMaps(loadedMaps);
   }
 
   public void loadMaps(List<Map> maps) {
     EditorScreen.instance().getMapObjectPanel().bind(null);
     this.setFocus(null, true);
     this.getMaps().clear();
-    maps.sort(new Comparator<Map>() {
 
-      @Override
-      public int compare(Map arg0, Map arg1) {
-        return arg0.getName().compareTo(arg1.getName());
-      }
-    });
+    Collections.sort(maps);
 
     this.getMaps().addAll(maps);
     EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
@@ -284,41 +279,27 @@ public class MapComponent extends EditorComponent {
   @Override
   public void prepare() {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
-    Program.horizontalScroll.addAdjustmentListener(new AdjustmentListener() {
-
-      @Override
-      public void adjustmentValueChanged(AdjustmentEvent e) {
-        if (isLoading) {
-          return;
-        }
-
-        Point2D cameraFocus = new Point2D.Double(Program.horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
-        Game.getCamera().setFocus(cameraFocus);
+    Program.horizontalScroll.addAdjustmentListener(e -> {
+      if (isLoading) {
+        return;
       }
+
+      Point2D newFocus = new Point2D.Double(Program.horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
+      Game.getCamera().setFocus(newFocus);
     });
 
-    Program.verticalScroll.addAdjustmentListener(new AdjustmentListener() {
-
-      @Override
-      public void adjustmentValueChanged(AdjustmentEvent e) {
-        if (isLoading) {
-          return;
-        }
-        Point2D cameraFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), Program.verticalScroll.getValue());
-        Game.getCamera().setFocus(cameraFocus);
+    Program.verticalScroll.addAdjustmentListener(e -> {
+      if (isLoading) {
+        return;
       }
+      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), Program.verticalScroll.getValue());
+      Game.getCamera().setFocus(newFocus);
     });
 
-    Game.getScreenManager().getRenderComponent().addFocusListener(new FocusListener() {
-
+    Game.getScreenManager().getRenderComponent().addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
         startPoint = null;
-      }
-
-      @Override
-      public void focusGained(FocusEvent e) {
-
       }
     });
 
@@ -491,6 +472,8 @@ public class MapComponent extends EditorComponent {
     case EDITMODE_MOVE:
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
+    default:
+      break;
     }
 
     this.currentEditMode = editMode;
@@ -565,6 +548,30 @@ public class MapComponent extends EditorComponent {
     this.gridSize = gridSize;
   }
 
+  public boolean isSnapToGrid() {
+    return this.snapToGrid;
+  }
+
+  public void setSnapToGrid(boolean snapToGrid) {
+    this.snapToGrid = snapToGrid;
+  }
+
+  public boolean isRenderGrid() {
+    return this.renderGrid;
+  }
+
+  public void setRenderGrid(boolean renderGrid) {
+    this.renderGrid = renderGrid;
+  }
+
+  public boolean isRenderCollisionBoxes() {
+    return this.renderCollisionBoxes;
+  }
+
+  public void setRenderCollisionBoxes(boolean renderCollisionBoxes) {
+    this.renderCollisionBoxes = renderCollisionBoxes;
+  }
+
   public void updateTransformControls() {
     final Rectangle2D focus = this.getFocus();
     if (focus == null) {
@@ -582,7 +589,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void deleteMap() {
-    if (this.getMaps() == null || this.getMaps().size() == 0) {
+    if (this.getMaps() == null || this.getMaps().isEmpty()) {
       return;
     }
 
@@ -591,14 +598,13 @@ public class MapComponent extends EditorComponent {
     }
 
     int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
-
     if (n != JOptionPane.YES_OPTION) {
       return;
     }
 
     this.getMaps().removeIf(x -> x.getFileName().equals(Game.getEnvironment().getMap().getFileName()));
     EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
-    if (this.maps.size() > 0) {
+    if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
     } else {
       this.loadEnvironment(null);
@@ -632,7 +638,7 @@ public class MapComponent extends EditorComponent {
           return;
         }
 
-        if (map.getMapObjectLayers().size() == 0) {
+        if (map.getMapObjectLayers().isEmpty()) {
 
           // make sure there's a map object layer on the map because we need one to add
           // any kind of entities
@@ -686,13 +692,13 @@ public class MapComponent extends EditorComponent {
         this.loadEnvironment(map);
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
-    } catch (IOException e1) {
-      e1.printStackTrace();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
   public void exportMap() {
-    if (this.getMaps() == null || this.getMaps().size() == 0) {
+    if (this.getMaps() == null || this.getMaps().isEmpty()) {
       return;
     }
 
@@ -736,13 +742,9 @@ public class MapComponent extends EditorComponent {
 
         log.log(Level.INFO, "exported {0} to {1}", new Object[] { map.getFileName(), newFile });
       }
-    } catch (IOException e1) {
-      e1.printStackTrace();
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
-  }
-
-  public void createNewMap() {
-
   }
 
   public void zoomIn() {
@@ -845,16 +847,16 @@ public class MapComponent extends EditorComponent {
   }
 
   private Rectangle2D getCurrentMouseSelectionArea() {
-    final Point2D startPoint = this.startPoint;
-    if (startPoint == null) {
+    final Point2D start = this.startPoint;
+    if (start == null) {
       return null;
     }
 
     final Point2D endPoint = Input.mouse().getMapLocation();
-    double minX = this.snapX(Math.min(startPoint.getX(), endPoint.getX()));
-    double maxX = this.snapX(Math.max(startPoint.getX(), endPoint.getX()));
-    double minY = this.snapY(Math.min(startPoint.getY(), endPoint.getY()));
-    double maxY = this.snapY(Math.max(startPoint.getY(), endPoint.getY()));
+    double minX = this.snapX(Math.min(start.getX(), endPoint.getX()));
+    double maxX = this.snapX(Math.max(start.getX(), endPoint.getX()));
+    double minY = this.snapY(Math.min(start.getY(), endPoint.getY()));
+    double maxY = this.snapY(Math.max(start.getY(), endPoint.getY()));
 
     double width = Math.abs(minX - maxX);
     double height = Math.abs(minY - maxY);
@@ -1071,10 +1073,8 @@ public class MapComponent extends EditorComponent {
         return;
       }
 
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        if (this.currentEditMode == EDITMODE_EDIT) {
-          this.delete();
-        }
+      if (Game.getScreenManager().getRenderComponent().hasFocus() && this.currentEditMode == EDITMODE_EDIT) {
+        this.delete();
       }
     });
 
@@ -1083,15 +1083,15 @@ public class MapComponent extends EditorComponent {
         return;
       }
 
+      final Point2D currentFocus = Game.getCamera().getFocus();
       // horizontal scrolling
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
         if (e.getWheelRotation() < 0) {
-          Point2D cameraFocus = Game.getCamera().getFocus();
-          Point2D newFocus = new Point2D.Double(cameraFocus.getX() - this.scrollSpeed, cameraFocus.getY());
+
+          Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
           Game.getCamera().setFocus(newFocus);
         } else {
-          Point2D cameraFocus = Game.getCamera().getFocus();
-          Point2D newFocus = new Point2D.Double(cameraFocus.getX() + this.scrollSpeed, cameraFocus.getY());
+          Point2D newFocus = new Point2D.Double(currentFocus.getX() + this.scrollSpeed, currentFocus.getY());
           Game.getCamera().setFocus(newFocus);
         }
 
@@ -1110,13 +1110,11 @@ public class MapComponent extends EditorComponent {
       }
 
       if (e.getWheelRotation() < 0) {
-        Point2D cameraFocus = Game.getCamera().getFocus();
-        Point2D newFocus = new Point2D.Double(cameraFocus.getX(), cameraFocus.getY() - this.scrollSpeed);
+        Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() - this.scrollSpeed);
         Game.getCamera().setFocus(newFocus);
 
       } else {
-        Point2D cameraFocus = Game.getCamera().getFocus();
-        Point2D newFocus = new Point2D.Double(cameraFocus.getX(), cameraFocus.getY() + this.scrollSpeed);
+        Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
         Game.getCamera().setFocus(newFocus);
       }
 
@@ -1273,6 +1271,8 @@ public class MapComponent extends EditorComponent {
 
         this.handleEntityDrag(this.getFocusedMapObject());
         break;
+      default:
+        break;
       }
     });
 
@@ -1362,6 +1362,8 @@ public class MapComponent extends EditorComponent {
         }
 
         break;
+      default:
+        break;
       }
 
       this.startPoint = null;
@@ -1412,7 +1414,6 @@ public class MapComponent extends EditorComponent {
   }
 
   private void renderCollisionBoxes(Graphics2D g, BasicStroke shapeStroke) {
-    Color colorBoundingBoxFill = DEFAULT_COLOR_BOUNDING_BOX_FILL;
 
     // render all entities
     for (final IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
@@ -1424,10 +1425,11 @@ public class MapComponent extends EditorComponent {
         continue;
       }
 
+      Color colorBoundingBoxFill;
       if (layer.getColor() != null) {
         colorBoundingBoxFill = new Color(layer.getColor().getRed(), layer.getColor().getGreen(), layer.getColor().getBlue(), 15);
       } else {
-        colorBoundingBoxFill = new Color(0, 0, 0, 35);
+        colorBoundingBoxFill = DEFAULT_COLOR_BOUNDING_BOX_FILL;
       }
 
       for (final IMapObject mapObject : layer.getMapObjects()) {
@@ -1461,9 +1463,10 @@ public class MapComponent extends EditorComponent {
         } else if (type == MapObjectType.PATH) {
           // render lane
 
-          if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().size() == 0) {
+          if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
             continue;
           }
+
           // found the path for the rat
           final Path2D path = MapUtilities.convertPolylineToPath(mapObject);
           if (path == null) {
@@ -1506,16 +1509,17 @@ public class MapComponent extends EditorComponent {
         final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN));
 
         if (coll != null && collisionBoxWidthFactor != null && collisionBoxHeightFactor != null) {
-          boolean collision = Boolean.valueOf(coll);
+          boolean collision = Boolean.parseBoolean(coll);
           final Color collisionColor = collision ? COLOR_COLLISION_FILL : COLOR_NOCOLLISION_FILL;
           final Color collisionShapeColor = collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER;
 
-          float collisionBoxWidth = 0, collisionBoxHeight = 0;
+          float collisionBoxWidth = 0;
+          float collisionBoxHeight = 0;
           try {
             collisionBoxWidth = Float.parseFloat(collisionBoxWidthFactor);
             collisionBoxHeight = Float.parseFloat(collisionBoxHeightFactor);
           } catch (NumberFormatException | NullPointerException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
           }
           g.setColor(collisionColor);
           Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
@@ -1586,11 +1590,11 @@ public class MapComponent extends EditorComponent {
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(COLOR_FOCUS_BORDER);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
+      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
       if (MapObjectType.get(focusedMapObject.getType()) == MapObjectType.TRIGGER) {
         g.setColor(COLOR_NOCOLLISION_BORDER);
         g.setFont(Program.TEXT_FONT.deriveFont(11f));
-        RenderEngine.drawMapText(g, focusedMapObject.getName(), focusedMapObject.getX() + 2, focusedMapObject.getY() + 5);
+        RenderEngine.drawMapText(g, focusedMapObject.getName(), focusedMapObject.getX() + 2.0, focusedMapObject.getY() + 5.0);
       }
     }
   }

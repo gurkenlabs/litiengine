@@ -335,27 +335,27 @@ public class Program {
 
     CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
     snapToGrid.setState(userPreferences.isSnapGrid());
-    EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
+    EditorScreen.instance().getMapComponent().setSnapToGrid(snapToGrid.getState());
     snapToGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().snapToGrid = snapToGrid.getState();
+      EditorScreen.instance().getMapComponent().setSnapToGrid(snapToGrid.getState());
       userPreferences.setSnapGrid(snapToGrid.getState());
     });
 
     CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
     renderGrid.setState(userPreferences.isShowGrid());
-    EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
+    EditorScreen.instance().getMapComponent().setRenderGrid(renderGrid.getState());
     renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
     renderGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().renderGrid = renderGrid.getState();
+      EditorScreen.instance().getMapComponent().setRenderGrid(renderGrid.getState());
       userPreferences.setShowGrid(renderGrid.getState());
     });
 
     CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
     renderCollision.setState(userPreferences.isRenderBoundingBoxes());
-    EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
+    EditorScreen.instance().getMapComponent().setRenderCollisionBoxes(renderCollision.getState());
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
     renderCollision.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().renderCollisionBoxes = renderCollision.getState();
+      EditorScreen.instance().getMapComponent().setRenderCollisionBoxes(renderCollision.getState());
       userPreferences.setRenderBoundingBoxes(renderCollision.getState());
     });
 
