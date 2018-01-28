@@ -22,7 +22,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     }
 
     final int alpha = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA);
-    final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, DEFAULT_INTENSITY);
+    final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
     final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
