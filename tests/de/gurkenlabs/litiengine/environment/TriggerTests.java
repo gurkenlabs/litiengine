@@ -28,6 +28,7 @@ public class TriggerTests {
 
     IEnvironment env = mock(IEnvironment.class);
     Game.loadEnvironment(env);
+    Game.init();
     when(env.get(456)).thenReturn(target);
 
     Assert.assertFalse(trigger.isActivated());
