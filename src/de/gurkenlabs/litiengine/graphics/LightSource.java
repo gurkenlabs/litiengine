@@ -31,6 +31,8 @@ public class LightSource extends Entity implements IRenderable {
 
   public static final String TOGGLE_MESSAGE = "toggle";
 
+  public static final int DEFAULT_INTENSITY = 100;
+
   /** The gradient radius for our shadow. */
   private static final float OBSTRUCTED_VISION_RADIUS = 200f;
 

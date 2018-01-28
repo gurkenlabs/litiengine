@@ -1584,6 +1584,10 @@ public class MapComponent extends EditorComponent {
     }
 
     for (IMapObject mapObject : this.selectedObjects.get(map)) {
+      if (mapObject.equals(this.getFocusedMapObject())) {
+        continue;
+      }
+
       Stroke stroke = new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
       if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
         g.setColor(COLOR_FOCUS_FILL);

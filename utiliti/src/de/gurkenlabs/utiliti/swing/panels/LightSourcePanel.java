@@ -57,7 +57,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
     this.btnSelectColor = new JButton("...");
 
-    this.spinnerIntensity = new JSpinner();
+    this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 1));
 
     JLabel lblIntensity = new JLabel(Resources.get("panel_intensity"));
 
@@ -92,9 +92,10 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
   @Override
   protected void clearControls() {
     this.spinnerBrightness.setValue(0);
-    this.spinnerIntensity.setValue(0);
+    this.spinnerIntensity.setValue(LightSource.DEFAULT_INTENSITY);
     this.textFieldColor.setText("#ffffff");
     this.comboBoxLightShape.setSelectedItem(LightSource.ELLIPSE);
+    this.checkBoxIsActive.setSelected(true);
   }
 
   @Override
@@ -105,7 +106,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
     boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
     this.spinnerBrightness.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA));
-    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY));
+    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);

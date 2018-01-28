@@ -22,12 +22,12 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     }
 
     final int alpha = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA);
-    final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY);
+    final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, DEFAULT_INTENSITY);
     final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
-    final String mapObjectLightOn = mapObject.getCustomProperty(MapObjectProperty.LIGHT_ACTIVE);
+    final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
     if (mapObjectColor == null || mapObjectColor.isEmpty() || lightShape == null) {
-      return null;
+      return super.load(mapObject);
     }
 
     final Color color = Color.decode(mapObjectColor);
@@ -43,8 +43,8 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     default:
       lightType = LightSource.ELLIPSE;
     }
-    boolean lightOn = mapObjectLightOn == null || mapObjectLightOn.isEmpty() ? true : Boolean.parseBoolean(mapObjectLightOn);
-    final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, lightOn);
+
+    final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
     light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     light.setLocation(mapObject.getLocation());
     light.setMapId(mapObject.getId());
