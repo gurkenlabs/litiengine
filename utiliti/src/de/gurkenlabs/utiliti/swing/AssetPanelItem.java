@@ -40,6 +40,7 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -292,9 +293,9 @@ public class AssetPanelItem extends JPanel {
 
         Program.getAssetTree().forceUpdate();
       }
-    } else if (getOrigin() instanceof MapObject) {
-      MapObject mapObject = (MapObject) getOrigin();
-      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the blueprint [" + mapObject.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
+    } else if (getOrigin() instanceof Blueprint) {
+      Blueprint blueprint = (Blueprint) getOrigin();
+      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
         Program.getAssetTree().forceUpdate();
@@ -313,8 +314,8 @@ public class AssetPanelItem extends JPanel {
 
       MapObject mo = new MapObject();
       mo.setType(MapObjectType.PROP.name());
-      mo.setX((int) Game.getCamera().getFocus().getX());
-      mo.setY((int) Game.getCamera().getFocus().getY());
+      mo.setX((int) Game.getCamera().getFocus().getX() - info.getWidth() / 2);
+      mo.setY((int) Game.getCamera().getFocus().getY() - info.getHeight() / 2);
       mo.setWidth((int) info.getWidth());
       mo.setHeight((int) info.getHeight());
       mo.setId(Game.getEnvironment().getNextMapId());
@@ -331,14 +332,11 @@ public class AssetPanelItem extends JPanel {
     } else if (this.getOrigin() instanceof EmitterData) {
       // TODO @matthias: implement this when the emitter tool is fully integrated and
       // there is a way to add a map object from EmitterData
-    } else if (this.getOrigin() instanceof MapObject) {
-      MapObject blueprint = (MapObject) this.getOrigin();
-      MapObject newMapObject = new MapObject(blueprint);
-      newMapObject.setId(Game.getEnvironment().getNextMapId());
-      newMapObject.setX((int) Game.getCamera().getFocus().getX());
-      newMapObject.setY((int) Game.getCamera().getFocus().getY());
-
-      EditorScreen.instance().getMapComponent().add(newMapObject);
+    } else if (this.getOrigin() instanceof Blueprint) {
+      Blueprint blueprint = (Blueprint) this.getOrigin();
+      for (MapObject newMapObject : blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2)) {
+        EditorScreen.instance().getMapComponent().add(newMapObject);
+      }
     }
 
     return false;
@@ -355,7 +353,7 @@ public class AssetPanelItem extends JPanel {
       this.exportEmitter();
       return;
     } else if (this.getOrigin() instanceof MapObject) {
-      this.exportMapObject();
+      this.exportBlueprint();
       return;
     }
   }
@@ -419,13 +417,13 @@ public class AssetPanelItem extends JPanel {
     XmlExportDialog.export(emitter, "Emitter", emitter.getName());
   }
 
-  private void exportMapObject() {
-    if (!(this.getOrigin() instanceof MapObject)) {
+  private void exportBlueprint() {
+    if (!(this.getOrigin() instanceof Blueprint)) {
       return;
     }
 
-    MapObject mapObject = (MapObject) this.getOrigin();
-    XmlExportDialog.export(mapObject, "Mapobject", mapObject.getName());
+    Blueprint mapObject = (Blueprint) this.getOrigin();
+    XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName());
   }
 
   private boolean canAdd() {

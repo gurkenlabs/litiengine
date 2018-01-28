@@ -215,7 +215,7 @@ public class MapSelectionPanel extends JSplitPane {
             if (item.getUserObject() instanceof IEntity) {
               IMapObject obj = Game.getEnvironment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
-                EditorScreen.instance().getMapComponent().setFocus(obj);
+                EditorScreen.instance().getMapComponent().setFocus(obj, true);
               }
             }
           }

@@ -34,6 +34,7 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -416,7 +417,7 @@ public class EditorScreen extends Screen {
   public void importBlueprints() {
     XmlImportDialog.importXml("Blueprint", files -> {
       for (File file : files) {
-        MapObject blueprint = XmlUtilities.readFromFile(MapObject.class, file.toString());
+        Blueprint blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
         if (blueprint == null) {
           continue;
         }

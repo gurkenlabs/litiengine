@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -56,7 +57,7 @@ public class GameFile implements Serializable {
   private List<EmitterData> emitters;
 
   @XmlElementWrapper(name = "blueprints")
-  private List<MapObject> blueprints;
+  private List<Blueprint> blueprints;
 
   public GameFile() {
     this.spriteSheets = new ArrayList<>();
@@ -109,7 +110,7 @@ public class GameFile implements Serializable {
   }
 
   @XmlTransient
-  public List<MapObject> getBluePrints() {
+  public List<Blueprint> getBluePrints() {
     return this.blueprints;
   }
 

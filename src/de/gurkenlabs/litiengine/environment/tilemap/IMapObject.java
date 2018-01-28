@@ -5,9 +5,9 @@ import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 
 /**
- * This interface represents a non graphical instance on a map that can define
- * vaious things for an engine. e.g. it can be used to define static collision
- * boxes or other special regions on the map.
+ * This interface represents an instance on a map that can define various things
+ * for an engine. e.g. it can be used to define static collision boxes or other
+ * special regions on the map.
  */
 public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObject> {
 

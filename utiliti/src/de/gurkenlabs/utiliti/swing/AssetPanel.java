@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -80,7 +81,7 @@ public class AssetPanel extends JPanel {
     });
   }
 
-  public void loadBlueprints(List<MapObject> blueprints) {
+  public void loadBlueprints(List<Blueprint> blueprints) {
     this.load(blueprints, () -> {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
