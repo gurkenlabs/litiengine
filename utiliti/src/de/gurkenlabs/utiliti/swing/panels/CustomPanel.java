@@ -22,17 +22,18 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.utiliti.UndoManager;
 
+@SuppressWarnings("serial")
 public class CustomPanel extends PropertyPanel<IMapObject> {
   private JTable tableCustomProperties;
   private JScrollPane scrollPane;
-  DefaultTableModel model;
+  private DefaultTableModel model;
 
   public CustomPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_customProperties"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    scrollPane = new JScrollPane();
+    this.scrollPane = new JScrollPane();
 
     JButton buttonAdd = new JButton("+");
     buttonAdd.addActionListener(a -> model.addRow(new Object[] { "", "" }));
@@ -47,51 +48,27 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
     });
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.TRAILING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(buttonAdd)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-                    .addGroup(groupLayout.createSequentialGroup()
-                        .addGap(11)
-                        .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)))
-                .addContainerGap()));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(buttonRemove)
-                    .addComponent(buttonAdd))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+        .addGroup(groupLayout.createSequentialGroup()
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(buttonAdd).addPreferredGap(ComponentPlacement.RELATED).addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup().addGap(11).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)))
+            .addContainerGap()));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
+        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(buttonRemove).addComponent(buttonAdd)).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
-    tableCustomProperties = new JTable();
-    tableCustomProperties.getTableHeader().setReorderingAllowed(false);
-    tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    scrollPane.setViewportView(tableCustomProperties);
-    tableCustomProperties.setModel(new DefaultTableModel(
-        new Object[][] {
-        },
-        new String[] {
-            Resources.get("panel_name"), Resources.get("panel_value")
-        }) {
-      Class[] columnTypes = new Class[] {
-          String.class, String.class
-      };
+    this.tableCustomProperties = new JTable();
+    this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
+    this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.scrollPane.setViewportView(tableCustomProperties);
+    this.tableCustomProperties.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_name"), Resources.get("panel_value") }) {
+      Class[] columnTypes = new Class[] { String.class, String.class };
 
       @Override
       public Class getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
 
-      boolean[] columnEditables = new boolean[] {
-          true, true
-      };
+      boolean[] columnEditables = new boolean[] { true, true };
 
       @Override
       public boolean isCellEditable(int row, int column) {

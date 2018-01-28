@@ -270,19 +270,19 @@ public class EditorScreen extends Screen {
   }
 
   public void load(File gameFile) {
-    final long current = System.nanoTime();
+    final long currentTime = System.nanoTime();
     Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
 
     try {
       if (!FileUtilities.getExtension(gameFile).equals(GameFile.FILE_EXTENSION)) {
-        log.log(Level.SEVERE, "unsupported file format '" + FileUtilities.getExtension(gameFile) + "'");
+        log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
         return;
       }
 
       if (!gameFile.exists()) {
-        log.log(Level.SEVERE, "gameFile '" + gameFile + "' doesn't exist");
+        log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
         return;
       }
 
@@ -303,7 +303,7 @@ public class EditorScreen extends Screen {
       // 2. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
 
-      log.log(Level.INFO, this.getGameFile().getSpriteSheets().size() + " spritesheets loaded from '" + this.currentResourceFile + "'");
+      log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
 
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
@@ -321,7 +321,7 @@ public class EditorScreen extends Screen {
       }
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-      log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - current) / 1000000.0 });
+      log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
       this.setCurrentStatus("gamefile loaded");
     }
   }
@@ -531,7 +531,7 @@ public class EditorScreen extends Screen {
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    log.log(Level.INFO, "saved " + this.getGameFile().getMaps().size() + " maps and " + this.getGameFile().getSpriteSheets().size() + " tilesets to '" + this.currentResourceFile + "'");
+    log.log(Level.INFO, "saved {0} maps and {1} tilesets to {2}", new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
     this.setCurrentStatus("saved gamefile");
 
     if (Program.getUserPreferences().isSyncMaps()) {
@@ -546,7 +546,7 @@ public class EditorScreen extends Screen {
     for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
-        log.log(Level.INFO, "synchronized map '" + newFile + "'");
+        log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
       }
     }
   }
@@ -626,7 +626,7 @@ public class EditorScreen extends Screen {
     }
 
     if (cnt > 0) {
-      log.log(Level.INFO, cnt + " tilesets loaded from '" + map.getFileName() + "'");
+      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getFileName() });
     }
   }
 }

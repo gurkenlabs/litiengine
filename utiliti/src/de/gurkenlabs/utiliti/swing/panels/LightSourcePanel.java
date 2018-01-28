@@ -24,13 +24,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
+@SuppressWarnings("serial")
 public class LightSourcePanel extends PropertyPanel<IMapObject> {
   private final JTextField textFieldColor;
   private final JSpinner spinnerBrightness;
   private final JComboBox<String> comboBoxLightShape;
   private final JButton btnSelectColor;
   private JSpinner spinnerIntensity;
-  private JLabel lblIntensity;
   private JCheckBox checkBoxIsActive;
 
   public LightSourcePanel() {
@@ -40,29 +40,29 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
     JLabel lblShadowType = new JLabel("alpha");
 
-    spinnerBrightness = new JSpinner();
-    spinnerBrightness.setModel(new SpinnerNumberModel(0, 0, 255, 1));
+    this.spinnerBrightness = new JSpinner();
+    this.spinnerBrightness.setModel(new SpinnerNumberModel(0, 0, 255, 1));
 
     JLabel lblColor = new JLabel(Resources.get("panel_color"));
 
     JLabel lblShape = new JLabel(Resources.get("panel_shape"));
 
-    textFieldColor = new JTextField();
-    textFieldColor.setText("#ffffff");
-    textFieldColor.setEditable(false);
-    textFieldColor.setColumns(10);
+    this.textFieldColor = new JTextField();
+    this.textFieldColor.setText("#ffffff");
+    this.textFieldColor.setEditable(false);
+    this.textFieldColor.setColumns(10);
 
-    comboBoxLightShape = new JComboBox<>();
-    comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
+    this.comboBoxLightShape = new JComboBox<>();
+    this.comboBoxLightShape.setModel(new DefaultComboBoxModel<String>(new String[] { LightSource.ELLIPSE, LightSource.RECTANGLE }));
 
-    btnSelectColor = new JButton("...");
+    this.btnSelectColor = new JButton("...");
 
-    spinnerIntensity = new JSpinner();
+    this.spinnerIntensity = new JSpinner();
 
-    lblIntensity = new JLabel(Resources.get("panel_intensity"));
+    JLabel lblIntensity = new JLabel(Resources.get("panel_intensity"));
 
-    checkBoxIsActive = new JCheckBox("is active");
-    checkBoxIsActive.setSelected(true);
+    this.checkBoxIsActive = new JCheckBox("is active");
+    this.checkBoxIsActive.setSelected(true);
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout

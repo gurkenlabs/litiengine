@@ -14,18 +14,19 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
+@SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
-  JCheckBox chckbxIsObstacle;
-  JCheckBox chckbxIsObstructingLights;
+  private JCheckBox chckbxIsObstacle;
+  private JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_collisionBox"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
+    this.chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
 
-    chckbxIsObstructingLights = new JCheckBox(Resources.get("panel_isObstructingLights"));
+    this.chckbxIsObstructingLights = new JCheckBox(Resources.get("panel_isObstructingLights"));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(

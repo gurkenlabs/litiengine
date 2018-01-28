@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 
+@SuppressWarnings("serial")
 public class AssetTree extends JTree {
   private static final Icon ASSET_ICON = new ImageIcon(Resources.getImage("asset.png"));
   private static final Icon SPRITESHEET_ICON = new ImageIcon(Resources.getImage("spritesheet.png"));

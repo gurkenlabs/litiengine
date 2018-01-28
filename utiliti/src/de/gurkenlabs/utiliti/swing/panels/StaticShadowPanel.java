@@ -19,9 +19,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 
+@SuppressWarnings("serial")
 public class StaticShadowPanel extends PropertyPanel<IMapObject> {
-  JComboBox<StaticShadowType> comboBoxShadowType;
-  JSpinner spinnerOffset;
+  private JComboBox<StaticShadowType> comboBoxShadowType;
+  private JSpinner spinnerOffset;
 
   public StaticShadowPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_staticShadow"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -30,12 +31,12 @@ public class StaticShadowPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblShadowType = new JLabel(Resources.get("panel_shadowType"));
 
-    comboBoxShadowType = new JComboBox<>();
-    comboBoxShadowType.setModel(new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
+    this.comboBoxShadowType = new JComboBox<>();
+    this.comboBoxShadowType.setModel(new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
 
     JLabel lblOffset = new JLabel("offset");
 
-    spinnerOffset = new JSpinner();
+    this.spinnerOffset = new JSpinner();
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)

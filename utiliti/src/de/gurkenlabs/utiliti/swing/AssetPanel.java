@@ -19,9 +19,9 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.ImageProcessing;
 
+@SuppressWarnings("serial")
 public class AssetPanel extends JPanel {
   private static final int COLUMNS = 10;
-  private static final Icon imageIcon = new ImageIcon(Resources.getImage("document-img.png"));
   private static final Icon tilesetIcon = new ImageIcon(Resources.getImage("document-tsx.png"));
   private static final Icon emitterIcon = new ImageIcon(Resources.getImage("document-emitter.png"));
   private static final Icon blueprintIcon = new ImageIcon(Resources.getImage("document-blueprint.png"));

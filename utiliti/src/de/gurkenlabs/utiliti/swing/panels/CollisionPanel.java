@@ -21,12 +21,13 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
+@SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel<IMapObject> {
   private JCheckBox chckbxHasCollision;
-  JSpinner spinnerWidth;
-  JSpinner spinnerHeight;
-  JComboBox<Align> comboBoxAlign;
-  JComboBox<Valign> comboBoxValign;
+  private JSpinner spinnerWidth;
+  private JSpinner spinnerHeight;
+  private JComboBox<Align> comboBoxAlign;
+  private JComboBox<Valign> comboBoxValign;
 
   /**
    * Create the panel.
@@ -38,21 +39,21 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblMaterial = new JLabel(Resources.get("panel_width"));
 
-    chckbxHasCollision = new JCheckBox("collision");
+    this.chckbxHasCollision = new JCheckBox("collision");
 
     JLabel lblHeightFactor = new JLabel(Resources.get("panel_height"));
 
-    spinnerWidth = new JSpinner();
-    spinnerWidth.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
+    this.spinnerWidth = new JSpinner();
+    this.spinnerWidth.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
 
-    spinnerHeight = new JSpinner();
-    spinnerHeight.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
+    this.spinnerHeight = new JSpinner();
+    this.spinnerHeight.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
 
-    comboBoxAlign = new JComboBox<>();
-    comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
+    this.comboBoxAlign = new JComboBox<>();
+    this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
 
-    comboBoxValign = new JComboBox<>();
-    comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
+    this.comboBoxValign = new JComboBox<>();
+    this.comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()

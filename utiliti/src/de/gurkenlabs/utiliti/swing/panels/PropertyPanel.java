@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.utiliti.UndoManager;
 
+@SuppressWarnings("serial")
 public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
   private transient T dataSource;
 

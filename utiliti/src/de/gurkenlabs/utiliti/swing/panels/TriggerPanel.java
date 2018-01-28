@@ -28,6 +28,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.util.ArrayUtilities;
 
+@SuppressWarnings("serial")
 public class TriggerPanel extends PropertyPanel<IMapObject> {
   private JTextField textFieldMessage;
   private DefaultTableModel model;
@@ -46,11 +47,11 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblShadowType = new JLabel(Resources.get("panel_message"));
 
-    textFieldMessage = new JTextField();
-    textFieldMessage.setColumns(10);
+    this.textFieldMessage = new JTextField();
+    this.textFieldMessage.setColumns(10);
 
-    comboBoxActivationType = new JComboBox<>();
-    comboBoxActivationType.setModel(new DefaultComboBoxModel<TriggerActivation>(TriggerActivation.values()));
+    this.comboBoxActivationType = new JComboBox<>();
+    this.comboBoxActivationType.setModel(new DefaultComboBoxModel<TriggerActivation>(TriggerActivation.values()));
 
     JLabel lblActivation = new JLabel(Resources.get("panel_activation"));
 
@@ -68,7 +69,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
       }
     });
 
-    chckbxOneTimeOnly = new JCheckBox(Resources.get("panel_oneTimeOnly"));
+    this.chckbxOneTimeOnly = new JCheckBox(Resources.get("panel_oneTimeOnly"));
 
     JScrollPane scrollPane1 = new JScrollPane();
 
@@ -84,7 +85,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
       }
     });
 
-    spinnerCooldown = new JSpinner();
+    this.spinnerCooldown = new JSpinner();
 
     JLabel lblCooldown = new JLabel("cooldown");
 
@@ -123,9 +124,9 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerCooldown, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblCooldown, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
             .addContainerGap(47, Short.MAX_VALUE)));
 
-    tableTargets = new JTable();
-    tableTargets.getTableHeader().setReorderingAllowed(false);
-    tableTargets.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_targets") }) {
+    this.tableTargets = new JTable();
+    this.tableTargets.getTableHeader().setReorderingAllowed(false);
+    this.tableTargets.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_targets") }) {
       Class[] columnTypes = new Class[] { Integer.class };
 
       @Override
@@ -133,12 +134,12 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
         return columnTypes[columnIndex];
       }
     });
-    tableTargets.getColumnModel().getColumn(0).setResizable(false);
+    this.tableTargets.getColumnModel().getColumn(0).setResizable(false);
     scrollPane1.setViewportView(tableTargets);
 
-    table = new JTable();
-    table.getTableHeader().setReorderingAllowed(false);
-    table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_activators") }) {
+    this.table = new JTable();
+    this.table.getTableHeader().setReorderingAllowed(false);
+    this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_activators") }) {
       Class[] columnTypes = new Class[] { Integer.class };
 
       @Override
@@ -146,12 +147,12 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
         return columnTypes[columnIndex];
       }
     });
-    table.getColumnModel().getColumn(0).setResizable(false);
+    this.table.getColumnModel().getColumn(0).setResizable(false);
 
     scrollPane.setViewportView(table);
     this.model = (DefaultTableModel) this.table.getModel();
     this.targetsModel = (DefaultTableModel) this.tableTargets.getModel();
-    setLayout(groupLayout);
+    this.setLayout(groupLayout);
 
     this.setupChangedListeners();
   }

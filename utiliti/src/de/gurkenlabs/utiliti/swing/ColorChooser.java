@@ -9,6 +9,9 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import de.gurkenlabs.litiengine.Game;
 
 public final class ColorChooser {
+  private ColorChooser() {
+  }
+
   public static final Color showRgbDialog(String title, Color color) {
     JColorChooser chooser = new JColorChooser();
     chooser.setColor(color);

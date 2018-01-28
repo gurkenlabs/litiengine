@@ -29,6 +29,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
+@SuppressWarnings("serial")
 public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<JLabel> comboBoxSpriteSheets;
   private JCheckBox chckbxIndestructible;
@@ -50,32 +51,30 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblHealth = new JLabel(Resources.get("panel_health"));
 
-    spinnerHealth = new JSpinner();
-    spinnerHealth.setModel(new SpinnerNumberModel(100, 0, 1000000, 1));
+    this.spinnerHealth = new JSpinner();
+    this.spinnerHealth.setModel(new SpinnerNumberModel(100, 0, 1000000, 1));
 
     JLabel lblMaterial = new JLabel(Resources.get("panel_material"));
 
-    comboBoxMaterial = new JComboBox<>();
-    comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.values()));
+    this.comboBoxMaterial = new JComboBox<>();
+    this.comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.values()));
 
     JLabel lblSprite = new JLabel(Resources.get("panel_sprite"));
 
-    comboBoxSpriteSheets = new JComboBox<>();
-    comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+    this.comboBoxSpriteSheets = new JComboBox<>();
+    this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
-    chckbxIndestructible = new JCheckBox(Resources.get("panel_destructible"));
+    this.chckbxIndestructible = new JCheckBox(Resources.get("panel_destructible"));
+    this.chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
+    this.chckbxShadow = new JCheckBox("shadow");
 
-    chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
-
-    chckbxShadow = new JCheckBox("shadow");
-
-    comboBoxRotation = new JComboBox<Material>();
-    comboBoxRotation.setModel(new DefaultComboBoxModel(Rotation.values()));
+    this.comboBoxRotation = new JComboBox<Material>();
+    this.comboBoxRotation.setModel(new DefaultComboBoxModel(Rotation.values()));
 
     JLabel lblRotation = new JLabel("rotation");
 
-    checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
-    checkBoxVerticalFlip = new JCheckBox("vertical flip");
+    this.checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
+    this.checkBoxVerticalFlip = new JCheckBox("vertical flip");
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout

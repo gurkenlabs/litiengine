@@ -20,8 +20,11 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 
+@SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel<IMapObject> {
-  private ImageIcon play, pause, rewind;
+  private ImageIcon play;
+  private ImageIcon pause;
+  private ImageIcon rewind;
   private CustomEmitter emitter;
 
   public EmitterPanel() {
@@ -29,9 +32,9 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    play = new ImageIcon(Resources.getImage("button-play.png"));
-    pause = new ImageIcon(Resources.getImage("button-pause.png"));
-    rewind = new ImageIcon(Resources.getImage("button-rewind.png"));
+    this.play = new ImageIcon(Resources.getImage("button-play.png"));
+    this.pause = new ImageIcon(Resources.getImage("button-pause.png"));
+    this.rewind = new ImageIcon(Resources.getImage("button-rewind.png"));
 
     JLabel lblEmitterData = new JLabel("Emitter Data");
     lblEmitterData.setFont(new Font("Tahoma", Font.BOLD, 11));

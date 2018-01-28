@@ -24,11 +24,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.utiliti.EditorScreen;
 
+@SuppressWarnings("serial")
 public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final Map<MapObjectType, PropertyPanel<IMapObject>> panels;
   private PropertyPanel<IMapObject> currentPanel;
-  JPanel componentPanel;
-  JPanel collWrapper = new JPanel();
+  private JPanel componentPanel;
+  private JPanel collWrapper = new JPanel();
   private final CollisionPanel collisionPanel;
   private final CustomPanel customPanel;
   private final JTextField textFieldName;
@@ -67,26 +68,23 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblName = new JLabel(Resources.get("panel_name"));
 
-    textFieldName = new JTextField();
-    textFieldName.setColumns(10);
+    this.textFieldName = new JTextField();
+    this.textFieldName.setColumns(10);
 
     JLabel lblType = new JLabel(Resources.get("panel_type"));
-    comboBoxType = new JComboBox<>();
-    comboBoxType.setModel(new DefaultComboBoxModel<MapObjectType>(MapObjectType.values()));
+    this.comboBoxType = new JComboBox<>();
+    this.comboBoxType.setModel(new DefaultComboBoxModel<MapObjectType>(MapObjectType.values()));
 
-    spinnerX = new JSpinner();
-
-    spinnerY = new JSpinner();
-
-    spinnerWidth = new JSpinner();
-
-    spinnerHeight = new JSpinner();
+    this.spinnerX = new JSpinner();
+    this.spinnerY = new JSpinner();
+    this.spinnerWidth = new JSpinner();
+    this.spinnerHeight = new JSpinner();
 
     JLabel lblNewLabel = new JLabel("ID");
     lblNewLabel.setFont(lblNewLabel.getFont().deriveFont(Font.BOLD).deriveFont(12f));
 
-    labelEntityID = new JLabel("####");
-    labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
+    this.labelEntityID = new JLabel("####");
+    this.labelEntityID.setFont(labelEntityID.getFont().deriveFont(12f));
 
     componentPanel = new JPanel();
     componentPanel.setBorder(null);

@@ -52,6 +52,7 @@ import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 
+@SuppressWarnings("serial")
 public class AssetPanelItem extends JPanel {
   private static final Logger log = Logger.getLogger(AssetPanelItem.class.getName());
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
