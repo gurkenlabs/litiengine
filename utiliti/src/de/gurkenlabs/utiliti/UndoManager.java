@@ -191,7 +191,7 @@ public class UndoManager {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    EditorScreen.instance().getMapComponent().setFocus(target);
+    EditorScreen.instance().getMapComponent().setFocus(target, true);
   }
 
   private static IMapObject clone(IMapObject mapObject) {
