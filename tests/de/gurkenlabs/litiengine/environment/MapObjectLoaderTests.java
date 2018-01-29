@@ -226,9 +226,9 @@ public class MapObjectLoaderTests {
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY)).thenReturn(100);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR)).thenReturn("#ffffff");
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_ACTIVE)).thenReturn("true");
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
     Collection<IEntity> entities = loader.load(mapObject);
