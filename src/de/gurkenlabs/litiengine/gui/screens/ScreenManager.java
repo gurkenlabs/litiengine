@@ -215,7 +215,9 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void windowLostFocus(WindowEvent e) {
-    Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+    if (Game.getConfiguration().graphics().reduceFramesWhenNotFocused()) {
+      Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+    }
   }
 
   private void setResolution(Dimension dim) {

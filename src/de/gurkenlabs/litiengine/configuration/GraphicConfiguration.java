@@ -23,8 +23,11 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean renderDynamicShadows;
 
-  // TODO: on low performance machines (surface 2 pro tablet) this can lead to frame drops (65->35fps); on high performance machines this can increase frame rate...
-  // Possible explanation: on low performance machines it takes more computing time to render larger images?
+  // TODO: on low performance machines (surface 2 pro tablet) this can lead to
+  // frame drops (65->35fps); on high performance machines this can increase frame
+  // rate...
+  // Possible explanation: on low performance machines it takes more computing
+  // time to render larger images?
   private boolean cacheStaticTiles;
 
   /** The resolution. */
@@ -33,6 +36,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
   private int resolutionWidth;
 
   private boolean enableResolutionScale;
+
+  private boolean reduceFramesWhenNotFocused;
 
   /**
    * Instantiates a new graphic configuration.
@@ -45,6 +50,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionWidth = 1600;
     this.setCacheStaticTiles(true);
     this.setEnableResolutionScale(true);
+    this.setReduceFramesWhenNotFocused(true);
   }
 
   /**
@@ -130,7 +136,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
   }
 
   public boolean enableCacheStaticTiles() {
-    return cacheStaticTiles;
+    return this.cacheStaticTiles;
   }
 
   public void setCacheStaticTiles(boolean cacheStaticTiles) {
@@ -138,10 +144,18 @@ public class GraphicConfiguration extends ConfigurationGroup {
   }
 
   public boolean enableResolutionScale() {
-    return enableResolutionScale;
+    return this.enableResolutionScale;
   }
 
   public void setEnableResolutionScale(boolean enableResolutionScale) {
     this.enableResolutionScale = enableResolutionScale;
+  }
+
+  public boolean reduceFramesWhenNotFocused() {
+    return this.reduceFramesWhenNotFocused;
+  }
+
+  public void setReduceFramesWhenNotFocused(boolean reduceFramesWhenNotFocused) {
+    this.reduceFramesWhenNotFocused = reduceFramesWhenNotFocused;
   }
 }
