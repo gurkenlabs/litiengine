@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -91,9 +92,8 @@ public class MapComponent extends EditorComponent {
 
   private static final Color DEFAULT_COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
   private static final Color COLOR_NAME_FILL = new Color(0, 0, 0, 60);
-  private static final Color COLOR_FOCUS_FILL = new Color(0, 0, 0, 50);
   private static final Color COLOR_FOCUS_BORDER = Color.BLACK;
-  private static final Color COLOR_SELECTION_BORDER = new Color(0, 0, 0, 150);
+  private static final Color COLOR_SELECTION_BORDER = new Color(0, 0, 0, 200);
   private static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
   private static final Color COLOR_NOCOLLISION_FILL = new Color(255, 100, 0, 15);
   private static final Color COLOR_COLLISION_BORDER = Color.RED;
@@ -105,6 +105,8 @@ public class MapComponent extends EditorComponent {
   private static final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
   private static final Color COLOR_SHADOW_FILL = new Color(85, 130, 200, 15);
   private static final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
+  private static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
+  private static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
 
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
   private final java.util.Map<TransformType, Rectangle2D> transformRects;
@@ -132,7 +134,7 @@ public class MapComponent extends EditorComponent {
   private boolean isTransforming;
   private boolean isFocussing;
   private Dimension dragSizeMapObject;
-  private Rectangle2D newObject;
+  private Rectangle2D newObjectArea;
   private IMapObject copiedMapObject;
   private int gridSize;
 
@@ -187,44 +189,19 @@ public class MapComponent extends EditorComponent {
       this.renderCollisionBoxes(g, shapeStroke);
     }
 
+    this.renderGrid(g);
+
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      if (newObject != null) {
-        g.setColor(COLOR_NEWOBJECT_FILL);
-        RenderEngine.fillShape(g, newObject);
-        g.setColor(COLOR_NEWOBJECT_BORDER);
-        RenderEngine.drawShape(g, newObject, shapeStroke);
-        g.setFont(g.getFont().deriveFont(Font.BOLD));
-        RenderEngine.drawMapText(g, newObject.getWidth() + "", newObject.getX() + newObject.getWidth() / 2 - 3, newObject.getY() - 5);
-        RenderEngine.drawMapText(g, newObject.getHeight() + "", newObject.getX() - 10, newObject.getY() + newObject.getHeight() / 2);
-      }
+      this.renderNewObjectArea(g, shapeStroke);
       break;
     case EDITMODE_EDIT:
-      // draw mouse selection area
-      final Point2D start = this.startPoint;
-      if (start != null && !Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        final Rectangle2D rect = this.getCurrentMouseSelectionArea();
-        if (rect == null) {
-          break;
-        }
-
-        g.setColor(new Color(0, 130, 152, 30));
-        RenderEngine.fillShape(g, rect);
-        if (rect.getWidth() > 0 || rect.getHeight() > 0) {
-          g.setColor(new Color(0, 130, 152, 255));
-          g.setFont(g.getFont().deriveFont(Font.BOLD));
-          RenderEngine.drawMapText(g, rect.getWidth() + "", rect.getX() + rect.getWidth() / 2 - 3, rect.getY() - 5);
-          RenderEngine.drawMapText(g, rect.getHeight() + "", rect.getX() - 10, rect.getY() + rect.getHeight() / 2);
-        }
-        g.setColor(new Color(0, 130, 152, 150));
-        RenderEngine.drawShape(g, rect, new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1 }, 0));
-      }
+      this.renderMouseSelectionArea(g, shapeStroke);
       break;
     default:
       break;
     }
 
-    this.renderGrid(g);
     this.renderSelection(g);
     this.renderFocus(g);
 
@@ -374,7 +351,7 @@ public class MapComponent extends EditorComponent {
 
   public void paste(int x, int y) {
     if (this.copiedMapObject != null) {
-      this.newObject = new Rectangle(x, y, (int) this.copiedMapObject.getDimension().getWidth(), (int) this.copiedMapObject.getDimension().getHeight());
+      this.newObjectArea = new Rectangle(x, y, (int) this.copiedMapObject.getDimension().getWidth(), (int) this.copiedMapObject.getDimension().getHeight());
       this.copyMapObject(this.copiedMapObject);
     }
   }
@@ -760,8 +737,8 @@ public class MapComponent extends EditorComponent {
 
     IMapObject mo = new MapObject();
     mo.setType(obj.getType());
-    mo.setX(this.snapX(this.newObject.getX()));
-    mo.setY(this.snapY(this.newObject.getY()));
+    mo.setX(this.snapX(this.newObjectArea.getX()));
+    mo.setY(this.snapY(this.newObjectArea.getY()));
     mo.setWidth((int) obj.getDimension().getWidth());
     mo.setHeight((int) obj.getDimension().getHeight());
     mo.setId(Game.getEnvironment().getNextMapId());
@@ -796,24 +773,24 @@ public class MapComponent extends EditorComponent {
   private IMapObject createNewMapObject(MapObjectType type) {
     IMapObject mo = new MapObject();
     mo.setType(type.toString());
-    mo.setX((int) this.newObject.getX());
-    mo.setY((int) this.newObject.getY());
-    mo.setWidth((int) this.newObject.getWidth());
-    mo.setHeight((int) this.newObject.getHeight());
+    mo.setX((int) this.newObjectArea.getX());
+    mo.setY((int) this.newObjectArea.getY());
+    mo.setWidth((int) this.newObjectArea.getWidth());
+    mo.setHeight((int) this.newObjectArea.getHeight());
     mo.setId(Game.getEnvironment().getNextMapId());
     mo.setName("");
 
     switch (type) {
     case PROP:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObject.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObject.getHeight() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
       mo.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, "false");
       mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
       break;
     case DECORMOB:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObject.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObject.getHeight() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4) + "");
+      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "false");
       mo.setCustomProperty(MapObjectProperty.DECORMOB_VELOCITY, "2");
       mo.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, MovementBehavior.IDLE.toString());
@@ -833,17 +810,24 @@ public class MapComponent extends EditorComponent {
     return mo;
   }
 
-  private Rectangle2D getCurrentMouseSelectionArea() {
+  private Rectangle2D getCurrentMouseSelectionArea(boolean snap) {
     final Point2D start = this.startPoint;
     if (start == null) {
       return null;
     }
 
     final Point2D endPoint = Input.mouse().getMapLocation();
-    double minX = this.snapX(Math.min(start.getX(), endPoint.getX()));
-    double maxX = this.snapX(Math.max(start.getX(), endPoint.getX()));
-    double minY = this.snapY(Math.min(start.getY(), endPoint.getY()));
-    double maxY = this.snapY(Math.max(start.getY(), endPoint.getY()));
+    double minX = Math.min(start.getX(), endPoint.getX());
+    double maxX = Math.max(start.getX(), endPoint.getX());
+    double minY = Math.min(start.getY(), endPoint.getY());
+    double maxY = Math.max(start.getY(), endPoint.getY());
+
+    if (snap) {
+      minX = this.snapX(minX);
+      maxX = this.snapX(maxX);
+      minY = this.snapY(minY);
+      maxY = this.snapY(maxY);
+    }
 
     double width = Math.abs(minX - maxX);
     double height = Math.abs(minY - maxY);
@@ -1125,22 +1109,22 @@ public class MapComponent extends EditorComponent {
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         return;
       }
-      for (TransformType type : this.transformRects.keySet()) {
-        Rectangle2D rect = this.transformRects.get(type);
+      for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
+        Rectangle2D rect = entry.getValue();
         Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
         if (hoverrect.contains(Input.mouse().getMapLocation())) {
           hovered = true;
-          if (type == TransformType.DOWN || type == TransformType.UP) {
+          if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
             Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
-          } else if (type == TransformType.UPLEFT || type == TransformType.DOWNRIGHT) {
+          } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
             Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
-          } else if (type == TransformType.UPRIGHT || type == TransformType.DOWNLEFT) {
+          } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
             Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
           } else {
             Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
           }
 
-          currentTransform = type;
+          currentTransform = entry.getKey();
           break;
         }
       }
@@ -1228,7 +1212,7 @@ public class MapComponent extends EditorComponent {
           return;
         }
 
-        newObject = this.getCurrentMouseSelectionArea();
+        newObjectArea = this.getCurrentMouseSelectionArea(true);
         break;
       case EDITMODE_EDIT:
         if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
@@ -1274,11 +1258,11 @@ public class MapComponent extends EditorComponent {
 
       switch (this.currentEditMode) {
       case EDITMODE_CREATE:
-        if (this.newObject == null) {
+        if (this.newObjectArea == null) {
           break;
         }
         IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
-        this.newObject = null;
+        this.newObjectArea = null;
         this.setFocus(mo, true);
         EditorScreen.instance().getMapObjectPanel().bind(mo);
         this.setEditMode(EDITMODE_EDIT);
@@ -1302,7 +1286,7 @@ public class MapComponent extends EditorComponent {
           return;
         }
 
-        Rectangle2D rect = this.getCurrentMouseSelectionArea();
+        Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
         if (rect.getHeight() == 0 || rect.getWidth() == 0) {
           break;
         }
@@ -1459,25 +1443,22 @@ public class MapComponent extends EditorComponent {
         }
 
         // render bounding boxes
-        final IMapObject focusedMapObject = this.getFocusedMapObject();
-        if (focusedMapObject == null || mapObject.getId() != focusedMapObject.getId()) {
-          g.setColor(colorBoundingBoxFill);
+        g.setColor(colorBoundingBoxFill);
 
-          // don't fill rect for lightsource because it is important to judge
-          // the color
-          if (type != MapObjectType.LIGHTSOURCE) {
-            if (type == MapObjectType.TRIGGER) {
-              g.setColor(COLOR_NOCOLLISION_FILL);
-            }
-            RenderEngine.fillShape(g, mapObject.getBoundingBox());
-          }
-
+        // don't fill rect for lightsource because it is important to judge
+        // the color
+        if (type != MapObjectType.LIGHTSOURCE) {
           if (type == MapObjectType.TRIGGER) {
-            g.setColor(COLOR_NOCOLLISION_BORDER);
+            g.setColor(COLOR_NOCOLLISION_FILL);
           }
-
-          RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
+          RenderEngine.fillShape(g, mapObject.getBoundingBox());
         }
+
+        if (type == MapObjectType.TRIGGER) {
+          g.setColor(COLOR_NOCOLLISION_BORDER);
+        }
+
+        RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
 
         // render collision boxes
         String coll = mapObject.getCustomProperty(MapObjectProperty.COLLISION);
@@ -1537,19 +1518,48 @@ public class MapComponent extends EditorComponent {
     }
   }
 
+  private void renderNewObjectArea(Graphics2D g, Stroke shapeStroke) {
+    if (this.newObjectArea == null) {
+      return;
+    }
+
+    g.setColor(COLOR_NEWOBJECT_FILL);
+    RenderEngine.fillShape(g, newObjectArea);
+    g.setColor(COLOR_NEWOBJECT_BORDER);
+    RenderEngine.drawShape(g, newObjectArea, shapeStroke);
+    g.setFont(g.getFont().deriveFont(Font.BOLD));
+    RenderEngine.drawMapText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
+    RenderEngine.drawMapText(g, newObjectArea.getHeight() + "", newObjectArea.getX() - 10, newObjectArea.getY() + newObjectArea.getHeight() / 2);
+  }
+
+  private void renderMouseSelectionArea(Graphics2D g, Stroke shapeStroke) {
+    // draw mouse selection area
+    final Point2D start = this.startPoint;
+    if (start != null && !Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+      final Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
+      if (rect == null) {
+        return;
+      }
+
+      g.setColor(COLOR_MOUSE_SELECTION_AREA_FILL);
+      RenderEngine.fillShape(g, rect);
+      g.setColor(COLOR_MOUSE_SELECTION_AREA_BORDER);
+      RenderEngine.drawShape(g, rect, shapeStroke);
+    }
+  }
+
   private void renderFocus(Graphics2D g) {
     // render the focus and the transform rects
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
-      if (MapObjectType.get(focusedMapObject.getType()) != MapObjectType.LIGHTSOURCE) {
-        g.setColor(COLOR_FOCUS_FILL);
-        RenderEngine.fillShape(g, focus);
-      }
-
+      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15);
       g.setColor(COLOR_FOCUS_BORDER);
       RenderEngine.drawShape(g, focus, stroke);
+
+      Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15 - 1f);
+      g.setColor(Color.WHITE);
+      RenderEngine.drawShape(g, focus, whiteStroke);
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
@@ -1588,11 +1598,7 @@ public class MapComponent extends EditorComponent {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(2 / Game.getCamera().getRenderScale(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
-      if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
-        g.setColor(COLOR_FOCUS_FILL);
-        RenderEngine.fillShape(g, mapObject.getBoundingBox());
-      }
+      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
 
       g.setColor(COLOR_SELECTION_BORDER);
       RenderEngine.drawShape(g, mapObject.getBoundingBox(), stroke);
