@@ -15,6 +15,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean renderBoundingBoxes;
   private boolean compressFile;
   private boolean syncMaps;
+  private int frameState;
   private int gridSize;
   private int mainSplitter;
   private int selectionEditSplitter;
@@ -196,5 +197,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setAssetsSplitter(int assetsSplitter) {
     this.assetsSplitter = assetsSplitter;
+  }
+
+  public int getFrameState() {
+    return frameState;
+  }
+
+  public void setFrameState(int frameState) {
+    this.frameState = frameState;
   }
 }

@@ -196,7 +196,12 @@ public class Program {
       EditorScreen.instance().save(false);
     }
 
-    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+    boolean exit = n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
+    if (exit) {
+      getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
+    }
+
+    return exit;
   }
 
   private static void handleArgs(String[] args) {
@@ -234,8 +239,13 @@ public class Program {
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
+
     if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
       window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
+    }
+
+    if (userPreferences.getFrameState() != JFrame.ICONIFIED && userPreferences.getFrameState() != JFrame.NORMAL) {
+      window.setExtendedState(userPreferences.getFrameState());
     }
 
     Canvas canvas = Game.getScreenManager().getRenderComponent();
