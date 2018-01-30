@@ -1199,50 +1199,6 @@ public class MapComponent extends EditorComponent {
 
         final Point2D mouse = Input.mouse().getMapLocation();
         this.startPoint = mouse;
-        boolean somethingIsFocused = false;
-        boolean currentObjectFocused = false;
-
-        for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
-          if (layer == null) {
-            continue;
-          }
-
-          if (somethingIsFocused) {
-            break;
-          }
-
-          if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
-            continue;
-          }
-
-          for (IMapObject mapObject : layer.getMapObjects()) {
-            if (mapObject == null) {
-              continue;
-            }
-
-            MapObjectType type = MapObjectType.get(mapObject.getType());
-            if (type == MapObjectType.PATH) {
-              continue;
-            }
-
-            if (mapObject.getBoundingBox().contains(mouse)) {
-              if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
-                currentObjectFocused = true;
-                continue;
-              }
-
-              this.setFocus(mapObject, false);
-              EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-              somethingIsFocused = true;
-              break;
-            }
-          }
-        }
-
-        if (!somethingIsFocused && !currentObjectFocused) {
-          this.setFocus(null, true);
-          EditorScreen.instance().getMapObjectPanel().bind(null);
-        }
         break;
       }
     });
@@ -1328,11 +1284,8 @@ public class MapComponent extends EditorComponent {
         }
 
         Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
-        if (rect.getHeight() == 0 || rect.getWidth() == 0) {
-          break;
-        }
-
         boolean somethingIsFocused = false;
+        boolean currentObjectFocused = false;
         for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
           if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
             continue;
@@ -1352,8 +1305,8 @@ public class MapComponent extends EditorComponent {
               continue;
             }
 
-            if (mapObject.equals(this.getFocusedMapObject())) {
-              somethingIsFocused = true;
+            if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+              currentObjectFocused = true;
               continue;
             }
 
@@ -1368,7 +1321,7 @@ public class MapComponent extends EditorComponent {
           }
         }
 
-        if (!somethingIsFocused) {
+        if (!somethingIsFocused && !currentObjectFocused) {
           this.setFocus(null, true);
           EditorScreen.instance().getMapObjectPanel().bind(null);
         }
