@@ -31,7 +31,7 @@ public final class XmlExportDialog {
       chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
       chooser.setDialogType(JFileChooser.SAVE_DIALOG);
       chooser.setDialogTitle("Export " + name);
-      FileFilter filter = new FileNameExtensionFilter(name + " XML", extension);
+      FileFilter filter = new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
       chooser.setSelectedFile(new File(filename + "." + extension));
@@ -39,7 +39,7 @@ public final class XmlExportDialog {
       int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
         String newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
-        log.log(Level.INFO, "exported mapobject {0} to {1}", new Object[] { filename, newFile });
+        log.log(Level.INFO, "exported {0} {1} to {2}", new Object[] { name, filename, newFile });
       }
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);

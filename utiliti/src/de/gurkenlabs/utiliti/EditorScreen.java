@@ -322,7 +322,7 @@ public class EditorScreen extends Screen {
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
-      this.setCurrentStatus("gamefile loaded");
+      this.setCurrentStatus(Resources.get("status_gamefile_loaded"));
     }
   }
 
@@ -399,7 +399,7 @@ public class EditorScreen extends Screen {
         }
 
         if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "An emitter with the name '" + emitter.getName() + "' already existing. Do you want to replace it?", "Replace existing Emitter?", JOptionPane.YES_NO_OPTION);
+          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_emitter_question", emitter.getName()), Resources.get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
           if (result == JOptionPane.NO_OPTION) {
             continue;
           }
@@ -422,7 +422,7 @@ public class EditorScreen extends Screen {
         }
 
         if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
-          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "A blueprint with the name '" + blueprint.getName() + "' already existing. Do you want to replace it?", "Replace existing Blueprint?", JOptionPane.YES_NO_OPTION);
+          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_blueprint_question", blueprint.getName()), Resources.get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
           if (result == JOptionPane.NO_OPTION) {
             continue;
           }
@@ -541,7 +541,7 @@ public class EditorScreen extends Screen {
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
     log.log(Level.INFO, "saved {0} maps and {1} tilesets to {2}", new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
-    this.setCurrentStatus("saved gamefile");
+    this.setCurrentStatus(Resources.get("status_gamefile_saved"));
 
     if (Program.getUserPreferences().isSyncMaps()) {
       this.saveMaps();

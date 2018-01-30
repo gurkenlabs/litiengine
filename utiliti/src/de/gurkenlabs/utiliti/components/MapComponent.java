@@ -427,7 +427,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), "Name:", "Enter blueprint name", JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
+    Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_prompt_name"), Resources.get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
     if (name == null) {
       return;
     }
@@ -633,7 +633,7 @@ public class MapComponent extends EditorComponent {
 
         Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
         if (current.isPresent()) {
-          int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to replace the existing map '" + map.getFileName() + "' ?", "Replace Map", JOptionPane.YES_NO_OPTION);
+          int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getFileName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
 
           if (n == JOptionPane.YES_OPTION) {
             this.getMaps().remove(current.get());
@@ -693,6 +693,7 @@ public class MapComponent extends EditorComponent {
   }
 
   public void exportMap(Map map) {
+    // TODO: replace by XmlExportDialog call
     JFileChooser chooser;
     try {
       String source = EditorScreen.instance().getProjectPath();
