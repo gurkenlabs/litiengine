@@ -76,6 +76,7 @@ import de.gurkenlabs.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 
 public class MapComponent extends EditorComponent {
   public enum TransformType {
@@ -601,6 +602,8 @@ public class MapComponent extends EditorComponent {
     } else {
       this.loadEnvironment(null);
     }
+
+    EditorScreen.instance().updateGameFileMaps();
   }
 
   public void importMap() {
@@ -608,22 +611,11 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    JFileChooser chooser;
-    try {
-      String defaultPath = EditorScreen.instance().getProjectPath() != null ? EditorScreen.instance().getProjectPath() : new File(".").getCanonicalPath();
-      chooser = new JFileChooser(defaultPath);
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-      chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-      chooser.setDialogTitle("Import Map");
-      FileFilter filter = new FileNameExtensionFilter("tmx - Tilemap XML", Map.FILE_EXTENSION);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
+    final IMapLoader tmxLoader = new TmxMapLoader();
+    XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, files -> {
+      for (File file : files) {
 
-      int result = chooser.showOpenDialog(Game.getScreenManager().getRenderComponent());
-      if (result == JFileChooser.APPROVE_OPTION) {
-
-        final IMapLoader tmxLoader = new TmxMapLoader();
-        String mapPath = chooser.getSelectedFile().toString();
+        String mapPath = file.toString();
         Map map = (Map) tmxLoader.loadMap(mapPath);
         if (map == null) {
           log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
@@ -680,13 +672,11 @@ public class MapComponent extends EditorComponent {
         }
 
         this.screen.getGameFile().getTilesets().addAll(map.getExternalTilesets());
-
+        EditorScreen.instance().updateGameFileMaps();
         this.loadEnvironment(map);
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
+    });
   }
 
   public void exportMap() {

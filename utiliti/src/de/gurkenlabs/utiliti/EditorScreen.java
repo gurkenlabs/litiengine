@@ -238,7 +238,7 @@ public class EditorScreen extends Screen {
       this.loadCustomEmitters(this.getProjectPath());
 
       // update new game file by the loaded information
-      this.updateGameFile();
+      this.updateGameFileMaps();
 
       // display first available map after loading all stuff
       if (!this.mapComponent.getMaps().isEmpty()) {
@@ -455,7 +455,7 @@ public class EditorScreen extends Screen {
   }
 
   public void save(boolean selectFile) {
-    this.updateGameFile();
+    this.updateGameFileMaps();
 
     if (this.getGameFile() == null) {
       return;
@@ -526,6 +526,15 @@ public class EditorScreen extends Screen {
     this.changedMaps.add((Map) Game.getEnvironment().getMap());
   }
 
+  public void updateGameFileMaps() {
+    this.getGameFile().getMaps().clear();
+    for (Map map : this.mapComponent.getMaps()) {
+      this.getGameFile().getMaps().add(map);
+    }
+
+    Program.getAssetTree().forceUpdate();
+  }
+
   private String saveGameFile(String target) {
     String saveFile = this.getGameFile().save(target, Program.getUserPreferences().isCompressFile());
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
@@ -548,17 +557,6 @@ public class EditorScreen extends Screen {
         String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
         log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
       }
-    }
-  }
-
-  /**
-   * Gets the currenly configured spritefiles/spriteinfos and maps from the
-   * different components and updates the game file object.
-   */
-  private void updateGameFile() {
-    this.getGameFile().getMaps().clear();
-    for (Map map : this.mapComponent.getMaps()) {
-      this.getGameFile().getMaps().add(map);
     }
   }
 

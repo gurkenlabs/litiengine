@@ -31,17 +31,17 @@ public final class XmlImportDialog {
       String source = EditorScreen.instance().getProjectPath();
       chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
 
-      FileFilter filter = new FileNameExtensionFilter(name + " XML", extension);
+      FileFilter filter = new FileNameExtensionFilter("." + extension + " - " + name + " XML", extension);
       chooser.setFileFilter(filter);
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogType(JFileChooser.OPEN_DIALOG);
       chooser.addChoosableFileFilter(filter);
       chooser.setMultiSelectionEnabled(true);
       if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
         consumer.accept(chooser.getSelectedFiles());
         Program.getAssetTree().forceUpdate();
       }
-    } catch (
-
-    IOException e) {
+    } catch (IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
   }

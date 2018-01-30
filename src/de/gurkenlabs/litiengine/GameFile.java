@@ -162,10 +162,6 @@ public class GameFile implements Serializable {
     return newFile.toString();
   }
 
-  public void setTileSets(final List<SpriteSheetInfo> tileSets) {
-    this.spriteSheets = tileSets;
-  }
-
   private static GameFile getGameFileFromFile(String file) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(GameFile.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
