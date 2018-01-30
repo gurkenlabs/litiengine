@@ -53,9 +53,11 @@ public class GameFile implements Serializable {
   private List<Tileset> tilesets;
 
   @XmlElementWrapper(name = "emitters")
+  @XmlElement(name = "emitter")
   private List<EmitterData> emitters;
 
   @XmlElementWrapper(name = "blueprints")
+  @XmlElement(name = "blueprint")
   private List<Blueprint> blueprints;
 
   public GameFile() {
