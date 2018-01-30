@@ -321,11 +321,16 @@ public class MapSelectionPanel extends JSplitPane {
     int end = mapList.getModel().getSize() - 1;
     if (end >= 0) {
       listObjectLayers.setSelectionInterval(start, end);
+      this.listObjectLayers.setSelectedIndex(0);
     }
   }
 
   public int getSelectedLayerIndex() {
     return listObjectLayers.getSelectedIndex();
+  }
+
+  public void selectLayer(int index) {
+    this.listObjectLayers.setSelectedIndex(index);
   }
 
   public void focus(final IMapObject mapObject) {

@@ -114,6 +114,8 @@ public class MapComponent extends EditorComponent {
   private final List<Consumer<Integer>> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
   private final List<Consumer<Map>> mapLoadedConsumer;
+
+  private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
   private final java.util.Map<String, List<MapObject>> selectedObjects;
@@ -156,6 +158,7 @@ public class MapComponent extends EditorComponent {
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
     this.maps = new ArrayList<>();
+    this.selectedLayers = new ConcurrentHashMap<>();
     this.cameraFocus = new ConcurrentHashMap<>();
     this.transformRects = new ConcurrentHashMap<>();
     this.dragLocationMapObjects = new ConcurrentHashMap<>();
@@ -286,13 +289,16 @@ public class MapComponent extends EditorComponent {
     this.loading = true;
     try {
       if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
+        final String mapName = Game.getEnvironment().getMap().getFileName();
         double x = Game.getCamera().getFocus().getX();
         double y = Game.getCamera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
-        this.cameraFocus.put(Game.getEnvironment().getMap().getFileName(), newPoint);
+        this.cameraFocus.put(mapName, newPoint);
+        this.selectedLayers.put(mapName, EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex());
       }
 
       Point2D newFocus = null;
+
       if (this.cameraFocus.containsKey(map.getFileName())) {
         newFocus = this.cameraFocus.get(map.getFileName());
       } else {
@@ -310,6 +316,10 @@ public class MapComponent extends EditorComponent {
       Program.updateScrollBars();
 
       EditorScreen.instance().getMapSelectionPanel().setSelection(map.getFileName());
+      if (this.selectedLayers.containsKey(map.getFileName())) {
+        EditorScreen.instance().getMapSelectionPanel().selectLayer(this.selectedLayers.get(map.getFileName()));
+      }
+
       EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
 
       for (Consumer<Map> cons : this.mapLoadedConsumer) {
