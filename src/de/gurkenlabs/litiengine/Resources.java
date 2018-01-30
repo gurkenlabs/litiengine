@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -45,10 +46,19 @@ public final class Resources {
     if (key == null) {
       return null;
     }
-    return get(DEFAULT_BUNDLE, key);
+
+    return getFrom(DEFAULT_BUNDLE, key);
   }
 
-  public static String get(final String bundleName, final String key) {
+  public static String get(final String key, Object... args) {
+    if (key == null) {
+      return null;
+    }
+
+    return getFrom(DEFAULT_BUNDLE, key, args);
+  }
+
+  public static String getFrom(final String bundleName, final String key, Object... args) {
     if (key == bundleName) {
       return null;
     }
@@ -57,7 +67,12 @@ public final class Resources {
 
       String value = defaultBundle.getString(key);
 
-      return encoding.equals(ENCODING_ISO_8859_1) ? value : new String(value.getBytes(ENCODING_ISO_8859_1), encoding);
+      String decodedValue = encoding.equals(ENCODING_ISO_8859_1) ? value : new String(value.getBytes(ENCODING_ISO_8859_1), encoding);
+      if (args.length > 0) {
+        return MessageFormat.format(decodedValue, args);
+      }
+
+      return decodedValue;
     } catch (final MissingResourceException | UnsupportedEncodingException me) {
       final StringWriter sw = new StringWriter();
       me.printStackTrace(new PrintWriter(sw));
