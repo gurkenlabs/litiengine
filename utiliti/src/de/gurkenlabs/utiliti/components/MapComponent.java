@@ -64,6 +64,8 @@ import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
+import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.util.MathUtilities;
@@ -280,9 +282,10 @@ public class MapComponent extends EditorComponent {
       }
     });
 
-    this.setupControls();
+    this.setupKeyboardControls();
     super.prepare();
     this.setupMouseControls();
+    this.initialized = true;
   }
 
   public void loadEnvironment(Map map) {
@@ -1037,7 +1040,7 @@ public class MapComponent extends EditorComponent {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
   }
 
-  private void setupControls() {
+  private void setupKeyboardControls() {
     if (this.initialized) {
       return;
     }
@@ -1060,18 +1063,14 @@ public class MapComponent extends EditorComponent {
       }
     });
 
-    Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> {
-      this.centerCameraOnFocus();
-    });
+    Input.keyboard().onKeyPressed(KeyEvent.VK_SPACE, e -> this.centerCameraOnFocus());
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_CONTROL, e -> {
       if (this.currentEditMode == EDITMODE_EDIT) {
         this.setEditMode(EDITMODE_MOVE);
       }
     });
-    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> {
-      this.setEditMode(EDITMODE_EDIT);
-    });
+    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> this.setEditMode(EDITMODE_EDIT));
 
     Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
@@ -1094,49 +1093,6 @@ public class MapComponent extends EditorComponent {
         this.delete();
       }
     });
-
-    Input.mouse().onWheelMoved(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      final Point2D currentFocus = Game.getCamera().getFocus();
-      // horizontal scrolling
-      if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
-        if (e.getWheelRotation() < 0) {
-
-          Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
-          Game.getCamera().setFocus(newFocus);
-        } else {
-          Point2D newFocus = new Point2D.Double(currentFocus.getX() + this.scrollSpeed, currentFocus.getY());
-          Game.getCamera().setFocus(newFocus);
-        }
-
-        Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewPort().getCenterX());
-        return;
-      }
-
-      if (Input.keyboard().isPressed(KeyEvent.VK_ALT)) {
-        if (e.getWheelRotation() < 0) {
-          this.zoomIn();
-        } else {
-          this.zoomOut();
-        }
-
-        return;
-      }
-
-      if (e.getWheelRotation() < 0) {
-        Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() - this.scrollSpeed);
-        Game.getCamera().setFocus(newFocus);
-
-      } else {
-        Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
-        Game.getCamera().setFocus(newFocus);
-      }
-
-      Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewPort().getCenterY());
-    });
   }
 
   private void setupMouseControls() {
@@ -1144,197 +1100,256 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    this.onMouseMoved(e -> {
-      if (this.getFocus() == null) {
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-        currentTransform = TransformType.NONE;
+    this.onMouseWheelScrolled(this::handleMouseWheelScrolled);
+    this.onMouseMoved(this::handleMouseMoved);
+    this.onMousePressed(this::handleMousePressed);
+    this.onMouseDragged(this::handleMouseDragged);
+    this.onMouseReleased(this::handleMouseReleased);
+  }
+
+  private void handleMouseWheelScrolled(ComponentMouseWheelEvent e) {
+    if (!this.hasFocus()) {
+      return;
+    }
+
+    final Point2D currentFocus = Game.getCamera().getFocus();
+    // horizontal scrolling
+    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
+      if (e.getEvent().getWheelRotation() < 0) {
+
+        Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
+        Game.getCamera().setFocus(newFocus);
+      } else {
+        Point2D newFocus = new Point2D.Double(currentFocus.getX() + this.scrollSpeed, currentFocus.getY());
+        Game.getCamera().setFocus(newFocus);
+      }
+
+      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewPort().getCenterX());
+      return;
+    }
+
+    if (Input.keyboard().isPressed(KeyEvent.VK_ALT)) {
+      if (e.getEvent().getWheelRotation() < 0) {
+        this.zoomIn();
+      } else {
+        this.zoomOut();
+      }
+
+      return;
+    }
+
+    if (e.getEvent().getWheelRotation() < 0) {
+      Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() - this.scrollSpeed);
+      Game.getCamera().setFocus(newFocus);
+
+    } else {
+      Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
+      Game.getCamera().setFocus(newFocus);
+    }
+
+    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewPort().getCenterY());
+  }
+
+  /***
+   * Handles the mouse moved event and executes the following:
+   * <ol>
+   * <li>Set cursor image depending on the hovered transform control</li>
+   * <li>Update the currently active transform field.</li>
+   * </ol>
+   * 
+   * @param e
+   *          The mouse event of the calling {@link GuiComponent}
+   */
+  private void handleMouseMoved(ComponentMouseEvent e) {
+    if (this.getFocus() == null) {
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      this.currentTransform = TransformType.NONE;
+      return;
+    }
+
+    boolean hovered = false;
+    if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+      return;
+    }
+    for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
+      Rectangle2D rect = entry.getValue();
+      Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
+      if (hoverrect.contains(Input.mouse().getMapLocation())) {
+        hovered = true;
+        if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
+          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
+        } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
+          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
+        } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
+          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
+        } else {
+          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
+        }
+
+        this.currentTransform = entry.getKey();
+        break;
+      }
+    }
+
+    if (!hovered) {
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      this.currentTransform = TransformType.NONE;
+    }
+  }
+
+  private void handleMousePressed(ComponentMouseEvent e) {
+    if (!this.hasFocus()) {
+      return;
+    }
+
+    switch (this.currentEditMode) {
+    case EDITMODE_CREATE:
+      this.startPoint = Input.mouse().getMapLocation();
+      break;
+    case EDITMODE_MOVE:
+      break;
+    case EDITMODE_EDIT:
+      if (this.isMoving || this.currentTransform != TransformType.NONE || SwingUtilities.isRightMouseButton(e.getEvent())) {
         return;
       }
 
-      boolean hovered = false;
+      final Point2D mouse = Input.mouse().getMapLocation();
+      this.startPoint = mouse;
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void handleMouseDragged(ComponentMouseEvent e) {
+    if (!this.hasFocus()) {
+      return;
+    }
+
+    switch (this.currentEditMode) {
+    case EDITMODE_CREATE:
+      if (startPoint == null) {
+        return;
+      }
+
+      newObjectArea = this.getCurrentMouseSelectionArea(true);
+      break;
+    case EDITMODE_EDIT:
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        return;
-      }
-      for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
-        Rectangle2D rect = entry.getValue();
-        Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
-        if (hoverrect.contains(Input.mouse().getMapLocation())) {
-          hovered = true;
-          if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
-          } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
-          } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
-          } else {
-            Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
-          }
-
-          currentTransform = entry.getKey();
-          break;
-        }
-      }
-
-      if (!hovered) {
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-        currentTransform = TransformType.NONE;
-      }
-    });
-
-    this.onMousePressed(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        this.startPoint = Input.mouse().getMapLocation();
-        break;
-      case EDITMODE_MOVE:
-        break;
-      case EDITMODE_EDIT:
-        if (this.isMoving || this.currentTransform != TransformType.NONE || SwingUtilities.isRightMouseButton(e.getEvent())) {
-          return;
-        }
-
-        final Point2D mouse = Input.mouse().getMapLocation();
-        this.startPoint = mouse;
-        break;
-      }
-    });
-
-    this.onMouseDragged(e -> {
-      if (!this.hasFocus()) {
-        return;
-      }
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        if (startPoint == null) {
-          return;
-        }
-
-        newObjectArea = this.getCurrentMouseSelectionArea(true);
-        break;
-      case EDITMODE_EDIT:
-        if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-          this.handleSelectedEntitiesDrag();
-          return;
-        } else if (this.currentTransform != TransformType.NONE) {
-          if (!this.isTransforming) {
-            this.isTransforming = true;
-            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-          }
-
-          this.handleTransform();
-          return;
-        }
-        break;
-      case EDITMODE_MOVE:
         this.handleSelectedEntitiesDrag();
+        return;
+      } else if (this.currentTransform != TransformType.NONE) {
+        if (!this.isTransforming) {
+          this.isTransforming = true;
+          UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
+        }
 
-        break;
-      default:
+        this.handleTransform();
+        return;
+      }
+      break;
+    case EDITMODE_MOVE:
+      this.handleSelectedEntitiesDrag();
+
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void handleMouseReleased(ComponentMouseEvent e) {
+    if (!this.hasFocus()) {
+      return;
+    }
+
+    this.dragPoint = null;
+    this.dragLocationMapObjects.clear();
+    this.dragSizeMapObject = null;
+
+    switch (this.currentEditMode) {
+    case EDITMODE_CREATE:
+      if (this.newObjectArea == null) {
         break;
       }
-    });
+      IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
+      this.newObjectArea = null;
+      this.setFocus(mo, true);
+      EditorScreen.instance().getMapObjectPanel().bind(mo);
+      this.setEditMode(EDITMODE_EDIT);
+      break;
+    case EDITMODE_MOVE:
 
-    this.onMouseReleased(e -> {
-      if (!this.hasFocus()) {
+      if (this.isMoving) {
+        this.isMoving = false;
+
+        for (IMapObject selected : this.getSelectedMapObjects()) {
+          UndoManager.instance().mapObjectChanged(selected);
+        }
+
+        UndoManager.instance().endOperation();
+      }
+
+      break;
+    case EDITMODE_EDIT:
+      if (this.isMoving || this.isTransforming) {
+        this.isMoving = false;
+        this.isTransforming = false;
+        UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+      }
+
+      if (this.startPoint == null) {
         return;
       }
 
-      this.dragPoint = null;
-      this.dragLocationMapObjects.clear();
-      this.dragSizeMapObject = null;
-
-      switch (this.currentEditMode) {
-      case EDITMODE_CREATE:
-        if (this.newObjectArea == null) {
-          break;
-        }
-        IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
-        this.newObjectArea = null;
-        this.setFocus(mo, true);
-        EditorScreen.instance().getMapObjectPanel().bind(mo);
-        this.setEditMode(EDITMODE_EDIT);
-        break;
-      case EDITMODE_MOVE:
-
-        if (this.isMoving) {
-          this.isMoving = false;
-
-          for (IMapObject selected : this.getSelectedMapObjects()) {
-            UndoManager.instance().mapObjectChanged(selected);
-          }
-
-          UndoManager.instance().endOperation();
+      Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
+      boolean somethingIsFocused = false;
+      boolean currentObjectFocused = false;
+      for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
+        if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+          continue;
         }
 
-        break;
-      case EDITMODE_EDIT:
-        if (this.isMoving || this.isTransforming) {
-          this.isMoving = false;
-          this.isTransforming = false;
-          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
-        }
-
-        if (this.startPoint == null) {
-          return;
-        }
-
-        Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
-        boolean somethingIsFocused = false;
-        boolean currentObjectFocused = false;
-        for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
-          if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+        for (IMapObject mapObject : layer.getMapObjects()) {
+          if (mapObject == null) {
             continue;
           }
 
-          for (IMapObject mapObject : layer.getMapObjects()) {
-            if (mapObject == null) {
-              continue;
-            }
-
-            MapObjectType type = MapObjectType.get(mapObject.getType());
-            if (type == MapObjectType.PATH) {
-              continue;
-            }
-
-            if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
-              continue;
-            }
-
-            if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
-              currentObjectFocused = true;
-              continue;
-            }
-
-            this.setSelection(mapObject, false, true);
-            if (somethingIsFocused) {
-              continue;
-            }
-
-            this.setFocus(mapObject, false);
-            EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-            somethingIsFocused = true;
+          MapObjectType type = MapObjectType.get(mapObject.getType());
+          if (type == MapObjectType.PATH) {
+            continue;
           }
-        }
 
-        if (!somethingIsFocused && !currentObjectFocused) {
-          this.setFocus(null, true);
-          EditorScreen.instance().getMapObjectPanel().bind(null);
-        }
+          if (!GeometricUtilities.intersects(rect, mapObject.getBoundingBox())) {
+            continue;
+          }
 
-        break;
-      default:
-        break;
+          if (this.getFocusedMapObject() != null && mapObject.getId() == this.getFocusedMapObject().getId()) {
+            currentObjectFocused = true;
+            continue;
+          }
+
+          this.setSelection(mapObject, false, true);
+          if (somethingIsFocused) {
+            continue;
+          }
+
+          this.setFocus(mapObject, false);
+          EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+          somethingIsFocused = true;
+        }
       }
 
-      this.startPoint = null;
-    });
+      if (!somethingIsFocused && !currentObjectFocused) {
+        this.setFocus(null, true);
+        EditorScreen.instance().getMapObjectPanel().bind(null);
+      }
 
-    this.initialized = true;
+      break;
+    default:
+      break;
+    }
+
+    this.startPoint = null;
   }
 
   private int snapX(double x) {
