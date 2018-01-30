@@ -52,7 +52,6 @@ public class GamepadManager implements IGamepadManager {
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
-          log.log(Level.SEVERE, e.getMessage(), e);
           Thread.currentThread().interrupt();
           break;
         }
