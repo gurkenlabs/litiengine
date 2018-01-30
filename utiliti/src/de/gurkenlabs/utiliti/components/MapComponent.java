@@ -275,17 +275,20 @@ public class MapComponent extends EditorComponent {
   @Override
   public void prepare() {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
-    Game.getScreenManager().getRenderComponent().addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusLost(FocusEvent e) {
-        startPoint = null;
-      }
-    });
+    if (!this.initialized) {
+      Game.getScreenManager().getRenderComponent().addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusLost(FocusEvent e) {
+          startPoint = null;
+        }
+      });
 
-    this.setupKeyboardControls();
+      this.setupKeyboardControls();
+      this.setupMouseControls();
+      this.initialized = true;
+    }
+
     super.prepare();
-    this.setupMouseControls();
-    this.initialized = true;
   }
 
   public void loadEnvironment(Map map) {
@@ -1041,10 +1044,6 @@ public class MapComponent extends EditorComponent {
   }
 
   private void setupKeyboardControls() {
-    if (this.initialized) {
-      return;
-    }
-
     Input.keyboard().onKeyReleased(KeyEvent.VK_ADD, e -> {
       if (this.isSuspended() || !this.isVisible()) {
         return;
@@ -1096,10 +1095,6 @@ public class MapComponent extends EditorComponent {
   }
 
   private void setupMouseControls() {
-    if (this.initialized) {
-      return;
-    }
-
     this.onMouseWheelScrolled(this::handleMouseWheelScrolled);
     this.onMouseMoved(this::handleMouseMoved);
     this.onMousePressed(this::handleMousePressed);
