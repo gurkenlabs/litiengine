@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -33,7 +32,6 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  * The Class GraphicsEngine.
  */
 public final class RenderEngine implements IRenderEngine {
-  private static final Logger log = Logger.getLogger(RenderEngine.class.getName());
 
   private final EntityYComparator entityComparator;
 

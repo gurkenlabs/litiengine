@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
@@ -28,36 +27,26 @@ import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.io.ImageSerializer;
 
+@SuppressWarnings("serial")
 public class RenderComponent extends Canvas implements IRenderComponent {
-  private static final Logger log = Logger.getLogger(RenderComponent.class.getName());
-
-  private static final long serialVersionUID = 5092360478850476013L;
-
   private static final int DEBUG_MOUSE_SIZE = 5;
+  private final transient List<Consumer<Integer>> fpsChangedConsumer;
+  private final transient List<Consumer<Graphics2D>> renderedConsumer;
 
   private transient BufferStrategy currentBufferStrategy;
 
   private float currentAlpha;
 
   private transient Image cursorImage;
-
   private int cursorOffsetX;
-
   private int cursorOffsetY;
 
   private long fadeInStart;
-
   private int fadeInTime;
   private long fadeOutStart;
-
   private int fadeOutTime;
 
-  private final transient List<Consumer<Integer>> fpsChangedConsumer;
-  private final transient List<Consumer<Graphics2D>> renderedConsumer;
-
-  /** The frame count. */
   private int frameCount = 0;
-  /** The last fps time. */
   private long lastFpsTime = System.currentTimeMillis();
 
   private boolean takeScreenShot;
