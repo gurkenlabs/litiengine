@@ -537,6 +537,9 @@ public class Program {
   }
 
   private static Component initConsole() {
+    // TODO: implement possibility to configure the desired log level
+    //// Logger root = Logger.getLogger("de.gurkenlabs");
+    //// root.setLevel(Level.FINE);
     Logger root = Logger.getLogger("");
     JTextPane consoleTextArea = new JTextPane();
     JScrollPane consoleScrollPane = new JScrollPane();
@@ -579,6 +582,7 @@ public class Program {
     JButton redo = new JButton();
     redo.setIcon(new ImageIcon(Resources.getImage("button-redo.png")));
     basicMenu.add(redo);
+    redo.addActionListener(a -> UndoManager.instance().redo());
 
     undo.setEnabled(false);
     redo.setEnabled(false);

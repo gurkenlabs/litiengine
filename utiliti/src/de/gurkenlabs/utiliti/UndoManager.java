@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
@@ -13,13 +15,17 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
+import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class UndoManager {
-  private static final int MAX_STACK_SIZE = 100;
+  private static final Logger log = Logger.getLogger(MapComponent.class.getName());
+  private static final int MAX_STACK_SIZE = 10000;
+  private static int nextOperation = 1;
   private UndoState[] undoStack;
   private List<IMapObject> changing;
   private int currentIndex = -1;
   private final String mapName;
+  private int operation = 0;
 
   private static HashMap<String, UndoManager> instance;
   private static List<Consumer<UndoManager>> undoStackChangedConsumers;
@@ -45,26 +51,43 @@ public class UndoManager {
     return newUndoManager;
   }
 
+  public void beginOperation() {
+    this.operation = nextOperation;
+  }
+
+  public void endOperation() {
+    ++nextOperation;
+    this.operation = 0;
+  }
+
   public void undo() {
     if (this.currentIndex < 0) {
       return;
     }
 
-    UndoState state = this.undoStack[this.currentIndex];
-    switch (state.operationType) {
-    case ADD:
-      EditorScreen.instance().getMapComponent().delete(state.target);
-      break;
-    case CHANGE:
-      restoreState(state.target, state.oldMapObject);
-      break;
-    case DELETE:
-      EditorScreen.instance().getMapComponent().add(state.target, state.layer);
-      break;
-    }
+    final int currentOperation = this.undoStack[this.currentIndex].getOperation();
+    UndoState state = null;
 
-    this.currentIndex--;
+    int stepsUndone = 0;
+    do {
+      stepsUndone++;
+      state = this.undoStack[this.currentIndex];
+      switch (state.operationType) {
+      case ADD:
+        EditorScreen.instance().getMapComponent().delete(state.target);
+        break;
+      case CHANGE:
+        restoreState(state.target, state.oldMapObject);
+        break;
+      case DELETE:
+        EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+        break;
+      }
 
+      this.currentIndex--;
+    } while (currentOperation != 0 && this.currentIndex >= 0 && this.undoStack[this.currentIndex].getOperation() == currentOperation);
+
+    log.log(Level.FINE, "{0} steps undone.", stepsUndone);
     fireUndoStackChangedEvent(this);
   }
 
@@ -78,21 +101,28 @@ public class UndoManager {
       return;
     }
 
-    this.currentIndex++;
-    UndoState state = this.undoStack[this.currentIndex];
+    final int currentOperation = this.undoStack[this.currentIndex + 1].getOperation();
+    UndoState state = null;
+    int stepsRedone = 0;
+    do {
+      ++stepsRedone;
+      ++this.currentIndex;
+      state = this.undoStack[this.currentIndex];
 
-    switch (state.operationType) {
-    case ADD:
-      EditorScreen.instance().getMapComponent().add(state.target, state.layer);
-      break;
-    case CHANGE:
-      restoreState(state.target, state.newMapObject);
-      break;
-    case DELETE:
-      EditorScreen.instance().getMapComponent().delete(state.target);
-      break;
-    }
+      switch (state.operationType) {
+      case ADD:
+        EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+        break;
+      case CHANGE:
+        restoreState(state.target, state.newMapObject);
+        break;
+      case DELETE:
+        EditorScreen.instance().getMapComponent().delete(state.target);
+        break;
+      }
+    } while (currentOperation != 0 && this.currentIndex < MAX_STACK_SIZE && this.undoStack[this.currentIndex + 1] != null && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
 
+    log.log(Level.FINE, "{0} steps redone.", stepsRedone);
     fireUndoStackChangedEvent(this);
   }
 
@@ -134,19 +164,22 @@ public class UndoManager {
     }
 
     this.ensureStackSize();
+
     this.currentIndex++;
+    this.clearRedoSteps();
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), clone(mapObject), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
-  public void mapObjectDeleting(IMapObject mapObject) {
+  public void mapObjectDeleted(IMapObject mapObject) {
     if (mapObject == null) {
       return;
     }
 
     this.ensureStackSize();
     this.currentIndex++;
+    this.clearRedoSteps();
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.DELETE);
     fireUndoStackChangedEvent(this);
@@ -159,6 +192,8 @@ public class UndoManager {
 
     this.ensureStackSize();
     this.currentIndex++;
+    this.clearRedoSteps();
+
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD);
     fireUndoStackChangedEvent(this);
   }
@@ -191,7 +226,10 @@ public class UndoManager {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    EditorScreen.instance().getMapComponent().setFocus(target, true);
+    if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
+      EditorScreen.instance().getMapObjectPanel().bind(target);
+      EditorScreen.instance().getMapSelectionPanel().focus(target);
+    }
   }
 
   private static IMapObject clone(IMapObject mapObject) {
@@ -224,6 +262,17 @@ public class UndoManager {
     }
   }
 
+  private void clearRedoSteps() {
+    // whenever a new UndoState gets added, while we're in the middle of the current
+    // stack, we need to remove all future redo steps because the new state will now
+    // be the last element
+    int index = this.currentIndex + 1;
+    while (this.undoStack[index] != null && index < MAX_STACK_SIZE) {
+      this.undoStack[index] = null;
+      index++;
+    }
+  }
+
   public String getMapName() {
     return mapName;
   }
@@ -238,8 +287,10 @@ public class UndoManager {
     private final IMapObject newMapObject;
     private final IMapObjectLayer layer;
     private final OperationType operationType;
+    private final int operation;
 
     public UndoState(IMapObject target, OperationType operationType) {
+      this.operation = UndoManager.this.operation;
       this.target = target;
       this.layer = Game.getEnvironment().getMap().getMapObjectLayer(target);
       this.oldMapObject = null;
@@ -248,7 +299,7 @@ public class UndoManager {
     }
 
     public UndoState(IMapObject target, IMapObject oldMapObject, IMapObject newMapObject, OperationType operationType) {
-
+      this.operation = UndoManager.this.operation;
       this.target = target;
       this.oldMapObject = operationType != OperationType.ADD ? oldMapObject : null;
       this.newMapObject = operationType != OperationType.DELETE ? newMapObject : null;
@@ -260,6 +311,10 @@ public class UndoManager {
     @Override
     public String toString() {
       return target.getName() + "(" + target.getId() + ") " + this.operationType.toString();
+    }
+
+    public int getOperation() {
+      return this.operation;
     }
   }
 }

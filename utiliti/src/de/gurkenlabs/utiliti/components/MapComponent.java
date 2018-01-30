@@ -117,6 +117,7 @@ public class MapComponent extends EditorComponent {
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
   private final java.util.Map<String, List<MapObject>> selectedObjects;
+  private final java.util.Map<IMapObject, Point2D> dragLocationMapObjects;
 
   private int currentEditMode = EDITMODE_EDIT;
   private TransformType currentTransform;
@@ -129,7 +130,7 @@ public class MapComponent extends EditorComponent {
 
   private Point2D startPoint;
   private Point2D dragPoint;
-  private Point2D dragLocationMapObject;
+
   private boolean isMoving;
   private boolean isTransforming;
   private boolean isFocussing;
@@ -157,6 +158,7 @@ public class MapComponent extends EditorComponent {
     this.maps = new ArrayList<>();
     this.cameraFocus = new ConcurrentHashMap<>();
     this.transformRects = new ConcurrentHashMap<>();
+    this.dragLocationMapObjects = new ConcurrentHashMap<>();
     this.screen = screen;
     Game.getCamera().onZoomChanged(zoom -> {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
@@ -320,6 +322,7 @@ public class MapComponent extends EditorComponent {
 
   public void add(IMapObject mapObject) {
     this.add(mapObject, getCurrentLayer());
+    UndoManager.instance().mapObjectAdded(mapObject);
   }
 
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
@@ -332,7 +335,6 @@ public class MapComponent extends EditorComponent {
     Game.getScreenManager().getRenderComponent().requestFocus();
     this.setFocus(mapObject, true);
     this.setEditMode(EDITMODE_EDIT);
-    UndoManager.instance().mapObjectAdded(mapObject);
   }
 
   public void copy() {
@@ -357,21 +359,23 @@ public class MapComponent extends EditorComponent {
 
   public void cut() {
     this.copiedMapObject = this.getFocusedMapObject();
-    UndoManager.instance().mapObjectDeleting(this.copiedMapObject);
+    UndoManager.instance().mapObjectDeleted(this.copiedMapObject);
     this.delete(this.copiedMapObject);
   }
 
   public void delete() {
-    final IMapObject deleteObject = this.getFocusedMapObject();
-    if (deleteObject == null) {
-      return;
-    }
+    UndoManager.instance().beginOperation();
+    try {
+      for (IMapObject deleteObject : this.selectedObjects.get(Game.getEnvironment().getMap().getFileName())) {
+        if (deleteObject == null) {
+          continue;
+        }
 
-    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the entity [" + deleteObject.getId() + "]", "Delete Entity?", JOptionPane.YES_NO_OPTION);
-
-    if (n == JOptionPane.OK_OPTION) {
-      UndoManager.instance().mapObjectDeleting(deleteObject);
-      this.delete(deleteObject);
+        UndoManager.instance().mapObjectDeleted(deleteObject);
+        this.delete(deleteObject);
+      }
+    } finally {
+      UndoManager.instance().endOperation();
     }
   }
 
@@ -387,7 +391,9 @@ public class MapComponent extends EditorComponent {
       Game.getEnvironment().getAmbientLight().createImage();
     }
 
-    this.setFocus(null, true);
+    if (mapObject.equals(this.getFocusedMapObject())) {
+      this.setFocus(null, true);
+    }
   }
 
   public void defineBlueprint() {
@@ -887,17 +893,18 @@ public class MapComponent extends EditorComponent {
 
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
-      this.dragLocationMapObject = new Point2D.Double(transformObject.getX(), transformObject.getY());
+      this.dragLocationMapObjects.put(this.getFocusedMapObject(), new Point2D.Double(transformObject.getX(), transformObject.getY()));
       this.dragSizeMapObject = new Dimension(transformObject.getDimension());
       return;
     }
 
+    Point2D dragLocationMapObject = this.dragLocationMapObjects.get(this.getFocusedMapObject());
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     double newWidth = this.dragSizeMapObject.getWidth();
     double newHeight = this.dragSizeMapObject.getHeight();
-    double newX = this.snapX(this.dragLocationMapObject.getX());
-    double newY = this.snapY(this.dragLocationMapObject.getY());
+    double newX = this.snapX(dragLocationMapObject.getX());
+    double newY = this.snapY(dragLocationMapObject.getY());
 
     switch (this.currentTransform) {
     case DOWN:
@@ -911,12 +918,12 @@ public class MapComponent extends EditorComponent {
       newHeight += deltaY;
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, this.dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
       break;
     case LEFT:
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, this.dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
       break;
     case RIGHT:
       newWidth += deltaX;
@@ -924,20 +931,20 @@ public class MapComponent extends EditorComponent {
     case UP:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, this.dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
       break;
     case UPLEFT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, this.dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, this.dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
       break;
     case UPRIGHT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, this.dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
       newWidth += deltaX;
       break;
     default:
@@ -958,6 +965,26 @@ public class MapComponent extends EditorComponent {
     this.updateTransformControls();
   }
 
+  private void handleSelectedEntitiesDrag() {
+    final String currentMap = Game.getEnvironment().getMap().getFileName();
+    if (!this.isMoving) {
+      this.isMoving = true;
+
+      UndoManager.instance().beginOperation();
+      for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+        UndoManager.instance().mapObjectChanging(selected);
+      }
+    }
+
+    for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+      this.handleEntityDrag(selected);
+    }
+
+    if (this.selectedObjects.get(currentMap).stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
+      Game.getEnvironment().getAmbientLight().createImage();
+    }
+  }
+
   private void handleEntityDrag(IMapObject mapObject) {
     final IMapObject dragObject = mapObject;
     if (dragObject == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
@@ -966,24 +993,28 @@ public class MapComponent extends EditorComponent {
 
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
-      this.dragLocationMapObject = new Point2D.Double(dragObject.getX(), dragObject.getY());
       return;
     }
 
+    if (!this.dragLocationMapObjects.containsKey(mapObject)) {
+      this.dragLocationMapObjects.put(mapObject, new Point2D.Double(dragObject.getX(), dragObject.getY()));
+    }
+
+    Point2D dragLocationMapObject = this.dragLocationMapObjects.get(mapObject);
+
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    double newX = this.snapX(this.dragLocationMapObject.getX() + deltaX);
-    double newY = this.snapY(this.dragLocationMapObject.getY() + deltaY);
+    double newX = this.snapX(dragLocationMapObject.getX() + deltaX);
+    double newY = this.snapY(dragLocationMapObject.getY() + deltaY);
     dragObject.setX((int) newX);
     dragObject.setY((int) newY);
 
     Game.getEnvironment().reloadFromMap(dragObject.getId());
-    if (MapObjectType.get(dragObject.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(dragObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().createImage();
-    }
 
-    EditorScreen.instance().getMapObjectPanel().bind(dragObject);
-    this.updateTransformControls();
+    if (mapObject.equals(this.getFocusedMapObject())) {
+      EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+      this.updateTransformControls();
+    }
   }
 
   private void setCurrentZoom() {
@@ -1215,13 +1246,7 @@ public class MapComponent extends EditorComponent {
         break;
       case EDITMODE_EDIT:
         if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-          if (!this.isMoving) {
-            this.isMoving = true;
-
-            UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-          }
-
-          this.handleEntityDrag(this.getFocusedMapObject());
+          this.handleSelectedEntitiesDrag();
           return;
         } else if (this.currentTransform != TransformType.NONE) {
           if (!this.isTransforming) {
@@ -1234,12 +1259,8 @@ public class MapComponent extends EditorComponent {
         }
         break;
       case EDITMODE_MOVE:
-        if (!this.isMoving) {
-          this.isMoving = true;
-          UndoManager.instance().mapObjectChanging(this.getFocusedMapObject());
-        }
+        this.handleSelectedEntitiesDrag();
 
-        this.handleEntityDrag(this.getFocusedMapObject());
         break;
       default:
         break;
@@ -1252,8 +1273,9 @@ public class MapComponent extends EditorComponent {
       }
 
       this.dragPoint = null;
-      this.dragLocationMapObject = null;
+      this.dragLocationMapObjects.clear();
       this.dragSizeMapObject = null;
+      final String currentMap = Game.getEnvironment().getMap().getFileName();
 
       switch (this.currentEditMode) {
       case EDITMODE_CREATE:
@@ -1270,7 +1292,12 @@ public class MapComponent extends EditorComponent {
 
         if (this.isMoving) {
           this.isMoving = false;
-          UndoManager.instance().mapObjectChanged(this.getFocusedMapObject());
+
+          for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+            UndoManager.instance().mapObjectChanged(selected);
+          }
+
+          UndoManager.instance().endOperation();
         }
 
         break;
