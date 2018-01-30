@@ -50,6 +50,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 
 @SuppressWarnings("serial")
@@ -335,8 +336,14 @@ public class AssetPanelItem extends JPanel {
       // there is a way to add a map object from EmitterData
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
-      for (MapObject newMapObject : blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2)) {
-        EditorScreen.instance().getMapComponent().add(newMapObject);
+
+      UndoManager.instance().beginOperation();
+      try  {
+        for (MapObject newMapObject : blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2)) {
+          EditorScreen.instance().getMapComponent().add(newMapObject);
+        }
+      } finally {
+        UndoManager.instance().endOperation();
       }
     }
 

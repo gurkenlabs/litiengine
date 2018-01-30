@@ -250,6 +250,15 @@ public class MapComponent extends EditorComponent {
     return null;
   }
 
+  public List<MapObject> getSelectedMapObjects() {
+    final String map = Game.getEnvironment().getMap().getFileName();
+    if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null && this.selectedObjects.containsKey(map)) {
+      return this.selectedObjects.get(map);
+    }
+
+    return new ArrayList<>();
+  }
+
   public IMapObject getCopiedMapObject() {
     return this.copiedMapObject;
   }
@@ -333,7 +342,7 @@ public class MapComponent extends EditorComponent {
     }
 
     Game.getScreenManager().getRenderComponent().requestFocus();
-    this.setFocus(mapObject, true);
+    this.setFocus(mapObject, false);
     this.setEditMode(EDITMODE_EDIT);
   }
 
@@ -366,7 +375,7 @@ public class MapComponent extends EditorComponent {
   public void delete() {
     UndoManager.instance().beginOperation();
     try {
-      for (IMapObject deleteObject : this.selectedObjects.get(Game.getEnvironment().getMap().getFileName())) {
+      for (IMapObject deleteObject : this.getSelectedMapObjects()) {
         if (deleteObject == null) {
           continue;
         }
@@ -397,7 +406,6 @@ public class MapComponent extends EditorComponent {
   }
 
   public void defineBlueprint() {
-    final String map = Game.getEnvironment().getMap().getFileName();
     if (this.getFocusedMapObject() == null) {
       return;
     }
@@ -407,7 +415,7 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    Blueprint blueprint = new Blueprint(name.toString(), this.selectedObjects.get(map).toArray(new MapObject[this.selectedObjects.get(map).size()]));
+    Blueprint blueprint = new Blueprint(name.toString(), this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
 
     EditorScreen.instance().getGameFile().getBluePrints().add(blueprint);
     Program.getAssetTree().forceUpdate();
@@ -435,7 +443,6 @@ public class MapComponent extends EditorComponent {
       EditorScreen.instance().getMapObjectPanel().bind(null);
       break;
     case EDITMODE_EDIT:
-
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       break;
     case EDITMODE_MOVE:
@@ -490,26 +497,26 @@ public class MapComponent extends EditorComponent {
   }
 
   public void setSelection(IMapObject mapObject, boolean clearSelection, boolean shiftPressed) {
-    final String map = Game.getEnvironment().getMap().getFileName();
     if (mapObject == null) {
-      this.selectedObjects.get(map).clear();
+      this.getSelectedMapObjects().clear();
       return;
     }
 
+    final String map = Game.getEnvironment().getMap().getFileName();
     if (!this.selectedObjects.containsKey(map)) {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
 
     if (!clearSelection && shiftPressed) {
-      if (!this.selectedObjects.get(map).contains(mapObject)) {
-        this.selectedObjects.get(map).add((MapObject) mapObject);
+      if (!this.getSelectedMapObjects().contains(mapObject)) {
+        this.getSelectedMapObjects().add((MapObject) mapObject);
       }
 
       return;
     }
 
-    this.selectedObjects.get(map).clear();
-    this.selectedObjects.get(map).add((MapObject) mapObject);
+    this.getSelectedMapObjects().clear();
+    this.getSelectedMapObjects().add((MapObject) mapObject);
   }
 
   public void setGridSize(int gridSize) {
@@ -966,21 +973,20 @@ public class MapComponent extends EditorComponent {
   }
 
   private void handleSelectedEntitiesDrag() {
-    final String currentMap = Game.getEnvironment().getMap().getFileName();
     if (!this.isMoving) {
       this.isMoving = true;
 
       UndoManager.instance().beginOperation();
-      for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+      for (IMapObject selected : this.getSelectedMapObjects()) {
         UndoManager.instance().mapObjectChanging(selected);
       }
     }
 
-    for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+    for (IMapObject selected : this.getSelectedMapObjects()) {
       this.handleEntityDrag(selected);
     }
 
-    if (this.selectedObjects.get(currentMap).stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
+    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
       Game.getEnvironment().getAmbientLight().createImage();
     }
   }
@@ -1275,7 +1281,6 @@ public class MapComponent extends EditorComponent {
       this.dragPoint = null;
       this.dragLocationMapObjects.clear();
       this.dragSizeMapObject = null;
-      final String currentMap = Game.getEnvironment().getMap().getFileName();
 
       switch (this.currentEditMode) {
       case EDITMODE_CREATE:
@@ -1293,7 +1298,7 @@ public class MapComponent extends EditorComponent {
         if (this.isMoving) {
           this.isMoving = false;
 
-          for (IMapObject selected : this.selectedObjects.get(currentMap)) {
+          for (IMapObject selected : this.getSelectedMapObjects()) {
             UndoManager.instance().mapObjectChanged(selected);
           }
 
@@ -1557,12 +1562,7 @@ public class MapComponent extends EditorComponent {
   }
 
   private void renderSelection(Graphics2D g) {
-    final String map = Game.getEnvironment().getMap().getFileName();
-    if (!this.selectedObjects.containsKey(map)) {
-      return;
-    }
-
-    for (IMapObject mapObject : this.selectedObjects.get(map)) {
+    for (IMapObject mapObject : this.getSelectedMapObjects()) {
       if (mapObject.equals(this.getFocusedMapObject())) {
         continue;
       }
