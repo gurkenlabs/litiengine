@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import java.awt.Color;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
@@ -32,6 +33,14 @@ public interface ICustomPropertyProvider {
   public double getCustomPropertyDouble(String name);
 
   public double getCustomPropertyDouble(String name, double defaultValue);
+
+  public Color getCustomPropertyColor(String name);
+
+  public Color getCustomPropertyColor(String name, Color defaultValue);
+
+  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType);
+
+  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType, T defaultValue);
 
   public void setCustomProperty(String name, String value);
 

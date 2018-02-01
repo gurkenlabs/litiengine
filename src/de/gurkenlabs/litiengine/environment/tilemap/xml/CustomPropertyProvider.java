@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 
 public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
@@ -137,6 +139,40 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
 
     return Double.valueOf(value);
+  }
+
+  @Override
+  public Color getCustomPropertyColor(String name) {
+    return getCustomPropertyColor(name, null);
+  }
+
+  @Override
+  public Color getCustomPropertyColor(String name, Color defaultValue) {
+    String value = this.getCustomProperty(name);
+    if (value == null || value.isEmpty()) {
+      return defaultValue;
+    }
+
+    return Color.decode(value);
+  }
+
+  @Override
+  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType) {
+    return getCustomPropertyEnum(name, enumType, null);
+  }
+
+  @Override
+  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType, T defaultValue) {
+    String value = this.getCustomProperty(name);
+    if (value == null || value.isEmpty()) {
+      return defaultValue;
+    }
+
+    try {
+      return Enum.valueOf(enumType, value);
+    } catch (final IllegalArgumentException iae) {
+      return defaultValue;
+    }
   }
 
   void beforeMarshal(Marshaller m) {

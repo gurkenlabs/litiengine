@@ -23,14 +23,12 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
 
     final int alpha = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA);
     final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
-    final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
+    final Color color = mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
-    if (mapObjectColor == null || mapObjectColor.isEmpty() || lightShape == null) {
+    if (color == null || lightShape == null) {
       return super.load(mapObject);
     }
-
-    final Color color = Color.decode(mapObjectColor);
 
     String lightType;
     switch (lightShape) {

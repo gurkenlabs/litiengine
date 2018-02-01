@@ -935,42 +935,14 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final String alphaProp = this.getMap().getCustomProperty(MapProperty.AMBIENTALPHA);
-    final String colorProp = this.getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
-    int ambientAlpha = 0;
-    Color ambientColor = Color.WHITE;
-    try {
-      if (alphaProp != null && !alphaProp.isEmpty()) {
-        ambientAlpha = (int) Double.parseDouble(alphaProp);
-      }
-
-      if (colorProp != null && !colorProp.isEmpty()) {
-        ambientColor = Color.decode(colorProp);
-      }
-    } catch (final NumberFormatException e) {
-      log.log(Level.WARNING, e.getMessage(), e);
-    }
-
+    final int ambientAlpha = this.getMap().getCustomPropertyInt(MapProperty.AMBIENTALPHA);
+    final Color ambientColor = this.getMap().getCustomPropertyColor(MapProperty.AMBIENTCOLOR, Color.WHITE);
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   private void addStaticShadows() {
-    final String alpha = this.getMap().getCustomProperty(MapProperty.SHADOWALPHA);
-    final String color = this.getMap().getCustomProperty(MapProperty.SHADOWCOLOR);
-    int shadowAlpha = StaticShadow.DEFAULT_ALPHA;
-    Color solidColor = StaticShadow.DEFAULT_COLOR;
-    try {
-      if (alpha != null && !alpha.isEmpty()) {
-        shadowAlpha = (int) Double.parseDouble(alpha);
-      }
-
-      if (color != null && !color.isEmpty()) {
-        solidColor = Color.decode(color);
-      }
-    } catch (final NumberFormatException e) {
-      log.log(Level.WARNING, e.getMessage(), e);
-    }
-
+    final int shadowAlpha = this.getMap().getCustomPropertyInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
+    final Color solidColor = this.getMap().getCustomPropertyColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
     final Color shadowColor = new Color(solidColor.getRed(), solidColor.getGreen(), solidColor.getBlue(), shadowAlpha);
 
     final List<Path2D> newStaticShadows = new ArrayList<>();
