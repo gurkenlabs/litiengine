@@ -93,6 +93,7 @@ public class Program {
   private static AssetPanel assetPanel;
   private static AssetTree assetTree;
   private static JPopupMenu canvasPopup;
+  private static JLabel statusBar;
   private static boolean isChanging;
 
   public static void main(String[] args) {
@@ -177,6 +178,10 @@ public class Program {
 
   public static UserPreferenceConfiguration getUserPreferences() {
     return userPreferences;
+  }
+
+  public static void setStatus(String status) {
+    statusBar.setText(status);
   }
 
   public static void updateScrollBars() {
@@ -305,6 +310,18 @@ public class Program {
     bottomTab.setIconAt(1, new ImageIcon(Resources.getImage("console.png")));
 
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
+
+    statusBar = new JLabel("");
+    statusBar.setPreferredSize(new Dimension(0, 16));
+    statusBar.setFont(new Font(ConsoleLogHandler.CONSOLE_FONT, Font.PLAIN, 10));
+    bottomPanel.add(statusBar, BorderLayout.SOUTH);
+    EditorScreen.instance().getMapComponent().onSelectionChanged(selection -> {
+      if (selection.isEmpty()) {
+        statusBar.setText("");
+      } else {
+        statusBar.setText(" " + selection.size() + " selected objects");
+      }
+    });
 
     JSplitPane rendersplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPane, bottomPanel);
     if (userPreferences.getBottomSplitter() != 0) {

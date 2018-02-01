@@ -12,7 +12,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class ConsoleLogHandler extends java.util.logging.Handler {
-  private static final String CONSOLE_FONT = "Consolas";
+  public static final String CONSOLE_FONT = "Consolas";
   private final JTextPane textPane;
 
   public ConsoleLogHandler(final JTextPane textPane) {
