@@ -299,6 +299,11 @@ public class MapSelectionPanel extends JSplitPane {
       this.mapList.setSelectedIndex(0);
     }
 
+    if (EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
+      layerModel.clear();
+      return;
+    }
+
     Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
     layerModel.clear();
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {

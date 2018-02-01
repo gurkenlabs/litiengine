@@ -20,12 +20,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameFile;
@@ -209,7 +203,7 @@ public class EditorScreen extends Screen {
     JFileChooser chooser;
     try {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
-      chooser.setDialogTitle("Select the java project folder");
+      chooser.setDialogTitle(Resources.get("input_select_project_folder"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) != JFileChooser.APPROVE_OPTION) {
         return;
@@ -235,7 +229,7 @@ public class EditorScreen extends Screen {
       Program.getAssetTree().forceUpdate();
 
       // load custom emitter files
-      this.loadCustomEmitters(this.getProjectPath());
+      this.loadCustomEmitters(this.getGameFile().getEmitters());
 
       // update new game file by the loaded information
       this.updateGameFileMaps();
@@ -310,15 +304,17 @@ public class EditorScreen extends Screen {
       }
 
       // load custom emitter files
-      this.loadCustomEmitters(this.getProjectPath());
+      this.loadCustomEmitters(this.getGameFile().getEmitters());
 
       // display first available map after loading all stuff
       // also switch to map component
       if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
-
-        this.changeComponent(ComponentType.MAP);
+      } else {
+        Game.loadEnvironment(null);
       }
+
+      this.changeComponent(ComponentType.MAP);
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
@@ -464,7 +460,8 @@ public class EditorScreen extends Screen {
     if (this.currentResourceFile == null || selectFile) {
       JFileChooser chooser;
       try {
-        chooser = new JFileChooser(new File(".").getCanonicalPath());
+        final String source = this.getProjectPath();
+        chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameFile.FILE_EXTENSION);
@@ -560,24 +557,9 @@ public class EditorScreen extends Screen {
     }
   }
 
-  private void loadCustomEmitters(String projectPath) {
-    for (String xmlFile : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(projectPath), "xml")) {
-      boolean isEmitter = false;
-      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-      try {
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(xmlFile);
-        doc.getDocumentElement().normalize();
-        if (doc.getDocumentElement().getNodeName().equalsIgnoreCase("emitter")) {
-          isEmitter = true;
-        }
-      } catch (SAXException | IOException | ParserConfigurationException e) {
-        log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-      }
-
-      if (isEmitter) {
-        CustomEmitter.load(xmlFile);
-      }
+  private void loadCustomEmitters(List<EmitterData> emitters) {
+    for (EmitterData emitter : emitters) {
+      CustomEmitter.load(emitter);
     }
   }
 

@@ -38,8 +38,16 @@ public class CustomEmitter extends Emitter {
       return null;
     }
 
-    loadedCustomEmitters.put(name, loaded);
-    return loaded;
+    return load(loaded);
+  }
+
+  public static EmitterData load(EmitterData emitterData) {
+    if (loadedCustomEmitters.containsKey(emitterData.getName())) {
+      return loadedCustomEmitters.get(emitterData.getName());
+    }
+
+    loadedCustomEmitters.put(emitterData.getName(), emitterData);
+    return emitterData;
   }
 
   private EmitterData emitterData;
