@@ -315,10 +315,10 @@ public class EditorScreen extends Screen {
       }
 
       this.changeComponent(ComponentType.MAP);
+      this.setCurrentStatus(Resources.get("status_gamefile_loaded"));
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
-      this.setCurrentStatus(Resources.get("status_gamefile_loaded"));
     }
   }
 

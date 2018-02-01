@@ -285,6 +285,7 @@ public class Program {
     });
 
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
+    mapEditorPanel.setupControls();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     mapWrap.setMinimumSize(new Dimension(300, 0));

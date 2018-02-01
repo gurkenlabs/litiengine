@@ -67,7 +67,7 @@ public class AssetPanelItem extends JPanel {
   private final JButton btnAdd;
   private final JButton btnExport;
 
-  private final Object origin;
+  private final transient Object origin;
 
   public AssetPanelItem() {
     this(null);
@@ -338,7 +338,7 @@ public class AssetPanelItem extends JPanel {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
       UndoManager.instance().beginOperation();
-      try  {
+      try {
         for (MapObject newMapObject : blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2)) {
           EditorScreen.instance().getMapComponent().add(newMapObject);
         }
@@ -438,17 +438,9 @@ public class AssetPanelItem extends JPanel {
     if (this.getOrigin() != null && this.getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
       String propName = Prop.getNameBySpriteName(info.getName());
-      if (propName == null) {
-        return false;
-      }
-
-      return true;
+      return propName != null && !propName.isEmpty();
     }
 
-    if (this.getOrigin() instanceof MapObject) {
-      return true;
-    }
-
-    return false;
+    return this.getOrigin() instanceof MapObject;
   }
 }

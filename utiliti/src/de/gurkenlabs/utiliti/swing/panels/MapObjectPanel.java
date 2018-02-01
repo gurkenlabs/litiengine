@@ -120,7 +120,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     componentPanel.add(this.customPanel, BorderLayout.SOUTH);
     setLayout(groupLayout);
 
-    this.setupControls();
     this.setupChangedListeners();
     this.comboBoxType.setSelectedItem(MapObjectType.AREA);
   }
@@ -143,6 +142,36 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     this.customPanel.bind(this.getDataSource());
     this.isFocussing = false;
+  }
+
+  public void setupControls() {
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
+      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
+        this.spinnerX.setValue(this.spinnerX.getNextValue());
+        EditorScreen.instance().getMapComponent().updateTransformControls();
+      }
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
+      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
+        this.spinnerX.setValue(this.spinnerX.getPreviousValue());
+        EditorScreen.instance().getMapComponent().updateTransformControls();
+      }
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
+      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
+        this.spinnerY.setValue(this.spinnerY.getPreviousValue());
+        EditorScreen.instance().getMapComponent().updateTransformControls();
+      }
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
+      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
+        this.spinnerY.setValue(this.spinnerY.getNextValue());
+        EditorScreen.instance().getMapComponent().updateTransformControls();
+      }
+    });
   }
 
   private void switchPanel(MapObjectType type) {
@@ -253,35 +282,5 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
       m.setHeight((int) spinnerHeight.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
-  }
-
-  private void setupControls() {
-    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerX.setValue(this.spinnerX.getNextValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerX.setValue(this.spinnerX.getPreviousValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerY.setValue(this.spinnerY.getPreviousValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerY.setValue(this.spinnerY.getNextValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
-      }
-    });
   }
 }
