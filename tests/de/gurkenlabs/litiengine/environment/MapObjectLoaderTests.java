@@ -227,7 +227,7 @@ public class MapObjectLoaderTests {
 
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
-    when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR)).thenReturn("#ffffff");
+    when(mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR)).thenReturn(Color.WHITE);
     when(mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
