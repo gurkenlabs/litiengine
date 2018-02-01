@@ -87,7 +87,7 @@ public class Blueprint extends MapObject {
     return this.keepIds;
   }
 
-  public Iterable<MapObject> build(int x, int y) {
+  public List<MapObject> build(int x, int y) {
     List<MapObject> builtObjects = new ArrayList<>();
 
     for (MapObject item : this.getItems()) {

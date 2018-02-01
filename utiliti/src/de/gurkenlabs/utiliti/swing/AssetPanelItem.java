@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -339,8 +340,15 @@ public class AssetPanelItem extends JPanel {
 
       UndoManager.instance().beginOperation();
       try {
-        for (MapObject newMapObject : blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2)) {
+        List<MapObject> newObjects = blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2);
+        for (MapObject newMapObject : newObjects) {
           EditorScreen.instance().getMapComponent().add(newMapObject);
+        }
+
+        // separately select the added objects because this cannot be done in the
+        // previous loop because it gets overwritten every time a map object gets added
+        for (MapObject newMapObject : newObjects) {
+          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false, true);
         }
       } finally {
         UndoManager.instance().endOperation();
