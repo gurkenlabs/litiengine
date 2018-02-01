@@ -121,7 +121,7 @@ public class Program {
       userPreferences.setZoom(zoom);
     });
 
-    Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
+    // Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
 
     Game.getScreenManager().addScreen(EditorScreen.instance());
     Game.getScreenManager().displayScreen("EDITOR");
@@ -725,6 +725,11 @@ public class Program {
       cut.setEnabled(mo != null);
       undo.setEnabled(UndoManager.instance().canUndo());
       redo.setEnabled(UndoManager.instance().canRedo());
+      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
+    });
+
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
+      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
     UndoManager.onUndoStackChanged(manager -> {
@@ -825,6 +830,7 @@ public class Program {
     JMenuItem paste = new JMenuItem("Paste Entity", new ImageIcon(Resources.getImage("button-pastex16.png")));
     paste.addActionListener(e -> EditorScreen.instance().getMapComponent().paste());
     paste.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Event.CTRL_MASK));
+    paste.setEnabled(false);
 
     JMenuItem blueprint = new JMenuItem("Define Blueprint", new ImageIcon(Resources.getImage("blueprint.png")));
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
@@ -843,13 +849,17 @@ public class Program {
       cut.setEnabled(mo != null);
       delete.setEnabled(mo != null);
       blueprint.setEnabled(mo != null);
+      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
+    });
+
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
+      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedMapObject() != null);
           canvasPopup.show(canvas, e.getX(), e.getY());
         }
       }

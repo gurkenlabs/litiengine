@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -141,7 +140,7 @@ public class MapComponent extends EditorComponent {
   private boolean isFocussing;
   private Dimension dragSizeMapObject;
   private Rectangle2D newObjectArea;
-  private IMapObject copiedMapObject;
+  private Blueprint copiedBlueprint;
   private int gridSize;
 
   private boolean snapToGrid = true;
@@ -265,8 +264,8 @@ public class MapComponent extends EditorComponent {
     return new ArrayList<>();
   }
 
-  public IMapObject getCopiedMapObject() {
-    return this.copiedMapObject;
+  public Blueprint getCopiedBlueprint() {
+    return this.copiedBlueprint;
   }
 
   public boolean isLoading() {
@@ -364,29 +363,52 @@ public class MapComponent extends EditorComponent {
   }
 
   public void copy() {
-    this.copiedMapObject = this.getFocusedMapObject();
+    this.copiedBlueprint = new Blueprint("", this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
   }
 
   public void paste() {
-    if (this.copiedMapObject != null) {
-      int x = (int) Input.mouse().getMapLocation().getX();
-      int y = (int) Input.mouse().getMapLocation().getY();
-
-      this.paste(x, y);
+    if (this.copiedBlueprint == null) {
+      return;
     }
+
+    int x = (int) Input.mouse().getMapLocation().getX();
+    int y = (int) Input.mouse().getMapLocation().getY();
+
+    this.paste(x, y);
   }
 
   public void paste(int x, int y) {
-    if (this.copiedMapObject != null) {
-      this.newObjectArea = new Rectangle(x, y, (int) this.copiedMapObject.getDimension().getWidth(), (int) this.copiedMapObject.getDimension().getHeight());
-      this.copyMapObject(this.copiedMapObject);
+    if (this.copiedBlueprint == null) {
+      return;
+    }
+
+    UndoManager.instance().beginOperation();
+    try {
+      for (MapObject mapObject : this.copiedBlueprint.build(x, y)) {
+        this.add(mapObject);
+      }
+
+      // clean up copied blueprints in case, we cut the objects and kept the IDs
+      if (this.copiedBlueprint.keepIds()) {
+        this.copiedBlueprint = null;
+      }
+    } finally {
+      UndoManager.instance().endOperation();
     }
   }
 
   public void cut() {
-    this.copiedMapObject = this.getFocusedMapObject();
-    UndoManager.instance().mapObjectDeleted(this.copiedMapObject);
-    this.delete(this.copiedMapObject);
+    this.copiedBlueprint = new Blueprint("", true, this.getSelectedMapObjects().toArray(new MapObject[this.getSelectedMapObjects().size()]));
+
+    UndoManager.instance().beginOperation();
+    try {
+      for (MapObject mapObject : this.getSelectedMapObjects()) {
+        UndoManager.instance().mapObjectDeleted(mapObject);
+        this.delete(mapObject);
+      }
+    } finally {
+      UndoManager.instance().endOperation();
+    }
   }
 
   public void delete() {
@@ -750,22 +772,6 @@ public class MapComponent extends EditorComponent {
 
   private void updateScrollSpeed() {
     this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
-  }
-
-  private IMapObject copyMapObject(IMapObject obj) {
-
-    IMapObject mo = new MapObject();
-    mo.setType(obj.getType());
-    mo.setX(this.snapX(this.newObjectArea.getX()));
-    mo.setY(this.snapY(this.newObjectArea.getY()));
-    mo.setWidth((int) obj.getDimension().getWidth());
-    mo.setHeight((int) obj.getDimension().getHeight());
-    mo.setId(Game.getEnvironment().getNextMapId());
-    mo.setName(obj.getName());
-    mo.setCustomProperties(obj.getAllCustomProperties());
-
-    this.add(mo);
-    return mo;
   }
 
   private void ensureUniqueIds(IMap map) {

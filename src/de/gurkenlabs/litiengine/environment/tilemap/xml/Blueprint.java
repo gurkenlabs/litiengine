@@ -19,11 +19,19 @@ public class Blueprint extends MapObject {
   @XmlElement(name = "object")
   private List<MapObject> items = new ArrayList<>();
 
+  @XmlTransient
+  private boolean keepIds;
+
   public Blueprint() {
     super();
   }
 
   public Blueprint(String name, MapObject... items) {
+    this(name, false, items);
+  }
+
+  public Blueprint(String name, boolean keepIds, MapObject... items) {
+    this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
     this.setName(name);
     int minX = -1;
@@ -55,6 +63,10 @@ public class Blueprint extends MapObject {
       MapObject newItem = new MapObject(item);
       newItem.setX(item.getX() - minX);
       newItem.setY(item.getY() - minY);
+      if (keepIds) {
+        newItem.setId(item.getId());
+      }
+
       this.items.add(newItem);
     }
   }
@@ -62,6 +74,17 @@ public class Blueprint extends MapObject {
   @XmlTransient
   public Iterable<MapObject> getItems() {
     return this.items;
+  }
+
+  /**
+   * Gets a value that indicates whether the IDs if this blueprint's map-objects
+   * should be kept. This is currently used when objects are cut and pasted
+   * afterwards.
+   * 
+   * @return
+   */
+  public boolean keepIds() {
+    return this.keepIds;
   }
 
   public Iterable<MapObject> build(int x, int y) {
@@ -72,6 +95,9 @@ public class Blueprint extends MapObject {
       newObject.setX(newObject.getX() + x);
       newObject.setY(newObject.getY() + y);
       newObject.setId(Game.getEnvironment().getNextMapId());
+      if (this.keepIds) {
+        newObject.setId(item.getId());
+      }
 
       builtObjects.add(newObject);
     }
