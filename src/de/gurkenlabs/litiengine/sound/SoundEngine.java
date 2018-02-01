@@ -15,8 +15,8 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   private Point2D listenerLocation;
   private Function<Point2D, Point2D> listenerLocationCallback;
   private float maxDist;
-  private SoundSource music;
-  private final List<SoundSource> sounds;
+  private SoundPlayback music;
+  private final List<SoundPlayback> sounds;
 
   public SoundEngine() {
     this.sounds = new CopyOnWriteArrayList<>();
@@ -30,50 +30,55 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   }
 
   @Override
-  public void playMusic(final Sound sound) {
+  public ISoundPlayback playMusic(final Sound sound) {
     if (sound == null || this.music != null && sound.equals(this.music.getSound())) {
-      return;
+      return null;
     }
 
     if (this.music != null) {
       this.music.dispose();
     }
 
-    this.music = new SoundSource(sound);
+    this.music = new SoundPlayback(sound);
     this.music.play(true, Game.getConfiguration().sound().getMusicVolume());
+    return this.music;
   }
 
   @Override
-  public void playSound(final IEntity entity, final Sound sound) {
+  public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
     if (sound == null) {
-      return;
+      return null;
     }
 
-    final SoundSource source = new SoundSource(sound, this.listenerLocation, entity);
-    source.play();
-    this.sounds.add(source);
+    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation, entity);
+    playback.play();
+    this.sounds.add(playback);
+    return playback;
   }
 
   @Override
-  public void playSound(final Point2D location, final Sound sound) {
+  public ISoundPlayback playSound(final Point2D location, final Sound sound) {
     if (sound == null) {
-      return;
+      return null;
     }
 
-    final SoundSource source = new SoundSource(sound, this.listenerLocation);
-    source.play();
-    this.sounds.add(source);
+    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation);
+    playback.play();
+    this.sounds.add(playback);
+    return playback;
   }
 
   @Override
-  public void playSound(final Sound sound) {
+  public ISoundPlayback playSound(final Sound sound) {
     if (sound == null) {
-      return;
+      return null;
     }
 
-    final SoundSource source = new SoundSource(sound);
-    source.play();
-    this.sounds.add(source);
+    final SoundPlayback playback = new SoundPlayback(sound);
+    playback.play();
+    this.sounds.add(playback);
+
+    return playback;
   }
 
   @Override
@@ -100,15 +105,25 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
   @Override
   public void terminate() {
     Game.getLoop().detach(this);
-    SoundSource.terminate();
+    if (this.music != null && this.music.isPlaying()) {
+      this.music.dispose();
+      this.music = null;
+    }
+
+    for (SoundPlayback playback : this.sounds) {
+      playback.dispose();
+    }
+
+    this.sounds.clear();
+    SoundPlayback.terminate();
   }
 
   @Override
   public void update() {
     this.listenerLocation = this.listenerLocationCallback.apply(this.listenerLocation);
 
-    final List<SoundSource> remove = new ArrayList<>();
-    for (final SoundSource s : this.sounds) {
+    final List<SoundPlayback> remove = new ArrayList<>();
+    for (final SoundPlayback s : this.sounds) {
       if (s != null && !s.isPlaying()) {
         s.dispose();
         remove.add(s);
@@ -116,7 +131,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
     }
 
     this.sounds.removeAll(remove);
-    for (final SoundSource s : this.sounds) {
+    for (final SoundPlayback s : this.sounds) {
       s.updateControls(this.listenerLocation);
     }
 
