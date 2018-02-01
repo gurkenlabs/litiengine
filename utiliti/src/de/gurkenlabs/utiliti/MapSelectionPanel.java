@@ -81,6 +81,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final JPanel panel;
   private final JTextField textField;
   private final JButton btnSearch;
+  private final JButton btnCollape;
   private final JTree tree;
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
@@ -231,6 +232,13 @@ public class MapSelectionPanel extends JSplitPane {
     entityScrollPane.setColumnHeaderView(panel);
     panel.setLayout(new BorderLayout(0, 0));
 
+    btnCollape = new JButton("");
+    btnCollape.setOpaque(false);
+    btnCollape.setMargin(new Insets(2, 2, 2, 2));
+    btnCollape.addActionListener(e -> collapseAll());
+    btnCollape.setIcon(new ImageIcon(Resources.getImage("collapse.png")));
+    panel.add(btnCollape, BorderLayout.WEST);
+
     textField = new JTextField();
     textField.addActionListener(e -> search());
     panel.add(textField, BorderLayout.CENTER);
@@ -375,6 +383,14 @@ public class MapSelectionPanel extends JSplitPane {
       break;
     default:
       return;
+    }
+  }
+
+  private void collapseAll() {
+    int row = tree.getRowCount() - 1;
+    while (row > 0) {
+      tree.collapseRow(row);
+      row--;
     }
   }
 
