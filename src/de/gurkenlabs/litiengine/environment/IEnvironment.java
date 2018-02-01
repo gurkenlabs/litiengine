@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
 /**
@@ -65,6 +66,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public List<IEntity> getByTag(final String tag);
 
   public AmbientLight getAmbientLight();
+
+  public StaticShadowLayer getStaticShadowLayer();
 
   public MapArea getArea(int mapId);
 

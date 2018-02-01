@@ -2,8 +2,11 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
+@EntityInfo(renderType = RenderType.OVERLAY)
 public class StaticShadow extends MapArea {
   public enum StaticShadowType {
     DOWN, DOWNLEFT, DOWNRIGHT, LEFT, LEFTDOWN, LEFTRIGHT, NONE, NOOFFSET, RIGHT, RIGHTDOWN, RIGHTLEFT;

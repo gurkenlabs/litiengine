@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.util.ImageProcessing;
@@ -21,7 +22,7 @@ import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
 
-public class AmbientLight {
+public class AmbientLight implements IRenderable {
   private int alpha;
   private Color color;
   private final IEnvironment environment;
@@ -32,6 +33,11 @@ public class AmbientLight {
     this.color = ambientColor;
     this.alpha = ambientAlpha;
     this.createImage();
+  }
+
+  @Override
+  public void render(Graphics2D g) {
+    RenderEngine.renderImage(g, this.getImage(), Game.getCamera().getViewPortLocation(0, 0));
   }
 
   public void createImage() {
@@ -93,11 +99,6 @@ public class AmbientLight {
     return this.color;
   }
 
-  public Image getImage() {
-    this.createImage();
-    return this.image;
-  }
-
   public void setAlpha(int ambientAlpha) {
     this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
     this.createImage();
@@ -128,6 +129,11 @@ public class AmbientLight {
 
     final int key = sb.toString().hashCode();
     return "ambientlight-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
+  }
+
+  private Image getImage() {
+    this.createImage();
+    return this.image;
   }
 
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {

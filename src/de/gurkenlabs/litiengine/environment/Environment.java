@@ -2,13 +2,9 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Area;
-import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -48,12 +43,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
-import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 
@@ -93,10 +87,10 @@ public class Environment implements IEnvironment {
   private final List<Spawnpoint> spawnPoints;
 
   private AmbientLight ambientLight;
+  private StaticShadowLayer staticShadowLayer;
   private boolean loaded;
   private boolean initialized;
   private IMap map;
-  private Image staticShadowImage;
 
   private int localIdSequence = 0;
   private int mapIdSequence;
@@ -597,10 +591,6 @@ public class Environment implements IEnvironment {
     return this.spawnPoints;
   }
 
-  public Image getStaticShadowImage() {
-    return this.staticShadowImage;
-  }
-
   @Override
   public Collection<StaticShadow> getStaticShadows() {
     return this.staticShadows;
@@ -614,6 +604,11 @@ public class Environment implements IEnvironment {
   @Override
   public StaticShadow getStaticShadow(String name) {
     return getByName(this.getStaticShadows(), name);
+  }
+
+  @Override
+  public StaticShadowLayer getStaticShadowLayer() {
+    return this.staticShadowLayer;
   }
 
   @Override
@@ -870,12 +865,11 @@ public class Environment implements IEnvironment {
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
 
     if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
-      // render static shadows
-      RenderEngine.renderImage(g, this.getStaticShadowImage(), Game.getCamera().getViewPortLocation(0, 0));
+      this.getStaticShadowLayer().render(g);
     }
 
     if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
-      RenderEngine.renderImage(g, this.getAmbientLight().getImage(), Game.getCamera().getViewPortLocation(0, 0));
+      this.getAmbientLight().render(g);
     }
 
     for (final IRenderable rend : this.getOverlayRenderables()) {
@@ -941,124 +935,9 @@ public class Environment implements IEnvironment {
   }
 
   private void addStaticShadows() {
-    final int shadowAlpha = this.getMap().getCustomPropertyInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
-    final Color solidColor = this.getMap().getCustomPropertyColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
-    final Color shadowColor = new Color(solidColor.getRed(), solidColor.getGreen(), solidColor.getBlue(), shadowAlpha);
-
-    final List<Path2D> newStaticShadows = new ArrayList<>();
-    // check if the collision boxes have shadows. if so, determine which
-    // shadow is needed, create the shape and add it to the
-    // list of static shadows.
-    for (final StaticShadow shadow : this.getStaticShadows()) {
-      final double shadowX = shadow.getLocation().getX();
-      final double shadowY = shadow.getLocation().getY();
-      final double shadowWidth = shadow.getWidth();
-      final double shadowHeight = shadow.getHeight();
-
-      final StaticShadowType shadowType = shadow.getShadowType();
-
-      final Path2D parallelogram = new Path2D.Double();
-      if (shadowType.equals(StaticShadowType.DOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.DOWNLEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.DOWNRIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.LEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.LEFTDOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.LEFTRIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.RIGHTLEFT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth - shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.RIGHT)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.RIGHTDOWN)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX + shadow.getOffset() / 2.0, shadowY + shadowHeight + shadow.getOffset());
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      } else if (shadowType.equals(StaticShadowType.NOOFFSET)) {
-        parallelogram.moveTo(shadowX, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY);
-        parallelogram.lineTo(shadowX + shadowWidth, shadowY + shadowHeight);
-        parallelogram.lineTo(shadowX, shadowY + shadowHeight);
-        parallelogram.closePath();
-      }
-
-      if (parallelogram.getWindingRule() != 0) {
-        newStaticShadows.add(parallelogram);
-      }
-    }
-
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getMap().getSizeInPixels().getWidth(), (int) this.getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
-    g.setColor(shadowColor);
-
-    final Area ar = new Area();
-    for (final Path2D staticShadow : newStaticShadows) {
-      final Area staticShadowArea = new Area(staticShadow);
-      for (final LightSource light : this.getLightSources()) {
-        if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
-          staticShadowArea.subtract(new Area(light.getLightShape()));
-        }
-      }
-
-      ar.add(staticShadowArea);
-    }
-
-    g.fill(ar);
-    g.dispose();
-
-    this.staticShadowImage = img;
+    final int alpha = this.getMap().getCustomPropertyInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
+    final Color color = this.getMap().getCustomPropertyColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
+    this.staticShadowLayer = new StaticShadowLayer(this, alpha, color);
   }
 
   private void dispose(final Collection<? extends IEntity> entities) {
