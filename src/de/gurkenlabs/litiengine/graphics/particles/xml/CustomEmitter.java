@@ -27,6 +27,27 @@ public class CustomEmitter extends Emitter {
     loadedCustomEmitters = new ConcurrentHashMap<>();
   }
 
+  private final EmitterData emitterData;
+
+  public CustomEmitter(final double x, final double y, EmitterData emitterData) {
+    super(x, y);
+    this.emitterData = emitterData;
+    this.init();
+  }
+
+  public CustomEmitter(final double originX, final double originY, final String emitterXml) {
+    super(originX, originY);
+
+    this.emitterData = load(emitterXml);
+    if (this.emitterData == null) {
+      this.delete();
+      return;
+    }
+
+    this.init();
+
+  }
+
   public static EmitterData load(String emitterXml) {
     final String name = FileUtilities.getFileName(emitterXml);
     if (loadedCustomEmitters.containsKey(name)) {
@@ -50,42 +71,8 @@ public class CustomEmitter extends Emitter {
     return emitterData;
   }
 
-  private EmitterData emitterData;
-
-  public CustomEmitter(final double originX, final double originY) {
-    super(originX, originY);
-  }
-
-  public CustomEmitter(final double originX, final double originY, final String emitterXml) {
-    super(originX, originY);
-
-    this.emitterData = load(emitterXml);
-    if (this.emitterData == null) {
-      this.delete();
-      return;
-    }
-
-    // set emitter parameters
-    this.setMaxParticles(this.getEmitterData().getMaxParticles());
-    this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
-    this.setParticleMaxTTL(this.getEmitterData().getParticleMaxTTL());
-    this.setTimeToLive(this.getEmitterData().getEmitterTTL());
-    this.setSpawnAmount(this.getEmitterData().getSpawnAmount());
-    this.setSpawnRate(this.getEmitterData().getSpawnRate());
-    this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());
-    this.setSize(this.getEmitterData().getWidth(), this.getEmitterData().getHeight());
-
-    for (final ParticleColor color : this.getEmitterData().getColors()) {
-      this.addParticleColor(color.toColor());
-    }
-  }
-
   public EmitterData getEmitterData() {
     return this.emitterData;
-  }
-
-  public void setEmitterData(EmitterData newData) {
-    this.emitterData = newData;
   }
 
   @Override
@@ -146,4 +133,19 @@ public class CustomEmitter extends Emitter {
     return particle;
   }
 
+  private void init() {
+    // set emitter parameters
+    this.setMaxParticles(this.getEmitterData().getMaxParticles());
+    this.setParticleMinTTL(this.getEmitterData().getParticleMinTTL());
+    this.setParticleMaxTTL(this.getEmitterData().getParticleMaxTTL());
+    this.setTimeToLive(this.getEmitterData().getEmitterTTL());
+    this.setSpawnAmount(this.getEmitterData().getSpawnAmount());
+    this.setSpawnRate(this.getEmitterData().getSpawnRate());
+    this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());
+    this.setSize(this.getEmitterData().getWidth(), this.getEmitterData().getHeight());
+
+    for (final ParticleColor color : this.getEmitterData().getColors()) {
+      this.addParticleColor(color.toColor());
+    }
+  }
 }

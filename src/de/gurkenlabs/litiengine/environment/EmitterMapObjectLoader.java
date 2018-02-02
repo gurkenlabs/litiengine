@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 
@@ -14,8 +15,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
   }
 
   /***
-   * TODO 04.10.2017: refactor this implementation because the hard coded
-   * emitter types are not a proper approach.
+   * TODO 04.10.2017: refactor this implementation because the hard coded emitter
+   * types are not a proper approach.
    */
   @Override
   public Collection<IEntity> load(IMapObject mapObject) {
@@ -23,7 +24,9 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + EmitterMapObjectLoader.class);
     }
 
-    CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().x, mapObject.getLocation().y);
+    // TODO: provide EmitterData instance from the mapobject properties
+    EmitterData data = new EmitterData();
+    CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().getX(), mapObject.getLocation().getY(), data);
 
     emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     emitter.setLocation(mapObject.getLocation());
