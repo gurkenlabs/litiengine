@@ -46,7 +46,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
       EmitterPropertyPanel panel = new EmitterPropertyPanel();
       panel.bind(this.getDataSource());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.CANCEL_OPTION) {
         panel.discardChanges();
       }
