@@ -115,6 +115,7 @@ public class MapComponent extends EditorComponent {
 
   private final List<Consumer<Integer>> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
+  private final List<Consumer<List<MapObject>>> selectionChangedConsumer;
   private final List<Consumer<Map>> mapLoadedConsumer;
 
   private final java.util.Map<String, Integer> selectedLayers;
@@ -156,6 +157,7 @@ public class MapComponent extends EditorComponent {
     super(ComponentType.MAP);
     this.editModeChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
+    this.selectionChangedConsumer = new CopyOnWriteArrayList<>();
     this.mapLoadedConsumer = new CopyOnWriteArrayList<>();
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
@@ -178,6 +180,10 @@ public class MapComponent extends EditorComponent {
 
   public void onFocusChanged(Consumer<IMapObject> cons) {
     this.focusChangedConsumer.add(cons);
+  }
+
+  public void onSelectionChanged(Consumer<List<MapObject>> cons) {
+    this.selectionChangedConsumer.add(cons);
   }
 
   public void onMapLoaded(Consumer<Map> cons) {
@@ -538,6 +544,9 @@ public class MapComponent extends EditorComponent {
   public void setSelection(IMapObject mapObject, boolean clearSelection, boolean shiftPressed) {
     if (mapObject == null) {
       this.getSelectedMapObjects().clear();
+      for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+        cons.accept(this.getSelectedMapObjects());
+      }
       return;
     }
 
@@ -549,6 +558,10 @@ public class MapComponent extends EditorComponent {
     if (!clearSelection && shiftPressed) {
       if (!this.getSelectedMapObjects().contains(mapObject)) {
         this.getSelectedMapObjects().add((MapObject) mapObject);
+
+        for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+          cons.accept(this.getSelectedMapObjects());
+        }
       }
 
       return;
@@ -556,6 +569,10 @@ public class MapComponent extends EditorComponent {
 
     this.getSelectedMapObjects().clear();
     this.getSelectedMapObjects().add((MapObject) mapObject);
+
+    for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+      cons.accept(this.getSelectedMapObjects());
+    }
   }
 
   public void setGridSize(int gridSize) {
