@@ -13,6 +13,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.util.MathUtilities;
+
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Comparable<EmitterData> {
@@ -86,13 +89,25 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   private int width;
 
   @XmlElement
-  private ParticleParameter colorDeviation;
+  private float colorDeviation;
+
+  @XmlElement
+  private float alphaDeviation;
 
   @XmlElement
   private ParticleParameter x;
 
   @XmlElement
   private ParticleParameter y;
+
+  @XmlElement
+  private boolean animateSprite;
+
+  @XmlElement
+  private String spritesheet;
+
+  @XmlElement
+  private String colorProbabilities;
 
   public EmitterData() {
     this.colors = new ArrayList<>();
@@ -106,6 +121,8 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.particleHeight = new ParticleParameter();
     this.deltaWidth = new ParticleParameter();
     this.deltaHeight = new ParticleParameter();
+    this.colorDeviation = 0;
+    this.alphaDeviation = 0;
     this.updateRate = 30;
   }
 
@@ -124,6 +141,16 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     }
 
     return this.getName().compareTo(obj.getName());
+  }
+
+  @XmlTransient
+  public float getColorDeviation() {
+    return colorDeviation;
+  }
+
+  @XmlTransient
+  public float getAlphaDeviation() {
+    return alphaDeviation;
   }
 
   @XmlTransient
@@ -231,6 +258,27 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     return this.spawnRate;
   }
 
+  public boolean isAnimateSprite() {
+    return animateSprite;
+  }
+
+  public void setAnimateSprite(boolean animateSprite) {
+    this.animateSprite = animateSprite;
+  }
+
+  @XmlTransient
+  public String getSpritesheet() {
+    return spritesheet;
+  }
+
+  public void setSpritesheet(String spritesheet) {
+    this.spritesheet = spritesheet;
+  }
+
+  public boolean isApplyStaticPhysics() {
+    return applyStaticPhysics;
+  }
+
   @XmlTransient
   public int getUpdateRate() {
     return this.updateRate;
@@ -246,6 +294,19 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     return this.applyStaticPhysics;
   }
 
+  @XmlTransient
+  public double[] getColorProbabilities() {
+    return ArrayUtilities.getDoubleArray(this.colorProbabilities);
+  }
+
+  public void setColorProbabilities(double[] colorProbabilities) {
+    this.colorProbabilities = ArrayUtilities.getCommaSeparatedString(colorProbabilities);
+  }
+
+  public void setColorProbabilities(String colorProbabilities) {
+    this.colorProbabilities = colorProbabilities;
+  }
+
   public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
     this.applyStaticPhysics = applyStaticPhysics;
   }
@@ -258,6 +319,14 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     List<ParticleColor> tmpList = new ArrayList<>();
     tmpList.add(new ParticleColor(color));
     this.colors = tmpList;
+  }
+
+  public void setAlphaDeviation(float alphaDeviation) {
+    this.alphaDeviation = MathUtilities.clamp(alphaDeviation, 0, 1);
+  }
+
+  public void setColorDeviation(float colorDeviation) {
+    this.colorDeviation = MathUtilities.clamp(colorDeviation, 0, 1);
   }
 
   public void setDeltaHeight(final ParticleParameter deltaHeight) {
@@ -347,5 +416,4 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   public void setParticleY(final ParticleParameter y) {
     this.y = y;
   }
-
 }
