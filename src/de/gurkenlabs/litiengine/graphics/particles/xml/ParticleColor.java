@@ -1,13 +1,16 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "color")
-public class ParticleColor {
+public class ParticleColor implements Serializable {
+  private static final long serialVersionUID = -5962060934939835282L;
+
   @XmlAttribute
   private int alpha;
 
@@ -26,6 +29,22 @@ public class ParticleColor {
     this.green = color.getGreen();
     this.blue = color.getBlue();
     this.alpha = color.getAlpha();
+  }
+
+  public static ParticleColor decode(final String particleColorString) {
+    String[] split = particleColorString.split("|");
+    if (split.length < 2) {
+      return null;
+    }
+    Color rgba;
+    try {
+      Color solid = Color.decode(split[0]);
+      rgba = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), Integer.parseInt(split[1]));
+    } catch (NumberFormatException e) {
+      return null;
+    }
+
+    return new ParticleColor(rgba);
   }
 
   @XmlTransient
@@ -65,11 +84,24 @@ public class ParticleColor {
   }
 
   public Color toColor() {
+    if (this.getAlpha() == 0) {
+      return new Color(this.getRed(), this.getGreen(), this.getBlue());
+    }
+    
     return new Color(this.getRed(), this.getGreen(), this.getBlue(), this.getAlpha());
   }
 
   public String toHexString() {
-    return "#" + Integer.toHexString(this.toColor().getRGB()).substring(2);
+    int rgb = this.toColor().getRGB();
+    if (rgb == 0) {
+      return "#000000";
+    }
+
+    return "#" + Integer.toHexString(rgb).substring(2);
   }
 
+  @Override
+  public String toString() {
+    return this.toHexString() + "|" + this.getAlpha();
+  }
 }

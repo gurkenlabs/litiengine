@@ -1,5 +1,7 @@
 package de.gurkenlabs.util;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,26 +20,25 @@ public final class ArrayUtilities {
     System.arraycopy(secondArray, 0, combinedArray, aLen, bLen);
     return combinedArray;
   }
-
-  public static int[] getIntegerArray(String commaSeparatedIntegers) {
-    if (commaSeparatedIntegers == null || commaSeparatedIntegers.isEmpty()) {
+  
+  public static int[] getIntegerArray(String commaSeperatedString) {
+    if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
       return new int[0];
     }
 
-    final String[] split = commaSeparatedIntegers.split(",");
+    final String[] split = commaSeperatedString.split(",");
     int[] integers = new int[split.length];
     if (integers.length == 0) {
       return integers;
     }
 
     for (int i = 0; i < split.length; i++) {
-      String integerString = split[i];
-      if (integerString == null || integerString.isEmpty()) {
+      if (split[i] == null || split[i].isEmpty()) {
         continue;
       }
 
       try {
-        integers[i] = Integer.parseInt(integerString);
+        integers[i] = Integer.parseInt(split[i]);
       } catch (final NumberFormatException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
@@ -46,20 +47,58 @@ public final class ArrayUtilities {
     return integers;
   }
 
+  public static double[] getDoubleArray(String commaSeperatedString) {
+    if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
+      return new double[0];
+    }
+
+    final String[] split = commaSeperatedString.split(",");
+    double[] doubles = new double[split.length];
+    if (doubles.length == 0) {
+      return doubles;
+    }
+
+    for (int i = 0; i < split.length; i++) {
+      if (split[i] == null || split[i].isEmpty()) {
+        continue;
+      }
+
+      try {
+        doubles[i] = Double.parseDouble(split[i]);
+      } catch (final NumberFormatException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
+
+    return doubles;
+  }
+
   public static String getCommaSeparatedString(int[] arr) {
-    if (arr == null || arr.length == 0) {
+    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Integer[]::new));
+  }
+
+  public static String getCommaSeparatedString(double[] arr) {
+    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Double[]::new));
+  }
+
+  public static <T> String getCommaSeparatedString(List<T> list) {
+    if (list == null || list.isEmpty()) {
       return null;
     }
 
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < arr.length; i++) {
-      sb.append(arr[i]);
-      if (i < arr.length - 1) {
+    for (int i = 0; i < list.size(); i++) {
+      sb.append(list.get(i));
+      if (i < list.size() - 1) {
         sb.append(',');
       }
     }
 
     return sb.toString();
+  }
+
+  public static <T> String getCommaSeparatedString(T[] arr) {
+    return getCommaSeparatedString(Arrays.asList(arr));
   }
 
   public static <T> T getRandom(T[] arr) {

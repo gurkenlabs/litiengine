@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.text.DecimalFormat;
@@ -27,6 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Game;
@@ -37,6 +39,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
+import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
@@ -78,8 +81,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private JSpinner spinnerMinDeltaX, spinnerMinDeltaY, spinnerMinGravityX, spinnerMinGravityY, spinnerMinStartWidth, spinnerMinStartHeight, spinnerMinDeltaWidth, spinnerMinDeltaHeight;
   private JSpinner spinnerMaxDeltaX, spinnerMaxDeltaY, spinnerMaxGravityX, spinnerMaxGravityY, spinnerMaxStartWidth, spinnerMaxStartHeight, spinnerMaxDeltaWidth, spinnerMaxDeltaHeight;
 
-  public static final int PARTICLESPINNER_MAX_VALUE=100;
-  
+  public static final int PARTICLESPINNER_MAX_VALUE = 100;
+
   /**
    * Create the dialog.
    */
@@ -116,10 +119,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMinDeltaY = new JSpinner();
     spinnerMinDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
-
     spinnerMinDeltaX = new JSpinner();
     spinnerMinDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
 
     JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
     lblMin1.setEnabled(false);
@@ -322,6 +323,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
     model = (DefaultTableModel) table.getModel();
     table.setFont(Program.TEXT_FONT);
+    table.getColumnModel().getColumn(1).setCellRenderer(new ParticleColorCellRenderer());
     scrollPane.setViewportView(table);
 
     btnAddColor = new JButton("+");
@@ -555,7 +557,12 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
+      if (table.getSelectedRow() == -1) {
+        return;
+      }
+
+      ParticleColor color = colors.get(table.getSelectedRow());
+      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectEmitterColor"), color.toColor());
       if (result == null) {
         return;
       }
@@ -564,11 +571,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       colors.set(table.getSelectedRow(), c);
       model.setValueAt(c, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
-        StringBuilder colorString = new StringBuilder();
-        for (ParticleColor color : colors) {
-          colorString.append(color.toHexString() + ",");
-        }
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_COLORS, colorString.toString());
+        String commaSeperated = ArrayUtilities.getCommaSeparatedString(colors);
+        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_COLORS, commaSeperated);
       }
     });
 
@@ -580,7 +584,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
         }
       }
 
-      model.removeRow(table.getSelectedRow());
+      if (table.getSelectedRow() != -1) {
+        model.removeRow(table.getSelectedRow());
+      }
     });
 
     btnAddColor.addActionListener(a -> {
@@ -597,12 +603,11 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxParticleType.addActionListener(new MapObjectPropertyActionListener(m -> {
       ParticleType particleType = (ParticleType) this.comboBoxParticleType.getSelectedItem();
-      if(particleType == ParticleType.SPRITE) {
+      if (particleType == ParticleType.SPRITE) {
         this.tabbedPanel.setSelectedIndex(1);
         tabbedPanel.setEnabledAt(0, false);
         tabbedPanel.setEnabledAt(1, true);
-      }
-      else {
+      } else {
         this.tabbedPanel.setSelectedIndex(0);
         tabbedPanel.setEnabledAt(0, true);
         tabbedPanel.setEnabledAt(1, false);
@@ -637,19 +642,30 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.spinnerColorDeviation.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_COLORDEVIATION, this.spinnerColorDeviation.getValue().toString())));
     this.spinnerAlphaDeviation.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_ALPHADEVIATION, this.spinnerAlphaDeviation.getValue().toString())));
 
-
   }
 
   @Override
   protected void clearControls() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    // TODO Auto-generated method stub
+  }
+  
+  public class ParticleColorCellRenderer extends DefaultTableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
+      // Cells are by default rendered as a JLabel.
+      JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+      Color bg = colors.get(row).toColor();
+      l.setBackground(bg);
+      l.setForeground(bg.getAlpha() > 100 ? Color.WHITE: Color.BLACK);
+      
+      // Return the JLabel which renders the cell.
+      return l;
+    }
   }
 
 }
