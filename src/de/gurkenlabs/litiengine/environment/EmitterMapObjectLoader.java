@@ -28,15 +28,15 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     EmitterData data = this.createEmitterData(mapObject);
     CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().getX(), mapObject.getLocation().getY(), data);
-    
+
     emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
     emitter.setLocation(mapObject.getLocation());
     emitter.setMapId(mapObject.getId());
     emitter.setName(mapObject.getName());
-    
+
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(emitter);
-      
+
     return entities;
   }
 
@@ -54,19 +54,21 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setColorDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.EMITTER_COLORDEVIATION));
     data.setAlphaDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.EMITTER_ALPHADEVIATION));
 
-    String[] colors = mapObject.getCustomProperty(MapObjectProperty.EMITTER_COLORS, "").split(",");
+    String colorsString = mapObject.getCustomProperty(MapObjectProperty.EMITTER_COLORS, "");
+    if (colorsString != null) {
+      String[] colors = colorsString.split(",");
 
-    List<ParticleColor> particleColors = new ArrayList<>();
-    for (String color : colors) {
-      ParticleColor particleColor = ParticleColor.decode(color);
-      if (particleColor != null) {
-        particleColors.add(particleColor);
+      List<ParticleColor> particleColors = new ArrayList<>();
+      for (String color : colors) {
+        ParticleColor particleColor = ParticleColor.decode(color);
+        if (particleColor != null) {
+          particleColors.add(particleColor);
+        }
       }
-    }
 
-    data.setColors(particleColors);
+      data.setColors(particleColors);
+    }
     data.setColorProbabilities(mapObject.getCustomProperty(MapObjectProperty.EMITTER_COLORPROBABILITIES, ""));
-    
 
     // particle
     data.setParticleX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINX), mapObject.getCustomPropertyBool(MapObjectProperty.PARTICLE_X_RANDOM), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINX),
