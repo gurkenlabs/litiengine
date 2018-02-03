@@ -3,10 +3,13 @@ package de.gurkenlabs.utiliti.swing.panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -27,7 +30,11 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
@@ -40,6 +47,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
+import de.gurkenlabs.utiliti.swing.SpinnerCellEditor;
 import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyActionListener;
 import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyChangeListener;
 
@@ -48,8 +56,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private DefaultTableModel model;
   private JTextField txt;
   private JButton btnSelectColor;
-  private JTable table;
+  private JTable colorTable;
   private List<ParticleColor> colors;
+  private List<Integer> colorProbabilities;
   private IMapObject backupMapObject;
   private JTabbedPane tabbedPanel;
   private JPanel colorPanel;
@@ -78,8 +87,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private JSpinner spinnerMinDeltaX, spinnerMinDeltaY, spinnerMinGravityX, spinnerMinGravityY, spinnerMinStartWidth, spinnerMinStartHeight, spinnerMinDeltaWidth, spinnerMinDeltaHeight;
   private JSpinner spinnerMaxDeltaX, spinnerMaxDeltaY, spinnerMaxGravityX, spinnerMaxGravityY, spinnerMaxStartWidth, spinnerMaxStartHeight, spinnerMaxDeltaWidth, spinnerMaxDeltaHeight;
 
-  public static final int PARTICLESPINNER_MAX_VALUE=100;
-  
+  public static final int PARTICLESPINNER_MAX_VALUE = 100;
+
   /**
    * Create the dialog.
    */
@@ -88,7 +97,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     setBounds(100, 100, 700, 464);
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-    colors = new ArrayList<>();
+    this.colors = new ArrayList<>();
+    this.colorProbabilities = new ArrayList<>();
     JLabel label = new JLabel(Resources.get("panel_emitterData"));
     label.setFont(new Font("Tahoma", Font.BOLD, 12));
 
@@ -116,10 +126,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMinDeltaY = new JSpinner();
     spinnerMinDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
-
     spinnerMinDeltaX = new JSpinner();
     spinnerMinDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
 
     JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
     lblMin1.setEnabled(false);
@@ -318,11 +326,42 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     JScrollPane scrollPane = new JScrollPane();
 
-    table = new JTable();
-    table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
-    model = (DefaultTableModel) table.getModel();
-    table.setFont(Program.TEXT_FONT);
-    scrollPane.setViewportView(table);
+    colorTable = new JTable() {
+      public boolean isCellEditable(int rowIndex, int colIndex) {
+        if (colIndex == 0) {
+          return true;
+        }
+        return false; // Disallow the editing of any cell
+      }
+    };
+
+    colorTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
+    model = (DefaultTableModel) colorTable.getModel();
+    colorTable.setFont(Program.TEXT_FONT);
+    scrollPane.setViewportView(colorTable);
+    TableColumnModel tcm = colorTable.getColumnModel();
+    TableColumn tc = tcm.getColumn(1);
+    tc.setCellEditor(new SpinnerCellEditor());
+        
+    CellEditorListener cellListener = new CellEditorListener() {
+
+      @Override
+      public void editingStopped(ChangeEvent e) {
+        int row = colorTable.getSelectedRow();
+        int column = colorTable.getSelectedColumn();
+        if (column == 0) {
+          colorProbabilities.set(row, (int) colorTable.getValueAt(row, column));
+        }
+      }
+
+      @Override
+      public void editingCanceled(ChangeEvent e) {
+        // TODO Auto-generated method stub
+
+      }
+    };
+
+    colorTable.getCellEditor().addCellEditorListener(cellListener);
 
     btnAddColor = new JButton("+");
 
@@ -555,14 +594,14 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectEmitterColor"), colors.get(table.getSelectedRow()).toColor());
+      Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectEmitterColor"), colors.get(colorTable.getSelectedRow()).toColor());
       if (result == null) {
         return;
       }
 
       ParticleColor c = new ParticleColor(result);
-      colors.set(table.getSelectedRow(), c);
-      model.setValueAt(c, table.getSelectedRow(), 1);
+      colors.set(colorTable.getSelectedRow(), c);
+      model.setValueAt(c.toHexString(), colorTable.getSelectedRow(), 1);
       if (getDataSource() != null) {
         StringBuilder colorString = new StringBuilder();
         for (ParticleColor color : colors) {
@@ -574,19 +613,19 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     btnRemoveColor.addActionListener(a -> {
       for (int removeIndex = 0; removeIndex < colors.size(); removeIndex++) {
-        if (removeIndex == table.getSelectedRow()) {
+        if (removeIndex == colorTable.getSelectedRow()) {
           colors.remove(removeIndex);
           break;
         }
       }
 
-      model.removeRow(table.getSelectedRow());
+      model.removeRow(colorTable.getSelectedRow());
     });
 
     btnAddColor.addActionListener(a -> {
       ParticleColor c = new ParticleColor();
       colors.add(c);
-      model.addRow(new Object[] { null, c.toString() });
+      model.addRow(new Object[] { null, c.toHexString() });
     });
 
     this.spinnerSpawnRate.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_SPAWNRATE, this.spinnerSpawnRate.getValue().toString())));
@@ -597,12 +636,11 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxParticleType.addActionListener(new MapObjectPropertyActionListener(m -> {
       ParticleType particleType = (ParticleType) this.comboBoxParticleType.getSelectedItem();
-      if(particleType == ParticleType.SPRITE) {
+      if (particleType == ParticleType.SPRITE) {
         this.tabbedPanel.setSelectedIndex(1);
         tabbedPanel.setEnabledAt(0, false);
         tabbedPanel.setEnabledAt(1, true);
-      }
-      else {
+      } else {
         this.tabbedPanel.setSelectedIndex(0);
         tabbedPanel.setEnabledAt(0, true);
         tabbedPanel.setEnabledAt(1, false);
@@ -636,7 +674,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.spinnerColorDeviation.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_COLORDEVIATION, this.spinnerColorDeviation.getValue().toString())));
     this.spinnerAlphaDeviation.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_ALPHADEVIATION, this.spinnerAlphaDeviation.getValue().toString())));
-
 
   }
 
