@@ -20,10 +20,6 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     super(MapObjectType.EMITTER);
   }
 
-  /***
-   * TODO 04.10.2017: refactor this implementation because the hard coded emitter
-   * types are not a proper approach.
-   */
   @Override
   public Collection<IEntity> load(IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
@@ -37,7 +33,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     emitter.setLocation(mapObject.getLocation());
     emitter.setMapId(mapObject.getId());
     emitter.setName(mapObject.getName());
-
+    
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(emitter);
       

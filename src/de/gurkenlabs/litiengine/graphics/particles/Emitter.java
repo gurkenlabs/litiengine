@@ -359,7 +359,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
 
-    if (Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
+    if (this.getSpawnRate() != 0 && Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
       this.spawnParticle();
     }
   }

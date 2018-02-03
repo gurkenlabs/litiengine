@@ -123,12 +123,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMinDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
-    lblMin1.setEnabled(false);
     lblMin1.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin1.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     JLabel lblMin2 = new JLabel(Resources.get("panel_min"));
-    lblMin2.setEnabled(false);
     lblMin2.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin2.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
@@ -180,7 +178,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblGravityX.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin3 = new JLabel(Resources.get("panel_min"));
-    lblMin3.setEnabled(false);
     lblMin3.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin3.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
@@ -211,7 +208,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblGravityY.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin4 = new JLabel(Resources.get("panel_min"));
-    lblMin4.setEnabled(false);
     lblMin4.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin4.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
@@ -236,20 +232,17 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblMaxParticles = new JLabel(Resources.get("panel_emitterMaxParticles"));
 
     spinnerMaxParticles = new JSpinner();
-    spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 0, 1));
+    spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
 
     JLabel lblStartWidth = new JLabel(Resources.get("panel_particleStartWidth"));
-    lblStartWidth.setEnabled(false);
     lblStartWidth.setHorizontalAlignment(SwingConstants.LEFT);
     lblStartWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin5 = new JLabel(Resources.get("panel_min"));
-    lblMin5.setEnabled(false);
     lblMin5.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin5.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     spinnerMinStartWidth = new JSpinner();
-    spinnerMinStartWidth.setEnabled(false);
     spinnerMinStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     JLabel lblMax4 = new JLabel(Resources.get("panel_max"));
@@ -262,12 +255,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMaxStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     rdbtnLockStartWidth = new JRadioButton("");
-    rdbtnLockStartWidth.setEnabled(false);
     buttonGroupStartWidth.add(rdbtnLockStartWidth);
     rdbtnLockStartWidth.setSelected(true);
 
     rdbtnRandomStartWidth = new JRadioButton("");
-    rdbtnRandomStartWidth.setEnabled(false);
     buttonGroupStartWidth.add(rdbtnRandomStartWidth);
     JLabel lblParticleType = new JLabel(Resources.get("panel_particleType"));
 
@@ -275,17 +266,14 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     comboBoxParticleType.setModel((ComboBoxModel) new DefaultComboBoxModel(ParticleType.values()));
 
     JLabel lblStartHeight = new JLabel(Resources.get("panel_particleStartHeight"));
-    lblStartHeight.setEnabled(false);
     lblStartHeight.setHorizontalAlignment(SwingConstants.LEFT);
     lblStartHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin6 = new JLabel(Resources.get("panel_min"));
-    lblMin6.setEnabled(false);
     lblMin6.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin6.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     spinnerMinStartHeight = new JSpinner();
-    spinnerMinStartHeight.setEnabled(false);
     spinnerMinStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     JLabel lblMax5 = new JLabel(Resources.get("panel_max"));
@@ -298,12 +286,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMaxStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     rdbtnLockStartHeight = new JRadioButton("");
-    rdbtnLockStartHeight.setEnabled(false);
     buttonGroupStartHeight.add(rdbtnLockStartHeight);
     rdbtnLockStartHeight.setSelected(true);
 
     rdbtnRandomStartHeight = new JRadioButton("");
-    rdbtnRandomStartHeight.setEnabled(false);
     buttonGroupStartHeight.add(rdbtnRandomStartHeight);
     tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
     tabbedPanel.setBorder(null);
@@ -386,17 +372,14 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spritePanel.setLayout(gl_spritePanel);
 
     JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
-    lblDeltaWidth.setEnabled(false);
     lblDeltaWidth.setHorizontalAlignment(SwingConstants.LEFT);
     lblDeltaWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin7 = new JLabel(Resources.get("panel_min"));
-    lblMin7.setEnabled(false);
     lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin7.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     spinnerMinDeltaWidth = new JSpinner();
-    spinnerMinDeltaWidth.setEnabled(false);
 
     JLabel lblMax6 = new JLabel(Resources.get("panel_max"));
     lblMax6.setEnabled(false);
@@ -407,25 +390,20 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMaxDeltaWidth.setEnabled(false);
 
     rdbtnLockDeltaWidth = new JRadioButton("");
-    rdbtnLockDeltaWidth.setEnabled(false);
     buttonGroupDeltaWidth.add(rdbtnLockDeltaWidth);
     rdbtnLockDeltaWidth.setSelected(true);
 
     rdbtnRandomDeltaWidth = new JRadioButton("");
-    rdbtnRandomDeltaWidth.setEnabled(false);
     buttonGroupDeltaWidth.add(rdbtnRandomDeltaWidth);
     JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
-    lblDeltaHeight.setEnabled(false);
     lblDeltaHeight.setHorizontalAlignment(SwingConstants.LEFT);
     lblDeltaHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin = new JLabel(Resources.get("panel_min"));
-    lblMin.setEnabled(false);
     lblMin.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     spinnerMinDeltaHeight = new JSpinner();
-    spinnerMinDeltaHeight.setEnabled(false);
 
     JLabel lblMax7 = new JLabel(Resources.get("panel_max"));
     lblMax7.setEnabled(false);
@@ -436,12 +414,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     spinnerMaxDeltaHeight.setEnabled(false);
 
     rdbtnLockDeltaHeight = new JRadioButton("");
-    rdbtnLockDeltaHeight.setEnabled(false);
     buttonGroupDeltaHeight.add(rdbtnLockDeltaHeight);
     rdbtnLockDeltaHeight.setSelected(true);
 
     rdbtnRandomDeltaHeight = new JRadioButton("");
-    rdbtnRandomDeltaHeight.setEnabled(false);
     buttonGroupDeltaHeight.add(rdbtnRandomDeltaHeight);
 
     JLabel lblStaticPhysics = new JLabel(Resources.get("panel_particleStaticPhysics"));
