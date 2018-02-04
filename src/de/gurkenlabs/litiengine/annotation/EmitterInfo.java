@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+
 /**
  * This annotation contains default values for the initialization of an emitter.
  */
@@ -46,7 +48,7 @@ public @interface EmitterInfo {
    *
    * @return
    */
-  int particleUpdateRate() default 30;
+  int particleUpdateRate() default Emitter.DEFAULT_UPDATERATE;
 
   /**
    * Spawn amount.
@@ -60,5 +62,5 @@ public @interface EmitterInfo {
    *
    * @return the int
    */
-  int spawnRate() default 40;
+  int spawnRate() default 0;
 }

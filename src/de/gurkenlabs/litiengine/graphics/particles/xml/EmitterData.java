@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.MathUtilities;
 
@@ -123,7 +124,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.deltaHeight = new ParticleParameter();
     this.colorDeviation = 0;
     this.alphaDeviation = 0;
-    this.updateRate = 30;
+    this.updateRate = Emitter.DEFAULT_UPDATERATE;
   }
 
   @Override
@@ -402,6 +403,10 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   public void setUpdateRate(final int updateRate) {
+    if(updateRate == 0) {
+      return;
+    }
+    
     this.updateRate = updateRate;
   }
 

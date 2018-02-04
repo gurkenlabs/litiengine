@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.util.MathUtilities;
+
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {
   public static final int MAX_VALUE_UNDEFINED = -1;
@@ -57,7 +59,7 @@ public class ParticleParameter implements Serializable {
 
   @XmlTransient
   public float getRandomNumber() {
-    return (float) (this.getMinValue() + Math.random() * (this.getMaxValue() - this.getMinValue() + 1));
+    return (float)MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
   }
 
   public void setMaxValue(final float maxValue) {

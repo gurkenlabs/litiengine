@@ -36,7 +36,7 @@ public class ParticleColor implements Serializable {
       return null;
     }
 
-    String[] split = particleColorString.split("|");
+    String[] split = particleColorString.split("\\|");
     if (split.length < 2) {
       return null;
     }

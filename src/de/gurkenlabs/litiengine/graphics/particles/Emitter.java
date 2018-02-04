@@ -26,7 +26,8 @@ import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
  */
 @CollisionInfo(collision = false)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
-  private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  public static final int DEFAULT_UPDATERATE = 30;
   private static final Random RANDOM = new Random();
 
   private final List<Consumer<Emitter>> finishedConsumer;
@@ -359,7 +360,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
 
-    if (this.getSpawnRate() != 0 && Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
+    if ((this.getSpawnRate() == 0 || Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate())) {
       this.spawnParticle();
     }
   }
@@ -397,6 +398,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   protected int getRandomParticleTTL() {
+    if (this.getParticleMaxTTL() == 0) {
+      return this.getParticleMinTTL();
+    }
+
     final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
     if (ttlDiff <= 0) {
       return this.getParticleMaxTTL();
@@ -425,9 +430,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   /**
-   * Render particles of this effect. The particles are always rendered
-   * relatively to this effects render location. A particle doesn't have an own
-   * map location. It is always relative to the effect it is assigned to.
+   * Render particles of this effect. The particles are always rendered relatively
+   * to this effects render location. A particle doesn't have an own map location.
+   * It is always relative to the effect it is assigned to.
    *
    * @param g
    *          the g

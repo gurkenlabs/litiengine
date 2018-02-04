@@ -8,6 +8,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
@@ -47,7 +48,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setHeight(mapObject.getHeight());
     data.setSpawnRate(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_SPAWNRATE));
     data.setSpawnAmount(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_SPAWNAMOUNT));
-    data.setUpdateRate(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_UPDATEDELAY));
+    data.setUpdateRate(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_UPDATERATE, Emitter.DEFAULT_UPDATERATE));
     data.setEmitterTTL(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_TIMETOLIVE));
     data.setMaxParticles(mapObject.getCustomPropertyInt(MapObjectProperty.EMITTER_MAXPARTICLES));
     data.setParticleType(mapObject.getCustomPropertyEnum(MapObjectProperty.EMITTER_PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE));
@@ -68,39 +69,23 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
       data.setColors(particleColors);
     }
+    
     data.setColorProbabilities(mapObject.getCustomProperty(MapObjectProperty.EMITTER_COLORPROBABILITIES, ""));
 
     // particle
-    data.setParticleX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINX),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXX, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setParticleX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINX), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXX, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setParticleY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINY), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXY, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setParticleWidth(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINSTARTWIDTH), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXSTARTWIDTH, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setParticleHeight(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINSTARTHEIGHT), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXSTARTHEIGHT, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setDeltaX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAX), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAX, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setDeltaY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAY), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAY, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setGravityX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINGRAVITYX), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXGRAVITYX, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setGravityY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINGRAVITYY), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXGRAVITYY, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setDeltaWidth(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAWIDTH), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, ParticleParameter.MAX_VALUE_UNDEFINED)));
+    data.setDeltaHeight(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAHEIGHT), mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, ParticleParameter.MAX_VALUE_UNDEFINED)));
 
-    data.setParticleY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINY),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXY, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setParticleWidth(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINSTARTWIDTH),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXSTARTWIDTH, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setParticleHeight(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINSTARTHEIGHT),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXSTARTHEIGHT, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setDeltaX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAX),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAX, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setDeltaY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAY),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAY, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setGravityX(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINGRAVITYX),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXGRAVITYX, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setGravityY(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINGRAVITYY),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXGRAVITYY, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setDeltaWidth(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAWIDTH),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
-    data.setDeltaHeight(new ParticleParameter(mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MINDELTAHEIGHT),
-        mapObject.getCustomPropertyFloat(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, ParticleParameter.MAX_VALUE_UNDEFINED)));
-
+    data.setParticleMinTTL(mapObject.getCustomPropertyInt(MapObjectProperty.PARTICLE_MINTTL));
+    data.setParticleMaxTTL(mapObject.getCustomPropertyInt(MapObjectProperty.PARTICLE_MAXTTL));
     data.setApplyStaticPhysics(mapObject.getCustomPropertyBool(MapObjectProperty.PARTICLE_STATICPHYSICS));
 
     data.setParticleText(mapObject.getCustomProperty(MapObjectProperty.PARTICLE_TEXT));

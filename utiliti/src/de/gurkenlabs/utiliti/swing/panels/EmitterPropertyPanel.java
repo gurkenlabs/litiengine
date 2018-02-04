@@ -41,6 +41,8 @@ import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
+import javax.swing.SpinnerModel;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
@@ -75,6 +77,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JRadioButton rdbtnRandomStartHeight = new JRadioButton("");
   private final JRadioButton rdbtnRandomDeltaWidth = new JRadioButton("");
   private final JRadioButton rdbtnRandomDeltaHeight = new JRadioButton("");
+  private final JRadioButton rdbtnLockParticleTTL = new JRadioButton("");
+  private final JRadioButton rdbtnRandomParticleTTL = new JRadioButton("");
+  
   private final JCheckBox chckbxStaticPhysics;
 
   private final JButton btnSelectColor = new JButton();
@@ -89,6 +94,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final ButtonGroup buttonGroupStartHeight = new ButtonGroup();
   private final ButtonGroup buttonGroupDeltaWidth = new ButtonGroup();
   private final ButtonGroup buttonGroupDeltaHeight = new ButtonGroup();
+  private final ButtonGroup buttonGroupParticleTTL = new ButtonGroup();
   private final JSpinner spinnerSpawnRate = new JSpinner();
   private final JSpinner spinnerSpawnAmount = new JSpinner();
   private final JSpinner spinnerUpdateDelay = new JSpinner();
@@ -113,11 +119,16 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JSpinner spinnerMaxDeltaWidth = new JSpinner(getParticleModel());
   private final JSpinner spinnerMaxDeltaHeight = new JSpinner(getParticleModel());
 
+  private final JSpinner spinnerMinParticleTTL = new JSpinner(new SpinnerNumberModel(0, 0, 30000, 1));
+  private final JSpinner spinnerMaxParticleTTL = new JSpinner(new SpinnerNumberModel(0, 0, 30000, 1));
+
   /**
    * Create the dialog.
    */
   public EmitterPropertyPanel() {
     super();
+    rdbtnLockParticleTTL.setSelected(true);
+    spinnerMaxParticleTTL.setEnabled(false);
     setBounds(100, 100, 700, 464);
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -173,12 +184,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblParticleData.setFont(new Font("Tahoma", Font.BOLD, 12));
 
     JLabel lblDeltax = new JLabel(Resources.get("panel_particleDeltaX"));
-    lblDeltax.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltax.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblDeltaY = new JLabel(Resources.get("panel_particleDeltaY"));
-    lblDeltaY.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltaY.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
     lblMin1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -189,12 +196,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMin2.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     JLabel lblLock = new JLabel(Resources.get("panel_lock"));
-    lblLock.setHorizontalAlignment(SwingConstants.LEFT);
-    lblLock.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblRandom = new JLabel(Resources.get("panel_random"));
-    lblRandom.setHorizontalAlignment(SwingConstants.CENTER);
-    lblRandom.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMax = new JLabel(Resources.get("panel_max"));
     lblMax.setHorizontalAlignment(SwingConstants.CENTER);
@@ -207,8 +210,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblUpdateDelay = new JLabel(Resources.get("panel_emitterUpdateDelay"));
 
     JLabel lblGravityX = new JLabel(Resources.get("panel_particleGravityX"));
-    lblGravityX.setHorizontalAlignment(SwingConstants.LEFT);
-    lblGravityX.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin3 = new JLabel(Resources.get("panel_min"));
     lblMin3.setHorizontalAlignment(SwingConstants.CENTER);
@@ -221,8 +222,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel labelTtl = new JLabel(Resources.get("panel_emitterTTL"));
 
     JLabel lblGravityY = new JLabel(Resources.get("panel_particleGravityY"));
-    lblGravityY.setHorizontalAlignment(SwingConstants.LEFT);
-    lblGravityY.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin4 = new JLabel(Resources.get("panel_min"));
     lblMin4.setHorizontalAlignment(SwingConstants.CENTER);
@@ -235,8 +234,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblMaxParticles = new JLabel(Resources.get("panel_emitterMaxParticles"));
 
     JLabel lblStartWidth = new JLabel(Resources.get("panel_particleStartWidth"));
-    lblStartWidth.setHorizontalAlignment(SwingConstants.LEFT);
-    lblStartWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin5 = new JLabel(Resources.get("panel_min"));
     lblMin5.setHorizontalAlignment(SwingConstants.CENTER);
@@ -249,8 +246,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblParticleType = new JLabel(Resources.get("panel_particleType"));
 
     JLabel lblStartHeight = new JLabel(Resources.get("panel_particleStartHeight"));
-    lblStartHeight.setHorizontalAlignment(SwingConstants.LEFT);
-    lblStartHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin6 = new JLabel(Resources.get("panel_min"));
     lblMin6.setHorizontalAlignment(SwingConstants.CENTER);
@@ -269,8 +264,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblSpritesheet = new JLabel(Resources.get("panel_sprite"));
 
     JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
-    lblDeltaWidth.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltaWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin7 = new JLabel(Resources.get("panel_min"));
     lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
@@ -281,8 +274,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMax6.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
-    lblDeltaHeight.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltaHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblMin = new JLabel(Resources.get("panel_min"));
     lblMin.setHorizontalAlignment(SwingConstants.CENTER);
@@ -297,8 +288,17 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblStaticPhysics.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
     JLabel lblText = new JLabel(Resources.get("panel_particleText"));
-    lblText.setHorizontalAlignment(SwingConstants.LEFT);
-    lblText.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+
+    JLabel lblParticleTtl = new JLabel("particle ttl");
+    
+    JLabel labelMinParticleTtl = new JLabel(Resources.get("panel_min"));
+    labelMinParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
+    labelMinParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    
+    JLabel lblMaxParticleTtl = new JLabel(Resources.get("panel_max"));
+    lblMaxParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
+    lblMaxParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
     GroupLayout groupLayoutcolorPanel = new GroupLayout(colorPanel);
     groupLayoutcolorPanel.setHorizontalGroup(groupLayoutcolorPanel.createParallelGroup(Alignment.LEADING)
@@ -352,16 +352,24 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                     .createSequentialGroup().addComponent(lblParticleType).addGap(20).addComponent(comboBoxParticleType, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE).addGap(18).addComponent(lblStartHeight, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMin6, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinStartHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax5, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                     .addComponent(spinnerMaxStartHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addGap(29).addComponent(rdbtnLockStartHeight).addGap(19).addComponent(rdbtnRandomStartHeight))
-                .addGroup(groupLayout.createSequentialGroup().addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, 286, GroupLayout.PREFERRED_SIZE).addGap(18)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblDeltaWidth, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addComponent(lblDeltaHeight).addComponent(lblStaticPhysics, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblText, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE))
-                    .addGroup(
-                        groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(lblMin7, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaWidth, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(groupLayout.createSequentialGroup().addComponent(lblMin, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(groupLayout.createSequentialGroup().addGap(49).addComponent(chckbxStaticPhysics)).addComponent(txt, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE))
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblMax6, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax7, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerMaxDeltaWidth, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMaxDeltaHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)).addGap(29)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnLockDeltaWidth).addComponent(rdbtnLockDeltaHeight)).addGap(19).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnRandomDeltaWidth).addComponent(rdbtnRandomDeltaHeight))))));
+                .addGroup(
+                    groupLayout.createSequentialGroup().addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, 286, GroupLayout.PREFERRED_SIZE).addGap(18)
+                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                            .addGroup(groupLayout.createSequentialGroup()
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblStaticPhysics, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addComponent(lblText, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(49).addComponent(chckbxStaticPhysics)).addComponent(txt, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(groupLayout.createSequentialGroup().addComponent(lblParticleTtl, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addComponent(labelMinParticleTtl, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spinnerMinParticleTTL, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMaxParticleTtl, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spinnerMaxParticleTTL, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addGap(29).addComponent(rdbtnLockParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addGap(19)
+                                .addComponent(rdbtnRandomParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblDeltaWidth, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addComponent(lblDeltaHeight))
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                                    .addGroup(groupLayout.createSequentialGroup().addComponent(lblMin7, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaWidth, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(groupLayout.createSequentialGroup().addComponent(lblMin, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblMax6, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax7, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerMaxDeltaWidth, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMaxDeltaHeight, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)).addGap(29)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnLockDeltaWidth).addComponent(rdbtnLockDeltaHeight)).addGap(19)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnRandomDeltaWidth).addComponent(rdbtnRandomDeltaHeight))))))));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(33)
         .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(labelEmitterData).addComponent(lblParticleData).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblLock)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblRandom))).addGap(12)
         .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblSpawnRate))
@@ -399,17 +407,27 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
             .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMin6)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMinStartHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMax5)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMaxStartHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addComponent(rdbtnLockStartHeight)
             .addComponent(rdbtnRandomStartHeight))
-        .addGap(5)
-        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
-            .addGroup(groupLayout.createSequentialGroup().addGap(8).addComponent(lblDeltaWidth).addGap(16).addComponent(lblDeltaHeight).addGap(16).addComponent(lblStaticPhysics).addGap(16).addComponent(lblText))
-            .addGroup(groupLayout.createSequentialGroup().addGap(5)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(3).addComponent(lblMin7)).addComponent(spinnerMinDeltaWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(10)
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(3).addComponent(lblMin)).addComponent(spinnerMinDeltaHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(9)
-                .addComponent(chckbxStaticPhysics).addGap(10).addComponent(txt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup().addGap(8).addComponent(lblMax6).addGap(16).addComponent(lblMax7))
-            .addGroup(groupLayout.createSequentialGroup().addGap(5).addComponent(spinnerMaxDeltaWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(10).addComponent(spinnerMaxDeltaHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnLockDeltaWidth).addGap(9).addComponent(rdbtnLockDeltaHeight)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnRandomDeltaWidth).addGap(9).addComponent(rdbtnRandomDeltaHeight)))));
+        .addGap(
+            5)
+        .addGroup(
+            groupLayout.createParallelGroup(Alignment.LEADING).addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
+                .addGroup(
+                    groupLayout.createSequentialGroup()
+                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(8).addComponent(lblMax6).addGap(16).addComponent(lblMax7))
+                            .addGroup(groupLayout.createSequentialGroup().addGap(5).addComponent(spinnerMaxDeltaWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addGap(10).addComponent(spinnerMaxDeltaHeight, GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnLockDeltaWidth).addGap(9).addComponent(rdbtnLockDeltaHeight))
+                            .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnRandomDeltaWidth).addGap(9).addComponent(rdbtnRandomDeltaHeight))
+                            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(8).addComponent(lblDeltaWidth).addGap(16).addComponent(lblDeltaHeight)).addGroup(groupLayout.createSequentialGroup().addGap(5)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(3).addComponent(lblMin7)).addComponent(spinnerMinDeltaWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(10)
+                                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(3).addComponent(lblMin)).addComponent(spinnerMinDeltaHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
+                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblParticleTtl)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(labelMinParticleTtl))
+                            .addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMinParticleTTL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMaxParticleTtl))
+                            .addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMaxParticleTTL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addComponent(rdbtnLockParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rdbtnRandomParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblStaticPhysics).addGap(16).addComponent(lblText))
+                            .addGroup(groupLayout.createSequentialGroup().addComponent(chckbxStaticPhysics).addGap(10).addComponent(txt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))));
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
@@ -451,7 +469,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.buttonGroupDeltaHeight.add(this.rdbtnLockDeltaHeight);
     this.buttonGroupDeltaHeight.add(this.rdbtnRandomDeltaHeight);
-
+    
+    this.buttonGroupParticleTTL.add(this.rdbtnLockParticleTTL);
+    this.buttonGroupParticleTTL.add(this.rdbtnRandomParticleTTL);
 
     this.rdbtnLockDeltaX.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaX));
     this.rdbtnLockDeltaY.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaY));
@@ -461,7 +481,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.rdbtnLockStartHeight.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxStartHeight));
     this.rdbtnLockDeltaWidth.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaWidth));
     this.rdbtnLockDeltaHeight.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaHeight));
-    
+    this.rdbtnLockParticleTTL.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxParticleTTL));
+
     this.rdbtnLockDeltaX.setSelected(true);
     this.rdbtnLockDeltaY.setSelected(true);
     this.rdbtnLockGravityX.setSelected(true);
@@ -470,6 +491,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.rdbtnLockStartHeight.setSelected(true);
     this.rdbtnLockDeltaWidth.setSelected(true);
     this.rdbtnLockDeltaHeight.setSelected(true);
+    this.rdbtnLockParticleTTL.setSelected(true);
   }
 
   public class ParticleRadioButtonListener implements ItemListener {
@@ -550,7 +572,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNRATE, this.spinnerSpawnRate));
     this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNAMOUNT, this.spinnerSpawnAmount));
-    this.spinnerUpdateDelay.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_UPDATEDELAY, this.spinnerUpdateDelay));
+    this.spinnerUpdateDelay.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_UPDATERATE, this.spinnerUpdateDelay));
     this.spinnerTTL.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_TIMETOLIVE, this.spinnerTTL));
     this.spinnerMaxParticles.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_MAXPARTICLES, this.spinnerMaxParticles));
 
@@ -573,10 +595,12 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.spinnerMaxDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, this.spinnerMaxDeltaWidth));
     this.spinnerMinDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAHEIGHT, this.spinnerMinDeltaHeight));
     this.spinnerMaxDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, this.spinnerMaxDeltaHeight));
-
+    this.spinnerMinParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINTTL, this.spinnerMinParticleTTL));
+    this.spinnerMaxParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXTTL, this.spinnerMaxParticleTTL));
+    
     this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_COLORDEVIATION, this.spinnerColorDeviation));
     this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_ALPHADEVIATION, this.spinnerAlphaDeviation));
-
+    
     this.chckbxStaticPhysics.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_STATICPHYSICS, Boolean.toString(this.chckbxStaticPhysics.isSelected()))));
 
     this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_TEXT, this.txt.getText())));
@@ -613,5 +637,4 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       return l;
     }
   }
-
 }
