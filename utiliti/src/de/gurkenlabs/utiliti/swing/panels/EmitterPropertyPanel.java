@@ -42,6 +42,7 @@ import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
+  private static final double PARTICLESPINNER_MAX_VALUE = 100.0;
   private DefaultTableModel model;
   private JTextField txt;
   private JButton btnSelectColor;
@@ -90,26 +91,24 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JSpinner spinnerUpdateDelay = new JSpinner();
   private final JSpinner spinnerTTL = new JSpinner();
   private final JSpinner spinnerMaxParticles = new JSpinner();
-  private final JSpinner spinnerColorDeviation = new JSpinner();
-  private final JSpinner spinnerAlphaDeviation = new JSpinner();
-  private final JSpinner spinnerMinDeltaX = new JSpinner();
-  private final JSpinner spinnerMinDeltaY = new JSpinner();
-  private final JSpinner spinnerMinGravityX = new JSpinner();
-  private final JSpinner spinnerMinGravityY = new JSpinner();
-  private final JSpinner spinnerMinStartWidth = new JSpinner();
-  private final JSpinner spinnerMinStartHeight = new JSpinner();
-  private final JSpinner spinnerMinDeltaWidth = new JSpinner();
-  private final JSpinner spinnerMinDeltaHeight = new JSpinner();
-  private final JSpinner spinnerMaxDeltaX = new JSpinner();
-  private final JSpinner spinnerMaxDeltaY = new JSpinner();
-  private final JSpinner spinnerMaxGravityX = new JSpinner();
-  private final JSpinner spinnerMaxGravityY = new JSpinner();
-  private final JSpinner spinnerMaxStartWidth = new JSpinner();
-  private final JSpinner spinnerMaxStartHeight = new JSpinner();
-  private final JSpinner spinnerMaxDeltaWidth = new JSpinner();
-  private final JSpinner spinnerMaxDeltaHeight = new JSpinner();
-
-  public static final int PARTICLESPINNER_MAX_VALUE = 100;
+  private final JSpinner spinnerColorDeviation = new JSpinner(getPercentModel());
+  private final JSpinner spinnerAlphaDeviation = new JSpinner(getPercentModel());
+  private final JSpinner spinnerMinDeltaX = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinDeltaY = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinGravityX = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinGravityY = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinStartWidth = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinStartHeight = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinDeltaWidth = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinDeltaHeight = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxDeltaX = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxDeltaY = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxGravityX = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxGravityY = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxStartWidth = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxStartHeight = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxDeltaWidth = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMaxDeltaHeight = new JSpinner(getParticleModel());
 
   /**
    * Create the dialog.
@@ -420,44 +419,16 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   }
 
   private void initSpinners() {
-    this.spinnerMinDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-    this.spinnerMinDeltaX.setModel(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.1));
-    this.spinnerMaxDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
     this.spinnerMaxDeltaX.setEnabled(false);
-
-    this.spinnerMaxDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
     this.spinnerMaxDeltaY.setEnabled(false);
-
-    this.spinnerMinGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-  
     this.spinnerMaxGravityX.setEnabled(false);
-    this.spinnerMaxGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-
-    this.spinnerMinGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     this.spinnerMaxGravityY.setEnabled(false);
-    this.spinnerMaxGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    this.spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
-
-    this.spinnerMinStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     this.spinnerMaxStartWidth.setEnabled(false);
-    this.spinnerMaxStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    this.spinnerMinStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     this.spinnerMaxStartHeight.setEnabled(false);
-    this.spinnerMaxStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    this.spinnerColorDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
-
-    this.spinnerAlphaDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
-    
-
     this.spinnerMaxDeltaWidth.setEnabled(false);
     this.spinnerMaxDeltaHeight.setEnabled(false);
+    
+    this.spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
   }
 
   private void initButtons() {
@@ -605,6 +576,14 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
+  }
+
+  private static SpinnerNumberModel getParticleModel() {
+    return new SpinnerNumberModel(0.0, 0.0, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+  
+  private static SpinnerNumberModel getPercentModel() {
+    return new SpinnerNumberModel(0.0, 0.0, 1.0, 0.01);
   }
   
   private class ParticleColorCellRenderer extends DefaultTableCellRenderer {

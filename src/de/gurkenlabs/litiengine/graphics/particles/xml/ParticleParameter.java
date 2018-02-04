@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {
+  public static final int MAX_VALUE_UNDEFINED = -1;
   private static final long serialVersionUID = 4893417265998349179L;
 
   public static int randomInRange(final int min, final int max) {
@@ -32,7 +33,7 @@ public class ParticleParameter implements Serializable {
   }
 
   public ParticleParameter(final float value, final boolean randomValue, final float minValue, final float maxValue) {
-    if (minValue > maxValue) {
+    if (maxValue != -1 && minValue > maxValue) {
       throw new IllegalArgumentException("minValue must be < than maxValue");
     }
 
