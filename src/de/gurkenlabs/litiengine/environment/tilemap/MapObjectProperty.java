@@ -73,7 +73,6 @@ public final class MapObjectProperty {
 
   public static final String PARTICLE_MINX = "particleMinX";
   public static final String PARTICLE_MAXX = "particleMaxX";
-  public static final String PARTICLE_X_RANDOM = "particleXRandom";
   public static final String PARTICLE_MINY = "particleMinY";
   public static final String PARTICLE_MAXY = "particleMaxY";
   public static final String PARTICLE_Y_RANDOM = "particleYRandom";
