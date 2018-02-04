@@ -32,6 +32,10 @@ public class ParticleColor implements Serializable {
   }
 
   public static ParticleColor decode(final String particleColorString) {
+    if (particleColorString == null) {
+      return null;
+    }
+
     String[] split = particleColorString.split("|");
     if (split.length < 2) {
       return null;
@@ -87,7 +91,7 @@ public class ParticleColor implements Serializable {
     if (this.getAlpha() == 0) {
       return new Color(this.getRed(), this.getGreen(), this.getBlue());
     }
-    
+
     return new Color(this.getRed(), this.getGreen(), this.getBlue(), this.getAlpha());
   }
 

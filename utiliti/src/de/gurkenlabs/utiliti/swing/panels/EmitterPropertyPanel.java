@@ -4,12 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -31,10 +29,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
-import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
@@ -43,8 +39,6 @@ import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyActionListener;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyChangeListener;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
@@ -57,18 +51,32 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private JTabbedPane tabbedPanel;
   private JPanel colorPanel;
   private JPanel spritePanel;
-  private static DecimalFormat df = new DecimalFormat("#.00");
-  private JRadioButton rdbtnLockDeltaX, rdbtnLockDeltaY, rdbtnLockGravityX, rdbtnLockGravityY, rdbtnLockStartWidth, rdbtnLockStartHeight, rdbtnLockDeltaWidth, rdbtnLockDeltaHeight;
-  private JRadioButton rdbtnRandomDeltaX, rdbtnRandomDeltaY, rdbtnRandomGravityX, rdbtnRandomGravityY, rdbtnRandomStartWidth, rdbtnRandomStartHeight, rdbtnRandomDeltaWidth, rdbtnRandomDeltaHeight;
+  
+  private final JComboBox<ParticleType> comboBoxParticleType = new JComboBox<>();
+  private final JComboBox<String> comboBoxSpriteType = new JComboBox<>();
+  private final JComboBox<String> comboBoxSprite= new JComboBox<>();
+  
+  private final JRadioButton rdbtnLockDeltaX = new JRadioButton("");
+  private final JRadioButton rdbtnLockDeltaY = new JRadioButton("");
+  private final JRadioButton rdbtnLockGravityX = new JRadioButton("");
+  private final JRadioButton rdbtnLockGravityY = new JRadioButton("");
+  private final JRadioButton rdbtnLockStartWidth = new JRadioButton("");
+  private final JRadioButton rdbtnLockStartHeight = new JRadioButton("");
+  private final JRadioButton rdbtnLockDeltaWidth = new JRadioButton("");
+  private final JRadioButton rdbtnLockDeltaHeight = new JRadioButton("");
+  private final JRadioButton rdbtnRandomDeltaX = new JRadioButton("");
+  private final JRadioButton rdbtnRandomDeltaY = new JRadioButton("");
+  private final JRadioButton rdbtnRandomGravityX = new JRadioButton("");
+  private final JRadioButton rdbtnRandomGravityY = new JRadioButton("");
+  private final JRadioButton rdbtnRandomStartWidth = new JRadioButton("");
+  private final JRadioButton rdbtnRandomStartHeight = new JRadioButton("");
+  private final JRadioButton rdbtnRandomDeltaWidth = new JRadioButton("");
+  private final JRadioButton rdbtnRandomDeltaHeight = new JRadioButton("");
   private JCheckBox chckbxStaticPhysics;
-  private JComboBox<ParticleType> comboBoxParticleType;
+  
+  private final JButton btnAddColor = new JButton("+");
+  private final JButton btnRemoveColor = new JButton("-");
 
-  private JButton btnAddColor, btnRemoveColor;
-  private JComboBox<String> comboBoxSpriteType, comboBoxSprite;
-
-  /**
-   * @wbp.nonvisual location=572,339
-   */
   private final ButtonGroup buttonGroupDeltaX = new ButtonGroup();
   private final ButtonGroup buttonGroupDeltaY = new ButtonGroup();
   private final ButtonGroup buttonGroupGravityX = new ButtonGroup();
@@ -77,9 +85,29 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final ButtonGroup buttonGroupStartHeight = new ButtonGroup();
   private final ButtonGroup buttonGroupDeltaWidth = new ButtonGroup();
   private final ButtonGroup buttonGroupDeltaHeight = new ButtonGroup();
-  private JSpinner spinnerSpawnRate, spinnerSpawnAmount, spinnerUpdateDelay, spinnerTTL, spinnerMaxParticles, spinnerColorDeviation, spinnerAlphaDeviation;
-  private JSpinner spinnerMinDeltaX, spinnerMinDeltaY, spinnerMinGravityX, spinnerMinGravityY, spinnerMinStartWidth, spinnerMinStartHeight, spinnerMinDeltaWidth, spinnerMinDeltaHeight;
-  private JSpinner spinnerMaxDeltaX, spinnerMaxDeltaY, spinnerMaxGravityX, spinnerMaxGravityY, spinnerMaxStartWidth, spinnerMaxStartHeight, spinnerMaxDeltaWidth, spinnerMaxDeltaHeight;
+  private final JSpinner spinnerSpawnRate = new JSpinner();
+  private final JSpinner spinnerSpawnAmount = new JSpinner();
+  private final JSpinner spinnerUpdateDelay = new JSpinner();
+  private final JSpinner spinnerTTL = new JSpinner();
+  private final JSpinner spinnerMaxParticles = new JSpinner();
+  private final JSpinner spinnerColorDeviation = new JSpinner();
+  private final JSpinner spinnerAlphaDeviation = new JSpinner();
+  private final JSpinner spinnerMinDeltaX = new JSpinner();
+  private final JSpinner spinnerMinDeltaY = new JSpinner();
+  private final JSpinner spinnerMinGravityX = new JSpinner();
+  private final JSpinner spinnerMinGravityY = new JSpinner();
+  private final JSpinner spinnerMinStartWidth = new JSpinner();
+  private final JSpinner spinnerMinStartHeight = new JSpinner();
+  private final JSpinner spinnerMinDeltaWidth = new JSpinner();
+  private final JSpinner spinnerMinDeltaHeight = new JSpinner();
+  private final JSpinner spinnerMaxDeltaX = new JSpinner();
+  private final JSpinner spinnerMaxDeltaY = new JSpinner();
+  private final JSpinner spinnerMaxGravityX = new JSpinner();
+  private final JSpinner spinnerMaxGravityY = new JSpinner();
+  private final JSpinner spinnerMaxStartWidth = new JSpinner();
+  private final JSpinner spinnerMaxStartHeight = new JSpinner();
+  private final JSpinner spinnerMaxDeltaWidth = new JSpinner();
+  private final JSpinner spinnerMaxDeltaHeight = new JSpinner();
 
   public static final int PARTICLESPINNER_MAX_VALUE = 100;
 
@@ -91,36 +119,61 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     setBounds(100, 100, 700, 464);
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-    colors = new ArrayList<>();
-    JLabel label = new JLabel(Resources.get("panel_emitterData"));
-    label.setFont(new Font("Tahoma", Font.BOLD, 12));
+    this.colors = new ArrayList<>();
+    
+    this.initButtons();
+    this.initSpinners();
+
+    this.comboBoxParticleType.setModel(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
+    this.comboBoxSpriteType.addItem(Resources.get("panel_animation"));
+    this.comboBoxSpriteType.addItem(Resources.get("panel_spritesheet"));
+    this.comboBoxSpriteType.setSelectedIndex(0);
+    for (SpriteSheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
+      this.comboBoxSprite.addItem(s.getName());
+    }
+    
+    this.chckbxStaticPhysics = new JCheckBox("");
+
+    this.txt = new JTextField();
+    this.txt.setEnabled(false);
+    this.txt.setText("IFFF");
+    this.txt.setColumns(10);
+    
+    this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+    this.tabbedPanel.setBorder(null);
+
+    this.colorPanel = new JPanel();
+    this.tabbedPanel.addTab(Resources.get("panel_color"), null, colorPanel, null);
+    this.tabbedPanel.setEnabledAt(0, true);
+
+    JScrollPane scrollPane = new JScrollPane();
+
+    this.table = new JTable();
+    this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
+    this.model = (DefaultTableModel) table.getModel();
+    this.table.setFont(Program.TEXT_FONT);
+    this.table.getColumnModel().getColumn(1).setCellRenderer(new ParticleColorCellRenderer());
+    scrollPane.setViewportView(this.table);
+    this.spritePanel = new JPanel();
+    this.tabbedPanel.addTab(Resources.get("panel_sprite"), null, spritePanel, null);
+    this.tabbedPanel.setEnabledAt(1, false);
+    
+    // init all labels
+    JLabel labelEmitterData = new JLabel(Resources.get("panel_emitterData"));
+    labelEmitterData.setFont(new Font("Tahoma", Font.BOLD, 12));
 
     JLabel lblSpawnRate = new JLabel(Resources.get("panel_emitterSpawnRate"));
-
-    spinnerSpawnRate = new JSpinner();
-
     JLabel lblSpawnAmount = new JLabel(Resources.get("panel_emitterSpawnAmount"));
-
-    spinnerSpawnAmount = new JSpinner();
-
-    spinnerUpdateDelay = new JSpinner();
-
     JLabel lblParticleData = new JLabel(Resources.get("panel_particleData"));
     lblParticleData.setFont(new Font("Tahoma", Font.BOLD, 12));
-
+    
     JLabel lblDeltax = new JLabel(Resources.get("panel_particleDeltaX"));
     lblDeltax.setHorizontalAlignment(SwingConstants.LEFT);
     lblDeltax.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
+    
     JLabel lblDeltaY = new JLabel(Resources.get("panel_particleDeltaY"));
     lblDeltaY.setHorizontalAlignment(SwingConstants.LEFT);
     lblDeltaY.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    spinnerMinDeltaY = new JSpinner();
-    spinnerMinDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    spinnerMinDeltaX = new JSpinner();
-    spinnerMinDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
 
     JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
     lblMin1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -134,24 +187,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblLock.setHorizontalAlignment(SwingConstants.LEFT);
     lblLock.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
-    rdbtnLockDeltaX = new JRadioButton("");
-    buttonGroupDeltaX.add(rdbtnLockDeltaX);
-    rdbtnLockDeltaX.setHorizontalAlignment(SwingConstants.CENTER);
-    rdbtnLockDeltaX.setSelected(true);
-
     JLabel lblRandom = new JLabel(Resources.get("panel_random"));
     lblRandom.setHorizontalAlignment(SwingConstants.CENTER);
     lblRandom.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    rdbtnRandomDeltaX = new JRadioButton("");
-    buttonGroupDeltaX.add(rdbtnRandomDeltaX);
-
-    rdbtnLockDeltaY = new JRadioButton("");
-    buttonGroupDeltaY.add(rdbtnLockDeltaY);
-    rdbtnLockDeltaY.setSelected(true);
-
-    rdbtnRandomDeltaY = new JRadioButton("");
-    buttonGroupDeltaY.add(rdbtnRandomDeltaY);
 
     JLabel lblMax = new JLabel(Resources.get("panel_max"));
     lblMax.setEnabled(false);
@@ -163,14 +201,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMax1.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax1.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMaxDeltaX = new JSpinner();
-    spinnerMaxDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-    spinnerMaxDeltaX.setEnabled(false);
-
-    spinnerMaxDeltaY = new JSpinner();
-    spinnerMaxDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-    spinnerMaxDeltaY.setEnabled(false);
-
     JLabel lblUpdateDelay = new JLabel(Resources.get("panel_emitterUpdateDelay"));
 
     JLabel lblGravityX = new JLabel(Resources.get("panel_particleGravityX"));
@@ -181,27 +211,12 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMin3.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin3.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMinGravityX = new JSpinner();
-    spinnerMinGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     JLabel lblMax2 = new JLabel(Resources.get("panel_max"));
     lblMax2.setEnabled(false);
     lblMax2.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax2.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMaxGravityX = new JSpinner();
-    spinnerMaxGravityX.setEnabled(false);
-    spinnerMaxGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    rdbtnLockGravityX = new JRadioButton("");
-    buttonGroupGravityX.add(rdbtnLockGravityX);
-    rdbtnLockGravityX.setSelected(true);
-
-    rdbtnRandomGravityX = new JRadioButton("");
-    buttonGroupGravityX.add(rdbtnRandomGravityX);
     JLabel labelTtl = new JLabel(Resources.get("panel_emitterTTL"));
-
-    spinnerTTL = new JSpinner();
 
     JLabel lblGravityY = new JLabel(Resources.get("panel_particleGravityY"));
     lblGravityY.setHorizontalAlignment(SwingConstants.LEFT);
@@ -211,29 +226,13 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMin4.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin4.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMinGravityY = new JSpinner();
-    spinnerMinGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     JLabel lblMax3 = new JLabel(Resources.get("panel_max"));
     lblMax3.setEnabled(false);
     lblMax3.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax3.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMaxGravityY = new JSpinner();
-    spinnerMaxGravityY.setEnabled(false);
-    spinnerMaxGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    rdbtnLockGravityY = new JRadioButton("");
-    buttonGroupGravityY.add(rdbtnLockGravityY);
-    rdbtnLockGravityY.setSelected(true);
-
-    rdbtnRandomGravityY = new JRadioButton("");
-    buttonGroupGravityY.add(rdbtnRandomGravityY);
     JLabel lblMaxParticles = new JLabel(Resources.get("panel_emitterMaxParticles"));
-
-    spinnerMaxParticles = new JSpinner();
-    spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
-
+    
     JLabel lblStartWidth = new JLabel(Resources.get("panel_particleStartWidth"));
     lblStartWidth.setHorizontalAlignment(SwingConstants.LEFT);
     lblStartWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -242,29 +241,13 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     lblMin5.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin5.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMinStartWidth = new JSpinner();
-    spinnerMinStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
     JLabel lblMax4 = new JLabel(Resources.get("panel_max"));
     lblMax4.setEnabled(false);
     lblMax4.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax4.setFont(new Font("Tahoma", Font.ITALIC, 11));
 
-    spinnerMaxStartWidth = new JSpinner();
-    spinnerMaxStartWidth.setEnabled(false);
-    spinnerMaxStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    rdbtnLockStartWidth = new JRadioButton("");
-    buttonGroupStartWidth.add(rdbtnLockStartWidth);
-    rdbtnLockStartWidth.setSelected(true);
-
-    rdbtnRandomStartWidth = new JRadioButton("");
-    buttonGroupStartWidth.add(rdbtnRandomStartWidth);
     JLabel lblParticleType = new JLabel(Resources.get("panel_particleType"));
-
-    comboBoxParticleType = new JComboBox();
-    comboBoxParticleType.setModel((ComboBoxModel) new DefaultComboBoxModel(ParticleType.values()));
-
+    
     JLabel lblStartHeight = new JLabel(Resources.get("panel_particleStartHeight"));
     lblStartHeight.setHorizontalAlignment(SwingConstants.LEFT);
     lblStartHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -272,60 +255,56 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     JLabel lblMin6 = new JLabel(Resources.get("panel_min"));
     lblMin6.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin6.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMinStartHeight = new JSpinner();
-    spinnerMinStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
+    
     JLabel lblMax5 = new JLabel(Resources.get("panel_max"));
     lblMax5.setEnabled(false);
     lblMax5.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax5.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMaxStartHeight = new JSpinner();
-    spinnerMaxStartHeight.setEnabled(false);
-    spinnerMaxStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
-
-    rdbtnLockStartHeight = new JRadioButton("");
-    buttonGroupStartHeight.add(rdbtnLockStartHeight);
-    rdbtnLockStartHeight.setSelected(true);
-
-    rdbtnRandomStartHeight = new JRadioButton("");
-    buttonGroupStartHeight.add(rdbtnRandomStartHeight);
-    tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
-    tabbedPanel.setBorder(null);
-
-    colorPanel = new JPanel();
-    tabbedPanel.addTab(Resources.get("panel_color"), null, colorPanel, null);
-    tabbedPanel.setEnabledAt(0, true);
-
-    btnSelectColor = new JButton();
-    btnSelectColor.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
-    btnSelectColor.setMinimumSize(new Dimension(30, 10));
-    btnSelectColor.setMaximumSize(new Dimension(30, 10));
-
-    JScrollPane scrollPane = new JScrollPane();
-
-    table = new JTable();
-    table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
-    model = (DefaultTableModel) table.getModel();
-    table.setFont(Program.TEXT_FONT);
-    table.getColumnModel().getColumn(1).setCellRenderer(new ParticleColorCellRenderer());
-    scrollPane.setViewportView(table);
-
-    btnAddColor = new JButton("+");
-
-    btnRemoveColor = new JButton("-");
-
+    
     JLabel lblColorDeviation = new JLabel(Resources.get("panel_colorDeviation"));
-
-    spinnerColorDeviation = new JSpinner();
-    spinnerColorDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
 
     JLabel lblAlphaDeviation = new JLabel(Resources.get("panel_alphaDeviation"));
 
-    spinnerAlphaDeviation = new JSpinner();
-    spinnerAlphaDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
+    JLabel lblEmittertype = new JLabel(Resources.get("panel_spriteType"));
 
+    JLabel lblSpritesheet = new JLabel(Resources.get("panel_sprite"));
+
+    JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
+    lblDeltaWidth.setHorizontalAlignment(SwingConstants.LEFT);
+    lblDeltaWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+    JLabel lblMin7 = new JLabel(Resources.get("panel_min"));
+    lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
+    lblMin7.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    
+    JLabel lblMax6 = new JLabel(Resources.get("panel_max"));
+    lblMax6.setEnabled(false);
+    lblMax6.setHorizontalAlignment(SwingConstants.CENTER);
+    lblMax6.setFont(new Font("Tahoma", Font.ITALIC, 11));
+
+    JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
+    lblDeltaHeight.setHorizontalAlignment(SwingConstants.LEFT);
+    lblDeltaHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+    JLabel lblMin = new JLabel(Resources.get("panel_min"));
+    lblMin.setHorizontalAlignment(SwingConstants.CENTER);
+    lblMin.setFont(new Font("Tahoma", Font.ITALIC, 11));
+
+    JLabel lblMax7 = new JLabel(Resources.get("panel_max"));
+    lblMax7.setEnabled(false);
+    lblMax7.setHorizontalAlignment(SwingConstants.CENTER);
+    lblMax7.setFont(new Font("Tahoma", Font.ITALIC, 11));
+
+    JLabel lblStaticPhysics = new JLabel(Resources.get("panel_particleStaticPhysics"));
+    lblStaticPhysics.setHorizontalAlignment(SwingConstants.LEFT);
+    lblStaticPhysics.setFont(new Font("Tahoma", Font.PLAIN, 11));
+
+
+    JLabel lblText = new JLabel(Resources.get("panel_particleText"));
+    lblText.setEnabled(false);
+    lblText.setHorizontalAlignment(SwingConstants.LEFT);
+    lblText.setFont(new Font("Tahoma", Font.PLAIN, 11));
+    
     GroupLayout groupLayoutcolorPanel = new GroupLayout(colorPanel);
     groupLayoutcolorPanel.setHorizontalGroup(groupLayoutcolorPanel.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayoutcolorPanel.createSequentialGroup().addGap(10)
@@ -342,103 +321,22 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
         .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE));
     colorPanel.setLayout(groupLayoutcolorPanel);
 
-    spritePanel = new JPanel();
-    tabbedPanel.addTab(Resources.get("panel_sprite"), null, spritePanel, null);
-    tabbedPanel.setEnabledAt(1, false);
-
-    JLabel lblEmittertype = new JLabel(Resources.get("panel_spriteType"));
-
-    comboBoxSpriteType = new JComboBox();
-    comboBoxSpriteType.addItem(Resources.get("panel_animation"));
-    comboBoxSpriteType.addItem(Resources.get("panel_spritesheet"));
-    comboBoxSpriteType.setSelectedIndex(0);
-
-    JLabel lblSpritesheet = new JLabel(Resources.get("panel_sprite"));
-
-    comboBoxSprite = new JComboBox();
-    for (SpriteSheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
-      comboBoxSprite.addItem(s.getName());
-    }
-    GroupLayout gl_spritePanel = new GroupLayout(spritePanel);
-    gl_spritePanel.setHorizontalGroup(gl_spritePanel.createParallelGroup(Alignment.LEADING)
-        .addGroup(gl_spritePanel.createSequentialGroup().addGap(10)
-            .addGroup(gl_spritePanel.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_spritePanel.createSequentialGroup().addComponent(lblEmittertype, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteType, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE))
-                .addGroup(gl_spritePanel.createSequentialGroup().addComponent(lblSpritesheet).addGap(43).addComponent(comboBoxSprite, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)))));
-    gl_spritePanel.setVerticalGroup(gl_spritePanel.createParallelGroup(Alignment.LEADING)
-        .addGroup(gl_spritePanel.createSequentialGroup().addGap(5)
-            .addGroup(gl_spritePanel.createParallelGroup(Alignment.LEADING).addGroup(gl_spritePanel.createSequentialGroup().addGap(3).addComponent(lblEmittertype)).addComponent(comboBoxSpriteType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(10)
-            .addGroup(gl_spritePanel.createParallelGroup(Alignment.LEADING).addGroup(gl_spritePanel.createSequentialGroup().addGap(3).addComponent(lblSpritesheet)).addComponent(comboBoxSprite, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))));
-    spritePanel.setLayout(gl_spritePanel);
-
-    JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
-    lblDeltaWidth.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltaWidth.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    JLabel lblMin7 = new JLabel(Resources.get("panel_min"));
-    lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin7.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMinDeltaWidth = new JSpinner();
-
-    JLabel lblMax6 = new JLabel(Resources.get("panel_max"));
-    lblMax6.setEnabled(false);
-    lblMax6.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax6.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMaxDeltaWidth = new JSpinner();
-    spinnerMaxDeltaWidth.setEnabled(false);
-
-    rdbtnLockDeltaWidth = new JRadioButton("");
-    buttonGroupDeltaWidth.add(rdbtnLockDeltaWidth);
-    rdbtnLockDeltaWidth.setSelected(true);
-
-    rdbtnRandomDeltaWidth = new JRadioButton("");
-    buttonGroupDeltaWidth.add(rdbtnRandomDeltaWidth);
-    JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
-    lblDeltaHeight.setHorizontalAlignment(SwingConstants.LEFT);
-    lblDeltaHeight.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    JLabel lblMin = new JLabel(Resources.get("panel_min"));
-    lblMin.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMinDeltaHeight = new JSpinner();
-
-    JLabel lblMax7 = new JLabel(Resources.get("panel_max"));
-    lblMax7.setEnabled(false);
-    lblMax7.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax7.setFont(new Font("Tahoma", Font.ITALIC, 11));
-
-    spinnerMaxDeltaHeight = new JSpinner();
-    spinnerMaxDeltaHeight.setEnabled(false);
-
-    rdbtnLockDeltaHeight = new JRadioButton("");
-    buttonGroupDeltaHeight.add(rdbtnLockDeltaHeight);
-    rdbtnLockDeltaHeight.setSelected(true);
-
-    rdbtnRandomDeltaHeight = new JRadioButton("");
-    buttonGroupDeltaHeight.add(rdbtnRandomDeltaHeight);
-
-    JLabel lblStaticPhysics = new JLabel(Resources.get("panel_particleStaticPhysics"));
-    lblStaticPhysics.setHorizontalAlignment(SwingConstants.LEFT);
-    lblStaticPhysics.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    chckbxStaticPhysics = new JCheckBox("");
-
-    JLabel lblText = new JLabel(Resources.get("panel_particleText"));
-    lblText.setEnabled(false);
-    lblText.setHorizontalAlignment(SwingConstants.LEFT);
-    lblText.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-    txt = new JTextField();
-    txt.setEnabled(false);
-    txt.setText("IFFF");
-    txt.setColumns(10);
+    GroupLayout groupLayoutSpritePanel = new GroupLayout(spritePanel);
+    groupLayoutSpritePanel.setHorizontalGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayoutSpritePanel.createSequentialGroup().addGap(10)
+            .addGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayoutSpritePanel.createSequentialGroup().addComponent(lblEmittertype, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteType, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayoutSpritePanel.createSequentialGroup().addComponent(lblSpritesheet).addGap(43).addComponent(comboBoxSprite, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)))));
+    groupLayoutSpritePanel.setVerticalGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayoutSpritePanel.createSequentialGroup().addGap(5)
+            .addGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING).addGroup(groupLayoutSpritePanel.createSequentialGroup().addGap(3).addComponent(lblEmittertype)).addComponent(comboBoxSpriteType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(10)
+            .addGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING).addGroup(groupLayoutSpritePanel.createSequentialGroup().addGap(3).addComponent(lblSpritesheet)).addComponent(comboBoxSprite, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))));
+    spritePanel.setLayout(groupLayoutSpritePanel);
+    
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGap(10)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(label).addGap(226).addComponent(lblParticleData).addGap(219).addComponent(lblLock).addGap(13).addComponent(lblRandom))
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(labelEmitterData).addGap(226).addComponent(lblParticleData).addGap(219).addComponent(lblLock).addGap(13).addComponent(lblRandom))
                 .addGroup(groupLayout.createSequentialGroup().addComponent(lblSpawnRate).addGap(26).addComponent(spinnerSpawnRate, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addGap(118).addComponent(lblDeltax, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMin1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                     .addComponent(spinnerMaxDeltaX, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addGap(29).addComponent(rdbtnLockDeltaX).addGap(19).addComponent(rdbtnRandomDeltaX))
@@ -470,7 +368,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                     .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnLockDeltaWidth).addComponent(rdbtnLockDeltaHeight)).addGap(19).addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(rdbtnRandomDeltaWidth).addComponent(rdbtnRandomDeltaHeight))))));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addGap(33)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(label).addComponent(lblParticleData).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblLock)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblRandom))).addGap(12)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(labelEmitterData).addComponent(lblParticleData).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblLock)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(lblRandom))).addGap(12)
             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblSpawnRate))
                 .addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerSpawnRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblDeltax))
                 .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMin1)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -519,7 +417,87 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                 .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnLockDeltaWidth).addGap(9).addComponent(rdbtnLockDeltaHeight)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(rdbtnRandomDeltaWidth).addGap(9).addComponent(rdbtnRandomDeltaHeight)))));
     setLayout(groupLayout);
     this.setupChangedListeners();
+  }
 
+  private void initSpinners() {
+    this.spinnerMinDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+    this.spinnerMinDeltaX.setModel(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.1));
+    this.spinnerMaxDeltaX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+    this.spinnerMaxDeltaX.setEnabled(false);
+
+    this.spinnerMaxDeltaY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+    this.spinnerMaxDeltaY.setEnabled(false);
+
+    this.spinnerMinGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+  
+    this.spinnerMaxGravityX.setEnabled(false);
+    this.spinnerMaxGravityX.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+
+    this.spinnerMinGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerMaxGravityY.setEnabled(false);
+    this.spinnerMaxGravityY.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
+
+    this.spinnerMinStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerMaxStartWidth.setEnabled(false);
+    this.spinnerMaxStartWidth.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerMinStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerMaxStartHeight.setEnabled(false);
+    this.spinnerMaxStartHeight.setModel(new SpinnerNumberModel(0, 0, PARTICLESPINNER_MAX_VALUE, 1));
+
+    this.spinnerColorDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
+
+    this.spinnerAlphaDeviation.setModel(new SpinnerNumberModel(0, null, 1, 0.01f));
+    
+
+    this.spinnerMaxDeltaWidth.setEnabled(false);
+    this.spinnerMaxDeltaHeight.setEnabled(false);
+  }
+
+  private void initButtons() {
+    this.buttonGroupDeltaX.add(rdbtnLockDeltaX);
+    this.rdbtnLockDeltaX.setHorizontalAlignment(SwingConstants.CENTER);
+    this.rdbtnLockDeltaX.setSelected(true);
+    this.buttonGroupDeltaX.add(rdbtnRandomDeltaX);
+
+    this.buttonGroupDeltaY.add(rdbtnLockDeltaY);
+    this.rdbtnLockDeltaY.setSelected(true);
+
+    this.buttonGroupDeltaY.add(rdbtnRandomDeltaY);
+    this.buttonGroupGravityX.add(rdbtnLockGravityX);
+    this.rdbtnLockGravityX.setSelected(true);
+
+    this.buttonGroupGravityX.add(rdbtnRandomGravityX);
+    this.buttonGroupGravityY.add(rdbtnLockGravityY);
+    this.rdbtnLockGravityY.setSelected(true);
+
+    this.buttonGroupGravityY.add(rdbtnRandomGravityY);
+    this.buttonGroupStartWidth.add(rdbtnLockStartWidth);
+    this.rdbtnLockStartWidth.setSelected(true);
+
+    this.buttonGroupStartWidth.add(rdbtnRandomStartWidth);
+    this.buttonGroupStartHeight.add(rdbtnLockStartHeight);
+    this.rdbtnLockStartHeight.setSelected(true);
+    this.buttonGroupStartHeight.add(rdbtnRandomStartHeight);
+    this.btnSelectColor = new JButton();
+    this.btnSelectColor.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
+    this.btnSelectColor.setMinimumSize(new Dimension(30, 10));
+    this.btnSelectColor.setMaximumSize(new Dimension(30, 10));
+
+    this.buttonGroupDeltaWidth.add(rdbtnLockDeltaWidth);
+    this.rdbtnLockDeltaWidth.setSelected(true);
+
+    this.buttonGroupDeltaWidth.add(rdbtnRandomDeltaWidth);
+    this.buttonGroupDeltaHeight.add(rdbtnLockDeltaHeight);
+    this.rdbtnLockDeltaHeight.setSelected(true);
+
+    this.buttonGroupDeltaHeight.add(rdbtnRandomDeltaHeight);
   }
 
   @Override
@@ -571,11 +549,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       model.addRow(new Object[] { null, c.toString() });
     });
 
-    this.spinnerSpawnRate.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_SPAWNRATE, this.spinnerSpawnRate.getValue().toString())));
-    this.spinnerSpawnAmount.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_SPAWNAMOUNT, this.spinnerSpawnAmount.getValue().toString())));
-    this.spinnerUpdateDelay.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_UPDATEDELAY, this.spinnerUpdateDelay.getValue().toString())));
-    this.spinnerTTL.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_TIMETOLIVE, this.spinnerTTL.getValue().toString())));
-    this.spinnerMaxParticles.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.EMITTER_MAXPARTICLES, this.spinnerMaxParticles.getValue().toString())));
 
     this.comboBoxParticleType.addActionListener(new MapObjectPropertyActionListener(m -> {
       ParticleType particleType = (ParticleType) this.comboBoxParticleType.getSelectedItem();
@@ -591,25 +564,31 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       m.setCustomProperty(MapObjectProperty.EMITTER_PARTICLETYPE, particleType.toString());
     }));
 
-    this.spinnerMinDeltaX.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINDELTAX, this.spinnerMinDeltaX.getValue().toString())));
-    this.spinnerMaxDeltaX.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXDELTAX, this.spinnerMaxDeltaX.getValue().toString())));
-    this.spinnerMinDeltaY.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINDELTAY, this.spinnerMinDeltaY.getValue().toString())));
-    this.spinnerMaxDeltaY.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXDELTAY, this.spinnerMaxDeltaY.getValue().toString())));
+    this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNRATE, this.spinnerSpawnRate));
+    this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNAMOUNT, this.spinnerSpawnAmount));
+    this.spinnerUpdateDelay.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_UPDATEDELAY, this.spinnerUpdateDelay));
+    this.spinnerTTL.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_TIMETOLIVE, this.spinnerTTL));
+    this.spinnerMaxParticles.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_MAXPARTICLES, this.spinnerMaxParticles));
 
-    this.spinnerMinGravityX.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityX.getValue().toString())));
-    this.spinnerMaxGravityX.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityX.getValue().toString())));
-    this.spinnerMinGravityY.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityY.getValue().toString())));
-    this.spinnerMaxGravityY.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityY.getValue().toString())));
+    this.spinnerMinDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAX, this.spinnerMinDeltaX));
+    this.spinnerMaxDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAX, this.spinnerMaxDeltaX));
+    this.spinnerMinDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAY, this.spinnerMinDeltaY));
+    this.spinnerMaxDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAY, this.spinnerMaxDeltaY));
 
-    this.spinnerMinStartWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINSTARTWIDTH, this.spinnerMinStartWidth.getValue().toString())));
-    this.spinnerMaxStartWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXSTARTWIDTH, this.spinnerMaxStartWidth.getValue().toString())));
-    this.spinnerMinStartHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINSTARTHEIGHT, this.spinnerMinStartHeight.getValue().toString())));
-    this.spinnerMaxStartHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXSTARTHEIGHT, this.spinnerMaxStartHeight.getValue().toString())));
+    this.spinnerMinGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityX));
+    this.spinnerMaxGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityX));
+    this.spinnerMinGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityY));
+    this.spinnerMaxGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityY));
 
-    this.spinnerMinDeltaWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINDELTAWIDTH, this.spinnerMinDeltaWidth.getValue().toString())));
-    this.spinnerMaxDeltaWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, this.spinnerMaxDeltaWidth.getValue().toString())));
-    this.spinnerMinDeltaHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MINDELTAHEIGHT, this.spinnerMinDeltaHeight.getValue().toString())));
-    this.spinnerMaxDeltaHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, this.spinnerMaxDeltaHeight.getValue().toString())));
+    this.spinnerMinStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINSTARTWIDTH, this.spinnerMinStartWidth));
+    this.spinnerMaxStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXSTARTWIDTH, this.spinnerMaxStartWidth));
+    this.spinnerMinStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINSTARTHEIGHT, this.spinnerMinStartHeight));
+    this.spinnerMaxStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXSTARTHEIGHT, this.spinnerMaxStartHeight));
+
+    this.spinnerMinDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAWIDTH, this.spinnerMinDeltaWidth));
+    this.spinnerMaxDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, this.spinnerMaxDeltaWidth));
+    this.spinnerMinDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAHEIGHT, this.spinnerMinDeltaHeight));
+    this.spinnerMaxDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, this.spinnerMaxDeltaHeight));
 
     this.chckbxStaticPhysics.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_STATICPHYSICS, Boolean.toString(this.chckbxStaticPhysics.isSelected()))));
 
@@ -628,7 +607,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   protected void setControlValues(IMapObject mapObject) {
   }
   
-  public class ParticleColorCellRenderer extends DefaultTableCellRenderer {
+  private class ParticleColorCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
