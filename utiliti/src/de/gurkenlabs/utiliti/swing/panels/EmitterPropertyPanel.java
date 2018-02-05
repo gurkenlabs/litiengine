@@ -537,18 +537,15 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxParticleType.addActionListener(new MapObjectPropertyActionListener(m -> {
       ParticleType particleType = (ParticleType) this.comboBoxParticleType.getSelectedItem();
-      if (particleType == ParticleType.SPRITE) {
-        this.tabbedPanel.setSelectedIndex(1);
-        tabbedPanel.setEnabledAt(0, false);
-        tabbedPanel.setEnabledAt(1, true);
-      } else {
-        this.tabbedPanel.setSelectedIndex(0);
-        tabbedPanel.setEnabledAt(0, true);
-        tabbedPanel.setEnabledAt(1, false);
-      }
+      this.updateTabbedGroup();
 
       this.txt.setEnabled(particleType == ParticleType.TEXT);
       m.setCustomProperty(MapObjectProperty.Emitter.PARTICLETYPE, particleType.toString());
+    }));
+    
+    this.comboBoxSprite.addActionListener(new MapObjectPropertyActionListener(m -> {
+      String sprite = this.comboBoxSprite.getSelectedItem().toString();
+      m.setCustomProperty(MapObjectProperty.Particle.SPRITE, sprite);
     }));
 
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
@@ -585,6 +582,18 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.chckbxStaticPhysics.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.Particle.STATICPHYSICS, Boolean.toString(this.chckbxStaticPhysics.isSelected()))));
 
     this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.TEXT, this.txt.getText())));
+  }
+  
+  private void updateTabbedGroup() {
+    if (this.comboBoxParticleType.getSelectedItem() == ParticleType.SPRITE) {
+      this.tabbedPanel.setSelectedIndex(1);
+      tabbedPanel.setEnabledAt(0, false);
+      tabbedPanel.setEnabledAt(1, true);
+    } else {
+      this.tabbedPanel.setSelectedIndex(0);
+      tabbedPanel.setEnabledAt(0, true);
+      tabbedPanel.setEnabledAt(1, false);
+    }
   }
 
   @Override
@@ -644,8 +653,11 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.comboBoxParticleType.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE));
+    ParticleType type = mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE);
+    this.comboBoxParticleType.setSelectedItem(type);
+    this.updateTabbedGroup();
     this.comboBoxSprite.setSelectedItem(mapObject.getCustomProperty(MapObjectProperty.Particle.SPRITE));
+    
 
     // TODO: implement this
     this.comboBoxSpriteType.setSelectedIndex(0);

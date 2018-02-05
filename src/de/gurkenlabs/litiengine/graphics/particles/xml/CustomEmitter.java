@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.OvalParticle;
@@ -14,10 +15,12 @@ import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.particles.RectangleOutlineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
+import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.XmlUtilities;
 
@@ -124,6 +127,15 @@ public class CustomEmitter extends Emitter {
       break;
     case TEXT:
       particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      break;
+    case SPRITE:
+      Spritesheet sprite = Spritesheet.find(this.getEmitterData().getSpritesheet());
+      if(sprite == null) {
+        return null;
+      }
+      
+      particle = new SpriteParticle(sprite.getSprite(MathUtilities.randomInRange(0, sprite.getTotalNumberOfSprites() - 1)), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth)
+          .setDeltaHeight(deltaHeight);
       break;
     default:
       particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);

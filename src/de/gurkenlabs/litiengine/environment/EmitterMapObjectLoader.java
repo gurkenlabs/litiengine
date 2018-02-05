@@ -44,10 +44,11 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     }
 
     EmitterData data = this.createEmitterData(mapObject);
-    CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().getX(), mapObject.getLocation().getY(), data);
+    
+    //TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
+    CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().getX() + mapObject.getWidth() / 2.0, mapObject.getLocation().getY() + mapObject.getHeight() / 2.0, data);
 
     emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    emitter.setLocation(mapObject.getLocation());
     emitter.setMapId(mapObject.getId());
     emitter.setName(mapObject.getName());
 
@@ -70,7 +71,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setParticleType(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE));
     data.setColorDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.Emitter.COLORDEVIATION));
     data.setAlphaDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.Emitter.ALPHADEVIATION));
-  
+
     data.setColors(getColors(mapObject));
 
     data.setColorProbabilities(mapObject.getCustomProperty(MapObjectProperty.Emitter.COLORPROBABILITIES, ""));
