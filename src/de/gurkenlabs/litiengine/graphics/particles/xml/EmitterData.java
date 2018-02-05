@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.util.MathUtilities;
 
@@ -21,9 +22,6 @@ import de.gurkenlabs.util.MathUtilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EmitterData implements Serializable, Comparable<EmitterData> {
   private static final long serialVersionUID = 50238884097993529L;
-
-  @XmlElement
-  private boolean applyStaticPhysics;
 
   @XmlElementWrapper(name = "colors")
   @XmlElement(name = "color")
@@ -109,6 +107,9 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   @XmlElement
   private String colorProbabilities;
+  
+  @XmlElement
+  private CollisionType collisionType;
 
   public EmitterData() {
     this.colors = new ArrayList<>();
@@ -255,6 +256,11 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   @XmlTransient
+  public CollisionType getCollisionType() {
+    return this.collisionType;
+  }
+
+  @XmlTransient
   public int getSpawnRate() {
     return this.spawnRate;
   }
@@ -276,10 +282,6 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.spritesheet = spritesheet;
   }
 
-  public boolean isApplyStaticPhysics() {
-    return applyStaticPhysics;
-  }
-
   @XmlTransient
   public int getUpdateRate() {
     return this.updateRate;
@@ -288,11 +290,6 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   @XmlTransient
   public int getWidth() {
     return this.width;
-  }
-
-  @XmlTransient
-  public boolean isApplyingStaticPhysics() {
-    return this.applyStaticPhysics;
   }
 
   @XmlTransient
@@ -306,10 +303,6 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   public void setColorProbabilities(String colorProbabilities) {
     this.colorProbabilities = colorProbabilities;
-  }
-
-  public void setApplyStaticPhysics(final boolean applyStaticPhysics) {
-    this.applyStaticPhysics = applyStaticPhysics;
   }
 
   public void setColors(final List<ParticleColor> colors) {
@@ -392,6 +385,10 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   public void setParticleWidth(final ParticleParameter particleWidth) {
     this.particleWidth = particleWidth;
+  }
+
+  public void setCollisionType(CollisionType physics) {
+    this.collisionType = physics;
   }
 
   public void setSpawnAmount(final int spawnAmount) {

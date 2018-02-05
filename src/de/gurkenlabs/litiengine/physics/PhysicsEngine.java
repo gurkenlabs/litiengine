@@ -71,7 +71,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean collides(double x, double y, int collisionType) {
+  public boolean collides(double x, double y, CollisionType collisionType) {
     return this.collides(new Point2D.Double(x, y), collisionType);
   }
 
@@ -86,21 +86,17 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean collides(Point2D point, int collisionType) {
-
-    if ((collisionType & CollisionType.COLLTYPE_ALL) == CollisionType.COLLTYPE_ALL) {
+  public boolean collides(Point2D point, CollisionType collisionType) {
+    switch (collisionType) {
+    case ALL:
       return this.collides(point);
-    }
-
-    if ((collisionType & CollisionType.COLLTYPE_ENTITY) == CollisionType.COLLTYPE_ENTITY) {
+    case ENTITY:
       return this.collidesWithAnyEntity(null, point);
-    }
-
-    if ((collisionType & CollisionType.COLLTYPE_STATIC) == CollisionType.COLLTYPE_STATIC) {
+    case STATIC:
       return this.collidesWithAnyStaticCollisionBox(point);
+    default:
+      return false;
     }
-
-    return false;
   }
 
   @Override
@@ -170,20 +166,17 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean collides(final Rectangle2D rect, final int collisionType) {
-    if ((collisionType & CollisionType.COLLTYPE_ALL) == CollisionType.COLLTYPE_ALL) {
+  public boolean collides(final Rectangle2D rect, final CollisionType collisionType) {
+    switch (collisionType) {
+    case ALL:
       return this.collides(rect);
-    }
-
-    if ((collisionType & CollisionType.COLLTYPE_ENTITY) == CollisionType.COLLTYPE_ENTITY) {
+    case ENTITY:
       return this.collidesWithAnyEntity(null, rect) != null;
-    }
-
-    if ((collisionType & CollisionType.COLLTYPE_STATIC) == CollisionType.COLLTYPE_STATIC) {
+    case STATIC:
       return this.collidesWithAnyStaticCollisionBox(rect) != null;
+    default:
+      return false;
     }
-
-    return false;
   }
 
   @Override

@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 
@@ -44,8 +45,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     }
 
     EmitterData data = this.createEmitterData(mapObject);
-    
-    //TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
+
+    // TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
     CustomEmitter emitter = new CustomEmitter(mapObject.getLocation().getX() + mapObject.getWidth() / 2.0, mapObject.getLocation().getY() + mapObject.getHeight() / 2.0, data);
 
     emitter.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
@@ -90,7 +91,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     data.setParticleMinTTL(mapObject.getCustomPropertyInt(MapObjectProperty.Particle.MINTTL));
     data.setParticleMaxTTL(mapObject.getCustomPropertyInt(MapObjectProperty.Particle.MAXTTL));
-    data.setApplyStaticPhysics(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.STATICPHYSICS));
+    data.setCollisionType(mapObject.getCustomPropertyEnum(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
 
     data.setParticleText(mapObject.getCustomProperty(MapObjectProperty.Particle.TEXT));
     data.setSpritesheet(mapObject.getCustomProperty(MapObjectProperty.Particle.SPRITE));

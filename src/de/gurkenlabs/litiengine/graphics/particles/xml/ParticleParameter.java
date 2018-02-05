@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.graphics.particles.xml;
 import java.io.Serializable;
 import java.util.Random;
 
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;

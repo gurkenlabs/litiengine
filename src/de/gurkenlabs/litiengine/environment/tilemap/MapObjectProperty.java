@@ -106,7 +106,7 @@ public final class MapObjectProperty {
     public static final String DELTAHEIGHT_RANDOM = "particleDeltaHeightRandom";
     public static final String SPRITE = "particleSprite";
     public static final String ANIMATESPRITE = "particleAnimateSprite";
-    public static final String STATICPHYSICS = "particleStaticPhysics";
+    public static final String COLLISIONTYPE = "particlePhysics";
     public static final String TEXT = "particleText";
     public static final String MINTTL = "particleMinTTL";
     public static final String MAXTTL = "particleMaxTTL";

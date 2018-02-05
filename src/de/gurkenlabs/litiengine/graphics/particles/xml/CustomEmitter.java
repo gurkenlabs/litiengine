@@ -17,9 +17,6 @@ import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
-import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
-import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.io.FileUtilities;
 import de.gurkenlabs.util.io.XmlUtilities;
@@ -144,8 +141,7 @@ public class CustomEmitter extends Emitter {
 
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
-    particle.setApplyPhysics(this.getEmitterData().isApplyingStaticPhysics());
-    particle.setCollisionType(CollisionType.COLLTYPE_STATIC);
+    particle.setCollisionType(this.getEmitterData().getCollisionType());
     return particle;
   }
 

@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public abstract class Particle implements ITimeToLive {
   public enum ParticleRenderType {
@@ -16,8 +17,7 @@ public abstract class Particle implements ITimeToLive {
   /** The activation tick. */
   private long aliveTick;
   private long aliveTime;
-  private boolean applyPhysics;
-  private int collisionType;
+  private CollisionType collisionType;
   /** The color of the particle. */
   private Color color;
   /** The color alpha. */
@@ -34,8 +34,8 @@ public abstract class Particle implements ITimeToLive {
   private float dy;
 
   /**
-   * The gravitational pull to the left (negative) and right (positive) acting
-   * on this particle.
+   * The gravitational pull to the left (negative) and right (positive) acting on
+   * this particle.
    */
   private float gravityX;
 
@@ -90,7 +90,7 @@ public abstract class Particle implements ITimeToLive {
     return new Rectangle2D.Double(origin.getX() + this.getX(), origin.getY() + this.getY(), this.getWidth(), this.getHeight());
   }
 
-  public int getCollisionType() {
+  public CollisionType getCollisionType() {
     return this.collisionType;
   }
 
@@ -215,18 +215,9 @@ public abstract class Particle implements ITimeToLive {
     return this.y;
   }
 
-  public boolean isApplyingPhysics() {
-    return this.applyPhysics;
-  }
-
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
-  public Particle setApplyPhysics(final boolean applyStaticPhysics) {
-    this.applyPhysics = applyStaticPhysics;
-    return this;
-  }
-
-  public Particle setCollisionType(final int collisionType) {
+  public Particle setCollisionType(final CollisionType collisionType) {
     this.collisionType = collisionType;
     return this;
   }
@@ -383,7 +374,7 @@ public abstract class Particle implements ITimeToLive {
     final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
 
-    if (this.isApplyingPhysics() && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+    if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
       return;
     }
 
