@@ -28,6 +28,9 @@ import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   public static final int DEFAULT_UPDATERATE = 30;
+  public static final int DEFAULT_SPAWNAMOUNT = 1;
+  public static final int DEFAULT_MAXPARTICLES = 100;
+  
   private static final Random RANDOM = new Random();
 
   private final List<Consumer<Emitter>> finishedConsumer;

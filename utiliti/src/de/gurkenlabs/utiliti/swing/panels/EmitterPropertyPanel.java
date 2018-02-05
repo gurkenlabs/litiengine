@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +24,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -33,21 +33,25 @@ import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
 import de.gurkenlabs.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
-import javax.swing.SpinnerModel;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   // TODO: implement support to adjust rendertype (GROUND, NORMAL, OVERLAY)
   private static final double PARTICLESPINNER_MAX_VALUE = 100.0;
+  private static final double PARTICLEDELTA_MAX_VALUE = 1.0;
+  private static final double PARTICLEDELTA_DEFAULT_VALUE = 0.1;
+  private static final int PARTICLEMINTTL_DEFAULT_VALUE = 2000;
+
   private final DefaultTableModel model;
   private final JTextField txt;
   private final JTable table;
@@ -79,7 +83,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JRadioButton rdbtnRandomDeltaHeight = new JRadioButton("");
   private final JRadioButton rdbtnLockParticleTTL = new JRadioButton("");
   private final JRadioButton rdbtnRandomParticleTTL = new JRadioButton("");
-  
+
   private final JCheckBox chckbxStaticPhysics;
 
   private final JButton btnSelectColor = new JButton();
@@ -96,30 +100,30 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final ButtonGroup buttonGroupDeltaHeight = new ButtonGroup();
   private final ButtonGroup buttonGroupParticleTTL = new ButtonGroup();
   private final JSpinner spinnerSpawnRate = new JSpinner();
-  private final JSpinner spinnerSpawnAmount = new JSpinner();
-  private final JSpinner spinnerUpdateDelay = new JSpinner();
+  private final JSpinner spinnerSpawnAmount = new JSpinner(new SpinnerNumberModel(Emitter.DEFAULT_SPAWNAMOUNT, 1, 100, 1));
+  private final JSpinner spinnerUpdateRate = new JSpinner();
   private final JSpinner spinnerTTL = new JSpinner();
-  private final JSpinner spinnerMaxParticles = new JSpinner();
+  private final JSpinner spinnerMaxParticles = new JSpinner(new SpinnerNumberModel(Emitter.DEFAULT_MAXPARTICLES, 1, 10000, 1));
   private final JSpinner spinnerColorDeviation = new JSpinner(getPercentModel());
   private final JSpinner spinnerAlphaDeviation = new JSpinner(getPercentModel());
-  private final JSpinner spinnerMinDeltaX = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinDeltaY = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinGravityX = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinGravityY = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinStartWidth = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinStartHeight = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinDeltaWidth = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMinDeltaHeight = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxDeltaX = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxDeltaY = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxGravityX = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxGravityY = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxStartWidth = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxStartHeight = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxDeltaWidth = new JSpinner(getParticleModel());
-  private final JSpinner spinnerMaxDeltaHeight = new JSpinner(getParticleModel());
+  private final JSpinner spinnerMinDeltaX = new JSpinner(getParticleMinModel());
+  private final JSpinner spinnerMinDeltaY = new JSpinner(getParticleMinModel());
+  private final JSpinner spinnerMinGravityX = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMinGravityY = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMinStartWidth = new JSpinner(getParticleDimensionModel());
+  private final JSpinner spinnerMinStartHeight = new JSpinner(getParticleDimensionModel());
+  private final JSpinner spinnerMinDeltaWidth = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMinDeltaHeight = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMaxDeltaX = new JSpinner(getParticleMaxModel());
+  private final JSpinner spinnerMaxDeltaY = new JSpinner(getParticleMaxModel());
+  private final JSpinner spinnerMaxGravityX = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMaxGravityY = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMaxStartWidth = new JSpinner(getParticleDimensionModel());
+  private final JSpinner spinnerMaxStartHeight = new JSpinner(getParticleDimensionModel());
+  private final JSpinner spinnerMaxDeltaWidth = new JSpinner(getDeltaModel());
+  private final JSpinner spinnerMaxDeltaHeight = new JSpinner(getDeltaModel());
 
-  private final JSpinner spinnerMinParticleTTL = new JSpinner(new SpinnerNumberModel(0, 0, 30000, 1));
+  private final JSpinner spinnerMinParticleTTL = new JSpinner(new SpinnerNumberModel(PARTICLEMINTTL_DEFAULT_VALUE, 0, 30000, 1));
   private final JSpinner spinnerMaxParticleTTL = new JSpinner(new SpinnerNumberModel(0, 0, 30000, 1));
 
   /**
@@ -135,7 +139,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.colors = new ArrayList<>();
 
     this.initRadioButtons();
-    this.initSpinners();
+
     this.btnSelectColor.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
     this.btnSelectColor.setMinimumSize(new Dimension(30, 10));
     this.btnSelectColor.setMaximumSize(new Dimension(30, 10));
@@ -164,6 +168,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     JScrollPane scrollPane = new JScrollPane();
 
+    // TODO: implement percentage logic
     this.table = new JTable();
     this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
     this.model = (DefaultTableModel) table.getModel();
@@ -289,13 +294,12 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblText = new JLabel(Resources.get("panel_particleText"));
 
-
     JLabel lblParticleTtl = new JLabel("particle ttl");
-    
+
     JLabel labelMinParticleTtl = new JLabel(Resources.get("panel_min"));
     labelMinParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
     labelMinParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
-    
+
     JLabel lblMaxParticleTtl = new JLabel(Resources.get("panel_max"));
     lblMaxParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
     lblMaxParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
@@ -339,7 +343,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                 .addGroup(groupLayout.createSequentialGroup().addComponent(lblSpawnAmount).addGap(10).addComponent(spinnerSpawnAmount, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addGap(118).addComponent(lblDeltaY, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMin2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinDeltaY, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                     .addComponent(spinnerMaxDeltaY, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addGap(29).addComponent(rdbtnLockDeltaY).addGap(19).addComponent(rdbtnRandomDeltaY))
-                .addGroup(groupLayout.createSequentialGroup().addComponent(lblUpdateDelay).addGap(17).addComponent(spinnerUpdateDelay, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addGap(118).addComponent(lblGravityX, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+                .addGroup(groupLayout.createSequentialGroup().addComponent(lblUpdateDelay).addGap(17).addComponent(spinnerUpdateRate, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addGap(118).addComponent(lblGravityX, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMin3, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addComponent(lblMax2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                     .addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE).addGap(29).addComponent(rdbtnLockGravityX).addGap(19).addComponent(rdbtnRandomGravityX))
                 .addGroup(groupLayout.createSequentialGroup().addComponent(labelTtl).addGap(28).addComponent(spinnerTTL, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE).addGap(118).addComponent(lblGravityY, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
@@ -385,7 +389,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
             .addComponent(rdbtnRandomDeltaY))
         .addGap(9)
         .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblUpdateDelay))
-            .addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerUpdateDelay, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblGravityX))
+            .addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerUpdateRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblGravityX))
             .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMin3)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             .addGroup(groupLayout.createSequentialGroup().addGap(4).addComponent(lblMax2)).addGroup(groupLayout.createSequentialGroup().addGap(1).addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addComponent(rdbtnLockGravityX)
             .addComponent(rdbtnRandomGravityX))
@@ -432,19 +436,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.setupChangedListeners();
   }
 
-  private void initSpinners() {
-    this.spinnerMaxDeltaX.setEnabled(false);
-    this.spinnerMaxDeltaY.setEnabled(false);
-    this.spinnerMaxGravityX.setEnabled(false);
-    this.spinnerMaxGravityY.setEnabled(false);
-    this.spinnerMaxStartWidth.setEnabled(false);
-    this.spinnerMaxStartHeight.setEnabled(false);
-    this.spinnerMaxDeltaWidth.setEnabled(false);
-    this.spinnerMaxDeltaHeight.setEnabled(false);
-
-    this.spinnerMaxParticles.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
-  }
-
   private void initRadioButtons() {
     this.buttonGroupDeltaX.add(this.rdbtnLockDeltaX);
     this.buttonGroupDeltaX.add(this.rdbtnRandomDeltaX);
@@ -469,22 +460,23 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.buttonGroupDeltaHeight.add(this.rdbtnLockDeltaHeight);
     this.buttonGroupDeltaHeight.add(this.rdbtnRandomDeltaHeight);
-    
+
     this.buttonGroupParticleTTL.add(this.rdbtnLockParticleTTL);
     this.buttonGroupParticleTTL.add(this.rdbtnRandomParticleTTL);
 
-    this.rdbtnLockDeltaX.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaX));
-    this.rdbtnLockDeltaY.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaY));
-    this.rdbtnLockGravityX.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxGravityX));
-    this.rdbtnLockGravityY.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxGravityY));
-    this.rdbtnLockStartWidth.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxStartWidth));
-    this.rdbtnLockStartHeight.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxStartHeight));
-    this.rdbtnLockDeltaWidth.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaWidth));
-    this.rdbtnLockDeltaHeight.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxDeltaHeight));
-    this.rdbtnLockParticleTTL.addItemListener(new ParticleRadioButtonListener(this.spinnerMaxParticleTTL));
+    this.rdbtnLockDeltaX.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.DELTAX_RANDOM, this.rdbtnLockDeltaX, this.spinnerMaxDeltaX));
+    this.rdbtnLockDeltaY.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.DELTAY_RANDOM, this.rdbtnLockDeltaY, this.spinnerMaxDeltaY));
+    this.rdbtnLockGravityX.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.GRAVITYX_RANDOM, this.rdbtnLockGravityX, this.spinnerMaxGravityX));
+    this.rdbtnLockGravityY.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.GRAVITYY_RANDOM, this.rdbtnLockGravityY, this.spinnerMaxGravityY));
+    this.rdbtnLockStartWidth.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.STARTWIDTH_RANDOM, this.rdbtnLockStartWidth, this.spinnerMaxStartWidth));
+    this.rdbtnLockStartHeight.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.STARTHEIGHT_RANDOM, this.rdbtnLockStartHeight, this.spinnerMaxStartHeight));
+    this.rdbtnLockDeltaWidth.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.DELTAWIDTH_RANDOM, this.rdbtnLockDeltaWidth, this.spinnerMaxDeltaWidth));
+    this.rdbtnLockDeltaHeight.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.DELTAHEIGHT_RANDOM, this.rdbtnLockDeltaHeight, this.spinnerMaxDeltaHeight));
+    this.rdbtnLockParticleTTL.addItemListener(new ParticleRadioButtonListener(MapObjectProperty.Particle.TTL_RANDOM, this.rdbtnLockParticleTTL, this.spinnerMaxParticleTTL));
 
-    this.rdbtnLockDeltaX.setSelected(true);
-    this.rdbtnLockDeltaY.setSelected(true);
+    this.rdbtnRandomDeltaX.setSelected(true);
+    this.rdbtnRandomDeltaY.setSelected(true);
+
     this.rdbtnLockGravityX.setSelected(true);
     this.rdbtnLockGravityY.setSelected(true);
     this.rdbtnLockStartWidth.setSelected(true);
@@ -492,19 +484,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.rdbtnLockDeltaWidth.setSelected(true);
     this.rdbtnLockDeltaHeight.setSelected(true);
     this.rdbtnLockParticleTTL.setSelected(true);
-  }
-
-  public class ParticleRadioButtonListener implements ItemListener {
-    private final JSpinner max;
-
-    public ParticleRadioButtonListener(JSpinner max) {
-      this.max = max;
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-      this.max.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-    }
   }
 
   @Override
@@ -517,7 +496,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    btnSelectColor.addActionListener(a -> {
+    this.btnSelectColor.addActionListener(a -> {
       if (table.getSelectedRow() == -1) {
         return;
       }
@@ -533,11 +512,11 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       model.setValueAt(c, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
         String commaSeperated = ArrayUtilities.getCommaSeparatedString(colors);
-        this.getDataSource().setCustomProperty(MapObjectProperty.EMITTER_COLORS, commaSeperated);
+        this.getDataSource().setCustomProperty(MapObjectProperty.Emitter.COLORS, commaSeperated);
       }
     });
 
-    btnRemoveColor.addActionListener(a -> {
+    this.btnRemoveColor.addActionListener(a -> {
       for (int removeIndex = 0; removeIndex < colors.size(); removeIndex++) {
         if (removeIndex == table.getSelectedRow()) {
           colors.remove(removeIndex);
@@ -550,7 +529,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       }
     });
 
-    btnAddColor.addActionListener(a -> {
+    this.btnAddColor.addActionListener(a -> {
       ParticleColor c = new ParticleColor();
       colors.add(c);
       model.addRow(new Object[] { null, c.toString() });
@@ -567,59 +546,196 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
         tabbedPanel.setEnabledAt(0, true);
         tabbedPanel.setEnabledAt(1, false);
       }
-      m.setCustomProperty(MapObjectProperty.EMITTER_PARTICLETYPE, particleType.toString());
+
+      this.txt.setEnabled(particleType == ParticleType.TEXT);
+      m.setCustomProperty(MapObjectProperty.Emitter.PARTICLETYPE, particleType.toString());
     }));
 
-    this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNRATE, this.spinnerSpawnRate));
-    this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_SPAWNAMOUNT, this.spinnerSpawnAmount));
-    this.spinnerUpdateDelay.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_UPDATERATE, this.spinnerUpdateDelay));
-    this.spinnerTTL.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_TIMETOLIVE, this.spinnerTTL));
-    this.spinnerMaxParticles.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_MAXPARTICLES, this.spinnerMaxParticles));
+    this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
+    this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNAMOUNT, this.spinnerSpawnAmount));
+    this.spinnerUpdateRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.UPDATERATE, this.spinnerUpdateRate));
+    this.spinnerTTL.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.TIMETOLIVE, this.spinnerTTL));
+    this.spinnerMaxParticles.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.MAXPARTICLES, this.spinnerMaxParticles));
 
-    this.spinnerMinDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAX, this.spinnerMinDeltaX));
-    this.spinnerMaxDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAX, this.spinnerMaxDeltaX));
-    this.spinnerMinDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAY, this.spinnerMinDeltaY));
-    this.spinnerMaxDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAY, this.spinnerMaxDeltaY));
+    this.spinnerMinDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINDELTAX, this.spinnerMinDeltaX));
+    this.spinnerMaxDeltaX.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXDELTAX, this.spinnerMaxDeltaX));
+    this.spinnerMinDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINDELTAY, this.spinnerMinDeltaY));
+    this.spinnerMaxDeltaY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXDELTAY, this.spinnerMaxDeltaY));
 
-    this.spinnerMinGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityX));
-    this.spinnerMaxGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityX));
-    this.spinnerMinGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINGRAVITYX, this.spinnerMinGravityY));
-    this.spinnerMaxGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXGRAVITYX, this.spinnerMaxGravityY));
+    this.spinnerMinGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINGRAVITYX, this.spinnerMinGravityX));
+    this.spinnerMaxGravityX.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXGRAVITYX, this.spinnerMaxGravityX));
+    this.spinnerMinGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINGRAVITYY, this.spinnerMinGravityY));
+    this.spinnerMaxGravityY.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXGRAVITYY, this.spinnerMaxGravityY));
 
-    this.spinnerMinStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINSTARTWIDTH, this.spinnerMinStartWidth));
-    this.spinnerMaxStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXSTARTWIDTH, this.spinnerMaxStartWidth));
-    this.spinnerMinStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINSTARTHEIGHT, this.spinnerMinStartHeight));
-    this.spinnerMaxStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXSTARTHEIGHT, this.spinnerMaxStartHeight));
+    this.spinnerMinStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINSTARTWIDTH, this.spinnerMinStartWidth));
+    this.spinnerMaxStartWidth.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXSTARTWIDTH, this.spinnerMaxStartWidth));
+    this.spinnerMinStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINSTARTHEIGHT, this.spinnerMinStartHeight));
+    this.spinnerMaxStartHeight.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXSTARTHEIGHT, this.spinnerMaxStartHeight));
 
-    this.spinnerMinDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAWIDTH, this.spinnerMinDeltaWidth));
-    this.spinnerMaxDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAWIDTH, this.spinnerMaxDeltaWidth));
-    this.spinnerMinDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINDELTAHEIGHT, this.spinnerMinDeltaHeight));
-    this.spinnerMaxDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXDELTAHEIGHT, this.spinnerMaxDeltaHeight));
-    this.spinnerMinParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MINTTL, this.spinnerMinParticleTTL));
-    this.spinnerMaxParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.PARTICLE_MAXTTL, this.spinnerMaxParticleTTL));
-    
-    this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_COLORDEVIATION, this.spinnerColorDeviation));
-    this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.EMITTER_ALPHADEVIATION, this.spinnerAlphaDeviation));
-    
-    this.chckbxStaticPhysics.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_STATICPHYSICS, Boolean.toString(this.chckbxStaticPhysics.isSelected()))));
+    this.spinnerMinDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINDELTAWIDTH, this.spinnerMinDeltaWidth));
+    this.spinnerMaxDeltaWidth.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXDELTAWIDTH, this.spinnerMaxDeltaWidth));
+    this.spinnerMinDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINDELTAHEIGHT, this.spinnerMinDeltaHeight));
+    this.spinnerMaxDeltaHeight.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXDELTAHEIGHT, this.spinnerMaxDeltaHeight));
+    this.spinnerMinParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MINTTL, this.spinnerMinParticleTTL));
+    this.spinnerMaxParticleTTL.addChangeListener(new SpinnerListener(MapObjectProperty.Particle.MAXTTL, this.spinnerMaxParticleTTL));
 
-    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PARTICLE_TEXT, this.txt.getText())));
+    this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.COLORDEVIATION, this.spinnerColorDeviation));
+    this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHADEVIATION, this.spinnerAlphaDeviation));
+
+    this.chckbxStaticPhysics.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.Particle.STATICPHYSICS, Boolean.toString(this.chckbxStaticPhysics.isSelected()))));
+
+    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.TEXT, this.txt.getText())));
   }
 
   @Override
   protected void clearControls() {
+    this.comboBoxParticleType.setSelectedItem(ParticleType.RECTANGLE);
+    this.comboBoxSprite.setSelectedItem(null);
+    this.comboBoxSpriteType.setSelectedIndex(0);
+
+    this.spinnerSpawnRate.setValue(0);
+    this.spinnerSpawnAmount.setValue(Emitter.DEFAULT_SPAWNAMOUNT);
+    this.spinnerUpdateRate.setValue(0);
+    this.spinnerTTL.setValue(0);
+    this.spinnerMaxParticles.setValue(Emitter.DEFAULT_MAXPARTICLES);
+
+    this.spinnerMinDeltaX.setValue(-PARTICLEDELTA_DEFAULT_VALUE);
+    this.spinnerMaxDeltaX.setValue(PARTICLEDELTA_DEFAULT_VALUE);
+    this.spinnerMinDeltaY.setValue(-PARTICLEDELTA_DEFAULT_VALUE);
+    this.spinnerMaxDeltaY.setValue(PARTICLEDELTA_DEFAULT_VALUE);
+
+    this.spinnerMinGravityX.setValue(0);
+    this.spinnerMaxGravityX.setValue(0);
+    this.spinnerMinGravityY.setValue(0);
+    this.spinnerMaxGravityY.setValue(0);
+
+    this.spinnerMinStartWidth.setValue(1);
+    this.spinnerMaxStartWidth.setValue(1);
+    this.spinnerMinStartHeight.setValue(1);
+    this.spinnerMaxStartHeight.setValue(1);
+
+    this.spinnerMinDeltaWidth.setValue(0);
+    this.spinnerMaxDeltaWidth.setValue(0);
+    this.spinnerMinDeltaHeight.setValue(0);
+    this.spinnerMaxDeltaHeight.setValue(0);
+
+    this.spinnerMinParticleTTL.setValue(PARTICLEMINTTL_DEFAULT_VALUE);
+    this.spinnerMaxParticleTTL.setValue(0);
+
+    this.spinnerColorDeviation.setValue(0);
+    this.spinnerAlphaDeviation.setValue(0);
+
+    this.chckbxStaticPhysics.setSelected(false);
+    this.txt.setText("");
+
+    this.rdbtnRandomDeltaX.setSelected(true);
+    this.rdbtnRandomDeltaY.setSelected(true);
+
+    this.rdbtnLockGravityX.setSelected(true);
+    this.rdbtnLockGravityY.setSelected(true);
+    this.rdbtnLockStartWidth.setSelected(true);
+    this.rdbtnLockStartHeight.setSelected(true);
+    this.rdbtnLockDeltaWidth.setSelected(true);
+    this.rdbtnLockDeltaHeight.setSelected(true);
+    this.rdbtnLockParticleTTL.setSelected(true);
+    this.model.setRowCount(0);
+    this.colors.clear();
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
+    this.comboBoxParticleType.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE));
+    this.comboBoxSprite.setSelectedItem(mapObject.getCustomProperty(MapObjectProperty.Particle.SPRITE));
+
+    // TODO: implement this
+    this.comboBoxSpriteType.setSelectedIndex(0);
+
+    this.spinnerSpawnRate.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.Emitter.SPAWNRATE));
+    this.spinnerSpawnAmount.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
+    this.spinnerUpdateRate.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.Emitter.UPDATERATE));
+    this.spinnerTTL.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.Emitter.TIMETOLIVE));
+    this.spinnerMaxParticles.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
+
+    // TODO: implement this
+    this.spinnerColorDeviation.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Emitter.COLORDEVIATION));
+    this.spinnerAlphaDeviation.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Emitter.ALPHADEVIATION));
+
+    this.spinnerMinDeltaX.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINDELTAX, -PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMaxDeltaX.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXDELTAX, PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMinDeltaY.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINDELTAY, -PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMaxDeltaY.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXDELTAY, PARTICLEDELTA_DEFAULT_VALUE));
+
+    this.spinnerMinGravityX.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINGRAVITYX));
+    this.spinnerMaxGravityX.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXGRAVITYX));
+    this.spinnerMinGravityY.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINGRAVITYY));
+    this.spinnerMaxGravityY.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXGRAVITYY));
+
+    this.spinnerMinStartWidth.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINSTARTWIDTH, 1));
+    this.spinnerMaxStartWidth.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXSTARTWIDTH, 1));
+    this.spinnerMinStartHeight.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINSTARTHEIGHT, 1));
+    this.spinnerMaxStartHeight.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXSTARTHEIGHT, 1));
+
+    this.spinnerMinDeltaWidth.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINDELTAWIDTH));
+    this.spinnerMaxDeltaWidth.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXDELTAWIDTH));
+    this.spinnerMinDeltaHeight.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINDELTAHEIGHT));
+    this.spinnerMaxDeltaHeight.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXDELTAHEIGHT));
+
+    this.spinnerMinParticleTTL.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MINTTL, PARTICLEMINTTL_DEFAULT_VALUE));
+    this.spinnerMaxParticleTTL.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.Particle.MAXTTL));
+
+    this.chckbxStaticPhysics.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.STATICPHYSICS));
+    this.txt.setText(mapObject.getCustomProperty(MapObjectProperty.Particle.TEXT));
+
+    this.rdbtnRandomDeltaX.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.DELTAX_RANDOM, true));
+    this.rdbtnRandomDeltaY.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.DELTAY_RANDOM, true));
+
+    this.rdbtnRandomGravityX.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.GRAVITYX_RANDOM));
+    this.rdbtnRandomGravityY.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.GRAVITYY_RANDOM));
+    this.rdbtnRandomStartWidth.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.STARTWIDTH_RANDOM));
+    this.rdbtnRandomStartHeight.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.STARTHEIGHT_RANDOM));
+    this.rdbtnRandomDeltaWidth.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.DELTAWIDTH_RANDOM));
+    this.rdbtnRandomDeltaHeight.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.DELTAHEIGHT_RANDOM));
+    this.rdbtnRandomParticleTTL.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.TTL_RANDOM));
+
+    this.model.setRowCount(0);
+    for (ParticleColor color : EmitterMapObjectLoader.getColors(mapObject)) {
+      this.colors.add(color);
+      this.model.addRow(new Object[] { null, color.toString() });
+    }
   }
 
-  private static SpinnerNumberModel getParticleModel() {
-    return new SpinnerNumberModel(0.0, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  private static SpinnerNumberModel getParticleMinModel() {
+    return new SpinnerNumberModel(-PARTICLEDELTA_DEFAULT_VALUE, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+
+  private static SpinnerNumberModel getParticleMaxModel() {
+    return new SpinnerNumberModel(PARTICLEDELTA_DEFAULT_VALUE, -PARTICLESPINNER_MAX_VALUE, PARTICLESPINNER_MAX_VALUE, 0.1);
+  }
+
+  private static SpinnerNumberModel getDeltaModel() {
+    return new SpinnerNumberModel(0.0, -PARTICLEDELTA_MAX_VALUE, PARTICLEDELTA_MAX_VALUE, 0.01);
+  }
+
+  private static SpinnerNumberModel getParticleDimensionModel() {
+    return new SpinnerNumberModel(1.0, 0.0, PARTICLESPINNER_MAX_VALUE, 1.0);
   }
 
   private static SpinnerNumberModel getPercentModel() {
     return new SpinnerNumberModel(0.0, 0.0, 1.0, 0.01);
+  }
+
+  private class ParticleRadioButtonListener extends MapObjectPropertyItemListener {
+    private final JSpinner max;
+
+    public ParticleRadioButtonListener(String mapObjectPropery, JRadioButton button, JSpinner max) {
+      super(m -> m.setCustomProperty(mapObjectPropery, Boolean.toString(button.isSelected())));
+      this.max = max;
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+      this.max.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
+    }
   }
 
   private class ParticleColorCellRenderer extends DefaultTableCellRenderer {
@@ -628,6 +744,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
       // Cells are by default rendered as a JLabel.
       JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+      if (colors.size() - 1 < row) {
+        return l;
+      }
 
       Color bg = colors.get(row).toColor();
       l.setBackground(bg);

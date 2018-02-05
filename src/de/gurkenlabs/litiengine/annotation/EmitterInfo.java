@@ -35,7 +35,7 @@ public @interface EmitterInfo {
    *
    * @return the int
    */
-  int maxParticles();
+  int maxParticles() default Emitter.DEFAULT_MAXPARTICLES;
 
   boolean particleFade() default true;
 
@@ -55,7 +55,7 @@ public @interface EmitterInfo {
    *
    * @return the int
    */
-  int spawnAmount();
+  int spawnAmount() default Emitter.DEFAULT_SPAWNAMOUNT;
 
   /**
    * Spawn rate.

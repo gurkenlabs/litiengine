@@ -25,6 +25,10 @@ public class TextParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
+    if(this.getText() == null || this.getText().isEmpty()) {
+      return;
+    }
+    
     final Point2D renderLocation = this.getLocation(emitterOrigin);
     g.setColor(this.getColor());
     final Font oldFont = g.getFont();
