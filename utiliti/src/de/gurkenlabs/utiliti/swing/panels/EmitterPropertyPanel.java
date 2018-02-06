@@ -66,6 +66,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JComboBox<String> comboBoxSprite = new JComboBox<>();
   private final JComboBox<CollisionType> comboBoxCollisionType = new JComboBox<>();
   
+  // TODO: refactor this code to use a custom ParticleParameter JPanel implementation that wraps the controls and logic
   private final JRadioButton rdbtnLockDeltaX = new JRadioButton("");
   private final JRadioButton rdbtnLockDeltaY = new JRadioButton("");
   private final JRadioButton rdbtnLockGravityX = new JRadioButton("");
