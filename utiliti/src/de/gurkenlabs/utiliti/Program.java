@@ -74,14 +74,14 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
-  public static final BufferedImage CURSOR = Spritesheet.load("cursor.png", 23, 32).getSprite(0);
-  public static final BufferedImage CURSOR_MOVE = Spritesheet.load("cursor-move.png", 23, 32).getSprite(0);
-  public static final BufferedImage CURSOR_SELECT = Spritesheet.load("cursor-select.png", 21, 21).getSprite(0);
-  public static final BufferedImage CURSOR_LOAD = Spritesheet.load("cursor-load.png", 23, 32).getSprite(0);
-  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Spritesheet.load("cursor-trans-horizontal.png", 32, 23).getSprite(0);
-  public static final BufferedImage CURSOR_TRANS_VERTICAL = Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0);
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(-45));
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = ImageProcessing.rotate(Spritesheet.load("cursor-trans-vertical.png", 23, 32).getSprite(0), Math.toRadians(45));
+  public static final BufferedImage CURSOR = Resources.getImage("cursor.png");
+  public static final BufferedImage CURSOR_MOVE = Resources.getImage("cursor-move.png");
+  public static final BufferedImage CURSOR_SELECT = Resources.getImage("cursor-select.png");
+  public static final BufferedImage CURSOR_LOAD = Resources.getImage("cursor-load.png");
+  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Resources.getImage("cursor-trans-horizontal.png");
+  public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.getImage("cursor-trans-vertical.png");
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.getImage("cursor-trans-315.png");
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.getImage("cursor-trans-45.png");
 
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;
@@ -650,8 +650,6 @@ public class Program {
       isChanging = true;
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
       isChanging = false;
-
-      Game.getScreenManager().getRenderComponent().setCursor(CURSOR_SELECT, 11, 11);
     });
 
     mv.addActionListener(a -> {
@@ -674,7 +672,6 @@ public class Program {
         ed.setSelected(false);
         mv.setSelected(false);
         place.setSelected(true);
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR_SELECT, 11, 11);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {

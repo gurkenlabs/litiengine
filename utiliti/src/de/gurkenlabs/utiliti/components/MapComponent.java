@@ -1182,7 +1182,7 @@ public class MapComponent extends EditorComponent {
     }
     for (Entry<TransformType, Rectangle2D> entry : this.transformRects.entrySet()) {
       Rectangle2D rect = entry.getValue();
-      Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 2, rect.getY() - rect.getHeight() * 2, rect.getWidth() * 4, rect.getHeight() * 4);
+      Rectangle2D hoverrect = new Rectangle2D.Double(rect.getX() - rect.getWidth() * 3, rect.getY() - rect.getHeight() * 3, rect.getWidth() * 5, rect.getHeight() * 5);
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         hovered = true;
         if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
