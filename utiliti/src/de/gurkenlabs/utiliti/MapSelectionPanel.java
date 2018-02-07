@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -30,6 +32,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -96,6 +100,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
+  private JPanel panel_1;
 
   /**
    * Create the panel.
@@ -158,17 +163,84 @@ public class MapSelectionPanel extends JSplitPane {
     layerScrollPane.setMinimumSize(new Dimension(150, 0));
     layerScrollPane.setMaximumSize(new Dimension(0, 250));
 
+    JTabbedPane tabPane = new JTabbedPane();
+    tabPane.add(Resources.get("panel_mapObjectLayers"), layerScrollPane);
+
+    panel_1 = new JPanel();
+    tabPane.addTab(Resources.get("panel_entities"), panel_1);
+    panel_1.setLayout(new BorderLayout(0, 0));
+
+    panel = new JPanel();
+    panel_1.add(panel, BorderLayout.NORTH);
+    panel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
+    panel.setBackground(Color.WHITE);
+    panel.setLayout(new BorderLayout(0, 0));
+
+    btnCollape = new JButton("");
+    btnCollape.setOpaque(false);
+    btnCollape.setMargin(new Insets(2, 2, 2, 2));
+    btnCollape.addActionListener(e -> collapseAll());
+    btnCollape.setIcon(new ImageIcon(Resources.getImage("collapse.png")));
+    panel.add(btnCollape, BorderLayout.WEST);
+
+    textField = new JTextField();
+    textField.setBorder(new EmptyBorder(0, 5, 0, 0));
+    textField.setOpaque(false);
+    textField.addActionListener(e -> search());
+    textField.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        textField.selectAll();
+      }
+    });
+    panel.add(textField, BorderLayout.CENTER);
+    textField.setColumns(10);
+
+    btnSearch = new JButton("");
+    btnSearch.setBorderPainted(false);
+    btnSearch.setContentAreaFilled(false);
+    btnSearch.setOpaque(false);
+    btnSearch.setMargin(new Insets(2, 2, 2, 2));
+    btnSearch.addActionListener(e -> search());
+    btnSearch.setIcon(new ImageIcon(Resources.getImage("search.png")));
+    panel.add(btnSearch, BorderLayout.EAST);
+
     entityScrollPane = new JScrollPane();
+    panel_1.add(entityScrollPane);
     entityScrollPane.setViewportBorder(null);
     entityScrollPane.setMinimumSize(new Dimension(150, 0));
     entityScrollPane.setMaximumSize(new Dimension(0, 250));
 
-    JTabbedPane tabPane = new JTabbedPane();
-    tabPane.add(Resources.get("panel_mapObjectLayers"), layerScrollPane);
-    tabPane.add(Resources.get("panel_entities"), entityScrollPane);
-    tabPane.setMaximumSize(new Dimension(0, 150));
-
     this.tree = new JTree();
+    tree.setBorder(null);
+
+
+    tree.setCellRenderer(new IconTreeListRenderer());
+    tree.setMaximumSize(new Dimension(0, 250));
+
+
+    tree.addTreeSelectionListener(e -> {
+      this.isFocussing = true;
+      try {
+        if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+          if (node.getUserObject() instanceof IconTreeListItem) {
+            IconTreeListItem item = (IconTreeListItem) node.getUserObject();
+            if (item.getUserObject() instanceof IEntity) {
+              IMapObject obj = Game.getEnvironment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
+              if (obj != null) {
+                EditorScreen.instance().getMapComponent().setFocus(obj, true);
+              }
+            }
+          }
+        }
+      } finally {
+        this.isFocussing = false;
+      }
+    });
+
+    entityScrollPane.setViewportView(tree);
+    tabPane.setMaximumSize(new Dimension(0, 150));
 
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), FOLDER_ICON));
     this.nodeProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_props"), PROP_ICON));
@@ -191,10 +263,6 @@ public class MapSelectionPanel extends JSplitPane {
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
     this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
-
-    tree.setModel(this.entitiesTreeModel);
-    tree.setCellRenderer(new IconTreeListRenderer());
-    tree.setMaximumSize(new Dimension(0, 250));
     MouseListener ml = new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -204,52 +272,8 @@ public class MapSelectionPanel extends JSplitPane {
         }
       }
     };
-
+    tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
-    tree.addTreeSelectionListener(e -> {
-      this.isFocussing = true;
-      try {
-        if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-          if (node.getUserObject() instanceof IconTreeListItem) {
-            IconTreeListItem item = (IconTreeListItem) node.getUserObject();
-            if (item.getUserObject() instanceof IEntity) {
-              IMapObject obj = Game.getEnvironment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
-              if (obj != null) {
-                EditorScreen.instance().getMapComponent().setFocus(obj, true);
-              }
-            }
-          }
-        }
-      } finally {
-        this.isFocussing = false;
-      }
-    });
-
-    entityScrollPane.setViewportView(tree);
-
-    panel = new JPanel();
-    entityScrollPane.setColumnHeaderView(panel);
-    panel.setLayout(new BorderLayout(0, 0));
-
-    btnCollape = new JButton("");
-    btnCollape.setOpaque(false);
-    btnCollape.setMargin(new Insets(2, 2, 2, 2));
-    btnCollape.addActionListener(e -> collapseAll());
-    btnCollape.setIcon(new ImageIcon(Resources.getImage("collapse.png")));
-    panel.add(btnCollape, BorderLayout.WEST);
-
-    textField = new JTextField();
-    textField.addActionListener(e -> search());
-    panel.add(textField, BorderLayout.CENTER);
-    textField.setColumns(10);
-
-    btnSearch = new JButton("");
-    btnSearch.setOpaque(false);
-    btnSearch.setMargin(new Insets(2, 2, 2, 2));
-    btnSearch.addActionListener(e -> search());
-    btnSearch.setIcon(new ImageIcon(Resources.getImage("search.png")));
-    panel.add(btnSearch, BorderLayout.EAST);
     tabPane.setIconAt(0, new ImageIcon(Resources.getImage("layer.png")));
     tabPane.setIconAt(1, new ImageIcon(Resources.getImage("object_cube-10x10.png")));
     this.setRightComponent(tabPane);
@@ -258,7 +282,6 @@ public class MapSelectionPanel extends JSplitPane {
     listObjectLayers.setModel(layerModel);
     listObjectLayers.setMaximumSize(new Dimension(0, 250));
     layerScrollPane.setViewportView(listObjectLayers);
-
   }
 
   public void bind(List<Map> maps) {
@@ -395,6 +418,7 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   private void search() {
+    this.btnSearch.requestFocus();
     if (this.textField.getText() == null || this.textField.getText().isEmpty()) {
       return;
     }
