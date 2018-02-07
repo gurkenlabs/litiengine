@@ -1337,8 +1337,12 @@ public class MapComponent extends EditorComponent {
             continue;
           }
 
-          this.setSelection(mapObject, false, true);
           if (somethingIsFocused) {
+            if(rect.getWidth() == 0 && rect.getHeight()== 0) {
+              break;
+            }
+            
+            this.setSelection(mapObject, false, true);
             continue;
           }
 
