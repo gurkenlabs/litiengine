@@ -12,9 +12,9 @@ LITIengine is the pure 2D free java game engine. Written in plain Java 8 it prov
 > ## Important Note 16.10.2017
 
 > Currently the LITIengine is being actively developed and therefore some parts of the framework are not final yet. Be aware that the engine API might change over the course of the next releases up until beta (v0.5.0-beta).
-Nontheless, the LITIengine can of course already be used to make fully functioning **2D java games**, at least we did that multiple times now :smile:.
+Nonetheless, the LITIengine can of course already be used to make fully functioning **2D java games**, or at least we've done so quite successfully :smile:.
 
-> We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that it doesn't get deprecated before it's even used.
+> We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
 > If any **questions occur**, please don't hesitate to contact us, preferably by opening an issue at our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
@@ -66,6 +66,9 @@ Nontheless, the LITIengine can of course already be used to make fully functioni
 
 ### Naughty Gnomes
 ![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
+
+### Naughty Elves
+![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2017/12/capsule_lg.png "Naughty Elves")
 
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
