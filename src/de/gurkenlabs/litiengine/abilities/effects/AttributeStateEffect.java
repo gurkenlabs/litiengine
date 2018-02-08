@@ -41,11 +41,6 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
     this.getAttribute(affectedEntity).removeModifier(this.getModifier());
   }
 
-  /**
-   * Gets the modifier.
-   *
-   * @return the modifier
-   */
   public AttributeModifier<T> getModifier() {
     return this.modifier;
   }

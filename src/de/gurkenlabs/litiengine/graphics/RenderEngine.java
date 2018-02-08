@@ -28,27 +28,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
-/**
- * The Class GraphicsEngine.
- */
 public final class RenderEngine implements IRenderEngine {
-
   private final EntityYComparator entityComparator;
-
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-
   private final List<Predicate<IEntity>> entityRenderingConditions;
-
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
-
-  /** The map renderer. */
   private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
-  /**
-   * Instantiates a new graphics engine.
-   */
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();

@@ -92,7 +92,9 @@ public final class Resources {
    * loading images from a folder and loading them from the resources.
    *
    * @param absolutPath
-   *          the image
+   *          The path to the image.
+   * @param forceLoad
+   *          Forces the image to be reloaded. Cached values will be ignored.
    * @return the image
    */
   public static BufferedImage getImage(final String absolutPath, final boolean forceLoad) {

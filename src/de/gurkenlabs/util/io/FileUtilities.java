@@ -135,7 +135,8 @@ public final class FileUtilities {
    * Gets the specified file from either a resource folder or the file system.
    * 
    * @param file
-   * @return
+   *          The path to the file.
+   * @return The contents of the specified file as {@link InputStream}.
    */
   public static InputStream getGameResource(final String file) {
     try {

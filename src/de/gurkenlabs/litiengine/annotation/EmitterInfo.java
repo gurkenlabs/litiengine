@@ -16,25 +16,10 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 @Inherited
 public @interface EmitterInfo {
 
-  /**
-   * Activate on init.
-   *
-   * @return true, if successful
-   */
   boolean activateOnInit() default true;
 
-  /**
-   * The time to live in milliseconds.
-   *
-   * @return the int
-   */
   int emitterTTL() default 0;
 
-  /**
-   * Max particles.
-   *
-   * @return the int
-   */
   int maxParticles() default Emitter.DEFAULT_MAXPARTICLES;
 
   boolean particleFade() default true;
@@ -43,24 +28,9 @@ public @interface EmitterInfo {
 
   int particleMinTTL() default 0;
 
-  /**
-   * Update particle 30 times per second.
-   *
-   * @return
-   */
   int particleUpdateRate() default Emitter.DEFAULT_UPDATERATE;
 
-  /**
-   * Spawn amount.
-   *
-   * @return the int
-   */
   int spawnAmount() default Emitter.DEFAULT_SPAWNAMOUNT;
 
-  /**
-   * Spawn rate.
-   *
-   * @return the int
-   */
   int spawnRate() default 0;
 }

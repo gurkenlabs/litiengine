@@ -110,6 +110,7 @@ public class Animation implements IUpdateable, ILaunchable {
    * specified value.
    *
    * @param frameDuration
+   *          The frameduration for all keyframes.
    */
   public void setFrameDuration(final int frameDuration) {
     this.frameDuration = frameDuration;

@@ -17,9 +17,9 @@ public interface IGameLoop extends ILoop, ILaunchable {
   public void updateExecutionTime(int index, long ticks);
 
   /**
-   * Gets the time passed since the last tick in ms.
+   * Gets the time that passed since the last tick in ms.
    *
-   * @return
+   * @return The delta time in ms.
    */
   public long getDeltaTime();
 

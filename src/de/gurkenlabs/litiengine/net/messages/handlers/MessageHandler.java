@@ -33,16 +33,6 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
     this.handle(message, address, port);
   }
 
-  /**
-   * Handle.
-   *
-   * @param message
-   *          the message
-   * @param address
-   *          the address
-   * @param port
-   *          the port
-   */
   protected abstract void handle(T message, InetAddress address, int port);
 
   /**
@@ -51,6 +41,7 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
    * certain field of the message is not null.
    *
    * @param message
+   *          The message object that is validated.
    * @return True if the message is valid for the message handler; otherwise
    *         false.
    */

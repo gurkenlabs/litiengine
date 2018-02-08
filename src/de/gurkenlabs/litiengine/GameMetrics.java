@@ -9,39 +9,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
-/**
- * The Class GameMetrics.
- */
 public class GameMetrics implements IUpdateable, IRenderable {
   private static final int OFFSET_X = 5;
   private static final int OFFSET_Y = 12;
+  
   private final List<Long> bytesReceived;
-
   private final List<Long> bytesSent;
 
-  /** The down stream in bytes. */
   private long downStreamInBytes;
-
-  /** The fps. */
   private final List<Long> fps;
-
-  /** The frames per second. */
   private long framesPerSecond;
-
   private long lastNetworkTickTime;
-
   private int packagesReceived;
-
   private int packagesSent;
-
-  /** The ping. */
   private long ping;
-
   private long updatesPerSecond;
-
   private final List<Long> ups;
-
-  /** The up stream in bytes. */
   private long upStreamInBytes;
 
   /**
@@ -54,11 +37,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
     this.bytesReceived = new CopyOnWriteArrayList<>();
   }
 
-  /**
-   * Gets the average frames per second.
-   *
-   * @return the average frames per second
-   */
   public float getAverageFramesPerSecond() {
     if (this.fps.isEmpty()) {
       return 0;
@@ -76,20 +54,10 @@ public class GameMetrics implements IUpdateable, IRenderable {
     return opt.isPresent() ? opt.get() / (float) this.ups.size() : 0;
   }
 
-  /**
-   * Gets the down stream in bytes.
-   *
-   * @return the down stream in bytes
-   */
   public float getDownStreamInBytes() {
     return this.downStreamInBytes;
   }
 
-  /**
-   * Gets the frames per second.
-   *
-   * @return the frames per second
-   */
   public long getFramesPerSecond() {
     return this.framesPerSecond;
   }
@@ -102,11 +70,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
     return this.packagesSent;
   }
 
-  /**
-   * Gets the ping.
-   *
-   * @return the ping
-   */
   public long getPing() {
     return this.ping;
   }
@@ -115,11 +78,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
     return this.updatesPerSecond;
   }
 
-  /**
-   * Gets the up stream in bytes.
-   *
-   * @return the up stream in bytes
-   */
   public float getUpStreamInBytes() {
     return this.upStreamInBytes;
   }
@@ -171,23 +129,11 @@ public class GameMetrics implements IUpdateable, IRenderable {
     g.drawString(upsString, OFFSET_X, currentOffsetY);
   }
 
-  /**
-   * Sets the frames per second.
-   *
-   * @param currentFramesPerSecond
-   *          the new frames per second
-   */
   public void setFramesPerSecond(final long currentFramesPerSecond) {
     this.framesPerSecond = currentFramesPerSecond;
     this.fps.add(this.framesPerSecond);
   }
 
-  /**
-   * Sets the ping.
-   *
-   * @param ping
-   *          the new ping
-   */
   public void setPing(final long ping) {
     this.ping = ping;
   }

@@ -6,21 +6,8 @@ import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
-/**
- * The Class ShieldEffect.
- */
 public class ShieldEffect extends AttributeStateEffect<Short> {
 
-  /**
-   * Instantiates a new shield effect.
-   *
-   * @param ability
-   *          the ability
-   * @param shieldDelta
-   *          the shield delta
-   * @param targtes
-   *          the targtes
-   */
   public ShieldEffect(final Ability ability, final short shieldDelta, final Modification modifictaion, final EffectTarget... targtes) {
     super(ability, modifictaion, shieldDelta, targtes);
   }

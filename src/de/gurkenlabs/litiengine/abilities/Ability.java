@@ -22,38 +22,20 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-/**
- * The Class Ability.
- */
 @AbilityInfo
 public abstract class Ability implements IRenderable {
   private final List<Consumer<AbilityExecution>> abilityCastConsumer;
-
-  /** The attributes. */
   private final AbilityAttributes attributes;
   private final CastType castType;
-
-  /** The current execution. */
-  private AbilityExecution currentExecution;
-
-  /** The tooltip. */
   private final String description;
-
-  /** The effects. */
   private final List<IEffect> effects;
-
-  /** The executing mob. */
   private final IMovableCombatEntity executor;
-
-  /** The multi target. */
   private final boolean multiTarget;
-
-  /** The ability type. */
   private final String name;
-
-  private Point2D origin;
-
   private final AbilityOrigin originType;
+
+  private AbilityExecution currentExecution;
+  private Point2D origin;
 
   /**
    * Instantiates a new ability.
@@ -79,11 +61,6 @@ public abstract class Ability implements IRenderable {
     this.getEffects().add(effect);
   }
 
-  /**
-   * Calculate impact area.
-   *
-   * @return the shape
-   */
   public Shape calculateImpactArea() {
     return this.internalCalculateImpactArea(this.getExecutor().getAngle());
   }
@@ -96,20 +73,17 @@ public abstract class Ability implements IRenderable {
     return new Ellipse2D.Double(arcX, arcY, range, range);
   }
 
-  /**
-   * Can cast.
-   *
-   * @return true, if successful
-   */
   public boolean canCast() {
     return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.getLoop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
 
   /**
    * Casts the ability by the temporal conditions of the specified game loop and
-   * the spatial circumstances of the specified environment. An ability
-   * execution will be taken out that start applying all the effects of this
-   * ability.
+   * the spatial circumstances of the specified environment. An ability execution
+   * will be taken out that start applying all the effects of this ability.
+   * 
+   * @return An {@link AbilityExecution} object that wraps all information about
+   *         this execution of the ability.
    */
   public AbilityExecution cast() {
     if (!this.canCast()) {
@@ -124,11 +98,6 @@ public abstract class Ability implements IRenderable {
     return this.getCurrentExecution();
   }
 
-  /**
-   * Gets the attributes.
-   *
-   * @return the attributes
-   */
   public AbilityAttributes getAttributes() {
     return this.attributes;
   }
@@ -137,20 +106,10 @@ public abstract class Ability implements IRenderable {
     return this.castType;
   }
 
-  /**
-   * Gets the cooldown in seconds.
-   *
-   * @return the cooldown in seconds
-   */
   public float getCooldownInSeconds() {
     return (float) (this.getAttributes().getCooldown().getCurrentValue() * 0.001);
   }
 
-  /**
-   * Gets the current execution.
-   *
-   * @return the current execution
-   */
   public AbilityExecution getCurrentExecution() {
     return this.currentExecution;
   }
@@ -159,11 +118,6 @@ public abstract class Ability implements IRenderable {
     return this.description;
   }
 
-  /**
-   * Gets the executing mob.
-   *
-   * @return the executing mob
-   */
   public IMovableCombatEntity getExecutor() {
     return this.executor;
   }
@@ -191,11 +145,6 @@ public abstract class Ability implements IRenderable {
     return this.executor.getLocation();
   }
 
-  /**
-   * Gets the remaining cooldown in seconds.
-   *
-   * @return the remaining cooldown in seconds
-   */
   public float getRemainingCooldownInSeconds(final IGameLoop loop) {
     if (this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()) {
       return 0;
@@ -209,11 +158,6 @@ public abstract class Ability implements IRenderable {
     return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 
-  /**
-   * Checks if is multi target.
-   *
-   * @return true, if is multi target
-   */
   public boolean isMultiTarget() {
     return this.multiTarget;
   }
@@ -250,20 +194,17 @@ public abstract class Ability implements IRenderable {
   }
 
   /**
-   * Sets a custom offset from the executors map location as origion of this
+   * Sets a custom offset from the executors map location as origin of this
    * ability.
    * 
    * @param origin
+   *          The origin that defines the execution offset for this
+   *          {@link Ability}.
    */
   public void setOrigin(final Point2D origin) {
     this.origin = origin;
   }
 
-  /**
-   * Gets the effects.
-   *
-   * @return the effects
-   */
   protected List<IEffect> getEffects() {
     return this.effects;
   }

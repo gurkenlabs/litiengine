@@ -9,10 +9,10 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 public interface IEffect extends IUpdateable {
   /**
-   * Applies the effect in the specified impact area on the specified
-   * environment.
+   * Applies the effect in the specified impact area on the specified environment.
    * 
    * @param impactArea
+   *          The impact area
    */
   public void apply(Shape impactArea);
 

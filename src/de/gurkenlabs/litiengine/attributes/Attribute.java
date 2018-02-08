@@ -5,18 +5,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The Class Attribute.
+ * The class Attribute represents a numerical representation of a character property that can be adjusted using {@link AttributeModifier}s.
  *
  * @param <T>
- *          the generic type
+ *          The type of the actual attribute.
  */
 public class Attribute<T extends Number> {
-
-  /** The base value. */
-  private T baseValue;
-
-  /** The modifiers. */
   private final List<AttributeModifier<T>> modifiers;
+  
+  private T baseValue;
 
   /**
    * Instantiates a new attribute.
@@ -29,12 +26,6 @@ public class Attribute<T extends Number> {
     this.baseValue = initialValue;
   }
 
-  /**
-   * Adds the modifier.
-   *
-   * @param modifier
-   *          the modifier
-   */
   public void addModifier(final AttributeModifier<T> modifier) {
     if (this.getModifiers().contains(modifier)) {
       return;
@@ -44,20 +35,10 @@ public class Attribute<T extends Number> {
     Collections.sort(this.getModifiers());
   }
 
-  /**
-   * Gets the current value.
-   *
-   * @return the current value
-   */
   public T getCurrentValue() {
     return this.applyModifiers(this.getBaseValue());
   }
 
-  /**
-   * Gets the modifiers.
-   *
-   * @return the modifiers
-   */
   public List<AttributeModifier<T>> getModifiers() {
     return this.modifiers;
   }
@@ -66,22 +47,10 @@ public class Attribute<T extends Number> {
     return this.getModifiers().contains(modifier);
   }
 
-  /**
-   * Modify base value.
-   *
-   * @param modifier
-   *          the modifier
-   */
   public void modifyBaseValue(final AttributeModifier<T> modifier) {
     this.baseValue = modifier.modify(this.getBaseValue());
   }
 
-  /**
-   * Removes the modifier.
-   *
-   * @param modifier
-   *          the modifier
-   */
   public void removeModifier(final AttributeModifier<T> modifier) {
     if (!this.getModifiers().contains(modifier)) {
       return;
@@ -91,13 +60,6 @@ public class Attribute<T extends Number> {
     Collections.sort(this.getModifiers());
   }
 
-  /**
-   * Apply modifiers.
-   *
-   * @param baseValue
-   *          the base value
-   * @return the t
-   */
   protected T applyModifiers(final T baseValue) {
     if (this.getModifiers().isEmpty()) {
       return baseValue;
@@ -111,21 +73,10 @@ public class Attribute<T extends Number> {
     return currentValue;
   }
 
-  /**
-   * Gets the base value.
-   *
-   * @return the base value
-   */
   protected T getBaseValue() {
     return this.baseValue;
   }
 
-  /**
-   * Sets the base value.
-   *
-   * @param baseValue
-   *          the new base value
-   */
   protected void setBaseValue(final T baseValue) {
     this.baseValue = baseValue;
   }

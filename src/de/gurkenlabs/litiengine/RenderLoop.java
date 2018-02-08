@@ -8,16 +8,12 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
-/**
- * The Class RenderLoop.
- */
 public class RenderLoop extends UpdateLoop {
   private static final Logger log = Logger.getLogger(RenderLoop.class.getName());
   private final IRenderComponent component;
-  /** The game is running. */
-  private boolean gameIsRunning = true;
   private final List<IRenderable> renderables;
-
+  
+  private boolean gameIsRunning = true;
   private int maxFps;
 
   public RenderLoop(final IRenderComponent component) {
@@ -55,9 +51,6 @@ public class RenderLoop extends UpdateLoop {
     }
   }
 
-  /**
-   * Terminate.
-   */
   public void terminate() {
     this.gameIsRunning = false;
   }

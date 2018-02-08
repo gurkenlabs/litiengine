@@ -103,11 +103,6 @@ public class GeometricUtilities {
     return point1.distance(point2) < epsilon;
   }
 
-  /**
-   * Gets the connecting lines.
-   *
-   * @return the connecting lines
-   */
   public static Line2D[] getConnectingLines(final Point2D point, final Point2D[] rectPoints) {
     final Line2D[] lines = new Line2D[rectPoints.length];
 

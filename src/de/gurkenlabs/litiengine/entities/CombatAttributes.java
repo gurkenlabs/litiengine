@@ -154,7 +154,7 @@ public class CombatAttributes {
   /**
    * The vision radius of the combat entity.
    * 
-   * @return
+   * @return The {@link Attribute} that corresponds to the entity vision.
    */
   public Attribute<Integer> getVision() {
     return this.vision;

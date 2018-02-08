@@ -34,9 +34,9 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
-  /***
-   * This flag indicates if the game currently supports debugging. This should be
-   * set to false for release builds.
+  /**
+   * This flag indicates if the game currently supports debugging. This should
+   * be set to false for release builds.
    */
   public static boolean DEBUG = true;
   protected static long environmentLoadTick;
@@ -309,10 +309,12 @@ public final class Game {
   /**
    * Returning false prevents the terminate event to continue.
    *
-   * @param cons
+   * @param terminationPredicate
+   *          The predicate that determine whether the {@link Game} should be
+   *          terminated.
    */
-  public static void onTerminating(final Predicate<String> cons) {
-    terminatingConsumer.add(cons);
+  public static void onTerminating(final Predicate<String> terminationPredicate) {
+    terminatingConsumer.add(terminationPredicate);
   }
 
   public static void onConfigurationLoaded(final Consumer<GameConfiguration> cons) {
@@ -364,5 +366,4 @@ public final class Game {
 
     getCamera().updateFocus();
   }
-
 }

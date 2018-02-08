@@ -169,8 +169,6 @@ public abstract class Entity implements IEntity {
   /**
    * Sets an id which should only be filled when an entity gets added due to map
    * information.
-   *
-   * @param mapId
    */
   @Override
   public void setMapId(final int mapId) {

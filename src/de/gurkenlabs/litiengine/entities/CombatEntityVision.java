@@ -14,15 +14,11 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.IVision;
 
-/**
- * The Class LitiVision.
- */
+
 public class CombatEntityVision implements IVision {
 
-  /** The Constant FogOfWarColor. */
   protected static final Color FogOfWarColor = new Color(0, 0, 0, 127);
 
-  /** The liti. */
   private final ICombatEntity combatEntity;
 
   private final IEnvironment environment;
@@ -31,18 +27,10 @@ public class CombatEntityVision implements IVision {
 
   private Shape renderVisionShape;
 
-  /** The vision diameter. */
   private int visionDiameter;
 
-  /** The vision radius. */
   private int visionRadius;
 
-  /**
-   * Instantiates a new liti vision.
-   *
-   * @param combatEntity
-   *          the liti
-   */
   public CombatEntityVision(final IEnvironment environment, final ICombatEntity combatEntity) {
     this.environment = environment;
     this.combatEntity = combatEntity;

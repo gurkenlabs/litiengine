@@ -4,33 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * The Class RangeAttribute.
- *
- * @param <T>
- *          the generic type
- */
 public class RangeAttribute<T extends Number> extends Attribute<T> {
-
-  /** The max base value. */
+  private final List<AttributeModifier<T>> maxModifiers;
+  private final T minBaseValue;
+  
   private T maxBaseValue;
 
-  /** The max modifiers. */
-  private final List<AttributeModifier<T>> maxModifiers;
-
-  /** The min base value. */
-  private final T minBaseValue;
-
-  /**
-   * Instantiates a new range attribute.
-   *
-   * @param maxValue
-   *          the max value
-   * @param minValue
-   *          the min value
-   * @param baseValue
-   *          the base value
-   */
   public RangeAttribute(final T maxValue, final T minValue, final T baseValue) {
     super(baseValue);
 
@@ -39,12 +18,6 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     this.minBaseValue = minValue;
   }
 
-  /**
-   * Adds the max modifier.
-   *
-   * @param modifier
-   *          the modifier
-   */
   public void addMaxModifier(final AttributeModifier<T> modifier) {
     if (this.getMaxModifiers().contains(modifier)) {
       return;
@@ -60,20 +33,10 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     return this.valueInRange(current);
   }
 
-  /**
-   * Gets the max value.
-   *
-   * @return the max value
-   */
   public T getMaxValue() {
     return this.applyModifiers(this.maxBaseValue);
   }
 
-  /**
-   * Gets the relative current value.
-   *
-   * @return the relative current value
-   */
   public float getRelativeCurrentValue() {
     return this.getCurrentValue().floatValue() / this.getMaxValue().floatValue();
   }
@@ -83,32 +46,14 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     this.setBaseValue(this.valueInRange(modifier.modify(this.getBaseValue())));
   }
 
-  /**
-   * Modify max base value.
-   *
-   * @param modifier
-   *          the modifier
-   */
   public void modifyMaxBaseValue(final AttributeModifier<T> modifier) {
     this.maxBaseValue = modifier.modify(this.maxBaseValue);
   }
 
-  /**
-   * Gets the max modifiers.
-   *
-   * @return the max modifiers
-   */
   protected List<AttributeModifier<T>> getMaxModifiers() {
     return this.maxModifiers;
   }
 
-  /**
-   * Value in range.
-   *
-   * @param value
-   *          the value
-   * @return the t
-   */
   private T valueInRange(final T value) {
     if (value.doubleValue() < this.minBaseValue.doubleValue()) {
       return this.minBaseValue;

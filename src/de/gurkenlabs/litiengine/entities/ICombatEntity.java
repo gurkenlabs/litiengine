@@ -24,11 +24,6 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public boolean hit(int damage);
 
-  /**
-   *
-   * @param damage
-   * @return Returns if the entity died by the hit.
-   */
   public boolean hit(int damage, Ability ability);
 
   public boolean isDead();
