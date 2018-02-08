@@ -31,23 +31,14 @@ public final class Spritesheet {
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
   private final List<Integer> emptySprites;
-  private int columns;
-
   private final int hashCode;
-
   private final BufferedImage image;
-
   private final String name;
-
   private final ImageFormat imageFormat;
 
-  /** The rows. */
+  private int columns;
   private int rows;
-
-  /** The sprite height. */
   private int spriteHeight;
-
-  /** The sprite width. */
   private int spriteWidth;
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
@@ -84,7 +75,9 @@ public final class Spritesheet {
    * sprites.info file.
    * 
    * @param path
-   * @return The Spritesheet assotiated with the path or null if not loaded yet
+   *          The path of the spritesheet.
+   * @return The {@link Spritesheet} assotiated with the path or null if not
+   *         loaded yet
    */
   public static Spritesheet find(final String path) {
     if (path == null || path.isEmpty()) {
@@ -145,11 +138,12 @@ public final class Spritesheet {
   }
 
   /**
-   * The sprite info file must be located under the GameInfo#getSpritesDirectory()
-   * directory.
+   * The sprite info file must be located under the
+   * GameInfo#getSpritesDirectory() directory.
    *
    * @param spriteInfoFile
-   * @return
+   *          The path to the sprite info file.
+   * @return A list of spritesheets that were loaded from the info file.
    */
   public static List<Spritesheet> load(final String spriteInfoFile) {
 

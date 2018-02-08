@@ -29,7 +29,9 @@ public class EntityControllerManager {
    * previously added controllers from the game loop.
    * 
    * @param entity
+   *          The entity for which the controller is added.
    * @param controller
+   *          The {@link IAnimationController} that is added to this manager.
    */
   public void addController(final IEntity entity, final IAnimationController controller) {
     if (entity == null || controller == null) {

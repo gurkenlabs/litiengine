@@ -202,12 +202,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.play(false, null, -1);
   }
 
-  /**
-   * Loops the sound with the specified volume.
-   *
-   * @param loop
-   * @param volume
-   */
+
   protected void play(final boolean loop, final float volume) {
     this.play(loop, null, volume);
   }

@@ -36,20 +36,6 @@ public class ListField extends GuiComponent {
   private final int shownElements;
   private VerticalSlider slider;
 
-  /**
-   * Instantiates a new list field.
-   *
-   * @param x
-   *          the x
-   * @param y
-   *          the y
-   * @param width
-   *          the width
-   * @param height
-   *          the height
-   * @param content
-   *          the content
-   */
   public ListField(final double x, final double y, final double width, final double height, final Object[] content, final int shownElements, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();

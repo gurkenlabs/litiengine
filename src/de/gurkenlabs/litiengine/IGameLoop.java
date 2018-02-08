@@ -28,6 +28,7 @@ public interface IGameLoop extends ILoop, ILaunchable {
    * ticks in ms.
    *
    * @param ticks
+   *          The ticks for which to calculate the delta time.
    * @return The delta time in ms.
    */
   public long getDeltaTime(final long ticks);

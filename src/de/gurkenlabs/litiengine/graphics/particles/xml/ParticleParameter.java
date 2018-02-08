@@ -33,10 +33,10 @@ public class ParticleParameter implements Serializable {
   }
 
   /**
-   * Gets either the acutal value or a random value, depending on the random
+   * Gets either the actual value or a random value, depending on the random
    * number flag being set.
    *
-   * @return
+   * @return The value of this parameter.
    */
   public float get() {
     if (maxValue != -1 && minValue < maxValue) {
@@ -58,7 +58,7 @@ public class ParticleParameter implements Serializable {
 
   @XmlTransient
   public float getRandomNumber() {
-    return (float)MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
+    return (float) MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
   }
 
   public void setMaxValue(final float maxValue) {

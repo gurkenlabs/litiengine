@@ -14,28 +14,19 @@ public abstract class Particle implements ITimeToLive {
     NONE, EMITTER, GROUND, OVERLAY
   }
 
-  /** The activation tick. */
   private long aliveTick;
   private long aliveTime;
   private CollisionType collisionType;
-  /** The color of the particle. */
   private Color color;
-  /** The color alpha. */
   private int colorAlpha = 255;
-
   private float deltaHeight;
-
   private float deltaWidth;
-
-  /** The change in X, per update, of the particle. */
-  private float dx;
-
-  /** The change in Y, per update, of the particle. */
-  private float dy;
+  private float deltaX;
+  private float deltaY;
 
   /**
-   * The gravitational pull to the left (negative) and right (positive) acting on
-   * this particle.
+   * The gravitational pull to the left (negative) and right (positive) acting
+   * on this particle.
    */
   private float gravityX;
 
@@ -44,12 +35,8 @@ public abstract class Particle implements ITimeToLive {
    * this particle.
    */
   private float gravityY;
-  /** The height. */
   private float height;
-
   private final int timeToLive;
-
-  /** The width. */
   private float width;
 
   /** The currentlocation of the particle on the X-axis. */
@@ -94,20 +81,10 @@ public abstract class Particle implements ITimeToLive {
     return this.collisionType;
   }
 
-  /**
-   * Gets the color.
-   *
-   * @return the color
-   */
   public Color getColor() {
     return this.color;
   }
 
-  /**
-   * Gets the color alpha.
-   *
-   * @return the color alpha
-   */
   public int getColorAlpha() {
     return this.colorAlpha;
   }
@@ -120,47 +97,22 @@ public abstract class Particle implements ITimeToLive {
     return this.deltaWidth;
   }
 
-  /**
-   * Gets the dx.
-   *
-   * @return the dx
-   */
   public float getDx() {
-    return this.dx;
+    return this.deltaX;
   }
 
-  /**
-   * Gets the dy.
-   *
-   * @return the dy
-   */
   public float getDy() {
-    return this.dy;
+    return this.deltaY;
   }
 
-  /**
-   * Gets the gravity x.
-   *
-   * @return the gravity x
-   */
   public float getGravityX() {
     return this.gravityX;
   }
 
-  /**
-   * Gets the gravity y.
-   *
-   * @return the gravity y
-   */
   public float getGravityY() {
     return this.gravityY;
   }
 
-  /**
-   * Gets the height.
-   *
-   * @return the height
-   */
   public float getHeight() {
     return this.height;
   }
@@ -188,29 +140,14 @@ public abstract class Particle implements ITimeToLive {
     return this.timeToLive;
   }
 
-  /**
-   * Gets the width.
-   *
-   * @return the width
-   */
   public float getWidth() {
     return this.width;
   }
 
-  /**
-   * Gets the x current.
-   *
-   * @return the x current
-   */
   public float getX() {
     return this.x;
   }
 
-  /**
-   * Gets the y current.
-   *
-   * @return the y current
-   */
   public float getY() {
     return this.y;
   }
@@ -222,12 +159,6 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  /**
-   * Sets the color.
-   *
-   * @param color
-   *          the new color
-   */
   public Particle setColor(final Color color) {
     this.color = color;
     return this;
@@ -239,6 +170,8 @@ public abstract class Particle implements ITimeToLive {
    *
    * @param colorAlpha
    *          the new color alpha
+   * 
+   * @return This {@link Particle} instance to chain further setter calls.
    */
   public Particle setColorAlpha(final int colorAlpha) {
     if (colorAlpha < 0 || colorAlpha > 100) {
@@ -254,23 +187,11 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  /**
-   * Sets the gravity x.
-   *
-   * @param gravityX
-   *          the new gravity x
-   */
   public Particle setDeltaIncX(final float gravityX) {
     this.gravityX = gravityX;
     return this;
   }
 
-  /**
-   * Sets the gravity y.
-   *
-   * @param gravityY
-   *          the new gravity y
-   */
   public Particle setDeltaIncY(final float gravityY) {
     this.gravityY = gravityY;
     return this;
@@ -281,34 +202,16 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  /**
-   * Sets the dx.
-   *
-   * @param dx
-   *          the new dx
-   */
   public Particle setDeltaX(final float dx) {
-    this.dx = dx;
+    this.deltaX = dx;
     return this;
   }
 
-  /**
-   * Sets the dy.
-   *
-   * @param dy
-   *          the new dy
-   */
   public Particle setDeltaY(final float dy) {
-    this.dy = dy;
+    this.deltaY = dy;
     return this;
   }
 
-  /**
-   * Sets the height.
-   *
-   * @param height
-   *          the new height
-   */
   public Particle setHeight(final float height) {
     this.height = height;
     return this;
@@ -319,34 +222,16 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  /**
-   * Sets the width.
-   *
-   * @param width
-   *          the new width
-   */
   public Particle setWidth(final float width) {
     this.width = width;
     return this;
   }
 
-  /**
-   * Sets the x current.
-   *
-   * @param x
-   *          the new x current
-   */
   public Particle setX(final float x) {
     this.x = x;
     return this;
   }
 
-  /**
-   * Sets the y current.
-   *
-   * @param y
-   *          the new y current
-   */
   public Particle setY(final float y) {
     this.y = y;
     return this;
@@ -360,6 +245,11 @@ public abstract class Particle implements ITimeToLive {
   /**
    * Updates the effect's position, change in xCurrent, change in yCurrent,
    * remaining lifetime, and color.
+   * 
+   * @param emitterOrigin
+   *          The current {@link Emitter} origin
+   * @param updateRatio
+   *          The update ratio for this particle.
    */
   public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
@@ -387,11 +277,11 @@ public abstract class Particle implements ITimeToLive {
     }
 
     if (this.getGravityX() != 0) {
-      this.dx += this.getGravityX() * updateRatio;
+      this.deltaX += this.getGravityX() * updateRatio;
     }
 
     if (this.getGravityY() != 0) {
-      this.dy += this.getGravityY() * updateRatio;
+      this.deltaY += this.getGravityY() * updateRatio;
     }
 
     if (this.getDeltaWidth() != 0) {

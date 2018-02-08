@@ -73,6 +73,8 @@ public class SerializationHelper {
    *
    * @param smallNumber
    *          The small number to encode
+   * @param precision
+   *          The comma precision for the encoding process.
    * @return The encoded number.
    */
   public static short encodeSmallFloatingPointNumber(final float smallNumber, final int precision) {

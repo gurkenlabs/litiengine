@@ -51,9 +51,13 @@ public final class RenderEngine implements IRenderEngine {
    * Draws the given string to the specified map location.
    *
    * @param g
+   *          The graphics object to draw on.
    * @param text
+   *          The text to be drawn
    * @param x
+   *          The x-coordinate of the text.
    * @param y
+   *          The y-coordinate of the text
    */
   public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
@@ -116,10 +120,16 @@ public final class RenderEngine implements IRenderEngine {
    * especially with antialiasing turned on.
    *
    * @param g
+   *          The graphics object to draw on.
    * @param text
+   *          The text to be drawn
    * @param x
+   *          The x-coordinate of the text.
    * @param y
+   *          The y-coordinate of the text
+   * 
    * @param shadow
+   *          The color of the shadow to be drawn
    */
   public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
     if (text == null || text.isEmpty()) {
@@ -161,7 +171,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   /***
-   * Note that rotating an image with 90/180/270 degree is way more performant
+   * Note that rotating an image with 90/180/270 degree is way more performant.
    * than rotating with in other degrees.
    * 
    * @param g

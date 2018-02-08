@@ -114,6 +114,7 @@ public class AStarGrid {
    * rectangle.
    *
    * @param rectangle
+   *          The rectangle within which the nodes should be updated.
    */
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
