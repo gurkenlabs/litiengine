@@ -68,7 +68,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 ![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
 
 ### Naughty Elves
-![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2017/12/capsule_lg.png "Naughty Elves")
+![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2018/02/banner.png "Naughty Elves")
 
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
