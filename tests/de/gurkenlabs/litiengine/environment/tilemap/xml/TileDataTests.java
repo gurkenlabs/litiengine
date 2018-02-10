@@ -1,10 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 
-import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.jupiter.api.Test;
 
 public class TileDataTests {
 
@@ -16,14 +18,14 @@ public class TileDataTests {
     data.setValue(uncompressedBase64);
     data.setEncoding(TileData.ENCODING_BASE64);
     List<Tile> tiles = data.parseTiles();
-    Assert.assertEquals(500, tiles.size());
-    Assert.assertEquals(1, tiles.get(0).getGridId());
-    Assert.assertEquals(17, tiles.get(19).getGridId());
-    Assert.assertEquals(18, tiles.get(405).getGridId());
-    Assert.assertTrue(tiles.get(127).isFlippedHorizontally());
-    Assert.assertTrue(tiles.get(127).isFlippedVertically());
-    Assert.assertFalse(tiles.get(127).isFlippedDiagonally());
-    Assert.assertEquals(18, tiles.get(127).getGridId());
+    assertEquals(500, tiles.size());
+    assertEquals(1, tiles.get(0).getGridId());
+    assertEquals(17, tiles.get(19).getGridId());
+    assertEquals(18, tiles.get(405).getGridId());
+    assertTrue(tiles.get(127).isFlippedHorizontally());
+    assertTrue(tiles.get(127).isFlippedVertically());
+    assertFalse(tiles.get(127).isFlippedDiagonally());
+    assertEquals(18, tiles.get(127).getGridId());
   }
 
   @Test
@@ -35,10 +37,10 @@ public class TileDataTests {
     data.setEncoding(TileData.ENCODING_BASE64);
     data.setCompression(TileData.COMPRESSION_GZIP);
     List<Tile> tiles = data.parseTiles();
-    Assert.assertEquals(500, tiles.size());
-    Assert.assertEquals(1, tiles.get(0).getGridId());
-    Assert.assertEquals(17, tiles.get(19).getGridId());
-    Assert.assertEquals(18, tiles.get(405).getGridId());
+    assertEquals(500, tiles.size());
+    assertEquals(1, tiles.get(0).getGridId());
+    assertEquals(17, tiles.get(19).getGridId());
+    assertEquals(18, tiles.get(405).getGridId());
   }
 
   @Test
@@ -50,10 +52,10 @@ public class TileDataTests {
     data.setEncoding(TileData.ENCODING_BASE64);
     data.setCompression(TileData.COMPRESSION_ZLIB);
     List<Tile> tiles = data.parseTiles();
-    Assert.assertEquals(500, tiles.size());
-    Assert.assertEquals(1, tiles.get(0).getGridId());
-    Assert.assertEquals(17, tiles.get(19).getGridId());
-    Assert.assertEquals(18, tiles.get(405).getGridId());
+    assertEquals(500, tiles.size());
+    assertEquals(1, tiles.get(0).getGridId());
+    assertEquals(17, tiles.get(19).getGridId());
+    assertEquals(18, tiles.get(405).getGridId());
   }
 
   @Test
@@ -89,13 +91,13 @@ public class TileDataTests {
     data.setValue(csv);
     data.setEncoding(TileData.ENCODING_CSV);
     List<Tile> tiles = data.parseTiles();
-    Assert.assertEquals(500, tiles.size());
-    Assert.assertEquals(1, tiles.get(0).getGridId());
-    Assert.assertEquals(17, tiles.get(19).getGridId());
-    Assert.assertEquals(18, tiles.get(405).getGridId());
-    Assert.assertTrue(tiles.get(127).isFlippedHorizontally());
-    Assert.assertTrue(tiles.get(127).isFlippedVertically());
-    Assert.assertFalse(tiles.get(127).isFlippedDiagonally());
-    Assert.assertEquals(18, tiles.get(127).getGridId());
+    assertEquals(500, tiles.size());
+    assertEquals(1, tiles.get(0).getGridId());
+    assertEquals(17, tiles.get(19).getGridId());
+    assertEquals(18, tiles.get(405).getGridId());
+    assertTrue(tiles.get(127).isFlippedHorizontally());
+    assertTrue(tiles.get(127).isFlippedVertically());
+    assertFalse(tiles.get(127).isFlippedDiagonally());
+    assertEquals(18, tiles.get(127).getGridId());
   }
 }

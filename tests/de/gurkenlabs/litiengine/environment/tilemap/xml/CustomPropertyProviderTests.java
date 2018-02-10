@@ -1,10 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.ArrayList;
 
-import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.jupiter.api.Test;
 
 public class CustomPropertyProviderTests {
 
@@ -13,13 +15,13 @@ public class CustomPropertyProviderTests {
     CustomPropertyProvider propProvider = new CustomPropertyProvider();
     propProvider.setCustomProperty("test", "testvalue");
 
-    Assert.assertEquals("testvalue", propProvider.getCustomProperty("test"));
-    Assert.assertNull(propProvider.getCustomProperty("test2"));
-    Assert.assertEquals(1, propProvider.getAllCustomProperties().size());
+    assertEquals("testvalue", propProvider.getCustomProperty("test"));
+    assertNull(propProvider.getCustomProperty("test2"));
+    assertEquals(1, propProvider.getAllCustomProperties().size());
 
     propProvider.setCustomProperty("test", "testvalue2");
 
-    Assert.assertEquals("testvalue2", propProvider.getCustomProperty("test"));
+    assertEquals("testvalue2", propProvider.getCustomProperty("test"));
 
     ArrayList<Property> props = new ArrayList<>();
     props.add(new Property("test2", "testvalue3"));
@@ -27,12 +29,12 @@ public class CustomPropertyProviderTests {
 
     propProvider.setCustomProperties(props);
 
-    Assert.assertEquals(2, propProvider.getAllCustomProperties().size());
-    Assert.assertEquals("testvalue3", propProvider.getCustomProperty("test2"));
-    Assert.assertEquals("testvalue4", propProvider.getCustomProperty("test3"));
+    assertEquals(2, propProvider.getAllCustomProperties().size());
+    assertEquals("testvalue3", propProvider.getCustomProperty("test2"));
+    assertEquals("testvalue4", propProvider.getCustomProperty("test3"));
 
     propProvider.setCustomProperties(null);
-    Assert.assertNotNull(propProvider.getAllCustomProperties());
-    Assert.assertEquals(0, propProvider.getAllCustomProperties().size());
+    assertNotNull(propProvider.getAllCustomProperties());
+    assertEquals(0, propProvider.getAllCustomProperties().size());
   }
 }

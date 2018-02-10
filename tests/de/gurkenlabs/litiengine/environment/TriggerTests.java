@@ -1,18 +1,19 @@
 package de.gurkenlabs.litiengine.environment;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
-import junit.framework.Assert;
 
 public class TriggerTests {
   @Test
@@ -31,11 +32,11 @@ public class TriggerTests {
     Game.init();
     when(env.get(456)).thenReturn(target);
 
-    Assert.assertFalse(trigger.isActivated());
+    assertFalse(trigger.isActivated());
 
     trigger.sendMessage(entity, Trigger.INTERACT_MESSAGE);
 
-    Assert.assertTrue(trigger.isActivated());
+    assertTrue(trigger.isActivated());
     verify(target, times(1)).sendMessage(trigger, trigger.getMessage());
   }
 }

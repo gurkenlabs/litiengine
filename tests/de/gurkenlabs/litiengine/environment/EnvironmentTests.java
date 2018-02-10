@@ -1,5 +1,8 @@
 package de.gurkenlabs.litiengine.environment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -7,8 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -29,7 +31,7 @@ public class EnvironmentTests {
 
     Environment env = new Environment(map);
 
-    Assert.assertNotNull(env);
+    assertNotNull(env);
   }
 
   @Test
@@ -64,30 +66,30 @@ public class EnvironmentTests {
     env.add(combatEntity);
     env.add(movableEntity);
 
-    Assert.assertNotNull(env.getTrigger("test"));
-    Assert.assertNotNull(env.get("test"));
+    assertNotNull(env.getTrigger("test"));
+    assertNotNull(env.get("test"));
 
-    Assert.assertNotNull(env.getLightSource(999));
-    Assert.assertNotNull(env.getCollisionBox(1));
+    assertNotNull(env.getLightSource(999));
+    assertNotNull(env.getCollisionBox(1));
 
-    Assert.assertNotNull(env.get(123));
-    Assert.assertNotNull(env.getCombatEntity(123));
-    Assert.assertEquals(1, env.getCombatEntities().size());
-    Assert.assertNotNull(env.get(456));
-    Assert.assertNotNull(env.getMovableEntity(456));
-    Assert.assertEquals(1, env.getMovableEntities().size());
+    assertNotNull(env.get(123));
+    assertNotNull(env.getCombatEntity(123));
+    assertEquals(1, env.getCombatEntities().size());
+    assertNotNull(env.get(456));
+    assertNotNull(env.getMovableEntity(456));
+    assertEquals(1, env.getMovableEntities().size());
 
-    Assert.assertNull(env.get(123456789));
-    Assert.assertNull(env.getCombatEntity(123456789));
-    Assert.assertNull(env.getMovableEntity(123456789));
-    Assert.assertNull(env.get(""));
-    Assert.assertNull(env.get(null));
+    assertNull(env.get(123456789));
+    assertNull(env.getCombatEntity(123456789));
+    assertNull(env.getMovableEntity(123456789));
+    assertNull(env.get(""));
+    assertNull(env.get(null));
 
-    Assert.assertEquals(2, env.getEntities(RenderType.NORMAL).size());
-    Assert.assertEquals(2, env.getEntities(RenderType.OVERLAY).size());
-    Assert.assertEquals(1, env.getEntities(RenderType.GROUND).size());
-    Assert.assertEquals(5, env.getEntities().size());
-    Assert.assertEquals(1, env.getEntitiesByType(Trigger.class).size());
+    assertEquals(2, env.getEntities(RenderType.NORMAL).size());
+    assertEquals(2, env.getEntities(RenderType.OVERLAY).size());
+    assertEquals(1, env.getEntities(RenderType.GROUND).size());
+    assertEquals(5, env.getEntities().size());
+    assertEquals(1, env.getEntitiesByType(Trigger.class).size());
   }
 
   @Test
@@ -114,8 +116,8 @@ public class EnvironmentTests {
     env.add(entityWithTags);
     env.add(anotherEntityWithTags);
 
-    Assert.assertEquals(2, env.getByTag("tag1").size());
-    Assert.assertEquals(2, env.getByTag("tag2").size());
-    Assert.assertEquals(0, env.getByTag("invalidTag").size());
+    assertEquals(2, env.getByTag("tag1").size());
+    assertEquals(2, env.getByTag("tag2").size());
+    assertEquals(0, env.getByTag("invalidTag").size());
   }
 }

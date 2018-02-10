@@ -1,10 +1,12 @@
 package de.gurkenlabs.litiengine.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.configuration.Configuration;
 import de.gurkenlabs.configuration.ConfigurationGroup;
@@ -29,9 +31,9 @@ public class ConfigurationTests {
     try {
       config = new Configuration(group);
       config.load();
-      Assert.assertTrue(config.getConfigurationGroup(group.getClass()).equals(group));
-      Assert.assertEquals("test-prefix", group.getPrefix());
-      Assert.assertTrue(config.getConfigurationGroup("test-prefix").equals(group));
+      assertTrue(config.getConfigurationGroup(group.getClass()).equals(group));
+      assertEquals("test-prefix", group.getPrefix());
+      assertTrue(config.getConfigurationGroup("test-prefix").equals(group));
 
     } finally {
       deleteTempConfigFile(config);
@@ -44,7 +46,7 @@ public class ConfigurationTests {
     try {
       config = new Configuration();
       config.load();
-      Assert.assertTrue(new File(config.getFileName()).exists());
+      assertTrue(new File(config.getFileName()).exists());
     } finally {
       deleteTempConfigFile(config);
     }
@@ -59,18 +61,18 @@ public class ConfigurationTests {
       deleteTempConfigFile(config);
       config = new Configuration(group);
       config.load();
-      Assert.assertTrue(new File(config.getFileName()).exists());
+      assertTrue(new File(config.getFileName()).exists());
 
       config.load();
       final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
-      Assert.assertEquals(10, configGroup.getTestInt());
-      Assert.assertEquals(10, configGroup.getTestByte());
-      Assert.assertEquals(10, configGroup.getTestShort());
-      Assert.assertEquals(10, configGroup.getTestLong());
-      Assert.assertEquals(10.0, configGroup.getTestDouble(), 0.00001);
-      Assert.assertEquals(10, configGroup.getTestFloat(), 0.00001f);
-      Assert.assertEquals("test", configGroup.getTestString());
-      Assert.assertEquals(true, configGroup.isTestBoolean());
+      assertEquals(10, configGroup.getTestInt());
+      assertEquals(10, configGroup.getTestByte());
+      assertEquals(10, configGroup.getTestShort());
+      assertEquals(10, configGroup.getTestLong());
+      assertEquals(10.0, configGroup.getTestDouble(), 0.00001);
+      assertEquals(10, configGroup.getTestFloat(), 0.00001f);
+      assertEquals("test", configGroup.getTestString());
+      assertEquals(true, configGroup.isTestBoolean());
     } finally {
       deleteTempConfigFile(config);
     }
@@ -83,7 +85,7 @@ public class ConfigurationTests {
     try {
       config = new Configuration(testFileName);
       config.load();
-      Assert.assertTrue(new File(testFileName).exists());
+      assertTrue(new File(testFileName).exists());
     } finally {
       deleteTempConfigFile(config);
     }

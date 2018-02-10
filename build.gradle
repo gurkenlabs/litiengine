@@ -1,3 +1,13 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+  }
+}
+ 
+ 
 plugins {
   id 'com.stehno.natives' version '0.3.1'
   id "org.sonarqube" version "2.5"
@@ -9,6 +19,7 @@ natives {
 }
 
 apply plugin: 'java'
+apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
@@ -36,10 +47,15 @@ dependencies {
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  compile 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
+  compile ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
+    exclude group:'junit'
+  }
+
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
-  testCompile 'junit:junit:4.12'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.1'
   testCompile 'org.mockito:mockito-core:2.+'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
+  testRuntime 'org.junit.platform:junit-platform-launcher:1.0.1'
 }
 
 jar {
@@ -60,6 +76,30 @@ jar {
 
 javadoc {
   options.encoding 'UTF-8'
+}
+
+afterEvaluate {
+  def junitPlatformTestTask = (JavaExec) project.tasks.getByName('junitPlatformTest')
+
+  jacoco {
+    applyTo(junitPlatformTestTask)
+  }
+
+  project.task(type: JacocoReport, "jacocoJupTestReport") {
+    executionData(junitPlatformTestTask)
+    sourceSets(sourceSets.main)
+    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+    classDirectories = files(sourceSets.main.output)
+
+    reports {
+      xml.enabled true
+      xml.destination file("${buildDir}/jacoco/report.xml")
+      html.enabled true
+      html.destination file("${buildDir}/jacoco/html")
+    }
+  }
+
+  check.dependsOn jacocoJupTestReport
 }
 
 jacocoTestReport {

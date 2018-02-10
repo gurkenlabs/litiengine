@@ -1,14 +1,15 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class CameraTests {
 
   @Test
   public void testInit() {
     Camera cam = new Camera();
-    Assert.assertEquals(cam.getZoom(), 1, 0.0001);
+    assertEquals(cam.getZoom(), 1, 0.0001);
   }
 
   @Test
@@ -16,6 +17,6 @@ public class CameraTests {
     Camera cam = new Camera();
     cam.setZoom(5, 0);
 
-    Assert.assertEquals(cam.getZoom(), 5, 0.0001);
+    assertEquals(cam.getZoom(), 5, 0.0001);
   }
 }
