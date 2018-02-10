@@ -18,15 +18,20 @@ import org.junit.jupiter.params.provider.EnumSource;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
+import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
 // TODO: extend the tests by all default entity types and provide tests for the delete operation
 public class EnvironmentTests {
-  IEnvironment testEnvironment;
+  private IEnvironment testEnvironment;
 
   @Test
   public void testInitialization() {
@@ -111,7 +116,52 @@ public class EnvironmentTests {
   }
 
   @Test
+  public void testAddAndGetEmitter() {
+    Emitter testEmitter = new Emitter(1, 1) {
+      @Override
+      protected Particle createNewParticle() {
+        return null;
+      }
+    };
+
+    testEmitter.setMapId(1);
+
+    this.testEnvironment.add(testEmitter);
+
+    assertNotNull(this.testEnvironment.getEmitter(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(Emitter.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testAddAndGetProp() {
+    Prop testProp = new Prop(0, 0, null);
+    testProp.setMapId(1);
+
+    this.testEnvironment.add(testProp);
+
+    assertNotNull(this.testEnvironment.getProp(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(Prop.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+  
+  @Test
+  public void testAddAndGetStaticShadow() {
+    StaticShadow testShadow = new StaticShadow(0,0,1,1, StaticShadowType.NONE);
+    
+    testShadow.setMapId(1);
+
+    this.testEnvironment.add(testShadow);
+
+    assertNotNull(this.testEnvironment.getStaticShadow(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(StaticShadow.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
   public void testGetNonExistingEntities() {
+    this.testEnvironment.add(null);
+
     assertNull(this.testEnvironment.get(123456789));
     assertNull(this.testEnvironment.getCombatEntity(123456789));
     assertNull(this.testEnvironment.getMovableEntity(123456789));

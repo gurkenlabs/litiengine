@@ -15,6 +15,18 @@ public class Prop extends CombatEntity {
   private boolean flipVertically;
   private Rotation rotation;
 
+  public Prop(double x, double y, final String spritesheetName) {
+    this(x, y, spritesheetName, Material.UNDEFINED);
+  }
+
+  public Prop(double x, double y, final String spritesheetName, final Material mat) {
+    this(new Point2D.Double(x, y), spritesheetName, mat);
+  }
+
+  public Prop(final Point2D location, final String spritesheetName) {
+    this(location, spritesheetName, Material.UNDEFINED);
+  }
+
   public Prop(final Point2D location, final String spritesheetName, final Material mat) {
     super();
     this.rotation = Rotation.NONE;
