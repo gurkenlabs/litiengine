@@ -305,14 +305,19 @@ public class EnvironmentTests {
   public void testEntityByRenderType(RenderType renderType) {
     ICombatEntity entity = mock(ICombatEntity.class);
     when(entity.getMapId()).thenReturn(123);
+    when(entity.getName()).thenReturn("test");
     when(entity.getRenderType()).thenReturn(renderType);
 
     this.testEnvironment.add(entity);
-
+    
+    assertNotNull(this.testEnvironment.get(123));
+    assertNotNull(this.testEnvironment.get("test"));
     assertEquals(1, this.testEnvironment.getEntities(renderType).size());
 
     this.testEnvironment.remove(entity);
 
+    assertNull(this.testEnvironment.get(123));
+    assertNull(this.testEnvironment.get("test"));
     assertEquals(0, this.testEnvironment.getEntities(renderType).size());
   }
 
