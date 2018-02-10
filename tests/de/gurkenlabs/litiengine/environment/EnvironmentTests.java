@@ -10,11 +10,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -29,7 +31,6 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
-// TODO: extend the tests by all default entity types and provide tests for the delete operation
 public class EnvironmentTests {
   private IEnvironment testEnvironment;
 
@@ -43,6 +44,14 @@ public class EnvironmentTests {
     assertNotNull(env);
   }
 
+  @BeforeAll
+  public static void initGame() {
+
+    // necessary because the environment need access to the game loop and other
+    // stuff
+    Game.init();
+  }
+
   @BeforeEach
   public void initEnvironment() {
     IMap map = mock(IMap.class);
@@ -51,7 +60,7 @@ public class EnvironmentTests {
   }
 
   @Test
-  public void testAddAndGetCombatEntity() {
+  public void testCombatEntity() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -63,10 +72,18 @@ public class EnvironmentTests {
     assertEquals(1, this.testEnvironment.getCombatEntities().size());
     assertEquals(1, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(combatEntity);
+
+    assertNull(this.testEnvironment.get(123));
+    assertNull(this.testEnvironment.getCombatEntity(123));
+    assertEquals(0, this.testEnvironment.getCombatEntities().size());
+    assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetMovableEntity() {
+  public void testMovableEntity() {
     IMovableEntity movableEntity = mock(IMovableEntity.class);
     when(movableEntity.getMapId()).thenReturn(456);
     when(movableEntity.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -78,21 +95,37 @@ public class EnvironmentTests {
     assertEquals(1, this.testEnvironment.getMovableEntities().size());
     assertEquals(1, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(movableEntity);
+
+    assertNull(this.testEnvironment.get(456));
+    assertNull(this.testEnvironment.getMovableEntity(456));
+    assertEquals(0, this.testEnvironment.getMovableEntities().size());
+    assertEquals(0, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetTrigger() {
+  public void testTrigger() {
     Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
+
     this.testEnvironment.add(testTrigger);
 
     assertNotNull(this.testEnvironment.getTrigger("test"));
     assertNotNull(this.testEnvironment.get("test"));
     assertEquals(1, this.testEnvironment.getEntitiesByType(Trigger.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testTrigger);
+
+    assertNull(this.testEnvironment.getTrigger("test"));
+    assertNull(this.testEnvironment.get("test"));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(Trigger.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetLightSource() {
+  public void testLightSource() {
     LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
     testLight.setMapId(999);
 
@@ -101,10 +134,16 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getLightSource(999));
     assertEquals(1, this.testEnvironment.getEntitiesByType(LightSource.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testLight);
+
+    assertNull(this.testEnvironment.getLightSource(999));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(LightSource.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetCollisionBox() {
+  public void testCollisionBox() {
     CollisionBox testCollider = new CollisionBox(true);
     testCollider.setMapId(1);
 
@@ -113,10 +152,16 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getCollisionBox(1));
     assertEquals(1, this.testEnvironment.getEntitiesByType(CollisionBox.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testCollider);
+
+    assertNull(this.testEnvironment.getCollisionBox(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(CollisionBox.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetEmitter() {
+  public void testEmitter() {
     Emitter testEmitter = new Emitter(1, 1) {
       @Override
       protected Particle createNewParticle() {
@@ -131,10 +176,16 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getEmitter(1));
     assertEquals(1, this.testEnvironment.getEntitiesByType(Emitter.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testEmitter);
+
+    assertNull(this.testEnvironment.getEmitter(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(Emitter.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
-  public void testAddAndGetProp() {
+  public void testProp() {
     Prop testProp = new Prop(0, 0, null);
     testProp.setMapId(1);
 
@@ -143,12 +194,18 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getProp(1));
     assertEquals(1, this.testEnvironment.getEntitiesByType(Prop.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testProp);
+
+    assertNull(this.testEnvironment.getProp(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(Prop.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
-  
+
   @Test
-  public void testAddAndGetStaticShadow() {
-    StaticShadow testShadow = new StaticShadow(0,0,1,1, StaticShadowType.NONE);
-    
+  public void testStaticShadow() {
+    StaticShadow testShadow = new StaticShadow(0, 0, 1, 1, StaticShadowType.NONE);
+
     testShadow.setMapId(1);
 
     this.testEnvironment.add(testShadow);
@@ -171,7 +228,7 @@ public class EnvironmentTests {
 
   @ParameterizedTest
   @EnumSource(value = RenderType.class)
-  public void testGetEntityByRenderType(RenderType renderType) {
+  public void testEntityByRenderType(RenderType renderType) {
     ICombatEntity entity = mock(ICombatEntity.class);
     when(entity.getMapId()).thenReturn(123);
     when(entity.getRenderType()).thenReturn(renderType);
@@ -179,15 +236,14 @@ public class EnvironmentTests {
     this.testEnvironment.add(entity);
 
     assertEquals(1, this.testEnvironment.getEntities(renderType).size());
+    
+    this.testEnvironment.remove(entity);
+    
+    assertEquals(0, this.testEnvironment.getEntities(renderType).size());
   }
 
   @Test
-  public void testAddandGetEntitiesByTag() {
-    IMap map = mock(IMap.class);
-    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
-
-    Environment env = new Environment(map);
-
+  public void testEntitiesByTag() {
     IMovableEntity entityWithTags = mock(IMovableEntity.class);
     when(entityWithTags.getMapId()).thenReturn(456);
     when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
@@ -202,11 +258,17 @@ public class EnvironmentTests {
     when(entityWithTags.getTags()).thenReturn(tags);
     when(anotherEntityWithTags.getTags()).thenReturn(tags);
 
-    env.add(entityWithTags);
-    env.add(anotherEntityWithTags);
+    this.testEnvironment.add(entityWithTags);
+    this.testEnvironment.add(anotherEntityWithTags);
 
-    assertEquals(2, env.getByTag("tag1").size());
-    assertEquals(2, env.getByTag("tag2").size());
-    assertEquals(0, env.getByTag("invalidTag").size());
+    assertEquals(2, this.testEnvironment.getByTag("tag1").size());
+    assertEquals(2, this.testEnvironment.getByTag("tag2").size());
+    assertEquals(0, this.testEnvironment.getByTag("invalidTag").size());
+    
+    this.testEnvironment.remove(entityWithTags);
+    this.testEnvironment.remove(anotherEntityWithTags);
+    
+    assertEquals(0, this.testEnvironment.getByTag("tag1").size());
+    assertEquals(0, this.testEnvironment.getByTag("tag2").size());
   }
 }
