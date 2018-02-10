@@ -9,9 +9,21 @@ public class Spawnpoint extends Entity {
   private Direction direction;
   private String spawnType;
 
+  public Spawnpoint(double x, double y) {
+    this(-1, x, y);
+  }
+
+  public Spawnpoint(int mapId, double x, double y) {
+    this(mapId, new Point2D.Double(x, y));
+  }
+
   public Spawnpoint(int mapId, Point2D point) {
     super(mapId);
     this.setLocation(point);
+  }
+
+  public Spawnpoint(int mapId, double x, double y, Direction direction) {
+    this(mapId, new Point2D.Double(x, y), direction);
   }
 
   public Spawnpoint(int mapId, Point2D point, Direction direction) {

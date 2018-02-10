@@ -793,6 +793,10 @@ public class Environment implements IEnvironment {
       this.triggers.remove(entity);
     }
 
+    if (entity instanceof Spawnpoint) {
+      this.spawnPoints.remove(entity);
+    }
+
     if (entity instanceof StaticShadow) {
       this.staticShadows.remove(entity);
       this.addStaticShadows();

@@ -24,6 +24,8 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
+import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
@@ -213,6 +215,48 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getStaticShadow(1));
     assertEquals(1, this.testEnvironment.getEntitiesByType(StaticShadow.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testShadow);
+
+    assertNull(this.testEnvironment.getStaticShadow(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(StaticShadow.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testMapArea() {
+    MapArea testArea = new MapArea(0, 0, 1, 1);
+
+    testArea.setMapId(1);
+
+    this.testEnvironment.add(testArea);
+
+    assertNotNull(this.testEnvironment.getArea(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+
+    this.testEnvironment.remove(testArea);
+
+    assertNull(this.testEnvironment.getArea(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testSpawnPoint() {
+    Spawnpoint testSpawn = new Spawnpoint(1, 0, 0);
+
+    this.testEnvironment.add(testSpawn);
+    
+    assertNotNull(this.testEnvironment.getSpawnpoint(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(Spawnpoint.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+    
+    this.testEnvironment.remove(testSpawn);
+
+    assertNull(this.testEnvironment.getSpawnpoint(1));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
   @Test
@@ -236,9 +280,9 @@ public class EnvironmentTests {
     this.testEnvironment.add(entity);
 
     assertEquals(1, this.testEnvironment.getEntities(renderType).size());
-    
+
     this.testEnvironment.remove(entity);
-    
+
     assertEquals(0, this.testEnvironment.getEntities(renderType).size());
   }
 
@@ -264,10 +308,10 @@ public class EnvironmentTests {
     assertEquals(2, this.testEnvironment.getByTag("tag1").size());
     assertEquals(2, this.testEnvironment.getByTag("tag2").size());
     assertEquals(0, this.testEnvironment.getByTag("invalidTag").size());
-    
+
     this.testEnvironment.remove(entityWithTags);
     this.testEnvironment.remove(anotherEntityWithTags);
-    
+
     assertEquals(0, this.testEnvironment.getByTag("tag1").size());
     assertEquals(0, this.testEnvironment.getByTag("tag2").size());
   }
