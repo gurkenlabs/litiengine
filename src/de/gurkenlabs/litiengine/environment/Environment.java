@@ -471,11 +471,12 @@ public class Environment implements IEnvironment {
 
   @Override
   public ICombatEntity getCombatEntity(final int mapId) {
-    if (this.combatEntities.containsKey(mapId)) {
-      return this.combatEntities.get(mapId);
-    }
+    return getById(this.getCombatEntities(), mapId);
+  }
 
-    return null;
+  @Override
+  public ICombatEntity getCombatEntity(String name) {
+    return getByName(this.getCombatEntities(), name);
   }
 
   @Override
@@ -510,19 +511,18 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public LightSource getLightSource(final int mapId) {
-    for (final LightSource light : this.getLightSources()) {
-      if (light.getMapId() == mapId) {
-        return light;
-      }
-    }
-
-    return null;
+  public Collection<LightSource> getLightSources() {
+    return this.lightSources;
   }
 
   @Override
-  public Collection<LightSource> getLightSources() {
-    return this.lightSources;
+  public LightSource getLightSource(final int mapId) {
+    return getById(this.getLightSources(), mapId);
+  }
+
+  @Override
+  public LightSource getLightSource(String name) {
+    return getByName(this.getLightSources(), name);
   }
 
   /**
@@ -545,11 +545,12 @@ public class Environment implements IEnvironment {
 
   @Override
   public IMovableEntity getMovableEntity(final int mapId) {
-    if (this.movableEntities.containsKey(mapId)) {
-      return this.movableEntities.get(mapId);
-    }
+    return getById(this.getMovableEntities(), mapId);
+  }
 
-    return null;
+  @Override
+  public IMovableEntity getMovableEntity(String name) {
+    return getByName(this.getMovableEntities(), name);
   }
 
   @Override

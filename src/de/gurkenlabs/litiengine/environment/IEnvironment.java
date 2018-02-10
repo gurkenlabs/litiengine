@@ -104,6 +104,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Prop getProp(final String name);
 
   public ICombatEntity getCombatEntity(final int mapId);
+  
+  public ICombatEntity getCombatEntity(final String name);
 
   public Collection<IEntity> getEntities();
 
@@ -112,6 +114,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
+  
+  public LightSource getLightSource(final String name);
 
   public Collection<LightSource> getLightSources();
 
@@ -127,6 +131,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IMovableEntity> getMovableEntities();
 
   public IMovableEntity getMovableEntity(final int mapId);
+  
+  public IMovableEntity getMovableEntity(String name);
 
   /**
    * Gets the next unique global map id.
