@@ -405,33 +405,18 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public MapArea getArea(final int mapId) {
-    for (final MapArea m : this.getAreas()) {
-      if (m.getMapId() == mapId) {
-        return m;
-      }
-    }
+  public Collection<MapArea> getAreas() {
+    return this.mapAreas;
+  }
 
-    return null;
+  @Override
+  public MapArea getArea(final int mapId) {
+    return getById(this.getAreas(), mapId);
   }
 
   @Override
   public MapArea getArea(final String name) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-
-    for (final MapArea m : this.getAreas()) {
-      if (m.getName() != null && m.getName().equals(name)) {
-        return m;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public Collection<MapArea> getAreas() {
-    return this.mapAreas;
+    return getByName(this.getAreas(), name);
   }
 
   @Override
@@ -830,6 +815,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public <T extends IEntity> void remove(Collection<T> entities) {
+    if(entities == null) {
+      return;
+    }
+    
     for (T ent : entities) {
       this.remove(ent);
     }

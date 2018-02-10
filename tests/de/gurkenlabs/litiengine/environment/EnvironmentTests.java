@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -59,6 +62,7 @@ public class EnvironmentTests {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     this.testEnvironment = new Environment(map);
+    this.testEnvironment.init();
   }
 
   @Test
@@ -121,6 +125,7 @@ public class EnvironmentTests {
     this.testEnvironment.add(testTrigger);
 
     assertNotNull(this.testEnvironment.getTrigger("test"));
+    assertNotNull(this.testEnvironment.getTrigger(1));
     assertNotNull(this.testEnvironment.get(1));
     assertNotNull(this.testEnvironment.get("test"));
     assertEquals(1, this.testEnvironment.getEntitiesByType(Trigger.class).size());
@@ -129,6 +134,7 @@ public class EnvironmentTests {
     this.testEnvironment.remove(testTrigger);
 
     assertNull(this.testEnvironment.getTrigger("test"));
+    assertNull(this.testEnvironment.getTrigger(1));
     assertNull(this.testEnvironment.get(1));
     assertNull(this.testEnvironment.get("test"));
 
@@ -291,6 +297,8 @@ public class EnvironmentTests {
   @Test
   public void testGetNonExistingEntities() {
     this.testEnvironment.add(null);
+    this.testEnvironment.remove((IEntity)null);
+    this.testEnvironment.remove((Collection<IEntity>)null);
     this.testEnvironment.clear();
 
     assertNull(this.testEnvironment.get(123456789));
@@ -309,7 +317,7 @@ public class EnvironmentTests {
     when(entity.getRenderType()).thenReturn(renderType);
 
     this.testEnvironment.add(entity);
-    
+
     assertNotNull(this.testEnvironment.get(123));
     assertNotNull(this.testEnvironment.get("test"));
     assertEquals(1, this.testEnvironment.getEntities(renderType).size());
@@ -349,5 +357,20 @@ public class EnvironmentTests {
 
     assertEquals(0, this.testEnvironment.getByTag("tag1").size());
     assertEquals(0, this.testEnvironment.getByTag("tag2").size());
+  }
+
+  @Test
+  public void testThatLocalMapIdIsAssigned() {
+    MapArea entity1 = new MapArea(0, 0, 0, 0);
+    MapArea entity2 = new MapArea(0, 0, 0, 0);
+    MapArea entity3 = new MapArea(0, 0, 0, 0);
+
+    this.testEnvironment.add(entity1);
+    this.testEnvironment.add(entity2);
+    this.testEnvironment.add(entity3);
+
+    assertNotEquals(0, entity1.getMapId());
+    assertNotEquals(0, entity2.getMapId());
+    assertNotEquals(0, entity3.getMapId());
   }
 }
