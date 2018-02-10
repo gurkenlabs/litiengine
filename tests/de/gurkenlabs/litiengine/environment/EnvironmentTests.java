@@ -10,7 +10,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
@@ -23,6 +26,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 
 // TODO: extend the tests by all default entity types and provide tests for the delete operation
 public class EnvironmentTests {
+  IEnvironment testEnvironment;
 
   @Test
   public void testInitialization() {
@@ -34,62 +38,97 @@ public class EnvironmentTests {
     assertNotNull(env);
   }
 
-  @Test
-  public void testAddAndGetEntities() {
+  @BeforeEach
+  public void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    this.testEnvironment = new Environment(map);
+  }
 
-    Environment env = new Environment(map);
-
-    Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
-
-    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
-    testLight.setMapId(999);
-
-    CollisionBox testCollider = new CollisionBox(true);
-    testCollider.setMapId(1);
-
+  @Test
+  public void testAddAndGetCombatEntity() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
     when(combatEntity.getMapId()).thenReturn(123);
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
 
+    this.testEnvironment.add(combatEntity);
+
+    assertNotNull(this.testEnvironment.get(123));
+    assertNotNull(this.testEnvironment.getCombatEntity(123));
+    assertEquals(1, this.testEnvironment.getCombatEntities().size());
+    assertEquals(1, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testAddAndGetMovableEntity() {
     IMovableEntity movableEntity = mock(IMovableEntity.class);
     when(movableEntity.getMapId()).thenReturn(456);
     when(movableEntity.getRenderType()).thenReturn(RenderType.NORMAL);
 
-    IMovableEntity notAddedToEnvironment = mock(IMovableEntity.class);
-    when(notAddedToEnvironment.getMapId()).thenReturn(222);
+    this.testEnvironment.add(movableEntity);
 
-    env.add(testTrigger);
-    env.add(testLight);
-    env.add(testCollider);
-    env.add(combatEntity);
-    env.add(movableEntity);
+    assertNotNull(this.testEnvironment.get(456));
+    assertNotNull(this.testEnvironment.getMovableEntity(456));
+    assertEquals(1, this.testEnvironment.getMovableEntities().size());
+    assertEquals(1, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
 
-    assertNotNull(env.getTrigger("test"));
-    assertNotNull(env.get("test"));
+  @Test
+  public void testAddAndGetTrigger() {
+    Trigger testTrigger = new Trigger(TriggerActivation.COLLISION, "test", "testmessage");
+    this.testEnvironment.add(testTrigger);
 
-    assertNotNull(env.getLightSource(999));
-    assertNotNull(env.getCollisionBox(1));
+    assertNotNull(this.testEnvironment.getTrigger("test"));
+    assertNotNull(this.testEnvironment.get("test"));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(Trigger.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
 
-    assertNotNull(env.get(123));
-    assertNotNull(env.getCombatEntity(123));
-    assertEquals(1, env.getCombatEntities().size());
-    assertNotNull(env.get(456));
-    assertNotNull(env.getMovableEntity(456));
-    assertEquals(1, env.getMovableEntities().size());
+  @Test
+  public void testAddAndGetLightSource() {
+    LightSource testLight = new LightSource(100, new Color(255, 255, 255, 100), LightSource.ELLIPSE, true);
+    testLight.setMapId(999);
 
-    assertNull(env.get(123456789));
-    assertNull(env.getCombatEntity(123456789));
-    assertNull(env.getMovableEntity(123456789));
-    assertNull(env.get(""));
-    assertNull(env.get(null));
+    this.testEnvironment.add(testLight);
 
-    assertEquals(2, env.getEntities(RenderType.NORMAL).size());
-    assertEquals(2, env.getEntities(RenderType.OVERLAY).size());
-    assertEquals(1, env.getEntities(RenderType.GROUND).size());
-    assertEquals(5, env.getEntities().size());
-    assertEquals(1, env.getEntitiesByType(Trigger.class).size());
+    assertNotNull(this.testEnvironment.getLightSource(999));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(LightSource.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testAddAndGetCollisionBox() {
+    CollisionBox testCollider = new CollisionBox(true);
+    testCollider.setMapId(1);
+
+    this.testEnvironment.add(testCollider);
+
+    assertNotNull(this.testEnvironment.getCollisionBox(1));
+    assertEquals(1, this.testEnvironment.getEntitiesByType(CollisionBox.class).size());
+    assertEquals(1, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
+  public void testGetNonExistingEntities() {
+    assertNull(this.testEnvironment.get(123456789));
+    assertNull(this.testEnvironment.getCombatEntity(123456789));
+    assertNull(this.testEnvironment.getMovableEntity(123456789));
+    assertNull(this.testEnvironment.get(""));
+    assertNull(this.testEnvironment.get(null));
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = RenderType.class)
+  public void testGetEntityByRenderType(RenderType renderType) {
+    ICombatEntity entity = mock(ICombatEntity.class);
+    when(entity.getMapId()).thenReturn(123);
+    when(entity.getRenderType()).thenReturn(renderType);
+
+    this.testEnvironment.add(entity);
+
+    assertEquals(1, this.testEnvironment.getEntities(renderType).size());
   }
 
   @Test

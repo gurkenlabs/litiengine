@@ -52,10 +52,11 @@ dependencies {
   }
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.1'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.+'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.+'
   testCompile 'org.mockito:mockito-core:2.+'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
-  testRuntime 'org.junit.platform:junit-platform-launcher:1.0.1'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.+'
+  testRuntime 'org.junit.platform:junit-platform-launcher:1.1.+'
 }
 
 jar {
