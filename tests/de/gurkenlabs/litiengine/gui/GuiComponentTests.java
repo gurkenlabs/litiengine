@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.event.MouseEvent;
@@ -47,7 +48,7 @@ public class GuiComponentTests {
   @Test
   public void testEventRegistration() {
     TestComponent component = new TestComponent(0, 0, 100, 50);
-    component.setVisible(true);
+
     
     final Object pressed = new Object();
     final Object clicked = new Object();
@@ -63,14 +64,28 @@ public class GuiComponentTests {
     component.onMouseReleased(c -> {
       c.getSender().setTag(released);
     });
+    
+    component.mousePressed(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.mouseClicked(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.mouseReleased(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.setVisible(true);
 
     component.mousePressed(createTestEvent(50, 25));
+    assertTrue(component.isPressed());
     assertEquals(pressed, component.getTag());
     
     component.mouseClicked(createTestEvent(50, 25));
+    assertFalse(component.isPressed());
     assertEquals(clicked, component.getTag());
     
     component.mouseReleased(createTestEvent(50, 25));
+    assertFalse(component.isPressed());
     assertEquals(released, component.getTag());
   }
 

@@ -442,7 +442,6 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
-
   }
 
   /**
