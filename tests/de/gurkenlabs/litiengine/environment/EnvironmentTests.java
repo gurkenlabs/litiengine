@@ -463,6 +463,11 @@ public class EnvironmentTests {
     
     this.testEnvironment.load();
     
+    // load a second time to ensure nothing brakes
+    this.testEnvironment.load();
+    
+    assertTrue(this.testEnvironment.isLoaded());
+    
     CollisionBox testCollider2 = new CollisionBox(true);
     testCollider.setMapId(2);
     testCollider.setName("test2");
@@ -470,5 +475,7 @@ public class EnvironmentTests {
     this.testEnvironment.add(testCollider2);
     
     this.testEnvironment.unload();
+    
+    assertFalse(this.testEnvironment.isLoaded());
   }
 }
