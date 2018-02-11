@@ -77,9 +77,8 @@ public final class RenderEngine implements IRenderEngine {
   public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
     final Graphics2D g2 = (Graphics2D) g.create();
     g2.rotate(Math.toRadians(angle), x, y);
-    RenderEngine.drawText(g2, text, x, y);
+    drawText(g2, text, x, y);
     g2.dispose();
-
   }
 
   public static void drawShape(final Graphics2D g, final Shape shape) {
@@ -267,11 +266,11 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final IVision vision) {
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    g.setClip(vision.getRenderVisionShape());
+    g.setClip(clip);
 
     renderables.forEach(r -> r.render(g));
 
@@ -320,12 +319,12 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    if (vision != null) {
-      g.setClip(vision.getRenderVisionShape());
+    if (clip != null) {
+      g.setClip(clip);
     }
 
     this.renderEntities(g, entities, sort);
@@ -334,8 +333,8 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final IVision vision) {
-    this.renderEntities(g, entities, true, vision);
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final Shape clip) {
+    this.renderEntities(g, entities, true, clip);
   }
 
   @Override
