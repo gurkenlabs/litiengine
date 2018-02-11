@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.MovableCombatEntity;
-import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class PhysicsTests {
 
@@ -86,10 +84,12 @@ public class PhysicsTests {
 
     IPhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
+    engine.add(new Rectangle2D.Double(5, 5, 10, 10));
     engine.update();
 
     assertNotNull(engine.collides(new Line2D.Double(0, 0, 5, 5)));
-    assertNull(engine.collides(new Line2D.Double(10.1, 10.1, 15, 15)));
+    assertNotNull(engine.collides(new Line2D.Double(10, 10, 5, 5)));
+    assertNull(engine.collides(new Line2D.Double(15.1, 15.0, 15, 15)));
   }
 
   @Test
@@ -103,6 +103,14 @@ public class PhysicsTests {
     engine.update();
 
     assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5)));
+
+    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), CollisionType.ENTITY));
+    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), CollisionType.ALL));
+    assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), CollisionType.STATIC));
+    assertFalse(engine.collides(new Rectangle2D.Double(9, 9, 5, 5), CollisionType.NONE));
+
     assertFalse(engine.collides(new Rectangle2D.Double(10.1, 10.1, 5, 5)));
+
+    assertTrue(engine.collidesWithEntites(new Rectangle2D.Double(9, 9, 5, 5)).contains(ent));
   }
 }
