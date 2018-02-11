@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
@@ -104,7 +105,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Prop getProp(final String name);
 
   public ICombatEntity getCombatEntity(final int mapId);
-  
+
   public ICombatEntity getCombatEntity(final String name);
 
   public Collection<IEntity> getEntities();
@@ -114,7 +115,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
-  
+
   public LightSource getLightSource(final String name);
 
   public Collection<LightSource> getLightSources();
@@ -131,7 +132,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IMovableEntity> getMovableEntities();
 
   public IMovableEntity getMovableEntity(final int mapId);
-  
+
   public IMovableEntity getMovableEntity(String name);
 
   /**
@@ -153,6 +154,16 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Trigger> getTriggers();
 
+  /**
+   * Gets all triggers with the specified name.
+   * @param name
+   *          The name of the trigger
+   * @return A collection of all triggers with the specified name.
+   * @deprecated This method is deprecated and will be removed in future
+   *             versions. While it is not forced, names are considered to be unique for entities. 
+   *             Use Tags rather than the Name to search multiple entities by the same string. (see {@link #getByTag(String)}, {@link Entity#addTag(String)})
+   */
+  @Deprecated
   public Collection<Trigger> getTriggers(String name);
 
   public boolean isLoaded();

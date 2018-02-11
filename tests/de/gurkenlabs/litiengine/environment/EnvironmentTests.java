@@ -278,6 +278,22 @@ public class EnvironmentTests {
     assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
+  
+  @Test
+  public void testRemoveById() {
+    MapArea testArea = new MapArea(0, 0, 1, 1);
+    testArea.setMapId(1);
+    testArea.setName("test");
+
+    this.testEnvironment.add(testArea);
+    this.testEnvironment.remove(1);
+    this.testEnvironment.remove(2);
+
+    assertNull(this.testEnvironment.getArea(1));
+    assertNull(this.testEnvironment.getArea("test"));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
+  }
 
   @Test
   public void testSpawnPoint() {
