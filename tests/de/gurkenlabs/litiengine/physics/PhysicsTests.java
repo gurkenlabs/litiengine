@@ -91,4 +91,18 @@ public class PhysicsTests {
     assertNotNull(engine.collides(new Line2D.Double(0, 0, 5, 5)));
     assertNull(engine.collides(new Line2D.Double(10.1, 10.1, 15, 15)));
   }
+
+  @Test
+  public void testRectangleCollides() {
+    ICombatEntity ent = mock(ICombatEntity.class);
+    when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
+    when(ent.hasCollision()).thenReturn(true);
+
+    IPhysicsEngine engine = new PhysicsEngine();
+    engine.add(ent);
+    engine.update();
+
+    assertTrue(engine.collides(new Rectangle2D.Double(9, 9, 5, 5)));
+    assertFalse(engine.collides(new Rectangle2D.Double(10.1, 10.1, 5, 5)));
+  }
 }
