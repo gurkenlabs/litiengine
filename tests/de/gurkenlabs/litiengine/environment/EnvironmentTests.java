@@ -434,4 +434,41 @@ public class EnvironmentTests {
     assertTrue(found2.contains(combatEntity));
     assertFalse(found2.contains(combatEntity2));
   }
+  
+  @Test
+  public void testLoading() {
+    CollisionBox testCollider = new CollisionBox(true);
+    testCollider.setMapId(1);
+    testCollider.setName("test");
+
+    this.testEnvironment.add(testCollider);
+    
+    Prop testProp = new Prop(0, 0, null);
+    testProp.setMapId(1);
+    testProp.setName("test");
+
+    this.testEnvironment.add(testProp);
+    
+    Emitter testEmitter = new Emitter(1, 1) {
+      @Override
+      protected Particle createNewParticle() {
+        return null;
+      }
+    };
+
+    testEmitter.setMapId(1);
+    testEmitter.setName("test");
+
+    this.testEnvironment.add(testEmitter);
+    
+    this.testEnvironment.load();
+    
+    CollisionBox testCollider2 = new CollisionBox(true);
+    testCollider.setMapId(2);
+    testCollider.setName("test2");
+    
+    this.testEnvironment.add(testCollider2);
+    
+    this.testEnvironment.unload();
+  }
 }
