@@ -1,16 +1,23 @@
 package de.gurkenlabs.litiengine.physics;
 
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
 import de.gurkenlabs.litiengine.entities.MovableCombatEntity;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class PhysicsTests {
 
@@ -47,5 +54,41 @@ public class PhysicsTests {
         assertTrue(engine.collides(rect5));
       });
     }
+  }
+
+  @Test
+  public void testPointCollides() {
+    ICombatEntity ent = mock(ICombatEntity.class);
+    when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
+    when(ent.hasCollision()).thenReturn(true);
+
+    IPhysicsEngine engine = new PhysicsEngine();
+    engine.add(ent);
+    engine.update();
+
+    assertTrue(engine.collides(5, 5));
+    assertTrue(engine.collides(5, 5, CollisionType.ALL));
+    assertTrue(engine.collides(5, 5, CollisionType.ENTITY));
+    assertFalse(engine.collides(5, 5, CollisionType.STATIC));
+    assertFalse(engine.collides(5, 5, CollisionType.NONE));
+
+    engine.remove(ent);
+    engine.update();
+
+    assertFalse(engine.collides(5, 5));
+  }
+
+  @Test
+  public void testRaycastCollides() {
+    ICombatEntity ent = mock(ICombatEntity.class);
+    when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
+    when(ent.hasCollision()).thenReturn(true);
+
+    IPhysicsEngine engine = new PhysicsEngine();
+    engine.add(ent);
+    engine.update();
+
+    assertNotNull(engine.collides(new Line2D.Double(0, 0, 5, 5)));
+    assertNull(engine.collides(new Line2D.Double(10.1, 10.1, 15, 15)));
   }
 }

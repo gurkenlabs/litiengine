@@ -141,7 +141,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean collides(final Point2D point) {
-    if (!this.environmentBounds.contains(point)) {
+    if (this.environmentBounds != null && !this.environmentBounds.contains(point)) {
       return true;
     }
 
