@@ -1425,7 +1425,7 @@ public class MapComponent extends EditorComponent {
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(COLOR_SPAWNPOINT);
-          RenderEngine.fillShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
+          Game.getRenderEngine().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
         } else if (type == MapObjectType.PATH) {
           // render lane
 
@@ -1440,10 +1440,10 @@ public class MapComponent extends EditorComponent {
           }
 
           g.setColor(COLOR_LANE);
-          RenderEngine.drawShape(g, path, shapeStroke);
+          Game.getRenderEngine().renderOutline(g, path, shapeStroke);
           Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-          RenderEngine.fillShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
-          RenderEngine.drawMapText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
+          Game.getRenderEngine().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
+          Game.getRenderEngine().renderText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
@@ -1461,7 +1461,7 @@ public class MapComponent extends EditorComponent {
       g.setColor(nameColor.getAlpha() > 100 ? nameColor : Color.WHITE);
       float textSize = 2.5f * zooms[this.currentZoomIndex];
       g.setFont(Program.TEXT_FONT.deriveFont(textSize).deriveFont(Font.PLAIN));
-      RenderEngine.drawMapText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
+      Game.getRenderEngine().renderText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
     }
   }
 
@@ -1479,11 +1479,11 @@ public class MapComponent extends EditorComponent {
       final int startX = Math.max(0, (int) (viewPortX / gridSize) * gridSize);
       final int startY = Math.max(0, (int) (viewPortY / gridSize) * gridSize);
       for (int x = startX; x <= viewPortMaxX; x += gridSize) {
-        RenderEngine.drawShape(g, new Line2D.Double(x, viewPortY, x, viewPortMaxY), stroke);
+        Game.getRenderEngine().renderOutline(g, new Line2D.Double(x, viewPortY, x, viewPortMaxY), stroke);
       }
 
       for (int y = startY; y <= viewPortMaxY; y += gridSize) {
-        RenderEngine.drawShape(g, new Line2D.Double(viewPortX, y, viewPortMaxX, y), stroke);
+        Game.getRenderEngine().renderOutline(g, new Line2D.Double(viewPortX, y, viewPortMaxX, y), stroke);
       }
     }
   }
@@ -1494,12 +1494,12 @@ public class MapComponent extends EditorComponent {
     }
 
     g.setColor(COLOR_NEWOBJECT_FILL);
-    RenderEngine.fillShape(g, newObjectArea);
+    Game.getRenderEngine().renderShape(g, newObjectArea);
     g.setColor(COLOR_NEWOBJECT_BORDER);
-    RenderEngine.drawShape(g, newObjectArea, shapeStroke);
+    Game.getRenderEngine().renderOutline(g, newObjectArea, shapeStroke);
     g.setFont(g.getFont().deriveFont(Font.BOLD));
-    RenderEngine.drawMapText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
-    RenderEngine.drawMapText(g, newObjectArea.getHeight() + "", newObjectArea.getX() - 10, newObjectArea.getY() + newObjectArea.getHeight() / 2);
+    Game.getRenderEngine().renderText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
+    Game.getRenderEngine().renderText(g, newObjectArea.getHeight() + "", newObjectArea.getX() - 10, newObjectArea.getY() + newObjectArea.getHeight() / 2);
   }
 
   private void renderMouseSelectionArea(Graphics2D g, Stroke shapeStroke) {
@@ -1512,9 +1512,9 @@ public class MapComponent extends EditorComponent {
       }
 
       g.setColor(COLOR_MOUSE_SELECTION_AREA_FILL);
-      RenderEngine.fillShape(g, rect);
+      Game.getRenderEngine().renderShape(g, rect);
       g.setColor(COLOR_MOUSE_SELECTION_AREA_BORDER);
-      RenderEngine.drawShape(g, rect, shapeStroke);
+      Game.getRenderEngine().renderOutline(g, rect, shapeStroke);
     }
   }
 
@@ -1525,20 +1525,20 @@ public class MapComponent extends EditorComponent {
     if (focus != null && focusedMapObject != null) {
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15);
       g.setColor(COLOR_FOCUS_BORDER);
-      RenderEngine.drawShape(g, focus, stroke);
+      Game.getRenderEngine().renderOutline(g, focus, stroke);
 
       Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15 - 1f);
       g.setColor(Color.WHITE);
-      RenderEngine.drawShape(g, focus, whiteStroke);
+      Game.getRenderEngine().renderOutline(g, focus, whiteStroke);
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
-          RenderEngine.fillShape(g, trans);
+          Game.getRenderEngine().renderShape(g, trans);
           g.setColor(COLOR_FOCUS_BORDER);
-          RenderEngine.drawShape(g, trans, transStroke);
+          Game.getRenderEngine().renderOutline(g, trans, transStroke);
         }
       }
     }
@@ -1561,7 +1561,7 @@ public class MapComponent extends EditorComponent {
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
 
       g.setColor(COLOR_SELECTION_BORDER);
-      RenderEngine.drawShape(g, mapObject.getBoundingBox(), stroke);
+      Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
   }
 
@@ -1580,7 +1580,7 @@ public class MapComponent extends EditorComponent {
     // don't fill rect for lightsource because it is important to judge
     // the color
     if (type != MapObjectType.LIGHTSOURCE) {
-      RenderEngine.fillShape(g, mapObject.getBoundingBox());
+      Game.getRenderEngine().renderShape(g, mapObject.getBoundingBox());
     }
 
     Color borderColor = colorBoundingBoxFill;
@@ -1600,7 +1600,7 @@ public class MapComponent extends EditorComponent {
 
     g.setColor(borderColor);
 
-    RenderEngine.drawShape(g, mapObject.getBoundingBox(), shapeStroke);
+    Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
 
     this.renderName(g, borderColor, mapObject);
   }
@@ -1624,11 +1624,11 @@ public class MapComponent extends EditorComponent {
       g.setColor(COLOR_COLLISION_FILL);
       Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
-      RenderEngine.fillShape(g, collisionBox);
+      Game.getRenderEngine().renderShape(g, collisionBox);
       g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);
 
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
-      RenderEngine.drawShape(g, collisionBox, collisionStroke);
+      Game.getRenderEngine().renderOutline(g, collisionBox, collisionStroke);
     }
   }
 }

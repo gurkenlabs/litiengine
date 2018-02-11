@@ -59,7 +59,8 @@ public final class RenderEngine implements IRenderEngine {
    * @param y
    *          The y-coordinate of the text
    */
-  public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
+  @Override
+  public void renderText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -69,9 +70,10 @@ public final class RenderEngine implements IRenderEngine {
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
-
-  public static void drawMapText(final Graphics2D g, final String text, final Point2D location) {
-    drawMapText(g, text, location.getX(), location.getY());
+  
+  @Override
+  public void renderText(final Graphics2D g, final String text, final Point2D location) {
+    this.renderText(g, text, location.getX(), location.getY());
   }
 
   public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
@@ -81,11 +83,29 @@ public final class RenderEngine implements IRenderEngine {
     g2.dispose();
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
+  @Override
+  public void renderShape(final Graphics2D g, final Shape shape) {
+    if (shape == null) {
+      return;
+    }
+
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
+    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
+    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
+
+    g.setTransform(t);
+    g.fill(shape);
+    g.setTransform(oldTransForm);
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
+  @Override
+  public void renderOutline(final Graphics2D g, final Shape shape) {
+    renderOutline(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
+  }
+
+  @Override
+  public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     if (shape == null) {
       return;
     }
@@ -143,21 +163,6 @@ public final class RenderEngine implements IRenderEngine {
     g.drawString(text, (float) x - 1, (float) y + 1);
     g.setColor(old);
     g.drawString(text, (float) x, (float) y);
-  }
-
-  public static void fillShape(final Graphics2D g, final Shape shape) {
-    if (shape == null) {
-      return;
-    }
-
-    final AffineTransform oldTransForm = g.getTransform();
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    g.setTransform(t);
-    g.fill(shape);
-    g.setTransform(oldTransForm);
   }
 
   public static void renderImage(final Graphics2D g, final Image image, final double x, final double y) {
