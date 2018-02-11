@@ -10,9 +10,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 
-/**
- * The Interface IGraphicsEngine.
- */
 public interface IRenderEngine {
 
   public boolean canRender(IEntity entity);
@@ -43,19 +40,7 @@ public interface IRenderEngine {
 
   public void renderEntity(Graphics2D g, IEntity entity);
 
-  /**
-   * Render map.
-   *
-   * @param g
-   *          the g
-   */
   public void renderLayers(Graphics2D g, final IMap map, RenderType type);
 
-  /**
-   * Render map.
-   *
-   * @param g
-   *          the g
-   */
   public void renderMap(Graphics2D g, final IMap map);
 }

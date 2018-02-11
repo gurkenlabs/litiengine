@@ -8,11 +8,7 @@ package de.gurkenlabs.litiengine.attributes;
  *          the generic type
  */
 public class AttributeModifier<T extends Number> implements Comparable<AttributeModifier<T>> {
-
-  /** The modification. */
   private final Modification modification;
-
-  /** The modify value. */
   private final double modifyValue;
 
   /**
@@ -48,31 +44,14 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     return super.hashCode();
   }
 
-  /**
-   * Gets the modification.
-   *
-   * @return the modification
-   */
   public Modification getModification() {
     return this.modification;
   }
 
-  /**
-   * Gets the modify value.
-   *
-   * @return the modify value
-   */
   public double getModifyValue() {
     return this.modifyValue;
   }
 
-  /**
-   * Modify.
-   *
-   * @param modvalue
-   *          the modvalue
-   * @return the t
-   */
   public T modify(final T modvalue) {
     switch (this.getModification()) {
     case ADD:
@@ -95,15 +74,6 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     }
   }
 
-  /**
-   * Ensure type.
-   *
-   * @param modValue
-   *          the mod value
-   * @param originalValue
-   *          the original value
-   * @return the t
-   */
   @SuppressWarnings("unchecked")
   private T ensureType(final Double modValue, final T originalValue) {
     if (originalValue instanceof Double) {

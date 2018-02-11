@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+
 /**
  * This annotation contains default values for the initialization of an emitter.
  */
@@ -14,26 +16,11 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface EmitterInfo {
 
-  /**
-   * Activate on init.
-   *
-   * @return true, if successful
-   */
   boolean activateOnInit() default true;
 
-  /**
-   * The time to live in milliseconds.
-   *
-   * @return the int
-   */
   int emitterTTL() default 0;
 
-  /**
-   * Max particles.
-   *
-   * @return the int
-   */
-  int maxParticles();
+  int maxParticles() default Emitter.DEFAULT_MAXPARTICLES;
 
   boolean particleFade() default true;
 
@@ -41,24 +28,9 @@ public @interface EmitterInfo {
 
   int particleMinTTL() default 0;
 
-  /**
-   * Update particle 30 times per second.
-   *
-   * @return
-   */
-  int particleUpdateRate() default 30;
+  int particleUpdateRate() default Emitter.DEFAULT_UPDATERATE;
 
-  /**
-   * Spawn amount.
-   *
-   * @return the int
-   */
-  int spawnAmount();
+  int spawnAmount() default Emitter.DEFAULT_SPAWNAMOUNT;
 
-  /**
-   * Spawn rate.
-   *
-   * @return the int
-   */
-  int spawnRate() default 40;
+  int spawnRate() default 0;
 }

@@ -122,15 +122,6 @@ public class ImageProcessing {
     return Toolkit.getDefaultToolkit().createImage(ip);
   }
 
-  /**
-   * Border alpha.
-   *
-   * @param image
-   *          the image
-   * @param strokeColor
-   *          the stroke color
-   * @return the buffered image
-   */
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
     final BufferedImage bimage = getCompatibleImage(image.getWidth(null) + 2, image.getHeight(null) + 2);
     if (bimage == null) {
@@ -170,6 +161,7 @@ public class ImageProcessing {
    * Crops a sub image from the specified image.
    *
    * @param image
+   *          The image to crop the sub-image from.
    * @param cropAlignment
    *          use the following consts: <br>
    *          <ul>
@@ -193,8 +185,11 @@ public class ImageProcessing {
    *          CROP_VALIGN_BOTTOM}</li>
    *          </ul>
    * @param width
+   *          The width to crop.
    * @param height
-   * @return
+   *          The height to crop.
+   * @return The cropped image or the original image if it is smaller than the
+   *         specified dimensions.
    */
   public static BufferedImage crop(final BufferedImage image, final int cropAlignment, final int cropVerticlaAlignment, final int width, final int height) {
     if (width > image.getWidth() || height > image.getHeight()) {
@@ -279,11 +274,11 @@ public class ImageProcessing {
   }
 
   /**
-   * All pixels that are not transparent are replaced by a pixel of the specified
-   * flashColor.
+   * All pixels that are not transparent are replaced by a pixel of the
+   * specified flashColor.
    *
    * @param image
-   *          the player image
+   *          the image
    * @param flashColor
    *          the flash color
    * @return the buffered image
@@ -440,9 +435,9 @@ public class ImageProcessing {
   }
 
   /**
-   * The specified image is scaled to a new dimension with the specified width and
-   * height. This method doesn't use anti aliasing for this process to keep the
-   * indy look.
+   * The specified image is scaled to a new dimension with the specified width
+   * and height. This method doesn't use anti aliasing for this process to keep
+   * the indy look.
    *
    * @param image
    *          the image

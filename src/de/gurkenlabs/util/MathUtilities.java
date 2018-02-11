@@ -77,7 +77,8 @@ public class MathUtilities {
    * The index probabilities must sum up to 1;
    *
    * @param indexProbabilities
-   * @return
+   *          The index with the probabilities for the related index.
+   * @return A random index within the range of the specified array.
    */
   public static int getRandomIndex(final double[] indexProbabilities) {
     final double rnd = random.nextDouble();

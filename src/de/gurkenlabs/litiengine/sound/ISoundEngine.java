@@ -17,19 +17,22 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 public interface ISoundEngine extends ILaunchable {
 
   /**
-   * Gets the maximum distance from the listener at which a sound source can still
-   * be heared.
+   * Gets the maximum distance from the listener at which a sound source can
+   * still be heard.
    * 
-   * @return
+   * @return The maximum distance at which a sound can be heard.
    */
   public float getMaxDistance();
 
   /**
    * Loops the specified sound file as background music. If another music was
-   * specified beforehand, its playback will get interrupted and the new one will
-   * be played.
+   * specified beforehand, its play-back will get interrupted and the new one
+   * will be played.
    * 
    * @param sound
+   *          The sound from which to play the background music.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
    */
   public ISoundPlayback playMusic(Sound sound);
 
@@ -38,7 +41,12 @@ public interface ISoundEngine extends ILaunchable {
    * entity location in relation to the listener location.
    * 
    * @param entity
+   *          The entity at which location the sound should be played.
    * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
    */
   public ISoundPlayback playSound(IEntity entity, Sound sound);
 
@@ -47,24 +55,34 @@ public interface ISoundEngine extends ILaunchable {
    * and pan in relation to the listener location.
    * 
    * @param location
+   *          The location at which to play the sound.
    * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
    */
   public ISoundPlayback playSound(Point2D location, Sound sound);
 
   /**
-   * Plays the specified sound with the volume configured in the SOUND config with
-   * a center pan.
+   * Plays the specified sound with the volume configured in the SOUND config
+   * with a center pan.
    * 
    * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
    */
   public ISoundPlayback playSound(Sound sound);
 
   /**
-   * Sets the maximum distance from the listener at which a sound source can still
-   * be heared. If the distance between the sound source and the listener is
-   * greater than the specified value, the volume is set to 0.
+   * Sets the maximum distance from the listener at which a sound source can
+   * still be heard. If the distance between the sound source and the listener
+   * is greater than the specified value, the volume is set to 0.
    * 
    * @param distance
+   *          The maximum distance at which sounds can still be heard.
    */
   public void setMaxDistance(float distance);
 
@@ -81,6 +99,7 @@ public interface ISoundEngine extends ILaunchable {
    * screen) as listener location.
    * 
    * @param listenerLocationCallback
+   *          The callback that determines the location of the sound listener.
    */
   public void setListenerLocationCallback(Function<Point2D, Point2D> listenerLocationCallback);
 }

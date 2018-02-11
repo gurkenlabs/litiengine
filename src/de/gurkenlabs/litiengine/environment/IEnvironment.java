@@ -35,6 +35,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
    * already been loaded.
    *
    * @param entity
+   *          The entity to add to the environment.
    */
   public void add(IEntity entity);
 
@@ -45,7 +46,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public List<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
-   * Searches for all combat entities whose hitBox intersect the specified shape.
+   * Searches for all combat entities whose hitBox intersect the specified
+   * shape.
    * 
    * @param shape
    *          The shape to check intersection for.
@@ -102,6 +104,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Prop getProp(final String name);
 
   public ICombatEntity getCombatEntity(final int mapId);
+  
+  public ICombatEntity getCombatEntity(final String name);
 
   public Collection<IEntity> getEntities();
 
@@ -110,29 +114,30 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
+  
+  public LightSource getLightSource(final String name);
 
   public Collection<LightSource> getLightSources();
 
   /**
    * Gets the next unique local map id. (All local map ids are negative).
+   * 
+   * @return The next unique local map id.
    */
   public int getLocalMapId();
 
-  /**
-   * Gets the map.
-   *
-   * @return the map
-   */
   public IMap getMap();
 
   public Collection<IMovableEntity> getMovableEntities();
 
   public IMovableEntity getMovableEntity(final int mapId);
+  
+  public IMovableEntity getMovableEntity(String name);
 
   /**
    * Gets the next unique global map id.
    *
-   * @return
+   * @return The next unique global map id.
    */
   public int getNextMapId();
 

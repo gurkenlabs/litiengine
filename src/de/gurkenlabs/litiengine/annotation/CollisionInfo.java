@@ -15,25 +15,10 @@ import de.gurkenlabs.core.Valign;
 public @interface CollisionInfo {
   Align align() default Align.CENTER;
 
-  /**
-   * Collision.
-   *
-   * @return true, if successful
-   */
   boolean collision();
 
-  /**
-   * Collision box height factor.
-   *
-   * @return the float
-   */
   int collisionBoxHeight() default -1;
 
-  /**
-   * Collision box width factor.
-   *
-   * @return the float
-   */
   int collisionBoxWidth() default -1;
 
   Valign valign() default Valign.DOWN;

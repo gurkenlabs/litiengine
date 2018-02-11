@@ -12,5 +12,4 @@ public class GameTime {
   public long sinceEnvironmentLoad() {
     return Game.getLoop().convertToMs(Game.getLoop().getTicks() - Game.environmentLoadTick);
   }
-
 }

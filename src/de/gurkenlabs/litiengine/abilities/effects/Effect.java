@@ -24,24 +24,16 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
  */
 public abstract class Effect implements IEffect {
   public static final int NO_DURATION = -1;
-
+  
   private final Ability ability;
   private final List<EffectApplication> appliances;
-
   private final List<Consumer<EffectArgument>> appliedConsumer;
   private final List<Consumer<EffectArgument>> ceasedConsumer;
-
-  /** The delay. */
-  private int delay;
-
-  /** The duration. */
-  private int duration;
-
-  /** The effect targets. */
   private final EffectTarget[] effectTargets;
-
   private final List<IEffect> followUpEffects;
-
+  
+  private int delay;
+  private int duration;
   private EntityComparator targetPriorityComparator;
 
   /**
@@ -69,9 +61,6 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  /**
-   * Apply.
-   */
   @Override
   public void apply(final Shape impactArea) {
     final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
@@ -96,11 +85,6 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  /**
-   * Gets the ability.
-   *
-   * @return the ability
-   */
   public Ability getAbility() {
     return this.ability;
   }
@@ -110,41 +94,21 @@ public abstract class Effect implements IEffect {
     return this.appliances;
   }
 
-  /**
-   * Gets the delay in milliseconds.
-   *
-   * @return the delay
-   */
   @Override
   public int getDelay() {
     return this.delay;
   }
 
-  /**
-   * Gets the duration.
-   *
-   * @return the duration
-   */
   @Override
   public int getDuration() {
     return this.duration;
   }
 
-  /**
-   * Gets the effect targets.
-   *
-   * @return the effect targets
-   */
   @Override
   public EffectTarget[] getEffectTargets() {
     return this.effectTargets;
   }
 
-  /**
-   * Gets the follow up effects.
-   *
-   * @return the follow up effects
-   */
   @Override
   public List<IEffect> getFollowUpEffects() {
     return this.followUpEffects;
@@ -181,22 +145,10 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  /**
-   * Sets the delay.
-   *
-   * @param delay
-   *          the new delay
-   */
   public void setDelay(final int delay) {
     this.delay = delay;
   }
 
-  /**
-   * Sets the duration.
-   *
-   * @param duration
-   *          the new duration
-   */
   public void setDuration(final int duration) {
     this.duration = duration;
   }
@@ -206,8 +158,10 @@ public abstract class Effect implements IEffect {
   }
 
   /**
-   * 1. Cease the effect after its duration. 2. apply all follow up effects 3.
-   * remove appliance 4. unregister from loop if all appliances are done
+   * 1. Cease the effect after its duration. 
+   * 2. apply all follow up effects 
+   * 3. remove appliance 
+   * 4. unregister from loop if all appliances are done
    */
   @Override
   public void update() {
@@ -250,11 +204,6 @@ public abstract class Effect implements IEffect {
     return Game.getEnvironment().findCombatEntities(impactArea);
   }
 
-  /**
-   * Gets the total duration.
-   *
-   * @return the total duration
-   */
   protected long getTotalDuration() {
     return this.getDuration() + (long) this.getDelay();
   }
@@ -264,11 +213,6 @@ public abstract class Effect implements IEffect {
     return effectDuration > this.getDuration();
   }
 
-  /**
-   * Look for affected entities.
-   *
-   * @return the list
-   */
   protected List<ICombatEntity> lookForAffectedEntities(final Shape impactArea) {
     List<ICombatEntity> affectedEntities = new ArrayList<>();
 
@@ -312,20 +256,10 @@ public abstract class Effect implements IEffect {
     return affectedEntities;
   }
 
-  /**
-   * Can attack entity.
-   *
-   * @return the predicate<? super attackable entity>
-   */
   private Predicate<? super ICombatEntity> canAttackEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && !entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
 
-  /**
-   * Checks if is alive friendly entity.
-   *
-   * @return the predicate<? super attackable entity>
-   */
   private Predicate<? super ICombatEntity> isAliveFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && !entity.isDead();
   }
@@ -333,5 +267,4 @@ public abstract class Effect implements IEffect {
   private Predicate<? super ICombatEntity> isDeadFriendlyEntity() {
     return entity -> !entity.equals(this.getAbility().getExecutor()) && entity.isFriendly(this.getAbility().getExecutor()) && entity.isDead();
   }
-
 }

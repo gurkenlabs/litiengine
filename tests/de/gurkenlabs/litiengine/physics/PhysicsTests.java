@@ -1,11 +1,12 @@
 package de.gurkenlabs.litiengine.physics;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.geom.Rectangle2D;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;

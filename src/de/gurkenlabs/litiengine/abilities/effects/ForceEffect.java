@@ -5,10 +5,8 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.physics.Force;
 
 public abstract class ForceEffect extends Effect {
-  private Force appliedForce;
-
-  /** The strength. */
   private final float strength;
+  private Force appliedForce;
 
   protected ForceEffect(final Ability ability, final float strength, final EffectTarget... targets) {
     super(ability, targets);

@@ -1,9 +1,10 @@
 package de.gurkenlabs.litiengine;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GameTest {
   @Test
@@ -11,12 +12,12 @@ public class GameTest {
     try {
       Game.init();
 
-      Assert.assertNotNull(Game.getRenderLoop());
-      Assert.assertNotNull(Game.getLoop());
-      Assert.assertNotNull(Game.getCamera());
-      Assert.assertNotNull(Game.getScreenManager());
-      Assert.assertNotNull(Game.getPhysicsEngine());
-      Assert.assertNotNull(Game.getRenderEngine());
+      assertNotNull(Game.getRenderLoop());
+      assertNotNull(Game.getLoop());
+      assertNotNull(Game.getCamera());
+      assertNotNull(Game.getScreenManager());
+      assertNotNull(Game.getPhysicsEngine());
+      assertNotNull(Game.getRenderEngine());
     } finally {
       final File configFile = new File(Game.getConfiguration().getFileName());
       if (configFile.exists()) {

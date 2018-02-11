@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.util.function.Consumer;
 
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -103,6 +104,12 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
       this.updateAction.accept(getDataSource());
       UndoManager.instance().mapObjectChanged(getDataSource());
       updateEnvironment();
+    }
+  }
+
+  protected class SpinnerListener extends MapObjectPropertyChangeListener{
+    SpinnerListener(String mapObjectProperty, JSpinner spinner) {
+      super(m -> m.setCustomProperty(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 

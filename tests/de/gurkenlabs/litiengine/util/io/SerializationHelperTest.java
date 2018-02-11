@@ -1,8 +1,9 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.util.io.SerializationHelper;
 
@@ -27,16 +28,16 @@ public class SerializationHelperTest {
     assertEquals(small, decoded, 0.1F);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void testSmallFloatEncodingNegative() {
     final float small = -1;
 
-    SerializationHelper.encodeSmallFloatingPointNumber(small, 1);
+    assertThrows(IllegalArgumentException.class, () -> SerializationHelper.encodeSmallFloatingPointNumber(small, 1));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void testSmallFloatEncodingTooLarge() {
     final float small = 6553.51254F;
-    SerializationHelper.encodeSmallFloatingPointNumber(small, 2);
+    assertThrows(IllegalArgumentException.class, () -> SerializationHelper.encodeSmallFloatingPointNumber(small, 2));
   }
 }

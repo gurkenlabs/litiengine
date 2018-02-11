@@ -19,11 +19,11 @@ public abstract class OffensiveAbility extends Ability {
   /**
    * Instantiates a new offensive ability.
    *
-   * @param executingMob
-   *          the executing mob
+   * @param executingEntity
+   *          the executing entity
    */
-  protected OffensiveAbility(final IMovableCombatEntity executingMob) {
-    super(executingMob);
+  protected OffensiveAbility(final IMovableCombatEntity executingEntity) {
+    super(executingEntity);
     this.entityHitConsumers = new CopyOnWriteArrayList<>();
   }
 
@@ -33,11 +33,6 @@ public abstract class OffensiveAbility extends Ability {
     }
   }
 
-  /**
-   * Gets the attack damage.
-   *
-   * @return the attack damage
-   */
   public int getAttackDamage() {
     return Math.round(this.getAttributes().getValue().getCurrentValue() * this.getExecutor().getAttributes().getDamageMultiplier().getCurrentValue());
   }

@@ -60,52 +60,59 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  public static final String EMITTER_COLORS = "emitterColors";
-  public static final String EMITTER_COLORPROBABILITIES = "emitterColorProbabilities";
-  public static final String EMITTER_SPAWNRATE = "emitterSpawnRate";
-  public static final String EMITTER_SPAWNAMOUNT = "emitterSpawnAmount";
-  public static final String EMITTER_UPDATEDELAY = "emitterUpdateDelay";
-  public static final String EMITTER_TIMETOLIVE = "emitterTimeToLive";
-  public static final String EMITTER_MAXPARTICLES = "emitterMaxParticles";
-  public static final String EMITTER_PARTICLETYPE = "emitterParticleType";
-  public static final String EMITTER_COLORDEVIATION = "emitterColorDeviation";
-  public static final String EMITTER_ALPHADEVIATION = "emitterAlphaDeviation";
+  public static class Emitter{
+    public static final String COLORS = "emitterColors";
+    public static final String COLORPROBABILITIES = "emitterColorProbabilities";
+    public static final String SPAWNRATE = "emitterSpawnRate";
+    public static final String SPAWNAMOUNT = "emitterSpawnAmount";
+    public static final String UPDATERATE = "emitterUpdateDelay";
+    public static final String TIMETOLIVE = "emitterTimeToLive";
+    public static final String MAXPARTICLES = "emitterMaxParticles";
+    public static final String PARTICLETYPE = "emitterParticleType";
+    public static final String COLORDEVIATION = "emitterColorDeviation";
+    public static final String ALPHADEVIATION = "emitterAlphaDeviation";
+  }
 
-  public static final String PARTICLE_MINX = "particleMinX";
-  public static final String PARTICLE_MAXX = "particleMaxX";
-  public static final String PARTICLE_X_RANDOM = "particleXRandom";
-  public static final String PARTICLE_MINY = "particleMinY";
-  public static final String PARTICLE_MAXY = "particleMaxY";
-  public static final String PARTICLE_Y_RANDOM = "particleYRandom";
-  public static final String PARTICLE_MINDELTAX = "particleMinDeltaX";
-  public static final String PARTICLE_MAXDELTAX = "particleMaxDeltaX";
-  public static final String PARTICLE_DELTAX_RANDOM = "particleDeltaXRandom";
-  public static final String PARTICLE_MINDELTAY = "particleMinDeltaY";
-  public static final String PARTICLE_MAXDELTAY = "particleMaxDeltaY";
-  public static final String PARTICLE_DELTAY_RANDOM = "particleDeltaYRandom";
-  public static final String PARTICLE_MINGRAVITYX = "particleMinGravityX";
-  public static final String PARTICLE_MAXGRAVITYX = "particleMaxGravityX";
-  public static final String PARTICLE_GRAVITYX_RANDOM = "particleGravityXRandom";
-  public static final String PARTICLE_MINGRAVITYY = "particleMinGravityY";
-  public static final String PARTICLE_MAXGRAVITYY = "particleMaxGravityY";
-  public static final String PARTICLE_GRAVITYY_RANDOM = "particleGravityYRandom";
-  public static final String PARTICLE_MINSTARTWIDTH = "particleMinStartWidth";
-  public static final String PARTICLE_MAXSTARTWIDTH = "particleMaxStartWidth";
-  public static final String PARTICLE_STARTWIDTH_RANDOM = "particleStartWidthRandom";
-  public static final String PARTICLE_MINSTARTHEIGHT = "particleMinStartHeight";
-  public static final String PARTICLE_MAXSTARTHEIGHT = "particleMaxStartHeight";
-  public static final String PARTICLE_STARTHEIGHT_RANDOM = "particleStartHeightRandom";
-  public static final String PARTICLE_MINDELTAWIDTH = "particleMinDeltaWidth";
-  public static final String PARTICLE_MAXDELTAWIDTH = "particleMaxDeltaWidth";
-  public static final String PARTICLE_DELTAWIDTH_RANDOM = "particleDeltaWidthRandom";
-  public static final String PARTICLE_MINDELTAHEIGHT = "particleMinDeltaHeight";
-  public static final String PARTICLE_MAXDELTAHEIGHT = "particleMaxDeltaHeight";
-  public static final String PARTICLE_DELTAHEIGHT_RANDOM = "particleDeltaHeightRandom";
-  public static final String PARTICLE_SPRITE = "particleSprite";
-  public static final String PARTICLE_ANIMATESPRITE = "particleAnimateSprite";
-  public static final String PARTICLE_STATICPHYSICS = "particleStaticPhysics";
-  public static final String PARTICLE_TEXT = "particleText";
-
+  public static class Particle{
+    public static final String MINX = "particleMinX";
+    public static final String MAXX = "particleMaxX";
+    public static final String X_RANDOM = "particleXRandom";
+    public static final String MINY = "particleMinY";
+    public static final String MAXY = "particleMaxY";
+    public static final String Y_RANDOM = "particleYRandom";
+    public static final String MINDELTAX = "particleMinDeltaX";
+    public static final String MAXDELTAX = "particleMaxDeltaX";
+    public static final String DELTAX_RANDOM = "particleDeltaXRandom";
+    public static final String MINDELTAY = "particleMinDeltaY";
+    public static final String MAXDELTAY = "particleMaxDeltaY";
+    public static final String DELTAY_RANDOM = "particleDeltaYRandom";
+    public static final String MINGRAVITYX = "particleMinGravityX";
+    public static final String MAXGRAVITYX = "particleMaxGravityX";
+    public static final String GRAVITYX_RANDOM = "particleGravityXRandom";
+    public static final String MINGRAVITYY = "particleMinGravityY";
+    public static final String MAXGRAVITYY = "particleMaxGravityY";
+    public static final String GRAVITYY_RANDOM = "particleGravityYRandom";
+    public static final String MINSTARTWIDTH = "particleMinStartWidth";
+    public static final String MAXSTARTWIDTH = "particleMaxStartWidth";
+    public static final String STARTWIDTH_RANDOM = "particleStartWidthRandom";
+    public static final String MINSTARTHEIGHT = "particleMinStartHeight";
+    public static final String MAXSTARTHEIGHT = "particleMaxStartHeight";
+    public static final String STARTHEIGHT_RANDOM = "particleStartHeightRandom";
+    public static final String MINDELTAWIDTH = "particleMinDeltaWidth";
+    public static final String MAXDELTAWIDTH = "particleMaxDeltaWidth";
+    public static final String DELTAWIDTH_RANDOM = "particleDeltaWidthRandom";
+    public static final String MINDELTAHEIGHT = "particleMinDeltaHeight";
+    public static final String MAXDELTAHEIGHT = "particleMaxDeltaHeight";
+    public static final String DELTAHEIGHT_RANDOM = "particleDeltaHeightRandom";
+    public static final String SPRITE = "particleSprite";
+    public static final String ANIMATESPRITE = "particleAnimateSprite";
+    public static final String COLLISIONTYPE = "particlePhysics";
+    public static final String TEXT = "particleText";
+    public static final String MINTTL = "particleMinTTL";
+    public static final String MAXTTL = "particleMaxTTL";
+    public static final String TTL_RANDOM = "particleTTLRandom";
+  }
+  
   private static List<Field> availableProperties = new ArrayList<>();
 
   private MapObjectProperty() {
@@ -114,6 +121,18 @@ public final class MapObjectProperty {
   public static boolean isCustom(final String name) {
     if (availableProperties.isEmpty()) {
       for (final Field field : MapObjectProperty.class.getDeclaredFields()) {
+        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+          availableProperties.add(field);
+        }
+      }
+      
+      for (final Field field : MapObjectProperty.Emitter.class.getDeclaredFields()) {
+        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+          availableProperties.add(field);
+        }
+      }
+      
+      for (final Field field : MapObjectProperty.Particle.class.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           availableProperties.add(field);
         }

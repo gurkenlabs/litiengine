@@ -9,8 +9,10 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
+
 /**
- * The Interface IMouse provides methods to mange mouse input in the litiengine.
+ * The Interface IMouse provides methods to manage mouse input in the LITIengine.
  */
 public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -29,11 +31,6 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
 
   public boolean isLeftMouseButtonDown();
 
-  /**
-   * Checks if is pressed.
-   *
-   * @return true, if is pressed
-   */
   public boolean isPressed();
 
   public boolean isRightMouseButtonDown();
@@ -77,7 +74,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
   /**
    * If set to true, the mouse will be locked to the render component of the game.
    * 
-   * @param grab
+   * @param grab True if the mouse should be grabbed to the {@link RenderComponent}, otherwise false.
    */
   public void setGrabMouse(boolean grab);
 

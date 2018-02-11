@@ -19,13 +19,24 @@ public class MessageType {
   public static final MessageType PING = new MessageType("PING", (byte) 4);
   private static final List<MessageType> messageTypes = new ArrayList<>();
 
-  /**
-   * Gets the.
-   *
-   * @param id
-   *          the id
-   * @return the message type
-   */
+  private final String name;
+  private final byte packetId;
+
+  public MessageType(final String name, final byte messageId) {
+    if (messageTypes.stream().anyMatch(type -> type.getId() == messageId)) {
+      throw new IllegalArgumentException(String.format("Cannot create a new message type with packetId '%d' because another message type has an equal id assigned.", messageId));
+    }
+
+    if (messageTypes.stream().anyMatch(type -> type.getName() == name)) {
+      throw new IllegalArgumentException(String.format("Cannot create a new message type with name '%s' because another message type has an equal name.", name));
+    }
+
+    this.name = name;
+    this.packetId = messageId;
+
+    messageTypes.add(this);
+  }
+
   public static MessageType get(final byte id) {
     final Optional<MessageType> optional = messageTypes.stream().filter(m -> m.getId() == id).findAny();
     if (!optional.isPresent()) {
@@ -44,37 +55,6 @@ public class MessageType {
     return optional.get();
   }
 
-  private final String name;
-
-  /** The packet id. */
-  private final byte packetId;
-
-  /**
-   * Instantiates a new message type.
-   *
-   * @param messageId
-   *          the packet id
-   */
-  public MessageType(final String name, final byte messageId) {
-    if (messageTypes.stream().anyMatch(type -> type.getId() == messageId)) {
-      throw new IllegalArgumentException(String.format("Cannot create a new message type with packetId '%d' because another message type has an equal id assigned.", messageId));
-    }
-
-    if (messageTypes.stream().anyMatch(type -> type.getName() == name)) {
-      throw new IllegalArgumentException(String.format("Cannot create a new message type with name '%s' because another message type has an equal name.", name));
-    }
-
-    this.name = name;
-    this.packetId = messageId;
-
-    messageTypes.add(this);
-  }
-
-  /**
-   * Gets the id.
-   *
-   * @return the id
-   */
   public byte getId() {
     return this.packetId;
   }

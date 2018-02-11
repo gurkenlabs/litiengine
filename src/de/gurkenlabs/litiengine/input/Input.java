@@ -7,19 +7,10 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
-/**
- * The Class Input.
- */
 public final class Input {
-
   private static IGamepadManager gamePadManager;
-
   private static List<IGamepad> gamePads;
-
-  /** The keyboard. */
   private static IKeyboard keyboard;
-
-  /** The mouse. */
   private static IMouse mouse;
 
   // we need an own gameloop because otherwise input won't work if the game has
@@ -73,9 +64,9 @@ public final class Input {
   }
 
   /**
-   * Gets the first gamepad that is currently available.
+   * Gets the first game pad that is currently available.
    *
-   * @return
+   * @return The first available {@link IGamepad} instance
    */
   public static IGamepad getGamepad() {
     if (gamePads.isEmpty()) {
@@ -86,11 +77,12 @@ public final class Input {
   }
 
   /**
-   * Gets the gamepad with the specified index if it is still plugged in. After
-   * replugging a controller while the game is running, its index might change.
+   * Gets the game pad with the specified index if it is still plugged in. After
+   * re-plugging a controller while the game is running, its index might change.
    *
    * @param index
-   * @return
+   *          The index of the {@link IGamepad}.
+   * @return The {@link IGamepad} with the specified index.
    */
   public static IGamepad getGamepad(final int index) {
     if (gamePads.isEmpty()) {

@@ -1,5 +1,10 @@
 package de.gurkenlabs.litiengine.environment;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +14,7 @@ import java.awt.Point;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.core.Align;
 import de.gurkenlabs.core.Valign;
@@ -53,27 +57,27 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testProp");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testProp");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     Prop prop = (Prop) entity;
-    Assert.assertEquals(prop.getMaterial(), Material.PLASTIC);
-    Assert.assertTrue(prop.isIndestructible());
-    Assert.assertTrue(prop.hasCollision());
-    Assert.assertEquals(prop.getAttributes().getHealth().getMaxValue().intValue(), 100);
-    Assert.assertEquals(prop.getAttributes().getHealth().getCurrentValue().intValue(), 100);
+    assertEquals(prop.getMaterial(), Material.PLASTIC);
+    assertTrue(prop.isIndestructible());
+    assertTrue(prop.hasCollision());
+    assertEquals(prop.getAttributes().getHealth().getMaxValue().intValue(), 100);
+    assertEquals(prop.getAttributes().getHealth().getCurrentValue().intValue(), 100);
 
-    Assert.assertEquals(prop.getCollisionBoxWidth(), 100.0, 0.0001);
-    Assert.assertEquals(prop.getCollisionBoxHeight(), 100.0, 0.0001);
-    Assert.assertEquals(prop.getCollisionBoxAlign(), Align.LEFT);
-    Assert.assertEquals(prop.getCollisionBoxValign(), Valign.MIDDLE);
-    Assert.assertEquals(prop.getTeam(), 1);
+    assertEquals(prop.getCollisionBoxWidth(), 100.0, 0.0001);
+    assertEquals(prop.getCollisionBoxHeight(), 100.0, 0.0001);
+    assertEquals(prop.getCollisionBoxAlign(), Align.LEFT);
+    assertEquals(prop.getCollisionBoxValign(), Valign.MIDDLE);
+    assertEquals(prop.getTeam(), 1);
   }
 
   @Test
@@ -90,20 +94,20 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
 
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testCollider");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testCollider");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     CollisionBox collider = (CollisionBox) entity;
 
-    Assert.assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
-    Assert.assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);
+    assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
+    assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);
   }
 
   @Test
@@ -124,24 +128,24 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
 
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testTrigger");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testTrigger");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     Trigger trigger = (Trigger) entity;
 
-    Assert.assertFalse(trigger.isOneTimeTrigger());
-    Assert.assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
-    Assert.assertArrayEquals(new Integer[] { 1, 2, 3 }, trigger.getTargets().toArray());
-    Assert.assertArrayEquals(new Integer[] { 4, 5, 6 }, trigger.getActivators().toArray());
-    Assert.assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
-    Assert.assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
+    assertFalse(trigger.isOneTimeTrigger());
+    assertEquals(TriggerActivation.INTERACT, trigger.getActivationType());
+    assertArrayEquals(new Integer[] { 1, 2, 3 }, trigger.getTargets().toArray());
+    assertArrayEquals(new Integer[] { 4, 5, 6 }, trigger.getActivators().toArray());
+    assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
+    assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
   }
 
   @Test
@@ -167,29 +171,29 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
 
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testDecorMob");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testDecorMob");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     DecorMob decorMob = (DecorMob) entity;
 
-    Assert.assertTrue(decorMob.isIndestructible());
-    Assert.assertFalse(decorMob.hasCollision());
+    assertTrue(decorMob.isIndestructible());
+    assertFalse(decorMob.hasCollision());
 
-    Assert.assertEquals(decorMob.getCollisionBoxWidth(), 100.0, 0.0001);
-    Assert.assertEquals(decorMob.getCollisionBoxHeight(), 100.0, 0.0001);
-    Assert.assertEquals(decorMob.getCollisionBoxAlign(), Align.LEFT);
-    Assert.assertEquals(decorMob.getCollisionBoxValign(), Valign.MIDDLE);
+    assertEquals(decorMob.getCollisionBoxWidth(), 100.0, 0.0001);
+    assertEquals(decorMob.getCollisionBoxHeight(), 100.0, 0.0001);
+    assertEquals(decorMob.getCollisionBoxAlign(), Align.LEFT);
+    assertEquals(decorMob.getCollisionBoxValign(), Valign.MIDDLE);
 
-    Assert.assertEquals(decorMob.getMovementBehavior(), MovementBehavior.SHY);
-    Assert.assertEquals(decorMob.getVelocity(), 200, 0.0001);
-    Assert.assertEquals(decorMob.getMobType(), "decorSprite");
+    assertEquals(decorMob.getMovementBehavior(), MovementBehavior.SHY);
+    assertEquals(decorMob.getVelocity(), 200, 0.0001);
+    assertEquals(decorMob.getMobType(), "decorSprite");
   }
 
   @Test
@@ -204,15 +208,15 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
 
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testEmitter");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testEmitter");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
   }
 
   @Test
@@ -233,23 +237,23 @@ public class MapObjectLoaderTests {
 
     Collection<IEntity> entities = loader.load(mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
-    Assert.assertTrue(opt.isPresent());
+    assertTrue(opt.isPresent());
 
     IEntity entity = entities.stream().findFirst().get();
 
-    Assert.assertNotNull(entity);
-    Assert.assertEquals(entity.getMapId(), 111);
-    Assert.assertEquals(entity.getName(), "testLight");
-    Assert.assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    Assert.assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertNotNull(entity);
+    assertEquals(entity.getMapId(), 111);
+    assertEquals(entity.getName(), "testLight");
+    assertEquals(entity.getLocation().getX(), 100, 0.0001);
+    assertEquals(entity.getLocation().getY(), 100, 0.0001);
 
     LightSource light = (LightSource) entity;
-    Assert.assertTrue(light.isActive());
-    Assert.assertEquals(Color.WHITE.getRed(), light.getColor().getRed());
-    Assert.assertEquals(Color.WHITE.getBlue(), light.getColor().getBlue());
-    Assert.assertEquals(Color.WHITE.getGreen(), light.getColor().getGreen());
-    Assert.assertEquals(100, light.getColor().getAlpha());
-    Assert.assertEquals(100, light.getIntensity());
-    Assert.assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
+    assertTrue(light.isActive());
+    assertEquals(Color.WHITE.getRed(), light.getColor().getRed());
+    assertEquals(Color.WHITE.getBlue(), light.getColor().getBlue());
+    assertEquals(Color.WHITE.getGreen(), light.getColor().getGreen());
+    assertEquals(100, light.getColor().getAlpha());
+    assertEquals(100, light.getIntensity());
+    assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
   }
 }

@@ -26,7 +26,11 @@ import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
  */
 @CollisionInfo(collision = false)
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
-  private static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
+  public static final int DEFAULT_UPDATERATE = 30;
+  public static final int DEFAULT_SPAWNAMOUNT = 1;
+  public static final int DEFAULT_MAXPARTICLES = 100;
+
   private static final Random RANDOM = new Random();
 
   private final List<Consumer<Emitter>> finishedConsumer;
@@ -90,21 +94,32 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     super();
     this.colors = new ArrayList<>();
     this.finishedConsumer = new CopyOnWriteArrayList<>();
-    final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
-
-    this.maxParticles = info.maxParticles();
-    this.spawnAmount = info.spawnAmount();
-    this.spawnRate = info.spawnRate();
-    this.timeToLive = info.emitterTTL();
-    this.particleMinTTL = info.particleMinTTL();
-    this.particleMaxTTL = info.particleMaxTTL();
-    this.particleUpdateDelay = info.particleUpdateRate();
     this.particles = new CopyOnWriteArrayList<>();
-    this.setLocation(origin);
-    this.activateOnInit = info.activateOnInit();
-
     this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
     this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
+    this.setLocation(origin);
+
+    final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
+
+    if (info != null) {
+      this.maxParticles = info.maxParticles();
+      this.spawnAmount = info.spawnAmount();
+      this.spawnRate = info.spawnRate();
+      this.timeToLive = info.emitterTTL();
+      this.particleMinTTL = info.particleMinTTL();
+      this.particleMaxTTL = info.particleMaxTTL();
+      this.particleUpdateDelay = info.particleUpdateRate();
+      this.activateOnInit = info.activateOnInit();
+    } else {
+      this.maxParticles = Emitter.DEFAULT_MAXPARTICLES;
+      this.spawnAmount = Emitter.DEFAULT_SPAWNAMOUNT;
+      this.spawnRate = 0;
+      this.timeToLive = 0;
+      this.particleMinTTL = 0;
+      this.particleMaxTTL = 0;
+      this.particleUpdateDelay = Emitter.DEFAULT_UPDATERATE;
+      this.activateOnInit = true;
+    }
   }
 
   /**
@@ -359,7 +374,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
 
-    if (this.getSpawnRate() != 0 && Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate()) {
+    if ((this.getSpawnRate() == 0 || Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate())) {
       this.spawnParticle();
     }
   }
@@ -397,6 +412,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   protected int getRandomParticleTTL() {
+    if (this.getParticleMaxTTL() == 0) {
+      return this.getParticleMinTTL();
+    }
+
     final int ttlDiff = this.getParticleMaxTTL() - this.getParticleMinTTL();
     if (ttlDiff <= 0) {
       return this.getParticleMaxTTL();

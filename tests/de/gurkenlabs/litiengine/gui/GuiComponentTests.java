@@ -1,7 +1,11 @@
 package de.gurkenlabs.litiengine.gui;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class GuiComponentTests {
 
@@ -9,31 +13,31 @@ public class GuiComponentTests {
   public void testInitializaion() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
 
-    Assert.assertNotNull(component);
-    Assert.assertEquals(10.0, component.getX(), 0.0001);
-    Assert.assertEquals(20.0, component.getY(), 0.0001);
-    Assert.assertEquals(100.0, component.getWidth(), 0.0001);
-    Assert.assertEquals(50.0, component.getHeight(), 0.0001);
+    assertNotNull(component);
+    assertEquals(10.0, component.getX(), 0.0001);
+    assertEquals(20.0, component.getY(), 0.0001);
+    assertEquals(100.0, component.getWidth(), 0.0001);
+    assertEquals(50.0, component.getHeight(), 0.0001);
 
-    Assert.assertTrue(component.isEnabled());
+    assertTrue(component.isEnabled());
 
-    Assert.assertFalse(component.isVisible());
-    Assert.assertFalse(component.isHovered());
-    Assert.assertFalse(component.isSelected());
+    assertFalse(component.isVisible());
+    assertFalse(component.isHovered());
+    assertFalse(component.isSelected());
   }
 
   @Test
   public void ensureThatDefaultAppearanceIsSet() {
     TestComponent component = new TestComponent(10, 20, 100, 50);
 
-    Assert.assertNotNull(component);
-    Assert.assertNotNull(component.getAppearance());
-    Assert.assertNotNull(component.getAppearanceDisabled());
-    Assert.assertNotNull(component.getAppearanceHovered());
+    assertNotNull(component);
+    assertNotNull(component.getAppearance());
+    assertNotNull(component.getAppearanceDisabled());
+    assertNotNull(component.getAppearanceHovered());
 
-    Assert.assertEquals(GuiProperties.getDefaultAppearance(), component.getAppearance());
-    Assert.assertEquals(GuiProperties.getDefaultAppearanceDisabled(), component.getAppearanceDisabled());
-    Assert.assertEquals(GuiProperties.getDefaultAppearanceHovered(), component.getAppearanceHovered());
+    assertEquals(GuiProperties.getDefaultAppearance(), component.getAppearance());
+    assertEquals(GuiProperties.getDefaultAppearanceDisabled(), component.getAppearanceDisabled());
+    assertEquals(GuiProperties.getDefaultAppearanceHovered(), component.getAppearanceHovered());
   }
 
   private class TestComponent extends GuiComponent {

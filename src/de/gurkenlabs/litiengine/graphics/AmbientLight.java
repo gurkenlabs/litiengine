@@ -41,6 +41,10 @@ public class AmbientLight implements IRenderable {
   }
 
   public void createImage() {
+    if (this.getColor() == null) {
+      return;
+    }
+
     final String cacheKey = this.getCacheKey();
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       this.image = ImageCache.IMAGES.get(cacheKey);

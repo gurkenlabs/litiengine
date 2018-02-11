@@ -106,7 +106,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
    * Checks whether the specified entity can interact with this trigger.
    * 
    * @param entity
-   * @return
+   *          The entity.
+   * @return True if the entity can interact with the trigger; otherwise false.
    */
   public boolean canTrigger(ICollisionEntity entity) {
     return entity.canCollideWith(this) && GeometricUtilities.intersects(this.getCollisionBox(), entity.getCollisionBox());
@@ -122,12 +123,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   /**
    * Allows to register functions that contain additional checks for the trigger
-   * activation. The return value of the function is considered the reason why the
-   * trigger cannot be activated. If the function returns anything else than null,
-   * the activation is cancelled and the result of the function is send to the
-   * activator entity.
+   * activation. The return value of the function is considered the reason why
+   * the trigger cannot be activated. If the function returns anything else than
+   * null, the activation is cancelled and the result of the function is send to
+   * the activator entity.
    * 
    * @param func
+   *          The callback takes in the {@link TriggerEvent} and returns a
+   *          {@link String}
    */
   public void onActivating(final Function<TriggerEvent, String> func) {
     if (this.activatingPredicates.contains(func)) {

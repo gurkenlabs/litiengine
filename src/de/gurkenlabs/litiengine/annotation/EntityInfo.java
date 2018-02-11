@@ -16,19 +16,9 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 @Inherited
 public @interface EntityInfo {
 
-  /**
-   * Height.
-   *
-   * @return the int
-   */
   float height() default 32;
 
   RenderType renderType() default RenderType.NORMAL;
-
-  /**
-   * Width.
-   *
-   * @return the int
-   */
+  
   float width() default 32;
 }

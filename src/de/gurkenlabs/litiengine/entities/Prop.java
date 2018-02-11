@@ -5,9 +5,6 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
-/**
- * The Class Destructable.
- */
 public class Prop extends CombatEntity {
   public static final String SPRITESHEET_PREFIX = "prop-";
   private Material material;
@@ -18,9 +15,18 @@ public class Prop extends CombatEntity {
   private boolean flipVertically;
   private Rotation rotation;
 
-  /**
-   * Instantiates a new destructible.
-   */
+  public Prop(double x, double y, final String spritesheetName) {
+    this(x, y, spritesheetName, Material.UNDEFINED);
+  }
+
+  public Prop(double x, double y, final String spritesheetName, final Material mat) {
+    this(new Point2D.Double(x, y), spritesheetName, mat);
+  }
+
+  public Prop(final Point2D location, final String spritesheetName) {
+    this(location, spritesheetName, Material.UNDEFINED);
+  }
+
   public Prop(final Point2D location, final String spritesheetName, final Material mat) {
     super();
     this.rotation = Rotation.NONE;

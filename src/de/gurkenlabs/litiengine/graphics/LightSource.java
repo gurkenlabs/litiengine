@@ -20,55 +20,32 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-/**
- * The Class LightSource.
- */
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
   public static final String ELLIPSE = "ellipse";
-
   public static final String RECTANGLE = "rectangle";
-
   public static final String TOGGLE_MESSAGE = "toggle";
-
   public static final int DEFAULT_INTENSITY = 100;
 
-  /** The gradient radius for our shadow. */
   private static final float OBSTRUCTED_VISION_RADIUS = 200f;
-
-  /** The gradient radius for our shadow. */
   private static final float SHADOW_GRADIENT_SIZE = 100f;
-
   /**
-   * } The fractions for our shadow gradient, going from 0.0 (black) to 1.0
+   * The fractions for our shadow gradient, going from 0.0 (black) to 1.0
    * (transparent).
    */
   private static final float[] SHADOW_GRADIENT_FRACTIONS = new float[] { 0f, 1f };
-
   /**
    * The colors for our shadow, going from opaque black to transparent black.
    */
   private static final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
 
   private boolean activated;
-
-  /** The color. */
   private Color color;
   private int intensity;
-
   private Shape lightShape;
-
   private String lightShapeType;
-
-  /** The radius. */
   private int radius;
 
-  /**
-   * Instantiates a new light source.
-   *
-   * @param lightColor
-   *          the light color
-   */
   public LightSource(final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();
     this.color = lightColor;
@@ -86,11 +63,6 @@ public class LightSource extends Entity implements IRenderable {
     this.activated = false;
   }
 
-  /**
-   * Gets the color.
-   *
-   * @return the color
-   */
   public Color getColor() {
     return this.color;
   }
@@ -107,11 +79,6 @@ public class LightSource extends Entity implements IRenderable {
     return this.lightShapeType;
   }
 
-  /**
-   * Gets the radius.
-   *
-   * @return the radius
-   */
   public int getRadius() {
     return this.radius;
   }
@@ -183,13 +150,6 @@ public class LightSource extends Entity implements IRenderable {
     return null;
   }
 
-  /**
-   * Gets the shadow ellipse.
-   *
-   * @param mob
-   *          the mob
-   * @return the shadow ellipse
-   */
   private static Ellipse2D getShadowEllipse(final IEntity mob) {
     final int shadowHeight = (int) (mob.getHeight() / 4);
     final int shadowWidth = (int) (mob.getWidth() / 3);
@@ -200,28 +160,10 @@ public class LightSource extends Entity implements IRenderable {
     return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
   }
 
-  /**
-   * Checks if is in range.
-   *
-   * @param center
-   *          the center
-   * @param radius
-   *          the radius
-   * @return the predicate<? super mob>
-   */
   private static Predicate<? super IEntity> isInRange(final Point2D center, final float radius) {
     return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getDimensionCenter());
   }
 
-  /**
-   * Gets the obstructed vision area.
-   *
-   * @param mob
-   *          the mob
-   * @param center
-   *          the center
-   * @return the obstructed vision area
-   */
   private Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
     final Polygon shadowPolygon = new Polygon();
 
@@ -338,12 +280,6 @@ public class LightSource extends Entity implements IRenderable {
     g.setPaint(oldPaint);
   }
 
-  /**
-   * Sets the radius.
-   *
-   * @param radius
-   *          the new radius
-   */
   private void setRadius(final int radius) {
     this.radius = radius;
   }

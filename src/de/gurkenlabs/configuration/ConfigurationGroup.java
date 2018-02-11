@@ -16,9 +16,7 @@ import java.util.logging.Logger;
 public abstract class ConfigurationGroup {
   private static final Logger log = Logger.getLogger(ConfigurationGroup.class.getName());
 
-  /** The prefix. */
   private final String prefix;
-
   private boolean debug;
 
   /**

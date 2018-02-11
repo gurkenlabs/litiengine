@@ -81,7 +81,7 @@ public class Blueprint extends MapObject {
    * should be kept. This is currently used when objects are cut and pasted
    * afterwards.
    * 
-   * @return
+   * @return True if the ids for all {@link MapObject}s of this {@link Blueprint} should be re-applied after building new instances.
    */
   public boolean keepIds() {
     return this.keepIds;

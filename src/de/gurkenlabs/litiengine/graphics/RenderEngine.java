@@ -28,27 +28,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
-/**
- * The Class GraphicsEngine.
- */
 public final class RenderEngine implements IRenderEngine {
-
   private final EntityYComparator entityComparator;
-
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
-
   private final List<Predicate<IEntity>> entityRenderingConditions;
-
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
-
-  /** The map renderer. */
   private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
-  /**
-   * Instantiates a new graphics engine.
-   */
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
@@ -64,9 +51,13 @@ public final class RenderEngine implements IRenderEngine {
    * Draws the given string to the specified map location.
    *
    * @param g
+   *          The graphics object to draw on.
    * @param text
+   *          The text to be drawn
    * @param x
+   *          The x-coordinate of the text.
    * @param y
+   *          The y-coordinate of the text
    */
   public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
@@ -129,10 +120,16 @@ public final class RenderEngine implements IRenderEngine {
    * especially with antialiasing turned on.
    *
    * @param g
+   *          The graphics object to draw on.
    * @param text
+   *          The text to be drawn
    * @param x
+   *          The x-coordinate of the text.
    * @param y
+   *          The y-coordinate of the text
+   * 
    * @param shadow
+   *          The color of the shadow to be drawn
    */
   public static void drawTextWithShadow(final Graphics2D g, final String text, final double x, final double y, final Color shadow) {
     if (text == null || text.isEmpty()) {
@@ -174,7 +171,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   /***
-   * Note that rotating an image with 90/180/270 degree is way more performant
+   * Note that rotating an image with 90/180/270 degree is way more performant.
    * than rotating with in other degrees.
    * 
    * @param g

@@ -3,13 +3,15 @@ package de.gurkenlabs.litiengine.graphics.particles.xml;
 import java.io.Serializable;
 import java.util.Random;
 
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.util.MathUtilities;
+
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {
+  public static final int MAX_VALUE_UNDEFINED = -1;
   private static final long serialVersionUID = 4893417265998349179L;
 
   public static int randomInRange(final int min, final int max) {
@@ -22,37 +24,25 @@ public class ParticleParameter implements Serializable {
   @XmlAttribute
   private float minValue;
 
-  @XmlAttribute
-  private boolean randomValue;
-
-  @XmlAttribute
-  private float value;
-
   public ParticleParameter() {
   }
 
-  public ParticleParameter(final float value, final boolean randomValue, final float minValue, final float maxValue) {
-    if (minValue > maxValue) {
-      throw new IllegalArgumentException("minValue must be < than maxValue");
-    }
-
-    this.value = value;
-    this.randomValue = randomValue;
+  public ParticleParameter(final float minValue, final float maxValue) {
     this.minValue = minValue;
     this.maxValue = maxValue;
   }
 
   /**
-   * Gets either the acutal value or a random value, depending on the random
+   * Gets either the actual value or a random value, depending on the random
    * number flag being set.
    *
-   * @return
+   * @return The value of this parameter.
    */
   public float get() {
-    if (this.isRandomValue()) {
+    if (maxValue != -1 && minValue < maxValue) {
       return this.getRandomNumber();
     } else {
-      return this.getValue();
+      return this.getMinValue();
     }
   }
 
@@ -68,17 +58,7 @@ public class ParticleParameter implements Serializable {
 
   @XmlTransient
   public float getRandomNumber() {
-    return (float) (this.getMinValue() + Math.random() * (this.getMaxValue() - this.getMinValue() + 1));
-  }
-
-  @XmlTransient
-  public float getValue() {
-    return this.value;
-  }
-
-  @XmlTransient
-  public boolean isRandomValue() {
-    return this.randomValue;
+    return (float) MathUtilities.randomInRange(this.getMinValue(), this.getMaxValue());
   }
 
   public void setMaxValue(final float maxValue) {
@@ -87,13 +67,5 @@ public class ParticleParameter implements Serializable {
 
   public void setMinValue(final float minValue) {
     this.minValue = minValue;
-  }
-
-  public void setRandomValue(final boolean randomValue) {
-    this.randomValue = randomValue;
-  }
-
-  public void setValue(final float value) {
-    this.value = value;
   }
 }

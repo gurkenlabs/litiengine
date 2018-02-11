@@ -106,13 +106,6 @@ public final class MapUtilities {
     return new Point2D.Double(tileLocation.x * map.getTileSize().getWidth(), tileLocation.y * map.getTileSize().getHeight());
   }
 
-  /**
-   * Gets the tiles by pixel location.
-   *
-   * @param location
-   *          the location
-   * @return the tiles by pixel location
-   */
   public static List<ITile> getTilesByPixelLocation(final IMap map, final Point2D location) {
     final List<ITile> tilesAtLocation = new ArrayList<>();
     if (map.getTileLayers() == null || map.getTileLayers().isEmpty()) {

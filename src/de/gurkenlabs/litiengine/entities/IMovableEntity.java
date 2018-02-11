@@ -8,14 +8,14 @@ public interface IMovableEntity extends ICollisionEntity {
    * Gets a value that defines how long it takes the entity to reach the full
    * velocity (in ms).
    * 
-   * @return
+   * @return the acceleration value
    */
   public int getAcceleration();
 
   /**
    * Gets a value that defines how long it takes the entity to stop (in ms).
    * 
-   * @return
+   * @return the deceleration value
    */
   public int getDeceleration();
 
@@ -24,7 +24,7 @@ public interface IMovableEntity extends ICollisionEntity {
   /**
    * Gets the entitie's velocity in PIXEL / Second
    *
-   * @return
+   * @return the velocity in pixel per second
    */
   public float getVelocity();
 

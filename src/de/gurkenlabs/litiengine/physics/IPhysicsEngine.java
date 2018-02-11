@@ -24,13 +24,13 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public boolean collides(double x, double y, ICollisionEntity collisionEntity);
 
-  public boolean collides(double x, double y, int collisionType);
+  public boolean collides(double x, double y, CollisionType collisionType);
 
   public Point2D collides(Line2D rayCast);
 
   public boolean collides(Point2D point);
 
-  public boolean collides(Point2D point, int collisionType);
+  public boolean collides(Point2D point, CollisionType collisionType);
 
   public boolean collides(Point2D point, ICollisionEntity collisionEntity);
 
@@ -51,7 +51,7 @@ public interface IPhysicsEngine extends IUpdateable {
    * @return Returns true if the specified rectangle collides with any collision
    *         box of the specified type(s); otherwise false.
    */
-  public boolean collides(Rectangle2D rect, int collisionType);
+  public boolean collides(Rectangle2D rect, CollisionType collisionType);
 
   public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect);
 

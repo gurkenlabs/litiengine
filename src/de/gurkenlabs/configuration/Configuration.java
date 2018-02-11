@@ -17,11 +17,9 @@ import de.gurkenlabs.util.io.FileUtilities;
 
 public class Configuration {
   private static final Logger log = Logger.getLogger(Configuration.class.getName());
-  /** The Constant CONFIGURATION_FILE_NAME. */
   private static final String DEFAULT_CONFIGURATION_FILE_NAME = "config.properties";
 
   private final List<ConfigurationGroup> configurationGroups;
-
   private final String fileName;
 
   private boolean allowDebug = true;
