@@ -10,7 +10,7 @@ public class Spawnpoint extends Entity {
   private String spawnType;
 
   public Spawnpoint(double x, double y) {
-    this(-1, x, y);
+    this(0, x, y);
   }
 
   public Spawnpoint(int mapId, double x, double y) {

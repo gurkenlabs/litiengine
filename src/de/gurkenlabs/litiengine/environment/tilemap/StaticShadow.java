@@ -33,7 +33,7 @@ public class StaticShadow extends MapArea {
   private final CollisionBox origin;
 
   public StaticShadow(double x, double y, float width, float height, StaticShadowType shadowType) {
-    this(-1, null, x, y, width, height, shadowType);
+    this(0, null, x, y, width, height, shadowType);
   }
   
   public StaticShadow(int id, double x, double y, float width, float height, StaticShadowType shadowType) {
@@ -47,7 +47,7 @@ public class StaticShadow extends MapArea {
   }
 
   public StaticShadow(CollisionBox box) {
-    super(-1, null, box.getLocation().getX(), box.getLocation().getY(), box.getWidth(), box.getHeight());
+    super(0, null, box.getLocation().getX(), box.getLocation().getY(), box.getWidth(), box.getHeight());
     this.setShadowType(StaticShadowType.NONE);
     this.origin = box;
     this.shadowOffset = DEFAULT_OFFSET;

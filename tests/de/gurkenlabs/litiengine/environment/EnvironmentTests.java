@@ -1,16 +1,21 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -297,8 +302,8 @@ public class EnvironmentTests {
   @Test
   public void testGetNonExistingEntities() {
     this.testEnvironment.add(null);
-    this.testEnvironment.remove((IEntity)null);
-    this.testEnvironment.remove((Collection<IEntity>)null);
+    this.testEnvironment.remove((IEntity) null);
+    this.testEnvironment.remove((Collection<IEntity>) null);
     this.testEnvironment.clear();
 
     assertNull(this.testEnvironment.get(123456789));
@@ -372,5 +377,45 @@ public class EnvironmentTests {
     assertNotEquals(0, entity1.getMapId());
     assertNotEquals(0, entity2.getMapId());
     assertNotEquals(0, entity3.getMapId());
+  }
+
+  @Test
+  public void testFindEntitiesInShape() {
+    MapArea entity = new MapArea(0, 0, 10, 10);
+    MapArea entity2 = new MapArea(10, 10, 10, 10);
+
+    this.testEnvironment.add(entity);
+    this.testEnvironment.add(entity2);
+
+    List<IEntity> found = this.testEnvironment.findEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    List<IEntity> found2 = this.testEnvironment.findEntities(new Ellipse2D.Double(0, 0, 10, 10));
+    assertTrue(found.contains(entity));
+    assertFalse(found.contains(entity2));
+    assertTrue(found2.contains(entity));
+    assertFalse(found2.contains(entity2));
+  }
+
+  @Test
+  public void testFindCombatEntitiesInShape() {
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(123);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity.getHitBox()).thenReturn(new Ellipse2D.Double(0, 0, 10, 10));
+
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(456);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity2.getHitBox()).thenReturn(new Ellipse2D.Double(10, 10, 10, 10));
+    
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+    
+    List<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    List<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
+
+    assertTrue(found.contains(combatEntity));
+    assertFalse(found.contains(combatEntity2));
+    assertTrue(found2.contains(combatEntity));
+    assertFalse(found2.contains(combatEntity2));
   }
 }
