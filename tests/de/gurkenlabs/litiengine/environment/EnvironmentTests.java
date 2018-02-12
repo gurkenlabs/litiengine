@@ -102,6 +102,7 @@ public class EnvironmentTests {
   @Test
   public void testGetByName() {
     ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
     when(combatEntity.getName()).thenReturn("test");
     when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
 
