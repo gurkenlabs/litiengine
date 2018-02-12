@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,6 +18,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,6 +100,25 @@ public class EnvironmentTests {
   }
 
   @Test
+  public void testGetByName() {
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getName()).thenReturn("test");
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    assertNotNull(this.testEnvironment.get("test"));
+    assertNull(this.testEnvironment.get(""));
+    assertNull(this.testEnvironment.get(null));
+  }
+
+
+
+  @Test
   public void testMovableEntity() {
     IMovableEntity movableEntity = mock(IMovableEntity.class);
     when(movableEntity.getMapId()).thenReturn(456);
@@ -110,6 +132,7 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getMovableEntity("test"));
     assertEquals(1, this.testEnvironment.getMovableEntities().size());
     assertEquals(1, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(movableEntity);
@@ -278,7 +301,7 @@ public class EnvironmentTests {
     assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
-  
+
   @Test
   public void testRemoveById() {
     MapArea testArea = new MapArea(0, 0, 1, 1);
@@ -422,10 +445,10 @@ public class EnvironmentTests {
     when(combatEntity2.getMapId()).thenReturn(456);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
     when(combatEntity2.getHitBox()).thenReturn(new Ellipse2D.Double(10, 10, 10, 10));
-    
+
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
-    
+
     List<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
     List<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
 
@@ -434,7 +457,7 @@ public class EnvironmentTests {
     assertTrue(found2.contains(combatEntity));
     assertFalse(found2.contains(combatEntity2));
   }
-  
+
   @Test
   public void testLoading() {
     CollisionBox testCollider = new CollisionBox(true);
@@ -442,13 +465,13 @@ public class EnvironmentTests {
     testCollider.setName("test");
 
     this.testEnvironment.add(testCollider);
-    
+
     Prop testProp = new Prop(0, 0, null);
     testProp.setMapId(1);
     testProp.setName("test");
 
     this.testEnvironment.add(testProp);
-    
+
     Emitter testEmitter = new Emitter(1, 1) {
       @Override
       protected Particle createNewParticle() {
@@ -460,22 +483,22 @@ public class EnvironmentTests {
     testEmitter.setName("test");
 
     this.testEnvironment.add(testEmitter);
-    
+
     this.testEnvironment.load();
-    
+
     // load a second time to ensure nothing brakes
     this.testEnvironment.load();
-    
+
     assertTrue(this.testEnvironment.isLoaded());
-    
+
     CollisionBox testCollider2 = new CollisionBox(true);
     testCollider.setMapId(2);
     testCollider.setName("test2");
-    
+
     this.testEnvironment.add(testCollider2);
-    
+
     this.testEnvironment.unload();
-    
+
     assertFalse(this.testEnvironment.isLoaded());
   }
 }
