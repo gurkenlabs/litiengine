@@ -9,7 +9,7 @@ public enum Align {
     }
 
     try {
-      return Align.valueOf(align);
+      return Align.valueOf(align.toUpperCase());
     } catch (final IllegalArgumentException iae) {
       return Align.CENTER;
     }

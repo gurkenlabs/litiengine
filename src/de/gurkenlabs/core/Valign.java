@@ -9,7 +9,7 @@ public enum Valign {
     }
 
     try {
-      return Valign.valueOf(valign);
+      return Valign.valueOf(valign.toUpperCase());
     } catch (final IllegalArgumentException iae) {
       return Valign.DOWN;
     }
