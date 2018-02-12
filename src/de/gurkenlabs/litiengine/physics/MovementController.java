@@ -58,10 +58,6 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
     this.movedConsumer.add(cons);
   }
 
-  protected IPhysicsEngine getPhysicsEngine() {
-    return Game.getPhysicsEngine();
-  }
-
   protected void moveEntity(double deltaX, double deltaY) {
     final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + deltaX, this.getEntity().getLocation().getY() + deltaY);
     Game.getPhysicsEngine().move(this.getEntity(), newLocation);
@@ -96,14 +92,14 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
         continue;
       }
 
-      final Point2D collisionBoxCenter = new Point2D.Double(this.getEntity().getCollisionBox().getCenterX(), this.getEntity().getCollisionBox().getCenterY());
+      final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
       if (collisionBoxCenter.distance(force.getLocation()) < FORCE_APPLY_ACCEPTED_ERROR) {
         final double yDelta = this.getEntity().getHeight() - this.getEntity().getCollisionBox().getHeight() + this.getEntity().getCollisionBox().getHeight() / 2;
         final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
         this.getEntity().setLocation(entityLocation);
       } else {
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final boolean success = this.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength());
+        final boolean success = Game.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength());
         if (force.cancelOnCollision() && !success) {
           force.end();
         }
