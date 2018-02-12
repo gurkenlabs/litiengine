@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
@@ -14,18 +13,10 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.MathUtilities;
 
-public class StaticShadowLayer implements IRenderable {
-  private int alpha;
-  private Color color;
-  private final IEnvironment environment;
-  private Image image;
-
+public class StaticShadowLayer extends ColorLayer implements IRenderable {
   public StaticShadowLayer(IEnvironment env, int alpha, Color color) {
-    this.environment = env;
-    this.alpha = alpha;
-    this.color = color;
+    super(env, color, alpha);
   }
 
   @Override
@@ -33,28 +24,11 @@ public class StaticShadowLayer implements IRenderable {
     RenderEngine.renderImage(g, this.getImage(), Game.getCamera().getViewPortLocation(0, 0));
   }
 
-  public int getAlpha() {
-    return this.alpha;
-  }
-
-  public Color getColor() {
-    return this.color;
-  }
-
-  public void setAlpha(int ambientAlpha) {
-    this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
-    this.createImage();
-  }
-
-  public void setColor(final Color color) {
-    this.color = color;
-    this.createImage();
-  }
-
+  @Override
   public void createImage() {
     final String cacheKey = this.getCacheKey();
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
-      this.image = ImageCache.IMAGES.get(cacheKey);
+      this.setImage(ImageCache.IMAGES.get(cacheKey));
       return;
     }
 
@@ -64,7 +38,7 @@ public class StaticShadowLayer implements IRenderable {
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the
     // list of static shadows.
-    for (final StaticShadow shadow : this.environment.getStaticShadows()) {
+    for (final StaticShadow shadow : this.getEnvironment().getStaticShadows()) {
       final double shadowX = shadow.getLocation().getX();
       final double shadowY = shadow.getLocation().getY();
       final double shadowWidth = shadow.getWidth();
@@ -154,14 +128,14 @@ public class StaticShadowLayer implements IRenderable {
       }
     }
 
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getEnvironment().getMap().getSizeInPixels().getWidth(), (int) this.getEnvironment().getMap().getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
     g.setColor(shadowColor);
 
     final Area ar = new Area();
     for (final Path2D staticShadow : newStaticShadows) {
       final Area staticShadowArea = new Area(staticShadow);
-      for (final LightSource light : this.environment.getLightSources()) {
+      for (final LightSource light : this.getEnvironment().getLightSources()) {
         if (light.getDimensionCenter().getY() > staticShadow.getBounds2D().getMaxY() || staticShadow.getBounds2D().contains(light.getDimensionCenter())) {
           staticShadowArea.subtract(new Area(light.getLightShape()));
         }
@@ -173,31 +147,27 @@ public class StaticShadowLayer implements IRenderable {
     g.fill(ar);
     g.dispose();
 
-    this.image = img;
+    this.setImage(img);
 
     ImageCache.IMAGES.put(cacheKey, img);
   }
-
-  private Image getImage() {
-    this.createImage();
-    return this.image;
-  }
-
-  private String getCacheKey() {
+  
+  @Override
+  protected String getCacheKey() {
     final StringBuilder sb = new StringBuilder();
     sb.append(this.getColor());
     sb.append(this.getAlpha());
 
-    for (final StaticShadow shadow : this.environment.getStaticShadows()) {
+    for (final StaticShadow shadow : this.getEnvironment().getStaticShadows()) {
       sb.append(shadow.getShadowType());
       sb.append(shadow.getLocation());
       sb.append(shadow.getWidth());
       sb.append(shadow.getHeight());
     }
 
-    sb.append(this.environment.getMap().getSizeInPixels());
+    sb.append(this.getEnvironment().getMap().getSizeInPixels());
 
     final int key = sb.toString().hashCode();
-    return "staticshadow-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
+    return "staticshadow-" + this.getEnvironment().getMap().getFileName() + "-" + Integer.toString(key);
   }
 }
