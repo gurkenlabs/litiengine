@@ -26,6 +26,10 @@ public class StaticShadowLayer extends ColorLayer implements IRenderable {
 
   @Override
   public void createImage() {
+    if (this.getColor() == null) {
+      return;
+    }
+
     final String cacheKey = this.getCacheKey();
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       this.setImage(ImageCache.IMAGES.get(cacheKey));
@@ -151,7 +155,7 @@ public class StaticShadowLayer extends ColorLayer implements IRenderable {
 
     ImageCache.IMAGES.put(cacheKey, img);
   }
-  
+
   @Override
   protected String getCacheKey() {
     final StringBuilder sb = new StringBuilder();
