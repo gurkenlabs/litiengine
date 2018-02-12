@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.environment;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.awt.Dimension;
@@ -13,9 +15,6 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 
 public class EnvironmentEventTests {
   private IEnvironment testEnvironment;
