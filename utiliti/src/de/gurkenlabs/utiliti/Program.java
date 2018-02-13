@@ -106,7 +106,7 @@ public class Program {
 
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("litiengine creation kit");
-    Game.getInfo().setVersion("v0.4.8-alpha");
+    Game.getInfo().setVersion("v0.4.9-alpha");
 
     initSystemTray();
 
