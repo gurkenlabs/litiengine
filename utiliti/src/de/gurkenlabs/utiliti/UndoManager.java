@@ -29,6 +29,8 @@ public class UndoManager {
 
   private static HashMap<String, UndoManager> instance;
   private static List<Consumer<UndoManager>> undoStackChangedConsumers;
+  private static List<Consumer<UndoManager>> mapObjectAdded;
+  private static List<Consumer<UndoManager>> mapObjectRemoved;
 
   private UndoManager(String mapName) {
     this.changing = new CopyOnWriteArrayList<>();
@@ -39,6 +41,8 @@ public class UndoManager {
   static {
     instance = new HashMap<>();
     undoStackChangedConsumers = new CopyOnWriteArrayList<>();
+    mapObjectAdded = new CopyOnWriteArrayList<>();
+    mapObjectRemoved = new CopyOnWriteArrayList<>();
   }
 
   public static UndoManager instance() {
@@ -144,7 +148,8 @@ public class UndoManager {
     }
 
     if (this.changing.contains(mapObject)) {
-      // the old state is already tracked, while multiple changes are carried out, we
+      // the old state is already tracked, while multiple changes are carried
+      // out, we
       // don't want to track the steps in between
       return;
     }
@@ -183,6 +188,7 @@ public class UndoManager {
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.DELETE);
     fireUndoStackChangedEvent(this);
+    fireUndoManagerEvent(mapObjectRemoved, this);
   }
 
   public void mapObjectAdded(IMapObject mapObject) {
@@ -196,14 +202,27 @@ public class UndoManager {
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD);
     fireUndoStackChangedEvent(this);
+    fireUndoManagerEvent(mapObjectAdded, this);
   }
 
   public static void onUndoStackChanged(Consumer<UndoManager> cons) {
     undoStackChangedConsumers.add(cons);
   }
 
+  public static void onMapObjectAdded(Consumer<UndoManager> cons) {
+    mapObjectAdded.add(cons);
+  }
+
+  public static void onMapObjectRemoved(Consumer<UndoManager> cons) {
+    mapObjectRemoved.add(cons);
+  }
+
   private static final void fireUndoStackChangedEvent(UndoManager undoManager) {
-    for (Consumer<UndoManager> cons : undoStackChangedConsumers) {
+    fireUndoManagerEvent(undoStackChangedConsumers, undoManager);
+  }
+
+  private static final void fireUndoManagerEvent(List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
+    for (Consumer<UndoManager> cons : consumers) {
       cons.accept(undoManager);
     }
   }
@@ -263,8 +282,10 @@ public class UndoManager {
   }
 
   private void clearRedoSteps() {
-    // whenever a new UndoState gets added, while we're in the middle of the current
-    // stack, we need to remove all future redo steps because the new state will now
+    // whenever a new UndoState gets added, while we're in the middle of the
+    // current
+    // stack, we need to remove all future redo steps because the new state will
+    // now
     // be the last element
     int index = this.currentIndex + 1;
     while (this.undoStack[index] != null && index < MAX_STACK_SIZE) {

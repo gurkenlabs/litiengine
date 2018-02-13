@@ -302,9 +302,9 @@ public class MapSelectionPanel extends JSplitPane {
     if (model.contains(mapName)) {
       mapList.setSelectedValue(mapName, true);
     }
-
-    Game.getEnvironment().onEntityAdded(ent -> this.populateMapObjectTree());
-    Game.getEnvironment().onEntityRemoved(ent -> this.populateMapObjectTree());
+    
+    UndoManager.onMapObjectAdded(manager -> this.populateMapObjectTree());
+    UndoManager.onMapObjectRemoved(manager -> this.populateMapObjectTree());
     this.initLayerControl();
     this.populateMapObjectTree();
   }

@@ -49,9 +49,6 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
-    if (Game.getEnvironment() != null) {
-      Game.getEnvironment().getEntities().add(this);
-    }
   }
 
   protected Entity(int mapId) {

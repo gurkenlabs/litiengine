@@ -33,8 +33,8 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
 
     this.isFocussing = true;
 
-    this.clearControls();
     if (this.dataSource == null) {
+      this.clearControls();
       return;
     }
 
