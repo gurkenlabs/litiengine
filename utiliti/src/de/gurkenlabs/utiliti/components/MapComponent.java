@@ -663,7 +663,8 @@ public class MapComponent extends EditorComponent {
 
         if (map.getMapObjectLayers().isEmpty()) {
 
-          // make sure there's a map object layer on the map because we need one to add
+          // make sure there's a map object layer on the map because we need one
+          // to add
           // any kind of entities
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
@@ -1040,10 +1041,15 @@ public class MapComponent extends EditorComponent {
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    double newX = this.snapX(dragLocationMapObject.getX() + deltaX);
-    double newY = this.snapY(dragLocationMapObject.getY() + deltaY);
-    dragObject.setX((int) newX);
-    dragObject.setY((int) newY);
+    int newX = this.snapX(dragLocationMapObject.getX() + deltaX);
+    int newY = this.snapY(dragLocationMapObject.getY() + deltaY);
+
+    if (newX == dragObject.getX() && newY == dragObject.getY()) {
+      return;
+    }
+    
+    dragObject.setX(newX);
+    dragObject.setY(newY);
 
     Game.getEnvironment().reloadFromMap(dragObject.getId());
 
@@ -1338,10 +1344,10 @@ public class MapComponent extends EditorComponent {
           }
 
           if (somethingIsFocused) {
-            if(rect.getWidth() == 0 && rect.getHeight()== 0) {
+            if (rect.getWidth() == 0 && rect.getHeight() == 0) {
               break;
             }
-            
+
             this.setSelection(mapObject, false, true);
             continue;
           }
