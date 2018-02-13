@@ -6,6 +6,7 @@ import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
@@ -112,21 +113,28 @@ public class AmbientLight extends ColorLayer implements IRenderable {
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {
     final Point2D lightCenter = light.getDimensionCenter();
 
-    final Area lightArea = new Area(light.getLightShape());
+    Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
       g.setColor(light.getColor());
-      g.fill(lightArea);
+      g.fill(light.getBoundingBox());
       return;
     }
 
     // cut the light area where shadow Boxes are (this simulates light falling
     // into and out of rooms)
     for (final StaticShadow col : this.getEnvironment().getStaticShadows()) {
-      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
+      if (!light.getBoundingBox().intersects(col.getBoundingBox())) {
         continue;
       }
+
       final Area boxInLight = new Area(col.getBoundingBox());
+      if (lightArea == null) {
+        lightArea = new Area(light.getLightShape());
+      }
       boxInLight.intersect(lightArea);
+      if (boxInLight.isEmpty()) {
+        continue;
+      }
 
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
       for (final Line2D line : bounds) {
@@ -161,14 +169,10 @@ public class AmbientLight extends ColorLayer implements IRenderable {
 
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
-    final Area lightRadiusArea = new Area(light.getLightShape());
+    final Shape lightShape = light.getLightShape();
     final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
-    try {
-      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightRadiusArea.getBounds2D().getCenterX(), lightRadiusArea.getBounds2D().getCenterY()), (float) (lightRadiusArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
-    } catch (final Exception e) {
-      g.setColor(light.getColor());
-    }
-    g.fill(lightArea);
+    g.setPaint(new RadialGradientPaint(new Point2D.Double(lightShape.getBounds2D().getCenterX(), lightShape.getBounds2D().getCenterY()), (float) (lightShape.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
+    g.fill(lightArea == null ? light.getBoundingBox() : lightArea);
     g.setPaint(oldPaint);
   }
 }
