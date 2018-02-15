@@ -534,7 +534,6 @@ public class Program {
 
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
         EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
-        EditorScreen.instance().mapChanged();
       }
     });
 
@@ -746,7 +745,6 @@ public class Program {
 
     UndoManager.onUndoStackChanged(manager -> {
       EditorScreen.instance().getMapComponent().updateTransformControls();
-      EditorScreen.instance().mapChanged();
       undo.setEnabled(manager.canUndo());
       redo.setEnabled(manager.canRedo());
     });

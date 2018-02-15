@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -26,6 +27,7 @@ public class UndoManager {
   private int currentIndex = -1;
   private final String mapName;
   private int operation = 0;
+  private boolean saved = true;
 
   private static HashMap<String, UndoManager> instance;
   private static List<Consumer<UndoManager>> undoStackChangedConsumers;
@@ -217,7 +219,22 @@ public class UndoManager {
     mapObjectRemoved.add(cons);
   }
 
+  public static boolean hasChanges(IMap map) {
+    if (instance.containsKey(map.getName())) {
+      return !instance.get(map.getName()).saved;
+    }
+
+    return false;
+  }
+
+  static void save(IMap map) {
+    if (instance.containsKey(map.getName())) {
+      instance.get(map.getName()).saved = true;
+    }
+  }
+
   private static final void fireUndoStackChangedEvent(UndoManager undoManager) {
+    undoManager.saved = false;
     fireUndoManagerEvent(undoStackChangedConsumers, undoManager);
   }
 

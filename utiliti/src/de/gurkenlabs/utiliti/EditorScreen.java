@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -81,11 +80,8 @@ public class EditorScreen extends Screen {
   private long statusTick;
   private String currentStatus;
 
-  private final List<Map> changedMaps;
-
   private EditorScreen() {
     this.comps = new ArrayList<>();
-    this.changedMaps = new CopyOnWriteArrayList<>();
   }
 
   public static EditorScreen instance() {
@@ -515,14 +511,6 @@ public class EditorScreen extends Screen {
     this.statusTick = Game.getLoop().getTicks();
   }
 
-  public void mapChanged() {
-    if (this.changedMaps.contains(Game.getEnvironment().getMap())) {
-      return;
-    }
-
-    this.changedMaps.add((Map) Game.getEnvironment().getMap());
-  }
-
   public void updateGameFileMaps() {
     this.getGameFile().getMaps().clear();
     for (Map map : this.mapComponent.getMaps()) {
@@ -544,12 +532,13 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    this.changedMaps.clear();
+    this.getMapSelectionPanel().bind(this.getMapComponent().getMaps());
     return saveFile;
   }
 
   private void saveMaps() {
-    for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
+    for (Map map : this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList())) {
+      UndoManager.save(map);
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
         log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });

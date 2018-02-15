@@ -214,10 +214,8 @@ public class MapSelectionPanel extends JSplitPane {
     this.tree = new JTree();
     tree.setBorder(null);
 
-
     tree.setCellRenderer(new IconTreeListRenderer());
     tree.setMaximumSize(new Dimension(0, 250));
-
 
     tree.addTreeSelectionListener(e -> {
       this.isFocussing = true;
@@ -286,9 +284,14 @@ public class MapSelectionPanel extends JSplitPane {
 
   public void bind(List<Map> maps) {
     model.clear();
-    for (int i = 0; i < maps.size(); i++) {
-      model.addElement(maps.get(i).getFileName());
+    for (Map map : maps) {
+      String name = map.getFileName();
+      if (UndoManager.hasChanges(map)) {
+        name += " *";
+      }
+      model.addElement(name);
     }
+    
     mapList.setVisible(false);
     mapList.setVisible(true);
   }
@@ -302,9 +305,10 @@ public class MapSelectionPanel extends JSplitPane {
     if (model.contains(mapName)) {
       mapList.setSelectedValue(mapName, true);
     }
-    
+
     UndoManager.onMapObjectAdded(manager -> this.populateMapObjectTree());
     UndoManager.onMapObjectRemoved(manager -> this.populateMapObjectTree());
+    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
     this.initLayerControl();
     this.populateMapObjectTree();
   }
