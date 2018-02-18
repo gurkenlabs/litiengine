@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;

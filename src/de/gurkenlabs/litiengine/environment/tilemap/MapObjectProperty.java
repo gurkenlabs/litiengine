@@ -63,7 +63,10 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  public static class Emitter{
+  public static final  class Emitter{
+    private Emitter() {
+    }
+    
     public static final String COLORS = "emitterColors";
     public static final String COLORPROBABILITIES = "emitterColorProbabilities";
     public static final String SPAWNRATE = "emitterSpawnRate";
@@ -76,7 +79,10 @@ public final class MapObjectProperty {
     public static final String ALPHADEVIATION = "emitterAlphaDeviation";
   }
 
-  public static class Particle{
+  public static final class Particle{
+    private Particle() {
+    }
+    
     public static final String MINX = "particleMinX";
     public static final String MAXX = "particleMaxX";
     public static final String X_RANDOM = "particleXRandom";
