@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -25,7 +27,19 @@ public class TagPanel extends JPanel {
   public TagPanel() {
     setBorder(null);
     WrapLayout wrapLayout = new WrapLayout(FlowLayout.LEADING, 0, 0);
-
+    this.addContainerListener(new ContainerListener() {
+      
+      @Override
+      public void componentRemoved(ContainerEvent e) {
+        fireActionPerformed();
+      }
+      
+      @Override
+      public void componentAdded(ContainerEvent e) {
+        fireActionPerformed();
+      }
+    });
+    
     this.setLayout(wrapLayout);
 
     this.textFieldInput = new JTextField();
@@ -92,7 +106,6 @@ public class TagPanel extends JPanel {
     }
     super.revalidate();
     this.repaint();
-    this.fireActionPerformed();
   }
 
   public synchronized void addActionListener(ActionListener l) {

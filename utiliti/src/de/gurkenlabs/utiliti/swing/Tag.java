@@ -75,7 +75,7 @@ public class Tag extends JPanel {
   private class InternalTagPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
-      return new Dimension(super.getMinimumSize().width, 19);
+      return new Dimension(super.getMinimumSize().width, 17);
     }
   }
 }
