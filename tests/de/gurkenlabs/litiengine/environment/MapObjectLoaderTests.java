@@ -118,6 +118,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testTrigger");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getWidth()).thenReturn(200);
+    when(mapObject.getHeight()).thenReturn(200);
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
