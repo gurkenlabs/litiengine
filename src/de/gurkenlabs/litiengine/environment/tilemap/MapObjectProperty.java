@@ -9,6 +9,9 @@ import java.util.logging.Logger;
 
 public final class MapObjectProperty {
   private static final Logger log = Logger.getLogger(MapObjectProperty.class.getName());
+  
+  public static final String TAGS = "tags";
+  
   // collision entity
   public static final String COLLISION = "collision";
   public static final String COLLISION_ALGIN = "collisionAlign";

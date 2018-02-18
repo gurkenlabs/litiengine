@@ -46,6 +46,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
     Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
     if (opt.isPresent()) {
+      // clear property if the value is null because there is no need to keep it
+      if (value == null || value.isEmpty()) {
+        this.properties.removeIf(x -> x.getName().equals(name));
+        return;
+      }
+
       opt.get().setValue(value);
       return;
     }
