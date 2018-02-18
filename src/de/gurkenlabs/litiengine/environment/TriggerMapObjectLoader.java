@@ -39,8 +39,9 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       }
     }
 
-    final Trigger trigger = new Trigger(act, mapObject.getName(), message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
-
+    final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
+    this.loadProperties(trigger, mapObject);
+    
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {
         trigger.addTarget(target);
@@ -52,10 +53,6 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
         trigger.addActivator(activator);
       }
     }
-
-    trigger.setMapId(mapObject.getId());
-    trigger.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    trigger.setLocation(new Point2D.Double(mapObject.getLocation().x, mapObject.getLocation().y));
 
     trigger.setCooldown(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
 

@@ -65,7 +65,7 @@ public abstract class Entity implements IEntity {
     this(mapId);
     this.name = name;
   }
-
+  
   @Override
   public float getAngle() {
     return this.angle;

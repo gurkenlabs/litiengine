@@ -32,13 +32,20 @@ public class StaticShadow extends MapArea {
   private int shadowOffset;
   private final CollisionBox origin;
 
+  public StaticShadow(StaticShadowType shadowType) {
+    this.shadowType = shadowType;
+    this.shadowOffset = DEFAULT_OFFSET;
+    this.origin = null;
+  }
+
   public StaticShadow(double x, double y, float width, float height, StaticShadowType shadowType) {
     this(0, null, x, y, width, height, shadowType);
   }
-  
+
   public StaticShadow(int id, double x, double y, float width, float height, StaticShadowType shadowType) {
     this(id, null, x, y, width, height, shadowType);
   }
+
   public StaticShadow(int id, String name, double x, double y, float width, float height, StaticShadowType shadowType) {
     super(id, name, x, y, width, height);
     this.setShadowType(shadowType);

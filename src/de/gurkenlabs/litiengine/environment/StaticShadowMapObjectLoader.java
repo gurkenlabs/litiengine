@@ -25,7 +25,9 @@ public class StaticShadowMapObjectLoader extends MapObjectLoader {
     StaticShadowType type = mapObject.getCustomPropertyEnum(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.DOWN);
     int offset = mapObject.getCustomPropertyInt(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET);
 
-    StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().width, mapObject.getDimension().height, type);
+    StaticShadow shadow = new StaticShadow(type);
+    this.loadProperties(shadow, mapObject);
+    
     shadow.setOffset(offset);
     entities.add(shadow);
     return entities;

@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,14 +33,39 @@ public class CustomEmitter extends Emitter {
 
   private final EmitterData emitterData;
 
+  public CustomEmitter(EmitterData emitterData) {
+    super();
+    this.emitterData = emitterData;
+    this.init();
+  }
+
+  public CustomEmitter(Point2D location, EmitterData emitterData) {
+    super(location);
+    this.emitterData = emitterData;
+    this.init();
+  }
+
+  public CustomEmitter(Point2D location, final String emitterXml) {
+    super(location);
+
+    this.emitterData = load(emitterXml);
+    if (this.emitterData == null) {
+      this.delete();
+      return;
+    }
+
+    this.init();
+
+  }
+
   public CustomEmitter(final double x, final double y, EmitterData emitterData) {
     super(x, y);
     this.emitterData = emitterData;
     this.init();
   }
 
-  public CustomEmitter(final double originX, final double originY, final String emitterXml) {
-    super(originX, originY);
+  public CustomEmitter(final double x, final double y, final String emitterXml) {
+    super(x, y);
 
     this.emitterData = load(emitterXml);
     if (this.emitterData == null) {
@@ -127,10 +153,10 @@ public class CustomEmitter extends Emitter {
       break;
     case SPRITE:
       Spritesheet sprite = Spritesheet.find(this.getEmitterData().getSpritesheet());
-      if(sprite == null) {
+      if (sprite == null) {
         return null;
       }
-      
+
       particle = new SpriteParticle(sprite.getSprite(MathUtilities.randomInRange(0, sprite.getTotalNumberOfSprites() - 1)), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth)
           .setDeltaHeight(deltaHeight);
       break;

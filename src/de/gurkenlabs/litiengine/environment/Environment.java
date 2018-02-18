@@ -629,6 +629,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Collection<String> getUsedTags() {
+    return this.entitiesByTag.keySet();
+  }
+
+  @Override
   public final void init() {
     if (this.initialized) {
       return;
@@ -747,6 +752,10 @@ public class Environment implements IEnvironment {
     for (String tag : entity.getTags()) {
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).remove(entity);
+
+        if (this.entitiesByTag.get(tag).isEmpty()) {
+          this.entitiesByTag.remove(tag);
+        }
       }
     }
 
@@ -815,10 +824,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public <T extends IEntity> void remove(Collection<T> entities) {
-    if(entities == null) {
+    if (entities == null) {
       return;
     }
-    
+
     for (T ent : entities) {
       this.remove(ent);
     }

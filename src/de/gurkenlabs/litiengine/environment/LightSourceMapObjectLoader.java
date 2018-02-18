@@ -43,10 +43,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     }
 
     final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
-    light.setSize((float) mapObject.getDimension().getWidth(), (float) mapObject.getDimension().getHeight());
-    light.setLocation(mapObject.getLocation());
-    light.setMapId(mapObject.getId());
-    light.setName(mapObject.getName());
+    this.loadProperties(light, mapObject);
 
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(light);
