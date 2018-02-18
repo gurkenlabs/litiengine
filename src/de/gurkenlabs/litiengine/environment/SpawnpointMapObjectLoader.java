@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.awt.Point;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.Direction;

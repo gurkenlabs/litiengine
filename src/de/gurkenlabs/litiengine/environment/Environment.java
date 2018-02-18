@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -629,8 +630,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<String> getUsedTags() {
-    return this.entitiesByTag.keySet();
+  public List<String> getUsedTags() {
+    final List<String> tags = this.entitiesByTag.keySet().stream().collect(Collectors.toList());
+    Collections.sort(tags);
+
+    return tags;
   }
 
   @Override

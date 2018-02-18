@@ -148,7 +148,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Spawnpoint> getSpawnPoints();
 
-  public Collection<String> getUsedTags();
+  public List<String> getUsedTags();
 
   public Trigger getTrigger(int mapId);
 

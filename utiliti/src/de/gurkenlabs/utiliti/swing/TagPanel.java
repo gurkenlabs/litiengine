@@ -9,13 +9,17 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.util.ArrayUtilities;
 
 public class TagPanel extends JPanel {
+  private static final int MAX_TAG_LENGTH = 15;
   private JTextField textFieldInput;
 
   public TagPanel() {
@@ -50,16 +54,33 @@ public class TagPanel extends JPanel {
     this.textFieldInput.addKeyListener(new KeyAdapter() {
       @Override
       public void keyTyped(KeyEvent e) {
-        // limit tags to 20 characters
-        if (textFieldInput.getText() != null && textFieldInput.getText().length() >= 20) {
+        // limit tags to MAX_TAG_LENGTH characters
+        if (textFieldInput.getText() != null && textFieldInput.getText().length() >= MAX_TAG_LENGTH) {
           e.consume();
         }
 
-        char c = e.getKeyChar();
+        final char c = e.getKeyChar();
 
         if (!(Character.isAlphabetic(c) || Character.isDigit(c) || c == '_' || c == KeyEvent.VK_MINUS || c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE)) {
           e.consume();
         }
+
+        // force lower case for tags
+        if (Character.isAlphabetic(c)) {
+          e.setKeyChar(Character.toLowerCase(e.getKeyChar()));
+        }
+      }
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+        textFieldInput.setText(textFieldInput.getText().toLowerCase());
+
+        final char c = e.getKeyChar();
+        if (c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE) {
+          return;
+        }
+
+        autoComplete();
       }
     });
   }
@@ -88,6 +109,10 @@ public class TagPanel extends JPanel {
     }
 
     return tags;
+  }
+
+  public List<String> getTagStrings() {
+    return this.getTags().stream().map(x -> x.getTag()).collect(Collectors.toList());
   }
 
   public String getTagsString() {
@@ -121,10 +146,10 @@ public class TagPanel extends JPanel {
 
       this.add(new Tag(tag));
     }
-    
+
     // remove all tags that are no longer present
-    for(Tag currentTag : this.getTags()) {
-      if(!tags.contains(currentTag.getTag())){
+    for (Tag currentTag : this.getTags()) {
+      if (!tags.contains(currentTag.getTag())) {
         this.remove(currentTag);
       }
     }
@@ -151,5 +176,28 @@ public class TagPanel extends JPanel {
 
       listener.actionPerformed(e);
     }
+  }
+
+  private void autoComplete() {
+    String autoCompletion = this.findAutoCompletion(this.textFieldInput.getText());
+    if (autoCompletion == null) {
+      return;
+    }
+
+    final int currentCaretPosition = this.textFieldInput.getCaretPosition();
+    this.textFieldInput.setText(autoCompletion);
+    this.validate();
+
+    this.textFieldInput.setCaretPosition(this.textFieldInput.getText().length());
+    this.textFieldInput.moveCaretPosition(currentCaretPosition);
+  }
+
+  private String findAutoCompletion(String currentText) {
+    if (currentText == null || currentText.trim().length() == 0) {
+      return null;
+    }
+
+    Optional<String> found = Game.getEnvironment().getUsedTags().stream().filter(x -> x != null && !this.getTagStrings().contains(x) && x.startsWith(currentText.toLowerCase())).findFirst();
+    return found.isPresent() ? found.get() : null;
   }
 }
