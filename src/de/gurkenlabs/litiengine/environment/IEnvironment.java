@@ -66,7 +66,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IEntity get(final String name);
 
-  public List<IEntity> getByTag(final String tag);
+  public Collection<IEntity> getByTag(final String tag);
+
+  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String tag);
 
   public AmbientLight getAmbientLight();
 
@@ -155,21 +157,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Trigger getTrigger(String name);
 
   public Collection<Trigger> getTriggers();
-
-  /**
-   * Gets all triggers with the specified name.
-   * 
-   * @param name
-   *          The name of the trigger
-   * @return A collection of all triggers with the specified name.
-   * @deprecated This method is deprecated and will be removed in future
-   *             versions. While it is not forced, names are considered to be
-   *             unique for entities. Use Tags rather than the Name to search
-   *             multiple entities by the same string. (see
-   *             {@link #getByTag(String)}, {@link Entity#addTag(String)})
-   */
-  @Deprecated
-  public Collection<Trigger> getTriggers(String name);
 
   public boolean isLoaded();
 

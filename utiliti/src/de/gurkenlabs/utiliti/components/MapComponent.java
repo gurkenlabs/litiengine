@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.FocusAdapter;
@@ -1047,7 +1048,7 @@ public class MapComponent extends EditorComponent {
     if (newX == dragObject.getX() && newY == dragObject.getY()) {
       return;
     }
-    
+
     dragObject.setX(newX);
     dragObject.setY(newY);
 
@@ -1462,13 +1463,31 @@ public class MapComponent extends EditorComponent {
   }
 
   private void renderName(Graphics2D g, Color nameColor, IMapObject mapObject) {
+    final int MAX_TAGS_RENDER_CHARS = 30;
+    g.setColor(nameColor.getAlpha() > 100 ? nameColor : Color.WHITE);
+    float textSize = 2.5f * zooms[this.currentZoomIndex];
+    g.setFont(Program.TEXT_FONT.deriveFont(textSize).deriveFont(Font.PLAIN));
+
     String objectName = mapObject.getName();
     if (objectName != null && !objectName.isEmpty()) {
-      g.setColor(nameColor.getAlpha() > 100 ? nameColor : Color.WHITE);
-      float textSize = 2.5f * zooms[this.currentZoomIndex];
-      g.setFont(Program.TEXT_FONT.deriveFont(textSize).deriveFont(Font.PLAIN));
       Game.getRenderEngine().renderText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
     }
+
+    // render tags
+    String tags = mapObject.getCustomProperty(MapObjectProperty.TAGS);
+    if (tags == null || tags.isEmpty()) {
+      return;
+    }
+
+    FontMetrics fm = g.getFontMetrics();
+
+    double y = objectName != null && !objectName.isEmpty() ? mapObject.getBoundingBox().getMaxY() - 2 - fm.getMaxDescent() : mapObject.getBoundingBox().getMaxY() - 1;
+    if (tags.length() > MAX_TAGS_RENDER_CHARS) {
+      tags = tags.substring(0, MAX_TAGS_RENDER_CHARS - 1);
+      tags += "...";
+    }
+
+    Game.getRenderEngine().renderText(g, "[" + tags + "]", mapObject.getX() + 1, y);
   }
 
   private void renderGrid(Graphics2D g) {

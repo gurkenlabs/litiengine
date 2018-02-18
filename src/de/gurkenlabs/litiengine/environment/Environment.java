@@ -213,7 +213,16 @@ public class Environment implements IEnvironment {
       this.mapAreas.add((MapArea) entity);
     }
 
-    for (String tag : entity.getTags()) {
+    for (String rawTag : entity.getTags()) {
+      if (rawTag == null) {
+        continue;
+      }
+
+      final String tag = rawTag.trim().toLowerCase();
+      if (tag.isEmpty()) {
+        continue;
+      }
+
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).add(entity);
         continue;
@@ -392,12 +401,29 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<IEntity> getByTag(String tag) {
-    if (this.entitiesByTag.containsKey(tag)) {
+  public Collection<IEntity> getByTag(String tag) {
+    if (this.entitiesByTag.containsKey(tag.toLowerCase())) {
       return this.entitiesByTag.get(tag);
     }
 
     return new ArrayList<>();
+  }
+
+  @Override
+  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String rawTag) {
+    List<T> entities = new ArrayList<>();
+    final String tag = rawTag.toLowerCase();
+    if (!this.entitiesByTag.containsKey(tag.toLowerCase())) {
+      return entities;
+    }
+
+    for (IEntity ent : this.entitiesByTag.get(tag)) {
+      if (clss.isInstance(ent)) {
+        entities.add((T) ent);
+      }
+    }
+
+    return entities;
   }
 
   @Override
@@ -611,22 +637,6 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<Trigger> getTriggers() {
     return this.triggers;
-  }
-
-  @Override
-  public Collection<Trigger> getTriggers(final String name) {
-    final List<Trigger> foundTriggers = new ArrayList<>();
-    if (name == null || name.isEmpty()) {
-      return foundTriggers;
-    }
-
-    for (final Trigger t : this.getTriggers()) {
-      if (t.getName() != null && t.getName().equals(name)) {
-        foundTriggers.add(t);
-      }
-    }
-
-    return foundTriggers;
   }
 
   @Override
