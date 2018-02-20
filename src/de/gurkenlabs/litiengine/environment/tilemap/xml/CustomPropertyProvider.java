@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,7 +20,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   /** The properties. */
   @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
-  private List<Property> properties = new ArrayList<>();
+  private List<Property> properties = new CopyOnWriteArrayList<>();
 
   @Override
   public String getCustomProperty(final String name) {
@@ -63,7 +64,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   @XmlTransient
   public List<Property> getAllCustomProperties() {
     if (this.properties == null) {
-      return new ArrayList<>();
+      return new CopyOnWriteArrayList<>();
     }
 
     return this.properties;
