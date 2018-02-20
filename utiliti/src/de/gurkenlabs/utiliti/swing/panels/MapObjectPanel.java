@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 
 @SuppressWarnings("serial")
@@ -43,6 +44,8 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
   private JLabel lblTags;
+  
+  private boolean isMoving;
 
   /**
    * Create the panel.
@@ -156,33 +159,73 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   }
 
   public void setupControls() {
-    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerX.setValue(this.spinnerX.getNextValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
+    Input.keyboard().onKeyReleased(e -> {
+      if (e.getKeyCode() != KeyEvent.VK_RIGHT && e.getKeyCode() != KeyEvent.VK_LEFT && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_DOWN) {
+        return;
       }
+
+      // if one of the move buttons is still pressed, don't end the operation
+      if (Input.keyboard().isPressed(KeyEvent.VK_RIGHT) || Input.keyboard().isPressed(KeyEvent.VK_LEFT) || Input.keyboard().isPressed(KeyEvent.VK_UP) || Input.keyboard().isPressed(KeyEvent.VK_DOWN)) {
+        return;
+      }
+
+      if (this.isMoving) {
+        UndoManager.instance().endOperation();
+        this.isMoving = false;
+      }
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
+      }
+
+      this.beforeKeyPressed();
+      this.spinnerX.setValue(this.spinnerX.getNextValue());
+      this.afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerX.setValue(this.spinnerX.getPreviousValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
       }
+
+      this.beforeKeyPressed();
+      this.spinnerX.setValue(this.spinnerX.getPreviousValue());
+      this.afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerY.setValue(this.spinnerY.getPreviousValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
       }
+
+      this.beforeKeyPressed();
+      this.spinnerY.setValue(this.spinnerY.getPreviousValue());
+      this.afterKeyPressed();
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
-      if (Game.getScreenManager().getRenderComponent().hasFocus()) {
-        this.spinnerY.setValue(this.spinnerY.getNextValue());
-        EditorScreen.instance().getMapComponent().updateTransformControls();
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
       }
+
+      this.beforeKeyPressed();
+      this.spinnerY.setValue(this.spinnerY.getNextValue());
+      this.afterKeyPressed();
     });
+  }
+
+  private void beforeKeyPressed() {
+    if (!this.isMoving) {
+      UndoManager.instance().beginOperation();
+      this.isMoving = true;
+    }
+
+  }
+
+  private void afterKeyPressed() {
+    EditorScreen.instance().getMapComponent().updateTransformControls();
   }
 
   private void switchPanel(MapObjectType type) {
@@ -296,7 +339,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
       m.setHeight((int) spinnerHeight.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
-    
+
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 }
