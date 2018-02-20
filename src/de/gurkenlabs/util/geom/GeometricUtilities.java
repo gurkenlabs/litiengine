@@ -558,6 +558,14 @@ public class GeometricUtilities {
    * @return true, if successful
    */
   public static boolean shapeIntersects(final Shape shapeA, final Shape shapeB) {
+    if (!shapeA.getBounds2D().intersects(shapeB.getBounds2D())) {
+      return false;
+    }
+
+    if (shapeA instanceof Rectangle2D && shapeB instanceof Rectangle2D) {
+      return ((Rectangle2D) shapeA).intersects((Rectangle2D) shapeB);
+    }
+
     final Area areaA = new Area(shapeA);
     areaA.intersect(new Area(shapeB));
     return !areaA.isEmpty();
