@@ -47,12 +47,6 @@ public class StaticShadowLayer extends ColorLayer implements IRenderable {
       }
       
       final Area staticShadowArea = staticShadow.getArea();
-      for (final LightSource light : this.getEnvironment().getLightSources()) {
-        if (light.getDimensionCenter().getY() > staticShadow.getBoundingBox().getMaxY() || staticShadow.getBoundingBox().contains(light.getDimensionCenter())) {
-          staticShadowArea.subtract(new Area(light.getLightShape()));
-        }
-      }
-
       ar.add(staticShadowArea);
     }
 
