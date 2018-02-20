@@ -126,14 +126,15 @@ public class AmbientLight extends ColorLayer implements IRenderable {
         continue;
       }
 
-      final Area boxInLight = new Area(col.getBoundingBox());
       if (lightArea == null) {
         lightArea = new Area(light.getLightShape());
       }
-      boxInLight.intersect(lightArea);
-      if (boxInLight.isEmpty()) {
+      
+      if (!lightArea.intersects(col.getBoundingBox())) {
         continue;
       }
+      
+      final Area boxInLight = new Area(col.getBoundingBox());
 
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
       for (final Line2D line : bounds) {
