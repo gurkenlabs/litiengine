@@ -6,8 +6,8 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 public class StaticShadowMapObjectLoader extends MapObjectLoader {
 

@@ -1,29 +1,13 @@
-package de.gurkenlabs.litiengine.environment.tilemap;
+package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
 
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class StaticShadow extends MapArea {
-  public enum StaticShadowType {
-    DOWN, DOWNLEFT, DOWNRIGHT, LEFT, LEFTDOWN, LEFTRIGHT, NONE, NOOFFSET, RIGHT, RIGHTDOWN, RIGHTLEFT;
-
-    public static StaticShadowType get(final String mapObjectType) {
-      if (mapObjectType == null || mapObjectType.isEmpty()) {
-        return StaticShadowType.NOOFFSET;
-      }
-
-      try {
-        return StaticShadowType.valueOf(mapObjectType);
-      } catch (final IllegalArgumentException iae) {
-        return StaticShadowType.NOOFFSET;
-      }
-    }
-  }
-
   public static final int DEFAULT_ALPHA = 75;
   public static final Color DEFAULT_COLOR = Color.BLACK;
   public static final int DEFAULT_OFFSET = 10;

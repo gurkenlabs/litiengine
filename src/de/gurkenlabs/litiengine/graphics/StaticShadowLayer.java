@@ -10,8 +10,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.util.ImageProcessing;
 
 public class StaticShadowLayer extends ColorLayer implements IRenderable {

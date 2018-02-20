@@ -34,10 +34,10 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 

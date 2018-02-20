@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
