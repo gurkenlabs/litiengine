@@ -65,7 +65,7 @@ public abstract class Entity implements IEntity {
     this(mapId);
     this.name = name;
   }
-  
+
   @Override
   public float getAngle() {
     return this.angle;
@@ -129,6 +129,16 @@ public abstract class Entity implements IEntity {
   @Override
   public float getWidth() {
     return this.width;
+  }
+
+  @Override
+  public double getX() {
+    return this.getLocation().getX();
+  }
+
+  @Override
+  public double getY() {
+    return this.getLocation().getY();
   }
 
   @Override

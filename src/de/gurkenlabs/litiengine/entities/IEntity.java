@@ -33,6 +33,10 @@ public interface IEntity {
   public RenderType getRenderType();
 
   public float getWidth();
+  
+  public double getX();
+  
+  public double getY();
 
   public String sendMessage(Object sender, String message);
 
