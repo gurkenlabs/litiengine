@@ -79,6 +79,7 @@ public class EditorScreen extends Screen {
 
   private long statusTick;
   private String currentStatus;
+  private boolean loading;
 
   private EditorScreen() {
     this.comps = new ArrayList<>();
@@ -265,6 +266,7 @@ public class EditorScreen extends Screen {
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
 
+    this.loading = true;
     try {
       if (!FileUtilities.getExtension(gameFile).equals(GameFile.FILE_EXTENSION)) {
         log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
@@ -287,7 +289,11 @@ public class EditorScreen extends Screen {
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
+      this.getMapSelectionPanel().bind(this.mapComponent.getMaps(), true);
 
+      ImageCache.clearAll();
+      Spritesheet.getSpritesheets().clear();
+      
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
       // 2. add sprite sheets by tile sets of all maps in the game file
@@ -301,6 +307,7 @@ public class EditorScreen extends Screen {
 
       // load custom emitter files
       this.loadCustomEmitters(this.getGameFile().getEmitters());
+      Program.getAssetTree().forceUpdate();
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -315,6 +322,7 @@ public class EditorScreen extends Screen {
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
+      this.loading = false;
     }
   }
 
@@ -428,6 +436,10 @@ public class EditorScreen extends Screen {
     });
   }
 
+  public boolean isLoading() {
+    return this.loading;
+  }
+
   public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
       Spritesheet.remove(info.getName());
@@ -437,6 +449,10 @@ public class EditorScreen extends Screen {
 
       Spritesheet.load(info);
     });
+
+    if (this.loading) {
+      return;
+    }
 
     ImageCache.clearAll();
     this.getMapComponent().reloadEnvironment();
@@ -505,8 +521,8 @@ public class EditorScreen extends Screen {
   public String getCurrentStatus() {
     return currentStatus;
   }
-  
-  public List<Map> getChangedMaps(){
+
+  public List<Map> getChangedMaps() {
     return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
   }
 

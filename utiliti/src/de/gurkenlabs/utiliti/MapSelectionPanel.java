@@ -128,6 +128,10 @@ public class MapSelectionPanel extends JSplitPane {
     mapList.setMaximumSize(new Dimension(0, 250));
 
     mapList.getSelectionModel().addListSelectionListener(e -> {
+      if (EditorScreen.instance().isLoading()) {
+        return;
+      }
+
       if (mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && mapList.getSelectedIndex() >= 0) {
         if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex()))) {
           return;
@@ -283,6 +287,14 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   public synchronized void bind(List<Map> maps) {
+    this.bind(maps, false);
+  }
+
+  public synchronized void bind(List<Map> maps, boolean clear) {
+    if (clear) {
+      this.model.clear();
+    }
+
     for (Map map : maps) {
       String name = map.getFileName();
       if (UndoManager.hasChanges(map)) {
@@ -298,8 +310,8 @@ public class MapSelectionPanel extends JSplitPane {
           updated = true;
         }
       }
-      
-      if(!updated) {
+
+      if (!updated) {
         // add new maps
         this.model.addElement(name);
       }
