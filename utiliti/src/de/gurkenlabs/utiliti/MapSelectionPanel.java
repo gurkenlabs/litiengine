@@ -302,17 +302,10 @@ public class MapSelectionPanel extends JSplitPane {
       }
 
       // update existing strings
-      boolean updated = false;
-      for (int i = 0; i < this.model.getSize(); i++) {
-        final String currentName = this.model.get(i);
-        if (currentName != null && currentName.equals(map.getFileName()) || currentName.equals(name)) {
-          this.model.set(i, name);
-          updated = true;
-          break;
-        }
-      }
-
-      if (!updated) {
+      int indexToReplace = getIndexToReplace(map.getFileName());
+      if (indexToReplace != -1) {
+        this.model.set(indexToReplace, name);
+      } else {
         // add new maps
         this.model.addElement(name);
       }
@@ -631,5 +624,16 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     this.entitiesTreeModel.reload();
+  }
+
+  private int getIndexToReplace(String mapName) {
+    for (int i = 0; i < this.model.getSize(); i++) {
+      final String currentName = this.model.get(i);
+      if (currentName != null && (currentName.equals(mapName) || currentName.equals(mapName + " *"))) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 }
