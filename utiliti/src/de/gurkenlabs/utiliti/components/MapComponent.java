@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
@@ -123,6 +124,7 @@ public class MapComponent extends EditorComponent {
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
   private final java.util.Map<String, List<MapObject>> selectedObjects;
+  private final java.util.Map<String, IEnvironment> environments;
   private final java.util.Map<IMapObject, Point2D> dragLocationMapObjects;
 
   private int currentEditMode = EDITMODE_EDIT;
@@ -162,6 +164,7 @@ public class MapComponent extends EditorComponent {
     this.mapLoadedConsumer = new CopyOnWriteArrayList<>();
     this.focusedObjects = new ConcurrentHashMap<>();
     this.selectedObjects = new ConcurrentHashMap<>();
+    this.environments = new ConcurrentHashMap<>();
     this.maps = new ArrayList<>();
     this.selectedLayers = new ConcurrentHashMap<>();
     this.cameraFocus = new ConcurrentHashMap<>();
@@ -322,9 +325,14 @@ public class MapComponent extends EditorComponent {
       Game.getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
       this.ensureUniqueIds(map);
-      Environment env = new Environment(map);
-      env.init();
-      Game.loadEnvironment(env);
+
+      if (!this.environments.containsKey(map.getFileName())) {
+        Environment env = new Environment(map);
+        env.init();
+        this.environments.put(map.getFileName(), env);
+      }
+
+      Game.loadEnvironment(this.environments.get(map.getFileName()));
 
       Program.updateScrollBars();
 
@@ -423,6 +431,7 @@ public class MapComponent extends EditorComponent {
     this.selectedLayers.clear();
     this.selectedObjects.clear();
     this.cameraFocus.clear();
+    this.environments.clear();
   }
 
   public void delete() {
