@@ -139,13 +139,13 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
 
-    this.lightSources = new CopyOnWriteArrayList<>();
-    this.colliders = new CopyOnWriteArrayList<>();
-    this.triggers = new CopyOnWriteArrayList<>();
-    this.mapAreas = new CopyOnWriteArrayList<>();
-    this.staticShadows = new CopyOnWriteArrayList<>();
-    this.props = new CopyOnWriteArrayList<>();
-    this.emitters = new CopyOnWriteArrayList<>();
+    this.lightSources = Collections.newSetFromMap(new ConcurrentHashMap<LightSource, Boolean>());
+    this.colliders = Collections.newSetFromMap(new ConcurrentHashMap<CollisionBox, Boolean>());
+    this.triggers = Collections.newSetFromMap(new ConcurrentHashMap<Trigger, Boolean>());
+    this.mapAreas = Collections.newSetFromMap(new ConcurrentHashMap<MapArea, Boolean>());
+    this.staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<StaticShadow, Boolean>());
+    this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
+    this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
