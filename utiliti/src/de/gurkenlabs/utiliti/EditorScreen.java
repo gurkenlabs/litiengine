@@ -277,6 +277,8 @@ public class EditorScreen extends Screen {
         log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
         return;
       }
+      
+      UndoManager.clearAll();
 
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
@@ -289,11 +291,10 @@ public class EditorScreen extends Screen {
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
-      this.getMapSelectionPanel().bind(this.mapComponent.getMaps(), true);
 
       ImageCache.clearAll();
       Spritesheet.getSpritesheets().clear();
-      
+
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
       // 2. add sprite sheets by tile sets of all maps in the game file

@@ -305,9 +305,10 @@ public class MapSelectionPanel extends JSplitPane {
       boolean updated = false;
       for (int i = 0; i < this.model.getSize(); i++) {
         final String currentName = this.model.get(i);
-        if (currentName != null && currentName.startsWith(map.getFileName())) {
+        if (currentName != null && currentName.equals(map.getFileName()) || currentName.equals(name)) {
           this.model.set(i, name);
           updated = true;
+          break;
         }
       }
 

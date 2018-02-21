@@ -58,6 +58,10 @@ public class UndoManager {
     return newUndoManager;
   }
 
+  public static void clearAll() {
+    instance.clear();
+  }
+
   public void beginOperation() {
     this.operation = nextOperation;
   }

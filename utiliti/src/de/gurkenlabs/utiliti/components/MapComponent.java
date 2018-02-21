@@ -243,7 +243,7 @@ public class MapComponent extends EditorComponent {
     Collections.sort(maps);
 
     this.getMaps().addAll(maps);
-    EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
+    EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
   }
 
   public List<Map> getMaps() {
@@ -416,6 +416,13 @@ public class MapComponent extends EditorComponent {
     } finally {
       UndoManager.instance().endOperation();
     }
+  }
+
+  public void clearAll() {
+    this.focusedObjects.clear();
+    this.selectedLayers.clear();
+    this.selectedObjects.clear();
+    this.cameraFocus.clear();
   }
 
   public void delete() {
