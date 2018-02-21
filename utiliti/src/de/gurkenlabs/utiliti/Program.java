@@ -193,6 +193,10 @@ public class Program {
 
   private static boolean exit() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
+    if (EditorScreen.instance().getChangedMaps().isEmpty()) {
+      return true;
+    }
+
     int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {

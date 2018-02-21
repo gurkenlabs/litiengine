@@ -505,6 +505,10 @@ public class EditorScreen extends Screen {
   public String getCurrentStatus() {
     return currentStatus;
   }
+  
+  public List<Map> getChangedMaps(){
+    return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
+  }
 
   public void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
@@ -537,7 +541,7 @@ public class EditorScreen extends Screen {
   }
 
   private void saveMaps() {
-    for (Map map : this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList())) {
+    for (Map map : this.getChangedMaps()) {
       UndoManager.save(map);
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);

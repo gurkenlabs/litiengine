@@ -282,18 +282,38 @@ public class MapSelectionPanel extends JSplitPane {
     layerScrollPane.setViewportView(listObjectLayers);
   }
 
-  public void bind(List<Map> maps) {
-    model.clear();
+  public synchronized void bind(List<Map> maps) {
     for (Map map : maps) {
       String name = map.getFileName();
       if (UndoManager.hasChanges(map)) {
         name += " *";
       }
-      model.addElement(name);
+
+      // update existing strings
+      boolean updated = false;
+      for (int i = 0; i < this.model.getSize(); i++) {
+        final String currentName = this.model.get(i);
+        if (currentName != null && currentName.startsWith(map.getFileName())) {
+          this.model.set(i, name);
+          updated = true;
+        }
+      }
+      
+      if(!updated) {
+        // add new maps
+        this.model.addElement(name);
+      }
     }
-    
-    mapList.setVisible(false);
-    mapList.setVisible(true);
+
+    // remove maps that are no longer present
+    for (int i = 0; i < this.model.getSize(); i++) {
+      final String current = this.model.get(i);
+      if (current == null || !maps.stream().anyMatch(x -> current.startsWith(x.getFileName()))) {
+        this.model.remove(i);
+      }
+    }
+
+    mapList.revalidate();
   }
 
   public void setSelection(String mapName) {
