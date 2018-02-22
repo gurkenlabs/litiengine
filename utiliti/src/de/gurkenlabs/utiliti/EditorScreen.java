@@ -261,6 +261,11 @@ public class EditorScreen extends Screen {
   }
 
   public void load(File gameFile) {
+    boolean proceedLoading = Program.notifyPendingChanges();
+    if (!proceedLoading) {
+      return;
+    }
+
     final long currentTime = System.nanoTime();
     Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
@@ -277,7 +282,7 @@ public class EditorScreen extends Screen {
         log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
         return;
       }
-      
+
       UndoManager.clearAll();
 
       // set up project settings
