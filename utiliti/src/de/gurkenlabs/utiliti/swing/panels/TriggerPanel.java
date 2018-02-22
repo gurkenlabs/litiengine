@@ -172,6 +172,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     this.textFieldMessage.setText(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE));
 
     String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
+    this.targetsModel.setRowCount(0);
     for (int target : ArrayUtilities.getIntegerArray(targets)) {
       this.targetsModel.addRow(new Object[] { target });
     }
@@ -182,6 +183,7 @@ public class TriggerPanel extends PropertyPanel<IMapObject> {
     this.comboBoxActivationType.setSelectedItem(act);
 
     String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
+    this.model.setRowCount(0);
     for (int activator : ArrayUtilities.getIntegerArray(activators)) {
       this.model.addRow(new Object[] { activator });
     }
