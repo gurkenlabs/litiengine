@@ -11,16 +11,13 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
 
-public class AmbientLight extends ColorLayer implements IRenderable {
+public class AmbientLight extends ColorLayer {
 
   public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
     super(env, ambientColor, ambientAlpha);
@@ -28,25 +25,8 @@ public class AmbientLight extends ColorLayer implements IRenderable {
   }
 
   @Override
-  public void render(Graphics2D g) {
-    RenderEngine.renderImage(g, this.getImage(), Game.getCamera().getViewPortLocation(0, 0));
-  }
-
-  @Override
-  public void createImage() {
-    if (this.getColor() == null) {
-      return;
-    }
-
-    final String cacheKey = this.getCacheKey();
-    if (ImageCache.IMAGES.containsKey(cacheKey)) {
-      this.setImage(ImageCache.IMAGES.get(cacheKey));
-      return;
-    }
-
-    final Color colorWithAlpha = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getEnvironment().getMap().getSizeInPixels().getWidth(), (int) this.getEnvironment().getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
+  protected void renderLayer(Graphics2D g) {
+    final Color colorWithAlpha = this.getColorWithAlpha();
 
     // create large rectangle and crop lights from it
     final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().getWidth();
@@ -78,11 +58,6 @@ public class AmbientLight extends ColorLayer implements IRenderable {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       this.renderLightSource(g, light, longerDimension);
     }
-
-    g.dispose();
-    this.setImage(img);
-
-    ImageCache.IMAGES.put(cacheKey, img);
   }
 
   @Override
@@ -128,11 +103,11 @@ public class AmbientLight extends ColorLayer implements IRenderable {
       if (lightArea == null) {
         lightArea = new Area(light.getLightShape());
       }
-      
+
       if (!lightArea.intersects(col.getBoundingBox())) {
         continue;
       }
-      
+
       final Area boxInLight = new Area(col.getBoundingBox());
 
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
