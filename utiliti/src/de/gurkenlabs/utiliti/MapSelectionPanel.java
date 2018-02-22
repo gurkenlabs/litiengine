@@ -52,6 +52,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
@@ -370,14 +371,19 @@ public class MapSelectionPanel extends JSplitPane {
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
       JCheckBox newBox = new JCheckBox(layer.getName() + " (" + layer.getMapObjects().size() + ")");
       if (layer.getColor() != null) {
-        BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
-        Graphics2D g = (Graphics2D) img.getGraphics();
-        g.setColor(layer.getColor());
-        g.fillRect(0, 0, 9, 9);
-        g.setColor(Color.BLACK);
-        g.drawRect(0, 0, 9, 9);
-        g.dispose();
-        newBox.setIcon(new ImageIcon(img));
+        final String cacheKey = map.getFileName() + layer.getName();
+        if (!ImageCache.IMAGES.containsKey(cacheKey)) {
+          BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
+          Graphics2D g = (Graphics2D) img.getGraphics();
+          g.setColor(layer.getColor());
+          g.fillRect(0, 0, 9, 9);
+          g.setColor(Color.BLACK);
+          g.drawRect(0, 0, 9, 9);
+          g.dispose();
+          ImageCache.IMAGES.put(cacheKey, img);
+        }
+
+        newBox.setIcon(new ImageIcon(ImageCache.IMAGES.get(cacheKey)));
       }
       newBox.setSelected(true);
       layerModel.addElement(newBox);
