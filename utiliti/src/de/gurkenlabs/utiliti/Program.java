@@ -309,7 +309,7 @@ public class Program {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
-    bottomTab.addTab("Assets", initAssetsComponent());
+    bottomTab.addTab(Resources.get("assettree_assets"), initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
     bottomTab.setIconAt(0, new ImageIcon(Resources.getImage("asset.png")));
     bottomTab.setIconAt(1, new ImageIcon(Resources.getImage("console.png")));
