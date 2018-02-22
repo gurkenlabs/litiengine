@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -46,42 +48,65 @@ public class JCheckBoxList extends JList<JCheckBox> {
   }
 
   protected class CellRenderer implements ListCellRenderer<JCheckBox> {
+    private final Map<JCheckBox, CheckBoxPanel> panels;
+
+    public CellRenderer() {
+      panels = new ConcurrentHashMap<>();
+    }
+
     @Override
-    public Component getListCellRendererComponent(
-        JList<? extends JCheckBox> list, JCheckBox value, int index,
-        boolean isSelected, boolean cellHasFocus) {
-      JPanel panel = new JPanel(new BorderLayout());
+    public Component getListCellRendererComponent(JList<? extends JCheckBox> list, JCheckBox value, int index, boolean isSelected, boolean cellHasFocus) {
+      if(!this.panels.containsKey(value)) {
+        this.panels.put(value, new CheckBoxPanel(value.getText()));
+      }
+      
+      CheckBoxPanel panel = this.panels.get(value);
 
-      JCheckBox checkbox = value;
-      final JCheckBox newCheck = new JCheckBox();
-      final JLabel newLabel = new JLabel(checkbox.getText());
-      newCheck.setSelected(checkbox.isSelected());
+      panel.getCheck().setSelected(value.isSelected());
       // Drawing checkbox, change the appearance here
-      newCheck.setBackground(isSelected ? getSelectionBackground()
-          : getBackground());
-      newCheck.setForeground(isSelected ? getSelectionForeground()
-          : getForeground());
-      newCheck.setEnabled(isEnabled());
-      newCheck.setFont(getFont());
-      newCheck.setFocusPainted(false);
-      newCheck.setBorderPainted(true);
-      newCheck.setBorder(isSelected ? UIManager
-          .getBorder("List.focusCellHighlightBorder") : noFocusBorder);
-      newLabel.setOpaque(true);
-      newLabel.setBackground(isSelected ? getSelectionBackground()
-          : getBackground());
-      newLabel.setForeground(isSelected ? getSelectionForeground()
-          : getForeground());
-      newLabel.setEnabled(isEnabled());
-      newLabel.setFocusable(false);
-      newLabel.setFont(getFont());
-      newLabel.setBorder(isSelected ? UIManager
-          .getBorder("List.focusCellHighlightBorder") : noFocusBorder);
-      newLabel.setIcon(checkbox.getIcon());
+      panel.getCheck().setBackground(isSelected ? getSelectionBackground() : getBackground());
+      panel.getCheck().setForeground(isSelected ? getSelectionForeground() : getForeground());
+      panel.getCheck().setEnabled(isEnabled());
+      panel.getCheck().setFont(getFont());
+      panel.getCheck().setFocusPainted(false);
+      panel.getCheck().setBorderPainted(true);
+      panel.getCheck().setBorder(isSelected ? UIManager.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
+      panel.getLabel().setOpaque(true);
+      panel.getLabel().setBackground(isSelected ? getSelectionBackground() : getBackground());
+      panel.getLabel().setForeground(isSelected ? getSelectionForeground() : getForeground());
+      panel.getLabel().setEnabled(isEnabled());
+      panel.getLabel().setFocusable(false);
+      panel.getLabel().setFont(getFont());
+      panel.getLabel().setBorder(isSelected ? UIManager.getBorder("List.focusCellHighlightBorder") : noFocusBorder);
+      panel.getLabel().setIcon(value.getIcon());
 
-      panel.add(newCheck, BorderLayout.WEST);
-      panel.add(newLabel, BorderLayout.CENTER);
       return panel;
+    }
+
+    private class CheckBoxPanel extends JPanel {
+      private final JCheckBox newCheck;
+      private final JLabel newLabel;
+
+      public CheckBoxPanel(String text) {
+        this.newCheck = new JCheckBox();
+        this.newLabel = new JLabel(text);
+        this.newCheck.setFocusPainted(false);
+        this.newCheck.setBorderPainted(true);
+        this.newLabel.setOpaque(true);
+        this.newLabel.setFocusable(false);
+        this.setLayout(new BorderLayout());
+        this.add(newCheck, BorderLayout.WEST);
+        this.add(newLabel, BorderLayout.CENTER);
+      }
+
+      public JCheckBox getCheck() {
+        return this.newCheck;
+      }
+
+      public JLabel getLabel() {
+        return this.newLabel;
+      }
+
     }
   }
 }

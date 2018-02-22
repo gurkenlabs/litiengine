@@ -39,6 +39,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -96,7 +97,8 @@ public class AssetPanelItem extends JPanel {
         textField.setForeground(defaults.getColor("Tree.selectionForeground"));
         setBorder(focusBorder);
 
-        // TODO: We might need to provide multiple JPanels that contain the buttons for
+        // TODO: We might need to provide multiple JPanels that contain the
+        // buttons for
         // a certain usage and swap them out
         if (getOrigin() instanceof SpriteSheetInfo) {
           btnEdit.setVisible(true);
@@ -225,7 +227,8 @@ public class AssetPanelItem extends JPanel {
         }
       }
 
-      // TODO: in case the asset has been renamed: update all props that uses the
+      // TODO: in case the asset has been renamed: update all props that uses
+      // the
       // asset to use the new name (assets are treated as reference by name)
       EditorScreen.instance().loadSpriteSheets(EditorScreen.instance().getGameFile().getSpriteSheets(), true);
     });
@@ -288,7 +291,7 @@ public class AssetPanelItem extends JPanel {
       }
     } else if (getOrigin() instanceof EmitterData) {
       EmitterData emitter = (EmitterData) getOrigin();
-      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]?\n Entities that use the emitter won't be rendered anymore!", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
+      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
@@ -333,8 +336,11 @@ public class AssetPanelItem extends JPanel {
       EditorScreen.instance().getMapComponent().add(mo);
       return true;
     } else if (this.getOrigin() instanceof EmitterData) {
-      // TODO @matthias: implement this when the emitter tool is fully integrated and
-      // there is a way to add a map object from EmitterData
+      MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) this.getOrigin());
+      newEmitter.setX((int) (Game.getCamera().getFocus().getX() - newEmitter.getWidth()));
+      newEmitter.setY((int) (Game.getCamera().getFocus().getY() - newEmitter.getHeight()));
+      newEmitter.setId(Game.getEnvironment().getNextMapId());
+      EditorScreen.instance().getMapComponent().add(newEmitter);
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
@@ -345,8 +351,10 @@ public class AssetPanelItem extends JPanel {
           EditorScreen.instance().getMapComponent().add(newMapObject);
         }
 
-        // separately select the added objects because this cannot be done in the
-        // previous loop because it gets overwritten every time a map object gets added
+        // separately select the added objects because this cannot be done in
+        // the
+        // previous loop because it gets overwritten every time a map object
+        // gets added
         for (MapObject newMapObject : newObjects) {
           EditorScreen.instance().getMapComponent().setSelection(newMapObject, false, true);
         }
@@ -449,6 +457,6 @@ public class AssetPanelItem extends JPanel {
       return propName != null && !propName.isEmpty();
     }
 
-    return this.getOrigin() instanceof MapObject;
+    return this.getOrigin() instanceof MapObject || this.getOrigin() instanceof EmitterData;
   }
 }

@@ -2,69 +2,42 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import de.gurkenlabs.util.geom.Vector2D;
 
-public class AmbientLight implements IRenderable {
-  private int alpha;
-  private Color color;
-  private final IEnvironment environment;
-  private Image image;
+public class AmbientLight extends ColorLayer {
 
   public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
-    this.environment = env;
-    this.color = ambientColor;
-    this.alpha = ambientAlpha;
+    super(env, ambientColor, ambientAlpha);
     this.createImage();
   }
 
   @Override
-  public void render(Graphics2D g) {
-    RenderEngine.renderImage(g, this.getImage(), Game.getCamera().getViewPortLocation(0, 0));
-  }
-
-  public void createImage() {
-    if (this.getColor() == null) {
-      return;
-    }
-
-    final String cacheKey = this.getCacheKey();
-    if (ImageCache.IMAGES.containsKey(cacheKey)) {
-      this.image = ImageCache.IMAGES.get(cacheKey);
-      return;
-    }
-
-    final Color colorWithAlpha = new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.environment.getMap().getSizeInPixels().getWidth(), (int) this.environment.getMap().getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
+  protected void renderLayer(Graphics2D g) {
+    final Color colorWithAlpha = this.getColorWithAlpha();
 
     // create large rectangle and crop lights from it
-    final double mapWidth = this.environment.getMap().getSizeInPixels().getWidth();
-    final double mapHeight = this.environment.getMap().getSizeInPixels().getHeight();
+    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().getWidth();
+    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().getHeight();
     double longerDimension = mapWidth;
     if (mapWidth < mapHeight) {
       longerDimension = mapHeight;
     }
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
 
-    for (final LightSource light : this.environment.getLightSources()) {
+    for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (!light.isActive()) {
         continue;
       }
@@ -73,12 +46,10 @@ public class AmbientLight implements IRenderable {
     }
 
     g.setColor(colorWithAlpha);
-    final Composite comp = g.getComposite();
-
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 1.0f));
     g.fill(darkArea);
 
-    for (final LightSource light : this.environment.getLightSources()) {
+    for (final LightSource light : this.getEnvironment().getLightSources()) {
       if (light.getIntensity() <= 0) {
         continue;
       }
@@ -87,38 +58,15 @@ public class AmbientLight implements IRenderable {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
       this.renderLightSource(g, light, longerDimension);
     }
-
-    g.setComposite(comp);
-    g.dispose();
-    this.image = img;
-
-    ImageCache.IMAGES.put(cacheKey, img);
   }
 
-  public int getAlpha() {
-    return this.alpha;
-  }
-
-  public Color getColor() {
-    return this.color;
-  }
-
-  public void setAlpha(int ambientAlpha) {
-    this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
-    this.createImage();
-  }
-
-  public void setColor(final Color color) {
-    this.color = color;
-    this.createImage();
-  }
-
-  private String getCacheKey() {
+  @Override
+  protected String getCacheKey() {
     final StringBuilder sb = new StringBuilder();
     sb.append(this.getColor());
     sb.append(this.getAlpha());
 
-    for (final LightSource light : this.environment.getLightSources()) {
+    for (final LightSource light : this.getEnvironment().getLightSources()) {
       sb.append(light.getIntensity());
       sb.append(light.getColor());
       sb.append(light.getLocation());
@@ -129,35 +77,38 @@ public class AmbientLight implements IRenderable {
       sb.append(light.isActive());
     }
 
-    sb.append(this.environment.getMap().getSizeInPixels());
+    sb.append(this.getEnvironment().getMap().getSizeInPixels());
 
     final int key = sb.toString().hashCode();
-    return "ambientlight-" + this.environment.getMap().getFileName() + "-" + Integer.toString(key);
-  }
-
-  private Image getImage() {
-    this.createImage();
-    return this.image;
+    return "ambientlight-" + this.getEnvironment().getMap().getFileName() + "-" + Integer.toString(key);
   }
 
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {
     final Point2D lightCenter = light.getDimensionCenter();
 
-    final Area lightArea = new Area(light.getLightShape());
+    Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
       g.setColor(light.getColor());
-      g.fill(lightArea);
+      g.fill(light.getBoundingBox());
       return;
     }
 
     // cut the light area where shadow Boxes are (this simulates light falling
     // into and out of rooms)
-    for (final StaticShadow col : this.environment.getStaticShadows()) {
-      if (!GeometricUtilities.shapeIntersects(light.getLightShape(), col.getBoundingBox())) {
+    for (final StaticShadow col : this.getEnvironment().getStaticShadows()) {
+      if (!light.getBoundingBox().intersects(col.getBoundingBox())) {
         continue;
       }
+
+      if (lightArea == null) {
+        lightArea = new Area(light.getLightShape());
+      }
+
+      if (!lightArea.intersects(col.getBoundingBox())) {
+        continue;
+      }
+
       final Area boxInLight = new Area(col.getBoundingBox());
-      boxInLight.intersect(lightArea);
 
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
       for (final Line2D line : bounds) {
@@ -192,14 +143,10 @@ public class AmbientLight implements IRenderable {
 
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
-    final Area lightRadiusArea = new Area(light.getLightShape());
+    final Shape lightShape = light.getLightShape();
     final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
-    try {
-      g.setPaint(new RadialGradientPaint(new Point2D.Double(lightRadiusArea.getBounds2D().getCenterX(), lightRadiusArea.getBounds2D().getCenterY()), (float) (lightRadiusArea.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
-    } catch (final Exception e) {
-      g.setColor(light.getColor());
-    }
-    g.fill(lightArea);
+    g.setPaint(new RadialGradientPaint(new Point2D.Double(lightShape.getBounds2D().getCenterX(), lightShape.getBounds2D().getCenterY()), (float) (lightShape.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
+    g.fill(lightArea == null ? light.getBoundingBox() : lightArea);
     g.setPaint(oldPaint);
   }
 }

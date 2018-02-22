@@ -1,16 +1,17 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class UpdateLoop extends Thread implements ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
-  private final List<IUpdateable> updatables;
+  private final Set<IUpdateable> updatables;
 
   protected UpdateLoop() {
-    this.updatables = new CopyOnWriteArrayList<>();
+    this.updatables = Collections.newSetFromMap(new ConcurrentHashMap<IUpdateable, Boolean>());
   }
 
   @Override
@@ -37,7 +38,7 @@ public abstract class UpdateLoop extends Thread implements ILoop {
     this.updatables.remove(updatable);
   }
 
-  protected List<IUpdateable> getUpdatables() {
+  protected Set<IUpdateable> getUpdatables() {
     return this.updatables;
   }
 

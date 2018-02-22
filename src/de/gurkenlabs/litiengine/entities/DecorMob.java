@@ -62,7 +62,7 @@ public class DecorMob extends MovableCombatEntity {
       }
 
       final float pixelsPerTick = Game.getLoop().getDeltaTime() * 0.001F * this.getEntity().getVelocity();
-      this.getPhysicsEngine().move(this.getEntity(), this.angle, pixelsPerTick);
+      Game.getPhysicsEngine().move(this.getEntity(), this.angle, pixelsPerTick);
     }
   }
 

@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.awt.Point;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.Direction;
@@ -23,9 +22,8 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     }
 
     final Direction direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
-    final Spawnpoint spawn = new Spawnpoint(mapObject.getId(), new Point(mapObject.getLocation()), direction);
-    spawn.setName(mapObject.getName());
-    spawn.setSize(mapObject.getWidth(), mapObject.getHeight());
+    final Spawnpoint spawn = new Spawnpoint(direction);
+    this.loadProperties(spawn, mapObject);
 
     final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
     spawn.setSpawnType(spawnType);

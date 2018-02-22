@@ -1,6 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.Box;
@@ -8,7 +9,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -19,12 +19,14 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
+import de.gurkenlabs.utiliti.EditorScreen;
 
 @SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel<IMapObject> {
   private ImageIcon play;
   private ImageIcon pause;
-  private ImageIcon rewind;
+  private JToggleButton btnPause;
   private CustomEmitter emitter;
 
   public EmitterPanel() {
@@ -34,86 +36,87 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
 
     this.play = new ImageIcon(Resources.getImage("button-play.png"));
     this.pause = new ImageIcon(Resources.getImage("button-pause.png"));
-    this.rewind = new ImageIcon(Resources.getImage("button-rewind.png"));
-
-    JLabel lblEmitterData = new JLabel("Emitter Data");
-    lblEmitterData.setFont(new Font("Tahoma", Font.BOLD, 11));
 
     Box horizontalBox = Box.createHorizontalBox();
 
     JButton btnCustomize = new JButton("Customize");
+    btnCustomize.setIcon(new ImageIcon(Resources.getImage("pencil.png")));
     btnCustomize.addActionListener(a -> {
       EmitterPropertyPanel panel = new EmitterPropertyPanel();
       panel.bind(this.getDataSource());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.CANCEL_OPTION) {
         panel.discardChanges();
       }
     });
 
-    JButton btnLoad = new JButton(Resources.get("menu_import"));
-
-    JButton btnSave = new JButton(Resources.get("menu_export"));
-
-    JToggleButton btnPause = new JToggleButton(Resources.get("panel_pause"));
-    btnPause.setIcon(pause);
-    btnPause.addActionListener(a -> {
-      this.emitter = (CustomEmitter) Game.getEnvironment().getEmitter(this.getDataSource().getId());
-      if (this.emitter != null) {
-        this.emitter.togglePaused();
+    JButton btnSave = new JButton("Define Asset");
+    btnSave.addActionListener(e -> {
+      if (emitter == null) {
+        return;
       }
 
-      if (btnPause.isSelected()) {
-        btnPause.setIcon(play);
-        btnPause.setText(Resources.get("panel_start"));
-      } else {
-        btnPause.setIcon(pause);
-        btnPause.setText(Resources.get("panel_pause"));
+      Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_prompt_name"), Resources.get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, emitter.getName());
+      if (name == null) {
+        return;
       }
 
+      final EmitterData data = new EmitterData(emitter.getEmitterData());
+      data.setName(name.toString());
+
+      EditorScreen.instance().getGameFile().getEmitters().removeIf(x -> x.getName().equals(data.getName()));
+      EditorScreen.instance().getGameFile().getEmitters().add(data);
     });
 
-    JButton btnRestart = new JButton(Resources.get("panel_rewind"));
-    btnRestart.setIcon(rewind);
+    btnSave.setIcon(new ImageIcon(Resources.getImage("emitter.png")));
+    this.btnPause = new JToggleButton();
+    this.btnPause.setSelected(true);
+    this.btnPause.setPreferredSize(new Dimension(40, 23));
+    this.btnPause.setIcon(pause);
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addContainerGap()
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(horizontalBox, GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
-                .addGroup(groupLayout.createSequentialGroup()
-                    .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(lblEmitterData, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(btnCustomize))
-                        .addComponent(btnPause, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout.createSequentialGroup().addComponent(btnLoad).addPreferredGap(ComponentPlacement.RELATED).addComponent(btnSave)).addComponent(btnRestart, 0, 0, Short.MAX_VALUE))))
-            .addContainerGap()));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(horizontalBox, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
+        .addComponent(btnPause, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE).addGroup(groupLayout.createSequentialGroup().addComponent(btnCustomize).addPreferredGap(ComponentPlacement.RELATED).addComponent(btnSave))).addContainerGap()));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnPause).addComponent(btnRestart)).addPreferredGap(ComponentPlacement.UNRELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnCustomize).addComponent(lblEmitterData, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(btnLoad).addComponent(btnSave)).addPreferredGap(ComponentPlacement.RELATED)
-            .addComponent(horizontalBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addContainerGap(18, Short.MAX_VALUE)));
+        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(btnPause, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnCustomize).addComponent(btnSave)).addPreferredGap(ComponentPlacement.RELATED).addComponent(horizontalBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(205, Short.MAX_VALUE)));
     setLayout(groupLayout);
 
     this.setupChangedListeners();
   }
 
   private void setupChangedListeners() {
+    this.btnPause.addActionListener(a -> {
+      if (this.emitter != null) {
+        this.emitter.togglePaused();
+      }
+
+      if (!btnPause.isSelected()) {
+        this.btnPause.setIcon(play);
+      } else {
+        this.btnPause.setIcon(pause);
+      }
+    });
   }
 
   @Override
   protected void clearControls() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    // TODO Auto-generated method stub
-
+    this.emitter = (CustomEmitter) Game.getEnvironment().getEmitter(mapObject.getId());
+    if (emitter == null) {
+      this.btnPause.setSelected(false);
+      return;
+    }
+    
+    this.btnPause.setSelected(!emitter.isPaused());
   }
 
   @Override
   protected IMapObject getDataSource() {
-    // TODO Auto-generated method stub
     return super.getDataSource();
   }
-
 }

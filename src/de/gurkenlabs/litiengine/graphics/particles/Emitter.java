@@ -78,27 +78,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   private IRenderable overlayRenderable;
 
-  /**
-   * Basic constructor for an effect.
-   *
-   * @param originX
-   *          The origin, on the X-axis, of the effect.
-   * @param originY
-   *          The origin, on the Y-axis, of the effect.
-   */
-  public Emitter(final double originX, final double originY) {
-    this(new Point2D.Double(originX, originY));
-  }
-
-  public Emitter(final Point2D origin) {
-    super();
+  public Emitter() {
     this.colors = new ArrayList<>();
     this.finishedConsumer = new CopyOnWriteArrayList<>();
     this.particles = new CopyOnWriteArrayList<>();
+    
     this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
     this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
-    this.setLocation(origin);
-
+    
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
 
     if (info != null) {
@@ -120,6 +107,23 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.particleUpdateDelay = Emitter.DEFAULT_UPDATERATE;
       this.activateOnInit = true;
     }
+  }
+
+  /**
+   * Basic constructor for an effect.
+   *
+   * @param originX
+   *          The origin, on the X-axis, of the effect.
+   * @param originY
+   *          The origin, on the Y-axis, of the effect.
+   */
+  public Emitter(final double originX, final double originY) {
+    this(new Point2D.Double(originX, originY));
+  }
+
+  public Emitter(final Point2D origin) {
+    this();
+    this.setLocation(origin);
   }
 
   /**
@@ -184,6 +188,11 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public IRenderable getGroundRenderable() {
     return this.groundRenderable;
+  }
+
+  public Point2D getOrigin() {
+    // TODO: implement properly
+    return this.getLocation();
   }
 
   public IRenderable getOverlayRenderable() {
@@ -369,7 +378,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
         continue;
       }
 
-      p.update(this.getLocation(), updateRatio);
+      p.update(this.getOrigin(), updateRatio);
     }
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
@@ -470,7 +479,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   private void renderParticles(final Graphics2D g, final ParticleRenderType renderType) {
-    final Point2D origin = this.getLocation();
+    final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> {
       if (particle.getParticleRenderType() == renderType) {
         particle.render(g, origin);

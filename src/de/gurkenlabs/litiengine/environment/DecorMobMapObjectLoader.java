@@ -35,7 +35,7 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
     }
 
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)), velocity);
-
+    this.loadProperties(mob, mapObject);
     mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
     mob.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
     mob.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
@@ -43,9 +43,6 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
 
     mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
     mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
-    mob.setSize(mapObject.getDimension().width, mapObject.getDimension().height);
-    mob.setMapId(mapObject.getId());
-    mob.setName(mapObject.getName());
 
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(mob);

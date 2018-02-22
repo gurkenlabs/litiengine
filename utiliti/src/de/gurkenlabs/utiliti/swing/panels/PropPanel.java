@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
@@ -41,10 +42,16 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JCheckBox checkBoxHorizontalFlip;
   private JCheckBox checkBoxVerticalFlip;
 
+  private boolean propsLoaded;
+
   /**
    * Create the panel.
    */
   public PropPanel() {
+    ImageCache.SPRITES.onCleared(e -> {
+      this.propsLoaded = false;
+    });
+
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_prop"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
@@ -183,6 +190,9 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   }
 
   private void loadAvailableProps() {
+    if (this.propsLoaded) {
+      return;
+    }
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
@@ -206,10 +216,17 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
         BufferedImage img = sprite.getSprite(0);
         BufferedImage scaled;
-        if (img != null) {
-          scaled = ImageProcessing.scaleImage(img, 24, 24, true);
+        String cacheKey = "iconx24" + sprite.getName();
+        if (ImageCache.SPRITES.containsKey(cacheKey)) {
+          scaled = ImageCache.SPRITES.get(cacheKey);
         } else {
-          scaled = ImageProcessing.getCompatibleImage(24, 24);
+          if (img != null) {
+            scaled = ImageProcessing.scaleImage(img, 24, 24, true);
+          } else {
+            scaled = ImageProcessing.getCompatibleImage(24, 24);
+          }
+
+          ImageCache.SPRITES.put(cacheKey, scaled);
         }
 
         if (scaled != null) {
@@ -219,5 +236,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
       this.comboBoxSpriteSheets.addItem(label);
     }
+    
+    this.propsLoaded = true;
   }
 }

@@ -107,7 +107,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   @XmlElement
   private String colorProbabilities;
-  
+
   @XmlElement
   private CollisionType collisionType;
 
@@ -125,7 +125,40 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.deltaHeight = new ParticleParameter();
     this.colorDeviation = 0;
     this.alphaDeviation = 0;
+    this.collisionType = CollisionType.NONE;
     this.updateRate = Emitter.DEFAULT_UPDATERATE;
+  }
+
+  public EmitterData(EmitterData data) {
+    this.colors = data.colors;
+    this.colorProbabilities = data.colorProbabilities;
+    this.x = data.x;
+    this.y = data.y;
+    this.deltaHeight = data.deltaHeight;
+    this.deltaWidth = data.deltaWidth;
+    this.deltaX = data.deltaX;
+    this.deltaY = data.deltaY;
+    this.emitterTTL = data.emitterTTL;
+    this.gravityX = data.gravityX;
+    this.gravityY = data.gravityY;
+    this.width = data.width;
+    this.height = data.height;
+    this.particleWidth = data.particleWidth;
+    this.particleHeight = data.particleHeight;
+    this.colorDeviation = data.colorDeviation;
+    this.alphaDeviation = data.alphaDeviation;
+    this.updateRate = data.updateRate;
+    this.collisionType = data.collisionType;
+    this.maxParticles = data.maxParticles;
+    this.name = data.name;
+    this.particleMinTTL = data.particleMinTTL;
+    this.particleMaxTTL = data.particleMaxTTL;
+    this.particleText = data.particleText;
+    this.particleType = data.particleType;
+    this.spawnAmount = data.spawnAmount;
+    this.spawnRate = data.spawnRate;
+    this.animateSprite = data.animateSprite;
+    this.spritesheet = data.spritesheet;
   }
 
   @Override
@@ -400,10 +433,10 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   public void setUpdateRate(final int updateRate) {
-    if(updateRate == 0) {
+    if (updateRate == 0) {
       return;
     }
-    
+
     this.updateRate = updateRate;
   }
 

@@ -43,11 +43,15 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   private boolean isActivated;
 
+  public Trigger(final TriggerActivation activation, final String message) {
+    this(activation, null, message);
+  }
+
   public Trigger(final TriggerActivation activation, final String name, final String message) {
     this(activation, name, message, false, new ConcurrentHashMap<>());
   }
 
-  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, final Map<String, String> arguments) {
+  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final Map<String, String> arguments) {
     super();
     this.activatingPredicates = new CopyOnWriteArrayList<>();
     this.activatedConsumer = new CopyOnWriteArrayList<>();
@@ -56,10 +60,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.activators = new CopyOnWriteArrayList<>();
     this.targets = new CopyOnWriteArrayList<>();
     this.activated = new CopyOnWriteArrayList<>();
-    this.setName(name);
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
+  }
+
+  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, final Map<String, String> arguments) {
+    this(activation, message, isOneTime, arguments);
+    this.setName(name);
   }
 
   public void addActivator(final int mapId) {

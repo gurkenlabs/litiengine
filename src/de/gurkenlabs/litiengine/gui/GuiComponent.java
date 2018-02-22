@@ -433,14 +433,15 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.isPressed = false;
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    this.getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
+    
+    // TODO: check if this should really call the clicked consumers...
     this.getClickConsumer().forEach(consumer -> consumer.accept(event));
+    this.getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.getMouseWheelConsumer().forEach(consumer -> consumer.accept(new ComponentMouseWheelEvent(e, this)));
-
   }
 
   /**
@@ -746,7 +747,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * @return true, if successful
    */
   protected boolean mouseEventShouldBeForwarded(final MouseEvent e) {
-    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && this.getBoundingBox().contains(e.getPoint());
+    return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null && this.getBoundingBox().contains(e.getPoint());
   }
 
   private void renderText(Graphics2D g) {

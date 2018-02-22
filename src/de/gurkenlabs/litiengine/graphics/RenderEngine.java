@@ -59,7 +59,8 @@ public final class RenderEngine implements IRenderEngine {
    * @param y
    *          The y-coordinate of the text
    */
-  public static void drawMapText(final Graphics2D g, final String text, final double x, final double y) {
+  @Override
+  public void renderText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -69,24 +70,42 @@ public final class RenderEngine implements IRenderEngine {
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
-
-  public static void drawMapText(final Graphics2D g, final String text, final Point2D location) {
-    drawMapText(g, text, location.getX(), location.getY());
+  
+  @Override
+  public void renderText(final Graphics2D g, final String text, final Point2D location) {
+    this.renderText(g, text, location.getX(), location.getY());
   }
 
   public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
     final Graphics2D g2 = (Graphics2D) g.create();
     g2.rotate(Math.toRadians(angle), x, y);
-    RenderEngine.drawText(g2, text, x, y);
+    drawText(g2, text, x, y);
     g2.dispose();
-
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape) {
-    drawShape(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
+  @Override
+  public void renderShape(final Graphics2D g, final Shape shape) {
+    if (shape == null) {
+      return;
+    }
+
+    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform t = new AffineTransform();
+    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
+    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
+
+    g.setTransform(t);
+    g.fill(shape);
+    g.setTransform(oldTransForm);
   }
 
-  public static void drawShape(final Graphics2D g, final Shape shape, final Stroke stroke) {
+  @Override
+  public void renderOutline(final Graphics2D g, final Shape shape) {
+    renderOutline(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
+  }
+
+  @Override
+  public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     if (shape == null) {
       return;
     }
@@ -144,21 +163,6 @@ public final class RenderEngine implements IRenderEngine {
     g.drawString(text, (float) x - 1, (float) y + 1);
     g.setColor(old);
     g.drawString(text, (float) x, (float) y);
-  }
-
-  public static void fillShape(final Graphics2D g, final Shape shape) {
-    if (shape == null) {
-      return;
-    }
-
-    final AffineTransform oldTransForm = g.getTransform();
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    g.setTransform(t);
-    g.fill(shape);
-    g.setTransform(oldTransForm);
   }
 
   public static void renderImage(final Graphics2D g, final Image image, final double x, final double y) {
@@ -267,11 +271,11 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final IVision vision) {
+  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    g.setClip(vision.getRenderVisionShape());
+    g.setClip(clip);
 
     renderables.forEach(r -> r.render(g));
 
@@ -320,12 +324,12 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final IVision vision) {
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
-    if (vision != null) {
-      g.setClip(vision.getRenderVisionShape());
+    if (clip != null) {
+      g.setClip(clip);
     }
 
     this.renderEntities(g, entities, sort);
@@ -334,8 +338,8 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final IVision vision) {
-    this.renderEntities(g, entities, true, vision);
+  public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final Shape clip) {
+    this.renderEntities(g, entities, true, clip);
   }
 
   @Override

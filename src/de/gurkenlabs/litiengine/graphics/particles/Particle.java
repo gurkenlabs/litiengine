@@ -66,6 +66,7 @@ public abstract class Particle implements ITimeToLive {
     this.timeToLive = ttl;
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
+    this.collisionType = CollisionType.NONE;
   }
 
   @Override

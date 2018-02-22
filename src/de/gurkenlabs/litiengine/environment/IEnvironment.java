@@ -17,11 +17,11 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
@@ -65,7 +65,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IEntity get(final String name);
 
-  public List<IEntity> getByTag(final String tag);
+  public Collection<IEntity> getByTag(final String tag);
+
+  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String tag);
 
   public AmbientLight getAmbientLight();
 
@@ -104,7 +106,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Prop getProp(final String name);
 
   public ICombatEntity getCombatEntity(final int mapId);
-  
+
   public ICombatEntity getCombatEntity(final String name);
 
   public Collection<IEntity> getEntities();
@@ -114,7 +116,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
-  
+
   public LightSource getLightSource(final String name);
 
   public Collection<LightSource> getLightSources();
@@ -131,7 +133,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IMovableEntity> getMovableEntities();
 
   public IMovableEntity getMovableEntity(final int mapId);
-  
+
   public IMovableEntity getMovableEntity(String name);
 
   /**
@@ -147,13 +149,13 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Spawnpoint> getSpawnPoints();
 
+  public List<String> getUsedTags();
+
   public Trigger getTrigger(int mapId);
 
   public Trigger getTrigger(String name);
 
   public Collection<Trigger> getTriggers();
-
-  public Collection<Trigger> getTriggers(String name);
 
   public boolean isLoaded();
 

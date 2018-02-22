@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -26,9 +27,13 @@ public class UndoManager {
   private int currentIndex = -1;
   private final String mapName;
   private int operation = 0;
+  private boolean saved = true;
+  private boolean executing;
 
   private static HashMap<String, UndoManager> instance;
   private static List<Consumer<UndoManager>> undoStackChangedConsumers;
+  private static List<Consumer<UndoManager>> mapObjectAdded;
+  private static List<Consumer<UndoManager>> mapObjectRemoved;
 
   private UndoManager(String mapName) {
     this.changing = new CopyOnWriteArrayList<>();
@@ -39,6 +44,8 @@ public class UndoManager {
   static {
     instance = new HashMap<>();
     undoStackChangedConsumers = new CopyOnWriteArrayList<>();
+    mapObjectAdded = new CopyOnWriteArrayList<>();
+    mapObjectRemoved = new CopyOnWriteArrayList<>();
   }
 
   public static UndoManager instance() {
@@ -51,6 +58,10 @@ public class UndoManager {
     return newUndoManager;
   }
 
+  public static void clearAll() {
+    instance.clear();
+  }
+
   public void beginOperation() {
     this.operation = nextOperation;
   }
@@ -61,7 +72,7 @@ public class UndoManager {
   }
 
   public void undo() {
-    if (this.currentIndex < 0) {
+    if (this.executing || this.currentIndex < 0) {
       return;
     }
 
@@ -69,30 +80,35 @@ public class UndoManager {
     UndoState state = null;
 
     int stepsUndone = 0;
-    do {
-      stepsUndone++;
-      state = this.undoStack[this.currentIndex];
-      switch (state.operationType) {
-      case ADD:
-        EditorScreen.instance().getMapComponent().delete(state.target);
-        break;
-      case CHANGE:
-        restoreState(state.target, state.oldMapObject);
-        break;
-      case DELETE:
-        EditorScreen.instance().getMapComponent().add(state.target, state.layer);
-        break;
-      }
+    this.executing = true;
+    try {
+      do {
+        stepsUndone++;
+        state = this.undoStack[this.currentIndex];
+        switch (state.operationType) {
+        case ADD:
+          EditorScreen.instance().getMapComponent().delete(state.target);
+          break;
+        case CHANGE:
+          restoreState(state.target, state.oldMapObject);
+          break;
+        case DELETE:
+          EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+          break;
+        }
 
-      this.currentIndex--;
-    } while (currentOperation != 0 && this.currentIndex >= 0 && this.undoStack[this.currentIndex].getOperation() == currentOperation);
+        this.currentIndex--;
+      } while (currentOperation != 0 && this.currentIndex >= 0 && this.undoStack[this.currentIndex].getOperation() == currentOperation);
 
-    log.log(Level.FINE, "{0} steps undone.", stepsUndone);
-    fireUndoStackChangedEvent(this);
+      log.log(Level.FINE, "{0} steps undone.", stepsUndone);
+      fireUndoStackChangedEvent(this);
+    } finally {
+      this.executing = false;
+    }
   }
 
   public void redo() {
-    if (this.undoStack.length - 1 == this.currentIndex || this.undoStack[this.currentIndex + 1] == null) {
+    if (this.executing || this.undoStack.length - 1 == this.currentIndex || this.undoStack[this.currentIndex + 1] == null) {
       return;
     }
 
@@ -104,26 +120,31 @@ public class UndoManager {
     final int currentOperation = this.undoStack[this.currentIndex + 1].getOperation();
     UndoState state = null;
     int stepsRedone = 0;
-    do {
-      ++stepsRedone;
-      ++this.currentIndex;
-      state = this.undoStack[this.currentIndex];
+    this.executing = true;
+    try {
+      do {
+        ++stepsRedone;
+        ++this.currentIndex;
+        state = this.undoStack[this.currentIndex];
 
-      switch (state.operationType) {
-      case ADD:
-        EditorScreen.instance().getMapComponent().add(state.target, state.layer);
-        break;
-      case CHANGE:
-        restoreState(state.target, state.newMapObject);
-        break;
-      case DELETE:
-        EditorScreen.instance().getMapComponent().delete(state.target);
-        break;
-      }
-    } while (currentOperation != 0 && this.currentIndex < MAX_STACK_SIZE && this.undoStack[this.currentIndex + 1] != null && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
+        switch (state.operationType) {
+        case ADD:
+          EditorScreen.instance().getMapComponent().add(state.target, state.layer);
+          break;
+        case CHANGE:
+          restoreState(state.target, state.newMapObject);
+          break;
+        case DELETE:
+          EditorScreen.instance().getMapComponent().delete(state.target);
+          break;
+        }
+      } while (currentOperation != 0 && this.currentIndex < MAX_STACK_SIZE && this.undoStack[this.currentIndex + 1] != null && this.undoStack[this.currentIndex + 1].getOperation() == currentOperation);
 
-    log.log(Level.FINE, "{0} steps redone.", stepsRedone);
-    fireUndoStackChangedEvent(this);
+      log.log(Level.FINE, "{0} steps redone.", stepsRedone);
+      fireUndoStackChangedEvent(this);
+    } finally {
+      this.executing = false;
+    }
   }
 
   public boolean canUndo() {
@@ -139,12 +160,13 @@ public class UndoManager {
   }
 
   public void mapObjectChanging(IMapObject mapObject) {
-    if (mapObject == null) {
+    if (executing || mapObject == null) {
       return;
     }
 
     if (this.changing.contains(mapObject)) {
-      // the old state is already tracked, while multiple changes are carried out, we
+      // the old state is already tracked, while multiple changes are carried
+      // out, we
       // don't want to track the steps in between
       return;
     }
@@ -153,7 +175,7 @@ public class UndoManager {
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
-    if (mapObject == null) {
+    if (executing || mapObject == null) {
       return;
     }
 
@@ -173,7 +195,7 @@ public class UndoManager {
   }
 
   public void mapObjectDeleted(IMapObject mapObject) {
-    if (mapObject == null) {
+    if (executing || mapObject == null) {
       return;
     }
 
@@ -183,10 +205,11 @@ public class UndoManager {
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.DELETE);
     fireUndoStackChangedEvent(this);
+    fireUndoManagerEvent(mapObjectRemoved, this);
   }
 
   public void mapObjectAdded(IMapObject mapObject) {
-    if (mapObject == null) {
+    if (executing || mapObject == null) {
       return;
     }
 
@@ -196,14 +219,42 @@ public class UndoManager {
 
     this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD);
     fireUndoStackChangedEvent(this);
+    fireUndoManagerEvent(mapObjectAdded, this);
   }
 
   public static void onUndoStackChanged(Consumer<UndoManager> cons) {
     undoStackChangedConsumers.add(cons);
   }
 
+  public static void onMapObjectAdded(Consumer<UndoManager> cons) {
+    mapObjectAdded.add(cons);
+  }
+
+  public static void onMapObjectRemoved(Consumer<UndoManager> cons) {
+    mapObjectRemoved.add(cons);
+  }
+
+  public static boolean hasChanges(IMap map) {
+    if (instance.containsKey(map.getName())) {
+      return !instance.get(map.getName()).saved;
+    }
+
+    return false;
+  }
+
+  static void save(IMap map) {
+    if (instance.containsKey(map.getName())) {
+      instance.get(map.getName()).saved = true;
+    }
+  }
+
   private static final void fireUndoStackChangedEvent(UndoManager undoManager) {
-    for (Consumer<UndoManager> cons : undoStackChangedConsumers) {
+    undoManager.saved = false;
+    fireUndoManagerEvent(undoStackChangedConsumers, undoManager);
+  }
+
+  private static final void fireUndoManagerEvent(List<Consumer<UndoManager>> consumers, UndoManager undoManager) {
+    for (Consumer<UndoManager> cons : consumers) {
       cons.accept(undoManager);
     }
   }
@@ -263,8 +314,10 @@ public class UndoManager {
   }
 
   private void clearRedoSteps() {
-    // whenever a new UndoState gets added, while we're in the middle of the current
-    // stack, we need to remove all future redo steps because the new state will now
+    // whenever a new UndoState gets added, while we're in the middle of the
+    // current
+    // stack, we need to remove all future redo steps because the new state will
+    // now
     // be the last element
     int index = this.currentIndex + 1;
     while (this.undoStack[index] != null && index < MAX_STACK_SIZE) {

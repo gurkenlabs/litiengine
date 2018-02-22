@@ -27,9 +27,16 @@ dependencies {
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-  compile 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
-  testCompile 'junit:junit:4.12'
+  compile ('com.googlecode.soundlibs:mp3spi:1.9.5.4'){
+    exclude group:'junit'
+  }
+
+  compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0'
   testCompile 'org.mockito:mockito-core:2.10.0'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+  testRuntime 'org.junit.platform:junit-platform-launcher:1.1.0'
 }
 
 jar {
@@ -37,7 +44,7 @@ jar {
   
   from('resources') { include '**/*' }
   
-  version = 'v0.4.8-alpha'
+  version = 'v0.4.9-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.so'
@@ -69,13 +76,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
-    version = 'v0.4.8-alpha'
+    version = 'v0.4.9-alpha'
 }
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
-    version = 'v0.4.8-alpha'
+    version = 'v0.4.9-alpha'
 }
 
 artifacts {
@@ -89,7 +96,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.8"
+version = "0.4.9"
 
 uploadArchives {
   repositories {

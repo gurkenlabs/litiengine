@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -80,12 +79,10 @@ public class EditorScreen extends Screen {
 
   private long statusTick;
   private String currentStatus;
-
-  private final List<Map> changedMaps;
+  private boolean loading;
 
   private EditorScreen() {
     this.comps = new ArrayList<>();
-    this.changedMaps = new CopyOnWriteArrayList<>();
   }
 
   public static EditorScreen instance() {
@@ -264,11 +261,17 @@ public class EditorScreen extends Screen {
   }
 
   public void load(File gameFile) {
+    boolean proceedLoading = Program.notifyPendingChanges();
+    if (!proceedLoading) {
+      return;
+    }
+
     final long currentTime = System.nanoTime();
     Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_LOAD, 0, 0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
     Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
 
+    this.loading = true;
     try {
       if (!FileUtilities.getExtension(gameFile).equals(GameFile.FILE_EXTENSION)) {
         log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
@@ -279,6 +282,8 @@ public class EditorScreen extends Screen {
         log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
         return;
       }
+
+      UndoManager.clearAll();
 
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
@@ -291,6 +296,9 @@ public class EditorScreen extends Screen {
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
+
+      ImageCache.clearAll();
+      Spritesheet.getSpritesheets().clear();
 
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
@@ -305,6 +313,7 @@ public class EditorScreen extends Screen {
 
       // load custom emitter files
       this.loadCustomEmitters(this.getGameFile().getEmitters());
+      Program.getAssetTree().forceUpdate();
 
       // display first available map after loading all stuff
       // also switch to map component
@@ -319,6 +328,7 @@ public class EditorScreen extends Screen {
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
+      this.loading = false;
     }
   }
 
@@ -432,6 +442,10 @@ public class EditorScreen extends Screen {
     });
   }
 
+  public boolean isLoading() {
+    return this.loading;
+  }
+
   public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
       Spritesheet.remove(info.getName());
@@ -441,6 +455,10 @@ public class EditorScreen extends Screen {
 
       Spritesheet.load(info);
     });
+
+    if (this.loading) {
+      return;
+    }
 
     ImageCache.clearAll();
     this.getMapComponent().reloadEnvironment();
@@ -510,17 +528,13 @@ public class EditorScreen extends Screen {
     return currentStatus;
   }
 
+  public List<Map> getChangedMaps() {
+    return this.getMapComponent().getMaps().stream().filter(UndoManager::hasChanges).distinct().collect(Collectors.toList());
+  }
+
   public void setCurrentStatus(String currentStatus) {
     this.currentStatus = currentStatus;
     this.statusTick = Game.getLoop().getTicks();
-  }
-
-  public void mapChanged() {
-    if (this.changedMaps.contains(Game.getEnvironment().getMap())) {
-      return;
-    }
-
-    this.changedMaps.add((Map) Game.getEnvironment().getMap());
   }
 
   public void updateGameFileMaps() {
@@ -544,12 +558,13 @@ public class EditorScreen extends Screen {
       this.saveMaps();
     }
 
-    this.changedMaps.clear();
+    this.getMapSelectionPanel().bind(this.getMapComponent().getMaps());
     return saveFile;
   }
 
   private void saveMaps() {
-    for (Map map : this.changedMaps.stream().distinct().collect(Collectors.toList())) {
+    for (Map map : this.getChangedMaps()) {
+      UndoManager.save(map);
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
         String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
         log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });

@@ -20,7 +20,10 @@ public class MapAreaMapObjectLoader extends MapObjectLoader {
     }
 
     Collection<IEntity> entities = super.load(mapObject);
-    entities.add(new MapArea(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().width, mapObject.getDimension().height));
+    MapArea mapArea = new MapArea();
+    this.loadProperties(mapArea, mapObject);
+    
+    entities.add(mapArea);
     return entities;
   }
 }

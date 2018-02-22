@@ -6,8 +6,8 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 public class StaticShadowMapObjectLoader extends MapObjectLoader {
 
@@ -25,7 +25,9 @@ public class StaticShadowMapObjectLoader extends MapObjectLoader {
     StaticShadowType type = mapObject.getCustomPropertyEnum(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.DOWN);
     int offset = mapObject.getCustomPropertyInt(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET);
 
-    StaticShadow shadow = new StaticShadow(mapObject.getId(), mapObject.getName(), mapObject.getX(), mapObject.getY(), mapObject.getDimension().width, mapObject.getDimension().height, type);
+    StaticShadow shadow = new StaticShadow(type);
+    this.loadProperties(shadow, mapObject);
+    
     shadow.setOffset(offset);
     entities.add(shadow);
     return entities;

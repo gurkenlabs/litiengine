@@ -3,7 +3,12 @@ package de.gurkenlabs.litiengine.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.event.MouseEvent;
+
+import javax.swing.JLabel;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +43,54 @@ public class GuiComponentTests {
     assertEquals(GuiProperties.getDefaultAppearance(), component.getAppearance());
     assertEquals(GuiProperties.getDefaultAppearanceDisabled(), component.getAppearanceDisabled());
     assertEquals(GuiProperties.getDefaultAppearanceHovered(), component.getAppearanceHovered());
+  }
+
+  @Test
+  public void testEventRegistration() {
+    TestComponent component = new TestComponent(0, 0, 100, 50);
+
+    
+    final Object pressed = new Object();
+    final Object clicked = new Object();
+    final Object released = new Object();
+    component.onMousePressed(c -> {
+      c.getSender().setTag(pressed);
+    });
+    
+    component.onClicked(c -> {
+      c.getSender().setTag(clicked);
+    });
+    
+    component.onMouseReleased(c -> {
+      c.getSender().setTag(released);
+    });
+    
+    component.mousePressed(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.mouseClicked(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.mouseReleased(createTestEvent(50, 25));
+    assertNull(component.getTag());
+    
+    component.setVisible(true);
+
+    component.mousePressed(createTestEvent(50, 25));
+    assertTrue(component.isPressed());
+    assertEquals(pressed, component.getTag());
+    
+    component.mouseClicked(createTestEvent(50, 25));
+    assertFalse(component.isPressed());
+    assertEquals(clicked, component.getTag());
+    
+    component.mouseReleased(createTestEvent(50, 25));
+    assertFalse(component.isPressed());
+    assertEquals(released, component.getTag());
+  }
+
+  private static MouseEvent createTestEvent(int x, int y) {
+    return new MouseEvent(new JLabel(), 0, 0, 0, x, y, 0, false);
   }
 
   private class TestComponent extends GuiComponent {

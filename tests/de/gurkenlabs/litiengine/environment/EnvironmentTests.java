@@ -34,10 +34,10 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
@@ -97,6 +97,26 @@ public class EnvironmentTests {
   }
 
   @Test
+  public void testGetByName() {
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getName()).thenReturn("test");
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    assertNotNull(this.testEnvironment.get("test"));
+    assertNull(this.testEnvironment.get(""));
+    assertNull(this.testEnvironment.get(null));
+  }
+
+
+
+  @Test
   public void testMovableEntity() {
     IMovableEntity movableEntity = mock(IMovableEntity.class);
     when(movableEntity.getMapId()).thenReturn(456);
@@ -110,6 +130,7 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getMovableEntity("test"));
     assertEquals(1, this.testEnvironment.getMovableEntities().size());
     assertEquals(1, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(movableEntity);
@@ -280,6 +301,22 @@ public class EnvironmentTests {
   }
 
   @Test
+  public void testRemoveById() {
+    MapArea testArea = new MapArea(0, 0, 1, 1);
+    testArea.setMapId(1);
+    testArea.setName("test");
+
+    this.testEnvironment.add(testArea);
+    this.testEnvironment.remove(1);
+    this.testEnvironment.remove(2);
+
+    assertNull(this.testEnvironment.getArea(1));
+    assertNull(this.testEnvironment.getArea("test"));
+    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getEntities().size());
+  }
+
+  @Test
   public void testSpawnPoint() {
     Spawnpoint testSpawn = new Spawnpoint(1, 0, 0);
     testSpawn.setName("test");
@@ -406,10 +443,10 @@ public class EnvironmentTests {
     when(combatEntity2.getMapId()).thenReturn(456);
     when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
     when(combatEntity2.getHitBox()).thenReturn(new Ellipse2D.Double(10, 10, 10, 10));
-    
+
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
-    
+
     List<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
     List<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
 
@@ -417,5 +454,49 @@ public class EnvironmentTests {
     assertFalse(found.contains(combatEntity2));
     assertTrue(found2.contains(combatEntity));
     assertFalse(found2.contains(combatEntity2));
+  }
+
+  @Test
+  public void testLoading() {
+    CollisionBox testCollider = new CollisionBox(true);
+    testCollider.setMapId(1);
+    testCollider.setName("test");
+
+    this.testEnvironment.add(testCollider);
+
+    Prop testProp = new Prop(0, 0, null);
+    testProp.setMapId(1);
+    testProp.setName("test");
+
+    this.testEnvironment.add(testProp);
+
+    Emitter testEmitter = new Emitter(1, 1) {
+      @Override
+      protected Particle createNewParticle() {
+        return null;
+      }
+    };
+
+    testEmitter.setMapId(1);
+    testEmitter.setName("test");
+
+    this.testEnvironment.add(testEmitter);
+
+    this.testEnvironment.load();
+
+    // load a second time to ensure nothing brakes
+    this.testEnvironment.load();
+
+    assertTrue(this.testEnvironment.isLoaded());
+
+    CollisionBox testCollider2 = new CollisionBox(true);
+    testCollider.setMapId(2);
+    testCollider.setName("test2");
+
+    this.testEnvironment.add(testCollider2);
+
+    this.testEnvironment.unload();
+
+    assertFalse(this.testEnvironment.isLoaded());
   }
 }

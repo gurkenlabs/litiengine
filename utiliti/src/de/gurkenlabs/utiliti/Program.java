@@ -106,7 +106,7 @@ public class Program {
 
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("litiengine creation kit");
-    Game.getInfo().setVersion("v0.4.8-alpha");
+    Game.getInfo().setVersion("v0.4.9-alpha");
 
     initSystemTray();
 
@@ -191,20 +191,19 @@ public class Program {
     verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
   }
 
-  private static boolean exit() {
+  public static boolean notifyPendingChanges() {
     String resourceFile = EditorScreen.instance().getCurrentResourceFile() != null ? EditorScreen.instance().getCurrentResourceFile() : "";
+    if (EditorScreen.instance().getChangedMaps().isEmpty()) {
+      return true;
+    }
+
     int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
       EditorScreen.instance().save(false);
     }
 
-    boolean exit = n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
-    if (exit) {
-      getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
-    }
-
-    return exit;
+    return n != JOptionPane.CANCEL_OPTION && n != JOptionPane.CLOSED_OPTION;
   }
 
   private static void handleArgs(String[] args) {
@@ -238,7 +237,15 @@ public class Program {
   private static void setupInterface() {
     MenuBar menuBar = new MenuBar();
     JFrame window = ((JFrame) Game.getScreenManager());
-    Game.onTerminating(s -> exit());
+    Game.onTerminating(s -> {
+      boolean terminate = notifyPendingChanges();
+      if (terminate) {
+        getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
+      }
+
+      return terminate;
+    });
+    
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
@@ -302,7 +309,7 @@ public class Program {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
-    bottomTab.addTab("Assets", initAssetsComponent());
+    bottomTab.addTab(Resources.get("assettree_assets"), initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
     bottomTab.setIconAt(0, new ImageIcon(Resources.getImage("asset.png")));
     bottomTab.setIconAt(1, new ImageIcon(Resources.getImage("console.png")));
@@ -534,7 +541,6 @@ public class Program {
 
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
         EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
-        EditorScreen.instance().mapChanged();
       }
     });
 
@@ -746,7 +752,6 @@ public class Program {
 
     UndoManager.onUndoStackChanged(manager -> {
       EditorScreen.instance().getMapComponent().updateTransformControls();
-      EditorScreen.instance().mapChanged();
       undo.setEnabled(manager.canUndo());
       redo.setEnabled(manager.canRedo());
     });

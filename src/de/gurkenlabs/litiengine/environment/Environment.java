@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,14 +38,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow;
-import de.gurkenlabs.litiengine.environment.tilemap.StaticShadow.StaticShadowType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
@@ -138,13 +139,13 @@ public class Environment implements IEnvironment {
     this.combatEntities = new ConcurrentHashMap<>();
     this.movableEntities = new ConcurrentHashMap<>();
 
-    this.lightSources = new CopyOnWriteArrayList<>();
-    this.colliders = new CopyOnWriteArrayList<>();
-    this.triggers = new CopyOnWriteArrayList<>();
-    this.mapAreas = new CopyOnWriteArrayList<>();
-    this.staticShadows = new CopyOnWriteArrayList<>();
-    this.props = new CopyOnWriteArrayList<>();
-    this.emitters = new CopyOnWriteArrayList<>();
+    this.lightSources = Collections.newSetFromMap(new ConcurrentHashMap<LightSource, Boolean>());
+    this.colliders = Collections.newSetFromMap(new ConcurrentHashMap<CollisionBox, Boolean>());
+    this.triggers = Collections.newSetFromMap(new ConcurrentHashMap<Trigger, Boolean>());
+    this.mapAreas = Collections.newSetFromMap(new ConcurrentHashMap<MapArea, Boolean>());
+    this.staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<StaticShadow, Boolean>());
+    this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
+    this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
@@ -212,7 +213,16 @@ public class Environment implements IEnvironment {
       this.mapAreas.add((MapArea) entity);
     }
 
-    for (String tag : entity.getTags()) {
+    for (String rawTag : entity.getTags()) {
+      if (rawTag == null) {
+        continue;
+      }
+
+      final String tag = rawTag.trim().toLowerCase();
+      if (tag.isEmpty()) {
+        continue;
+      }
+
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).add(entity);
         continue;
@@ -391,12 +401,29 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<IEntity> getByTag(String tag) {
-    if (this.entitiesByTag.containsKey(tag)) {
+  public Collection<IEntity> getByTag(String tag) {
+    if (this.entitiesByTag.containsKey(tag.toLowerCase())) {
       return this.entitiesByTag.get(tag);
     }
 
     return new ArrayList<>();
+  }
+
+  @Override
+  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String rawTag) {
+    List<T> entities = new ArrayList<>();
+    final String tag = rawTag.toLowerCase();
+    if (!this.entitiesByTag.containsKey(tag.toLowerCase())) {
+      return entities;
+    }
+
+    for (IEntity ent : this.entitiesByTag.get(tag)) {
+      if (clss.isInstance(ent)) {
+        entities.add((T) ent);
+      }
+    }
+
+    return entities;
   }
 
   @Override
@@ -613,19 +640,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<Trigger> getTriggers(final String name) {
-    final List<Trigger> foundTriggers = new ArrayList<>();
-    if (name == null || name.isEmpty()) {
-      return foundTriggers;
-    }
+  public List<String> getUsedTags() {
+    final List<String> tags = this.entitiesByTag.keySet().stream().collect(Collectors.toList());
+    Collections.sort(tags);
 
-    for (final Trigger t : this.getTriggers()) {
-      if (t.getName() != null && t.getName().equals(name)) {
-        foundTriggers.add(t);
-      }
-    }
-
-    return foundTriggers;
+    return tags;
   }
 
   @Override
@@ -747,6 +766,10 @@ public class Environment implements IEnvironment {
     for (String tag : entity.getTags()) {
       if (this.entitiesByTag.containsKey(tag)) {
         this.entitiesByTag.get(tag).remove(entity);
+
+        if (this.entitiesByTag.get(tag).isEmpty()) {
+          this.entitiesByTag.remove(tag);
+        }
       }
     }
 
@@ -815,10 +838,10 @@ public class Environment implements IEnvironment {
 
   @Override
   public <T extends IEntity> void remove(Collection<T> entities) {
-    if(entities == null) {
+    if (entities == null) {
       return;
     }
-    
+
     for (T ent : entities) {
       this.remove(ent);
     }

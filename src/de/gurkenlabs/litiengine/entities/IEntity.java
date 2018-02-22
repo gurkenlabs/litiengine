@@ -34,6 +34,10 @@ public interface IEntity {
 
   public float getWidth();
 
+  public double getX();
+
+  public double getY();
+
   public String sendMessage(Object sender, String message);
 
   public void registerMessageAction(String message, Consumer<MessageArgs> action);
@@ -74,4 +78,8 @@ public interface IEntity {
   public void setSize(float width, float height);
 
   public void setWidth(float width);
+
+  public void setX(double x);
+
+  public void setY(double y);
 }

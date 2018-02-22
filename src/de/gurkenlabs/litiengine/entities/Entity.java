@@ -49,9 +49,6 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
-    if (Game.getEnvironment() != null) {
-      Game.getEnvironment().getEntities().add(this);
-    }
   }
 
   protected Entity(int mapId) {
@@ -135,6 +132,16 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public double getX() {
+    return this.getLocation().getX();
+  }
+
+  @Override
+  public double getY() {
+    return this.getLocation().getY();
+  }
+
+  @Override
   public String sendMessage(final Object sender, final String message) {
     for (MessageAction action : this.messageActions.stream().filter(x -> x.getMessage().equals(message)).collect(Collectors.toList())) {
       action.execute(sender);
@@ -195,6 +202,16 @@ public abstract class Entity implements IEntity {
   public void setWidth(final float width) {
     this.width = width;
     this.boundingBox = null;
+  }
+
+  @Override
+  public void setX(double x) {
+    this.getLocation().setLocation(x, this.getY());
+  }
+
+  @Override
+  public void setY(double y) {
+    this.getLocation().setLocation(this.getX(), y);
   }
 
   @Override

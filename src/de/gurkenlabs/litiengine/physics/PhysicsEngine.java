@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMovableEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -141,7 +140,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean collides(final Point2D point) {
-    if (!this.environmentBounds.contains(point)) {
+    if (this.environmentBounds != null && !this.environmentBounds.contains(point)) {
       return true;
     }
 
@@ -182,7 +181,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   @Override
   public List<ICollisionEntity> collidesWithEntites(final Rectangle2D rect) {
     final List<ICollisionEntity> collEntities = new CopyOnWriteArrayList<>();
-    for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
+    for (final ICollisionEntity coll : this.getCollisionEntities()) {
       if (coll.getCollisionBox().intersects(rect)) {
         collEntities.add(coll);
       }
