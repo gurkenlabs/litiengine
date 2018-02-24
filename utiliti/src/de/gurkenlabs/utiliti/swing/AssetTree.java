@@ -97,9 +97,9 @@ public class AssetTree extends JTree {
     if (selectedPath.equals(spritePath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Program.PROP_SPRITE_PREFIX)).collect(Collectors.toList()));
     } else if (selectedPath.equals(miscPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Prop.SPRITESHEET_PREFIX)).collect(Collectors.toList()));
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Program.PROP_SPRITE_PREFIX)).collect(Collectors.toList()));
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>();
       allTilesets.addAll(gameFile.getTilesets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));

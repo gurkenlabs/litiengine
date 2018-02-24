@@ -32,10 +32,7 @@ public class AnimationController implements IAnimationController {
 
   public AnimationController(final Animation defaultAnimation) {
     this();
-    this.defaultAnimation = defaultAnimation;
-    if (this.defaultAnimation != null) {
-      this.animations.add(this.defaultAnimation);
-    }
+    this.setDefaultAnimation(defaultAnimation);
   }
 
   public AnimationController(final Spritesheet sprite) {
@@ -147,7 +144,15 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public Animation getDefaultAnimation() {
-    return this.defaultAnimation;
+    if (this.defaultAnimation != null) {
+      return this.defaultAnimation;
+    }
+
+    if (this.getAnimations().isEmpty()) {
+      return null;
+    }
+
+    return this.getAnimations().get(0);
   }
 
   @Override
@@ -192,10 +197,17 @@ public class AnimationController implements IAnimationController {
       cons.accept(this.getCurrentAnimation());
     }
   }
-  
+
   @Override
   public void setDefaultAnimation(Animation defaultAnimation) {
+    if (this.defaultAnimation != null) {
+      this.animations.remove(this.defaultAnimation);
+    }
+
     this.defaultAnimation = defaultAnimation;
+    if (this.defaultAnimation != null) {
+      this.animations.add(this.defaultAnimation);
+    }
   }
 
   @Override

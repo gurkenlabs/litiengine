@@ -5,7 +5,7 @@ import java.util.Random;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
-import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
 @CombatAttributesInfo(health = 1)
@@ -74,8 +74,9 @@ public class DecorMob extends Creature {
     super();
     this.mobType = mobType;
     this.setLocation(location);
+    this.setSpritePrefix("decormob-" + this.getMobType().toLowerCase());
 
-    Game.getEntityControllerManager().addController(this, new DecorMobAnimationController(this));
+    Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
     this.movementBehaviour = behaviour;
 
     switch (this.movementBehaviour) {

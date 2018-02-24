@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -10,44 +9,16 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
-public class PropAnimationController extends AnimationController {
+public class PropAnimationController extends EntityAnimationController<Prop> {
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
   private static final String INTACT = "intact";
 
-  public static Animation createAnimation(final Prop prop, final PropState state) {
-    final Spritesheet spritesheet = findSpriteSheet(prop, state);
-    if (spritesheet == null) {
-      return null;
-    }
-
-    return new Animation(state.name(), spritesheet, true, true, Spritesheet.getCustomKeyFrameDurations(spritesheet.getName()));
-  }
-
-  private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
-    if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
-      return null;
-    }
-
-    final String propState = state.name().toLowerCase();
-    final String name = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + propState;
-    Spritesheet sprite = Spritesheet.find(name);
-
-    if (sprite != null) {
-      return sprite;
-    }
-
-    final String fallbackName = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase();
-    return Spritesheet.find(fallbackName);
-  }
-
-  private final Prop prop;
-
-  public PropAnimationController(final IEntity prop) {
-    super(createAnimation((Prop) prop, PropState.INTACT));
-    this.prop = (Prop) prop;
-    this.add(createAnimation(this.prop, PropState.DAMAGED));
-    this.add(createAnimation(this.prop, PropState.DESTROYED));
+  public PropAnimationController(final Prop prop) {
+    super(prop);
+    this.setDefaultAnimation(this.createAnimation(this.getEntity(), PropState.INTACT));
+    this.add(createAnimation(this.getEntity(), PropState.DAMAGED));
+    this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
   }
 
   @Override
@@ -61,11 +32,11 @@ public class PropAnimationController extends AnimationController {
     }
 
     String cacheKey = this.buildCurrentCacheKey();
-    cacheKey += "_" + this.prop.isAddShadow();
-    cacheKey += "_" + this.prop.getState();
-    cacheKey += "_" + this.prop.getSpriteRotation();
-    cacheKey += "_" + this.prop.flipHorizontally();
-    cacheKey += "_" + this.prop.flipVertically();
+    cacheKey += "_" + this.getEntity().isAddShadow();
+    cacheKey += "_" + this.getEntity().getState();
+    cacheKey += "_" + this.getEntity().getSpriteRotation();
+    cacheKey += "_" + this.getEntity().flipHorizontally();
+    cacheKey += "_" + this.getEntity().flipVertically();
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
@@ -75,19 +46,19 @@ public class PropAnimationController extends AnimationController {
       return null;
     }
 
-    if (prop.getSpriteRotation() != Rotation.NONE) {
-      currentImage = ImageProcessing.rotate(currentImage, prop.getSpriteRotation());
+    if (this.getEntity().getSpriteRotation() != Rotation.NONE) {
+      currentImage = ImageProcessing.rotate(currentImage, this.getEntity().getSpriteRotation());
     }
 
-    if (prop.flipHorizontally()) {
+    if (this.getEntity().flipHorizontally()) {
       currentImage = ImageProcessing.horizontalFlip(currentImage);
     }
 
-    if (prop.flipVertically()) {
+    if (this.getEntity().flipVertically()) {
       currentImage = ImageProcessing.verticalFlip(currentImage);
     }
 
-    if (!prop.isAddShadow()) {
+    if (!this.getEntity().isAddShadow()) {
       return currentImage;
     }
 
@@ -102,7 +73,7 @@ public class PropAnimationController extends AnimationController {
   @Override
   public void update() {
     super.update();
-    switch (this.prop.getState()) {
+    switch (this.getEntity().getState()) {
     case DAMAGED:
       this.playAnimation(DAMAGED);
       break;
@@ -114,5 +85,31 @@ public class PropAnimationController extends AnimationController {
       this.playAnimation(INTACT);
       break;
     }
+  }
+
+  private Animation createAnimation(final Prop prop, final PropState state) {
+    final Spritesheet spritesheet = this.findSpriteSheet(prop, state);
+    if (spritesheet == null) {
+      return null;
+    }
+
+    return new Animation(state.name(), spritesheet, true, true, Spritesheet.getCustomKeyFrameDurations(spritesheet.getName()));
+  }
+
+  private Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
+    if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
+      return null;
+    }
+
+    final String propState = state.name().toLowerCase();
+    final String name = this.getSpritePrefix() + prop.getSpritesheetName().toLowerCase() + "-" + propState;
+    Spritesheet sprite = Spritesheet.find(name);
+
+    if (sprite != null) {
+      return sprite;
+    }
+
+    final String fallbackName = this.getSpritePrefix() + prop.getSpritesheetName().toLowerCase();
+    return Spritesheet.find(fallbackName);
   }
 }

@@ -80,6 +80,7 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.getImage("cursor-trans-vertical.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.getImage("cursor-trans-315.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.getImage("cursor-trans-45.png");
+  public static final String PROP_SPRITE_PREFIX = "prop-";
 
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;

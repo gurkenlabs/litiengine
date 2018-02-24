@@ -20,6 +20,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -114,7 +115,25 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
+  
+  public static String getNameBySpriteName(String spriteName) {
+    if (spriteName == null || spriteName.isEmpty()) {
+      return null;
+    }
 
+    AnimationInfo info = Prop.class.getAnnotation(AnimationInfo.class);
+    if (info == null || info.spritePrefix() == null || info.spritePrefix().isEmpty()) {
+      return null;
+    }
+    
+    if (!spriteName.toLowerCase().startsWith(info.spritePrefix())) {
+      return null;
+    }
+
+    String[] parts = spriteName.split("-");
+    return parts[1];
+  }
+  
   @Override
   public void bind(IMapObject mapObject) {
     this.isFocussing = true;
@@ -196,7 +215,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
-      String propName = Prop.getNameBySpriteName(spriteName);
+      String propName = getNameBySpriteName(spriteName);
 
       if (propName == null) {
         continue;

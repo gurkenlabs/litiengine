@@ -54,6 +54,7 @@ import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.panels.PropPanel;
 
 @SuppressWarnings("serial")
 public class AssetPanelItem extends JPanel {
@@ -313,7 +314,7 @@ public class AssetPanelItem extends JPanel {
     // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
-      String propName = Prop.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getNameBySpriteName(info.getName());
       if (propName == null) {
         return false;
       }
@@ -453,7 +454,7 @@ public class AssetPanelItem extends JPanel {
   private boolean canAdd() {
     if (this.getOrigin() != null && this.getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
-      String propName = Prop.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getNameBySpriteName(info.getName());
       return propName != null && !propName.isEmpty();
     }
 

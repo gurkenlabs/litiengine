@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.utiliti.Program;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
   public static final Icon DEFAULT_NODE_ICON = new ImageIcon(Resources.getImage("bullet.png"));
@@ -69,8 +70,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       propImag = ImageCache.IMAGES.get(cacheKey);
     } else {
 
-      final String name = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
-      final String fallbackName = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase();
+      final String name = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
+      final String fallbackName = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase();
       Spritesheet sprite = Spritesheet.find(name);
       if (sprite == null) {
         sprite = Spritesheet.find(fallbackName);

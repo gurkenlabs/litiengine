@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -23,6 +24,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   private short velocity;
 
+  private String spritePrefix;
+
   public Creature() {
     super();
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
@@ -31,6 +34,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.acceleration = info.acceleration();
     this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
+
+    AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
+    if (animationInfo != null) {
+      this.setSpritePrefix(animationInfo.spritePrefix());
+    } else {
+      this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
+    }
   }
 
   @Override
@@ -50,6 +60,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
+  }
+
+  public String getSpritePrefix() {
+    return spritePrefix;
   }
 
   @Override
@@ -120,6 +134,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public void setVelocity(final short velocity) {
     this.velocity = velocity;
+  }
+
+  public void setSpritePrefix(String spritePrefix) {
+    this.spritePrefix = spritePrefix;
   }
 
   @Override

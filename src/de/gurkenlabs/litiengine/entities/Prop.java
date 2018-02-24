@@ -3,10 +3,11 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
+@AnimationInfo(spritePrefix = "prop-")
 public class Prop extends CombatEntity {
-  public static final String SPRITESHEET_PREFIX = "prop-";
   private Material material;
   private String spritesheetName;
   private boolean isObstacle;
@@ -36,33 +37,12 @@ public class Prop extends CombatEntity {
     this.updateAnimationController();
   }
 
-  public static String getNameBySpriteName(String spriteName) {
-    if (spriteName == null || spriteName.isEmpty()) {
-      return spriteName;
-    }
-
-    if (!spriteName.toLowerCase().startsWith(SPRITESHEET_PREFIX)) {
-      return null;
-    }
-
-    String[] parts = spriteName.split("-");
-    return parts[1];
-  }
-
   public Material getMaterial() {
     return this.material;
   }
 
   public String getSpritesheetName() {
     return this.spritesheetName;
-  }
-
-  public void updateAnimationController() {
-    PropAnimationController controller = new PropAnimationController(this);
-    Game.getEntityControllerManager().addController(this, controller);
-    if (Game.getEnvironment() != null && Game.getEnvironment().isLoaded()) {
-      Game.getLoop().attach(controller);
-    }
   }
 
   /**
@@ -127,5 +107,13 @@ public class Prop extends CombatEntity {
 
   public void setFlipVertically(boolean flipVertically) {
     this.flipVertically = flipVertically;
+  }
+
+  private void updateAnimationController() {
+    PropAnimationController controller = new PropAnimationController(this);
+    Game.getEntityControllerManager().addController(this, controller);
+    if (Game.getEnvironment() != null && Game.getEnvironment().isLoaded()) {
+      Game.getLoop().attach(controller);
+    }
   }
 }
