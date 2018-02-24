@@ -22,6 +22,7 @@ import de.gurkenlabs.configuration.Quality;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -79,6 +80,7 @@ public class Environment implements IEnvironment {
   private final Collection<Trigger> triggers;
   private final Collection<Prop> props;
   private final Collection<Emitter> emitters;
+  private final Collection<Creature> creatures;
 
   private final Collection<MapArea> mapAreas;
 
@@ -146,6 +148,7 @@ public class Environment implements IEnvironment {
     this.staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<StaticShadow, Boolean>());
     this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
     this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
+    this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
@@ -189,6 +192,10 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Prop) {
       this.props.add((Prop) entity);
+    }
+    
+    if (entity instanceof Creature) {
+      this.creatures.add((Creature) entity);
     }
 
     if (entity instanceof CollisionBox) {
@@ -590,6 +597,21 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Creature getCreature(int mapId) {
+    return getById(this.getCreatures(), mapId);
+  }
+
+  @Override
+  public Creature getCreature(String name) {
+    return getByName(this.getCreatures(), name);
+  }
+
+  @Override
+  public Collection<Creature> getCreatures() {
+    return this.creatures;
+  }
+
+  @Override
   public Spawnpoint getSpawnpoint(final int mapId) {
     return getById(this.getSpawnPoints(), mapId);
   }
@@ -786,6 +808,10 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Prop) {
       this.props.remove(entity);
+    }
+    
+    if (entity instanceof Creature) {
+      this.creatures.remove(entity);
     }
 
     if (entity instanceof CollisionBox) {

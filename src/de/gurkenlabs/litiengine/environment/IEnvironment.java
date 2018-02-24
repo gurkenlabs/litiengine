@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.core.IInitializable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
@@ -148,6 +149,12 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Spawnpoint getSpawnpoint(String name);
 
   public Collection<Spawnpoint> getSpawnPoints();
+
+  public Creature getCreature(int mapId);
+
+  public Creature getCreature(String name);
+
+  public Collection<Creature> getCreatures();
 
   public List<String> getUsedTags();
 
