@@ -4,17 +4,17 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 
-import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.physics.IEntityNavigator;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
-public class MousePathCombatEntityController extends MovementController<IMobileCombatEntity> {
+public class MousePathCombatEntityController extends MovementController<Creature> {
   /** The player is navigating. */
   private boolean navigating;
 
   private final IEntityNavigator navigator;
 
-  public MousePathCombatEntityController(final IEntityNavigator navigator, final IMobileCombatEntity entity) {
+  public MousePathCombatEntityController(final IEntityNavigator navigator, final Creature entity) {
     super(entity);
     this.navigator = navigator;
     Input.mouse().onPressed(this::mousePressed);

@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
 @CombatAttributesInfo(health = 1)
-public class DecorMob extends MobileCombatEntity {
+public class DecorMob extends Creature {
   public enum MovementBehavior {
     IDLE,
 

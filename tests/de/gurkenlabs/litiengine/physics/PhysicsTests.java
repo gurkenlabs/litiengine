@@ -13,16 +13,15 @@ import java.awt.geom.Rectangle2D;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
-import de.gurkenlabs.litiengine.entities.MobileCombatEntity;
 
 public class PhysicsTests {
 
   @Test
   public void testBasicCollisionDetection() {
     try (GameLoop loop = new GameLoop(30)) {
-      IMobileCombatEntity ent = new MobileCombatEntity();
+      Creature ent = new Creature();
       ent.setSize(16, 16);
       ent.setCollision(true);
       ent.setCollisionBoxWidth(16);

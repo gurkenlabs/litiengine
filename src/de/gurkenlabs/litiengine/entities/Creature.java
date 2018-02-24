@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
-public class MobileCombatEntity extends CombatEntity implements IMobileCombatEntity {
+public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
   private int acceleration;
   private int deceleration;
@@ -23,7 +23,7 @@ public class MobileCombatEntity extends CombatEntity implements IMobileCombatEnt
 
   private short velocity;
 
-  public MobileCombatEntity() {
+  public Creature() {
     super();
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
@@ -43,7 +43,6 @@ public class MobileCombatEntity extends CombatEntity implements IMobileCombatEnt
     return this.deceleration;
   }
 
-  @Override
   public Direction getFacingDirection() {
     return Direction.fromAngle(this.getAngle());
   }
@@ -63,7 +62,6 @@ public class MobileCombatEntity extends CombatEntity implements IMobileCombatEnt
    *
    * @return true, if is idle
    */
-  @Override
   public boolean isIdle() {
     return Game.getLoop().getDeltaTime(this.lastMoved) > IDLE_DELAY;
   }
@@ -87,7 +85,6 @@ public class MobileCombatEntity extends CombatEntity implements IMobileCombatEnt
     this.deceleration = deceleration;
   }
 
-  @Override
   public void setFacingDirection(final Direction facingDirection) {
     this.setAngle(Direction.toAngle(facingDirection));
   }

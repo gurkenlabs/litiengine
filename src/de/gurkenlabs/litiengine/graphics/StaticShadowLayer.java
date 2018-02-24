@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Area;
+
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public class StaticShadowLayer extends ColorLayer {
