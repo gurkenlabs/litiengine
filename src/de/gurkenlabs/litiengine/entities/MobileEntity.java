@@ -9,16 +9,16 @@ import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
-public class MovableEntity extends CollisionEntity implements IMovableEntity {
+public class MobileEntity extends CollisionEntity implements IMobileEntity {
   private int acceleration;
   private int deceleration;
-  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
+  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
   private Point2D moveDestination;
   private boolean turnOnMove;
 
   private short velocity;
 
-  public MovableEntity() {
+  public MobileEntity() {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
@@ -48,7 +48,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
   }
 
   @Override
-  public void onMoved(final Consumer<IMovableEntity> consumer) {
+  public void onMoved(final Consumer<IMobileEntity> consumer) {
     if (this.entityMovedConsumer.contains(consumer)) {
       return;
     }
@@ -74,7 +74,7 @@ public class MovableEntity extends CollisionEntity implements IMovableEntity {
 
     super.setLocation(position);
 
-    for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
+    for (final Consumer<IMobileEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
     }
   }

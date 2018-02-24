@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.graphics.animation.DecorMobAnimationController;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
 @CombatAttributesInfo(health = 1)
-public class DecorMob extends MovableCombatEntity {
+public class DecorMob extends MobileCombatEntity {
   public enum MovementBehavior {
     IDLE,
 
@@ -37,8 +37,8 @@ public class DecorMob extends MovableCombatEntity {
     private long lastAngleChange;
     private long nextAngleChange;
 
-    public ShyDecorMobMovementController(final DecorMob movableEntity) {
-      super(movableEntity);
+    public ShyDecorMobMovementController(final DecorMob decorMob) {
+      super(decorMob);
       this.calculateNextAngleChange();
     }
 

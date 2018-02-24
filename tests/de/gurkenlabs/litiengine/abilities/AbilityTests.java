@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
 
 public class AbilityTests {
 
   @Test
   public void testInitialization() {
-    IMovableCombatEntity entity = mock(IMovableCombatEntity.class);
+    IMobileCombatEntity entity = mock(IMobileCombatEntity.class);
     TestAbility ability = new TestAbility(entity);
 
     assertEquals("I do somethin", ability.getName());
@@ -34,7 +34,7 @@ public class AbilityTests {
 
   @Test
   public void testEffectInitialization() {
-    IMovableCombatEntity entity = mock(IMovableCombatEntity.class);
+    IMobileCombatEntity entity = mock(IMobileCombatEntity.class);
     TestAbility ability = new TestAbility(entity);
 
     Effect effect = new TestEffect(ability, EffectTarget.ENEMY);
@@ -48,7 +48,7 @@ public class AbilityTests {
   @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = AbilityOrigin.COLLISIONBOX_CENTER, range = 444, value = 999)
   private class TestAbility extends Ability {
 
-    protected TestAbility(IMovableCombatEntity executor) {
+    protected TestAbility(IMobileCombatEntity executor) {
       super(executor);
     }
   }

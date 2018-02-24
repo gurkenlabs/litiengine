@@ -10,11 +10,11 @@ import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
-public class MovableCombatEntity extends CombatEntity implements IMovableCombatEntity {
+public class MobileCombatEntity extends CombatEntity implements IMobileCombatEntity {
   private static final int IDLE_DELAY = 100;
   private int acceleration;
   private int deceleration;
-  private final List<Consumer<IMovableEntity>> entityMovedConsumer;
+  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
   /** The last moved. */
   private long lastMoved;
 
@@ -23,7 +23,7 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
 
   private short velocity;
 
-  public MovableCombatEntity() {
+  public MobileCombatEntity() {
     super();
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
@@ -69,7 +69,7 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
   }
 
   @Override
-  public void onMoved(final Consumer<IMovableEntity> consumer) {
+  public void onMoved(final Consumer<IMobileEntity> consumer) {
     if (this.entityMovedConsumer.contains(consumer)) {
       return;
     }
@@ -104,7 +104,7 @@ public class MovableCombatEntity extends CombatEntity implements IMovableCombatE
       this.lastMoved = Game.getLoop().getTicks();
     }
 
-    for (final Consumer<IMovableEntity> consumer : this.entityMovedConsumer) {
+    for (final Consumer<IMobileEntity> consumer : this.entityMovedConsumer) {
       consumer.accept(this);
     }
   }

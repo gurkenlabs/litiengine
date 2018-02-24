@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
@@ -82,7 +82,7 @@ public class Environment implements IEnvironment {
 
   private final Collection<MapArea> mapAreas;
 
-  private final Map<Integer, IMovableEntity> movableEntities;
+  private final Map<Integer, IMobileEntity> mobileEntities;
   private final List<IRenderable> overlayRenderable;
 
   private final List<Spawnpoint> spawnPoints;
@@ -137,7 +137,7 @@ public class Environment implements IEnvironment {
     this.entities.put(RenderType.OVERLAY, new ConcurrentHashMap<>());
 
     this.combatEntities = new ConcurrentHashMap<>();
-    this.movableEntities = new ConcurrentHashMap<>();
+    this.mobileEntities = new ConcurrentHashMap<>();
 
     this.lightSources = Collections.newSetFromMap(new ConcurrentHashMap<LightSource, Boolean>());
     this.colliders = Collections.newSetFromMap(new ConcurrentHashMap<CollisionBox, Boolean>());
@@ -183,8 +183,8 @@ public class Environment implements IEnvironment {
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
 
-    if (entity instanceof IMovableEntity) {
-      this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      this.mobileEntities.put(entity.getMapId(), (IMobileEntity) entity);
     }
 
     if (entity instanceof Prop) {
@@ -266,7 +266,7 @@ public class Environment implements IEnvironment {
     this.dispose(this.getEntities());
     this.dispose(this.getTriggers());
     this.getCombatEntities().clear();
-    this.getMovableEntities().clear();
+    this.getMobileEntities().clear();
     this.getLightSources().clear();
     this.getCollisionBoxes().clear();
     this.getSpawnPoints().clear();
@@ -551,18 +551,18 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<IMovableEntity> getMovableEntities() {
-    return this.movableEntities.values();
+  public Collection<IMobileEntity> getMobileEntities() {
+    return this.mobileEntities.values();
   }
 
   @Override
-  public IMovableEntity getMovableEntity(final int mapId) {
-    return getById(this.getMovableEntities(), mapId);
+  public IMobileEntity getMobileEntity(final int mapId) {
+    return getById(this.getMobileEntities(), mapId);
   }
 
   @Override
-  public IMovableEntity getMovableEntity(String name) {
-    return getByName(this.getMovableEntities(), name);
+  public IMobileEntity getMobileEntity(String name) {
+    return getByName(this.getMobileEntities(), name);
   }
 
   @Override
@@ -811,8 +811,8 @@ public class Environment implements IEnvironment {
       this.addStaticShadows();
     }
 
-    if (entity instanceof IMovableEntity) {
-      this.movableEntities.values().remove(entity);
+    if (entity instanceof IMobileEntity) {
+      this.mobileEntities.values().remove(entity);
     }
 
     if (entity instanceof ICombatEntity) {
@@ -999,8 +999,8 @@ public class Environment implements IEnvironment {
     }
 
     // 4. register movement controller for update
-    if (entity instanceof IMovableEntity) {
-      final IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().attach(movementController);
       }
@@ -1108,8 +1108,8 @@ public class Environment implements IEnvironment {
     }
 
     // 5. unregister movement controller from update
-    if (entity instanceof IMovableEntity) {
-      final IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().detach(movementController);
       }

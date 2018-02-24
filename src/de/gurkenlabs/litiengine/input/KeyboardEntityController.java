@@ -4,11 +4,11 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 import de.gurkenlabs.util.ListUtilities;
 
-public class KeyboardEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> {
+public class KeyboardEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
   private final List<Integer> up;
   private final List<Integer> down;
   private final List<Integer> left;

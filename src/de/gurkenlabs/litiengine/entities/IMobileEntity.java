@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
-public interface IMovableEntity extends ICollisionEntity {
+public interface IMobileEntity extends ICollisionEntity {
   /**
    * Gets a value that defines how long it takes the entity to reach the full
    * velocity (in ms).
@@ -28,7 +28,7 @@ public interface IMovableEntity extends ICollisionEntity {
    */
   public float getVelocity();
 
-  public void onMoved(Consumer<IMovableEntity> consumer);
+  public void onMoved(Consumer<IMobileEntity> consumer);
 
   public void setAcceleration(int acceleration);
 

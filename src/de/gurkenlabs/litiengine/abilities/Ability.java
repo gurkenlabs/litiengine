@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
@@ -28,7 +28,7 @@ public abstract class Ability implements IRenderable {
   private final CastType castType;
   private final String description;
   private final List<IEffect> effects;
-  private final IMovableCombatEntity executor;
+  private final IMobileCombatEntity executor;
   private final boolean multiTarget;
   private final String name;
   private final AbilityOrigin originType;
@@ -42,7 +42,7 @@ public abstract class Ability implements IRenderable {
    * @param executor
    *          the executing entity
    */
-  protected Ability(final IMovableCombatEntity executor) {
+  protected Ability(final IMobileCombatEntity executor) {
     this.abilityCastConsumer = new CopyOnWriteArrayList<>();
     this.effects = new CopyOnWriteArrayList<>();
 
@@ -117,7 +117,7 @@ public abstract class Ability implements IRenderable {
     return this.description;
   }
 
-  public IMovableCombatEntity getExecutor() {
+  public IMobileCombatEntity getExecutor() {
     return this.executor;
   }
 

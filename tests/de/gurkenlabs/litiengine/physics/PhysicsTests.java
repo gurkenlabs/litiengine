@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
-import de.gurkenlabs.litiengine.entities.MovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
+import de.gurkenlabs.litiengine.entities.MobileCombatEntity;
 
 public class PhysicsTests {
 
   @Test
   public void testBasicCollisionDetection() {
     try (GameLoop loop = new GameLoop(30)) {
-      IMovableCombatEntity ent = new MovableCombatEntity();
+      IMobileCombatEntity ent = new MobileCombatEntity();
       ent.setSize(16, 16);
       ent.setCollision(true);
       ent.setCollisionBoxWidth(16);

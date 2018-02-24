@@ -7,14 +7,14 @@ import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Direction;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 
 /**
  * This {@link AnimationController} implementation provides animation rules that
  * use naming conventions to provide {@link Animation}s for
- * {@link IMovableCombatEntity} implementations.
+ * {@link IMobileCombatEntity} implementations.
  * 
  * The spritesheet images need to be named according to the following
  * conventions in order to be automatically used by this controller:
@@ -26,23 +26,23 @@ import de.gurkenlabs.util.ImageProcessing;
  * {entity-name} refers to the name of the entity. {EXTENSION} refers to a value
  * of the {@link de.gurkenlabs.litiengine.graphics.ImageFormat} enum.
  * 
- * @see de.gurkenlabs.litiengine.entities.IMovableCombatEntity
+ * @see de.gurkenlabs.litiengine.entities.IMobileCombatEntity
  * @see de.gurkenlabs.litiengine.entities.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
-public class MovableCombatEntityAnimationController<T extends IMovableCombatEntity> extends EntityAnimationController<T> {
+public class MobileCombatEntityAnimationController<T extends IMobileCombatEntity> extends EntityAnimationController<T> {
 
-  public MovableCombatEntityAnimationController(T entity, Animation defaultAnimation) {
+  public MobileCombatEntityAnimationController(T entity, Animation defaultAnimation) {
     this(entity, defaultAnimation, true);
   }
 
-  public MovableCombatEntityAnimationController(T entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
+  public MobileCombatEntityAnimationController(T entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
     super(entity, defaultAnimation);
 
     // TODO: evaluate a better way to determine the animation name because the
     // name of entities of the same type might differ
     if (this.getEntity().getName() == null || this.getEntity().getName().isEmpty()) {
-      throw new IllegalArgumentException("Make sure the name of the entity is set before using a MovableCombatEntityAnimationController.");
+      throw new IllegalArgumentException("Make sure the name of the entity is set before using a MobileCombatEntityAnimationController.");
     }
 
     this.getAnimations().addAll(this.initializeAvailableAnimations());

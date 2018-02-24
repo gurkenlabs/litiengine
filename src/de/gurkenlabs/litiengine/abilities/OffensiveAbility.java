@@ -5,7 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.abilities.effects.EntityHitArgument;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileCombatEntity;
 
 /**
  * This ability class provides some additional events and helper methods to
@@ -22,7 +22,7 @@ public abstract class OffensiveAbility extends Ability {
    * @param executingEntity
    *          the executing entity
    */
-  protected OffensiveAbility(final IMovableCombatEntity executingEntity) {
+  protected OffensiveAbility(final IMobileCombatEntity executingEntity) {
     super(executingEntity);
     this.entityHitConsumers = new CopyOnWriteArrayList<>();
   }

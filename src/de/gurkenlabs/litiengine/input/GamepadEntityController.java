@@ -2,12 +2,12 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
 
-public class GamepadEntityController<T extends IMovableEntity> extends AccelerationMovementController<T> {
+public class GamepadEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
   private int gamePadIndex = -1;
   private double gamePadDeadzone = 0.15;
   private double gamePadRightStick = 0.08;

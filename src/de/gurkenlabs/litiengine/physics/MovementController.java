@@ -7,21 +7,21 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
-public class MovementController<T extends IMovableEntity> implements IMovementController<T> {
+public class MovementController<T extends IMobileEntity> implements IMovementController<T> {
   private static final double FORCE_APPLY_ACCEPTED_ERROR = 0.1;
   private final List<Force> activeForces;
-  private final T movableEntity;
+  private final T mobileEntity;
   private final List<Predicate<T>> movementPredicates;
   private final List<Consumer<Point2D>> movedConsumer;
 
-  public MovementController(final T movableEntity) {
+  public MovementController(final T mobileEntity) {
     this.activeForces = new CopyOnWriteArrayList<>();
     this.movementPredicates = new CopyOnWriteArrayList<>();
     this.movedConsumer = new CopyOnWriteArrayList<>();
-    this.movableEntity = movableEntity;
+    this.mobileEntity = mobileEntity;
   }
 
   @Override
@@ -38,7 +38,7 @@ public class MovementController<T extends IMovableEntity> implements IMovementCo
 
   @Override
   public T getEntity() {
-    return this.movableEntity;
+    return this.mobileEntity;
   }
 
   @Override

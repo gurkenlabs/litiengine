@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 
-public interface IMovementController<T extends IMovableEntity> extends IUpdateable, IEntityController<T> {
+public interface IMovementController<T extends IMobileEntity> extends IUpdateable, IEntityController<T> {
   public void apply(Force force);
 
   public List<Force> getActiceForces();

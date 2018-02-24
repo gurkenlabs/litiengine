@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.physics.pathfinding;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.Path;
 
 /**
@@ -19,5 +19,5 @@ public interface IPathFinder {
    *          the goal
    * @return the path
    */
-  public Path findPath(IMovableEntity start, Point2D target);
+  public Path findPath(IMobileEntity start, Point2D target);
 }
