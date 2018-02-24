@@ -18,16 +18,20 @@ public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
   private Animation currentAnimation;
-  private final Animation defaultAnimation;
+  private Animation defaultAnimation;
   private final List<IImageEffect> imageEffects;
   private final List<Consumer<Animation>> playbackConsumer;
   private final List<Consumer<Animation>> playbackFinishedConsumer;
 
-  private AnimationController(final Animation defaultAnimation) {
+  public AnimationController() {
     this.animations = new CopyOnWriteArrayList<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
     this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
     this.playbackConsumer = new CopyOnWriteArrayList<>();
+  }
+
+  public AnimationController(final Animation defaultAnimation) {
+    this();
     this.defaultAnimation = defaultAnimation;
     if (this.defaultAnimation != null) {
       this.animations.add(this.defaultAnimation);
@@ -188,6 +192,11 @@ public class AnimationController implements IAnimationController {
       cons.accept(this.getCurrentAnimation());
     }
   }
+  
+  @Override
+  public void setDefaultAnimation(Animation defaultAnimation) {
+    this.defaultAnimation = defaultAnimation;
+  }
 
   @Override
   public void update() {
@@ -203,8 +212,8 @@ public class AnimationController implements IAnimationController {
     }
 
     if (this.getCurrentAnimation() == null || playbackFinished) {
-      if (this.defaultAnimation != null) {
-        this.playAnimation(this.defaultAnimation.getName());
+      if (this.getDefaultAnimation() != null) {
+        this.playAnimation(this.getDefaultAnimation().getName());
       } else {
         this.currentAnimation = null;
       }

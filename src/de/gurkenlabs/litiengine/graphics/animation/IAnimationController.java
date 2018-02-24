@@ -33,4 +33,6 @@ public interface IAnimationController extends IUpdateable {
   public void onPlaybackEnded(Consumer<Animation> cons);
 
   public void playAnimation(final String animationName);
+
+  public void setDefaultAnimation(Animation defaultAnimation);
 }
