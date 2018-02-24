@@ -31,6 +31,9 @@ import de.gurkenlabs.util.ImageProcessing;
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {
+  private static final String IDLE = "-idle-";
+  private static final String WALK = "-walk-";
+  
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
     this.setSpritePrefix(entity.getSpritePrefix());
@@ -152,17 +155,14 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getIdleSpriteName(Direction dir) {
-    final String spriteIdle = "%s-idle-%s";
-    return getSpriteName(spriteIdle, dir);
+    return getSpriteName(IDLE, dir);
   }
 
   private String getWalkSpriteName(Direction dir) {
-    final String spriteWalk = "%s-walk-%s";
-    return getSpriteName(spriteWalk, dir);
+    return getSpriteName(WALK, dir);
   }
 
-  // TODO: this formatting is not very performant...
-  private String getSpriteName(String formatString, Direction dir) {
-    return String.format(formatString, this.getSpritePrefix(), dir.toString().toLowerCase());
+  private String getSpriteName(String state, Direction dir) {
+    return this.getSpritePrefix() + state + dir.toString().toLowerCase();
   }
 }

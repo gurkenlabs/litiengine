@@ -175,7 +175,7 @@ public class AnimationController implements IAnimationController {
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do
     // nothing
-    if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
+    if (animationName == null || animationName.isEmpty() || this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
         || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       return;
     }
