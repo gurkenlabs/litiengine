@@ -6,11 +6,13 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -24,11 +26,6 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyActionListener;
-import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropteryFocusListener;
-
-import javax.swing.JTextField;
-import javax.swing.DefaultComboBoxModel;
 
 @SuppressWarnings("serial")
 public class CreaturePanel extends PropertyPanel<IMapObject> {

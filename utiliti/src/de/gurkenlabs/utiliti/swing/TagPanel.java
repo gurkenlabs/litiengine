@@ -125,7 +125,7 @@ public class TagPanel extends JPanel {
   }
 
   public List<String> getTagStrings() {
-    return this.getTags().stream().map(x -> x.getTag()).collect(Collectors.toList());
+    return this.getTags().stream().map(Tag::getTag).collect(Collectors.toList());
   }
 
   public String getTagsString() {

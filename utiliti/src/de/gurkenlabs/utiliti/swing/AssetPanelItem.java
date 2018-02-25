@@ -414,7 +414,7 @@ public class AssetPanelItem extends JPanel {
           int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
           if (result == JFileChooser.APPROVE_OPTION) {
             ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
-            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile().toString() });
+            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile() });
           }
         }
       } catch (IOException e) {

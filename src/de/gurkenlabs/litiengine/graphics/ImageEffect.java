@@ -1,7 +1,5 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import java.awt.image.BufferedImage;
-
 import de.gurkenlabs.litiengine.Game;
 
 public abstract class ImageEffect implements IImageEffect {

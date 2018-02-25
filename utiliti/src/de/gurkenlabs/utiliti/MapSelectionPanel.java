@@ -323,7 +323,7 @@ public class MapSelectionPanel extends JSplitPane {
     // remove maps that are no longer present
     for (int i = 0; i < this.model.getSize(); i++) {
       final String current = this.model.get(i);
-      if (current == null || !maps.stream().anyMatch(x -> current.startsWith(x.getFileName()))) {
+      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getFileName()))) {
         this.model.remove(i);
       }
     }

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -101,7 +100,7 @@ public final class Spritesheet {
       return new ArrayList<>();
     }
 
-    return spritesheets.values().stream().filter(s -> pred.test(s)).collect(Collectors.toList());
+    return spritesheets.values().stream().filter(pred).collect(Collectors.toList());
   }
 
   public static int[] getCustomKeyFrameDurations(final String name) {
@@ -135,7 +134,7 @@ public final class Spritesheet {
   public static Spritesheet load(final SpriteSheetInfo info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
-      log.log(Level.SEVERE, "Sprite '{0}' could not be loaded because no image is defined.", new Object[] { info.getName() });
+      log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
       return null;
     } else {
       sprite = Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());

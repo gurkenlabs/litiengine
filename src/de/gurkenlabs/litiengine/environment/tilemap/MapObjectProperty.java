@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 
 public final class MapObjectProperty {
   private static final Logger log = Logger.getLogger(MapObjectProperty.class.getName());
-  
+
   public static final String TAGS = "tags";
-  
+
   // collision entity
   public static final String COLLISION = "collision";
   public static final String COLLISION_ALGIN = "collisionAlign";
@@ -33,7 +33,7 @@ public final class MapObjectProperty {
 
   // creature
   public static final String CREATURE_TYPE = "creature-type";
-  
+
   // props
   public static final String PROP_INDESTRUCTIBLE = "indestructible";
   public static final String PROP_MATERIAL = "material";
@@ -66,10 +66,10 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  public static final  class Emitter{
+  public static final class Emitter {
     private Emitter() {
     }
-    
+
     public static final String COLORS = "emitterColors";
     public static final String COLORPROBABILITIES = "emitterColorProbabilities";
     public static final String SPAWNRATE = "emitterSpawnRate";
@@ -82,10 +82,10 @@ public final class MapObjectProperty {
     public static final String ALPHADEVIATION = "emitterAlphaDeviation";
   }
 
-  public static final class Particle{
+  public static final class Particle {
     private Particle() {
     }
-    
+
     public static final String MINX = "particleMinX";
     public static final String MAXX = "particleMaxX";
     public static final String X_RANDOM = "particleXRandom";
@@ -124,7 +124,7 @@ public final class MapObjectProperty {
     public static final String MAXTTL = "particleMaxTTL";
     public static final String TTL_RANDOM = "particleTTLRandom";
   }
-  
+
   private static List<Field> availableProperties = new ArrayList<>();
 
   private MapObjectProperty() {
@@ -137,13 +137,13 @@ public final class MapObjectProperty {
           availableProperties.add(field);
         }
       }
-      
+
       for (final Field field : MapObjectProperty.Emitter.class.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           availableProperties.add(field);
         }
       }
-      
+
       for (final Field field : MapObjectProperty.Particle.class.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
           availableProperties.add(field);
@@ -151,7 +151,7 @@ public final class MapObjectProperty {
       }
     }
 
-    return !availableProperties.stream().anyMatch(x -> {
+    return availableProperties.stream().noneMatch(x -> {
       try {
         return x.get(null).equals(name);
       } catch (final IllegalArgumentException | IllegalAccessException e) {

@@ -39,7 +39,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxShadow;
-  private JComboBox<Material> comboBoxRotation;
+  private JComboBox<Rotation> comboBoxRotation;
   private JCheckBox checkBoxHorizontalFlip;
   private JCheckBox checkBoxVerticalFlip;
 
@@ -49,9 +49,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
    * Create the panel.
    */
   public PropPanel() {
-    ImageCache.SPRITES.onCleared(e -> {
-      this.propsLoaded = false;
-    });
+    ImageCache.SPRITES.onCleared(e -> this.propsLoaded = false);
 
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_prop"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
@@ -76,8 +74,8 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     this.chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
     this.chckbxShadow = new JCheckBox("shadow");
 
-    this.comboBoxRotation = new JComboBox<Material>();
-    this.comboBoxRotation.setModel(new DefaultComboBoxModel(Rotation.values()));
+    this.comboBoxRotation = new JComboBox<>();
+    this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));
 
     JLabel lblRotation = new JLabel("rotation");
 
@@ -115,7 +113,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
-  
+
   public static String getNameBySpriteName(String spriteName) {
     if (spriteName == null || spriteName.isEmpty()) {
       return null;
@@ -125,7 +123,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     if (info == null || info.spritePrefix() == null || info.spritePrefix().isEmpty()) {
       return null;
     }
-    
+
     if (!spriteName.toLowerCase().startsWith(info.spritePrefix())) {
       return null;
     }
@@ -133,7 +131,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     String[] parts = spriteName.split("-");
     return parts[1];
   }
-  
+
   @Override
   public void bind(IMapObject mapObject) {
     this.isFocussing = true;
@@ -255,7 +253,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
       this.comboBoxSpriteSheets.addItem(label);
     }
-    
+
     this.propsLoaded = true;
   }
 }

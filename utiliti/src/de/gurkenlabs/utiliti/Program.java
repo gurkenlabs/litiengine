@@ -117,9 +117,7 @@ public class Program {
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
-    Game.getCamera().onZoomChanged(zoom -> {
-      userPreferences.setZoom(zoom);
-    });
+    Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
     // Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
 
@@ -246,7 +244,7 @@ public class Program {
 
       return terminate;
     });
-    
+
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
@@ -747,9 +745,7 @@ public class Program {
       paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
-    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
-      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
-    });
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
     UndoManager.onUndoStackChanged(manager -> {
       EditorScreen.instance().getMapComponent().updateTransformControls();
@@ -870,9 +866,7 @@ public class Program {
       paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
-    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
-      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
-    });
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override
