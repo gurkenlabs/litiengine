@@ -29,8 +29,8 @@ import de.gurkenlabs.util.ImageProcessing;
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {
-  private static final String IDLE = "-idle-";
-  private static final String WALK = "-walk-";
+  public static final String IDLE = "-idle";
+  public static final String WALK = "-walk";
 
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
@@ -122,15 +122,41 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getIdleSpriteName(Direction dir) {
-    return getSpriteName(IDLE, dir);
+    return this.getSpriteNameWithDirection(IDLE, dir);
   }
 
   private String getWalkSpriteName(Direction dir) {
-    return getSpriteName(WALK, dir);
+    return getSpriteNameWithDirection(WALK, dir);
   }
 
-  private String getSpriteName(String state, Direction dir) {
-    return this.getSpritePrefix() + state + dir.toString().toLowerCase();
+  private String getSpriteNameWithDirection(String state, Direction dir) {
+    String name = this.getSpriteName(state) + "-" + dir.toString().toLowerCase();
+    if (this.hasAnimation(name)) {
+      return name;
+    }
+
+    return getFallbackSpriteName(state);
+  }
+
+  private String getFallbackSpriteName(String state) {
+    String baseName = this.getSpriteName(state);
+    if (this.hasAnimation(baseName)) {
+      return baseName;
+    }
+
+    // search for any animation for the specified state with dir information
+    for (Direction dir : Direction.values()) {
+      final String name = this.getSpriteName(state) + "-" + dir.toString().toLowerCase();
+      if (this.hasAnimation(name)) {
+        return name;
+      }
+    }
+
+    return this.getDefaultAnimation() != null ? this.getDefaultAnimation().getName() : null;
+  }
+
+  private String getSpriteName(String state) {
+    return this.getSpritePrefix() + state;
   }
 
   private void init(boolean useFlippedSpritesAsFallback) {

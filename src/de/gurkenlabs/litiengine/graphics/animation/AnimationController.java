@@ -162,6 +162,11 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
+  public boolean hasAnimation(String animationName) {
+    return this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName));
+  }
+
+  @Override
   public void onPlayback(final Consumer<Animation> cons) {
     this.playbackConsumer.add(cons);
   }
