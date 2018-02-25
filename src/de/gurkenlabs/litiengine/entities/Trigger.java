@@ -217,15 +217,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   @Override
-  public String toString() {
-    if (this.getName() != null) {
-      return "trigger: " + super.toString();
-    }
-
-    return super.toString();
-  }
-
-  @Override
   public void update() {
     if (Game.getEnvironment() == null || this.activationType != TriggerActivation.COLLISION) {
       return;

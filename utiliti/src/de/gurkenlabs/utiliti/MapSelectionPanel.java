@@ -84,7 +84,8 @@ public class MapSelectionPanel extends JSplitPane {
   private final JPopupMenu popupMenu;
   private final JMenuItem mntmExportMap;
   private final JMenuItem mntmDeleteMap;
-
+  
+  private final JPanel entityPanel;
   private final JPanel panel;
   private final JTextField textField;
   private final JButton btnSearch;
@@ -104,7 +105,6 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
-  private JPanel panel_1;
 
   /**
    * Create the panel.
@@ -172,14 +172,15 @@ public class MapSelectionPanel extends JSplitPane {
     layerScrollPane.setMaximumSize(new Dimension(0, 250));
 
     JTabbedPane tabPane = new JTabbedPane();
+
+    this.entityPanel = new JPanel();
+    this.entityPanel.setLayout(new BorderLayout(0, 0));
+
+    tabPane.addTab(Resources.get("panel_entities"), entityPanel);
     tabPane.add(Resources.get("panel_mapObjectLayers"), layerScrollPane);
-
-    panel_1 = new JPanel();
-    tabPane.addTab(Resources.get("panel_entities"), panel_1);
-    panel_1.setLayout(new BorderLayout(0, 0));
-
+    
     panel = new JPanel();
-    panel_1.add(panel, BorderLayout.NORTH);
+    entityPanel.add(panel, BorderLayout.NORTH);
     panel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
     panel.setBackground(Color.WHITE);
     panel.setLayout(new BorderLayout(0, 0));
@@ -214,7 +215,7 @@ public class MapSelectionPanel extends JSplitPane {
     panel.add(btnSearch, BorderLayout.EAST);
 
     entityScrollPane = new JScrollPane();
-    panel_1.add(entityScrollPane);
+    entityPanel.add(entityScrollPane);
     entityScrollPane.setViewportBorder(null);
     entityScrollPane.setMinimumSize(new Dimension(150, 0));
     entityScrollPane.setMaximumSize(new Dimension(0, 250));
@@ -282,8 +283,10 @@ public class MapSelectionPanel extends JSplitPane {
     };
     tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
-    tabPane.setIconAt(0, new ImageIcon(Resources.getImage("layer.png")));
-    tabPane.setIconAt(1, new ImageIcon(Resources.getImage("object_cube-10x10.png")));
+    
+    tabPane.setIconAt(0, new ImageIcon(Resources.getImage("object_cube-10x10.png")));
+    tabPane.setIconAt(1, new ImageIcon(Resources.getImage("layer.png")));
+    
     this.setRightComponent(tabPane);
 
     listObjectLayers = new JCheckBoxList();
