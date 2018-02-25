@@ -37,4 +37,8 @@ public interface IAnimationController extends IUpdateable {
   public void playAnimation(final String animationName);
 
   public void setDefaultAnimation(Animation defaultAnimation);
+  
+  public void remove(Animation animation);
+
+  public void remove(IImageEffect effect);
 }

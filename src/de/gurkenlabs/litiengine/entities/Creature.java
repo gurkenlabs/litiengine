@@ -15,7 +15,7 @@ import de.gurkenlabs.util.geom.GeometricUtilities;
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
   private final List<Consumer<IMobileEntity>> entityMovedConsumer;
-  
+
   private int acceleration;
   private int deceleration;
   private long lastMoved;
@@ -25,6 +25,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private String spritePrefix;
 
   public Creature() {
+    this(null);
+  }
+
+  public Creature(String spritePrefix) {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
@@ -34,17 +38,19 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.setTurnOnMove(movementInfo.turnOnMove());
     }
 
-    AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
-    if (animationInfo != null) {
-      this.setSpritePrefix(animationInfo.spritePrefix());
+    if (spritePrefix != null) {
+      this.setSpritePrefix(spritePrefix);
     } else {
-      this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
-    }
-  }
 
-  public Creature(String spritePrefix) {
-    this();
-    this.setSpritePrefix(spritePrefix);
+      AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
+      if (animationInfo != null) {
+        this.setSpritePrefix(animationInfo.spritePrefix());
+      } else {
+        this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
+      }
+    }
+
+    Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
   }
 
   @Override
@@ -70,8 +76,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
    * Gets the current sprite prefix of this instance. Overwriting this allows
    * for a more sophisticated logic that determines the sprite to be used; e.g.
    * This method could append certain properties of the creature (state, weapon,
-   * ...) to the default string.
-   * <br><br>
+   * ...) to the default string. <br>
+   * <br>
    * The value of this method will be used e.g. by the
    * {@link CreatureAnimationController} to determine the animation that it
    * should play.

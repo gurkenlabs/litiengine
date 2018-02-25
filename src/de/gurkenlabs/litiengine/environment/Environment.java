@@ -1088,6 +1088,7 @@ public class Environment implements IEnvironment {
     registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
     registerMapObjectLoader(MapObjectType.AREA, new MapAreaMapObjectLoader());
     registerMapObjectLoader(MapObjectType.STATICSHADOW, new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.CREATURE, new CreatureMapObjectLoader());
   }
 
   /**

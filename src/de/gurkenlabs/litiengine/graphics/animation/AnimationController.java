@@ -76,6 +76,7 @@ public class AnimationController implements IAnimationController {
     }
 
     this.getImageEffects().add(effect);
+    Collections.sort(this.getImageEffects());
   }
 
   @Override
@@ -163,6 +164,10 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public boolean hasAnimation(String animationName) {
+    if (animationName == null || animationName.isEmpty()) {
+      return false;
+    }
+
     return this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName));
   }
 
@@ -200,6 +205,32 @@ public class AnimationController implements IAnimationController {
 
     for (final Consumer<Animation> cons : this.playbackConsumer) {
       cons.accept(this.getCurrentAnimation());
+    }
+  }
+
+  @Override
+  public void remove(Animation animation) {
+    if (animation == null) {
+      return;
+    }
+
+    if (this.getAnimations().contains(animation)) {
+      this.animations.remove(animation);
+    }
+
+    if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
+      this.setDefaultAnimation(!this.getAnimations().isEmpty() ? this.getAnimations().get(0) : null);
+    }
+  }
+
+  @Override
+  public void remove(IImageEffect effect) {
+    if (effect == null) {
+      return;
+    }
+
+    if (this.getImageEffects().contains(effect)) {
+      this.imageEffects.remove(effect);
     }
   }
 

@@ -37,23 +37,25 @@ public class CreatureShadowImageEffect extends ImageEffect {
 
     final BufferedImage buffer = ImageProcessing.getCompatibleImage(image.getWidth() * 2 + 2, image.getHeight() * 2);
     final Graphics2D graphics = buffer.createGraphics();
+    float offsetX = image.getWidth() / 2.0f;
+    float offsetY = image.getHeight() / 2.0f;
 
-    this.drawShadow(graphics, image.getWidth(), image.getHeight());
+    this.drawShadow(graphics, image.getWidth(), image.getHeight(), offsetX, offsetY);
 
-    graphics.drawImage(image, 0, 0, null);
+    RenderEngine.renderImage(graphics, image, offsetX, offsetY);
     graphics.dispose();
     return buffer;
   }
 
-  protected Ellipse2D getShadowEllipse(final int spriteWidth, final int spriteHeight) {
+  protected Ellipse2D getShadowEllipse(final float spriteWidth, final float spriteHeight, float offsetX, float offsetY) {
     final double ellipseWidth = 0.60 * spriteWidth;
     final double ellipseHeight = 0.20 * spriteWidth;
     final double startX = (spriteWidth - ellipseWidth) / 2.0;
     final double startY = spriteHeight - ellipseHeight;
-    return new Ellipse2D.Double(startX, startY, ellipseWidth, ellipseHeight);
+    return new Ellipse2D.Double(startX + offsetX, startY + offsetY, ellipseWidth, ellipseHeight);
   }
 
-  private void drawShadow(final Graphics2D graphics, final int spriteWidth, final int spriteHeight) {
+  private void drawShadow(final Graphics2D graphics, final float spriteWidth, final float spriteHeight, float offsetX, float offsetY) {
     graphics.setColor(this.shadowColor);
     final RenderingHints hints = graphics.getRenderingHints();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -61,7 +63,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
     graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
     graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-    graphics.fill(getShadowEllipse(spriteWidth, spriteHeight));
+    graphics.fill(getShadowEllipse(spriteWidth, spriteHeight, offsetX, offsetY));
     graphics.setRenderingHints(hints);
   }
 }

@@ -13,7 +13,6 @@ import javax.swing.tree.TreePath;
 
 import de.gurkenlabs.litiengine.GameFile;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;

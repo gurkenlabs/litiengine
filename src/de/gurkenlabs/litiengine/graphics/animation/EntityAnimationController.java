@@ -20,8 +20,10 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.animationRules = new ConcurrentHashMap<>();
     this.entity = entity;
 
-    AnimationInfo info = entity.getClass().getAnnotation(AnimationInfo.class);
-    this.spritePrefix = info != null ? info.spritePrefix() : null;
+    if (entity != null) {
+      AnimationInfo info = entity.getClass().getAnnotation(AnimationInfo.class);
+      this.spritePrefix = info != null ? info.spritePrefix() : null;
+    }
   }
 
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
@@ -65,7 +67,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
         if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
           this.playAnimation(animationName);
         }
-        
+
         break;
       }
     }

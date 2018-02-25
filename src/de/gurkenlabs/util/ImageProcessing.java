@@ -2,6 +2,7 @@ package de.gurkenlabs.util;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -130,16 +131,29 @@ public class ImageProcessing {
 
     final BufferedImage strokeImg = flashVisiblePixels(image, strokeColor);
     // Draw the image on to the buffered image
-    final Graphics2D bGr = bimage.createGraphics();
-    bGr.drawImage(strokeImg, 0, 1, null);
-    bGr.drawImage(strokeImg, 2, 1, null);
-    bGr.drawImage(strokeImg, 1, 0, null);
-    bGr.drawImage(strokeImg, 1, 2, null);
-    if (!borderOnly) {
-      bGr.drawImage(image, 1, 1, null);
+    final Graphics2D graphics = bimage.createGraphics();
+    graphics.drawImage(strokeImg, 0, 1, null);
+    graphics.drawImage(strokeImg, 2, 1, null);
+    graphics.drawImage(strokeImg, 1, 0, null);
+    graphics.drawImage(strokeImg, 1, 2, null);
+
+    Composite old = graphics.getComposite();
+    graphics.setComposite(AlphaComposite.Clear);
+    for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = 0; x < image.getWidth(); x++) {
+        final int pixel = image.getRGB(x, y);
+        if (pixel >> 24 != 0x00) {
+          graphics.fillRect(x + 1, y + 1, 1, 1);
+        }
+      }
     }
 
-    bGr.dispose();
+    if (!borderOnly) {
+      graphics.setComposite(old);
+      graphics.drawImage(image, 1, 1, null);
+    }
+
+    graphics.dispose();
 
     return bimage;
   }

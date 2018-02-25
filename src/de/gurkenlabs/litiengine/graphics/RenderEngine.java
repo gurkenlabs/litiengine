@@ -70,7 +70,7 @@ public final class RenderEngine implements IRenderEngine {
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
-  
+
   @Override
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
     this.renderText(g, text, location.getX(), location.getY());
@@ -361,7 +361,14 @@ public final class RenderEngine implements IRenderEngine {
     final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
-      renderImage(g, img, Game.getCamera().getViewPortLocation(entity));
+      if (img == null) {
+        return;
+      }
+
+      float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
+      float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
+
+      renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY));
     }
 
     if (entity instanceof IRenderable) {

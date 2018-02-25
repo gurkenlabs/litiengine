@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.image.BufferedImage;
+
 import de.gurkenlabs.litiengine.Game;
 
 public abstract class ImageEffect implements IImageEffect {
@@ -7,6 +9,7 @@ public abstract class ImageEffect implements IImageEffect {
 
   private final String name;
   private final int ttl;
+  private int priority;
 
   protected ImageEffect(final String name) {
     this(0, name);
@@ -36,5 +39,20 @@ public abstract class ImageEffect implements IImageEffect {
   @Override
   public boolean timeToLiveReached() {
     return this.getTimeToLive() > 0 && this.getAliveTime() > this.getTimeToLive();
+  }
+
+  @Override
+  public int getPriority() {
+    return priority;
+  }
+
+  @Override
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
+  @Override
+  public int compareTo(IImageEffect other) {
+    return Integer.compare(this.getPriority(), other.getPriority());
   }
 }

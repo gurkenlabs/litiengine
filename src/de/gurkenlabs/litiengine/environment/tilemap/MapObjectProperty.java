@@ -31,6 +31,9 @@ public final class MapObjectProperty {
   public static final String DECORMOB_BEHAVIOUR = "decormob-behaviour";
   public static final String DECORMOB_VELOCITY = "decormob-velocity";
 
+  // creature
+  public static final String CREATURE_TYPE = "creature-type";
+  
   // props
   public static final String PROP_INDESTRUCTIBLE = "indestructible";
   public static final String PROP_MATERIAL = "material";

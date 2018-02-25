@@ -31,6 +31,7 @@ import de.gurkenlabs.util.ImageProcessing;
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {
   public static final String IDLE = "-idle";
   public static final String WALK = "-walk";
+  public static final String DEAD = "-dead";
 
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
@@ -38,11 +39,11 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   public CreatureAnimationController(T entity, Animation defaultAnimation) {
-    this(entity, defaultAnimation, true);
+    this(entity, true, defaultAnimation);
   }
 
-  public CreatureAnimationController(T entity, Animation defaultAnimation, boolean useFlippedSpritesAsFallback) {
-    super(entity, defaultAnimation);
+  public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback, Animation defaultAnimation, final Animation... animations) {
+    super(entity, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
 
@@ -59,34 +60,59 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    * @return The name of the current animation that should be played
    */
   protected String getCurrentAnimationName() {
-    return this.getEntity().isIdle() ? this.getIdleSpriteName(this.getEntity().getFacingDirection()) : this.getWalkSpriteName(this.getEntity().getFacingDirection());
+    if (this.getEntity().isDead()) {
+      String deadName = this.getSpritePrefix() + DEAD;
+      if (this.hasAnimation(deadName)) {
+        return deadName;
+      }
+    }
+
+    if (this.getEntity().isIdle()) {
+      String idleName = this.getIdleSpriteName(this.getEntity().getFacingDirection());
+      if (this.hasAnimation(idleName)) {
+        return idleName;
+      }
+
+      return this.getWalkSpriteName(this.getEntity().getFacingDirection());
+    }
+
+    String walkName = this.getWalkSpriteName(this.getEntity().getFacingDirection());
+    if (this.hasAnimation(walkName)) {
+      return walkName;
+    }
+
+    return this.getIdleSpriteName(this.getEntity().getFacingDirection());
   }
 
   private void initializeAvailableAnimations() {
-
     for (Direction dir : Direction.values()) {
       // initialize walking animations
-      Spritesheet walkSprite = getWalkSprite(dir);
+      Spritesheet walkSprite = Spritesheet.find(this.getSpriteName(WALK) + "-" + dir.toString().toLowerCase());
       if (walkSprite != null) {
         this.add(new Animation(walkSprite, true));
       }
 
       // initialize idle animations
-      Spritesheet idleSprite = getIdleSprite(dir);
+      Spritesheet idleSprite = Spritesheet.find(this.getSpriteName(IDLE) + "-" + dir.toString().toLowerCase());
       if (idleSprite != null) {
         this.add(new Animation(idleSprite, true));
       }
     }
+
+    Spritesheet deadSprite = Spritesheet.find(this.getSpritePrefix() + DEAD);
+    if (deadSprite != null) {
+      this.add(new Animation(deadSprite, true));
+    }
   }
 
   private void initializeFlippedAnimations() {
-    String leftIdle = getIdleSpriteName(Direction.LEFT);
-    String leftWalk = getWalkSpriteName(Direction.LEFT);
+    String leftIdle = this.getSpriteName(IDLE) + "-left";
+    String leftWalk = this.getSpriteName(WALK) + "-left";
     Optional<Animation> leftIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftIdle)).findFirst();
     Optional<Animation> leftWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftWalk)).findFirst();
 
-    String rightIdle = getIdleSpriteName(Direction.RIGHT);
-    String rightWalk = getWalkSpriteName(Direction.RIGHT);
+    String rightIdle = this.getSpriteName(IDLE) + "-right";
+    String rightWalk = this.getSpriteName(WALK) + "-right";
     Optional<Animation> rightIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightIdle)).findFirst();
     Optional<Animation> rightWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
 
@@ -111,14 +137,6 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
     Spritesheet leftIdleSpritesheet = Spritesheet.load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
-  }
-
-  private Spritesheet getIdleSprite(Direction dir) {
-    return Spritesheet.find(getIdleSpriteName(dir));
-  }
-
-  private Spritesheet getWalkSprite(Direction dir) {
-    return Spritesheet.find(getWalkSpriteName(dir));
   }
 
   private String getIdleSpriteName(Direction dir) {
