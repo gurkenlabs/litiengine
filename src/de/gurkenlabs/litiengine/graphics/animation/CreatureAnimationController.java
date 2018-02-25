@@ -153,18 +153,27 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       return name;
     }
 
-    return getFallbackSpriteName(state);
+    return getFallbackSpriteName(state, dir);
   }
 
-  private String getFallbackSpriteName(String state) {
+  private static String getOppositeState(String state) {
+    return state.equalsIgnoreCase(IDLE) ? WALK : IDLE;
+  }
+
+  private String getFallbackSpriteName(String state, Direction dir) {
+    String fallbackStateName = this.getSpriteName(getOppositeState(state)) + "-" + dir.toString().toLowerCase();
+    if (this.hasAnimation(fallbackStateName)) {
+      return fallbackStateName;
+    }
+
     String baseName = this.getSpriteName(state);
     if (this.hasAnimation(baseName)) {
       return baseName;
     }
 
     // search for any animation for the specified state with dir information
-    for (Direction dir : Direction.values()) {
-      final String name = this.getSpriteName(state) + "-" + dir.toString().toLowerCase();
+    for (Direction d : Direction.values()) {
+      final String name = this.getSpriteName(state) + "-" + d.toString().toLowerCase();
       if (this.hasAnimation(name)) {
         return name;
       }
