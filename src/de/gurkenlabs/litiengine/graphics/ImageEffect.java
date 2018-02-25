@@ -8,6 +8,10 @@ public abstract class ImageEffect implements IImageEffect {
   private final String name;
   private final int ttl;
 
+  protected ImageEffect(final String name) {
+    this(0, name);
+  }
+
   protected ImageEffect(final int ttl, final String name) {
     this.ttl = ttl;
     this.name = name;

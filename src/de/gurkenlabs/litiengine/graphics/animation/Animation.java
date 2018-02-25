@@ -26,6 +26,10 @@ public class Animation implements IUpdateable, ILaunchable {
   private boolean playing;
   private final Spritesheet spritesheet;
 
+  public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
+    this(Spritesheet.find(spriteSheetName), loop, randomizeStart, keyFrameDurations);
+  }
+
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);
   }
