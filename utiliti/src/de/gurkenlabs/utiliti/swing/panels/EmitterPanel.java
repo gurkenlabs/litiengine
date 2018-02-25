@@ -91,7 +91,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
       if (!btnPause.isSelected()) {
         this.btnPause.setIcon(Icons.PLAY);
       } else {
-        this.btnPause.setIcon(Icons.PLAY);
+        this.btnPause.setIcon(Icons.PAUSE);
       }
     });
   }
