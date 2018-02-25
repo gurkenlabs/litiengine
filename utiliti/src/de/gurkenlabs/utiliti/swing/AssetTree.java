@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -17,20 +15,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 
 @SuppressWarnings("serial")
 public class AssetTree extends JTree {
-  private static final Icon ASSET_ICON = new ImageIcon(Resources.getImage("asset.png"));
-  private static final Icon SPRITESHEET_ICON = new ImageIcon(Resources.getImage("spritesheet.png"));
-  private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
-  private static final Icon CREATURE_ICON = new ImageIcon(Resources.getImage("creature.png"));
-  private static final Icon MISC_ICON = new ImageIcon(Resources.getImage("misc.png"));
-  private static final Icon TILESET_ICON = new ImageIcon(Resources.getImage("tileset.png"));
-  private static final Icon EMITTER_ICON = new ImageIcon(Resources.getImage("emitter.png"));
-  private static final Icon BLUEPRINT_ICON = new ImageIcon(Resources.getImage("blueprint.png"));
-
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
   private final DefaultMutableTreeNode nodeSpritesheets;
@@ -42,14 +32,14 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeCreatures;
 
   public AssetTree() {
-    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_assets"), ASSET_ICON));
-    this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets"), SPRITESHEET_ICON));
-    this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets_props"), PROP_ICON));
-    this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets_misc"), MISC_ICON));
-    this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_tilesets"), TILESET_ICON));
-    this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_emitters"), EMITTER_ICON));
-    this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_blueprints"), BLUEPRINT_ICON));
-    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_creatures"), CREATURE_ICON));
+    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_assets"), Icons.ASSET));
+    this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets"), Icons.SPRITESHEET));
+    this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets_props"), Icons.PROP));
+    this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets_misc"), Icons.MISC));
+    this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_tilesets"), Icons.TILESET));
+    this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_emitters"), Icons.EMITTER));
+    this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_blueprints"), Icons.BLUEPRINT));
+    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_creatures"), Icons.CREATURE));
     
     this.nodeSpritesheets.add(this.nodeSpriteProps);
     this.nodeSpritesheets.add(this.nodeCreatures);

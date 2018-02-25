@@ -21,11 +21,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel<IMapObject> {
-  private ImageIcon play;
-  private ImageIcon pause;
   private JToggleButton btnPause;
   private CustomEmitter emitter;
 
@@ -33,9 +32,6 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_emitter"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
-
-    this.play = new ImageIcon(Resources.getImage("button-play.png"));
-    this.pause = new ImageIcon(Resources.getImage("button-pause.png"));
 
     Box horizontalBox = Box.createHorizontalBox();
 
@@ -73,7 +69,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
     this.btnPause = new JToggleButton();
     this.btnPause.setSelected(true);
     this.btnPause.setPreferredSize(new Dimension(40, 23));
-    this.btnPause.setIcon(pause);
+    this.btnPause.setIcon(Icons.PAUSE);
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(horizontalBox, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
         .addComponent(btnPause, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE).addGroup(groupLayout.createSequentialGroup().addComponent(btnCustomize).addPreferredGap(ComponentPlacement.RELATED).addComponent(btnSave))).addContainerGap()));
@@ -93,9 +89,9 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
       }
 
       if (!btnPause.isSelected()) {
-        this.btnPause.setIcon(play);
+        this.btnPause.setIcon(Icons.PLAY);
       } else {
-        this.btnPause.setIcon(pause);
+        this.btnPause.setIcon(Icons.PLAY);
       }
     });
   }

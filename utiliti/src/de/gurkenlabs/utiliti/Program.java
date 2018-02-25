@@ -578,7 +578,8 @@ public class Program {
     consoleScrollPane.setViewportView(consoleTextArea);
 
     consoleTextArea.setEditable(false);
-    consoleTextArea.setBackground(Color.DARK_GRAY);
+    consoleTextArea.setBackground(AssetPanel.BACKGROUND);
+    consoleTextArea.setForeground(Color.WHITE);
     consoleTextArea.setAutoscrolls(true);
     root.addHandler(new ConsoleLogHandler(consoleTextArea));
     return consoleScrollPane;

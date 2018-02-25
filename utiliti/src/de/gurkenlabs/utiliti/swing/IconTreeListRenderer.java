@@ -16,17 +16,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
-  public static final Icon DEFAULT_NODE_ICON = new ImageIcon(Resources.getImage("bullet.png"));
+
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
@@ -39,7 +39,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   @Override
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-    this.label.setIcon(DEFAULT_NODE_ICON);
+    this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
 
     if (value instanceof DefaultMutableTreeNode) {

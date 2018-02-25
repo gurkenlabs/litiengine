@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -50,6 +49,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
@@ -78,7 +78,7 @@ public class AssetPanelItem extends JPanel {
   public AssetPanelItem(Object origin) {
     setPreferredSize(new Dimension(64, 100));
     this.origin = origin;
-    this.setBackground(Color.DARK_GRAY);
+    this.setBackground(AssetPanel.BACKGROUND);
     this.setBorder(normalBorder);
 
     this.getInputMap(JPanel.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
@@ -126,9 +126,9 @@ public class AssetPanelItem extends JPanel {
       @Override
       public void focusLost(FocusEvent e) {
         UIDefaults defaults = UIManager.getDefaults();
-        setBackground(Color.DARK_GRAY);
+        setBackground(AssetPanel.BACKGROUND);
         setForeground(defaults.getColor("Tree.foreground"));
-        textField.setForeground(Color.LIGHT_GRAY);
+        textField.setForeground(Color.WHITE);
         setBorder(normalBorder);
 
         btnEdit.setVisible(false);
@@ -173,7 +173,7 @@ public class AssetPanelItem extends JPanel {
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
     this.textField.setHorizontalAlignment(JTextField.CENTER);
-    this.textField.setForeground(Color.LIGHT_GRAY);
+    this.textField.setForeground(Color.WHITE);
     this.textField.setBackground(null);
     this.textField.setBorder(null);
     this.textField.setEditable(false);
@@ -194,7 +194,7 @@ public class AssetPanelItem extends JPanel {
     btnAdd.setMinimumSize(new Dimension(16, 16));
     btnAdd.setPreferredSize(new Dimension(16, 16));
     btnAdd.setOpaque(false);
-    btnAdd.setIcon(new ImageIcon(Resources.getImage("addx12.png")));
+    btnAdd.setIcon(Icons.ADD);
     btnAdd.setVisible(false);
     btnAdd.setEnabled(canAdd());
 
@@ -236,7 +236,7 @@ public class AssetPanelItem extends JPanel {
     btnEdit.setMinimumSize(new Dimension(16, 16));
     btnEdit.setPreferredSize(new Dimension(16, 16));
     btnEdit.setOpaque(false);
-    btnEdit.setIcon(new ImageIcon(Resources.getImage("pencil.png")));
+    btnEdit.setIcon(Icons.PENCIL);
     btnEdit.setVisible(false);
 
     btnDelete = new JButton("");
@@ -246,7 +246,7 @@ public class AssetPanelItem extends JPanel {
     btnDelete.setMinimumSize(new Dimension(16, 16));
     btnDelete.setPreferredSize(new Dimension(16, 16));
     btnDelete.setOpaque(false);
-    btnDelete.setIcon(new ImageIcon(Resources.getImage("button-deletex12.png")));
+    btnDelete.setIcon(Icons.DELETE);
     btnDelete.setVisible(false);
 
     btnExport = new JButton("");
@@ -256,7 +256,7 @@ public class AssetPanelItem extends JPanel {
     btnExport.setMinimumSize(new Dimension(16, 16));
     btnExport.setPreferredSize(new Dimension(16, 16));
     btnExport.setOpaque(false);
-    btnExport.setIcon(new ImageIcon(Resources.getImage("export.png")));
+    btnExport.setIcon(Icons.EXPORT);
     btnExport.setVisible(false);
 
     buttonPanel.add(btnEdit);
