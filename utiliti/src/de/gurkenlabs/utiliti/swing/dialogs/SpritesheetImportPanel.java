@@ -248,7 +248,7 @@ public class SpritesheetImportPanel extends JPanel {
     ArrayList<SpriteSheetInfo> infos = new ArrayList<>();
 
     for (int i = 0; i < this.fileList.getModel().getSize(); i++) {
-      SpriteFileWrapper wrap = this.fileListModel.getElementAt(0);
+      SpriteFileWrapper wrap = this.fileListModel.getElementAt(i);
       infos.add(wrap.createSpritesheetInfo());
     }
 
