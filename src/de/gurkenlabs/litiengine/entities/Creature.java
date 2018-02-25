@@ -27,13 +27,14 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private String spritePrefix;
 
   public Creature() {
-    super();
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
-    final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
-    this.velocity = info.velocity();
-    this.acceleration = info.acceleration();
-    this.deceleration = info.deceleration();
-    this.setTurnOnMove(info.turnOnMove());
+    final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
+    if (movementInfo != null) {
+      this.velocity = movementInfo.velocity();
+      this.acceleration = movementInfo.acceleration();
+      this.deceleration = movementInfo.deceleration();
+      this.setTurnOnMove(movementInfo.turnOnMove());
+    }
 
     AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
     if (animationInfo != null) {
@@ -41,6 +42,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
     } else {
       this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
     }
+  }
+
+  public Creature(String spritePrefix) {
+    this();
+    this.setSpritePrefix(spritePrefix);
   }
 
   @Override
