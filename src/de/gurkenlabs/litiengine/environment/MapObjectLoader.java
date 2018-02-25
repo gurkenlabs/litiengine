@@ -3,6 +3,9 @@ package de.gurkenlabs.litiengine.environment;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.gurkenlabs.core.Align;
+import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -48,5 +51,13 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
         entity.addTag(tag);
       }
     }
+  }
+
+  protected void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
+    entity.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
+    entity.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
+    entity.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
+    entity.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
+    entity.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
   }
 }

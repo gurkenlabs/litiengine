@@ -19,25 +19,15 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<IEffect> appliedEffects;
-  /** The attributes. */
-  private final CombatAttributes attributes;
   private final List<Consumer<ICombatEntity>> entityDeathConsumer;
-
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
-
   private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
-
-  /** The is indestructible. */
+  private final CombatAttributes attributes;
+  
   private boolean isIndestructible;
-
   private ICombatEntity target;
-
-  /** The team. */
   private int team;
 
-  /**
-   * Instantiates a new attackable entity.
-   */
   public CombatEntity() {
     super();
     this.entityDeathConsumer = new CopyOnWriteArrayList<>();
@@ -52,9 +42,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.setupAttributes(this.getAttributes());
   }
 
-  /**
-   * Die.
-   */
   @Override
   public void die() {
     if (this.isDead()) {
@@ -226,15 +213,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
     this.setCollision(true);
   }
-
-  /**
-   * Sets the indestructible.
-   *
-   * @param ind
-   *          the new indestructible
-   */
-  public void setIndestructible(final boolean ind) {
-    this.isIndestructible = ind;
+  
+  @Override
+  public void setIndestructible(final boolean indestructible) {
+    this.isIndestructible = indestructible;
   }
 
   @Override

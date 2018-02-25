@@ -42,6 +42,8 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public void resurrect();
 
+  public void setIndestructible(final boolean indestructible);
+
   public void setTarget(final ICombatEntity target);
 
   public void setTeam(int team);
