@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -24,9 +25,10 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
       return super.load(mapObject);
     }
 
-    Creature creature = this.createNewCreature(mapObject);
+    Creature creature = this.createNewCreature(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
     loadProperties(creature, mapObject);
     loadCollisionProperties(creature, mapObject);
+    creature.setFacingDirection(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
     // TODO: load IMobileEntity and ICombatEntity properties
 
     Collection<IEntity> entities = super.load(mapObject);
@@ -34,7 +36,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     return entities;
   }
 
-  protected Creature createNewCreature(IMapObject mapObject) {
+  protected Creature createNewCreature(IMapObject mapObject, String spawnType) {
     return new Creature(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME));
   }
 }

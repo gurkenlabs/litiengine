@@ -43,6 +43,7 @@ import javax.swing.tree.TreePath;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -63,6 +64,7 @@ import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
   private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
+  private static final Icon CREATURE_ICON = new ImageIcon(Resources.getImage("creature.png"));
   private static final Icon FOLDER_ICON = new ImageIcon(Resources.getImage("object_cube-10x10.png"));
   private static final Icon LIGHT_ICON = new ImageIcon(Resources.getImage("bulb.png"));
   private static final Icon TRIGGER_ICON = new ImageIcon(Resources.getImage("trigger.png"));
@@ -91,6 +93,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
   private final DefaultMutableTreeNode nodeProps;
+  private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeLights;
   private final DefaultMutableTreeNode nodeTriggers;
   private final DefaultMutableTreeNode nodeSpawnpoints;
@@ -247,6 +250,7 @@ public class MapSelectionPanel extends JSplitPane {
 
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), FOLDER_ICON));
     this.nodeProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_props"), PROP_ICON));
+    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_creatures"), CREATURE_ICON));
     this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), LIGHT_ICON));
     this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
     this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
@@ -255,17 +259,18 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), SHADOWBOX_ICON));
     this.nodeEmitter = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_emitter"), EMITTER_ICON));
 
-    this.nodeRoot.add(nodeProps);
-    this.nodeRoot.add(nodeLights);
-    this.nodeRoot.add(nodeTriggers);
-    this.nodeRoot.add(nodeSpawnpoints);
-    this.nodeRoot.add(nodeCollisionBoxes);
-    this.nodeRoot.add(nodeMapAreas);
-    this.nodeRoot.add(nodeStaticShadows);
-    this.nodeRoot.add(nodeEmitter);
+    this.nodeRoot.add(this.nodeProps);
+    this.nodeRoot.add(this.nodeCreatures);
+    this.nodeRoot.add(this.nodeLights);
+    this.nodeRoot.add(this.nodeTriggers);
+    this.nodeRoot.add(this.nodeSpawnpoints);
+    this.nodeRoot.add(this.nodeCollisionBoxes);
+    this.nodeRoot.add(this.nodeMapAreas);
+    this.nodeRoot.add(this.nodeStaticShadows);
+    this.nodeRoot.add(this.nodeEmitter);
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
-    this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
+    this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeCreatures, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
     MouseListener ml = new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -582,6 +587,7 @@ public class MapSelectionPanel extends JSplitPane {
 
     this.nodeLights.setUserObject(new IconTreeListItem(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"), LIGHT_ICON));
     this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), PROP_ICON));
+    this.nodeCreatures.setUserObject(new IconTreeListItem(Game.getEnvironment().getCreatures().size() + " " + Resources.get("panel_mapselection_creatures"), CREATURE_ICON));
     this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
     this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
     this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), COLLISIONBOX_ICON));
@@ -597,6 +603,11 @@ public class MapSelectionPanel extends JSplitPane {
     for (Prop prop : Game.getEnvironment().getProps()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
       this.nodeProps.add(node);
+    }
+    
+    for (Creature creature : Game.getEnvironment().getCreatures()) {
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(creature));
+      this.nodeCreatures.add(node);
     }
 
     for (Trigger trigger : Game.getEnvironment().getTriggers()) {

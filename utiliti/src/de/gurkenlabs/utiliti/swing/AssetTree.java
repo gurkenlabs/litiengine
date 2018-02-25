@@ -18,12 +18,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 
 @SuppressWarnings("serial")
 public class AssetTree extends JTree {
   private static final Icon ASSET_ICON = new ImageIcon(Resources.getImage("asset.png"));
   private static final Icon SPRITESHEET_ICON = new ImageIcon(Resources.getImage("spritesheet.png"));
   private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
+  private static final Icon CREATURE_ICON = new ImageIcon(Resources.getImage("creature.png"));
   private static final Icon MISC_ICON = new ImageIcon(Resources.getImage("misc.png"));
   private static final Icon TILESET_ICON = new ImageIcon(Resources.getImage("tileset.png"));
   private static final Icon EMITTER_ICON = new ImageIcon(Resources.getImage("emitter.png"));
@@ -37,6 +39,7 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeTileSets;
   private final DefaultMutableTreeNode nodeEmitters;
   private final DefaultMutableTreeNode nodeBlueprints;
+  private final DefaultMutableTreeNode nodeCreatures;
 
   public AssetTree() {
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_assets"), ASSET_ICON));
@@ -46,8 +49,10 @@ public class AssetTree extends JTree {
     this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_tilesets"), TILESET_ICON));
     this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_emitters"), EMITTER_ICON));
     this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_blueprints"), BLUEPRINT_ICON));
-
+    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_creatures"), CREATURE_ICON));
+    
     this.nodeSpritesheets.add(this.nodeSpriteProps);
+    this.nodeSpritesheets.add(this.nodeCreatures);
     this.nodeSpritesheets.add(this.nodeSpriteMisc);
 
     this.nodeRoot.add(this.nodeSpritesheets);
@@ -87,6 +92,7 @@ public class AssetTree extends JTree {
 
     final TreePath spritePath = new TreePath(this.nodeSpritesheets.getPath());
     final TreePath propPath = new TreePath(this.nodeSpriteProps.getPath());
+    final TreePath creaturePath = new TreePath(this.nodeCreatures.getPath());
     final TreePath miscPath = new TreePath(this.nodeSpriteMisc.getPath());
     final TreePath tilesetPath = new TreePath(this.nodeTileSets.getPath());
     final TreePath emitterPath = new TreePath(this.nodeEmitters.getPath());
@@ -97,8 +103,10 @@ public class AssetTree extends JTree {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Program.PROP_SPRITE_PREFIX)).collect(Collectors.toList()));
-    } else if (selectedPath.equals(miscPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Program.PROP_SPRITE_PREFIX)).collect(Collectors.toList()));
+    } else if (this.getSelectionPath().equals(creaturePath)) {
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).collect(Collectors.toList()));
+    }else if (selectedPath.equals(miscPath)) {
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Program.PROP_SPRITE_PREFIX) && CreaturePanel.getCreatureSpriteName(x.getName()) == null).collect(Collectors.toList()));
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>();
       allTilesets.addAll(gameFile.getTilesets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));

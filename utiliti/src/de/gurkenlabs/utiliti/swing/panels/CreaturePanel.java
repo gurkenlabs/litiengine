@@ -24,10 +24,17 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropertyActionListener;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel.MapObjectPropteryFocusListener;
+
+import javax.swing.JTextField;
+import javax.swing.DefaultComboBoxModel;
 
 @SuppressWarnings("serial")
 public class CreaturePanel extends PropertyPanel<IMapObject> {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
+  private final JComboBox<Direction> comboBoxDirection;
+  private final JTextField textFieldType;
 
   /**
    * Create the panel.
@@ -41,15 +48,80 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
+
+    this.comboBoxDirection = new JComboBox<>();
+    this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
+
+    JLabel label = new JLabel("direction");
+
+    textFieldType = new JTextField();
+    textFieldType.setColumns(10);
+
+    JLabel lblType = new JLabel("type");
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE).addGap(10)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+    groupLayout.setHorizontalGroup(
+      groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addContainerGap(259, Short.MAX_VALUE)));
+          .addContainerGap()
+          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(comboBoxSpriteSheets, 0, 227, Short.MAX_VALUE))
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(textFieldType, GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(comboBoxDirection, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+          .addContainerGap())
+    );
+    groupLayout.setVerticalGroup(
+      groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+          .addPreferredGap(ComponentPlacement.RELATED)
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(textFieldType, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
+            .addComponent(label, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
+            .addComponent(comboBoxDirection, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+          .addContainerGap(233, Short.MAX_VALUE))
+    );
     setLayout(groupLayout);
     this.setupChangedListeners();
+  }
+
+  public static String getCreatureSpriteName(String name) {
+    if (name.endsWith(CreatureAnimationController.IDLE)) {
+      return name.substring(0, name.length() - CreatureAnimationController.IDLE.length());
+    }
+
+    if (name.endsWith(CreatureAnimationController.WALK)) {
+      return name.substring(0, name.length() - CreatureAnimationController.WALK.length());
+    }
+
+    if (name.endsWith(CreatureAnimationController.DEAD)) {
+      return name.substring(0, name.length() - CreatureAnimationController.DEAD.length());
+    }
+
+    for (Direction dir : Direction.values()) {
+      String idle = CreatureAnimationController.IDLE + "-" + dir.toString().toLowerCase();
+      if (name.endsWith(idle)) {
+        return name.substring(0, name.length() - idle.length());
+      }
+
+      String walk = CreatureAnimationController.WALK + "-" + dir.toString().toLowerCase();
+      if (name.endsWith(walk)) {
+        return name.substring(0, name.length() - walk.length());
+      }
+    }
+
+    return null;
   }
 
   @Override
@@ -67,6 +139,8 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
   @Override
   protected void clearControls() {
     this.comboBoxSpriteSheets.setSelectedItem(null);
+    this.textFieldType.setText(null);
+    this.comboBoxDirection.setSelectedItem(Direction.UNDEFINED);
   }
 
   @Override
@@ -80,6 +154,9 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
         }
       }
     }
+
+    this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
+    this.comboBoxDirection.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
   }
 
   private void setupChangedListeners() {
@@ -87,6 +164,13 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
       m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
+
+    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> {
+      m.setCustomProperty(MapObjectProperty.SPAWN_DIRECTION, this.comboBoxDirection.getSelectedItem().toString());
+    }));
+
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
   }
 
   private void loadAvailableCreatureSprites() {
@@ -108,7 +192,7 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
       Spritesheet sprite = Spritesheet.find(value);
       if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
         BufferedImage img = sprite.getSprite(0);
-        
+
         BufferedImage scaled;
         String cacheKey = "iconx24" + sprite.getName();
         if (ImageCache.SPRITES.containsKey(cacheKey)) {
@@ -122,7 +206,7 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
 
           ImageCache.SPRITES.put(cacheKey, scaled);
         }
-        
+
         if (scaled != null) {
           label.setIcon(new ImageIcon(scaled));
         }
@@ -130,29 +214,5 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
 
       this.comboBoxSpriteSheets.addItem(label);
     }
-  }
-
-  private static String getCreatureSpriteName(String name) {
-    if (name.endsWith(CreatureAnimationController.IDLE)) {
-      return name.substring(0, name.length() - CreatureAnimationController.IDLE.length());
-    }
-
-    if (name.endsWith(CreatureAnimationController.WALK)) {
-      return name.substring(0, name.length() - CreatureAnimationController.WALK.length());
-    }
-
-    for (Direction dir : Direction.values()) {
-      String idle = CreatureAnimationController.IDLE + "-" + dir.toString().toLowerCase();
-      if (name.endsWith(idle)) {
-        return name.substring(0, name.length() - idle.length());
-      }
-
-      String walk = CreatureAnimationController.WALK + "-" + dir.toString().toLowerCase();
-      if (name.endsWith(walk)) {
-        return name.substring(0, name.length() - walk.length());
-      }
-    }
-
-    return null;
   }
 }
