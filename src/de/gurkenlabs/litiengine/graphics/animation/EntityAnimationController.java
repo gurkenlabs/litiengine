@@ -3,13 +3,15 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
-  private final Map<Predicate<T>, String> animationRules;
+  private final Map<Predicate<T>, Function<T, String>> animationRules;
   private final T entity;
   private String spritePrefix;
 
@@ -32,7 +34,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void addAnimationRule(Predicate<T> rule, String animationName) {
+  public void addAnimationRule(Predicate<T> rule, Function<T, String> animationName) {
     this.animationRules.put(rule, animationName);
   }
 
@@ -45,13 +47,25 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public void update() {
     super.update();
 
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return;
+    }
+
     if (this.getCurrentAnimation() != null && !this.getCurrentAnimation().isLoop() && this.getCurrentAnimation().isPlaying()) {
       return;
     }
 
-    for (Entry<Predicate<T>, String> animationRule : this.animationRules.entrySet()) {
+    if (this.getEntity() == null) {
+      return;
+    }
+
+    for (Entry<Predicate<T>, Function<T, String>> animationRule : this.animationRules.entrySet()) {
       if (animationRule.getKey().test(this.getEntity())) {
-        this.playAnimation(animationRule.getValue());
+        final String animationName = animationRule.getValue().apply(this.getEntity());
+        if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
+          this.playAnimation(animationName);
+        }
+        
         break;
       }
     }

@@ -8,22 +8,20 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
+  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
+  
   private int acceleration;
   private int deceleration;
-  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
-  /** The last moved. */
   private long lastMoved;
-
   private Point2D moveDestination;
   private boolean turnOnMove;
-
   private short velocity;
-
   private String spritePrefix;
 
   public Creature() {
@@ -68,8 +66,20 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.moveDestination;
   }
 
+  /**
+   * Gets the current sprite prefix of this instance. Overwriting this allows
+   * for a more sophisticated logic that determines the sprite to be used; e.g.
+   * This method could append certain properties of the creature (state, weapon,
+   * ...) to the default string.
+   * <br><br>
+   * The value of this method will be used e.g. by the
+   * {@link CreatureAnimationController} to determine the animation that it
+   * should play.
+   * 
+   * @return The current sprite prefix of this instance.
+   */
   public String getSpritePrefix() {
-    return spritePrefix;
+    return this.spritePrefix;
   }
 
   @Override
