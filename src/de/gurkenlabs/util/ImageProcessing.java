@@ -64,6 +64,12 @@ public class ImageProcessing {
       return image;
     }
 
+    final int width = image.getWidth();
+    final int height = image.getHeight();
+    if (width == 0 || height == 0) {
+      return image;
+    }
+
     // Transform visible pixels to a semi-transparent black
     final BufferedImage shadowImage = flashVisiblePixels(image, new Color(0, 0, 0, 30));
     if (shadowImage == null) {
@@ -78,7 +84,7 @@ public class ImageProcessing {
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
 
-    final BufferedImage shadow = getCompatibleImage(image.getWidth(), image.getHeight() + rotatedImage.getHeight());
+    final BufferedImage shadow = getCompatibleImage(width, height + rotatedImage.getHeight());
     final Graphics2D g2D = shadow.createGraphics();
     g2D.drawImage(rotatedImage, xOffset, yOffset, null);
     g2D.drawImage(image, 0, 0, null);
@@ -372,6 +378,10 @@ public class ImageProcessing {
   public static BufferedImage horizontalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
+    if (w == 0 || h == 0) {
+      return img;
+    }
+
     final BufferedImage dimg = getCompatibleImage(w, h);
     final Graphics2D g = dimg.createGraphics();
     g.drawImage(img, 0, 0, w, h, w, 0, 0, h, null);
@@ -566,6 +576,10 @@ public class ImageProcessing {
   public static BufferedImage verticalFlip(final BufferedImage img) {
     final int w = img.getWidth();
     final int h = img.getHeight();
+    if (w == 0 || h == 0) {
+      return img;
+    }
+
     final BufferedImage dimg = getCompatibleImage(w, h);
     final Graphics2D g = dimg.createGraphics();
     g.drawImage(img, 0, 0 + h, w, -h, null);

@@ -279,7 +279,7 @@ public class EditorScreen extends Screen {
       }
 
       if (!gameFile.exists()) {
-        log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
+        log.log(Level.SEVERE, "gameFile {0} doesn\'t exist", gameFile);
         return;
       }
 

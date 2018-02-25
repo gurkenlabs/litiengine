@@ -202,7 +202,6 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.play(false, null, -1);
   }
 
-
   protected void play(final boolean loop, final float volume) {
     this.play(loop, null, volume);
   }
@@ -359,7 +358,9 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
         try {
           Thread.sleep(50);
         } catch (final InterruptedException e) {
+          this.terminate();
           log.log(Level.SEVERE, e.getMessage(), e);
+          Thread.currentThread().interrupt();
         }
       }
 
