@@ -22,79 +22,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.ImageProcessing;
 import de.gurkenlabs.util.MathUtilities;
 
-/**
- * The Class OrthogonalMapRenderer.
- */
 public class OrthogonalMapRenderer implements IMapRenderer {
-
-  /**
-   * Gets the cache key.
-   *
-   * @param map
-   *          the map
-   * @return the cache key
-   */
-  public static String getCacheKey(final IMap map) {
-    return MessageFormat.format("map_{0}", map.getFileName());
-  }
-
-  private static Image getTileImage(final IMap map, final ITile tile) {
-    if (tile == null) {
-      return null;
-    }
-
-    final ITileset tileset = MapUtilities.findTileSet(map, tile);
-    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
-      return null;
-    }
-
-    // get the grid id relative to the sprite sheet since we use a 0 based
-    // approach to calculate the position
-    int index = tile.getGridId() - tileset.getFirstGridId();
-
-    // support for animated tiles
-    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
-    if (animation != null && !animation.getFrames().isEmpty()) {
-      final long playedMs = Game.getTime().sinceGameStart();
-
-      final int totalDuration = animation.getTotalDuration();
-      final long animationsPlayed = playedMs / totalDuration;
-
-      final long deltaTicks = playedMs - animationsPlayed * totalDuration;
-      int currentPlayTime = 0;
-      for (final ITileAnimationFrame frame : animation.getFrames()) {
-        currentPlayTime += frame.getDuration();
-        if (deltaTicks < currentPlayTime) {
-          // found the current animation frame
-          index = frame.getTileId();
-          break;
-        }
-      }
-
-    }
-
-    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
-    if (sprite == null) {
-      sprite = Spritesheet.load(tileset);
-      if (sprite == null) {
-        return null;
-      }
-    }
-
-    BufferedImage tileImage = sprite.getSprite(index);
-    if (tile.isFlippedDiagonally()) {
-      tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
-      tileImage = ImageProcessing.verticalFlip(tileImage);
-    }
-    if (tile.isFlippedHorizontally()) {
-      tileImage = ImageProcessing.horizontalFlip(tileImage);
-    }
-    if (tile.isFlippedVertically()) {
-      tileImage = ImageProcessing.verticalFlip(tileImage);
-    }
-
-    return tileImage;
-  }
 
   @Override
   public BufferedImage getMapImage(final IMap map) {
@@ -164,6 +92,75 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
   }
 
+  /**
+   * Gets the cache key.
+   *
+   * @param map
+   *          the map
+   * @return the cache key
+   */
+  private static String getCacheKey(final IMap map) {
+    return MessageFormat.format("map_{0}", map.getFileName());
+  }
+
+  private static Image getTileImage(final IMap map, final ITile tile) {
+    if (tile == null) {
+      return null;
+    }
+
+    final ITileset tileset = MapUtilities.findTileSet(map, tile);
+    if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
+      return null;
+    }
+
+    // get the grid id relative to the sprite sheet since we use a 0 based
+    // approach to calculate the position
+    int index = tile.getGridId() - tileset.getFirstGridId();
+
+    // support for animated tiles
+    final ITileAnimation animation = MapUtilities.getAnimation(map, index);
+    if (animation != null && !animation.getFrames().isEmpty()) {
+      final long playedMs = Game.getTime().sinceGameStart();
+
+      final int totalDuration = animation.getTotalDuration();
+      final long animationsPlayed = playedMs / totalDuration;
+
+      final long deltaTicks = playedMs - animationsPlayed * totalDuration;
+      int currentPlayTime = 0;
+      for (final ITileAnimationFrame frame : animation.getFrames()) {
+        currentPlayTime += frame.getDuration();
+        if (deltaTicks < currentPlayTime) {
+          // found the current animation frame
+          index = frame.getTileId();
+          break;
+        }
+      }
+
+    }
+
+    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    if (sprite == null) {
+      sprite = Spritesheet.load(tileset);
+      if (sprite == null) {
+        return null;
+      }
+    }
+
+    BufferedImage tileImage = sprite.getSprite(index);
+    if (tile.isFlippedDiagonally()) {
+      tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
+      tileImage = ImageProcessing.verticalFlip(tileImage);
+    }
+    if (tile.isFlippedHorizontally()) {
+      tileImage = ImageProcessing.horizontalFlip(tileImage);
+    }
+    if (tile.isFlippedVertically()) {
+      tileImage = ImageProcessing.verticalFlip(tileImage);
+    }
+
+    return tileImage;
+  }
+
   private List<ILayer> getAllRenderLayers(IMap map) {
     ArrayList<ILayer> layers = new ArrayList<>();
     for (ITileLayer tileLayer : map.getTileLayers()) {
@@ -227,10 +224,10 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   /**
-   * Renders the tiles from the specified layer that lie within the bounds of the
-   * viewport. This rendering of static tiles is cached when when the related
-   * graphics setting is enabled, which tremendously improves the rendering
-   * performance.
+   * Renders the tiles from the specified layer that lie within the bounds of
+   * the viewport. This rendering of static tiles is cached when when the
+   * related graphics setting is enabled, which tremendously improves the
+   * rendering performance.
    *
    * @param g
    * @param layer
