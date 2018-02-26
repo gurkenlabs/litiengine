@@ -1,4 +1,4 @@
-package de.gurkenlabs.states;
+package de.gurkenlabs.litiengine.states;
 
 public abstract class Transition implements ITransition {
   private final int priority;

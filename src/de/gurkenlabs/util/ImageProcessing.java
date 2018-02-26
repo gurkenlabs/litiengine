@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
@@ -30,7 +31,6 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.geom.Vector2D;
 
 public class ImageProcessing {
   private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
@@ -447,8 +447,8 @@ public class ImageProcessing {
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final int max) {
-    Vector2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
-    return scaleImage(image, (int) newDimension.getX(), (int) newDimension.getY());
+    Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
+    return scaleImage(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final float factor) {

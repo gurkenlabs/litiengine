@@ -14,12 +14,10 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.net.UdpPacketReceiver;
 import de.gurkenlabs.util.ImageProcessing;
 
 public final class ImageSerializer {
-
-  private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
+  private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());
 
   private ImageSerializer() {
   }

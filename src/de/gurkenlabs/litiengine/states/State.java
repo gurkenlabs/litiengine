@@ -1,4 +1,4 @@
-package de.gurkenlabs.states;
+package de.gurkenlabs.litiengine.states;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

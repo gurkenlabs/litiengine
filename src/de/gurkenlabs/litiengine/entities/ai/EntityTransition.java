@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.entities.ai;
 
 import de.gurkenlabs.litiengine.entities.Entity;
-import de.gurkenlabs.states.Transition;
+import de.gurkenlabs.litiengine.states.Transition;
 
 public abstract class EntityTransition<T extends Entity> extends Transition {
   private final T entity;

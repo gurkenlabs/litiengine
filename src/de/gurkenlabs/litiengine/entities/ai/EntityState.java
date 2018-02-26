@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.entities.ai;
 
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.states.State;
+import de.gurkenlabs.litiengine.states.State;
 
 public abstract class EntityState<T extends Entity> extends State implements IEntityState<T> {
   private final T entity;

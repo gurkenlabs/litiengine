@@ -1,8 +1,10 @@
 package de.gurkenlabs.util.geom;
 
+import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
@@ -509,16 +511,16 @@ public class GeometricUtilities {
   }
 
   public static Shape scaleRect(final Rectangle2D shape, final int max) {
-    Vector2D newDimension = scaleWithRatio(shape.getWidth(), shape.getHeight(), max);
+    Dimension2D newDimension = scaleWithRatio(shape.getWidth(), shape.getHeight(), max);
     if (newDimension == null) {
       return shape;
     }
 
-    final AffineTransform transform = AffineTransform.getScaleInstance(newDimension.getX(), newDimension.getY());
+    final AffineTransform transform = AffineTransform.getScaleInstance(newDimension.getWidth(), newDimension.getHeight());
     return transform.createTransformedShape(shape);
   }
 
-  public static Vector2D scaleWithRatio(final double width, final double height, final int max) {
+  public static Dimension2D scaleWithRatio(final double width, final double height, final int max) {
     if (width == 0 || height == 0) {
       return null;
     }
@@ -539,7 +541,9 @@ public class GeometricUtilities {
       dWidth = width / height * max;
     }
 
-    return new Vector2D(dWidth, dHeight);
+    Dimension2D dim = new Dimension();
+    dim.setSize(dWidth, dHeight);
+    return dim;
   }
 
   public static Shape scaleShape(final Shape shape, final double scale) {
