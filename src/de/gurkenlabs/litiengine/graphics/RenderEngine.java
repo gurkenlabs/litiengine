@@ -77,6 +77,7 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
+    // TODO: does this actually work as expected if we're rendering on the copy?
     final Graphics2D g2 = (Graphics2D) g.create();
     g2.rotate(Math.toRadians(angle), x, y);
     drawText(g2, text, x, y);
@@ -189,7 +190,7 @@ public final class RenderEngine implements IRenderEngine {
    * @param angle
    *          The angle by which the image will be rotated.s
    */
-  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y, final float angle) {
+  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y, final double angle) {
     if (image == null) {
       return;
     }
@@ -211,7 +212,7 @@ public final class RenderEngine implements IRenderEngine {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY());
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final float angle) {
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final double angle) {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
   }
 
@@ -390,15 +391,8 @@ public final class RenderEngine implements IRenderEngine {
 
     // draw tile layers
     this.mapRenderer.get(map.getOrientation()).renderOverlay(g, map, Game.getCamera().getViewPort());
-
   }
 
-  /**
-   * Draws the tile layers of the mapcontainer and the animations.
-   *
-   * @param g
-   *          the g
-   */
   @Override
   public void renderMap(final Graphics2D g, final IMap map) {
     if (map == null) {
