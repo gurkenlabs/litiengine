@@ -1,8 +1,5 @@
 package de.gurkenlabs.litiengine.configuration;
 
-import de.gurkenlabs.configuration.Configuration;
-import de.gurkenlabs.configuration.ConfigurationGroup;
-
 public final class GameConfiguration extends Configuration {
   private final ClientConfiguration client;
   private final DebugConfiguration debug;

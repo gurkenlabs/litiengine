@@ -1,4 +1,4 @@
-package de.gurkenlabs.core;
+package de.gurkenlabs.litiengine;
 
 public enum Valign {
   DOWN, MIDDLE, TOP;

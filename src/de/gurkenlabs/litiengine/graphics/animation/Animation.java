@@ -6,8 +6,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 

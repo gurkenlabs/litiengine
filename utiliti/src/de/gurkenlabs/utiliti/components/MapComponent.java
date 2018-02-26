@@ -36,11 +36,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.Environment;

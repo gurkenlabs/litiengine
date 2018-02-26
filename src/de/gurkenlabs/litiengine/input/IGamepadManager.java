@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.input;
 
 import java.util.function.Consumer;
 
-import de.gurkenlabs.core.ILaunchable;
+import de.gurkenlabs.litiengine.ILaunchable;
 
 public interface IGamepadManager extends ILaunchable, IGamepadEvents {
   public void onGamepadAdded(Consumer<IGamepad> cons);

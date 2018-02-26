@@ -1,4 +1,4 @@
-package de.gurkenlabs.configuration;
+package de.gurkenlabs.litiengine.configuration;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.util.io.FileUtilities;
 
 public class Configuration {
@@ -83,7 +84,7 @@ public class Configuration {
     try {
       final OutputStream out = new FileOutputStream(settingsFile, false);
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
-        if (!this.isAllowDebug() && group.isDebug()) {
+        if (!Game.isDebug() && group.isDebug()) {
           continue;
         }
 
@@ -94,14 +95,6 @@ public class Configuration {
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-  }
-
-  public boolean isAllowDebug() {
-    return this.allowDebug;
-  }
-
-  public void setAllowDebug(boolean allow) {
-    this.allowDebug = allow;
   }
 
   private static void storeConfigurationGroup(final OutputStream out, final ConfigurationGroup group) {

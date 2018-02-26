@@ -1,4 +1,4 @@
-package de.gurkenlabs.configuration;
+package de.gurkenlabs.litiengine.configuration;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;

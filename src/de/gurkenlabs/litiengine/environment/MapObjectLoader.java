@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.environment;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;

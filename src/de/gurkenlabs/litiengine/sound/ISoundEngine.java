@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.sound;
 import java.awt.geom.Point2D;
 import java.util.function.Function;
 
-import de.gurkenlabs.core.ILaunchable;
+import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**

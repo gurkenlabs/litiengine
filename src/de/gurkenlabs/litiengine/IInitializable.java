@@ -1,4 +1,4 @@
-package de.gurkenlabs.core;
+package de.gurkenlabs.litiengine;
 
 public interface IInitializable {
   public void init();

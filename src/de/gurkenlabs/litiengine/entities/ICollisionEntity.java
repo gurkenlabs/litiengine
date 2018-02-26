@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 
 public interface ICollisionEntity extends IEntity {
   public boolean canCollideWith(ICollisionEntity otherEntity);

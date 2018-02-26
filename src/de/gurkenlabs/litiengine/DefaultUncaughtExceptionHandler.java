@@ -1,4 +1,4 @@
-package de.gurkenlabs.core;
+package de.gurkenlabs.litiengine;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

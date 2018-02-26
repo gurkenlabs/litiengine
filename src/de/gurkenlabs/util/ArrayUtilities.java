@@ -20,7 +20,7 @@ public final class ArrayUtilities {
     System.arraycopy(secondArray, 0, combinedArray, aLen, bLen);
     return combinedArray;
   }
-  
+
   public static int[] getIntegerArray(String commaSeperatedString) {
     if (commaSeperatedString == null || commaSeperatedString.isEmpty()) {
       return new int[0];
@@ -109,4 +109,20 @@ public final class ArrayUtilities {
     final int randomIndex = new Random().nextInt(arr.length);
     return arr[randomIndex];
   }
+
+  public static boolean containsArgument(String[] args, String argument) {
+    if (args == null || args.length == 0) {
+      return false;
+    }
+
+    for (int i = 0; i < args.length; i++) {
+      final String a = args[i];
+      if (a != null && !a.isEmpty() && a.equalsIgnoreCase(argument)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }

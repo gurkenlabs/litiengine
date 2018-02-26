@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.core.IInitializable;
+import de.gurkenlabs.litiengine.IInitializable;
 
 public interface IRenderComponent extends IInitializable {
 

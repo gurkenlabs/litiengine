@@ -2,9 +2,6 @@ package de.gurkenlabs.litiengine.configuration;
 
 import java.util.Locale;
 
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
-
 /**
  * The client configuration contains client specific configuration elements.
  */

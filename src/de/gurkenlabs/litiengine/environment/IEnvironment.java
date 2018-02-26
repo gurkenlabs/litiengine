@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import de.gurkenlabs.core.IInitializable;
+import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;

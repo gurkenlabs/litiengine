@@ -9,8 +9,8 @@ import java.text.MessageFormat;
 
 import javax.swing.JLabel;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;

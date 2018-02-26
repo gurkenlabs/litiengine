@@ -6,8 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

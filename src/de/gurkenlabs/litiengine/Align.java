@@ -1,4 +1,4 @@
-package de.gurkenlabs.core;
+package de.gurkenlabs.litiengine;
 
 public enum Align {
   CENTER, LEFT, RIGHT;

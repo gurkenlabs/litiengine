@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.core.ILaunchable;
+import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.litiengine.net.messages.ClientMessage;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;

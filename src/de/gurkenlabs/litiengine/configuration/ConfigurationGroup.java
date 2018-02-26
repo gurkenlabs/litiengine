@@ -1,4 +1,4 @@
-package de.gurkenlabs.configuration;
+package de.gurkenlabs.litiengine.configuration;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
