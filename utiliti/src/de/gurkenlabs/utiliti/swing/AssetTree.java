@@ -32,6 +32,8 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeCreatures;
 
   public AssetTree() {
+    this.setRootVisible(false);
+    
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_assets"), Icons.ASSET));
     this.nodeSpritesheets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets"), Icons.SPRITESHEET));
     this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("assettree_spritesheets_props"), Icons.PROP));

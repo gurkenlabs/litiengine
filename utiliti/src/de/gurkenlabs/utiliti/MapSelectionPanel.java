@@ -209,12 +209,14 @@ public class MapSelectionPanel extends JSplitPane {
     entityScrollPane.setMaximumSize(new Dimension(0, 250));
 
     this.tree = new JTree();
-    tree.setBorder(null);
+    this.tree.setBorder(null);
+    this.tree.setRootVisible(false);
+    this.tree.setShowsRootHandles(true);
 
-    tree.setCellRenderer(new IconTreeListRenderer());
-    tree.setMaximumSize(new Dimension(0, 250));
+    this.tree.setCellRenderer(new IconTreeListRenderer());
+    this.tree.setMaximumSize(new Dimension(0, 250));
 
-    tree.addTreeSelectionListener(e -> {
+    this.tree.addTreeSelectionListener(e -> {
       this.isFocussing = true;
       try {
         if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
@@ -234,7 +236,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
     });
 
-    entityScrollPane.setViewportView(tree);
+    entityScrollPane.setViewportView(this.tree);
     tabPane.setMaximumSize(new Dimension(0, 150));
 
     this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), Icons.FOLDER));
@@ -443,7 +445,7 @@ public class MapSelectionPanel extends JSplitPane {
 
   private void collapseAll() {
     int row = tree.getRowCount() - 1;
-    while (row > 0) {
+    while (row >= 0) {
       tree.collapseRow(row);
       row--;
     }
