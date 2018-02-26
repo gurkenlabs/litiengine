@@ -23,8 +23,6 @@ public class Configuration {
   private final List<ConfigurationGroup> configurationGroups;
   private final String fileName;
 
-  private boolean allowDebug = true;
-
   public Configuration(final ConfigurationGroup... configurationGroups) {
     this(DEFAULT_CONFIGURATION_FILE_NAME, configurationGroups);
   }
