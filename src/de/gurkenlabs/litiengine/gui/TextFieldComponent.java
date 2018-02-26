@@ -82,7 +82,7 @@ public class TextFieldComponent extends ImageComponent {
       this.toggleSelection();
       this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
 
-      log.log(Level.INFO, "\'{0}\' typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
+      log.log(Level.INFO, "{0} typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
       break;
     default:
       this.handleNormalTyping(event);

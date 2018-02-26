@@ -31,7 +31,7 @@ public class CommandManager implements ICommandManager {
       return false;
     }
 
-    log.log(Level.FINE, "Command received: %s", command);
+    log.log(Level.FINE, "Command received: {0}", command);
     final String[] arr = command.split(" ");
     if (arr.length == 0) {
       return false;

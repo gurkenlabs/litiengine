@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.configuration.Quality;
@@ -57,7 +56,6 @@ import de.gurkenlabs.util.io.FileUtilities;
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-  private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
   private final Map<Integer, ICombatEntity> combatEntities;

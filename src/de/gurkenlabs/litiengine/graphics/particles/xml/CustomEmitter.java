@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -24,7 +23,6 @@ import de.gurkenlabs.util.io.XmlUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
-  private static final Logger log = Logger.getLogger(CustomEmitter.class.getName());
   private static final Map<String, EmitterData> loadedCustomEmitters;
 
   static {

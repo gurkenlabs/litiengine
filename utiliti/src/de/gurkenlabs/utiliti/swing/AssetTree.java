@@ -61,9 +61,7 @@ public class AssetTree extends JTree {
       this.expandRow(i);
     }
 
-    this.addTreeSelectionListener(e -> {
-      loadAssetsOfCurrentSelection(e.getPath());
-    });
+    this.addTreeSelectionListener(e -> loadAssetsOfCurrentSelection(e.getPath()));
   }
 
   public void forceUpdate() {
