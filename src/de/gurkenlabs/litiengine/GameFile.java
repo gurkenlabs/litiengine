@@ -30,13 +30,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.XmlUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {
   private static final Logger log = Logger.getLogger(GameFile.class.getName());
-  public static final String FILE_EXTENSION = "env";
+  public static final String FILE_EXTENSION = "ltx";
 
   private static final long serialVersionUID = -2101786184799276518L;
 

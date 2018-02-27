@@ -8,8 +8,8 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.geom.PointDistanceComparator;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.PointDistanceComparator;
 
 public class PathFindingTests {
 

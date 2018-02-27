@@ -27,10 +27,18 @@ public interface IAnimationController extends IUpdateable {
   public Animation getDefaultAnimation();
 
   public List<IImageEffect> getImageEffects();
+  
+  public boolean hasAnimation(String animationName);
 
   public void onPlayback(Consumer<Animation> cons);
 
   public void onPlaybackEnded(Consumer<Animation> cons);
 
   public void playAnimation(final String animationName);
+
+  public void setDefaultAnimation(Animation defaultAnimation);
+  
+  public void remove(Animation animation);
+
+  public void remove(IImageEffect effect);
 }

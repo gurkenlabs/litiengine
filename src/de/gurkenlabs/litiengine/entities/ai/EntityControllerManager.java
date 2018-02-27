@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 
@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.physics.IMovementController;
 public class EntityControllerManager {
   private final Map<IEntity, IEntityController<? extends IEntity>> aiControllers;
   private final Map<IEntity, IAnimationController> animationControllers;
-  private final Map<IEntity, IMovementController<? extends IMovableEntity>> movementControllers;
+  private final Map<IEntity, IMovementController<? extends IMobileEntity>> movementControllers;
 
   public EntityControllerManager() {
     this.aiControllers = new ConcurrentHashMap<>();
@@ -57,7 +57,7 @@ public class EntityControllerManager {
     this.aiControllers.put(entity, controller);
   }
 
-  public <T extends IMovableEntity> void addController(final T entity, final IMovementController<T> controller) {
+  public <T extends IMobileEntity> void addController(final T entity, final IMovementController<T> controller) {
     if (entity == null || controller == null) {
       return;
     }
@@ -77,8 +77,8 @@ public class EntityControllerManager {
       this.aiControllers.remove(entity);
     }
 
-    if (entity instanceof IMovableEntity) {
-      final IMovementController<? extends IMovableEntity> controller = this.getMovementController((IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      final IMovementController<? extends IMobileEntity> controller = this.getMovementController((IMobileEntity) entity);
       if (controller != null) {
 
         Game.getLoop().detach(controller);
@@ -109,7 +109,7 @@ public class EntityControllerManager {
     return null;
   }
 
-  public IMovementController<? extends IMovableEntity> getMovementController(final IMovableEntity entity) {
+  public IMovementController<? extends IMobileEntity> getMovementController(final IMobileEntity entity) {
     if (this.movementControllers.containsKey(entity)) {
       return this.movementControllers.get(entity);
     }

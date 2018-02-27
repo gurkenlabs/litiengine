@@ -23,9 +23,9 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.io.ImageSerializer;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
 public class RenderComponent extends Canvas implements IRenderComponent {

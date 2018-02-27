@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;
@@ -125,7 +125,7 @@ public class TagPanel extends JPanel {
   }
 
   public List<String> getTagStrings() {
-    return this.getTags().stream().map(x -> x.getTag()).collect(Collectors.toList());
+    return this.getTags().stream().map(Tag::getTag).collect(Collectors.toList());
   }
 
   public String getTagsString() {

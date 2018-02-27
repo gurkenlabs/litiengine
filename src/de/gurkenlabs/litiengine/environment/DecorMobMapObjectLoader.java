@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.util.Collection;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.DecorMob;
 import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
@@ -36,13 +34,8 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
 
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)), velocity);
     this.loadProperties(mob, mapObject);
+    this.loadCollisionProperties(mob, mapObject);
     mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
-    mob.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
-    mob.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
-    mob.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
-
-    mob.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
-    mob.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
 
     Collection<IEntity> entities = super.load(mapObject);
     entities.add(mob);

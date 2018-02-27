@@ -4,10 +4,6 @@ import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
-import de.gurkenlabs.configuration.Quality;
-
 /**
  * The Class GraphicSettings contains all settings that allow to influence the
  * appearance of the game.

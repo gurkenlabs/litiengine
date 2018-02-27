@@ -1,8 +1,5 @@
 package de.gurkenlabs.litiengine.configuration;
 
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
-
 /**
  * The Class SoundSettings.
  */

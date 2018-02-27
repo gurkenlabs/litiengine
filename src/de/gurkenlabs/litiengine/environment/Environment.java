@@ -15,17 +15,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import de.gurkenlabs.configuration.Quality;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.ai.IEntityController;
@@ -49,14 +49,13 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
-import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * The Class MapContainerBase.
  */
 public class Environment implements IEnvironment {
-  private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
   private final Map<Integer, ICombatEntity> combatEntities;
@@ -79,10 +78,11 @@ public class Environment implements IEnvironment {
   private final Collection<Trigger> triggers;
   private final Collection<Prop> props;
   private final Collection<Emitter> emitters;
+  private final Collection<Creature> creatures;
 
   private final Collection<MapArea> mapAreas;
 
-  private final Map<Integer, IMovableEntity> movableEntities;
+  private final Map<Integer, IMobileEntity> mobileEntities;
   private final List<IRenderable> overlayRenderable;
 
   private final List<Spawnpoint> spawnPoints;
@@ -137,7 +137,7 @@ public class Environment implements IEnvironment {
     this.entities.put(RenderType.OVERLAY, new ConcurrentHashMap<>());
 
     this.combatEntities = new ConcurrentHashMap<>();
-    this.movableEntities = new ConcurrentHashMap<>();
+    this.mobileEntities = new ConcurrentHashMap<>();
 
     this.lightSources = Collections.newSetFromMap(new ConcurrentHashMap<LightSource, Boolean>());
     this.colliders = Collections.newSetFromMap(new ConcurrentHashMap<CollisionBox, Boolean>());
@@ -146,6 +146,7 @@ public class Environment implements IEnvironment {
     this.staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<StaticShadow, Boolean>());
     this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
     this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
+    this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
@@ -183,12 +184,16 @@ public class Environment implements IEnvironment {
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
 
-    if (entity instanceof IMovableEntity) {
-      this.movableEntities.put(entity.getMapId(), (IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      this.mobileEntities.put(entity.getMapId(), (IMobileEntity) entity);
     }
 
     if (entity instanceof Prop) {
       this.props.add((Prop) entity);
+    }
+    
+    if (entity instanceof Creature) {
+      this.creatures.add((Creature) entity);
     }
 
     if (entity instanceof CollisionBox) {
@@ -266,7 +271,7 @@ public class Environment implements IEnvironment {
     this.dispose(this.getEntities());
     this.dispose(this.getTriggers());
     this.getCombatEntities().clear();
-    this.getMovableEntities().clear();
+    this.getMobileEntities().clear();
     this.getLightSources().clear();
     this.getCollisionBoxes().clear();
     this.getSpawnPoints().clear();
@@ -411,19 +416,19 @@ public class Environment implements IEnvironment {
 
   @Override
   public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String rawTag) {
-    List<T> entities = new ArrayList<>();
+    List<T> foundEntities = new ArrayList<>();
     final String tag = rawTag.toLowerCase();
     if (!this.entitiesByTag.containsKey(tag.toLowerCase())) {
-      return entities;
+      return foundEntities;
     }
 
     for (IEntity ent : this.entitiesByTag.get(tag)) {
       if (clss.isInstance(ent)) {
-        entities.add((T) ent);
+        foundEntities.add((T) ent);
       }
     }
 
-    return entities;
+    return foundEntities;
   }
 
   @Override
@@ -551,18 +556,18 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<IMovableEntity> getMovableEntities() {
-    return this.movableEntities.values();
+  public Collection<IMobileEntity> getMobileEntities() {
+    return this.mobileEntities.values();
   }
 
   @Override
-  public IMovableEntity getMovableEntity(final int mapId) {
-    return getById(this.getMovableEntities(), mapId);
+  public IMobileEntity getMobileEntity(final int mapId) {
+    return getById(this.getMobileEntities(), mapId);
   }
 
   @Override
-  public IMovableEntity getMovableEntity(String name) {
-    return getByName(this.getMovableEntities(), name);
+  public IMobileEntity getMobileEntity(String name) {
+    return getByName(this.getMobileEntities(), name);
   }
 
   @Override
@@ -587,6 +592,21 @@ public class Environment implements IEnvironment {
   @Override
   public Prop getProp(String name) {
     return getByName(this.getProps(), name);
+  }
+
+  @Override
+  public Creature getCreature(int mapId) {
+    return getById(this.getCreatures(), mapId);
+  }
+
+  @Override
+  public Creature getCreature(String name) {
+    return getByName(this.getCreatures(), name);
+  }
+
+  @Override
+  public Collection<Creature> getCreatures() {
+    return this.creatures;
   }
 
   @Override
@@ -787,6 +807,10 @@ public class Environment implements IEnvironment {
     if (entity instanceof Prop) {
       this.props.remove(entity);
     }
+    
+    if (entity instanceof Creature) {
+      this.creatures.remove(entity);
+    }
 
     if (entity instanceof CollisionBox) {
       this.colliders.remove(entity);
@@ -811,8 +835,8 @@ public class Environment implements IEnvironment {
       this.addStaticShadows();
     }
 
-    if (entity instanceof IMovableEntity) {
-      this.movableEntities.values().remove(entity);
+    if (entity instanceof IMobileEntity) {
+      this.mobileEntities.values().remove(entity);
     }
 
     if (entity instanceof ICombatEntity) {
@@ -999,8 +1023,8 @@ public class Environment implements IEnvironment {
     }
 
     // 4. register movement controller for update
-    if (entity instanceof IMovableEntity) {
-      final IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().attach(movementController);
       }
@@ -1062,6 +1086,7 @@ public class Environment implements IEnvironment {
     registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
     registerMapObjectLoader(MapObjectType.AREA, new MapAreaMapObjectLoader());
     registerMapObjectLoader(MapObjectType.STATICSHADOW, new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(MapObjectType.CREATURE, new CreatureMapObjectLoader());
   }
 
   /**
@@ -1108,8 +1133,8 @@ public class Environment implements IEnvironment {
     }
 
     // 5. unregister movement controller from update
-    if (entity instanceof IMovableEntity) {
-      final IMovementController<? extends IMovableEntity> movementController = Game.getEntityControllerManager().getMovementController((IMovableEntity) entity);
+    if (entity instanceof IMobileEntity) {
+      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().detach(movementController);
       }

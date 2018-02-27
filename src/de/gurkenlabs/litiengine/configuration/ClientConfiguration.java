@@ -2,9 +2,6 @@ package de.gurkenlabs.litiengine.configuration;
 
 import java.util.Locale;
 
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
-
 /**
  * The client configuration contains client specific configuration elements.
  */
@@ -15,14 +12,10 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   private String language;
 
-  private Locale locale;
-
-  /** The max fps. */
   private int maxFps;
 
   private boolean showGameMetrics;
 
-  /** The updaterate. */
   private int updaterate;
 
   /**
@@ -73,12 +66,10 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   public void setCountry(final String country) {
     this.country = country;
-    this.locale = null;
   }
 
   public void setLanguage(final String language) {
     this.language = language;
-    this.locale = null;
   }
 
   /**

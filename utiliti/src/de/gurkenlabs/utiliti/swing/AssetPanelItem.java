@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -38,7 +37,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
-import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -49,11 +47,13 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
-import de.gurkenlabs.util.io.ImageSerializer;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.panels.PropPanel;
 
 @SuppressWarnings("serial")
 public class AssetPanelItem extends JPanel {
@@ -78,7 +78,7 @@ public class AssetPanelItem extends JPanel {
   public AssetPanelItem(Object origin) {
     setPreferredSize(new Dimension(64, 100));
     this.origin = origin;
-    this.setBackground(Color.DARK_GRAY);
+    this.setBackground(AssetPanel.BACKGROUND);
     this.setBorder(normalBorder);
 
     this.getInputMap(JPanel.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
@@ -126,9 +126,9 @@ public class AssetPanelItem extends JPanel {
       @Override
       public void focusLost(FocusEvent e) {
         UIDefaults defaults = UIManager.getDefaults();
-        setBackground(Color.DARK_GRAY);
+        setBackground(AssetPanel.BACKGROUND);
         setForeground(defaults.getColor("Tree.foreground"));
-        textField.setForeground(Color.LIGHT_GRAY);
+        textField.setForeground(Color.WHITE);
         setBorder(normalBorder);
 
         btnEdit.setVisible(false);
@@ -173,7 +173,7 @@ public class AssetPanelItem extends JPanel {
     add(this.textField, BorderLayout.SOUTH);
     this.textField.setColumns(10);
     this.textField.setHorizontalAlignment(JTextField.CENTER);
-    this.textField.setForeground(Color.LIGHT_GRAY);
+    this.textField.setForeground(Color.WHITE);
     this.textField.setBackground(null);
     this.textField.setBorder(null);
     this.textField.setEditable(false);
@@ -194,7 +194,7 @@ public class AssetPanelItem extends JPanel {
     btnAdd.setMinimumSize(new Dimension(16, 16));
     btnAdd.setPreferredSize(new Dimension(16, 16));
     btnAdd.setOpaque(false);
-    btnAdd.setIcon(new ImageIcon(Resources.getImage("addx12.png")));
+    btnAdd.setIcon(Icons.ADD);
     btnAdd.setVisible(false);
     btnAdd.setEnabled(canAdd());
 
@@ -236,7 +236,7 @@ public class AssetPanelItem extends JPanel {
     btnEdit.setMinimumSize(new Dimension(16, 16));
     btnEdit.setPreferredSize(new Dimension(16, 16));
     btnEdit.setOpaque(false);
-    btnEdit.setIcon(new ImageIcon(Resources.getImage("pencil.png")));
+    btnEdit.setIcon(Icons.PENCIL);
     btnEdit.setVisible(false);
 
     btnDelete = new JButton("");
@@ -246,7 +246,7 @@ public class AssetPanelItem extends JPanel {
     btnDelete.setMinimumSize(new Dimension(16, 16));
     btnDelete.setPreferredSize(new Dimension(16, 16));
     btnDelete.setOpaque(false);
-    btnDelete.setIcon(new ImageIcon(Resources.getImage("button-deletex12.png")));
+    btnDelete.setIcon(Icons.DELETE);
     btnDelete.setVisible(false);
 
     btnExport = new JButton("");
@@ -256,7 +256,7 @@ public class AssetPanelItem extends JPanel {
     btnExport.setMinimumSize(new Dimension(16, 16));
     btnExport.setPreferredSize(new Dimension(16, 16));
     btnExport.setOpaque(false);
-    btnExport.setIcon(new ImageIcon(Resources.getImage("export.png")));
+    btnExport.setIcon(Icons.EXPORT);
     btnExport.setVisible(false);
 
     buttonPanel.add(btnEdit);
@@ -313,7 +313,7 @@ public class AssetPanelItem extends JPanel {
     // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
-      String propName = Prop.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getNameBySpriteName(info.getName());
       if (propName == null) {
         return false;
       }
@@ -414,7 +414,7 @@ public class AssetPanelItem extends JPanel {
           int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
           if (result == JFileChooser.APPROVE_OPTION) {
             ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
-            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile().toString() });
+            log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile() });
           }
         }
       } catch (IOException e) {
@@ -453,7 +453,7 @@ public class AssetPanelItem extends JPanel {
   private boolean canAdd() {
     if (this.getOrigin() != null && this.getOrigin() instanceof SpriteSheetInfo) {
       SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
-      String propName = Prop.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getNameBySpriteName(info.getName());
       return propName != null && !propName.isEmpty();
     }
 

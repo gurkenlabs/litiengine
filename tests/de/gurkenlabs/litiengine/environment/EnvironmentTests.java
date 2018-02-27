@@ -27,7 +27,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
@@ -117,29 +117,29 @@ public class EnvironmentTests {
 
 
   @Test
-  public void testMovableEntity() {
-    IMovableEntity movableEntity = mock(IMovableEntity.class);
-    when(movableEntity.getMapId()).thenReturn(456);
-    when(movableEntity.getName()).thenReturn("test");
-    when(movableEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+  public void testMobileEntity() {
+    IMobileEntity mobileEntity = mock(IMobileEntity.class);
+    when(mobileEntity.getMapId()).thenReturn(456);
+    when(mobileEntity.getName()).thenReturn("test");
+    when(mobileEntity.getRenderType()).thenReturn(RenderType.NORMAL);
 
-    this.testEnvironment.add(movableEntity);
+    this.testEnvironment.add(mobileEntity);
 
     assertNotNull(this.testEnvironment.get(456));
-    assertNotNull(this.testEnvironment.getMovableEntity(456));
-    assertNotNull(this.testEnvironment.getMovableEntity("test"));
-    assertEquals(1, this.testEnvironment.getMovableEntities().size());
-    assertEquals(1, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertNotNull(this.testEnvironment.getMobileEntity(456));
+    assertNotNull(this.testEnvironment.getMobileEntity("test"));
+    assertEquals(1, this.testEnvironment.getMobileEntities().size());
+    assertEquals(1, this.testEnvironment.getEntitiesByType(IMobileEntity.class).size());
     assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
-    this.testEnvironment.remove(movableEntity);
+    this.testEnvironment.remove(mobileEntity);
 
     assertNull(this.testEnvironment.get(456));
-    assertNull(this.testEnvironment.getMovableEntity(456));
-    assertNull(this.testEnvironment.getMovableEntity("test"));
-    assertEquals(0, this.testEnvironment.getMovableEntities().size());
-    assertEquals(0, this.testEnvironment.getEntitiesByType(IMovableEntity.class).size());
+    assertNull(this.testEnvironment.getMobileEntity(456));
+    assertNull(this.testEnvironment.getMobileEntity("test"));
+    assertEquals(0, this.testEnvironment.getMobileEntities().size());
+    assertEquals(0, this.testEnvironment.getEntitiesByType(IMobileEntity.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -345,7 +345,7 @@ public class EnvironmentTests {
 
     assertNull(this.testEnvironment.get(123456789));
     assertNull(this.testEnvironment.getCombatEntity(123456789));
-    assertNull(this.testEnvironment.getMovableEntity(123456789));
+    assertNull(this.testEnvironment.getMobileEntity(123456789));
     assertNull(this.testEnvironment.get(""));
     assertNull(this.testEnvironment.get(null));
   }
@@ -373,11 +373,11 @@ public class EnvironmentTests {
 
   @Test
   public void testEntitiesByTag() {
-    IMovableEntity entityWithTags = mock(IMovableEntity.class);
+    IMobileEntity entityWithTags = mock(IMobileEntity.class);
     when(entityWithTags.getMapId()).thenReturn(456);
     when(entityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
 
-    IMovableEntity anotherEntityWithTags = mock(IMovableEntity.class);
+    IMobileEntity anotherEntityWithTags = mock(IMobileEntity.class);
     when(anotherEntityWithTags.getMapId()).thenReturn(123);
     when(anotherEntityWithTags.getRenderType()).thenReturn(RenderType.NORMAL);
 

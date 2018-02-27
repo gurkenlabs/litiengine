@@ -32,8 +32,8 @@ import javax.swing.table.DefaultTableModel;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel {
@@ -165,9 +165,7 @@ public class SpritesheetImportPanel extends JPanel {
 
     textField = new JTextField();
     textField.setColumns(10);
-    textField.addActionListener(e -> {
-      fileList.getSelectedValue().setName(textField.getText());
-    });
+    textField.addActionListener(e -> fileList.getSelectedValue().setName(textField.getText()));
 
     textField.addFocusListener(new FocusAdapter() {
       @Override
@@ -209,9 +207,8 @@ public class SpritesheetImportPanel extends JPanel {
             .addGap(14)
             .addGroup(glPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblSpriteheight).addComponent(lblSpritewidth).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE,
                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblName))
-            .addGroup(glPanel.createParallelGroup(Alignment.LEADING).addGroup(glPanel.createSequentialGroup().addGap(13).addComponent(lblKeyframes))
-                .addGroup(glPanel.createSequentialGroup().addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
+            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(glPanel.createParallelGroup(Alignment.LEADING).addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblName)).addGroup(glPanel.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPanel.createSequentialGroup().addGap(13).addComponent(lblKeyframes)).addGroup(glPanel.createSequentialGroup().addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPane1, GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
             .addContainerGap()));
 
     tableKeyFrames = new JTable();
@@ -248,7 +245,7 @@ public class SpritesheetImportPanel extends JPanel {
     ArrayList<SpriteSheetInfo> infos = new ArrayList<>();
 
     for (int i = 0; i < this.fileList.getModel().getSize(); i++) {
-      SpriteFileWrapper wrap = this.fileListModel.getElementAt(0);
+      SpriteFileWrapper wrap = this.fileListModel.getElementAt(i);
       infos.add(wrap.createSpritesheetInfo());
     }
 

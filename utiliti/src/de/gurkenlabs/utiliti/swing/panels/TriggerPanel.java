@@ -26,7 +26,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 @SuppressWarnings("serial")
 public class TriggerPanel extends PropertyPanel<IMapObject> {

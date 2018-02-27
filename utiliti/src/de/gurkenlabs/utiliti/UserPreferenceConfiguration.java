@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
+import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
+import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 
 @ConfigurationGroupInfo(prefix = "user_")
 public class UserPreferenceConfiguration extends ConfigurationGroup {

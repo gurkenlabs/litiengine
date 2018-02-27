@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.gurkenlabs.core.Align;
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
@@ -82,7 +82,7 @@ public class TextFieldComponent extends ImageComponent {
       this.toggleSelection();
       this.changeConfirmedConsumers.forEach(c -> c.accept(this.getText()));
 
-      log.log(Level.INFO, "\'{0}\' typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
+      log.log(Level.INFO, "{0} typed into TextField with ComponentID {1}", new Object[] { this.getText(), this.getComponentId() });
       break;
     default:
       this.handleNormalTyping(event);

@@ -37,9 +37,9 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.XmlUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -279,7 +279,7 @@ public class EditorScreen extends Screen {
       }
 
       if (!gameFile.exists()) {
-        log.log(Level.SEVERE, "gameFile {0} doesn't exist", gameFile);
+        log.log(Level.SEVERE, "gameFile {0} does not exist", gameFile);
         return;
       }
 
@@ -414,7 +414,7 @@ public class EditorScreen extends Screen {
         }
 
         this.gameFile.getEmitters().add(emitter);
-        log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] { emitter.getName(), file.toString() });
+        log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] { emitter.getName(), file });
       }
     });
   }
@@ -437,7 +437,7 @@ public class EditorScreen extends Screen {
         }
 
         this.gameFile.getBluePrints().add(blueprint);
-        log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file.toString() });
+        log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
       }
     });
   }

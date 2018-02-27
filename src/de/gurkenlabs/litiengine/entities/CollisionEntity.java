@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.core.Align;
-import de.gurkenlabs.core.Valign;
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 
 @CollisionInfo(collision = true)
@@ -72,7 +72,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public boolean canCollideWith(final ICollisionEntity otherEntity) {
     return true;
   }
-
+  
+  @Override
   public Align getCollisionBoxAlign() {
     return this.align;
   }
@@ -117,6 +118,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     return new Point2D.Double(this.getCollisionBox().getCenterX(), this.getCollisionBox().getCenterY());
   }
 
+  @Override
   public Valign getCollisionBoxValign() {
     return this.valign;
   }
@@ -142,6 +144,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collision = collision;
   }
 
+  @Override
   public void setCollisionBoxAlign(final Align align) {
     this.align = align;
     this.collisionBox = this.getCollisionBox(this.getLocation());
@@ -152,7 +155,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collisionBoxHeight = collisionBoxHeight;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
-
+  
+  @Override
   public void setCollisionBoxValign(final Valign valign) {
     this.valign = valign;
     this.collisionBox = this.getCollisionBox(this.getLocation());

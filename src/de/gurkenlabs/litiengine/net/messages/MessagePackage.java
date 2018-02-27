@@ -6,9 +6,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.net.Package;
-import de.gurkenlabs.util.ArrayUtilities;
-import de.gurkenlabs.util.io.CompressionUtilities;
-import de.gurkenlabs.util.io.Serializer;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.CompressionUtilities;
+import de.gurkenlabs.litiengine.util.io.Serializer;
 
 /**
  * The Class ObjectPacket.

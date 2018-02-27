@@ -62,6 +62,6 @@ public class ConsoleLogHandler extends java.util.logging.Handler {
     } else if (level == Level.WARNING) {
       return Color.ORANGE;
     } else
-      return Color.LIGHT_GRAY;
+      return Color.WHITE;
   }
 }

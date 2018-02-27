@@ -10,21 +10,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class AssetPanel extends JPanel {
+  public static final Color BACKGROUND = new Color(24, 24, 24);
   private static final int COLUMNS = 10;
-  private static final Icon tilesetIcon = new ImageIcon(Resources.getImage("document-tsx.png"));
-  private static final Icon emitterIcon = new ImageIcon(Resources.getImage("document-emitter.png"));
-  private static final Icon blueprintIcon = new ImageIcon(Resources.getImage("document-blueprint.png"));
   private final GridLayout gridLayout;
 
   public AssetPanel() {
@@ -34,7 +32,7 @@ public class AssetPanel extends JPanel {
     this.setLayout(this.gridLayout);
 
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
-    this.setBackground(Color.DARK_GRAY);
+    this.setBackground(BACKGROUND);
 
     // TODO: implement support for arrow keys to change focus
   }
@@ -63,7 +61,7 @@ public class AssetPanel extends JPanel {
     this.load(tilesets, () -> {
       Collections.sort(tilesets);
       for (Tileset tileset : tilesets) {
-        AssetPanelItem panelItem = new AssetPanelItem(tilesetIcon, tileset.getName(), tileset);
+        AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_TILESET, tileset.getName(), tileset);
         this.add(panelItem);
         panelItem.validate();
       }
@@ -74,7 +72,7 @@ public class AssetPanel extends JPanel {
     this.load(emitters, () -> {
       Collections.sort(emitters);
       for (EmitterData emitter : emitters) {
-        AssetPanelItem panelItem = new AssetPanelItem(emitterIcon, emitter.getName(), emitter);
+        AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_EMITTER, emitter.getName(), emitter);
         this.add(panelItem);
         panelItem.validate();
       }
@@ -85,7 +83,7 @@ public class AssetPanel extends JPanel {
     this.load(blueprints, () -> {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
-        AssetPanelItem panelItem = new AssetPanelItem(blueprintIcon, blueprint.getName(), blueprint);
+        AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
         this.add(panelItem);
         panelItem.validate();
       }

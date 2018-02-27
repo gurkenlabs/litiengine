@@ -8,10 +8,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.configuration.Configuration;
-import de.gurkenlabs.configuration.ConfigurationGroup;
-import de.gurkenlabs.configuration.ConfigurationGroupInfo;
-
 public class ConfigurationTests {
 
   private static void deleteTempConfigFile(final Configuration config) {

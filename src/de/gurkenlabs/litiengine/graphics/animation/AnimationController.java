@@ -12,26 +12,27 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
   private Animation currentAnimation;
-  private final Animation defaultAnimation;
+  private Animation defaultAnimation;
   private final List<IImageEffect> imageEffects;
   private final List<Consumer<Animation>> playbackConsumer;
   private final List<Consumer<Animation>> playbackFinishedConsumer;
 
-  private AnimationController(final Animation defaultAnimation) {
+  public AnimationController() {
     this.animations = new CopyOnWriteArrayList<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
     this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
     this.playbackConsumer = new CopyOnWriteArrayList<>();
-    this.defaultAnimation = defaultAnimation;
-    if (this.defaultAnimation != null) {
-      this.animations.add(this.defaultAnimation);
-    }
+  }
+
+  public AnimationController(final Animation defaultAnimation) {
+    this();
+    this.setDefaultAnimation(defaultAnimation);
   }
 
   public AnimationController(final Spritesheet sprite) {
@@ -75,6 +76,7 @@ public class AnimationController implements IAnimationController {
     }
 
     this.getImageEffects().add(effect);
+    Collections.sort(this.getImageEffects());
   }
 
   @Override
@@ -143,13 +145,30 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public Animation getDefaultAnimation() {
-    return this.defaultAnimation;
+    if (this.defaultAnimation != null) {
+      return this.defaultAnimation;
+    }
+
+    if (this.getAnimations().isEmpty()) {
+      return null;
+    }
+
+    return this.getAnimations().get(0);
   }
 
   @Override
   public List<IImageEffect> getImageEffects() {
     this.removeFinishedImageEffects();
     return this.imageEffects;
+  }
+
+  @Override
+  public boolean hasAnimation(String animationName) {
+    if (animationName == null || animationName.isEmpty()) {
+      return false;
+    }
+
+    return this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName));
   }
 
   @Override
@@ -166,7 +185,7 @@ public class AnimationController implements IAnimationController {
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do
     // nothing
-    if (this.getAnimations() == null || !this.getAnimations().stream().anyMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
+    if (animationName == null || animationName.isEmpty() || this.getAnimations() == null || this.getAnimations().stream().noneMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
         || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
       return;
     }
@@ -190,6 +209,44 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
+  public void remove(Animation animation) {
+    if (animation == null) {
+      return;
+    }
+
+    if (this.getAnimations().contains(animation)) {
+      this.animations.remove(animation);
+    }
+
+    if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
+      this.setDefaultAnimation(!this.getAnimations().isEmpty() ? this.getAnimations().get(0) : null);
+    }
+  }
+
+  @Override
+  public void remove(IImageEffect effect) {
+    if (effect == null) {
+      return;
+    }
+
+    if (this.getImageEffects().contains(effect)) {
+      this.imageEffects.remove(effect);
+    }
+  }
+
+  @Override
+  public void setDefaultAnimation(Animation defaultAnimation) {
+    if (this.defaultAnimation != null) {
+      this.animations.remove(this.defaultAnimation);
+    }
+
+    this.defaultAnimation = defaultAnimation;
+    if (this.defaultAnimation != null) {
+      this.animations.add(this.defaultAnimation);
+    }
+  }
+
+  @Override
   public void update() {
     if (this.getCurrentAnimation() != null && this.getCurrentAnimation().isPaused()) {
       return;
@@ -203,8 +260,8 @@ public class AnimationController implements IAnimationController {
     }
 
     if (this.getCurrentAnimation() == null || playbackFinished) {
-      if (this.defaultAnimation != null) {
-        this.playAnimation(this.defaultAnimation.getName());
+      if (this.getDefaultAnimation() != null) {
+        this.playAnimation(this.getDefaultAnimation().getName());
       } else {
         this.currentAnimation = null;
       }

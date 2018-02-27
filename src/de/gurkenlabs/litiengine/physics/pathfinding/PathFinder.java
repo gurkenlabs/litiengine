@@ -11,7 +11,7 @@ import java.util.List;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.physics.Path;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public abstract class PathFinder implements IPathFinder {
   private static final float PATH_MARGIN = 2.0f;

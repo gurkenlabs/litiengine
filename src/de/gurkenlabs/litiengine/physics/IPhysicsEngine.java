@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
 /**
  * The Interface IPhysicsEngine.
@@ -73,15 +73,15 @@ public interface IPhysicsEngine extends IUpdateable {
    * @return true, if successful, false if the physics engine detected a
    *         collision.
    */
-  public boolean move(IMovableEntity entity, double angle, double delta);
+  public boolean move(IMobileEntity entity, double angle, double delta);
 
-  public boolean move(IMovableEntity entity, double x, double y, float delta);
+  public boolean move(IMobileEntity entity, double x, double y, float delta);
 
-  public boolean move(IMovableEntity entity, float delta);
+  public boolean move(IMobileEntity entity, float delta);
 
-  public boolean move(final IMovableEntity entity, Point2D newPosition);
+  public boolean move(final IMobileEntity entity, Point2D newPosition);
 
-  public boolean move(IMovableEntity entity, Point2D target, float delta);
+  public boolean move(IMobileEntity entity, Point2D target, float delta);
 
   public void remove(ICollisionEntity entity);
 

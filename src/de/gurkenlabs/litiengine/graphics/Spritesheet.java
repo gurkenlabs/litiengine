@@ -15,14 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheet {
   private static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
@@ -93,6 +95,14 @@ public final class Spritesheet {
     return spritesheets.get(name);
   }
 
+  public static Collection<Spritesheet> find(Predicate<Spritesheet> pred) {
+    if (pred == null) {
+      return new ArrayList<>();
+    }
+
+    return spritesheets.values().stream().filter(pred).collect(Collectors.toList());
+  }
+
   public static int[] getCustomKeyFrameDurations(final String name) {
     if (customKeyFrameDurations.containsKey(FileUtilities.getFileName(name).toLowerCase())) {
       return customKeyFrameDurations.get(FileUtilities.getFileName(name).toLowerCase());
@@ -124,7 +134,7 @@ public final class Spritesheet {
   public static Spritesheet load(final SpriteSheetInfo info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
-      log.log(Level.SEVERE, "Sprite '{0}' could not be loaded because no image is defined.", new Object[] { info.getName() });
+      log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
       return null;
     } else {
       sprite = Spritesheet.load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());

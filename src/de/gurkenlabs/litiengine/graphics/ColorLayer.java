@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class ColorLayer implements IRenderable {
   private final IEnvironment environment;

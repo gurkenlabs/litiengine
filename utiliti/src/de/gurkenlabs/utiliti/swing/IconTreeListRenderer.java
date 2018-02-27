@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.awt.Component;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -15,15 +16,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.utiliti.Icons;
+import de.gurkenlabs.utiliti.Program;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
-  public static final Icon DEFAULT_NODE_ICON = new ImageIcon(Resources.getImage("bullet.png"));
+
   private static final Border normalBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
   private static final Border focusBorder = BorderFactory.createDashedBorder(UIManager.getDefaults().getColor("Tree.selectionBorderColor"));
 
@@ -36,7 +39,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
   @Override
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-    this.label.setIcon(DEFAULT_NODE_ICON);
+    this.label.setIcon(Icons.DEFAULT_NODE);
     this.label.setText(value.toString());
 
     if (value instanceof DefaultMutableTreeNode) {
@@ -49,6 +52,9 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         } else if (iconItem.getUserObject() instanceof Prop) {
           Prop prop = (Prop) iconItem.getUserObject();
           label.setIcon(getIcon(prop));
+        } else if (iconItem.getUserObject() instanceof Creature) {
+          Creature creature = (Creature) iconItem.getUserObject();
+          label.setIcon(getIcon(creature));
         }
       }
     }
@@ -63,14 +69,14 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Prop prop) {
-    String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getName() + "-" + prop.getMapId() + "-tree";
+    String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
     BufferedImage propImag;
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       propImag = ImageCache.IMAGES.get(cacheKey);
     } else {
 
-      final String name = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
-      final String fallbackName = Prop.SPRITESHEET_PREFIX + prop.getSpritesheetName().toLowerCase();
+      final String name = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
+      final String fallbackName = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase();
       Spritesheet sprite = Spritesheet.find(name);
       if (sprite == null) {
         sprite = Spritesheet.find(fallbackName);
@@ -81,6 +87,24 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       }
 
       propImag = ImageProcessing.scaleImage(sprite.getSprite(0), 16, 16, true);
+      ImageCache.IMAGES.put(cacheKey, propImag);
+    }
+
+    return new ImageIcon(propImag);
+  }
+
+  private static Icon getIcon(Creature creature) {
+    String cacheKey = Game.getEnvironment().getMap().getName() + "-" + creature.getSpritePrefix() + "-" + creature.getMapId() + "-tree";
+    BufferedImage propImag;
+    if (ImageCache.IMAGES.containsKey(cacheKey)) {
+      propImag = ImageCache.IMAGES.get(cacheKey);
+    } else {
+      Collection<Spritesheet> sprites = Spritesheet.find(s -> s.getName().startsWith(creature.getSpritePrefix()));
+      if (sprites.isEmpty()) {
+        return null;
+      }
+
+      propImag = ImageProcessing.scaleImage(sprites.iterator().next().getSprite(0), 16, 16, true);
       ImageCache.IMAGES.put(cacheKey, propImag);
     }
 

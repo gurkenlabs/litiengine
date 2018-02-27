@@ -20,6 +20,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -27,7 +28,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -38,7 +39,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxShadow;
-  private JComboBox<Material> comboBoxRotation;
+  private JComboBox<Rotation> comboBoxRotation;
   private JCheckBox checkBoxHorizontalFlip;
   private JCheckBox checkBoxVerticalFlip;
 
@@ -48,9 +49,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
    * Create the panel.
    */
   public PropPanel() {
-    ImageCache.SPRITES.onCleared(e -> {
-      this.propsLoaded = false;
-    });
+    ImageCache.SPRITES.onCleared(e -> this.propsLoaded = false);
 
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_prop"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
@@ -75,8 +74,8 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     this.chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
     this.chckbxShadow = new JCheckBox("shadow");
 
-    this.comboBoxRotation = new JComboBox<Material>();
-    this.comboBoxRotation.setModel(new DefaultComboBoxModel(Rotation.values()));
+    this.comboBoxRotation = new JComboBox<>();
+    this.comboBoxRotation.setModel(new DefaultComboBoxModel<>(Rotation.values()));
 
     JLabel lblRotation = new JLabel("rotation");
 
@@ -113,6 +112,24 @@ public class PropPanel extends PropertyPanel<IMapObject> {
             .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
     setLayout(groupLayout);
     this.setupChangedListeners();
+  }
+
+  public static String getNameBySpriteName(String spriteName) {
+    if (spriteName == null || spriteName.isEmpty()) {
+      return null;
+    }
+
+    AnimationInfo info = Prop.class.getAnnotation(AnimationInfo.class);
+    if (info == null || info.spritePrefix() == null || info.spritePrefix().isEmpty()) {
+      return null;
+    }
+
+    if (!spriteName.toLowerCase().startsWith(info.spritePrefix())) {
+      return null;
+    }
+
+    String[] parts = spriteName.split("-");
+    return parts[1];
   }
 
   @Override
@@ -196,7 +213,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String spriteName = s.getName();
-      String propName = Prop.getNameBySpriteName(spriteName);
+      String propName = getNameBySpriteName(spriteName);
 
       if (propName == null) {
         continue;
@@ -236,7 +253,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
       this.comboBoxSpriteSheets.addItem(label);
     }
-    
+
     this.propsLoaded = true;
   }
 }

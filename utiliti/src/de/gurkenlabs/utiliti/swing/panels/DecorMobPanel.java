@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -14,10 +13,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JSpinner;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -27,7 +24,8 @@ import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
 public class DecorMobPanel extends PropertyPanel<IMapObject> {
@@ -47,7 +45,7 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
     JLabel lblSprite = new JLabel(Resources.get("panel_sprite"));
 
     this.comboBoxSpriteSheets = new JComboBox<>();
-    this.comboBoxSpriteSheets.setRenderer(new MyComboRenderer());
+    this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
     JLabel lblBehaviour = new JLabel(Resources.get("panel_behavior"));
 
@@ -158,17 +156,6 @@ public class DecorMobPanel extends PropertyPanel<IMapObject> {
       }
 
       this.comboBoxSpriteSheets.addItem(label);
-    }
-  }
-
-  class MyComboRenderer implements ListCellRenderer {
-
-    @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-      if (value != null) {
-        return (JLabel) value;
-      }
-      return new JLabel();
     }
   }
 }

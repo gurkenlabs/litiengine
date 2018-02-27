@@ -9,9 +9,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * The Class PhysicsEngine.
@@ -211,23 +211,23 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, final double angle, final double delta) {
+  public boolean move(final IMobileEntity entity, final double angle, final double delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, final double x, final double y, final float delta) {
+  public boolean move(final IMobileEntity entity, final double x, final double y, final float delta) {
     return this.move(entity, new Point2D.Double(x, y), delta);
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, final float delta) {
+  public boolean move(final IMobileEntity entity, final float delta) {
     return this.move(entity, entity.getAngle(), delta);
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, Point2D newPosition) {
+  public boolean move(final IMobileEntity entity, Point2D newPosition) {
     if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
     }
@@ -260,7 +260,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return success;
   }
 
-  private boolean resolveCollisionForCurrentLocation(IMovableEntity entity) {
+  private boolean resolveCollisionForCurrentLocation(IMobileEntity entity) {
     // resolve collision for current location
     if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
       final Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
@@ -271,7 +271,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  private boolean resolveCollisionForNewPosition(IMovableEntity entity, Point2D newPosition) {
+  private boolean resolveCollisionForNewPosition(IMobileEntity entity, Point2D newPosition) {
     // resolve collision for new location
     if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
       final Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
@@ -282,7 +282,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  private boolean resolveCollisionForRaycastToNewPosition(IMovableEntity entity, Point2D newPosition) {
+  private boolean resolveCollisionForRaycastToNewPosition(IMobileEntity entity, Point2D newPosition) {
     // special case to prevent entities to glitch through collision boxes if
     // they have a large enough step size
     final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
@@ -302,7 +302,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(final IMovableEntity entity, final Point2D target, final float delta) {
+  public boolean move(final IMobileEntity entity, final Point2D target, final float delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
     return this.move(entity, newPosition);
   }
@@ -495,7 +495,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
    * @param newPosition
    * @return
    */
-  private Point2D resolveCollision(final IMovableEntity entity, final Point2D newPosition) {
+  private Point2D resolveCollision(final IMobileEntity entity, final Point2D newPosition) {
     // first resolve x-axis movement
     Point2D resolvedPosition = new Point2D.Double(newPosition.getX(), entity.getLocation().getY());
 

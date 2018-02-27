@@ -6,8 +6,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.core.ILaunchable;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 
@@ -25,6 +25,10 @@ public class Animation implements IUpdateable, ILaunchable {
   private boolean paused;
   private boolean playing;
   private final Spritesheet spritesheet;
+
+  public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
+    this(Spritesheet.find(spriteSheetName), loop, randomizeStart, keyFrameDurations);
+  }
 
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);

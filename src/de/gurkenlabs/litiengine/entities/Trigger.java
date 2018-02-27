@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @CollisionInfo(collision = false)
 @EntityInfo(renderType = RenderType.OVERLAY)
@@ -214,15 +214,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public void setCooldown(int cooldown) {
     this.cooldown = cooldown;
-  }
-
-  @Override
-  public String toString() {
-    if (this.getName() != null) {
-      return "trigger: " + super.toString();
-    }
-
-    return super.toString();
   }
 
   @Override

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.Path;
@@ -26,7 +26,7 @@ public class AStarPathFinder extends PathFinder {
   }
 
   @Override
-  public Path findPath(final IMovableEntity entity, final Point2D target) {
+  public Path findPath(final IMobileEntity entity, final Point2D target) {
     // if there is no collision between the start and the target return a direct
     // path
     final Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());

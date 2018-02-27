@@ -21,8 +21,8 @@ import javax.sound.sampled.SourceDataLine;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * This class is responsible for the playback of all sounds in the engine. If
@@ -202,7 +202,6 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.play(false, null, -1);
   }
 
-
   protected void play(final boolean loop, final float volume) {
     this.play(loop, null, volume);
   }
@@ -359,7 +358,9 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
         try {
           Thread.sleep(50);
         } catch (final InterruptedException e) {
+          this.terminate();
           log.log(Level.SEVERE, e.getMessage(), e);
+          Thread.currentThread().interrupt();
         }
       }
 

@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * This implementation provides information about the mouse input in the

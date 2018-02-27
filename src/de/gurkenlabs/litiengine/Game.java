@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.core.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
@@ -34,19 +33,18 @@ import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 
 public final class Game {
-  /**
-   * This flag indicates if the game currently supports debugging. This should
-   * be set to false for release builds.
-   */
-  public static boolean DEBUG = true;
   protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
-  private static final GameConfiguration configuration;
-  private static final EntityControllerManager entityControllerManager;
 
+  private static boolean debug = true;
+  private static final List<Consumer<String>> startedConsumer;
+  private static final List<Predicate<String>> terminatingConsumer;
+  private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
   private static final List<Consumer<IEnvironment>> environmentLoadedConsumer;
 
+  private static final GameConfiguration configuration;
+  private static final EntityControllerManager entityControllerManager;
   private static final IRenderEngine graphicsEngine;
   private static final GameInfo info;
   private static final List<IMap> maps;
@@ -61,10 +59,6 @@ public final class Game {
   private static IGameLoop gameLoop;
   private static RenderLoop renderLoop;
   private static IScreenManager screenManager;
-
-  private static final List<Consumer<String>> startedConsumer;
-  private static final List<Predicate<String>> terminatingConsumer;
-  private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
 
   private static boolean hasStarted;
 
@@ -89,6 +83,24 @@ public final class Game {
   }
 
   private Game() {
+  }
+
+  /**
+   * This flag indicates if the game currently supports debugging. This should
+   * be set to false for release builds.
+   * 
+   * The default value here is true and will allow debugging unless explicitly
+   * disabled by calling this method.
+   * 
+   * @param allow
+   *          If set to true, the game will be told to allow debugging.
+   */
+  public static void allowDebug(boolean allow) {
+    debug = allow;
+  }
+
+  public static boolean isDebug() {
+    return debug;
   }
 
   public static GameConfiguration getConfiguration() {
@@ -166,7 +178,6 @@ public final class Game {
   }
 
   public static void init() {
-    getConfiguration().setAllowDebug(DEBUG);
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
     for (Consumer<GameConfiguration> cons : configLoadedConsumer) {

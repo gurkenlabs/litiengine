@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.net;
 
-import de.gurkenlabs.core.ILaunchable;
+import de.gurkenlabs.litiengine.ILaunchable;
 
 /**
  * The Interface IPacketReceiver.

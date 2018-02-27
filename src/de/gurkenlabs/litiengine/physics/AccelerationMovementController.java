@@ -1,10 +1,10 @@
 package de.gurkenlabs.litiengine.physics;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
-public abstract class AccelerationMovementController<T extends IMovableEntity> extends MovementController<T> {
+public abstract class AccelerationMovementController<T extends IMobileEntity> extends MovementController<T> {
   private float dx;
   private float dy;
   private boolean movedX;
@@ -12,8 +12,8 @@ public abstract class AccelerationMovementController<T extends IMovableEntity> e
   private double velocityX;
   private double velocityY;
 
-  public AccelerationMovementController(T movableEntity) {
-    super(movableEntity);
+  public AccelerationMovementController(T mobileEntity) {
+    super(mobileEntity);
   }
 
   @Override

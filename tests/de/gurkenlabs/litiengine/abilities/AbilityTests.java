@@ -3,21 +3,19 @@ package de.gurkenlabs.litiengine.abilities;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectTarget;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
-import de.gurkenlabs.litiengine.entities.IMovableCombatEntity;
+import de.gurkenlabs.litiengine.entities.Creature;
 
 public class AbilityTests {
 
   @Test
   public void testInitialization() {
-    IMovableCombatEntity entity = mock(IMovableCombatEntity.class);
-    TestAbility ability = new TestAbility(entity);
+    TestAbility ability = new TestAbility(new Creature());
 
     assertEquals("I do somethin", ability.getName());
     assertEquals("does somethin", ability.getDescription());
@@ -34,8 +32,8 @@ public class AbilityTests {
 
   @Test
   public void testEffectInitialization() {
-    IMovableCombatEntity entity = mock(IMovableCombatEntity.class);
-    TestAbility ability = new TestAbility(entity);
+    Creature entity = new Creature();
+    TestAbility ability = new TestAbility(new Creature());
 
     Effect effect = new TestEffect(ability, EffectTarget.ENEMY);
     assertEquals(ability.getAttributes().getDuration().getCurrentValue().intValue(), effect.getDuration());
@@ -48,7 +46,7 @@ public class AbilityTests {
   @AbilityInfo(castType = CastType.ONCONFIRM, name = "I do somethin", description = "does somethin", cooldown = 333, duration = 222, impact = 111, impactAngle = 99, multiTarget = true, origin = AbilityOrigin.COLLISIONBOX_CENTER, range = 444, value = 999)
   private class TestAbility extends Ability {
 
-    protected TestAbility(IMovableCombatEntity executor) {
+    protected TestAbility(Creature executor) {
       super(executor);
     }
   }

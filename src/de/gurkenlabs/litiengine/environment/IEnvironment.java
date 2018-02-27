@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import de.gurkenlabs.core.IInitializable;
+import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -130,11 +131,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IMap getMap();
 
-  public Collection<IMovableEntity> getMovableEntities();
+  public Collection<IMobileEntity> getMobileEntities();
 
-  public IMovableEntity getMovableEntity(final int mapId);
+  public IMobileEntity getMobileEntity(final int mapId);
 
-  public IMovableEntity getMovableEntity(String name);
+  public IMobileEntity getMobileEntity(String name);
 
   /**
    * Gets the next unique global map id.
@@ -148,6 +149,12 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Spawnpoint getSpawnpoint(String name);
 
   public Collection<Spawnpoint> getSpawnPoints();
+
+  public Creature getCreature(int mapId);
+
+  public Creature getCreature(String name);
+
+  public Collection<Creature> getCreatures();
 
   public List<String> getUsedTags();
 

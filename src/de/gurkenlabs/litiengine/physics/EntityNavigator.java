@@ -8,9 +8,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.entities.IMovableEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * The Class EntityNavigator.
@@ -20,10 +20,10 @@ public class EntityNavigator implements IEntityNavigator {
   /** The Constant ACCEPTABLE_ERROR. */
   private static final float ACCEPTABLE_ERROR = 0.3f;
 
-  private final List<Predicate<IMovableEntity>> cancelNavigationConditions;
+  private final List<Predicate<IMobileEntity>> cancelNavigationConditions;
   /** The current segments. */
   private int currentSegment;
-  private final IMovableEntity entity;
+  private final IMobileEntity entity;
 
   /** The navigations. */
   private Path path;
@@ -38,7 +38,7 @@ public class EntityNavigator implements IEntityNavigator {
    * @param pathFinder
    *          The pathfinder that is used to navigate the entity
    */
-  public EntityNavigator(final IMovableEntity entity, final IPathFinder pathFinder) {
+  public EntityNavigator(final IMobileEntity entity, final IPathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
     this.entity = entity;
     this.pathFinder = pathFinder;
@@ -46,14 +46,14 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
-  public void cancelNavigation(final Predicate<IMovableEntity> predicate) {
+  public void cancelNavigation(final Predicate<IMobileEntity> predicate) {
     if (!this.cancelNavigationConditions.contains(predicate)) {
       this.cancelNavigationConditions.add(predicate);
     }
   }
 
   @Override
-  public IMovableEntity getEntity() {
+  public IMobileEntity getEntity() {
     return this.entity;
   }
 
@@ -106,7 +106,7 @@ public class EntityNavigator implements IEntityNavigator {
       return;
     }
 
-    for (final Predicate<IMovableEntity> pred : this.cancelNavigationConditions) {
+    for (final Predicate<IMobileEntity> pred : this.cancelNavigationConditions) {
       if (pred.test(this.getEntity())) {
         this.stop();
         return;

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import javax.swing.DefaultListModel;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -43,6 +42,7 @@ import javax.swing.tree.TreePath;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -56,22 +56,12 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
-  private static final Icon PROP_ICON = new ImageIcon(Resources.getImage("entity.png"));
-  private static final Icon FOLDER_ICON = new ImageIcon(Resources.getImage("object_cube-10x10.png"));
-  private static final Icon LIGHT_ICON = new ImageIcon(Resources.getImage("bulb.png"));
-  private static final Icon TRIGGER_ICON = new ImageIcon(Resources.getImage("trigger.png"));
-  private static final Icon SPAWMPOINT_ICON = new ImageIcon(Resources.getImage("spawnpoint.png"));
-  private static final Icon COLLISIONBOX_ICON = new ImageIcon(Resources.getImage("collisionbox.png"));
-  private static final Icon MAPAREA_ICON = new ImageIcon(Resources.getImage("maparea.png"));
-  private static final Icon SHADOWBOX_ICON = new ImageIcon(Resources.getImage("shadowbox.png"));
-  private static final Icon EMITTER_ICON = new ImageIcon(Resources.getImage("emitter.png"));
-
   private final JList<String> mapList;
   private final JCheckBoxList listObjectLayers;
   private final DefaultListModel<String> model;
@@ -82,7 +72,8 @@ public class MapSelectionPanel extends JSplitPane {
   private final JPopupMenu popupMenu;
   private final JMenuItem mntmExportMap;
   private final JMenuItem mntmDeleteMap;
-
+  
+  private final JPanel entityPanel;
   private final JPanel panel;
   private final JTextField textField;
   private final JButton btnSearch;
@@ -91,6 +82,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultTreeModel entitiesTreeModel;
   private final DefaultMutableTreeNode nodeRoot;
   private final DefaultMutableTreeNode nodeProps;
+  private final DefaultMutableTreeNode nodeCreatures;
   private final DefaultMutableTreeNode nodeLights;
   private final DefaultMutableTreeNode nodeTriggers;
   private final DefaultMutableTreeNode nodeSpawnpoints;
@@ -101,7 +93,6 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
-  private JPanel panel_1;
 
   /**
    * Create the panel.
@@ -148,15 +139,13 @@ public class MapSelectionPanel extends JSplitPane {
     addPopup(mapList, popupMenu);
 
     mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
-    mntmExportMap.setIcon(new ImageIcon(Resources.getImage("button-map-exportx16.png")));
-    mntmExportMap.addActionListener(a -> {
-      EditorScreen.instance().getMapComponent().exportMap();
-    });
+    mntmExportMap.setIcon(Icons.MAP_EXPORT);
+    mntmExportMap.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
     popupMenu.add(mntmExportMap);
 
     mntmDeleteMap = new JMenuItem(Resources.get("hud_deleteMap"));
-    mntmDeleteMap.setIcon(new ImageIcon(Resources.getImage("button-deletex16.png")));
+    mntmDeleteMap.setIcon(Icons.MAP_DELETE);
     mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
     popupMenu.add(mntmDeleteMap);
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -169,14 +158,15 @@ public class MapSelectionPanel extends JSplitPane {
     layerScrollPane.setMaximumSize(new Dimension(0, 250));
 
     JTabbedPane tabPane = new JTabbedPane();
+
+    this.entityPanel = new JPanel();
+    this.entityPanel.setLayout(new BorderLayout(0, 0));
+
+    tabPane.addTab(Resources.get("panel_entities"), entityPanel);
     tabPane.add(Resources.get("panel_mapObjectLayers"), layerScrollPane);
-
-    panel_1 = new JPanel();
-    tabPane.addTab(Resources.get("panel_entities"), panel_1);
-    panel_1.setLayout(new BorderLayout(0, 0));
-
+    
     panel = new JPanel();
-    panel_1.add(panel, BorderLayout.NORTH);
+    entityPanel.add(panel, BorderLayout.NORTH);
     panel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
     panel.setBackground(Color.WHITE);
     panel.setLayout(new BorderLayout(0, 0));
@@ -185,7 +175,7 @@ public class MapSelectionPanel extends JSplitPane {
     btnCollape.setOpaque(false);
     btnCollape.setMargin(new Insets(2, 2, 2, 2));
     btnCollape.addActionListener(e -> collapseAll());
-    btnCollape.setIcon(new ImageIcon(Resources.getImage("collapse.png")));
+    btnCollape.setIcon(Icons.COLLAPSE);
     panel.add(btnCollape, BorderLayout.WEST);
 
     textField = new JTextField();
@@ -207,22 +197,24 @@ public class MapSelectionPanel extends JSplitPane {
     btnSearch.setOpaque(false);
     btnSearch.setMargin(new Insets(2, 2, 2, 2));
     btnSearch.addActionListener(e -> search());
-    btnSearch.setIcon(new ImageIcon(Resources.getImage("search.png")));
+    btnSearch.setIcon(Icons.SEARCH);
     panel.add(btnSearch, BorderLayout.EAST);
 
     entityScrollPane = new JScrollPane();
-    panel_1.add(entityScrollPane);
+    entityPanel.add(entityScrollPane);
     entityScrollPane.setViewportBorder(null);
     entityScrollPane.setMinimumSize(new Dimension(150, 0));
     entityScrollPane.setMaximumSize(new Dimension(0, 250));
 
     this.tree = new JTree();
-    tree.setBorder(null);
+    this.tree.setBorder(null);
+    this.tree.setRootVisible(false);
+    this.tree.setShowsRootHandles(true);
 
-    tree.setCellRenderer(new IconTreeListRenderer());
-    tree.setMaximumSize(new Dimension(0, 250));
+    this.tree.setCellRenderer(new IconTreeListRenderer());
+    this.tree.setMaximumSize(new Dimension(0, 250));
 
-    tree.addTreeSelectionListener(e -> {
+    this.tree.addTreeSelectionListener(e -> {
       this.isFocussing = true;
       try {
         if (e.getPath().getLastPathComponent() instanceof DefaultMutableTreeNode) {
@@ -242,30 +234,32 @@ public class MapSelectionPanel extends JSplitPane {
       }
     });
 
-    entityScrollPane.setViewportView(tree);
+    entityScrollPane.setViewportView(this.tree);
     tabPane.setMaximumSize(new Dimension(0, 150));
 
-    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), FOLDER_ICON));
-    this.nodeProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_props"), PROP_ICON));
-    this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), LIGHT_ICON));
-    this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
-    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
-    this.nodeCollisionBoxes = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_collboxes"), COLLISIONBOX_ICON));
-    this.nodeMapAreas = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_areas"), MAPAREA_ICON));
-    this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), SHADOWBOX_ICON));
-    this.nodeEmitter = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_emitter"), EMITTER_ICON));
+    this.nodeRoot = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_entities"), Icons.FOLDER));
+    this.nodeProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_props"), Icons.PROP));
+    this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
+    this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), Icons.LIGHT));
+    this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
+    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeCollisionBoxes = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
+    this.nodeMapAreas = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
+    this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));
+    this.nodeEmitter = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_emitter"), Icons.EMITTER));
 
-    this.nodeRoot.add(nodeProps);
-    this.nodeRoot.add(nodeLights);
-    this.nodeRoot.add(nodeTriggers);
-    this.nodeRoot.add(nodeSpawnpoints);
-    this.nodeRoot.add(nodeCollisionBoxes);
-    this.nodeRoot.add(nodeMapAreas);
-    this.nodeRoot.add(nodeStaticShadows);
-    this.nodeRoot.add(nodeEmitter);
+    this.nodeRoot.add(this.nodeProps);
+    this.nodeRoot.add(this.nodeCreatures);
+    this.nodeRoot.add(this.nodeLights);
+    this.nodeRoot.add(this.nodeTriggers);
+    this.nodeRoot.add(this.nodeSpawnpoints);
+    this.nodeRoot.add(this.nodeCollisionBoxes);
+    this.nodeRoot.add(this.nodeMapAreas);
+    this.nodeRoot.add(this.nodeStaticShadows);
+    this.nodeRoot.add(this.nodeEmitter);
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
-    this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
+    this.entityNodes = new DefaultMutableTreeNode[] { this.nodeProps, this.nodeCreatures, this.nodeLights, this.nodeTriggers, this.nodeSpawnpoints, this.nodeCollisionBoxes, this.nodeMapAreas, this.nodeStaticShadows, this.nodeEmitter, };
     MouseListener ml = new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -277,8 +271,10 @@ public class MapSelectionPanel extends JSplitPane {
     };
     tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
-    tabPane.setIconAt(0, new ImageIcon(Resources.getImage("layer.png")));
-    tabPane.setIconAt(1, new ImageIcon(Resources.getImage("object_cube-10x10.png")));
+    
+    tabPane.setIconAt(0, Icons.CUBE);
+    tabPane.setIconAt(1, Icons.LAYER);
+    
     this.setRightComponent(tabPane);
 
     listObjectLayers = new JCheckBoxList();
@@ -315,7 +311,7 @@ public class MapSelectionPanel extends JSplitPane {
     // remove maps that are no longer present
     for (int i = 0; i < this.model.getSize(); i++) {
       final String current = this.model.get(i);
-      if (current == null || !maps.stream().anyMatch(x -> current.startsWith(x.getFileName()))) {
+      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getFileName()))) {
         this.model.remove(i);
       }
     }
@@ -447,7 +443,7 @@ public class MapSelectionPanel extends JSplitPane {
 
   private void collapseAll() {
     int row = tree.getRowCount() - 1;
-    while (row > 0) {
+    while (row >= 0) {
       tree.collapseRow(row);
       row--;
     }
@@ -575,19 +571,20 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   private void populateMapObjectTree() {
-    this.nodeRoot.setUserObject(new IconTreeListItem(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"), FOLDER_ICON));
+    this.nodeRoot.setUserObject(new IconTreeListItem(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
     }
 
-    this.nodeLights.setUserObject(new IconTreeListItem(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"), LIGHT_ICON));
-    this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), PROP_ICON));
-    this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), TRIGGER_ICON));
-    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), SPAWMPOINT_ICON));
-    this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), COLLISIONBOX_ICON));
-    this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"), MAPAREA_ICON));
-    this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"), SHADOWBOX_ICON));
-    this.nodeEmitter.setUserObject(new IconTreeListItem(Game.getEnvironment().getEmitters().size() + " " + Resources.get("panel_mapselection_emitter"), EMITTER_ICON));
+    this.nodeLights.setUserObject(new IconTreeListItem(Game.getEnvironment().getLightSources().size() + " " + Resources.get("panel_mapselection_lights"), Icons.LIGHT));
+    this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), Icons.PROP));
+    this.nodeCreatures.setUserObject(new IconTreeListItem(Game.getEnvironment().getCreatures().size() + " " + Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
+    this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
+    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
+    this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
+    this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));
+    this.nodeEmitter.setUserObject(new IconTreeListItem(Game.getEnvironment().getEmitters().size() + " " + Resources.get("panel_mapselection_emitter"), Icons.EMITTER));
 
     for (LightSource light : Game.getEnvironment().getLightSources()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(light));
@@ -597,6 +594,11 @@ public class MapSelectionPanel extends JSplitPane {
     for (Prop prop : Game.getEnvironment().getProps()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
       this.nodeProps.add(node);
+    }
+    
+    for (Creature creature : Game.getEnvironment().getCreatures()) {
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(creature));
+      this.nodeCreatures.add(node);
     }
 
     for (Trigger trigger : Game.getEnvironment().getTriggers()) {

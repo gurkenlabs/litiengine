@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * The Class Camera.
@@ -106,14 +106,6 @@ public class Camera implements ICamera {
 
   @Override
   public Point2D getViewPortLocation(final IEntity entity) {
-    // localplayer camera causes flickering and bouncing of the sprite
-    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
-    if (animationController != null && animationController.getCurrentAnimation() != null && animationController.getCurrentAnimation().getSpritesheet() != null) {
-      final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
-      final Point2D location = new Point2D.Double(entity.getLocation().getX() - (spriteSheet.getSpriteWidth() - entity.getWidth()) * 0.5, entity.getLocation().getY() - (spriteSheet.getSpriteHeight() - entity.getHeight()) * 0.5);
-      return this.getViewPortLocation(location);
-    }
-
     return this.getViewPortLocation(entity.getLocation());
   }
 

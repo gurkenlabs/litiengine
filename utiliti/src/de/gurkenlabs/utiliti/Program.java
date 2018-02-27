@@ -80,6 +80,7 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.getImage("cursor-trans-vertical.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.getImage("cursor-trans-315.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.getImage("cursor-trans-45.png");
+  public static final String PROP_SPRITE_PREFIX = "prop-";
 
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;
@@ -116,9 +117,7 @@ public class Program {
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
-    Game.getCamera().onZoomChanged(zoom -> {
-      userPreferences.setZoom(zoom);
-    });
+    Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
     // Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
 
@@ -245,7 +244,7 @@ public class Program {
 
       return terminate;
     });
-    
+
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
@@ -579,7 +578,8 @@ public class Program {
     consoleScrollPane.setViewportView(consoleTextArea);
 
     consoleTextArea.setEditable(false);
-    consoleTextArea.setBackground(Color.DARK_GRAY);
+    consoleTextArea.setBackground(AssetPanel.BACKGROUND);
+    consoleTextArea.setForeground(Color.WHITE);
     consoleTextArea.setAutoscrolls(true);
     root.addHandler(new ConsoleLogHandler(consoleTextArea));
     return consoleScrollPane;
@@ -746,9 +746,7 @@ public class Program {
       paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
-    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
-      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
-    });
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
     UndoManager.onUndoStackChanged(manager -> {
       EditorScreen.instance().getMapComponent().updateTransformControls();
@@ -869,9 +867,7 @@ public class Program {
       paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
     });
 
-    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> {
-      paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null);
-    });
+    EditorScreen.instance().getMapComponent().onEditModeChanged(mode -> paste.setEnabled(EditorScreen.instance().getMapComponent().getCopiedBlueprint() != null));
 
     canvas.addMouseListener(new MouseAdapter() {
       @Override
