@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,9 +37,13 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 @XmlRootElement(name = "game")
 public class GameFile implements Serializable {
   private static final Logger log = Logger.getLogger(GameFile.class.getName());
-  public static final String FILE_EXTENSION = "ltx";
+  public static final String FILE_EXTENSION = "env";
+  public static final float CURRENT_VERSION = 1.0f;
 
   private static final long serialVersionUID = -2101786184799276518L;
+
+  @XmlAttribute(name = "version")
+  private float version;
 
   @XmlElementWrapper(name = "maps")
   @XmlElement(name = "map")
@@ -199,5 +204,9 @@ public class GameFile implements Serializable {
     }
 
     this.tilesets = distinctTilesets;
+
+    if (this.version == 0) {
+      this.version = CURRENT_VERSION;
+    }
   }
 }
