@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
-import de.gurkenlabs.util.ListUtilities;
+import de.gurkenlabs.litiengine.util.ListUtilities;
 
 public class KeyboardEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
   private final List<Integer> up;

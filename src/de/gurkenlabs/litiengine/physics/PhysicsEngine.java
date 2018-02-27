@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * The Class PhysicsEngine.

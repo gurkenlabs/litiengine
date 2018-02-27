@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {

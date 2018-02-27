@@ -12,9 +12,9 @@ import de.gurkenlabs.litiengine.net.UdpPacketSender;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
 import de.gurkenlabs.litiengine.net.messages.MessageType;
-import de.gurkenlabs.util.CommandManager;
-import de.gurkenlabs.util.ICommandManager;
-import de.gurkenlabs.util.io.CompressionUtilities;
+import de.gurkenlabs.litiengine.util.CommandManager;
+import de.gurkenlabs.litiengine.util.ICommandManager;
+import de.gurkenlabs.litiengine.util.io.CompressionUtilities;
 
 public class UdpServer implements IServer {
   private static final String SHUTDOWN = "shutdown";

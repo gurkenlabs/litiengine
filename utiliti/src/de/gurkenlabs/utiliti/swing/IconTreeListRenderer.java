@@ -21,7 +21,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 

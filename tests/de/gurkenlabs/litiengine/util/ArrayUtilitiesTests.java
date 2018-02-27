@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.ArrayUtilities;
-
 public class ArrayUtilitiesTests {
 
   @Test

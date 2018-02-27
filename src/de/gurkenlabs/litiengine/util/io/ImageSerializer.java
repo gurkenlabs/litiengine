@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.io;
+package de.gurkenlabs.litiengine.util.io;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,7 +14,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public final class ImageSerializer {
   private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());

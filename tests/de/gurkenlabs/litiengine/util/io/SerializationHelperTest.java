@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.io.SerializationHelper;
-
 public class SerializationHelperTest {
   @Test
   public void testSmallFloatEncodingMax() {

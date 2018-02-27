@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheet {
   private static final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();

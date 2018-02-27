@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @AbilityInfo
 public abstract class Ability implements IRenderable {

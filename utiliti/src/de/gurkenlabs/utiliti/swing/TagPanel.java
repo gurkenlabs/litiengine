@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;

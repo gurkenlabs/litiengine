@@ -19,8 +19,8 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class OrthogonalMapRenderer implements IMapRenderer {
 

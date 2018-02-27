@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * The Class EntityNavigator.

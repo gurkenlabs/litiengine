@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.geom;
+package de.gurkenlabs.litiengine.util.geom;
 
 import java.awt.Dimension;
 import java.awt.Shape;

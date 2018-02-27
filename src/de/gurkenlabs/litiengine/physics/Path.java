@@ -4,7 +4,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * The Class Path.

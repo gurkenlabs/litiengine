@@ -6,7 +6,7 @@ import java.util.Optional;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 /**
  * This {@link AnimationController} implementation provides animation rules that

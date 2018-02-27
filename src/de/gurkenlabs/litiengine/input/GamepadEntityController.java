@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
 
 public class GamepadEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {

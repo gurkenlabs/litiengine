@@ -17,9 +17,9 @@ import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.XmlUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {

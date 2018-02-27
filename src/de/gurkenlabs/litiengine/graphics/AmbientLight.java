@@ -13,9 +13,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.environment.IEnvironment;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.geom.Vector2D;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.Vector2D;
 
 public class AmbientLight extends ColorLayer {
 

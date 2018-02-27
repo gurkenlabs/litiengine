@@ -7,8 +7,6 @@ import java.awt.geom.Point2D;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.geom.GeometricUtilities;
-
 public class GeometricUtilitiesTests {
 
   @Test

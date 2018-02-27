@@ -28,7 +28,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")

@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.MathUtilities;
-
 public class MathUtilitiesTests {
 
   @Test

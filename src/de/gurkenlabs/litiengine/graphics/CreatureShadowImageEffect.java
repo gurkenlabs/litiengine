@@ -7,7 +7,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class CreatureShadowImageEffect extends ImageEffect {
   private static final Color DEFAULT_SHADOW_COLOR = new Color(124, 164, 174, 120);

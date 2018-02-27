@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.gui.GuiProperties;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class SpeechBubble implements IUpdateable, IRenderable {
   private static final Map<IEntity, SpeechBubble> activeSpeechBubbles = new ConcurrentHashMap<>();

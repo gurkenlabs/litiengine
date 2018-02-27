@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
-import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 /**
  * The Class Tile.

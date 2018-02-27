@@ -47,7 +47,7 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
-import de.gurkenlabs.util.io.ImageSerializer;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;

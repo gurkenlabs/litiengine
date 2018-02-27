@@ -10,7 +10,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.util.io.XmlUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 
 public final class XmlExportDialog {

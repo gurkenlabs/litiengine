@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
 

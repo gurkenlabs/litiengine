@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MobileEntity extends CollisionEntity implements IMobileEntity {

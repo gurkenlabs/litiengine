@@ -1,4 +1,4 @@
-package de.gurkenlabs.util;
+package de.gurkenlabs.litiengine.util;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class ImageProcessing {
   private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
@@ -185,23 +185,23 @@ public class ImageProcessing {
    * @param cropAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_CENTER
    *          CROP_ALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_LEFT
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_LEFT
    *          CROP_ALIGN_LEFT}</li>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_ALIGN_RIGHT
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_RIGHT
    *          CROP_ALIGN_RIGHT}</li>
    *          </ul>
    * @param cropVerticlaAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_CENTER
    *          CROP_VALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_TOP
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOP
    *          CROP_VALIGN_TOP}</li>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_TOPCENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOPCENTER
    *          CROP_VALIGN_TOPCENTER}</li>
-   *          <li>{@link de.gurkenlabs.util.ImageProcessing#CROP_VALIGN_BOTTOM
+   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_BOTTOM
    *          CROP_VALIGN_BOTTOM}</li>
    *          </ul>
    * @param width

@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.geom;
+package de.gurkenlabs.litiengine.util.geom;
 
 public class Trigonometry {
   private static final int ATAN2_BITS = 7;

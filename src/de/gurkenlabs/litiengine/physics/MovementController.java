@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class MovementController<T extends IMobileEntity> implements IMovementController<T> {
   private static final double FORCE_APPLY_ACCEPTED_ERROR = 0.1;

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * The Class FontLoader loads custom fonts to the java environment.

@@ -1,12 +1,6 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import de.gurkenlabs.util.ImageProcessing;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -15,6 +9,11 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class RenderEngineTests {
 

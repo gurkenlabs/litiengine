@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public class Configuration {
   private static final Logger log = Logger.getLogger(Configuration.class.getName());

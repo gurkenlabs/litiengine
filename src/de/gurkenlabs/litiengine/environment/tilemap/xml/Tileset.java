@@ -20,8 +20,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.XmlUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 /**
  * The Class Tileset.

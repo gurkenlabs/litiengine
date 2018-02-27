@@ -12,8 +12,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import de.gurkenlabs.util.io.FileUtilities;
-import de.gurkenlabs.util.io.StreamUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.StreamUtilities;
 
 /**
  * This class implements all required functionality to load sounds from the file

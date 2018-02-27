@@ -32,8 +32,8 @@ import javax.swing.table.DefaultTableModel;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel {

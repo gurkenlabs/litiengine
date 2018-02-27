@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class GravityForce extends Force {
   private final Direction direction;

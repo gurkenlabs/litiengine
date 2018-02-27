@@ -56,7 +56,7 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;

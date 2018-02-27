@@ -7,7 +7,7 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class PropAnimationController extends EntityAnimationController<Prop> {
   private static final String DAMAGED = "damaged";

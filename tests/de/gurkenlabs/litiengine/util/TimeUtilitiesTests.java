@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.util.TimeUtilities;
-import de.gurkenlabs.util.TimeUtilities.TimerFormat;
+import de.gurkenlabs.litiengine.util.TimeUtilities.TimerFormat;
 
 public class TimeUtilitiesTests {
 

@@ -49,8 +49,8 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
-import de.gurkenlabs.util.geom.GeometricUtilities;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * The Class MapContainerBase.

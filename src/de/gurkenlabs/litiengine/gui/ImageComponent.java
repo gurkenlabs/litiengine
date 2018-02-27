@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_INDEX = 0;

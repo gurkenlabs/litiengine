@@ -21,8 +21,8 @@ import javax.sound.sampled.SourceDataLine;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.util.MathUtilities;
-import de.gurkenlabs.util.geom.GeometricUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**
  * This class is responsible for the playback of all sounds in the engine. If

@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @XmlRootElement(name = "param")
 public class ParticleParameter implements Serializable {

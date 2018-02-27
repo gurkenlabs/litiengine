@@ -15,8 +15,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.util.ArrayUtilities;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)

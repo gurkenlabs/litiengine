@@ -1,4 +1,4 @@
-package de.gurkenlabs.util;
+package de.gurkenlabs.litiengine.util;
 
 import java.util.Random;
 

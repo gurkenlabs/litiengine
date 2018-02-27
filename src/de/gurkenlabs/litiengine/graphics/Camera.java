@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
  * The Class Camera.

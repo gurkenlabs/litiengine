@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.graphics.ImageCache;
-import de.gurkenlabs.util.ImageProcessing;
-import de.gurkenlabs.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Resources {
   public static final String LOCALIZATION_RESOURCE_FOLDER = "localization/";

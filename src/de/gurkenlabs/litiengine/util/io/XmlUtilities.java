@@ -1,4 +1,4 @@
-package de.gurkenlabs.util.io;
+package de.gurkenlabs.litiengine.util.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

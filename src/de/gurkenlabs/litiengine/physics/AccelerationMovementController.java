@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.physics;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class AccelerationMovementController<T extends IMobileEntity> extends MovementController<T> {
   private float dx;
