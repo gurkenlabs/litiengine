@@ -1,4 +1,4 @@
-package de.gurkenlabs.core;
+package de.gurkenlabs.litiengine.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
