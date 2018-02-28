@@ -955,7 +955,7 @@ public class Environment implements IEnvironment {
 
   protected void addMapObject(final IMapObject mapObject) {
     if (mapObjectLoaders.containsKey(mapObject.getType())) {
-      Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(mapObject);
+      Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(this, mapObject);
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
           this.add(entity);

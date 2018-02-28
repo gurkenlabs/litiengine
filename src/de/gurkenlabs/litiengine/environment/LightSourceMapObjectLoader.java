@@ -16,7 +16,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment,IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
@@ -26,8 +26,9 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final Color color = mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
+    Collection<IEntity> entities = super.load(environment, mapObject);
     if (color == null || lightShape == null) {
-      return super.load(mapObject);
+      return entities;
     }
 
     String lightType;
@@ -45,7 +46,6 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
     loadDefaultProperties(light, mapObject);
 
-    Collection<IEntity> entities = super.load(mapObject);
     entities.add(light);
     return entities;
   }

@@ -9,5 +9,5 @@ public interface IMapObjectLoader {
 
   String getMapObjectType();
 
-  Collection<IEntity> load(IMapObject mapObject);
+  Collection<IEntity> load(IEnvironment environment, IMapObject mapObject);
 }

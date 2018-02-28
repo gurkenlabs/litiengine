@@ -26,8 +26,9 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   public String getMapObjectType() {
     return this.mapObjectType;
   }
-
-  public Collection<IEntity> load(IMapObject mapObject) {
+  
+  @Override
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     return new ArrayList<>();
   }
 

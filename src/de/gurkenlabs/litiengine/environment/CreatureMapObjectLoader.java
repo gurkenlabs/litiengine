@@ -63,14 +63,15 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.CREATURE) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CreatureMapObjectLoader.class);
     }
-
+    
+    Collection<IEntity> entities = super.load(environment, mapObject);
     final String spriteSheet = mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME);
     if (spriteSheet == null) {
-      return super.load(mapObject);
+      return entities;
     }
 
     Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
@@ -80,7 +81,6 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     // TODO: load IMobileEntity and ICombatEntity properties
     creature.setFacingDirection(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
 
-    Collection<IEntity> entities = super.load(mapObject);
     entities.add(creature);
     return entities;
   }

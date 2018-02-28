@@ -36,6 +36,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.PROP.name());
     when(mapObject.getId()).thenReturn(111);
@@ -55,7 +56,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
     when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -83,6 +84,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testColliderMapObjectLoader() {
     CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
     when(mapObject.getId()).thenReturn(111);
@@ -92,7 +94,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(200);
     when(mapObject.getHeight()).thenReturn(200);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -113,6 +115,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testTriggerMapObjectLoader() {
     TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -128,7 +131,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -153,6 +156,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testDecorMobMapObjectLoader() {
     DecorMobMapObjectLoader loader = new DecorMobMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.DECORMOB.name());
     when(mapObject.getId()).thenReturn(111);
@@ -171,7 +175,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -201,6 +205,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testEmitterMapObjectLoader() {
     EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -208,7 +213,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -224,6 +229,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
     when(mapObject.getId()).thenReturn(111);
@@ -237,7 +243,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 

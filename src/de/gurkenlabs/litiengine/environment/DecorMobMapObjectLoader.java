@@ -17,7 +17,7 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.DECORMOB) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + DecorMobMapObjectLoader.class);
     }
@@ -37,7 +37,7 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
     loadCollisionProperties(mob, mapObject);
     mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
 
-    Collection<IEntity> entities = super.load(mapObject);
+    Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(mob);
     return entities;
   }
