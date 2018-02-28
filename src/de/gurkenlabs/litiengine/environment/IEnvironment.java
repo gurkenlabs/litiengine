@@ -114,7 +114,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IEntity> getEntities(RenderType renderType);
 
-  public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
+  public <T extends IEntity> Collection<T> getByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
 

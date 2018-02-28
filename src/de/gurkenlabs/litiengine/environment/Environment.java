@@ -512,7 +512,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> cls) {
+  public <T extends IEntity> Collection<T> getByType(Class<T> cls) {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
