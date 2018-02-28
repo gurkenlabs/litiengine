@@ -34,9 +34,10 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
    * automatically provided by this {@link MapObjectLoader}.
    * </p>
    * 
+   * <p>
    * <b>This should only be used if the particular implementation doesn't
    * require any additional map object properties to be initialized.</b>
-   * <p>
+   * </p>
    * 
    * Make sure that the implementation has the following present:
    * <ol>
@@ -46,6 +47,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
    * prefix from the loader.</li>
    * </ol>
    * 
+   * <p>
    * The latter is particularly useful for classes that can have different
    * sprite sheets, i.e. share the same logic but might have a different
    * appearance.
@@ -74,7 +76,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
     loadDefaultProperties(creature, mapObject);
     loadCollisionProperties(creature, mapObject);
-    
+
     // TODO: load IMobileEntity and ICombatEntity properties
     creature.setFacingDirection(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
 
