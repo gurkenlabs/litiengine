@@ -59,19 +59,24 @@ public class Environment implements IEnvironment {
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
   private final Map<Integer, ICombatEntity> combatEntities;
-
+  private final Map<Integer, IMobileEntity> mobileEntities;
   private final Map<RenderType, Map<Integer, IEntity>> entities;
   private final Map<String, List<IEntity>> entitiesByTag;
 
   private final List<Consumer<Graphics2D>> entitiesRenderedConsumers;
+  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
+  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
+
   private final List<Consumer<IEnvironment>> initializedConsumers;
   private final List<Consumer<IEnvironment>> loadedConsumers;
+  private final List<Consumer<IEnvironment>> unloadedConsumers;
+  private final List<Consumer<IEnvironment>> clearedConsumers;
+
   private final List<Consumer<IEntity>> entityAddedConsumers;
   private final List<Consumer<IEntity>> entityRemovedConsumers;
-  private final List<Consumer<Graphics2D>> overlayRenderedConsumer;
-  private final List<Consumer<Graphics2D>> mapRenderedConsumer;
 
-  private final List<IRenderable> groundRenderable;
+  private final Collection<IRenderable> groundRenderable;
+  private final Collection<IRenderable> overlayRenderable;
   private final Collection<CollisionBox> colliders;
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
@@ -79,13 +84,8 @@ public class Environment implements IEnvironment {
   private final Collection<Prop> props;
   private final Collection<Emitter> emitters;
   private final Collection<Creature> creatures;
-
+  private final Collection<Spawnpoint> spawnPoints;
   private final Collection<MapArea> mapAreas;
-
-  private final Map<Integer, IMobileEntity> mobileEntities;
-  private final List<IRenderable> overlayRenderable;
-
-  private final List<Spawnpoint> spawnPoints;
 
   private AmbientLight ambientLight;
   private StaticShadowLayer staticShadowLayer;
@@ -147,19 +147,19 @@ public class Environment implements IEnvironment {
     this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
     this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
     this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
+    this.spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<Spawnpoint, Boolean>());
+    this.groundRenderable = new CopyOnWriteArrayList<>();
+    this.overlayRenderable = new CopyOnWriteArrayList<>();
 
     this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
+    this.clearedConsumers = new CopyOnWriteArrayList<>();
     this.entitiesRenderedConsumers = new CopyOnWriteArrayList<>();
     this.overlayRenderedConsumer = new CopyOnWriteArrayList<>();
     this.initializedConsumers = new CopyOnWriteArrayList<>();
     this.loadedConsumers = new CopyOnWriteArrayList<>();
+    this.unloadedConsumers = new CopyOnWriteArrayList<>();
     this.entityAddedConsumers = new CopyOnWriteArrayList<>();
     this.entityRemovedConsumers = new CopyOnWriteArrayList<>();
-
-    this.spawnPoints = new CopyOnWriteArrayList<>();
-
-    this.groundRenderable = new CopyOnWriteArrayList<>();
-    this.overlayRenderable = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -191,7 +191,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof Prop) {
       this.props.add((Prop) entity);
     }
-    
+
     if (entity instanceof Creature) {
       this.creatures.add((Creature) entity);
     }
@@ -283,6 +283,9 @@ public class Environment implements IEnvironment {
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
     this.initialized = false;
+    for (final Consumer<IEnvironment> cons : this.clearedConsumers) {
+      cons.accept(this);
+    }
   }
 
   @Override
@@ -523,6 +526,7 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
+  @Override
   public Collection<IRenderable> getGroundRenderables() {
     return this.groundRenderable;
   }
@@ -575,7 +579,8 @@ public class Environment implements IEnvironment {
     return ++mapIdSequence;
   }
 
-  public List<IRenderable> getOverlayRenderables() {
+  @Override
+  public Collection<IRenderable> getOverlayRenderables() {
     return this.overlayRenderable;
   }
 
@@ -620,7 +625,7 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<Spawnpoint> getSpawnPoints() {
+  public Collection<Spawnpoint> getSpawnPoints() {
     return this.spawnPoints;
   }
 
@@ -725,6 +730,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void onCleared(Consumer<IEnvironment> consumer) {
+    this.clearedConsumers.add(consumer);
+  }
+
+  @Override
   public void onEntityRemoved(Consumer<IEntity> consumer) {
     this.entityRemovedConsumers.add(consumer);
   }
@@ -747,6 +757,11 @@ public class Environment implements IEnvironment {
   @Override
   public void onLoaded(final Consumer<IEnvironment> consumer) {
     this.loadedConsumers.add(consumer);
+  }
+
+  @Override
+  public void onUnloaded(Consumer<IEnvironment> consumer) {
+    this.unloadedConsumers.add(consumer);
   }
 
   @Override
@@ -807,7 +822,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof Prop) {
       this.props.remove(entity);
     }
-    
+
     if (entity instanceof Creature) {
       this.creatures.remove(entity);
     }
@@ -933,6 +948,9 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = false;
+    for (final Consumer<IEnvironment> cons : this.unloadedConsumers) {
+      cons.accept(this);
+    }
   }
 
   protected void addMapObject(final IMapObject mapObject) {
