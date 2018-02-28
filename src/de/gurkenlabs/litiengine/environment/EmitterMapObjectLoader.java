@@ -51,7 +51,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     // TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
     // Also see Emitter.getOrigin
     CustomEmitter emitter = new CustomEmitter(data);
-    this.loadProperties(emitter, mapObject);
+    loadDefaultProperties(emitter, mapObject);
     emitter.setLocation(mapObject.getLocation().getX() + mapObject.getWidth() / 2.0, mapObject.getLocation().getY() + mapObject.getHeight() / 2.0);
 
     Collection<IEntity> entities = super.load(mapObject);

@@ -25,7 +25,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
     boolean isObstructingLight = mapObject.getCustomPropertyBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
 
     final CollisionBox col = new CollisionBox(isObstacle, isObstructingLight);
-    this.loadProperties(col, mapObject);
+    loadDefaultProperties(col, mapObject);
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
 

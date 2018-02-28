@@ -6,14 +6,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
+
   private final List<Consumer<IMobileEntity>> entityMovedConsumer;
 
   private int acceleration;
@@ -30,6 +32,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   public Creature(String spritePrefix) {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
+
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = movementInfo.velocity();
@@ -41,19 +44,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (spritePrefix != null) {
       this.setSpritePrefix(spritePrefix);
     } else {
-      this.setSpritePrefix(getDefaultSpritePrefix(this.getClass()));
+      this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
 
     Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
-  }
-
-  public static <T> String getDefaultSpritePrefix(Class<T> cls) {
-    AnimationInfo animationInfo = cls.getAnnotation(AnimationInfo.class);
-    if (animationInfo != null) {
-      return animationInfo.spritePrefix();
-    } else {
-      return cls.getSimpleName().toLowerCase();
-    }
   }
 
   @Override

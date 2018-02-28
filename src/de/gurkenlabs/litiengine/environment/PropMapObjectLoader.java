@@ -26,8 +26,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     final Material material = mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL));
     final Prop prop = this.createNewProp(mapObject, mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), material);
-    this.loadProperties(prop, mapObject);
-    this.loadCollisionProperties(prop, mapObject);
+    loadDefaultProperties(prop, mapObject);
+    loadCollisionProperties(prop, mapObject);
+    prop.setObstacle(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
     
     final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
     prop.setSpriteRotation(rotation);
@@ -42,7 +43,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     prop.setFlipHorizontally(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     prop.setFlipVertically(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
-    
+
     prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
 
     Collection<IEntity> entities = super.load(mapObject);
@@ -52,7 +53,6 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
   protected Prop createNewProp(IMapObject mapObject, String spriteSheetName, Material material) {
     Prop prop = new Prop(mapObject.getLocation(), spriteSheetName, material);
-    prop.setObstacle(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
     return prop;
   }
 }

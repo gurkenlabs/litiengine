@@ -21,7 +21,7 @@ public class MapAreaMapObjectLoader extends MapObjectLoader {
 
     Collection<IEntity> entities = super.load(mapObject);
     MapArea mapArea = new MapArea();
-    this.loadProperties(mapArea, mapObject);
+    loadDefaultProperties(mapArea, mapObject);
     
     entities.add(mapArea);
     return entities;

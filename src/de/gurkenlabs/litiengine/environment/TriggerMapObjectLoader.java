@@ -39,8 +39,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     }
 
     final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
-    this.loadProperties(trigger, mapObject);
-    
+    loadDefaultProperties(trigger, mapObject);
+
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {
         trigger.addTarget(target);

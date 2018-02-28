@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
   private final Map<Predicate<T>, Function<T, String>> animationRules;
@@ -21,8 +22,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.entity = entity;
 
     if (entity != null) {
-      AnimationInfo info = entity.getClass().getAnnotation(AnimationInfo.class);
-      this.spritePrefix = info != null ? info.spritePrefix() : null;
+      this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
     }
   }
 
@@ -31,8 +31,16 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.animationRules = new ConcurrentHashMap<>();
     this.entity = entity;
 
-    AnimationInfo info = entity.getClass().getAnnotation(AnimationInfo.class);
-    this.spritePrefix = info != null ? info.spritePrefix() : null;
+    this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
+  }
+
+  public static <T> String[] getDefaultSpritePrefixes(Class<T> cls) {
+    AnimationInfo animationInfo = cls.getAnnotation(AnimationInfo.class);
+    if (animationInfo != null && animationInfo.spritePrefix().length > 0) {
+      return animationInfo.spritePrefix();
+    } else {
+      return new String[] { cls.getSimpleName().toLowerCase() };
+    }
   }
 
   @Override

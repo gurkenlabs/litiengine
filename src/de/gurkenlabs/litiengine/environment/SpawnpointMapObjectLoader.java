@@ -23,7 +23,7 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
 
     final Direction direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
     final Spawnpoint spawn = new Spawnpoint(direction);
-    this.loadProperties(spawn, mapObject);
+    loadDefaultProperties(spawn, mapObject);
 
     final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
     spawn.setSpawnType(spawnType);

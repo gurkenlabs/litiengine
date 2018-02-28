@@ -33,8 +33,8 @@ public class DecorMobMapObjectLoader extends MapObjectLoader {
     }
 
     final DecorMob mob = new DecorMob(mapObject.getLocation(), mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME), MovementBehavior.get(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)), velocity);
-    this.loadProperties(mob, mapObject);
-    this.loadCollisionProperties(mob, mapObject);
+    loadDefaultProperties(mob, mapObject);
+    loadCollisionProperties(mob, mapObject);
     mob.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
 
     Collection<IEntity> entities = super.load(mapObject);

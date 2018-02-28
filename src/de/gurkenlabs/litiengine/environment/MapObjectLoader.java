@@ -31,7 +31,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     return new ArrayList<>();
   }
 
-  protected void loadProperties(IEntity entity, IMapObject mapObject) {
+  public static void loadDefaultProperties(IEntity entity, IMapObject mapObject) {
     entity.setMapId(mapObject.getId());
     entity.setWidth(mapObject.getWidth());
     entity.setHeight(mapObject.getHeight());
@@ -53,7 +53,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     }
   }
 
-  protected void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
+  public static void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
     entity.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
     entity.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
     entity.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
