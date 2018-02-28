@@ -41,16 +41,19 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (spritePrefix != null) {
       this.setSpritePrefix(spritePrefix);
     } else {
-
-      AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
-      if (animationInfo != null) {
-        this.setSpritePrefix(animationInfo.spritePrefix());
-      } else {
-        this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
-      }
+      this.setSpritePrefix(getDefaultSpritePrefix(this.getClass()));
     }
 
     Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
+  }
+
+  public static <T> String getDefaultSpritePrefix(Class<T> cls) {
+    AnimationInfo animationInfo = cls.getAnnotation(AnimationInfo.class);
+    if (animationInfo != null) {
+      return animationInfo.spritePrefix();
+    } else {
+      return cls.getSimpleName().toLowerCase();
+    }
   }
 
   @Override
