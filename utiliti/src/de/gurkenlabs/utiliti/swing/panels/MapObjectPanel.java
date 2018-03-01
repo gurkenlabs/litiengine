@@ -41,11 +41,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private TagPanel tagPanel;
   private JLabel lblTags;
   
-  private boolean isMoving;
-
-  /**
-   * Create the panel.
-   */
   public MapObjectPanel() {
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
