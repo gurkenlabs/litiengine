@@ -1030,18 +1030,19 @@ public class MapComponent extends EditorComponent {
       }
     }
 
+    IMapObject minX = null;
+    IMapObject minY = null;
     for (IMapObject selected : this.getSelectedMapObjects()) {
-      this.handleEntityDrag(selected);
+      if (minX == null || selected.getX() < minX.getX()) {
+        minX = selected;
+      }
+
+      if (minY == null || selected.getY() < minY.getY()) {
+        minY = selected;
+      }
     }
 
-    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
-      Game.getEnvironment().getAmbientLight().createImage();
-    }
-  }
-
-  private void handleEntityDrag(IMapObject mapObject) {
-    final IMapObject dragObject = mapObject;
-    if (dragObject == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
+    if (minX == null || minY == null || (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.currentEditMode != EDITMODE_MOVE)) {
       return;
     }
 
@@ -1050,29 +1051,48 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    if (!this.dragLocationMapObjects.containsKey(mapObject)) {
-      this.dragLocationMapObjects.put(mapObject, new Point2D.Double(dragObject.getX(), dragObject.getY()));
+    if (!this.dragLocationMapObjects.containsKey(minX)) {
+      this.dragLocationMapObjects.put(minX, new Point2D.Double(minX.getX(), minX.getY()));
     }
 
-    Point2D dragLocationMapObject = this.dragLocationMapObjects.get(mapObject);
+    if (!this.dragLocationMapObjects.containsKey(minY)) {
+      this.dragLocationMapObjects.put(minY, new Point2D.Double(minY.getX(), minY.getY()));
+    }
+
+    Point2D dragLocationMapObjectMinX = this.dragLocationMapObjects.get(minX);
+    Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    int newX = this.snapX(dragLocationMapObject.getX() + deltaX);
-    int newY = this.snapY(dragLocationMapObject.getY() + deltaY);
+    int newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
+    int snappedDeltaX = newX - minX.getX();
 
-    if (newX == dragObject.getX() && newY == dragObject.getY()) {
+    double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
+    int newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
+    int snappedDeltaY = newY - minY.getY();
+
+    if (snappedDeltaX == 0 && snappedDeltaY == 0) {
       return;
     }
 
-    dragObject.setX(newX);
-    dragObject.setY(newY);
+    this.handleEntityDrag(snappedDeltaX, snappedDeltaY);
 
-    Game.getEnvironment().reloadFromMap(dragObject.getId());
+    if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
+      Game.getEnvironment().getAmbientLight().createImage();
+    }
+  }
 
-    if (mapObject.equals(this.getFocusedMapObject())) {
-      EditorScreen.instance().getMapObjectPanel().bind(mapObject);
-      this.updateTransformControls();
+  private void handleEntityDrag(int snappedDeltaX, int snappedDeltaY) {
+    for (IMapObject selected : this.getSelectedMapObjects()) {
+
+      selected.setX(selected.getX() + snappedDeltaX);
+      selected.setY(selected.getY() + snappedDeltaY);
+
+      Game.getEnvironment().reloadFromMap(selected.getId());
+
+      if (selected.equals(this.getFocusedMapObject())) {
+        EditorScreen.instance().getMapObjectPanel().bind(selected);
+        this.updateTransformControls();
+      }
     }
   }
 
