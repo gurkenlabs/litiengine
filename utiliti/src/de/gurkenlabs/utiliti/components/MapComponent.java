@@ -140,6 +140,7 @@ public class MapComponent extends EditorComponent {
   private Point2D dragPoint;
 
   private boolean isMoving;
+  private boolean isMovingWithKeyboard;
   private boolean isTransforming;
   private boolean isFocussing;
   private Dimension dragSizeMapObject;
@@ -1149,6 +1150,81 @@ public class MapComponent extends EditorComponent {
         this.delete();
       }
     });
+
+    Input.keyboard().onKeyReleased(e -> {
+      if (e.getKeyCode() != KeyEvent.VK_RIGHT && e.getKeyCode() != KeyEvent.VK_LEFT && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_DOWN) {
+        return;
+      }
+
+      // if one of the move buttons is still pressed, don't end the operation
+      if (Input.keyboard().isPressed(KeyEvent.VK_RIGHT) || Input.keyboard().isPressed(KeyEvent.VK_LEFT) || Input.keyboard().isPressed(KeyEvent.VK_UP) || Input.keyboard().isPressed(KeyEvent.VK_DOWN)) {
+        return;
+      }
+
+      if (this.isMovingWithKeyboard) {
+        for (IMapObject selected : this.getSelectedMapObjects()) {
+          UndoManager.instance().mapObjectChanged(selected);
+        }
+        
+        UndoManager.instance().endOperation();
+        this.isMovingWithKeyboard = false;
+      }
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
+      }
+
+      this.beforeKeyPressed();
+      this.handleEntityDrag(1, 0);
+      this.afterKeyPressed();
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
+      }
+
+      this.beforeKeyPressed();
+      this.handleEntityDrag(-1, 0);
+      this.afterKeyPressed();
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
+      }
+
+      this.beforeKeyPressed();
+      this.handleEntityDrag(0, -1);
+      this.afterKeyPressed();
+    });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
+      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+        return;
+      }
+
+      this.beforeKeyPressed();
+      this.handleEntityDrag(0, 1);
+      this.afterKeyPressed();
+    });
+  }
+
+  private void beforeKeyPressed() {
+    if (!this.isMovingWithKeyboard) {
+      UndoManager.instance().beginOperation();
+      for (IMapObject selected : this.getSelectedMapObjects()) {
+        UndoManager.instance().mapObjectChanging(selected);
+      }
+
+      this.isMovingWithKeyboard = true;
+    }
+  }
+
+  private void afterKeyPressed() {
+    EditorScreen.instance().getMapComponent().updateTransformControls();
   }
 
   private void setupMouseControls() {
