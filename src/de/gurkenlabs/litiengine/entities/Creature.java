@@ -163,4 +163,20 @@ public class Creature extends CombatEntity implements IMobileEntity {
   public boolean turnOnMove() {
     return this.turnOnMove;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (this.getName() != null && !this.getName().isEmpty()) {
+      sb.append(this.getName());
+    } else {
+      sb.append(Creature.class.getSimpleName());
+    }
+    sb.append(" (");
+    sb.append(this.getSpritePrefix());
+
+    sb.append(") #");
+    sb.append(this.getMapId());
+    return sb.toString();
+  }
 }

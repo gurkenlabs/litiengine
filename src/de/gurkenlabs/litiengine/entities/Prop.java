@@ -109,6 +109,22 @@ public class Prop extends CombatEntity {
     this.flipVertically = flipVertically;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (this.getName() != null && !this.getName().isEmpty()) {
+      sb.append(this.getName());
+    } else {
+      sb.append(Prop.class.getSimpleName());
+    }
+    sb.append(" (");
+    sb.append(this.getSpritesheetName());
+
+    sb.append(") #");
+    sb.append(this.getMapId());
+    return sb.toString();
+  }
+
   private void updateAnimationController() {
     PropAnimationController controller = new PropAnimationController(this);
     Game.getEntityControllerManager().addController(this, controller);

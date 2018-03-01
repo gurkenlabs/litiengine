@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
@@ -99,7 +100,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       propImag = ImageCache.IMAGES.get(cacheKey);
     } else {
-      Collection<Spritesheet> sprites = Spritesheet.find(s -> s.getName().startsWith(creature.getSpritePrefix()));
+      Collection<Spritesheet> sprites = Spritesheet.find(s -> s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.IDLE) || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.WALK)
+          || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.DEAD) || s.getName().startsWith(creature.getSpritePrefix() + "-"));
       if (sprites.isEmpty()) {
         return null;
       }
