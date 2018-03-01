@@ -41,7 +41,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.EMITTER) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + EmitterMapObjectLoader.class);
     }
@@ -51,10 +51,10 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     // TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
     // Also see Emitter.getOrigin
     CustomEmitter emitter = new CustomEmitter(data);
-    this.loadProperties(emitter, mapObject);
+    loadDefaultProperties(emitter, mapObject);
     emitter.setLocation(mapObject.getLocation().getX() + mapObject.getWidth() / 2.0, mapObject.getLocation().getY() + mapObject.getHeight() / 2.0);
 
-    Collection<IEntity> entities = super.load(mapObject);
+    Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(emitter);
 
     return entities;

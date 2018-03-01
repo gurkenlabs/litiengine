@@ -240,7 +240,7 @@ public final class Game {
   }
 
   public static void load(final String gameResourceFile) {
-    final GameFile file = GameFile.load(gameResourceFile);
+    final GameData file = GameData.load(gameResourceFile);
     if (file == null) {
       return;
     }

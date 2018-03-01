@@ -20,7 +20,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.TRIGGER) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + TriggerMapObjectLoader.class);
     }
@@ -39,8 +39,8 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     }
 
     final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
-    this.loadProperties(trigger, mapObject);
-    
+    loadDefaultProperties(trigger, mapObject);
+
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {
         trigger.addTarget(target);
@@ -55,7 +55,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
 
     trigger.setCooldown(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
 
-    Collection<IEntity> entities = super.load(mapObject);
+    Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(trigger);
     return entities;
   }

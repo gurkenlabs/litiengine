@@ -6,14 +6,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
+
   private final List<Consumer<IMobileEntity>> entityMovedConsumer;
 
   private int acceleration;
@@ -30,6 +32,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   public Creature(String spritePrefix) {
     this.entityMovedConsumer = new CopyOnWriteArrayList<>();
+
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = movementInfo.velocity();
@@ -41,13 +44,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     if (spritePrefix != null) {
       this.setSpritePrefix(spritePrefix);
     } else {
-
-      AnimationInfo animationInfo = this.getClass().getAnnotation(AnimationInfo.class);
-      if (animationInfo != null) {
-        this.setSpritePrefix(animationInfo.spritePrefix());
-      } else {
-        this.setSpritePrefix(this.getClass().getSimpleName().toLowerCase());
-      }
+      this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
 
     Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
@@ -165,5 +162,21 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (this.getName() != null && !this.getName().isEmpty()) {
+      sb.append(this.getName());
+    } else {
+      sb.append(Creature.class.getSimpleName());
+    }
+    sb.append(" (");
+    sb.append(this.getSpritePrefix());
+
+    sb.append(") #");
+    sb.append(this.getMapId());
+    return sb.toString();
   }
 }

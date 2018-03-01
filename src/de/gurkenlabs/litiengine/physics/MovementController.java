@@ -60,9 +60,10 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   protected void moveEntity(double deltaX, double deltaY) {
     final Point2D newLocation = new Point2D.Double(this.getEntity().getLocation().getX() + deltaX, this.getEntity().getLocation().getY() + deltaY);
+    final Point2D oldLocation = this.getEntity().getLocation();
     Game.getPhysicsEngine().move(this.getEntity(), newLocation);
 
-    final Point2D delta = new Point2D.Double(deltaX, deltaY);
+    final Point2D delta = new Point2D.Double(this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY());
     for (Consumer<Point2D> cons : this.movedConsumer) {
       cons.accept(delta);
     }

@@ -83,7 +83,7 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getCombatEntity(123));
     assertNotNull(this.testEnvironment.getCombatEntity("test"));
     assertEquals(1, this.testEnvironment.getCombatEntities().size());
-    assertEquals(1, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
+    assertEquals(1, this.testEnvironment.getByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(combatEntity);
@@ -92,7 +92,7 @@ public class EnvironmentTests {
     assertNull(this.testEnvironment.getCombatEntity(123));
     assertNull(this.testEnvironment.getCombatEntity("test"));
     assertEquals(0, this.testEnvironment.getCombatEntities().size());
-    assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
+    assertEquals(0, this.testEnvironment.getByType(ICombatEntity.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -129,8 +129,8 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getMobileEntity(456));
     assertNotNull(this.testEnvironment.getMobileEntity("test"));
     assertEquals(1, this.testEnvironment.getMobileEntities().size());
-    assertEquals(1, this.testEnvironment.getEntitiesByType(IMobileEntity.class).size());
-    assertEquals(0, this.testEnvironment.getEntitiesByType(ICombatEntity.class).size());
+    assertEquals(1, this.testEnvironment.getByType(IMobileEntity.class).size());
+    assertEquals(0, this.testEnvironment.getByType(ICombatEntity.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(mobileEntity);
@@ -139,7 +139,7 @@ public class EnvironmentTests {
     assertNull(this.testEnvironment.getMobileEntity(456));
     assertNull(this.testEnvironment.getMobileEntity("test"));
     assertEquals(0, this.testEnvironment.getMobileEntities().size());
-    assertEquals(0, this.testEnvironment.getEntitiesByType(IMobileEntity.class).size());
+    assertEquals(0, this.testEnvironment.getByType(IMobileEntity.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -154,7 +154,7 @@ public class EnvironmentTests {
     assertNotNull(this.testEnvironment.getTrigger(1));
     assertNotNull(this.testEnvironment.get(1));
     assertNotNull(this.testEnvironment.get("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(Trigger.class).size());
+    assertEquals(1, this.testEnvironment.getByType(Trigger.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testTrigger);
@@ -164,7 +164,7 @@ public class EnvironmentTests {
     assertNull(this.testEnvironment.get(1));
     assertNull(this.testEnvironment.get("test"));
 
-    assertEquals(0, this.testEnvironment.getEntitiesByType(Trigger.class).size());
+    assertEquals(0, this.testEnvironment.getByType(Trigger.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -178,14 +178,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getLightSource(999));
     assertNotNull(this.testEnvironment.getLightSource("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(LightSource.class).size());
+    assertEquals(1, this.testEnvironment.getByType(LightSource.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testLight);
 
     assertNull(this.testEnvironment.getLightSource(999));
     assertNull(this.testEnvironment.getLightSource("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(LightSource.class).size());
+    assertEquals(0, this.testEnvironment.getByType(LightSource.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -199,14 +199,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getCollisionBox(1));
     assertNotNull(this.testEnvironment.getCollisionBox("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(CollisionBox.class).size());
+    assertEquals(1, this.testEnvironment.getByType(CollisionBox.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testCollider);
 
     assertNull(this.testEnvironment.getCollisionBox(1));
     assertNull(this.testEnvironment.getCollisionBox("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(CollisionBox.class).size());
+    assertEquals(0, this.testEnvironment.getByType(CollisionBox.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -226,14 +226,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getEmitter(1));
     assertNotNull(this.testEnvironment.getEmitter("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(Emitter.class).size());
+    assertEquals(1, this.testEnvironment.getByType(Emitter.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testEmitter);
 
     assertNull(this.testEnvironment.getEmitter(1));
     assertNull(this.testEnvironment.getEmitter("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(Emitter.class).size());
+    assertEquals(0, this.testEnvironment.getByType(Emitter.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -247,14 +247,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getProp(1));
     assertNotNull(this.testEnvironment.getProp("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(Prop.class).size());
+    assertEquals(1, this.testEnvironment.getByType(Prop.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testProp);
 
     assertNull(this.testEnvironment.getProp(1));
     assertNull(this.testEnvironment.getProp("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(Prop.class).size());
+    assertEquals(0, this.testEnvironment.getByType(Prop.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -268,14 +268,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getStaticShadow(1));
     assertNotNull(this.testEnvironment.getStaticShadow("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(StaticShadow.class).size());
+    assertEquals(1, this.testEnvironment.getByType(StaticShadow.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testShadow);
 
     assertNull(this.testEnvironment.getStaticShadow(1));
     assertNull(this.testEnvironment.getStaticShadow("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(StaticShadow.class).size());
+    assertEquals(0, this.testEnvironment.getByType(StaticShadow.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -289,14 +289,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getArea(1));
     assertNotNull(this.testEnvironment.getArea("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(1, this.testEnvironment.getByType(MapArea.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testArea);
 
     assertNull(this.testEnvironment.getArea(1));
     assertNull(this.testEnvironment.getArea("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getByType(MapArea.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -312,7 +312,7 @@ public class EnvironmentTests {
 
     assertNull(this.testEnvironment.getArea(1));
     assertNull(this.testEnvironment.getArea("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getByType(MapArea.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 
@@ -325,14 +325,14 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.getSpawnpoint(1));
     assertNotNull(this.testEnvironment.getSpawnpoint("test"));
-    assertEquals(1, this.testEnvironment.getEntitiesByType(Spawnpoint.class).size());
+    assertEquals(1, this.testEnvironment.getByType(Spawnpoint.class).size());
     assertEquals(1, this.testEnvironment.getEntities().size());
 
     this.testEnvironment.remove(testSpawn);
 
     assertNull(this.testEnvironment.getSpawnpoint(1));
     assertNull(this.testEnvironment.getSpawnpoint("test"));
-    assertEquals(0, this.testEnvironment.getEntitiesByType(MapArea.class).size());
+    assertEquals(0, this.testEnvironment.getByType(MapArea.class).size());
     assertEquals(0, this.testEnvironment.getEntities().size());
   }
 

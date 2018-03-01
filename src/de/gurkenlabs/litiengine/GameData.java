@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,12 +34,16 @@ import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
-@XmlRootElement(name = "game")
-public class GameFile implements Serializable {
-  private static final Logger log = Logger.getLogger(GameFile.class.getName());
-  public static final String FILE_EXTENSION = "ltx";
+@XmlRootElement(name = "litidata")
+public class GameData implements Serializable {
+  private static final Logger log = Logger.getLogger(GameData.class.getName());
+  public static final String FILE_EXTENSION = "litidata";
+  public static final float CURRENT_VERSION = 1.0f;
 
   private static final long serialVersionUID = -2101786184799276518L;
+
+  @XmlAttribute(name = "version")
+  private float version;
 
   @XmlElementWrapper(name = "maps")
   @XmlElement(name = "map")
@@ -60,7 +65,7 @@ public class GameFile implements Serializable {
   @XmlElement(name = "blueprint")
   private List<Blueprint> blueprints;
 
-  public GameFile() {
+  public GameData() {
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
     this.tilesets = new ArrayList<>();
@@ -68,9 +73,9 @@ public class GameFile implements Serializable {
     this.blueprints = new ArrayList<>();
   }
 
-  public static GameFile load(final String file) {
+  public static GameData load(final String file) {
     try {
-      GameFile gameFile = getGameFileFromFile(file);
+      GameData gameFile = getGameFileFromFile(file);
       if (gameFile == null) {
         return null;
       }
@@ -133,7 +138,7 @@ public class GameFile implements Serializable {
     Collections.sort(this.getMaps());
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
-      final JAXBContext jaxbContext = XmlUtilities.getContext(GameFile.class);
+      final JAXBContext jaxbContext = XmlUtilities.getContext(GameData.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -162,18 +167,18 @@ public class GameFile implements Serializable {
     return newFile.toString();
   }
 
-  private static GameFile getGameFileFromFile(String file) throws JAXBException, IOException {
-    final JAXBContext jaxbContext = XmlUtilities.getContext(GameFile.class);
+  private static GameData getGameFileFromFile(String file) throws JAXBException, IOException {
+    final JAXBContext jaxbContext = XmlUtilities.getContext(GameData.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = FileUtilities.getGameResource(file)) {
 
       // try to get compressed game file
       final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
-      return (GameFile) um.unmarshal(zipStream);
+      return (GameData) um.unmarshal(zipStream);
     } catch (final ZipException e) {
 
       // if it fails to load the compressed file, get it from plain XML
-      return XmlUtilities.readFromFile(GameFile.class, file);
+      return XmlUtilities.readFromFile(GameData.class, file);
     }
   }
 
@@ -199,5 +204,9 @@ public class GameFile implements Serializable {
     }
 
     this.tilesets = distinctTilesets;
+
+    if (this.version == 0) {
+      this.version = CURRENT_VERSION;
+    }
   }
 }

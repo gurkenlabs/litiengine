@@ -114,7 +114,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IEntity> getEntities(RenderType renderType);
 
-  public <T extends IEntity> Collection<T> getEntitiesByType(Class<T> clss);
+  public <T extends IEntity> Collection<T> getByType(Class<T> clss);
 
   public LightSource getLightSource(int mapId);
 
@@ -164,6 +164,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Trigger> getTriggers();
 
+  public Collection<IRenderable> getOverlayRenderables();
+
+  public Collection<IRenderable> getGroundRenderables();
+
   public boolean isLoaded();
 
   public void load();
@@ -179,6 +183,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onInitialized(final Consumer<IEnvironment> consumer);
 
   public void onLoaded(final Consumer<IEnvironment> consumer);
+  
+  public void onUnloaded(final Consumer<IEnvironment> consumer);
+
+  public void onCleared(final Consumer<IEnvironment> consumer);
 
   public void onMapRendered(final Consumer<Graphics2D> consumer);
 

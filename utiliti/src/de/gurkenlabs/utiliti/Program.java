@@ -107,7 +107,7 @@ public class Program {
 
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("litiengine creation kit");
-    Game.getInfo().setVersion("v0.4.9-alpha");
+    Game.getInfo().setVersion("v0.4.10-alpha");
 
     initSystemTray();
 
@@ -294,7 +294,6 @@ public class Program {
     });
 
     MapObjectPanel mapEditorPanel = new MapObjectPanel();
-    mapEditorPanel.setupControls();
     MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
     JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     mapWrap.setMinimumSize(new Dimension(300, 0));

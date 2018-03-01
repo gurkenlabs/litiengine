@@ -102,14 +102,14 @@ public class PropAnimationController extends EntityAnimationController<Prop> {
     }
 
     final String propState = state.name().toLowerCase();
-    final String name = this.getSpritePrefix() + prop.getSpritesheetName().toLowerCase() + "-" + propState;
+    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState;
     Spritesheet sprite = Spritesheet.find(name);
 
     if (sprite != null) {
       return sprite;
     }
 
-    final String fallbackName = this.getSpritePrefix() + prop.getSpritesheetName().toLowerCase();
+    final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
     return Spritesheet.find(fallbackName);
   }
 }

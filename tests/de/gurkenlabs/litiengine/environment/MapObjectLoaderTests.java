@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.entities.DecorMob;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -36,6 +34,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.PROP.name());
     when(mapObject.getId()).thenReturn(111);
@@ -55,7 +54,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
     when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -83,6 +82,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testColliderMapObjectLoader() {
     CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
     when(mapObject.getId()).thenReturn(111);
@@ -92,7 +92,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(200);
     when(mapObject.getHeight()).thenReturn(200);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -113,6 +113,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testTriggerMapObjectLoader() {
     TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -128,7 +129,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -151,56 +152,9 @@ public class MapObjectLoaderTests {
   }
 
   @Test
-  public void testDecorMobMapObjectLoader() {
-    DecorMobMapObjectLoader loader = new DecorMobMapObjectLoader();
-    IMapObject mapObject = mock(IMapObject.class);
-    when(mapObject.getType()).thenReturn(MapObjectType.DECORMOB.name());
-    when(mapObject.getId()).thenReturn(111);
-    when(mapObject.getName()).thenReturn("testDecorMob");
-    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
-
-    when(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME)).thenReturn("decorSprite");
-    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)).thenReturn("200");
-    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(false);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
-
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
-
-    Collection<IEntity> entities = loader.load(mapObject);
-    Optional<IEntity> opt = entities.stream().findFirst();
-    assertTrue(opt.isPresent());
-
-    IEntity entity = entities.stream().findFirst().get();
-
-    assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testDecorMob");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
-
-    DecorMob decorMob = (DecorMob) entity;
-
-    assertTrue(decorMob.isIndestructible());
-    assertFalse(decorMob.hasCollision());
-
-    assertEquals(decorMob.getCollisionBoxWidth(), 100.0, 0.0001);
-    assertEquals(decorMob.getCollisionBoxHeight(), 100.0, 0.0001);
-    assertEquals(decorMob.getCollisionBoxAlign(), Align.LEFT);
-    assertEquals(decorMob.getCollisionBoxValign(), Valign.MIDDLE);
-
-    assertEquals(decorMob.getMovementBehavior(), MovementBehavior.SHY);
-    assertEquals(decorMob.getVelocity(), 200, 0.0001);
-    assertEquals(decorMob.getMobType(), "decorSprite");
-  }
-
-  @Test
   public void testEmitterMapObjectLoader() {
     EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -208,7 +162,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
     when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -224,6 +178,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
+    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
     when(mapObject.getId()).thenReturn(111);
@@ -237,7 +192,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
-    Collection<IEntity> entities = loader.load(mapObject);
+    Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 

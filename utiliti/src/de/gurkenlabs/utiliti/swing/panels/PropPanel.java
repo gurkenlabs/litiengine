@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing.panels;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -120,11 +121,11 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     }
 
     AnimationInfo info = Prop.class.getAnnotation(AnimationInfo.class);
-    if (info == null || info.spritePrefix() == null || info.spritePrefix().isEmpty()) {
+    if (info == null || info.spritePrefix() == null || info.spritePrefix().length == 0) {
       return null;
     }
 
-    if (!spriteName.toLowerCase().startsWith(info.spritePrefix())) {
+    if (Arrays.asList(info.spritePrefix()).stream().noneMatch(x -> spriteName.toLowerCase().startsWith(x))) {
       return null;
     }
 

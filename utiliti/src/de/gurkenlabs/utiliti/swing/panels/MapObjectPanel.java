@@ -3,7 +3,6 @@ package de.gurkenlabs.utiliti.swing.panels;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,14 +16,11 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.utiliti.EditorScreen;
-import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 
 @SuppressWarnings("serial")
@@ -45,11 +41,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private TagPanel tagPanel;
   private JLabel lblTags;
   
-  private boolean isMoving;
-
-  /**
-   * Create the panel.
-   */
   public MapObjectPanel() {
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
@@ -57,7 +48,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.panels.put(MapObjectType.STATICSHADOW, new StaticShadowPanel());
     this.panels.put(MapObjectType.TRIGGER, new TriggerPanel());
     this.panels.put(MapObjectType.LIGHTSOURCE, new LightSourcePanel());
-    this.panels.put(MapObjectType.DECORMOB, new DecorMobPanel());
     this.panels.put(MapObjectType.SPAWNPOINT, new SpawnpointPanel());
     this.panels.put(MapObjectType.EMITTER, new EmitterPanel());
     this.panels.put(MapObjectType.CREATURE, new CreaturePanel());
@@ -159,76 +149,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.isFocussing = false;
   }
 
-  public void setupControls() {
-    Input.keyboard().onKeyReleased(e -> {
-      if (e.getKeyCode() != KeyEvent.VK_RIGHT && e.getKeyCode() != KeyEvent.VK_LEFT && e.getKeyCode() != KeyEvent.VK_UP && e.getKeyCode() != KeyEvent.VK_DOWN) {
-        return;
-      }
-
-      // if one of the move buttons is still pressed, don't end the operation
-      if (Input.keyboard().isPressed(KeyEvent.VK_RIGHT) || Input.keyboard().isPressed(KeyEvent.VK_LEFT) || Input.keyboard().isPressed(KeyEvent.VK_UP) || Input.keyboard().isPressed(KeyEvent.VK_DOWN)) {
-        return;
-      }
-
-      if (this.isMoving) {
-        UndoManager.instance().endOperation();
-        this.isMoving = false;
-      }
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeKeyPressed();
-      this.spinnerX.setValue(this.spinnerX.getNextValue());
-      this.afterKeyPressed();
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeKeyPressed();
-      this.spinnerX.setValue(this.spinnerX.getPreviousValue());
-      this.afterKeyPressed();
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeKeyPressed();
-      this.spinnerY.setValue(this.spinnerY.getPreviousValue());
-      this.afterKeyPressed();
-    });
-
-    Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
-        return;
-      }
-
-      this.beforeKeyPressed();
-      this.spinnerY.setValue(this.spinnerY.getNextValue());
-      this.afterKeyPressed();
-    });
-  }
-
-  private void beforeKeyPressed() {
-    if (!this.isMoving) {
-      UndoManager.instance().beginOperation();
-      this.isMoving = true;
-    }
-
-  }
-
-  private void afterKeyPressed() {
-    EditorScreen.instance().getMapComponent().updateTransformControls();
-  }
-
   private void switchPanel(MapObjectType type) {
     PropertyPanel<IMapObject> panel = this.panels.get(type);
     if (panel == null) {
@@ -258,7 +178,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.componentPanel.add(panel, BorderLayout.CENTER);
 
     // TODO: support all types that implement ICollisionEntity
-    if (type == MapObjectType.PROP || type == MapObjectType.DECORMOB || type == MapObjectType.CREATURE) {
+    if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
       this.collWrapper.add(this.collisionPanel);
       this.collWrapper.revalidate();
       this.collWrapper.repaint();
