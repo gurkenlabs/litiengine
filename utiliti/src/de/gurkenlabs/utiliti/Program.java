@@ -484,11 +484,16 @@ public class Program {
 
     MenuItem importBlueprints = new MenuItem(Resources.get("menu_assets_importBlueprints"));
     importBlueprints.addActionListener(a -> EditorScreen.instance().importBlueprints());
+    
+    MenuItem importTilesets = new MenuItem(Resources.get("menu_assets_importTilesets"));
+    importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
+    
 
     mnProject.add(importSprite);
     mnProject.add(importSpriteFile);
     mnProject.add(importEmitters);
     mnProject.add(importBlueprints);
+    mnProject.add(importTilesets);
     mnProject.addSeparator();
     mnProject.add(compress);
     mnProject.add(sync);
