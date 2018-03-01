@@ -81,7 +81,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public int compareTo(ITileset obj) {
-    if (obj == null) {
+    if (obj == null || obj.getName() == null) {
       return 1;
     }
 
