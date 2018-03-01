@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.gurkenlabs.litiengine.GameFile;
+import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
@@ -88,7 +88,7 @@ public class AssetTree extends JTree {
     final TreePath emitterPath = new TreePath(this.nodeEmitters.getPath());
     final TreePath blueprintPath = new TreePath(this.nodeBlueprints.getPath());
 
-    final GameFile gameFile = EditorScreen.instance().getGameFile();
+    final GameData gameFile = EditorScreen.instance().getGameFile();
     if (selectedPath.equals(spritePath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {

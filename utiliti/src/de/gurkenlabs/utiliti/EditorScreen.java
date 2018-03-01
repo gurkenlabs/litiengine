@@ -21,7 +21,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.GameFile;
+import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.annotation.ScreenInfo;
@@ -68,7 +68,7 @@ public class EditorScreen extends Screen {
 
   private double padding;
   private MapComponent mapComponent;
-  private GameFile gameFile = new GameFile();
+  private GameData gameFile = new GameData();
   private EditorComponent current;
   private String projectPath;
   private String currentResourceFile;
@@ -164,7 +164,7 @@ public class EditorScreen extends Screen {
     }
   }
 
-  public GameFile getGameFile() {
+  public GameData getGameFile() {
     return this.gameFile;
   }
 
@@ -216,7 +216,7 @@ public class EditorScreen extends Screen {
       // load all maps in the directory
       this.mapComponent.loadMaps(this.getProjectPath());
       this.currentResourceFile = null;
-      this.gameFile = new GameFile();
+      this.gameFile = new GameData();
 
       // add sprite sheets by tile sets of all maps in the project director
       for (Map map : this.mapComponent.getMaps()) {
@@ -249,7 +249,7 @@ public class EditorScreen extends Screen {
     try {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
 
-      FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameFile.FILE_EXTENSION);
+      FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameData.FILE_EXTENSION);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
       if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
@@ -273,7 +273,7 @@ public class EditorScreen extends Screen {
 
     this.loading = true;
     try {
-      if (!FileUtilities.getExtension(gameFile).equals(GameFile.FILE_EXTENSION)) {
+      if (!FileUtilities.getExtension(gameFile).equals(GameData.FILE_EXTENSION)) {
         log.log(Level.SEVERE, "unsupported file format {0}", FileUtilities.getExtension(gameFile));
         return;
       }
@@ -287,7 +287,7 @@ public class EditorScreen extends Screen {
 
       // set up project settings
       this.currentResourceFile = gameFile.getPath();
-      this.gameFile = GameFile.load(gameFile.getPath());
+      this.gameFile = GameData.load(gameFile.getPath());
 
       Program.getUserPreferences().setLastGameFile(gameFile.getPath());
       Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
@@ -482,10 +482,10 @@ public class EditorScreen extends Screen {
         chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameFile.FILE_EXTENSION);
+        FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameData.FILE_EXTENSION);
         chooser.setFileFilter(filter);
         chooser.addChoosableFileFilter(filter);
-        chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + GameFile.FILE_EXTENSION));
+        chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + GameData.FILE_EXTENSION));
 
         int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
         if (result == JFileChooser.APPROVE_OPTION) {
