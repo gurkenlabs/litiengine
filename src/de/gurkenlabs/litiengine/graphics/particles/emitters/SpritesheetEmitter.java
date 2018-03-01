@@ -6,6 +6,8 @@ import java.util.Random;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
 
 public abstract class SpritesheetEmitter extends Emitter {
   private final Spritesheet spriteSheet;
@@ -21,5 +23,13 @@ public abstract class SpritesheetEmitter extends Emitter {
 
   protected Image getRandomSprite() {
     return this.getSpritesheet().getSprite(new Random().nextInt(this.getSpritesheet().getTotalNumberOfSprites()));
+  }
+  
+  @Override
+  protected Particle createNewParticle() {
+    final int life = this.getRandomParticleTTL();
+
+    final SpriteParticle p = new SpriteParticle(this.getRandomSprite(), life);
+    return p;
   }
 }
