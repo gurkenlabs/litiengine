@@ -385,7 +385,8 @@ public class EditorScreen extends Screen {
 
         final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
         for (SpriteSheetInfo spriteFile : sprites) {
-          this.gameFile.getSpriteSheets().add(spriteFile);
+          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
+          this.getGameFile().getSpriteSheets().add(spriteFile);
           log.log(Level.INFO, "imported spritesheet {0}", new Object[] { spriteFile.getName() });
         }
 
@@ -460,7 +461,6 @@ public class EditorScreen extends Screen {
 
           Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
           if (sprite != null) {
-            Spritesheet.remove(sprite.getName());
             this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
           }
 
