@@ -19,13 +19,13 @@ import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 public class CreatureMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(CreatureMapObjectLoader.class.getName());
   private static final List<Class<? extends Creature>> customCreatureType;
+  
+  static {
+    customCreatureType = new CopyOnWriteArrayList<>();
+  }
 
   protected CreatureMapObjectLoader() {
     super(MapObjectType.CREATURE);
-  }
-
-  static {
-    customCreatureType = new CopyOnWriteArrayList<>();
   }
 
   /**
@@ -67,7 +67,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.CREATURE) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CreatureMapObjectLoader.class);
     }
-    
+
     Collection<IEntity> entities = super.load(environment, mapObject);
     final String spriteSheet = mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME);
     if (spriteSheet == null) {

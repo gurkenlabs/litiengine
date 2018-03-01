@@ -16,6 +16,10 @@ public class Prop extends CombatEntity {
   private boolean flipVertically;
   private Rotation rotation;
 
+  public Prop(final String spritesheetName) {
+    this(0, 0, spritesheetName);
+  }
+
   public Prop(double x, double y, final String spritesheetName) {
     this(x, y, spritesheetName, Material.UNDEFINED);
   }
