@@ -103,6 +103,16 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     if (deadSprite != null) {
       this.add(new Animation(deadSprite, true));
     }
+
+    Spritesheet baseIdle = Spritesheet.find(this.getSpriteName(IDLE));
+    if (baseIdle != null) {
+      this.add(new Animation(baseIdle, true));
+    }
+
+    Spritesheet baseWalk = Spritesheet.find(this.getSpriteName(WALK));
+    if (baseWalk != null) {
+      this.add(new Animation(baseWalk, true));
+    }
   }
 
   private void initializeFlippedAnimations() {

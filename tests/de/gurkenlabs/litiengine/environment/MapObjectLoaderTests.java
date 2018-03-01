@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.entities.DecorMob;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -151,55 +149,6 @@ public class MapObjectLoaderTests {
     assertArrayEquals(new Integer[] { 4, 5, 6 }, trigger.getActivators().toArray());
     assertEquals(200.0, trigger.getCollisionBoxWidth(), 0.0001);
     assertEquals(200.0, trigger.getCollisionBoxHeight(), 0.0001);
-  }
-
-  @Test
-  public void testDecorMobMapObjectLoader() {
-    DecorMobMapObjectLoader loader = new DecorMobMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
-    IMapObject mapObject = mock(IMapObject.class);
-    when(mapObject.getType()).thenReturn(MapObjectType.DECORMOB.name());
-    when(mapObject.getId()).thenReturn(111);
-    when(mapObject.getName()).thenReturn("testDecorMob");
-    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
-
-    when(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME)).thenReturn("decorSprite");
-    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_VELOCITY)).thenReturn("200");
-    when(mapObject.getCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR)).thenReturn(MovementBehavior.SHY.name());
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(false);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
-
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
-
-    Collection<IEntity> entities = loader.load(environment, mapObject);
-    Optional<IEntity> opt = entities.stream().findFirst();
-    assertTrue(opt.isPresent());
-
-    IEntity entity = entities.stream().findFirst().get();
-
-    assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testDecorMob");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
-
-    DecorMob decorMob = (DecorMob) entity;
-
-    assertTrue(decorMob.isIndestructible());
-    assertFalse(decorMob.hasCollision());
-
-    assertEquals(decorMob.getCollisionBoxWidth(), 100.0, 0.0001);
-    assertEquals(decorMob.getCollisionBoxHeight(), 100.0, 0.0001);
-    assertEquals(decorMob.getCollisionBoxAlign(), Align.LEFT);
-    assertEquals(decorMob.getCollisionBoxValign(), Valign.MIDDLE);
-
-    assertEquals(decorMob.getMovementBehavior(), MovementBehavior.SHY);
-    assertEquals(decorMob.getVelocity(), 200, 0.0001);
-    assertEquals(decorMob.getMobType(), "decorSprite");
   }
 
   @Test

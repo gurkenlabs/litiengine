@@ -42,7 +42,6 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
-import de.gurkenlabs.litiengine.entities.DecorMob.MovementBehavior;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -848,13 +847,6 @@ public class MapComponent extends EditorComponent {
       mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
       mo.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, "false");
       mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
-      break;
-    case DECORMOB:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISION, "false");
-      mo.setCustomProperty(MapObjectProperty.DECORMOB_VELOCITY, "2");
-      mo.setCustomProperty(MapObjectProperty.DECORMOB_BEHAVIOUR, MovementBehavior.IDLE.toString());
       break;
     case LIGHTSOURCE:
       mo.setCustomProperty(MapObjectProperty.LIGHT_ALPHA, "180");

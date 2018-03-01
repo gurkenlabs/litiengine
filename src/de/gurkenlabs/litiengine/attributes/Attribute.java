@@ -59,6 +59,10 @@ public class Attribute<T extends Number> {
     this.getModifiers().remove(modifier);
     Collections.sort(this.getModifiers());
   }
+  
+  public void setBaseValue(final T baseValue) {
+    this.baseValue = baseValue;
+  }
 
   protected T applyModifiers(final T baseValue) {
     if (this.getModifiers().isEmpty()) {
@@ -75,9 +79,5 @@ public class Attribute<T extends Number> {
 
   protected T getBaseValue() {
     return this.baseValue;
-  }
-
-  protected void setBaseValue(final T baseValue) {
-    this.baseValue = baseValue;
   }
 }

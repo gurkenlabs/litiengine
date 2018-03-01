@@ -53,7 +53,6 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.panels.put(MapObjectType.STATICSHADOW, new StaticShadowPanel());
     this.panels.put(MapObjectType.TRIGGER, new TriggerPanel());
     this.panels.put(MapObjectType.LIGHTSOURCE, new LightSourcePanel());
-    this.panels.put(MapObjectType.DECORMOB, new DecorMobPanel());
     this.panels.put(MapObjectType.SPAWNPOINT, new SpawnpointPanel());
     this.panels.put(MapObjectType.EMITTER, new EmitterPanel());
     this.panels.put(MapObjectType.CREATURE, new CreaturePanel());
@@ -184,7 +183,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.componentPanel.add(panel, BorderLayout.CENTER);
 
     // TODO: support all types that implement ICollisionEntity
-    if (type == MapObjectType.PROP || type == MapObjectType.DECORMOB || type == MapObjectType.CREATURE) {
+    if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
       this.collWrapper.add(this.collisionPanel);
       this.collWrapper.revalidate();
       this.collWrapper.repaint();

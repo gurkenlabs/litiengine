@@ -1098,7 +1098,6 @@ public class Environment implements IEnvironment {
     registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
     registerMapObjectLoader(MapObjectType.COLLISIONBOX, new CollisionBoxMapObjectLoader());
     registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.DECORMOB, new DecorMobMapObjectLoader());
     registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
     registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
     registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
