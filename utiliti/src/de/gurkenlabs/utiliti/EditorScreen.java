@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -438,6 +440,41 @@ public class EditorScreen extends Screen {
 
         this.gameFile.getBluePrints().add(blueprint);
         log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
+      }
+    });
+  }
+
+  public void importTilesets() {
+    XmlImportDialog.importXml("Tilesets", Tileset.FILE_EXTENSION, files -> {
+      for (File file : files) {
+        Tileset tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
+        if (tileset == null) {
+          continue;
+        }
+
+        if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
+          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_tileset_title", tileset.getName()), Resources.get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
+          if (result == JOptionPane.NO_OPTION) {
+            continue;
+          }
+
+          Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+          if (sprite != null) {
+            Spritesheet.remove(sprite.getName());
+            this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
+          }
+
+          this.gameFile.getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+        }
+        String path = FileUtilities.getParentDirPath(file.getPath());
+
+        tileset.setMapPath(path);
+        Spritesheet sprite = Spritesheet.load(tileset);
+        this.gameFile.getTilesets().add(tileset);
+        this.loadSpriteSheets(Arrays.asList(new SpriteSheetInfo(sprite)), true);
+
+
+        log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
       }
     });
   }
