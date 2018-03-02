@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -703,38 +704,46 @@ public class MapComponent extends EditorComponent {
         this.getMaps().add(map);
         EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
 
-        // remove old spritesheets
-        for (ITileset tileSet : map.getTilesets()) {
-          Spritesheet sprite = Spritesheet.find(tileSet.getImage().getSource());
-          if (sprite != null) {
-            Spritesheet.remove(sprite.getName());
-            this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
-          }
-        }
-
-        for (ITileset tileSet : map.getTilesets()) {
-          Spritesheet sprite = Spritesheet.load(tileSet);
-          this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
-        }
-
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
           this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
 
-        // remove old tilesets
-        for (ITileset tileset : map.getExternalTilesets()) {
-          this.screen.getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+        // remove old spritesheets
+        for (ITileset tileSet : map.getTilesets()) {
+          this.loadTileset(tileSet, true);
         }
 
-        this.screen.getGameFile().getTilesets().addAll(map.getExternalTilesets());
+        // remove old tilesets
+        for (ITileset tileset : map.getExternalTilesets()) {
+          this.loadTileset(tileset, false);
+        }
+
         EditorScreen.instance().updateGameFileMaps();
         this.loadEnvironment(map);
         ImageCache.clearAll();
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
     });
+  }
+
+  public void loadTileset(ITileset tileset, boolean embedded) {
+    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    if (sprite != null) {
+      Spritesheet.remove(sprite.getName());
+      this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
+    }
+
+    Spritesheet newSprite = Spritesheet.load(tileset);
+    SpriteSheetInfo info = new SpriteSheetInfo(newSprite);
+    EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+    EditorScreen.instance().getGameFile().getSpriteSheets().add(info);
+    EditorScreen.instance().loadSpriteSheets(Arrays.asList(info), true);
+    if (!embedded) {
+      this.screen.getGameFile().getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+      this.screen.getGameFile().getTilesets().add((Tileset) tileset);
+    }
   }
 
   public void exportMap() {
@@ -1158,7 +1167,7 @@ public class MapComponent extends EditorComponent {
         for (IMapObject selected : this.getSelectedMapObjects()) {
           UndoManager.instance().mapObjectChanged(selected);
         }
-        
+
         UndoManager.instance().endOperation();
         this.isMovingWithKeyboard = false;
       }

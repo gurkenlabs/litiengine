@@ -354,7 +354,8 @@ public class EditorScreen extends Screen {
         for (Spritesheet sprite : loaded) {
           SpriteSheetInfo info = new SpriteSheetInfo(sprite);
           infos.add(info);
-          this.gameFile.getSpriteSheets().add(info);
+          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+          this.getGameFile().getSpriteSheets().add(info);
         }
 
         this.loadSpriteSheets(infos, true);
@@ -382,12 +383,10 @@ public class EditorScreen extends Screen {
         if (option != JOptionPane.OK_OPTION) {
           return;
         }
-
-        final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
-        for (SpriteSheetInfo spriteFile : sprites) {
-          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(spriteFile.getName()));
-          this.getGameFile().getSpriteSheets().add(spriteFile);
-          log.log(Level.INFO, "imported spritesheet {0}", new Object[] { spriteFile.getName() });
+        Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
+        for (SpriteSheetInfo info : sprites) {
+          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+          this.getGameFile().getSpriteSheets().add(info);
         }
 
         this.loadSpriteSheets(sprites, true);
@@ -453,25 +452,17 @@ public class EditorScreen extends Screen {
           continue;
         }
 
+        String path = FileUtilities.getParentDirPath(file.getPath());
+        tileset.setMapPath(path);
+
         if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
           int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_tileset_title", tileset.getName()), Resources.get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
           if (result == JOptionPane.NO_OPTION) {
             continue;
           }
 
-          Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
-          if (sprite != null) {
-            this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
-          }
-
-          this.gameFile.getTilesets().removeIf(x -> x.getName().equals(tileset.getName()));
+          this.getMapComponent().loadTileset(tileset, false);
         }
-        String path = FileUtilities.getParentDirPath(file.getPath());
-
-        tileset.setMapPath(path);
-        Spritesheet sprite = Spritesheet.load(tileset);
-        this.gameFile.getTilesets().add(tileset);
-        this.loadSpriteSheets(Arrays.asList(new SpriteSheetInfo(sprite)), true);
 
         log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
       }
@@ -490,6 +481,8 @@ public class EditorScreen extends Screen {
       }
 
       Spritesheet.load(info);
+
+      log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
     });
 
     if (this.loading) {
@@ -646,7 +639,10 @@ public class EditorScreen extends Screen {
         }
       }
 
-      infos.add(new SpriteSheetInfo(sprite));
+      SpriteSheetInfo info = new SpriteSheetInfo(sprite);
+      infos.add(info);
+      this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+      this.getGameFile().getSpriteSheets().add(info);
       cnt++;
     }
 
