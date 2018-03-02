@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -144,6 +145,11 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   @Override
   public ITileAnimation getAnimation() {
     return this.animation;
+  }
+
+  @Override
+  public String toString() {
+    return this.getGridId() + " (" + Arrays.toString(this.getTerrainIds()) + ")";
   }
 
   protected int[] getTerrainIds() {

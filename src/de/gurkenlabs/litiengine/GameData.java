@@ -81,10 +81,11 @@ public class GameData implements Serializable {
       }
 
       gameFile.getMaps().parallelStream().forEach(map -> {
-        map.updateTileTerrain();
         for (final Tileset tileset : map.getRawTileSets()) {
           tileset.load(gameFile.getTilesets());
         }
+        
+        map.updateTileTerrain();
       });
 
       return gameFile;

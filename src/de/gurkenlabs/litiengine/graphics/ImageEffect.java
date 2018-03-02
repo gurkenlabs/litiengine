@@ -5,7 +5,7 @@ import de.gurkenlabs.litiengine.Game;
 public abstract class ImageEffect implements IImageEffect {
   private final long aliveTick;
 
-  private final String name;
+  private String name;
   private final int ttl;
   private int priority;
 
@@ -47,6 +47,10 @@ public abstract class ImageEffect implements IImageEffect {
   @Override
   public void setPriority(int priority) {
     this.priority = priority;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override

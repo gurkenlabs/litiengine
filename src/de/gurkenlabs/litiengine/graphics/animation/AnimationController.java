@@ -111,7 +111,8 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public BufferedImage getCurrentSprite() {
-    if (this.getCurrentAnimation() == null || this.getCurrentAnimation().getSpritesheet() == null || this.getCurrentAnimation().getCurrentKeyFrame() == null) {
+    final Animation current =this.getCurrentAnimation();
+    if (current == null || current.getSpritesheet() == null || current.getCurrentKeyFrame() == null) {
       return null;
     }
 
@@ -120,7 +121,7 @@ public class AnimationController implements IAnimationController {
       return ImageCache.SPRITES.get(cacheKey);
     }
 
-    BufferedImage sprite = this.getCurrentAnimation().getSpritesheet().getSprite(this.getCurrentAnimation().getCurrentKeyFrame().getSpriteIndex());
+    BufferedImage sprite = current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
     for (final IImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
