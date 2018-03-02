@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
   private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
+  private static final String FILE_SEPARATOR_WIN = "\\";
+  private static final String FILE_SEPARATOR_LINUX = "/";
 
   private FileUtilities() {
   }
@@ -165,12 +167,76 @@ public final class FileUtilities {
   }
 
   public static String getParentDirPath(final String fileOrDirPath) {
-    if (fileOrDirPath.contains(File.separator)) {
-      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(File.separatorChar) + 1);
-    } else if (fileOrDirPath.contains("/")) {
-      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf('/') + 1);
+    if (fileOrDirPath.contains(FILE_SEPARATOR_WIN)) {
+      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(FILE_SEPARATOR_WIN) + 1);
+    } else if (fileOrDirPath.contains(FILE_SEPARATOR_LINUX)) {
+      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(FILE_SEPARATOR_LINUX) + 1);
     }
 
     return "";
+  }
+
+  /**
+   * This method combines the specified basepath with the path parts provided as
+   * arguments. The output will use the same path separator as the basePath;
+   * e.g. if the basePath is a windows path, the output path will also be
+   * separated by {@value #FILE_SEPARATOR_WIN} and for linux paths,
+   * {@value #FILE_SEPARATOR_LINUX} will be used.
+   * 
+   * The output path will always have a trailing separator.
+   * 
+   * @param basePath
+   *          The base path for the combined path.
+   * @param paths
+   *          The parts of the path to be constructed.
+   * @return The combined path.
+   */
+  public static String combinePaths(final String basePath, final String... paths) {
+
+    if (basePath.contains(FILE_SEPARATOR_WIN)) {
+      return combinePaths(basePath, FILE_SEPARATOR_WIN, paths);
+    } else if (basePath.contains(FILE_SEPARATOR_LINUX)) {
+      return combinePaths(basePath, FILE_SEPARATOR_LINUX, paths);
+    }
+
+    return basePath;
+  }
+
+  private static String combinePaths(final String basePath, final String separator, final String... paths) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(removeTrailingSeparator(basePath));
+    for (String path : paths) {
+      if (path == null) {
+        continue;
+      }
+
+      String adjusted = removeTrailingSeparator(removeLeadingSeparator(ensurePathSeparator(path, separator)));
+      sb.append(separator);
+      sb.append(adjusted);
+    }
+    sb.append(separator);
+    return sb.toString();
+  }
+
+  public static String ensurePathSeparator(final String path, final String separator) {
+    final String separatorToReplace = separator == FILE_SEPARATOR_LINUX ? FILE_SEPARATOR_WIN : FILE_SEPARATOR_LINUX;
+
+    return path.replace(separatorToReplace, separator);
+  }
+
+  public static String removeTrailingSeparator(final String path) {
+    if (path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR_LINUX)) {
+      return path.substring(0, path.length() - 1);
+    }
+
+    return path;
+  }
+
+  public static String removeLeadingSeparator(final String path) {
+    if (path.startsWith(FILE_SEPARATOR_WIN) || path.startsWith(FILE_SEPARATOR_LINUX)) {
+      return path.substring(1);
+    }
+
+    return path;
   }
 }

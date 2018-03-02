@@ -171,8 +171,13 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   public void setMapPath(final String path) {
+    String completePath = path;
+    if (this.source != null) {
+      completePath = FileUtilities.combinePaths(path, FileUtilities.getParentDirPath(this.source));
+    }
+
     if (this.sourceTileset != null) {
-      this.sourceTileset.setMapPath(path);
+      this.sourceTileset.setMapPath(completePath);
       return;
     }
 
@@ -180,7 +185,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    this.image.setAbsolutPath(path);
+    this.image.setAbsolutPath(completePath);
   }
 
   @Override

@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * The Class Map.
@@ -310,7 +311,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
           continue;
         }
 
-        tileSet.setMapPath(path);
+        tileSet.setMapPath(FileUtilities.getParentDirPath(path));
       }
     }
   }

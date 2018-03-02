@@ -731,6 +731,7 @@ public class MapComponent extends EditorComponent {
         this.screen.getGameFile().getTilesets().addAll(map.getExternalTilesets());
         EditorScreen.instance().updateGameFileMaps();
         this.loadEnvironment(map);
+        ImageCache.clearAll();
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
     });
