@@ -55,7 +55,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
     return new Ellipse2D.Double(startX + offsetX, startY + offsetY, ellipseWidth, ellipseHeight);
   }
 
-  private void drawShadow(final Graphics2D graphics, final float spriteWidth, final float spriteHeight, float offsetX, float offsetY) {
+  protected void drawShadow(final Graphics2D graphics, final float spriteWidth, final float spriteHeight, float offsetX, float offsetY) {
     graphics.setColor(this.shadowColor);
     final RenderingHints hints = graphics.getRenderingHints();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
