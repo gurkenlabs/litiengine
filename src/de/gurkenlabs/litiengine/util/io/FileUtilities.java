@@ -101,7 +101,11 @@ public final class FileUtilities {
     return getExtension(file.getAbsolutePath());
   }
 
-  public static String getExtension(final String fileName) {
+  public static String getExtension(final String path) {
+    final String fileName = getFileName(path, true);
+    if (!fileName.contains(".")) {
+      return "";
+    }
     try {
       return fileName.substring(fileName.lastIndexOf('.') + 1);
     } catch (final Exception e) {
@@ -110,21 +114,28 @@ public final class FileUtilities {
   }
 
   public static String getFileName(final String path) {
-    if (path == null || path.isEmpty()) {
+    return getFileName(path, false);
+  }
+
+  public static String getFileName(final String path, boolean extension) {
+    if (path == null || path.isEmpty() || path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR_LINUX)) {
       return "";
     }
 
     String name = path;
-    final int pos = name.lastIndexOf('.');
-    if (pos > 0) {
-      name = name.substring(0, pos);
+
+    if (!extension) {
+      final int pos = name.lastIndexOf('.');
+      if (pos > 0) {
+        name = name.substring(0, pos);
+      }
     }
 
-    final int lastBackslash = name.lastIndexOf('/');
+    final int lastBackslash = name.lastIndexOf(FILE_SEPARATOR_LINUX);
     if (lastBackslash != -1) {
       name = name.substring(lastBackslash + 1, name.length());
     } else {
-      final int lastForwardSlash = name.lastIndexOf('\\');
+      final int lastForwardSlash = name.lastIndexOf(FILE_SEPARATOR_WIN);
       if (lastForwardSlash != -1) {
         name = name.substring(lastForwardSlash + 1, name.length());
       }
