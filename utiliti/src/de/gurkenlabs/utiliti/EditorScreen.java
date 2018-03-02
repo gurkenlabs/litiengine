@@ -473,7 +473,6 @@ public class EditorScreen extends Screen {
         this.gameFile.getTilesets().add(tileset);
         this.loadSpriteSheets(Arrays.asList(new SpriteSheetInfo(sprite)), true);
 
-
         log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
       }
     });
@@ -588,7 +587,8 @@ public class EditorScreen extends Screen {
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    log.log(Level.INFO, "saved {0} maps and {1} tilesets to {2}", new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
+    log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints to {5}",
+        new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.get("status_gamefile_saved"));
 
     if (Program.getUserPreferences().isSyncMaps()) {
