@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -33,14 +34,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final Collection<Function<TriggerEvent, String>> activatingPredicates;
   private final TriggerActivation activationType;
   private final List<Integer> activators;
-  private final Map<String, String> arguments;
+  private final List<Integer> targets;
+  private final ICustomPropertyProvider customProperties;
   private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
   private final boolean isOneTimeTrigger;
+  
   private String message;
-  private final List<Integer> targets;
   private int cooldown;
   private long lastActivation;
-
   private boolean isActivated;
 
   public Trigger(final TriggerActivation activation, final String message) {
@@ -48,15 +49,15 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   }
 
   public Trigger(final TriggerActivation activation, final String name, final String message) {
-    this(activation, name, message, false, new ConcurrentHashMap<>());
+    this(activation, name, message, false, null);
   }
 
-  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final Map<String, String> arguments) {
+  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
     super();
     this.activatingPredicates = new CopyOnWriteArrayList<>();
     this.activatedConsumer = new CopyOnWriteArrayList<>();
     this.deactivatedConsumer = new CopyOnWriteArrayList<>();
-    this.arguments = arguments;
+    this.customProperties = customProperties;
     this.activators = new CopyOnWriteArrayList<>();
     this.targets = new CopyOnWriteArrayList<>();
     this.activated = new CopyOnWriteArrayList<>();
@@ -65,8 +66,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.activationType = activation;
   }
 
-  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, final Map<String, String> arguments) {
-    this(activation, message, isOneTime, arguments);
+  public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
+    this(activation, message, isOneTime, customProperties);
     this.setName(name);
   }
 
@@ -82,16 +83,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     return this.activationType;
   }
 
-  public Map<String, String> getArguments() {
-    return this.arguments;
-  }
-
-  public String getArgument(String key) {
-    if (this.getArguments().containsKey(key)) {
-      return this.getArguments().get(key);
-    }
-
-    return null;
+  public ICustomPropertyProvider getCustomProperties() {
+    return this.customProperties;
   }
 
   public List<Integer> getActivators() {

@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
@@ -10,7 +8,6 @@ import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class TriggerMapObjectLoader extends MapObjectLoader {
@@ -31,14 +28,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
     final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
 
-    final Map<String, String> triggerArguments = new HashMap<>();
-    for (final Property prop : mapObject.getAllCustomProperties()) {
-      if (MapObjectProperty.isCustom(prop.getName())) {
-        triggerArguments.put(prop.getName(), prop.getValue());
-      }
-    }
-
-    final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), triggerArguments);
+    final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), mapObject);
     loadDefaultProperties(trigger, mapObject);
 
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
