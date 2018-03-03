@@ -387,6 +387,7 @@ public class EditorScreen extends Screen {
         for (SpriteSheetInfo info : sprites) {
           this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
           this.getGameFile().getSpriteSheets().add(info);
+          log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
         }
 
         this.loadSpriteSheets(sprites, true);
@@ -481,8 +482,6 @@ public class EditorScreen extends Screen {
       }
 
       Spritesheet.load(info);
-
-      log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
     });
 
     if (this.loading) {
