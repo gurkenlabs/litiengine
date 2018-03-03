@@ -75,7 +75,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     this.lastTextDispay = Game.getLoop().getTicks();
     this.createBubbleImage();
     Game.getEnvironment().add(this, RenderType.OVERLAY);
-    Game.getLoop().attach(this);
+    Game.getRenderLoop().attach(this);
     activeSpeechBubbles.put(entity, this);
   }
 
@@ -130,7 +130,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   public void update() {
     if (this.currentText == null || this.cancelled) {
       Game.getEnvironment().removeRenderable(this);
-      Game.getLoop().detach(this);
+      Game.getRenderLoop().detach(this);
       return;
     }
     this.entityLocation = Game.getCamera().getViewPortLocation(this.entity.getDimensionCenter());

@@ -1,37 +1,73 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
   private final Map<Predicate<T>, Function<T, String>> animationRules;
+  private final List<IRenderable> rendering;
+  private final List<IRenderable> rendered;
+
   private final T entity;
   private String spritePrefix;
 
   public EntityAnimationController(final T entity) {
     super();
     this.animationRules = new ConcurrentHashMap<>();
+    this.rendered = new CopyOnWriteArrayList<>();
+    this.rendering = new CopyOnWriteArrayList<>();
+
     this.entity = entity;
 
     if (entity != null) {
       this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
     }
+
+    this.initRenderCallbacks();
+  }
+
+  private void initRenderCallbacks() {
+    Game.getRenderEngine().onEntityRendered(e -> {
+      if (!e.getRenderedObject().equals(this.getEntity())) {
+        return;
+      }
+
+      for (IRenderable renderable : this.rendered) {
+        renderable.render(e.getGraphics());
+      }
+    });
+
+    Game.getRenderEngine().onEntityRendering(e -> {
+      if (!e.getRenderedObject().equals(this.getEntity())) {
+        return;
+      }
+
+      for (IRenderable renderable : this.rendering) {
+        renderable.render(e.getGraphics());
+      }
+    });
   }
 
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
     this.animationRules = new ConcurrentHashMap<>();
+    this.rendered = new CopyOnWriteArrayList<>();
+    this.rendering = new CopyOnWriteArrayList<>();
     this.entity = entity;
 
     this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
+    this.initRenderCallbacks();
   }
 
   public static <T> String[] getDefaultSpritePrefixes(Class<T> cls) {
@@ -87,5 +123,15 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
+  }
+
+  @Override
+  public void onEntityRendering(IRenderable renderable) {
+    this.rendering.add(renderable);
+  }
+
+  @Override
+  public void onEntityRendered(IRenderable renderable) {
+    this.rendered.add(renderable);
   }
 }

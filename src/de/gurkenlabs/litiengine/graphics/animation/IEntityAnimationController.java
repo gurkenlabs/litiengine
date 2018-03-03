@@ -4,6 +4,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 
 public interface IEntityAnimationController<T extends IEntity> extends IAnimationController {
   public T getEntity();
@@ -20,4 +21,8 @@ public interface IEntityAnimationController<T extends IEntity> extends IAnimatio
    *          applied
    */
   public void addAnimationRule(Predicate<T> rule, Function<T, String> animationName);
+
+  public void onEntityRendering(IRenderable renderable);
+
+  public void onEntityRendered(IRenderable renderable);
 }
