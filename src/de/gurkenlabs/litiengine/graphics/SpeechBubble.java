@@ -32,41 +32,27 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int DISPLAYTIME_MIN = 2000;
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int LETTER_WRITE_DELAY = 30;
-  private static final int PADDING = 4;
-  private static final int TRIANGLE_SIZE = 6;
+  private static final double PADDING = 4.0;
+  private static final double TRIANGLE_SIZE = 6;
   private static final Color SPEAK_BACKGROUNDCOLOR = new Color(0, 0, 0, 80);
   private static final Color SPEAK_BORDERCOLOR = new Color(0, 0, 0, 160);
   private static final Color SPEAK_FONT_COLOR = Color.WHITE;
-
-  public static SpeechBubble createEntityBubble(final IEntity entity, final String text) {
-    float fontSize = GuiProperties.getDefaultAppearance().getFont().getSize() / Game.getCamera().getRenderScale();
-    return new SpeechBubble(entity, GuiProperties.getDefaultAppearance().getFont().deriveFont(fontSize), text);
-  }
-
-  public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text) {
-    return new SpeechBubble(entity, font, text);
-  }
-
-  public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
-    return new SpeechBubble(entity, font, text, typeSound);
-  }
+  private final int currentTextDisplayTime;
+  private final Queue<Character> currentTextQueue;
 
   private Image bubble;
   private boolean cancelled;
   private String currentText;
-  private final int currentTextDisplayTime;
-  private final Queue<Character> currentTextQueue;
 
   private String displayedText;
   private final IEntity entity;
   private final Font font;
-  private int height;
+  private float height;
   private long lastCharPoll;
   private long lastTextDispay;
-
-  private int textBoxWidth;
-
+  private float textBoxWidth;
   private Sound typeSound;
+  private Point2D entityLocation;
 
   private SpeechBubble(final IEntity entity, final Font font, final String text) {
     final SpeechBubble active = activeSpeechBubbles.get(entity);
@@ -74,7 +60,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       active.cancel();
     }
 
-    this.textBoxWidth = (int) (entity.getWidth() * 4);
+    this.textBoxWidth = (float) (entity.getWidth() * 4);
     this.entity = entity;
     this.font = font;
 
@@ -93,6 +79,19 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     activeSpeechBubbles.put(entity, this);
   }
 
+  public static SpeechBubble createEntityBubble(final IEntity entity, final String text) {
+    float fontSize = GuiProperties.getDefaultAppearance().getFont().getSize() / Game.getCamera().getRenderScale();
+    return new SpeechBubble(entity, GuiProperties.getDefaultAppearance().getFont().deriveFont(fontSize), text);
+  }
+
+  public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text) {
+    return new SpeechBubble(entity, font, text);
+  }
+
+  public static SpeechBubble createEntityBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
+    return new SpeechBubble(entity, font, text, typeSound);
+  }
+
   private SpeechBubble(final IEntity entity, final Font font, final String text, final Sound typeSound) {
     this(entity, font, text);
     this.typeSound = typeSound;
@@ -104,8 +103,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       return;
     }
 
-    final Point2D location = Game.getCamera().getViewPortLocation(this.entity);
-    RenderEngine.renderImage(g, this.bubble, new Point2D.Double(location.getX() + this.entity.getWidth() / 2.0 - this.textBoxWidth / 2.0 - PADDING, location.getY() - this.height - PADDING));
+    RenderEngine.renderImage(g, this.bubble, new Point2D.Double(this.entityLocation.getX() - this.textBoxWidth / 2.0 - PADDING, this.entityLocation.getY() - this.height * 1.5 - PADDING));
 
     g.setColor(SPEAK_FONT_COLOR);
     final FontRenderContext frc = g.getFontRenderContext();
@@ -116,8 +114,8 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);
-    final float x = (float) Game.getCamera().getViewPortLocation(this.entity).getX() + this.entity.getWidth() / 2.0f - this.textBoxWidth / 2.0f;
-    float y = (float) Game.getCamera().getViewPortLocation(this.entity).getY() - this.height;
+    final float x = (float) this.entityLocation.getX() - this.textBoxWidth / 2.0f;
+    float y = (float) this.entityLocation.getY() - this.height * 1.5f;
     while (measurer.getPosition() < text.length()) {
       final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
 
@@ -135,7 +133,8 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       Game.getLoop().detach(this);
       return;
     }
-
+    this.entityLocation = Game.getCamera().getViewPortLocation(this.entity.getDimensionCenter());
+    
     // old text was displayed long enough
     if (this.lastTextDispay != 0 && Game.getLoop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
       this.currentText = null;
@@ -165,7 +164,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
     final Graphics2D g = img.createGraphics();
     g.setFont(this.font);
-    final int stringWidth = g.getFontMetrics().stringWidth(this.currentText);
+    final float stringWidth = g.getFontMetrics().stringWidth(this.currentText);
     if (stringWidth < this.textBoxWidth) {
       this.textBoxWidth = stringWidth;
     }
@@ -203,6 +202,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     g.draw(ar);
     g.dispose();
 
-    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, this.height + 1);
+    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, (int) this.height + 1);
   }
 }

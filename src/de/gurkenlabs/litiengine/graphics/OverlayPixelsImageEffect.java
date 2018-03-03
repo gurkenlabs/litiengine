@@ -26,4 +26,8 @@ public class OverlayPixelsImageEffect extends ImageEffect {
 
     return bimage;
   }
+
+  public Color getColor() {
+    return this.color;
+  }
 }

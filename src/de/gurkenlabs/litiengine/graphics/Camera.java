@@ -12,9 +12,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
-/**
- * The Class Camera.
- */
 public class Camera implements ICamera {
   private final List<Consumer<Float>> zoomChangedConsumer;
   private final List<Consumer<Point2D>> focusChangedConsumer;
@@ -26,16 +23,12 @@ public class Camera implements ICamera {
 
   private int shakeDelay;
 
-  /** The shake duration. */
   private int shakeDuration = 2;
-
-  /** The shake intensity. */
   private double shakeIntensity = 1;
 
   private double shakeOffsetX;
   private double shakeOffsetY;
 
-  /** The shake tick. */
   private long shakeTick;
   private Rectangle2D viewPort;
 
@@ -235,8 +228,10 @@ public class Camera implements ICamera {
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
+    
+    final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(this.getFocus().getX() - this.getViewPortCenterX(), viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
+    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
   }
 
   @Override
