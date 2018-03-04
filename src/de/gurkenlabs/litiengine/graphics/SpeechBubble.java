@@ -34,8 +34,8 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int LETTER_WRITE_DELAY = 30;
   private static final double PADDING = 4.0;
   private static final double TRIANGLE_SIZE = 6;
-  private static final Color SPEAK_BACKGROUNDCOLOR = new Color(0, 0, 0, 80);
-  private static final Color SPEAK_BORDERCOLOR = new Color(0, 0, 0, 160);
+  private static final Color SPEAK_BACKGROUNDCOLOR = new Color(16, 20, 19, 150);
+  private static final Color SPEAK_BORDERCOLOR = new Color(16, 20, 19);
   private static final Color SPEAK_FONT_COLOR = Color.WHITE;
   private final int currentTextDisplayTime;
   private final Queue<Character> currentTextQueue;
@@ -60,7 +60,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       active.cancel();
     }
 
-    this.textBoxWidth = (float) (entity.getWidth() * 4);
+    this.textBoxWidth = entity.getWidth() * 4;
     this.entity = entity;
     this.font = font;
 
@@ -160,7 +160,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   }
 
   private void createBubbleImage() {
-
     final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
     final Graphics2D g = img.createGraphics();
     g.setFont(this.font);
@@ -178,16 +177,16 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     float y = 0;
     while (measurer.getPosition() < this.currentText.length()) {
       final TextLayout layout = measurer.nextLayout(this.textBoxWidth);
-      y += layout.getAscent() + layout.getLeading() + 0.2;
+      y += layout.getAscent() + layout.getLeading() + layout.getDescent();
     }
 
-    final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, PADDING, PADDING);
+    final RoundRectangle2D bounds = new RoundRectangle2D.Double(0, 0, this.textBoxWidth + 2 * PADDING, y + 2 * PADDING, 0, 0);
 
     // Build a path
     final GeneralPath path = new GeneralPath();
-    path.moveTo(bounds.getWidth() / 2.0 - TRIANGLE_SIZE / 2.0, bounds.getHeight());
+    path.moveTo(bounds.getWidth() / 2.0, bounds.getHeight());
     path.lineTo(bounds.getWidth() / 2.0, bounds.getHeight() + TRIANGLE_SIZE);
-    path.lineTo(bounds.getWidth() / 2.0 + TRIANGLE_SIZE / 2.0, bounds.getHeight());
+    path.lineTo(bounds.getWidth() / 2.0 + TRIANGLE_SIZE, bounds.getHeight());
     path.closePath();
 
     final Area ar = new Area(bounds);
