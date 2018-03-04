@@ -1,12 +1,16 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -129,5 +133,40 @@ public final class Resources {
 
     ImageCache.IMAGES.put(cacheKey, compatibleImg);
     return compatibleImg;
+  }
+
+  /**
+   * Get a list of strings from the specified raw text files. Strings are
+   * separated by a new line. <br>
+   * <b>This method is not cached. Ever call will open up a new
+   * {@link InputStream} to read the strings from the textfile.</b>
+   * 
+   * @param textFile
+   * @return A list with all strings that are contained by the textfile.
+   */
+  public static String[] getStringList(String textFile) {
+    if (textFile == null || textFile.isEmpty()) {
+      return new String[0];
+    }
+
+    try (InputStream is = FileUtilities.getGameResource(textFile)) {
+      if (is == null) {
+        return new String[0];
+      }
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      final List<String> strings = new ArrayList<>();
+      String str = "";
+      while ((str = reader.readLine()) != null) {
+        strings.add(str);
+      }
+
+      String[] stockArr = new String[strings.size()];
+      return strings.toArray(stockArr);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    return new String[0];
   }
 }
