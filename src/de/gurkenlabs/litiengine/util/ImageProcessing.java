@@ -601,4 +601,12 @@ public class ImageProcessing {
 
     return resizedImage;
   }
+
+  public static BufferedImage convertToGrayScale(BufferedImage image) {
+    BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
+    Graphics2D g = result.createGraphics();
+    g.drawImage(image, 0, 0, null);
+    g.dispose();
+    return result;
+  }
 }
