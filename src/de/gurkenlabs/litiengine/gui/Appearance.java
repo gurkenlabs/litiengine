@@ -81,7 +81,7 @@ public class Appearance {
   }
 
   public Font getFont() {
-    return font;
+    return this.font;
   }
 
   public boolean isHorizontalBackgroundGradient() {
@@ -140,7 +140,7 @@ public class Appearance {
     this.setFont(updateAppearance.getFont());
   }
 
-  private void fireOnChangeEvent() {
+  protected void fireOnChangeEvent() {
     for (Consumer<Appearance> cons : this.changedConsumer) {
       cons.accept(this);
     }
