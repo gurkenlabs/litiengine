@@ -3,9 +3,11 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 
+import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 /**
@@ -32,6 +34,9 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   public static final String IDLE = "-idle";
   public static final String WALK = "-walk";
   public static final String DEAD = "-dead";
+
+  private String[] customDeathAnimations;
+  private String randomDeathSprite;
 
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
@@ -61,10 +66,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
    */
   protected String getCurrentAnimationName() {
     if (this.getEntity().isDead()) {
-      String deadName = this.getSpritePrefix() + DEAD;
-      if (this.hasAnimation(deadName)) {
-        return deadName;
-      }
+      return this.getDeathAnimationName();
     }
 
     if (this.getEntity().isIdle()) {
@@ -82,6 +84,30 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     }
 
     return this.getIdleSpriteName(this.getEntity().getFacingDirection());
+  }
+
+  private String getDeathAnimationName() {
+    if (this.customDeathAnimations.length > 0) {
+      if (this.randomDeathSprite != null) {
+        return this.randomDeathSprite;
+      }
+
+      String randomDeathAnim = ArrayUtilities.getRandom(this.customDeathAnimations);
+      if (randomDeathAnim != null && !randomDeathAnim.isEmpty()) {
+        String randomDeathAnmimation = this.getSpritePrefix() + "-" + randomDeathAnim;
+        if (this.hasAnimation(randomDeathAnmimation)) {
+          this.randomDeathSprite = randomDeathAnmimation;
+          return this.randomDeathSprite;
+        }
+      }
+    }
+
+    String deadName = this.getSpritePrefix() + DEAD;
+    if (this.hasAnimation(deadName)) {
+      return deadName;
+    }
+
+    return null;
   }
 
   private void initializeAvailableAnimations() {
@@ -204,5 +230,12 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     }
 
     this.addAnimationRule(e -> true, e -> this.getCurrentAnimationName());
+
+    AnimationInfo info = this.getEntity().getClass().getAnnotation(AnimationInfo.class);
+    if (info != null) {
+      this.customDeathAnimations = info.deathAnimations();
+    } else {
+      this.customDeathAnimations = new String[0];
+    }
   }
 }

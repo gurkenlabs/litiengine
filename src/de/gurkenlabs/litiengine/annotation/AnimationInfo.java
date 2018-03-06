@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface AnimationInfo {
   String[] spritePrefix();
+
+  String[] deathAnimations() default {};
 }

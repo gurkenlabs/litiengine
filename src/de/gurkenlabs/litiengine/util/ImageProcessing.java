@@ -340,6 +340,21 @@ public class ImageProcessing {
 
     return flippedSprite;
   }
+  
+  public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
+    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    if (flippedSprite == null) {
+      return null;
+    }
+
+    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
+    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
+      g.drawImage(ImageProcessing.verticalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+    }
+    g.dispose();
+
+    return flippedSprite;
+  }
 
   public static BufferedImage getCompatibleImage(final int width, final int height) {
     if (width == 0 && height == 0) {
