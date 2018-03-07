@@ -18,6 +18,15 @@ public interface IMapRenderer {
   public BufferedImage getMapImage(IMap map);
 
   /**
+   * Gets the map image with all layers, including overlay layers (Useful for minimaps, for example). 
+   *
+   * @param map
+   *          the map
+   * @return the map image
+   */
+  public BufferedImage getMapImageWithOverlayLayers(IMap map);
+  
+  /**
    * Gets the supported orientation.
    *
    * @return the supported orientation

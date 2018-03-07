@@ -48,6 +48,29 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
+  public BufferedImage getMapImageWithOverlayLayers(final IMap map) {
+    if (ImageCache.MAPS.containsKey(getCacheKey(map))) {
+      return ImageCache.MAPS.get(getCacheKey(map));
+    }
+
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
+    final Graphics2D g = img.createGraphics();
+
+    for (final ITileLayer layer : map.getTileLayers()) {
+      if (layer == null) {
+        continue;
+      }
+
+      RenderEngine.renderImage(g, this.getLayerImage(layer, map, true), layer.getPosition());
+    }
+
+    g.dispose();
+
+    ImageCache.MAPS.put(getCacheKey(map), img);
+    return img;
+  }
+
+  @Override
   public MapOrientation getSupportedOrientation() {
     return MapOrientation.ORTHOGONAL;
   }
