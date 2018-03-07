@@ -383,6 +383,8 @@ public class EditorScreen extends Screen {
         if (option != JOptionPane.OK_OPTION) {
           return;
         }
+        
+        // TODO: somehow improve this to allow keeping the animation frames and only update the image
         Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
         for (SpriteSheetInfo info : sprites) {
           this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));

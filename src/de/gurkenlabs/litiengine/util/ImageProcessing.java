@@ -84,10 +84,10 @@ public class ImageProcessing {
     final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
     final BufferedImage rotatedImage = op.filter(shadowImage, null);
 
-    final BufferedImage shadow = getCompatibleImage(width, height + rotatedImage.getHeight());
+    final BufferedImage shadow = getCompatibleImage(width, height + rotatedImage.getHeight() * 2);
     final Graphics2D g2D = shadow.createGraphics();
-    g2D.drawImage(rotatedImage, xOffset, yOffset, null);
-    g2D.drawImage(image, 0, 0, null);
+    g2D.drawImage(rotatedImage, xOffset, yOffset + rotatedImage.getHeight(), null);
+    g2D.drawImage(image, 0, rotatedImage.getHeight(), null);
 
     g2D.dispose();
 
@@ -340,7 +340,7 @@ public class ImageProcessing {
 
     return flippedSprite;
   }
-  
+
   public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
     final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
     if (flippedSprite == null) {
