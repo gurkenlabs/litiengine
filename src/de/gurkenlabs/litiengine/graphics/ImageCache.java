@@ -51,6 +51,10 @@ public final class ImageCache {
 
   public void clear() {
     this.cache.clear();
+
+    for (Consumer<ImageCache> cons : this.clearConsumers) {
+      cons.accept(this);
+    }
   }
 
   public void onCleared(Consumer<ImageCache> cons) {
