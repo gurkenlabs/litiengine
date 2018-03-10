@@ -563,7 +563,6 @@ public class MapComponent extends EditorComponent {
 
   public void setSelection(IMapObject mapObject, boolean clearSelection, boolean shiftPressed) {
     if (mapObject == null) {
-      System.out.println("cleaaaarrr");
       this.getSelectedMapObjects().clear();
       for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
         cons.accept(this.getSelectedMapObjects());
