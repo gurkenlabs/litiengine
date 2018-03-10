@@ -400,8 +400,10 @@ public class MapComponent extends EditorComponent {
 
     UndoManager.instance().beginOperation();
     try {
+      this.setSelection(null, true, false);
       for (MapObject mapObject : this.copiedBlueprint.build(x, y)) {
         this.add(mapObject);
+        this.setSelection(mapObject, false, true);
       }
 
       // clean up copied blueprints in case, we cut the objects and kept the IDs
@@ -561,6 +563,7 @@ public class MapComponent extends EditorComponent {
 
   public void setSelection(IMapObject mapObject, boolean clearSelection, boolean shiftPressed) {
     if (mapObject == null) {
+      System.out.println("cleaaaarrr");
       this.getSelectedMapObjects().clear();
       for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
         cons.accept(this.getSelectedMapObjects());
@@ -585,7 +588,10 @@ public class MapComponent extends EditorComponent {
       return;
     }
 
-    this.getSelectedMapObjects().clear();
+    if (clearSelection) {
+      this.getSelectedMapObjects().clear();
+    }
+
     this.getSelectedMapObjects().add((MapObject) mapObject);
 
     for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
