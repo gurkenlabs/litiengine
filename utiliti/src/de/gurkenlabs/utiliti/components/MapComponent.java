@@ -400,10 +400,10 @@ public class MapComponent extends EditorComponent {
 
     UndoManager.instance().beginOperation();
     try {
-      this.setSelection(null, true, false);
+      this.setSelection(null, true);
       for (MapObject mapObject : this.copiedBlueprint.build(x, y)) {
         this.add(mapObject);
-        this.setSelection(mapObject, false, true);
+        this.setSelection(mapObject, false);
       }
 
       // clean up copied blueprints in case, we cut the objects and kept the IDs
@@ -555,13 +555,13 @@ public class MapComponent extends EditorComponent {
       }
 
       this.updateTransformControls();
-      this.setSelection(mapObject, clearSelection, Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+      this.setSelection(mapObject, clearSelection);
     } finally {
       this.isFocussing = false;
     }
   }
 
-  public void setSelection(IMapObject mapObject, boolean clearSelection, boolean shiftPressed) {
+  public void setSelection(IMapObject mapObject, boolean clearSelection) {
     if (mapObject == null) {
       this.getSelectedMapObjects().clear();
       for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
@@ -575,23 +575,13 @@ public class MapComponent extends EditorComponent {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
 
-    if (!clearSelection && shiftPressed) {
-      if (!this.getSelectedMapObjects().contains(mapObject)) {
-        this.getSelectedMapObjects().add((MapObject) mapObject);
-
-        for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
-          cons.accept(this.getSelectedMapObjects());
-        }
-      }
-
-      return;
-    }
-
-    if (clearSelection) {
+    if(clearSelection) {
       this.getSelectedMapObjects().clear();
     }
-
+    
+    if (!this.getSelectedMapObjects().contains(mapObject)) {
     this.getSelectedMapObjects().add((MapObject) mapObject);
+    }
 
     for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
       cons.accept(this.getSelectedMapObjects());
@@ -1408,7 +1398,7 @@ public class MapComponent extends EditorComponent {
       }
       IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
       this.newObjectArea = null;
-      this.setFocus(mo, true);
+      this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
       EditorScreen.instance().getMapObjectPanel().bind(mo);
       this.setEditMode(EDITMODE_EDIT);
       break;
@@ -1468,11 +1458,11 @@ public class MapComponent extends EditorComponent {
               break;
             }
 
-            this.setSelection(mapObject, false, true);
+            this.setSelection(mapObject, false);
             continue;
           }
 
-          this.setFocus(mapObject, false);
+          this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
           EditorScreen.instance().getMapObjectPanel().bind(mapObject);
           somethingIsFocused = true;
         }

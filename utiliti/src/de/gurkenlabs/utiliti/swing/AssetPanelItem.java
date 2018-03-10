@@ -356,7 +356,7 @@ public class AssetPanelItem extends JPanel {
         // previous loop because it gets overwritten every time a map object
         // gets added
         for (MapObject newMapObject : newObjects) {
-          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false, true);
+          EditorScreen.instance().getMapComponent().setSelection(newMapObject, false);
         }
       } finally {
         UndoManager.instance().endOperation();
