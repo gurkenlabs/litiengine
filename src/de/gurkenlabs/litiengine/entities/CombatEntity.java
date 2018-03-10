@@ -48,7 +48,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, 0));
+    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
     for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
       consumer.accept(this);
     }
@@ -114,12 +114,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (!this.isIndestructible()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, actualDamage));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, actualDamage));
     }
 
     if (this.isDead()) {
       this.setCollision(false);
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, 0));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
       for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
         consumer.accept(this);
       }
@@ -206,7 +206,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<Short>(Modification.SET, this.getAttributes().getHealth().getMaxValue()));
+    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getAttributes().getHealth().getMaxValue()));
     for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
       consumer.accept(this);
     }

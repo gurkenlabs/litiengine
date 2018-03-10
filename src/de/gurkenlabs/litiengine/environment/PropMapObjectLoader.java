@@ -83,7 +83,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     prop.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
 
-    AttributeModifier<Short> mod = new AttributeModifier<>(Modification.SET, mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
+    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
     prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
     prop.getAttributes().getHealth().modifyBaseValue(mod);
 

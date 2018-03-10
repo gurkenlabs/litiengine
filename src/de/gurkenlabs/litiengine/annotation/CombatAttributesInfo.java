@@ -18,7 +18,7 @@ public @interface CombatAttributesInfo {
 
   float damageMultiplier() default 1.0f;
 
-  short health() default 100;
+  int health() default 100;
 
   byte healthRegenerationPerSecond() default 1;
 

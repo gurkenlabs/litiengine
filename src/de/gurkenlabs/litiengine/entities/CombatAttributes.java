@@ -27,7 +27,7 @@ public class CombatAttributes {
   private final RangeAttribute<Integer> experience;
 
   /** The health. */
-  private final RangeAttribute<Short> health;
+  private final RangeAttribute<Integer> health;
 
   /** The health regeneration. */
   private final Attribute<Byte> healthRegeneration;
@@ -58,7 +58,7 @@ public class CombatAttributes {
     this.info = info;
 
     // init range attributes
-    this.health = new RangeAttribute<>(info.health(), (short) 0, info.health());
+    this.health = new RangeAttribute<>(info.health(), 0, info.health());
     this.shield = new RangeAttribute<>(info.maxShield(), (short) 0, info.shield());
     this.level = new RangeAttribute<>(info.maxLevel(), (byte) 0, info.level());
     this.experience = new RangeAttribute<>(info.maxExperience(), 0, 0);
@@ -111,7 +111,7 @@ public class CombatAttributes {
    *
    * @return the health
    */
-  public RangeAttribute<Short> getHealth() {
+  public RangeAttribute<Integer> getHealth() {
     return this.health;
   }
 
