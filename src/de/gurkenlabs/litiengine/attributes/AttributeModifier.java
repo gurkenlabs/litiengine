@@ -9,7 +9,7 @@ package de.gurkenlabs.litiengine.attributes;
  */
 public class AttributeModifier<T extends Number> implements Comparable<AttributeModifier<T>> {
   private final Modification modification;
-  private final double modifyValue;
+  private double modifyValue;
 
   /**
    * Instantiates a new attribute modifier.
@@ -72,6 +72,10 @@ public class AttributeModifier<T extends Number> implements Comparable<Attribute
     default:
       return modvalue;
     }
+  }
+
+  public void setModifyValue(double value) {
+    this.modifyValue = value;
   }
 
   @SuppressWarnings("unchecked")
