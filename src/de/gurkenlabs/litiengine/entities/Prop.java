@@ -55,9 +55,9 @@ public class Prop extends CombatEntity {
    * @return the state
    */
   public PropState getState() {
-    if (this.getAttributes().getHealth().getCurrentValue() <= 0) {
+    if (!this.isIndestructible() && this.getAttributes().getHealth().getCurrentValue() <= 0) {
       return PropState.DESTROYED;
-    } else if (this.getAttributes().getHealth().getCurrentValue() <= this.getAttributes().getHealth().getMaxValue() * 0.5) {
+    } else if (!this.isIndestructible() && this.getAttributes().getHealth().getCurrentValue() <= this.getAttributes().getHealth().getMaxValue() * 0.5) {
       return PropState.DAMAGED;
     } else {
       return PropState.INTACT;
@@ -87,6 +87,14 @@ public class Prop extends CombatEntity {
 
   public void setAddShadow(boolean addShadow) {
     this.addShadow = addShadow;
+  }
+
+  @Override
+  public boolean isDead() {
+    if(this.isIndestructible()) {
+      return false;
+    }
+    return this.getAttributes().getHealth().getCurrentValue() <= 0;
   }
 
   public Rotation getSpriteRotation() {
