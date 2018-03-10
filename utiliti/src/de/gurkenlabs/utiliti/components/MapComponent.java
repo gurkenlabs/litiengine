@@ -400,7 +400,7 @@ public class MapComponent extends EditorComponent {
 
     UndoManager.instance().beginOperation();
     try {
-      this.setSelection(null, true);
+      this.setFocus(null, true);
       for (MapObject mapObject : this.copiedBlueprint.build(x, y)) {
         this.add(mapObject);
         this.setSelection(mapObject, false);
