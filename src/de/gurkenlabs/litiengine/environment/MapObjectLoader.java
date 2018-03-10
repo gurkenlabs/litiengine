@@ -65,14 +65,14 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       return;
     }
 
-    final String memberField = customProp.memberField() != null && !customProp.memberField().isEmpty() ? customProp.memberField() : customProp.key();
+    for (String key : customProp.keys()) {
+      Field field = ReflectionUtilities.getField(entity.getClass(), key);
+      if (field == null) {
+        return;
+      }
 
-    Field field = ReflectionUtilities.getField(entity.getClass(), memberField);
-    if (field == null) {
-      return;
+      ReflectionUtilities.setFieldValue(entity.getClass(), entity, key, mapObject.getCustomProperty(key));
     }
-
-    ReflectionUtilities.setFieldValue(entity.getClass(), entity, memberField, mapObject.getCustomProperty(customProp.key()));
   }
 
   public static void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {

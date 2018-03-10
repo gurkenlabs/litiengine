@@ -10,6 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface CustomMapObjectProperty {
-  String key();
-  String memberField() default "";
+  String[] keys();
 }
