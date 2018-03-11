@@ -39,6 +39,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.Valign;
@@ -79,7 +80,7 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 
-public class MapComponent extends EditorComponent {
+public class MapComponent extends EditorComponent implements IUpdateable {
   public enum TransformType {
     UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, NONE
   }
@@ -95,8 +96,7 @@ public class MapComponent extends EditorComponent {
   private static final int BASE_SCROLL_SPEED = 50;
 
   private static final Color DEFAULT_COLOR_BOUNDING_BOX_FILL = new Color(0, 0, 0, 35);
-  private static final Color COLOR_FOCUS_BORDER = Color.BLACK;
-  private static final Color COLOR_SELECTION_BORDER = new Color(0, 0, 0, 200);
+
   private static final Color COLOR_COLLISION_FILL = new Color(255, 0, 0, 15);
   private static final Color COLOR_COLLISION_BORDER = Color.RED;
   private static final Color COLOR_NOCOLLISION_BORDER = new Color(255, 0, 0, 150);
@@ -111,6 +111,11 @@ public class MapComponent extends EditorComponent {
   private static final Color COLOR_SHADOW_BORDER = new Color(30, 85, 170);
   private static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
   private static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
+
+  private static Color COLOR_SELECTION_BORDER;
+  private static float FOCUS_BORDER_HUE = .65f;
+  private static float FOCUS_BORDER_BRIGHTNESS = 0;
+  private static boolean FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
 
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
   private final java.util.Map<TransformType, Rectangle2D> transformRects;
@@ -575,12 +580,12 @@ public class MapComponent extends EditorComponent {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
 
-    if(clearSelection) {
+    if (clearSelection) {
       this.getSelectedMapObjects().clear();
     }
-    
+
     if (!this.getSelectedMapObjects().contains(mapObject)) {
-    this.getSelectedMapObjects().add((MapObject) mapObject);
+      this.getSelectedMapObjects().add((MapObject) mapObject);
     }
 
     for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
@@ -1658,7 +1663,10 @@ public class MapComponent extends EditorComponent {
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15);
-      g.setColor(COLOR_FOCUS_BORDER);
+
+     
+      g.setColor(Color.BLACK);
+
       Game.getRenderEngine().renderOutline(g, focus, stroke);
 
       Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15 - 1f);
@@ -1671,7 +1679,18 @@ public class MapComponent extends EditorComponent {
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           Game.getRenderEngine().renderShape(g, trans);
-          g.setColor(COLOR_FOCUS_BORDER);
+          g.setColor(Color.BLACK);
+          Game.getRenderEngine().renderOutline(g, trans, transStroke);
+        }
+      }
+
+      // render transform rects
+      if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
+        Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+        for (Rectangle2D trans : this.transformRects.values()) {
+          g.setColor(COLOR_TRANSFORM_RECT_FILL);
+          Game.getRenderEngine().renderShape(g, trans);
+          g.setColor(Color.BLACK);
           Game.getRenderEngine().renderOutline(g, trans, transStroke);
         }
       }
@@ -1680,7 +1699,7 @@ public class MapComponent extends EditorComponent {
     if (focusedMapObject != null) {
       Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
-      g.setColor(COLOR_FOCUS_BORDER);
+      g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
       RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
     }
@@ -1692,8 +1711,22 @@ public class MapComponent extends EditorComponent {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 0.5f }, 0);
+      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
+      if (FOCUS_BORDER_BRIGHTNESS <= 0.4) {
+        FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
+      } else if (FOCUS_BORDER_BRIGHTNESS >= 0.9) {
+        FOCUS_BORDER_BRIGHTNESS_INCREASING = false;
+      }
+
+      if (FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS < 0.9) {
+        FOCUS_BORDER_BRIGHTNESS += 0.005;
+      } else if (!FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS >= 0.4) {
+        FOCUS_BORDER_BRIGHTNESS -= 0.005;
+      }
+      COLOR_SELECTION_BORDER = Color.getHSBColor(FOCUS_BORDER_HUE, 0, FOCUS_BORDER_BRIGHTNESS);
+
+      
       g.setColor(COLOR_SELECTION_BORDER);
       Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
@@ -1764,5 +1797,11 @@ public class MapComponent extends EditorComponent {
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       Game.getRenderEngine().renderOutline(g, collisionBox, collisionStroke);
     }
+  }
+
+  @Override
+  public void update() {
+    // TODO Auto-generated method stub
+
   }
 }
