@@ -301,7 +301,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.setupKeyboardControls();
       this.setupMouseControls();
       this.initialized = true;
-      
+
       Game.getLoop().attach(this);
     }
 
@@ -683,8 +683,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         if (map.getMapObjectLayers().isEmpty()) {
 
           // make sure there's a map object layer on the map because we need one
-          // to add
-          // any kind of entities
+          // to add any kind of entities
           MapObjectLayer layer = new MapObjectLayer();
           layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
           map.addMapObjectLayer(layer);
@@ -696,14 +695,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
           if (n == JOptionPane.YES_OPTION) {
             this.getMaps().remove(current.get());
-            ImageCache.MAPS.clear();
+
           } else {
             return;
           }
         }
 
         this.getMaps().add(map);
-        EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
@@ -722,8 +720,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         EditorScreen.instance().updateGameFileMaps();
-        this.loadEnvironment(map);
         ImageCache.clearAll();
+        if (this.environments.containsKey(map.getFileName())) {
+          this.environments.remove(map.getFileName());
+        }
+        
+        this.loadEnvironment(map);
+        EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
+
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
     });

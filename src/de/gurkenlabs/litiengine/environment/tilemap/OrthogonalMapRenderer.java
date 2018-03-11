@@ -123,7 +123,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @return the cache key
    */
   private static String getCacheKey(final IMap map) {
-    return MessageFormat.format("map_{0}", map.getFileName());
+    return "map_" + map.getFileName();
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {
@@ -268,23 +268,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
-    if (Game.getConfiguration().graphics().enableCacheStaticTiles()) {
-      // render all static tiles first because we're able to cache them because
-      // they're never supposed to be change during runtime
-      final String cacheKey = MessageFormat.format("{0}_{1}_static", getCacheKey(map), layer.getName());
-      BufferedImage staticTileImage = null;
-      if (ImageCache.MAPS.containsKey(cacheKey)) {
-        staticTileImage = ImageCache.MAPS.get(cacheKey);
-      } else {
-        staticTileImage = this.getLayerImage(layer, map, false);
-        ImageCache.MAPS.put(cacheKey, staticTileImage);
-      }
-
-      double staticX = layer.getPosition().x - viewport.getX();
-      double staticY = layer.getPosition().x - viewport.getY();
-      RenderEngine.renderImage(g, staticTileImage, staticX, staticY);
-    }
-
     final int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
     final int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
     final int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
@@ -300,12 +283,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
           continue;
         }
 
-        // always render tiles if the cache for static tiles is disabled or, in
-        // case it is enabled: only render animation tiles here
-        if (!Game.getConfiguration().graphics().enableCacheStaticTiles() || MapUtilities.hasAnimation(map, tile)) {
-          final Image tileTexture = getTileImage(map, tile);
-          RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
-        }
+        final Image tileTexture = getTileImage(map, tile);
+        RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
       }
     });
 

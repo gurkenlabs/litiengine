@@ -120,7 +120,7 @@ public class MapSelectionPanel extends JSplitPane {
     mapList.setMaximumSize(new Dimension(0, 250));
 
     mapList.getSelectionModel().addListSelectionListener(e -> {
-      if (EditorScreen.instance().isLoading()) {
+      if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
 
