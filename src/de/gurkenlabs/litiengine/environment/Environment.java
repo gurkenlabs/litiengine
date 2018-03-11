@@ -359,24 +359,11 @@ public class Environment implements IEnvironment {
 
   @Override
   public IEntity get(final int mapId) {
-    IEntity entity = this.entities.get(RenderType.GROUND).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    entity = this.entities.get(RenderType.NORMAL).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    entity = this.entities.get(RenderType.OVERLAY).get(mapId);
-    if (entity != null) {
-      return entity;
-    }
-
-    entity = this.entities.get(RenderType.NONE).get(mapId);
-    if (entity != null) {
-      return entity;
+    for(RenderType type : RenderType.values()) {
+      IEntity entity = this.entities.get(type).get(mapId);
+      if (entity != null) {
+        return entity;
+      }
     }
 
     return null;
@@ -388,27 +375,11 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    for (final IEntity entity : this.entities.get(RenderType.GROUND).values()) {
-      if (entity.getName() != null && entity.getName().equals(name)) {
-        return entity;
-      }
-    }
-
-    for (final IEntity entity : this.entities.get(RenderType.NORMAL).values()) {
-      if (entity.getName() != null && entity.getName().equals(name)) {
-        return entity;
-      }
-    }
-
-    for (final IEntity entity : this.entities.get(RenderType.OVERLAY).values()) {
-      if (entity.getName() != null && entity.getName().equals(name)) {
-        return entity;
-      }
-    }
-
-    for (final IEntity entity : this.entities.get(RenderType.NONE).values()) {
-      if (entity.getName() != null && entity.getName().equals(name)) {
-        return entity;
+    for(RenderType type : RenderType.values()) {
+      for (final IEntity entity : this.entities.get(type).values()) {
+        if (entity.getName() != null && entity.getName().equals(name)) {
+          return entity;
+        }
       }
     }
 
