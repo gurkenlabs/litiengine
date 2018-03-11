@@ -4,29 +4,15 @@ import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-/**
- * The Class GraphicSettings contains all settings that allow to influence the
- * appearance of the game.
- */
 @ConfigurationGroupInfo(prefix = "gfx_")
 public class GraphicConfiguration extends ConfigurationGroup {
 
-  /** The fullscreen. */
   private boolean fullscreen;
 
-  /** The graphic quality. */
   private Quality graphicQuality;
 
   private boolean renderDynamicShadows;
 
-  // TODO: on low performance machines (surface 2 pro tablet) this can lead to
-  // frame drops (65->35fps); on high performance machines this can increase frame
-  // rate...
-  // Possible explanation: on low performance machines it takes more computing
-  // time to render larger images?
-  private boolean cacheStaticTiles;
-
-  /** The resolution. */
   private int resolutionHeight;
 
   private int resolutionWidth;
@@ -44,7 +30,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.renderDynamicShadows = false;
     this.resolutionHeight = 900;
     this.resolutionWidth = 1600;
-    this.setCacheStaticTiles(true);
     this.setEnableResolutionScale(true);
     this.setReduceFramesWhenNotFocused(true);
   }
@@ -129,14 +114,6 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setResolutionWidth(final int resolutionWidth) {
     this.resolutionWidth = resolutionWidth;
-  }
-
-  public boolean enableCacheStaticTiles() {
-    return this.cacheStaticTiles;
-  }
-
-  public void setCacheStaticTiles(boolean cacheStaticTiles) {
-    this.cacheStaticTiles = cacheStaticTiles;
   }
 
   public boolean enableResolutionScale() {
