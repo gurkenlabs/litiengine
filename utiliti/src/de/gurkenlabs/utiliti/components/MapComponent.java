@@ -301,6 +301,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.setupKeyboardControls();
       this.setupMouseControls();
       this.initialized = true;
+      
+      Game.getLoop().attach(this);
     }
 
     super.prepare();
@@ -1663,7 +1665,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (focus != null && focusedMapObject != null) {
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15);
 
-     
       g.setColor(Color.BLACK);
 
       Game.getRenderEngine().renderOutline(g, focus, stroke);
@@ -1712,20 +1713,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
-      if (FOCUS_BORDER_BRIGHTNESS <= 0.4) {
-        FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
-      } else if (FOCUS_BORDER_BRIGHTNESS >= 0.9) {
-        FOCUS_BORDER_BRIGHTNESS_INCREASING = false;
-      }
-
-      if (FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS < 0.9) {
-        FOCUS_BORDER_BRIGHTNESS += 0.005;
-      } else if (!FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS >= 0.4) {
-        FOCUS_BORDER_BRIGHTNESS -= 0.005;
-      }
-      COLOR_SELECTION_BORDER = Color.getHSBColor(0, 0, FOCUS_BORDER_BRIGHTNESS);
-
-      
       g.setColor(COLOR_SELECTION_BORDER);
       Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
@@ -1800,7 +1787,17 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   @Override
   public void update() {
-    // TODO Auto-generated method stub
+    if (FOCUS_BORDER_BRIGHTNESS <= 0.4) {
+      FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
+    } else if (FOCUS_BORDER_BRIGHTNESS >= 0.9) {
+      FOCUS_BORDER_BRIGHTNESS_INCREASING = false;
+    }
 
+    if (FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS < 0.9) {
+      FOCUS_BORDER_BRIGHTNESS += 0.005;
+    } else if (!FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS >= 0.4) {
+      FOCUS_BORDER_BRIGHTNESS -= 0.005;
+    }
+    COLOR_SELECTION_BORDER = Color.getHSBColor(0, 0, FOCUS_BORDER_BRIGHTNESS);
   }
 }
