@@ -34,7 +34,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.snapGrid = true;
     this.renderBoundingBoxes = true;
     this.lastOpenedFiles = new String[10];
-    this.compressFile = true;
+    this.compressFile = false;
     this.gridSize = 16;
   }
 
