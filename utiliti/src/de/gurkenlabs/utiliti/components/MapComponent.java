@@ -113,7 +113,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
 
   private static Color COLOR_SELECTION_BORDER;
-  private static float FOCUS_BORDER_HUE = .65f;
   private static float FOCUS_BORDER_BRIGHTNESS = 0;
   private static boolean FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
 
@@ -1724,7 +1723,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       } else if (!FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS >= 0.4) {
         FOCUS_BORDER_BRIGHTNESS -= 0.005;
       }
-      COLOR_SELECTION_BORDER = Color.getHSBColor(FOCUS_BORDER_HUE, 0, FOCUS_BORDER_BRIGHTNESS);
+      COLOR_SELECTION_BORDER = Color.getHSBColor(0, 0, FOCUS_BORDER_BRIGHTNESS);
 
       
       g.setColor(COLOR_SELECTION_BORDER);
