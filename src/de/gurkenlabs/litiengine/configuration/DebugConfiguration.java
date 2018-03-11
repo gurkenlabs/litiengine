@@ -10,26 +10,23 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   private boolean renderBoundingBoxes = false;
 
-  /** The render collision boxes. */
   private boolean renderCollisionBoxes = false;
 
   private boolean renderDebugMouse = false;
 
-  /** The render entity names. */
   private boolean renderEntityNames = false;
 
   private boolean renderGuiComponentBoundingBoxes = false;
 
-  /** The render hit boxes. */
   private boolean renderHitBoxes = false;
 
-  /** The render paths. */
   private boolean renderPaths = false;
-  /** The show mouse target metric. */
+  
   private boolean showMouseTargetMetric = true;
 
-  /** The show tiles metric. */
   private boolean showTilesMetric = false;
+  
+  private boolean logDetailedRenderTimes = false;
 
   /**
    * Checks if is debug enabled.
@@ -154,5 +151,13 @@ public class DebugConfiguration extends ConfigurationGroup {
   // game metric settings
   public boolean showTilesMetric() {
     return this.isDebugEnabled() && this.showTilesMetric;
+  }
+
+  public boolean isLogDetailedRenderTimes() {
+    return logDetailedRenderTimes;
+  }
+
+  public void setLogDetailedRenderTimes(boolean logDetailedRenderTimes) {
+    this.logDetailedRenderTimes = logDetailedRenderTimes;
   }
 }

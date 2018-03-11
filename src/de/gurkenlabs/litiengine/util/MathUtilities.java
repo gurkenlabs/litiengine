@@ -134,4 +134,12 @@ public class MathUtilities {
   public static int randomSign() {
     return randomBoolean() ? 1 : -1;
   }
+
+  public static int getFullPercent(double value, double fraction) {
+    return (int) ((fraction * 100.0f) / value);
+  }
+
+  public static double getPercent(double value, double fraction) {
+    return (float) fraction * 100 / value;
+  }
 }
