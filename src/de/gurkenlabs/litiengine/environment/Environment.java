@@ -878,6 +878,10 @@ public class Environment implements IEnvironment {
     if (this.getOverlayRenderables().contains(renderable)) {
       this.getOverlayRenderables().remove(renderable);
     }
+    
+    if (this.getUIRenderables().contains(renderable)) {
+      this.getUIRenderables().remove(renderable);
+    }
   }
 
   @Override
