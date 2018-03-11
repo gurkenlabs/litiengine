@@ -99,8 +99,8 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
       }
 
       if (targetX != 0 || targetY != 0) {
-        final Point2D target = new Point2D.Double(this.getEntity().getDimensionCenter().getX() + targetX, this.getEntity().getDimensionCenter().getY() + targetY);
-        final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getDimensionCenter(), target);
+        final Point2D target = new Point2D.Double(this.getEntity().getCenter().getX() + targetX, this.getEntity().getCenter().getY() + targetY);
+        final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.getEntity().getCenter(), target);
         this.getEntity().setAngle((float) angle);
       }
     }

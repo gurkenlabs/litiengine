@@ -86,13 +86,8 @@ public abstract class Entity implements IEntity {
     return this.boundingBox;
   }
 
-  /**
-   * Gets the map dimension center.
-   *
-   * @return the map dimension center
-   */
   @Override
-  public Point2D getDimensionCenter() {
+  public Point2D getCenter() {
     return new Point2D.Double(this.getLocation().getX() + this.getWidth() * 0.5, this.getLocation().getY() + this.getHeight() * 0.5);
   }
 
@@ -101,11 +96,6 @@ public abstract class Entity implements IEntity {
     return this.height;
   }
 
-  /**
-   * Gets the map location.
-   *
-   * @return the map location
-   */
   @Override
   public Point2D getLocation() {
     return this.mapLocation;

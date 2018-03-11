@@ -157,7 +157,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     if (Game.getConfiguration().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
-      Game.getRenderEngine().renderOutline(g, new Rectangle2D.Double(this.getEntity().getDimensionCenter().getX() - deltaX, this.getEntity().getDimensionCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
+      Game.getRenderEngine().renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
     }
   }
 
@@ -169,7 +169,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       return;
     }
 
-    this.entityCenter = Game.getCamera().getViewPortLocation(this.getEntity().getDimensionCenter());
+    this.entityCenter = Game.getCamera().getViewPortLocation(this.getEntity().getCenter());
 
     // old text was displayed long enough
     if (this.lastTextDispay != 0 && Game.getLoop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {

@@ -13,7 +13,7 @@ public class GravityForce extends Force {
   private final IEntity forceEntiy;
 
   public GravityForce(final IEntity forceEntity, final float strength, final Direction dir) {
-    super(forceEntity.getDimensionCenter(), strength, 0);
+    super(forceEntity.getCenter(), strength, 0);
     this.forceEntiy = forceEntity;
     this.direction = dir;
     this.setCancelOnCollision(false);
@@ -31,6 +31,6 @@ public class GravityForce extends Force {
 
   @Override
   public Point2D getLocation() {
-    return GeometricUtilities.project(this.getForceEntiy().getDimensionCenter(), Direction.toAngle(this.direction), Math.max(this.forceEntiy.getHeight(), this.forceEntiy.getWidth() * 2 + this.getStrength()));
+    return GeometricUtilities.project(this.getForceEntiy().getCenter(), Direction.toAngle(this.direction), Math.max(this.forceEntiy.getHeight(), this.forceEntiy.getWidth() * 2 + this.getStrength()));
   }
 }

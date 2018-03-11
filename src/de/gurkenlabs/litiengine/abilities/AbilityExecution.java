@@ -27,7 +27,7 @@ public class AbilityExecution implements IUpdateable {
     this.ability = ability;
     this.executionTicks = Game.getLoop().getTicks();
     this.impactArea = ability.calculateImpactArea();
-    this.castLocation = ability.getExecutor().getDimensionCenter();
+    this.castLocation = ability.getExecutor().getCenter();
     Game.getLoop().attach(this);
   }
 

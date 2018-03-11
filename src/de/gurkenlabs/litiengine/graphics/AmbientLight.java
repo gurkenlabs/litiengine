@@ -84,7 +84,7 @@ public class AmbientLight extends ColorLayer {
   }
 
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {
-    final Point2D lightCenter = light.getDimensionCenter();
+    final Point2D lightCenter = light.getCenter();
 
     Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
@@ -115,7 +115,7 @@ public class AmbientLight extends ColorLayer {
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
         final Vector2D lightVector = new Vector2D(lightCenter, line.getP1());
 
-        if (light.getDimensionCenter().getY() < line.getY1() && light.getDimensionCenter().getY() < line.getY2() && col.getBoundingBox().contains(light.getDimensionCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
+        if (light.getCenter().getY() < line.getY1() && light.getCenter().getY() < line.getY2() && col.getBoundingBox().contains(light.getCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
 
@@ -131,7 +131,7 @@ public class AmbientLight extends ColorLayer {
         shadowParallelogram.closePath();
 
         final Area shadowArea = new Area(shadowParallelogram);
-        if (light.getDimensionCenter().getY() < col.getBoundingBox().getMaxY() && !col.getBoundingBox().contains(light.getDimensionCenter())) {
+        if (light.getCenter().getY() < col.getBoundingBox().getMaxY() && !col.getBoundingBox().contains(light.getCenter())) {
           shadowArea.add(boxInLight);
         }
         shadowArea.intersect(lightArea);

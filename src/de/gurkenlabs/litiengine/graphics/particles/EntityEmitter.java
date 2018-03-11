@@ -20,7 +20,7 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
    *          the entity
    */
   public EntityEmitter(final IEntity entity) {
-    super((int) entity.getDimensionCenter().getX(), (int) entity.getDimensionCenter().getY());
+    super((int) entity.getCenter().getX(), (int) entity.getCenter().getY());
     this.entity = entity;
   }
 
@@ -35,7 +35,7 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
       return null;
     }
 
-    return this.getEntity().getDimensionCenter();
+    return this.getEntity().getCenter();
   }
 
   @Override

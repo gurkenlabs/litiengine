@@ -15,7 +15,7 @@ public interface IEntity {
 
   public Rectangle2D getBoundingBox();
 
-  public Point2D getDimensionCenter();
+  public Point2D getCenter();
 
   public float getHeight();
 

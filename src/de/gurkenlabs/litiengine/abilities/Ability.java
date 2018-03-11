@@ -130,7 +130,7 @@ public abstract class Ability implements IRenderable {
     case COLLISIONBOX_CENTER:
       return new Point2D.Double(this.executor.getCollisionBox().getCenterX(), this.executor.getCollisionBox().getCenterY());
     case DIMENSION_CENTER:
-      return this.executor.getDimensionCenter();
+      return this.executor.getCenter();
     case CUSTOM:
       if (this.origin != null) {
         return new Point2D.Double(this.executor.getLocation().getX() + this.origin.getX(), this.executor.getLocation().getY() + this.origin.getY());

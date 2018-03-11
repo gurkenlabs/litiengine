@@ -29,6 +29,6 @@ public class PositionLockCamera extends Camera {
   }
 
   protected Point2D getLockedCameraLocation() {
-    return this.getLockedEntity().getDimensionCenter();
+    return this.getLockedEntity().getCenter();
   }
 }
