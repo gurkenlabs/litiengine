@@ -33,30 +33,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     if (entity != null) {
       this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
     }
-
-    this.initRenderCallbacks();
-  }
-
-  private void initRenderCallbacks() {
-    Game.getRenderEngine().onEntityRendered(e -> {
-      if (!e.getRenderedObject().equals(this.getEntity())) {
-        return;
-      }
-
-      for (IRenderable renderable : this.rendered) {
-        renderable.render(e.getGraphics());
-      }
-    });
-
-    Game.getRenderEngine().onEntityRendering(e -> {
-      if (!e.getRenderedObject().equals(this.getEntity())) {
-        return;
-      }
-
-      for (IRenderable renderable : this.rendering) {
-        renderable.render(e.getGraphics());
-      }
-    });
   }
 
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
@@ -67,7 +43,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this.entity = entity;
 
     this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
-    this.initRenderCallbacks();
   }
 
   public static <T> String[] getDefaultSpritePrefixes(Class<T> cls) {
@@ -123,15 +98,5 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
-  }
-
-  @Override
-  public void onEntityRendering(IRenderable renderable) {
-    this.rendering.add(renderable);
-  }
-
-  @Override
-  public void onEntityRendered(IRenderable renderable) {
-    this.rendered.add(renderable);
   }
 }

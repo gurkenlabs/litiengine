@@ -111,7 +111,7 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public BufferedImage getCurrentSprite() {
-    final Animation current =this.getCurrentAnimation();
+    final Animation current = this.getCurrentAnimation();
     if (current == null || current.getSpritesheet() == null || current.getCurrentKeyFrame() == null) {
       return null;
     }
