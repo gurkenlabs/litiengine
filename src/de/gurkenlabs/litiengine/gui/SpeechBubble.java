@@ -24,7 +24,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -84,7 +83,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     this.lastTextDispay = Game.getLoop().getTicks();
     this.createBubbleImage();
-    Game.getEnvironment().add(this, RenderType.OVERLAY);
+    Game.getEnvironment().addToUI(this);
     Game.getRenderLoop().attach(this);
     activeSpeechBubbles.put(entity, this);
   }

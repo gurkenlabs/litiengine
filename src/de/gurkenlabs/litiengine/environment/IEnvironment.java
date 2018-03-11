@@ -40,7 +40,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public void add(IEntity entity);
 
-  public void add(IRenderable renderable, RenderType type);
+  public void addToGround(IRenderable renderable);
+  public void addToOverlay(IRenderable renderable);
+  public void addToUI(IRenderable renderable);
 
   public void clear();
 
@@ -167,6 +169,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IRenderable> getOverlayRenderables();
 
   public Collection<IRenderable> getGroundRenderables();
+  
+  public Collection<IRenderable> getUIRenderables();
 
   public boolean isLoaded();
 
