@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,10 @@ public class Blueprint extends MapObject {
    */
   public boolean keepIds() {
     return this.keepIds;
+  }
+
+  public List<MapObject> build(Point2D location) {
+    return this.build(Math.round((float)location.getX()), Math.round((float)location.getY()));
   }
 
   public List<MapObject> build(int x, int y) {

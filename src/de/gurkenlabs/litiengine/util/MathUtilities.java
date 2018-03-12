@@ -100,7 +100,8 @@ public class MathUtilities {
   }
 
   public static boolean probabilityIsTrue(final double probability) {
-    return random.nextDouble() < probability;
+    double rnd = random.nextDouble();
+    return rnd < probability;
   }
 
   public static boolean randomBoolean() {
