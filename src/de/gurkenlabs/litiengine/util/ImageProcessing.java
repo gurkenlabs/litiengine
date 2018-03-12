@@ -43,6 +43,8 @@ public class ImageProcessing {
   public static final int CROP_VALIGN_TOP = 1;
   public static final int CROP_VALIGN_TOPCENTER = 2;
 
+  private static GraphicsConfiguration graphicsConfig;
+
   private ImageProcessing() {
   }
 
@@ -361,10 +363,13 @@ public class ImageProcessing {
       return null;
     }
 
-    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
-    final GraphicsConfiguration config = device.getDefaultConfiguration();
-    return config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+    if (graphicsConfig == null) {
+      final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      final GraphicsDevice device = env.getDefaultScreenDevice();
+      graphicsConfig = device.getDefaultConfiguration();
+    }
+
+    return graphicsConfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
