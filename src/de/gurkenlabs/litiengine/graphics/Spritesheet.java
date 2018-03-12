@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -237,7 +236,7 @@ public final class Spritesheet {
       return null;
     }
 
-    final String imageCacheKey = MessageFormat.format("{0}_{1}", this.hashCode, index);
+    final String imageCacheKey = this.hashCode + "_" + index;
     if (ImageCache.SPRITES.containsKey(imageCacheKey)) {
       return ImageCache.SPRITES.get(imageCacheKey);
     }

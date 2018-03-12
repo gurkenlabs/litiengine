@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 
 import javax.swing.JLabel;
 
@@ -65,7 +64,7 @@ public class ImageComponent extends GuiComponent {
       return null;
     }
 
-    final String cacheKey = MessageFormat.format("{0}_{1}_{2}_{3}_{4}x{5}", this.getSpritesheet().getName().hashCode(), this.isHovered(), this.isPressed(), this.isEnabled(), this.getWidth(), this.getHeight());
+    final String cacheKey = this.getSpritesheet().getName().hashCode() + "_" + this.isHovered() + "_" + this.isPressed() + "_" + this.isEnabled() + "_" + this.getWidth() + "x" + this.getHeight();
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
@@ -100,7 +99,7 @@ public class ImageComponent extends GuiComponent {
       imageHeight = (int) this.getHeight();
     }
 
-    final String cacheKey = MessageFormat.format("{0}_{1}x{2}", this.image.hashCode(), imageWidth, imageHeight);
+    final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
     if (ImageCache.SPRITES.containsKey(cacheKey)) {
       return ImageCache.SPRITES.get(cacheKey);
     }
