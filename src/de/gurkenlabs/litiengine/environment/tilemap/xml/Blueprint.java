@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,35 +36,15 @@ public class Blueprint extends MapObject {
     this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
     this.setName(name);
-    int minX = -1;
-    int minY = -1;
-    int maxX = -1;
-    int maxY = -1;
-    for (MapObject item : items) {
-      if (minX == -1 || item.getX() < minX) {
-        minX = item.getX();
-      }
-
-      if (minY == -1 || item.getY() < minY) {
-        minY = item.getY();
-      }
-
-      if (maxX == -1 || item.getBoundingBox().getMaxX() > maxX) {
-        maxX = (int) item.getBoundingBox().getMaxX();
-      }
-
-      if (maxY == -1 || item.getBoundingBox().getMaxY() > maxY) {
-        maxY = (int) item.getBoundingBox().getMaxY();
-      }
-    }
-
-    this.setWidth(maxX - minX);
-    this.setHeight(maxY - minY);
+    
+    final Rectangle bounds = MapObject.getBounds(items);
+    this.setWidth(bounds.width);
+    this.setHeight(bounds.height);
 
     for (MapObject item : items) {
       MapObject newItem = new MapObject(item);
-      newItem.setX(item.getX() - minX);
-      newItem.setY(item.getY() - minY);
+      newItem.setX(item.getX() - bounds.x);
+      newItem.setY(item.getY() - bounds.y);
       if (keepIds) {
         newItem.setId(item.getId());
       }
@@ -89,7 +70,7 @@ public class Blueprint extends MapObject {
   }
 
   public List<MapObject> build(Point2D location) {
-    return this.build(Math.round((float)location.getX()), Math.round((float)location.getY()));
+    return this.build(Math.round((float) location.getX()), Math.round((float) location.getY()));
   }
 
   public List<MapObject> build(int x, int y) {

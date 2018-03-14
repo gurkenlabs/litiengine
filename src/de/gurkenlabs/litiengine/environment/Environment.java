@@ -109,7 +109,7 @@ public class Environment implements IEnvironment {
     this();
     this.map = map;
     this.mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
-    Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
+    Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
   }
 
   /**
@@ -257,6 +257,16 @@ public class Environment implements IEnvironment {
     }
   }
 
+  private void updateColorLayers(IEntity entity) {
+    if (this.staticShadowLayer != null) {
+      this.staticShadowLayer.updateSection(entity.getBoundingBox());
+    }
+
+    if (this.ambientLight != null) {
+      this.ambientLight.updateSection(entity.getBoundingBox());
+    }
+  }
+
   @Override
   public void addToGround(IRenderable renderable) {
     this.getGroundRenderables().add(renderable);
@@ -359,7 +369,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public IEntity get(final int mapId) {
-    for(RenderType type : RenderType.values()) {
+    for (RenderType type : RenderType.values()) {
       IEntity entity = this.entities.get(type).get(mapId);
       if (entity != null) {
         return entity;
@@ -375,7 +385,7 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    for(RenderType type : RenderType.values()) {
+    for (RenderType type : RenderType.values()) {
       for (final IEntity entity : this.entities.get(type).values()) {
         if (entity.getName() != null && entity.getName().equals(name)) {
           return entity;
@@ -702,10 +712,6 @@ public class Environment implements IEnvironment {
       if (opt.isPresent()) {
         IMapObject mapObject = opt.get();
         this.addMapObject(mapObject);
-        if (MapObjectType.get(mapObject.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-          this.addStaticShadows();
-        }
-
         break;
       }
     }
@@ -817,7 +823,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof LightSource) {
       this.lightSources.remove(entity);
-      this.addStaticShadows();
+      this.updateColorLayers(entity);
     }
 
     if (entity instanceof Trigger) {
@@ -830,7 +836,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof StaticShadow) {
       this.staticShadows.remove(entity);
-      this.addStaticShadows();
+      this.updateColorLayers(entity);
     }
 
     if (entity instanceof IMobileEntity) {
@@ -878,7 +884,7 @@ public class Environment implements IEnvironment {
     if (this.getOverlayRenderables().contains(renderable)) {
       this.getOverlayRenderables().remove(renderable);
     }
-    
+
     if (this.getUIRenderables().contains(renderable)) {
       this.getUIRenderables().remove(renderable);
     }
@@ -951,21 +957,20 @@ public class Environment implements IEnvironment {
     final long uiRenderTime = (System.nanoTime() - renderStart) / 1000000;
 
     if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
-      log.log(Level.INFO, "render details:\n 1. map:{0}ms\n 2. ground:{1}ms\n 3. light:{2}ms\n 4. entities({8}):{3}ms\n 5. shadows:{4}ms\n 6. overlay({9} + {10}):{5}ms\n 7. ambientLight:{6}ms\n 8. ui:{7}ms", 
-          new Object[] 
-              { 
-                  mapRenderTime, 
-                  groundRenderTime, 
-                  lightRenderTime,
-                  normalRenderTime,
-                  staticShadowRenderTime,
-                  overlayRenderTime,
-                  ambientLightRenderTime,
-                  uiRenderTime,
-                  this.getEntities(RenderType.NORMAL).size(),
-                  this.getEntities(RenderType.OVERLAY).size(),
-                  this.getOverlayRenderables().size(),
-              });
+      log.log(Level.INFO, "render details:\n 1. map:{0}ms\n 2. ground:{1}ms\n 3. light:{2}ms\n 4. entities({8}):{3}ms\n 5. shadows:{4}ms\n 6. overlay({9} + {10}):{5}ms\n 7. ambientLight:{6}ms\n 8. ui:{7}ms",
+          new Object[] {
+              mapRenderTime,
+              groundRenderTime,
+              lightRenderTime,
+              normalRenderTime,
+              staticShadowRenderTime,
+              overlayRenderTime,
+              ambientLightRenderTime,
+              uiRenderTime,
+              this.getEntities(RenderType.NORMAL).size(),
+              this.getEntities(RenderType.OVERLAY).size(),
+              this.getOverlayRenderables().size(),
+          });
     }
     g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
   }
@@ -1086,6 +1091,10 @@ public class Environment implements IEnvironment {
     final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
     if (controller != null) {
       Game.getLoop().attach(controller);
+    }
+    
+    if(entity instanceof LightSource || entity instanceof StaticShadow) {
+      this.updateColorLayers(entity);
     }
   }
 

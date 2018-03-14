@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
@@ -21,28 +22,30 @@ public class AmbientLight extends ColorLayer {
 
   public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
     super(env, ambientColor, ambientAlpha);
-    this.createImage();
   }
 
   @Override
-  protected void renderLayer(Graphics2D g) {
+  protected void renderSection(Graphics2D g, Rectangle2D section) {
     final Color colorWithAlpha = this.getColorWithAlpha();
 
     // create large rectangle and crop lights from it
-    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().getWidth();
-    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().getHeight();
+    final double width = section.getWidth();
+    final double height = section.getHeight();
+
+    final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
+    final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
     double longerDimension = mapWidth;
     if (mapWidth < mapHeight) {
       longerDimension = mapHeight;
     }
-    final Area darkArea = new Area(new Rectangle2D.Double(0, 0, mapWidth, mapHeight));
+    final Area darkArea = new Area(new Rectangle2D.Double(0, 0, width, height));
 
     for (final LightSource light : this.getEnvironment().getLightSources()) {
-      if (!light.isActive()) {
+      if (!light.getBoundingBox().intersects(section) || !light.isActive()) {
         continue;
       }
 
-      this.renderLightSource(g, light, longerDimension);
+      this.renderLightSource(g, light, longerDimension, section);
     }
 
     g.setColor(colorWithAlpha);
@@ -50,40 +53,17 @@ public class AmbientLight extends ColorLayer {
     g.fill(darkArea);
 
     for (final LightSource light : this.getEnvironment().getLightSources()) {
-      if (light.getIntensity() <= 0) {
+      if (!light.getBoundingBox().intersects(section) || !light.isActive() || light.getIntensity() <= 0) {
         continue;
       }
 
       final float intensity = MathUtilities.clamp((float) light.getIntensity() / 255, 0, 1);
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, intensity));
-      this.renderLightSource(g, light, longerDimension);
+      this.renderLightSource(g, light, longerDimension, section);
     }
   }
 
-  @Override
-  protected String getCacheKey() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(this.getColor());
-    sb.append(this.getAlpha());
-
-    for (final LightSource light : this.getEnvironment().getLightSources()) {
-      sb.append(light.getIntensity());
-      sb.append(light.getColor());
-      sb.append(light.getLocation());
-      sb.append(light.getRadius());
-      sb.append(light.getLightShapeType());
-      sb.append(light.getWidth());
-      sb.append(light.getHeight());
-      sb.append(light.isActive());
-    }
-
-    sb.append(this.getEnvironment().getMap().getSizeInPixels());
-
-    final int key = sb.toString().hashCode();
-    return "ambientlight-" + this.getEnvironment().getMap().getFileName() + "-" + Integer.toString(key);
-  }
-
-  private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension) {
+  private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension, Rectangle2D section) {
     final Point2D lightCenter = light.getCenter();
 
     Area lightArea = null;
@@ -144,9 +124,19 @@ public class AmbientLight extends ColorLayer {
     // render parts that lie within the shadow with a gradient from the light
     // color to transparent
     final Shape lightShape = light.getLightShape();
+
     final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
-    g.setPaint(new RadialGradientPaint(new Point2D.Double(lightShape.getBounds2D().getCenterX(), lightShape.getBounds2D().getCenterY()), (float) (lightShape.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
-    g.fill(lightArea == null ? light.getBoundingBox() : lightArea);
+    g.setPaint(new RadialGradientPaint(new Point2D.Double(lightShape.getBounds2D().getCenterX() - section.getX(), lightShape.getBounds2D().getCenterY() - section.getY()), (float) (lightShape.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
+
+    Shape fillShape;
+    if (lightArea != null) {
+      lightArea.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
+      fillShape = lightArea;
+    } else {
+      fillShape = new Rectangle2D.Double(light.getBoundingBox().getX() - section.getX(), light.getBoundingBox().getY() - section.getY(), light.getBoundingBox().getWidth(), light.getBoundingBox().getHeight());
+    }
+
+    g.fill(fillShape);
     g.setPaint(oldPaint);
   }
 }

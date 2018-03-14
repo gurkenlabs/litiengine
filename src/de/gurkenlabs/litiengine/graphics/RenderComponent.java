@@ -96,7 +96,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
   @Override
   public void init() {
-    this.createBufferStrategy(2);
+    this.createBufferStrategy(3);
     this.currentBufferStrategy = this.getBufferStrategy();
     this.currentAlpha = 1.1f;
   }

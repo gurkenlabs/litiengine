@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -68,6 +70,44 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.x = mapObject.x;
     this.y = mapObject.y;
     this.setCustomProperties(mapObject.getAllCustomProperties());
+  }
+
+  public static Rectangle2D getBounds2D(MapObject... objects) {
+    return getBounds(objects);
+  }
+
+  public static Rectangle2D getBounds2D(Iterable<MapObject> objects) {
+    return getBounds(objects);
+  }
+
+  public static Rectangle getBounds(MapObject... objects) {
+    return getBounds(Arrays.asList(objects));
+  }
+
+  public static Rectangle getBounds(Iterable<MapObject> objects) {
+    int minX = -1;
+    int minY = -1;
+    int maxX = -1;
+    int maxY = -1;
+    for (MapObject item : objects) {
+      if (minX == -1 || item.getX() < minX) {
+        minX = item.getX();
+      }
+
+      if (minY == -1 || item.getY() < minY) {
+        minY = item.getY();
+      }
+
+      if (maxX == -1 || item.getBoundingBox().getMaxX() > maxX) {
+        maxX = (int) item.getBoundingBox().getMaxX();
+      }
+
+      if (maxY == -1 || item.getBoundingBox().getMaxY() > maxY) {
+        maxY = (int) item.getBoundingBox().getMaxY();
+      }
+    }
+
+    return new Rectangle(minX, minY, maxX - minX, maxY - minY);
   }
 
   @Override

@@ -3,30 +3,53 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class ColorLayer implements IRenderable {
   private final IEnvironment environment;
-  private Image image;
+  private final Image[][] tiles;
 
   private int alpha;
   private Color color;
 
-  protected ColorLayer(IEnvironment env, final Color ambientColor, final int ambientAlpha) {
+  protected ColorLayer(IEnvironment env, final Color color, final int alpha) {
     this.environment = env;
-    this.color = ambientColor;
-    this.alpha = ambientAlpha;
-    this.createImage();
+    this.color = color;
+    this.alpha = alpha;
+    this.tiles = new Image[env.getMap().getSizeInTiles().width][env.getMap().getSizeInTiles().height];
+    this.updateSection(this.environment.getMap().getBounds());
   }
-  
+
   @Override
   public void render(Graphics2D g) {
-    RenderEngine.renderImage(g, this.getImage(), Game.getCamera().getViewPortLocation(0, 0));
+    final Rectangle2D viewport = Game.getCamera().getViewPort();
+
+    final IMap map = this.getEnvironment().getMap();
+    final Point startTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getX(), viewport.getY()));
+    final Point endTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
+    final int startX = MathUtilities.clamp(startTile.x, 0, tiles.length - 1);
+    final int endX = MathUtilities.clamp(endTile.x, 0, tiles.length - 1);
+    final int startY = MathUtilities.clamp(startTile.y, 0, tiles[0].length - 1);
+    final int endY = MathUtilities.clamp(endTile.y, 0, tiles[0].length - 1);
+
+    final Point2D origin = Game.getCamera().getViewPortLocation(0, 0);
+
+    // draw the tile on the layer image
+    for (int x = startX; x <= endX; x++) {
+      for (int y = startY; y <= endY; y++) {
+        RenderEngine.renderImage(g, tiles[x][y], origin.getX() + x * map.getTileSize().width, origin.getY() + y * map.getTileSize().height);
+      }
+    }
   }
 
   public int getAlpha() {
@@ -36,57 +59,60 @@ public abstract class ColorLayer implements IRenderable {
   public Color getColor() {
     return this.color;
   }
-  
+
   public Color getColorWithAlpha() {
     return new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
   }
 
   public void setAlpha(int ambientAlpha) {
     this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
-    this.createImage();
+    this.updateSection(this.environment.getMap().getBounds());
   }
 
   public void setColor(final Color color) {
     this.color = color;
-    this.createImage();
+    this.updateSection(this.environment.getMap().getBounds());
   }
 
-  public void createImage(){
+  public void updateSection(Rectangle2D section) {
     if (this.getColor() == null) {
       return;
     }
 
-    final String cacheKey = this.getCacheKey();
-    if (ImageCache.IMAGES.containsKey(cacheKey)) {
-      this.setImage(ImageCache.IMAGES.get(cacheKey));
-      return;
-    }
+    final IMap map = this.getEnvironment().getMap();
 
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) this.getEnvironment().getMap().getSizeInPixels().getWidth(), (int) this.getEnvironment().getMap().getSizeInPixels().getHeight());
+    final Rectangle2D tileSection = MapUtilities.getTileBoundingBox(map, section);
+    final BufferedImage img = ImageProcessing.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
     final Graphics2D g = img.createGraphics();
-    
-    this.renderLayer(g);
-    
+
+    this.renderSection(g, tileSection);
+
     g.dispose();
-    this.setImage(img);
 
-    ImageCache.IMAGES.put(cacheKey, img);
-  }
-  
-  protected abstract void renderLayer(Graphics2D g);
-  
-  protected Image getImage() {
-    this.createImage();
-    return this.image;
+    this.setTiles(img, tileSection);
   }
 
-  protected abstract String getCacheKey();
+  private void setTiles(BufferedImage img, Rectangle2D section) {
+    final IMap map = this.getEnvironment().getMap();
+    final Point startTile = MapUtilities.getTile(map, new Point2D.Double(section.getX(), section.getY()));
+    final Point endTile = MapUtilities.getTile(map, new Point2D.Double(section.getMaxX(), section.getMaxY()));
+    final int startX = MathUtilities.clamp(startTile.x, 0, tiles.length - 1);
+    final int startY = MathUtilities.clamp(startTile.y, 0, tiles[0].length - 1);
+
+    final int endX = MathUtilities.clamp(endTile.x, 0, tiles.length - 1);
+    final int endY = MathUtilities.clamp(endTile.y, 0, tiles[0].length - 1);
+
+    for (int x = startX; x < endX; x++) {
+      for (int y = startY; y < endY; y++) {
+        final BufferedImage smallImage = img.getSubimage((x - startX) * map.getTileSize().width, (y - startY) * map.getTileSize().height, map.getTileSize().width, map.getTileSize().height);
+        this.tiles[x][y] = smallImage;
+      }
+    }
+  }
+
+  protected abstract void renderSection(Graphics2D g, Rectangle2D section);
 
   protected IEnvironment getEnvironment() {
     return this.environment;
-  }
-
-  protected void setImage(Image image) {
-    this.image = image;
   }
 }

@@ -57,3 +57,5 @@ cleanup.use_this_for_non_static_method_access_only_if_necessary=false
 cleanup_profile=_gurkenlabs-clean-up
 cleanup_settings_version=2
 eclipse.preferences.version=1
+formatter_profile=_gurkenlabs
+formatter_settings_version=13

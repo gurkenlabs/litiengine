@@ -23,6 +23,7 @@ public class EnvironmentEventTests {
   public void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     this.testEnvironment = new Environment(map);
   }
 

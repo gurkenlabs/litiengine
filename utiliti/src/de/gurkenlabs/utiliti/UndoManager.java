@@ -274,7 +274,7 @@ public class UndoManager {
 
     Game.getEnvironment().reloadFromMap(target.getId());
     if (MapObjectType.get(target.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds2D((MapObject) target, (MapObject) restore));
     }
 
     if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {

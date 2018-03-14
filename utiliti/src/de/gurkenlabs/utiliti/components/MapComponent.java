@@ -376,7 +376,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     layer.addMapObject(mapObject);
     Game.getEnvironment().loadFromMap(mapObject.getId());
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
     }
 
     Game.getScreenManager().getRenderComponent().requestFocus();
@@ -468,7 +468,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Game.getEnvironment().getMap().removeMapObject(mapObject.getId());
     Game.getEnvironment().remove(mapObject.getId());
     if (type == MapObjectType.STATICSHADOW || type == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
     }
 
     if (mapObject.equals(this.getFocusedMapObject())) {
@@ -724,7 +724,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         if (this.environments.containsKey(map.getFileName())) {
           this.environments.remove(map.getFileName());
         }
-        
+
         this.loadEnvironment(map);
         EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
 
@@ -1021,7 +1021,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     Game.getEnvironment().reloadFromMap(transformObject.getId());
     if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(transformObject.getBoundingBox());
     }
 
     EditorScreen.instance().getMapObjectPanel().bind(transformObject);
@@ -1085,7 +1085,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.handleEntityDrag(snappedDeltaX, snappedDeltaY);
 
     if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds2D(this.getSelectedMapObjects()));
     }
   }
 

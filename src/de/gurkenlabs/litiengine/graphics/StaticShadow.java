@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
@@ -101,11 +102,20 @@ public class StaticShadow extends MapArea {
     return "[" + this.getOrigin().toString() + "] -> " + super.toString();
   }
 
+  @Override
+  public Rectangle2D getBoundingBox() {
+    if (this.getArea() == null) {
+      return super.getBoundingBox();
+    }
+
+    return this.getArea().getBounds2D();
+  }
+
   public Area getArea() {
     if (this.getShadowType() == StaticShadowType.NONE) {
       return null;
     }
-    
+
     if (this.area == null) {
       this.createArea();
     }

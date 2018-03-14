@@ -48,7 +48,7 @@ public class EnvironmentTests {
   public void testInitialization() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
-
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     Environment env = new Environment(map);
 
     assertNotNull(env);
@@ -66,6 +66,7 @@ public class EnvironmentTests {
   public void initEnvironment() {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
     this.testEnvironment = new Environment(map);
     this.testEnvironment.init();
   }

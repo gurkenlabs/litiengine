@@ -2,7 +2,9 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
@@ -12,7 +14,7 @@ public class StaticShadowLayer extends ColorLayer {
   }
 
   @Override
-  protected void renderLayer(Graphics2D g) {
+  protected void renderSection(Graphics2D g, Rectangle2D section) {
     final Color colorWithAlpha = this.getColorWithAlpha();
     g.setColor(colorWithAlpha);
 
@@ -21,7 +23,7 @@ public class StaticShadowLayer extends ColorLayer {
     // list of static shadows.
     final Area ar = new Area();
     for (final StaticShadow staticShadow : this.getEnvironment().getStaticShadows()) {
-      if (staticShadow.getShadowType() == StaticShadowType.NONE) {
+      if (!staticShadow.getBoundingBox().intersects(section) || staticShadow.getShadowType() == StaticShadowType.NONE) {
         continue;
       }
 
@@ -29,25 +31,7 @@ public class StaticShadowLayer extends ColorLayer {
       ar.add(staticShadowArea);
     }
 
+    ar.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
     g.fill(ar);
-  }
-
-  @Override
-  protected String getCacheKey() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(this.getColor());
-    sb.append(this.getAlpha());
-
-    for (final StaticShadow shadow : this.getEnvironment().getStaticShadows()) {
-      sb.append(shadow.getShadowType());
-      sb.append(shadow.getLocation());
-      sb.append(shadow.getWidth());
-      sb.append(shadow.getHeight());
-    }
-
-    sb.append(this.getEnvironment().getMap().getSizeInPixels());
-
-    final int key = sb.toString().hashCode();
-    return "staticshadow-" + this.getEnvironment().getMap().getFileName() + "-" + Integer.toString(key);
   }
 }

@@ -90,6 +90,15 @@ public final class MapUtilities {
     return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
+  public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
+    final Point start = getTile(map, box.getX(), box.getY());
+    final Point end = new Point((int) Math.ceil(box.getMaxX() / map.getTileSize().getWidth()), (int) Math.ceil(box.getMaxY() / map.getTileSize().getHeight()));
+    final double tileWidth = map.getTileSize().getWidth();
+    final double tileHeight = map.getTileSize().getHeight();
+
+    return new Rectangle2D.Double(start.x * tileWidth, start.y * map.getTileSize().getHeight(), end.x * tileWidth - start.x * tileWidth, end.y * tileHeight - start.y * tileHeight);
+  }
+
   public static Point getTile(final Point2D mapLocation) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return new Point();
@@ -99,7 +108,11 @@ public final class MapUtilities {
   }
 
   public static Point getTile(final IMap map, final Point2D mapLocation) {
-    return new Point((int) (mapLocation.getX() / map.getTileSize().getWidth()), (int) (mapLocation.getY() / map.getTileSize().getHeight()));
+    return getTile(map, mapLocation.getX(), mapLocation.getY());
+  }
+
+  public static Point getTile(final IMap map, final double x, final double y) {
+    return new Point((int) (x / map.getTileSize().getWidth()), (int) (y / map.getTileSize().getHeight()));
   }
 
   public static Point2D getMapLocation(final IMap map, final Point tileLocation) {

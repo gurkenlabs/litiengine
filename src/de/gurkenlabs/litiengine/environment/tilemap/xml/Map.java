@@ -2,6 +2,8 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -189,8 +191,14 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
   }
 
+  @XmlTransient
   @Override
-  public Dimension getSizeinTiles() {
+  public Rectangle2D getBounds() {
+    return new Rectangle(this.getSizeInPixels());
+  }
+
+  @Override
+  public Dimension getSizeInTiles() {
     return new Dimension(this.width, this.height);
   }
 

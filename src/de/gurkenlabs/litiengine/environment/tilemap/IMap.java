@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
 
@@ -81,7 +82,9 @@ public interface IMap extends ICustomPropertyProvider {
    *
    * @return the sizein tiles
    */
-  public Dimension getSizeinTiles();
+  public Dimension getSizeInTiles();
+  
+  public Rectangle2D getBounds();
 
   /**
    * Gets the tile layers.

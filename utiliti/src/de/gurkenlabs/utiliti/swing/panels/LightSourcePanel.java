@@ -128,28 +128,28 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
       if (getDataSource() != null) {
         getDataSource().setCustomProperty(MapObjectProperty.LIGHT_COLOR, h);
         Game.getEnvironment().reloadFromMap(getDataSource().getId());
-        Game.getEnvironment().getAmbientLight().createImage();
+        Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
       }
     });
 
     spinnerBrightness.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setCustomProperty(MapObjectProperty.LIGHT_ALPHA, spinnerBrightness.getValue().toString());
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setCustomProperty(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setCustomProperty(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setCustomProperty(MapObjectProperty.LIGHT_ACTIVE, Boolean.toString(checkBoxIsActive.isSelected()));
-      Game.getEnvironment().getAmbientLight().createImage();
+      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
   }
 }

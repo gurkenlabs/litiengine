@@ -140,7 +140,7 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
       IMapObject obj = (IMapObject) getDataSource();
       Game.getEnvironment().reloadFromMap(obj.getId());
       if (MapObjectType.get(obj.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.getEnvironment().getAmbientLight().createImage();
+        Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
       }
     }
 
