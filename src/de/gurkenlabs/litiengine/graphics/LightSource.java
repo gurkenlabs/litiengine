@@ -45,6 +45,8 @@ public class LightSource extends Entity implements IRenderable {
   private Shape lightShape;
   private String lightShapeType;
   private int radius;
+  private double focusOffsetX;
+  private double focusOffsetY;
 
   public LightSource(final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();
@@ -65,6 +67,14 @@ public class LightSource extends Entity implements IRenderable {
 
   public Color getColor() {
     return this.color;
+  }
+
+  public double getFocusOffsetX() {
+    return this.focusOffsetX;
+  }
+
+  public double getFocusOffsetY() {
+    return this.focusOffsetY;
   }
 
   public int getIntensity() {
@@ -92,6 +102,14 @@ public class LightSource extends Entity implements IRenderable {
     if (Game.getConfiguration().graphics().renderDynamicShadows()) {
       this.renderShadows(g);
     }
+  }
+
+  public void setFocusOffsetX(double focusOffsetX) {
+    this.focusOffsetX = focusOffsetX;
+  }
+
+  public void setFocusOffsetY(double focusOffsetY) {
+    this.focusOffsetY = focusOffsetY;
   }
 
   public void setColor(final Color result) {

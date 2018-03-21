@@ -34,48 +34,24 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private static final Random RANDOM = new Random();
 
   private final List<Consumer<Emitter>> finishedConsumer;
-
-  /** The activated. */
-  private boolean activated;
-
-  private final boolean activateOnInit;
-
-  /** The activation tick. */
-  private long activationTick;
-
-  /** The alive time. */
-  private long aliveTime;
-
-  private final List<Color> colors;
-
-  /** The last spawn. */
-  private long lastSpawn;
-
-  /** The max particles. */
-  private int maxParticles;
-
-  private int particleMaxTTL;
-
-  private int particleMinTTL;
-
   private final CopyOnWriteArrayList<Particle> particles;
-
+  private final List<Color> colors;
+  
+  private boolean activated;
+  private final boolean activateOnInit;
+  private long activationTick;
+  private long aliveTime;
+  private long lastSpawn;
+  private int maxParticles;
+  private int particleMaxTTL;
+  private int particleMinTTL;
   private int particleUpdateDelay;
-
-  /** The paused. */
   private boolean paused;
-
-  /** The spawn amount. */
   private int spawnAmount;
-
-  /** The spawn rate. */
   private int spawnRate;
-
-  /** The time to live. */
   private int timeToLive;
 
   private IRenderable groundRenderable;
-
   private IRenderable overlayRenderable;
 
   public Emitter() {
@@ -109,14 +85,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
-  /**
-   * Basic constructor for an effect.
-   *
-   * @param originX
-   *          The origin, on the X-axis, of the effect.
-   * @param originY
-   *          The origin, on the Y-axis, of the effect.
-   */
   public Emitter(final double originX, final double originY) {
     this(new Point2D.Double(originX, originY));
   }
@@ -126,9 +94,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.setLocation(origin);
   }
 
-  /**
-   * Activate.
-   */
   public void activate() {
     if (this.activated) {
       return;
@@ -191,7 +156,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   public Point2D getOrigin() {
-    // TODO: implement properly
+    // TODO: implement properly https://github.com/gurkenlabs/litiengine/issues/74
     return this.getLocation();
   }
 

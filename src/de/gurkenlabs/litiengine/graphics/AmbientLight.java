@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.Shape;
@@ -125,8 +126,18 @@ public class AmbientLight extends ColorLayer {
     // color to transparent
     final Shape lightShape = light.getLightShape();
 
+    final double radius = lightShape.getBounds2D().getWidth() > lightShape.getBounds2D().getHeight() ? lightShape.getBounds2D().getWidth() : lightShape.getBounds2D().getHeight();
     final Color[] transColors = new Color[] { light.getColor(), new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), 0) };
-    g.setPaint(new RadialGradientPaint(new Point2D.Double(lightShape.getBounds2D().getCenterX() - section.getX(), lightShape.getBounds2D().getCenterY() - section.getY()), (float) (lightShape.getBounds2D().getWidth() / 2), new float[] { 0.0f, 1.00f }, transColors));
+    final Point2D center = new Point2D.Double(lightShape.getBounds2D().getCenterX() - section.getX(), lightShape.getBounds2D().getCenterY() - section.getY());
+    final Point2D focus = new Point2D.Double(center.getX() + lightShape.getBounds2D().getWidth() * light.getFocusOffsetX(), center.getY() + lightShape.getBounds2D().getHeight() * light.getFocusOffsetY());
+    RadialGradientPaint paint = new RadialGradientPaint(
+        center,
+        (float) (radius / 2d),
+        focus,
+        new float[] { 0.0f, 1.00f },
+        transColors,
+        CycleMethod.NO_CYCLE);
+    g.setPaint(paint);
 
     Shape fillShape;
     if (lightArea != null) {
