@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 import java.awt.Dimension;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
+
 /**
  * The Interface ITileset.
  */
@@ -21,6 +23,8 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
    * @return the image
    */
   public IMapImage getImage();
+  
+  public Spritesheet getSpritesheet();
 
   /**
    * Gets the name.

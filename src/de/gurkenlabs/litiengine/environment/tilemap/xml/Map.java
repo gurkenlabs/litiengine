@@ -48,6 +48,9 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   @XmlAttribute
   private String orientation;
 
+  @XmlTransient
+  private MapOrientation mapOrientation = MapOrientation.UNDEFINED;
+
   /** The renderorder. */
   @XmlAttribute
   private String renderorder;
@@ -133,7 +136,11 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
 
   @Override
   public MapOrientation getOrientation() {
-    return MapOrientation.valueOf(this.orientation.toUpperCase());
+    if (this.mapOrientation == MapOrientation.UNDEFINED) {
+      this.mapOrientation = MapOrientation.valueOf(this.orientation.toUpperCase());
+    }
+
+    return this.mapOrientation;
   }
 
   @Override

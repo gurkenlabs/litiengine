@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.Game;
 
 public final class MapUtilities {
-  private static Map<String, ITileAnimation> animations;
-  private static Map<String, Boolean> hasAnimation;
-  private static Map<String, ITileset> tilesets = new ConcurrentHashMap<>();
+  private static final Map<String, ITileAnimation> animations;
+  private static final Map<String, Boolean> hasAnimation;
+  private static final Map<String, ITileset> tilesets;
 
   static {
     animations = new ConcurrentHashMap<>();
@@ -243,11 +243,6 @@ public final class MapUtilities {
       return null;
     }
 
-    String cacheKey = map.getFileName() + "[" + tile.getGridId() + "]";
-    if (tilesets.containsKey(cacheKey)) {
-      return tilesets.get(cacheKey);
-    }
-
     ITileset match = null;
 
     for (final ITileset tileset : map.getTilesets()) {
@@ -255,10 +250,6 @@ public final class MapUtilities {
         match = tileset;
         break;
       }
-    }
-
-    if (match != null) {
-      tilesets.put(cacheKey, match);
     }
 
     return match;

@@ -20,6 +20,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.graphics.ImageCache;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -78,6 +80,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @XmlTransient
   protected Tileset sourceTileset;
+
+  private transient Spritesheet spriteSheet;
+
+  public Tileset() {
+    ImageCache.SPRITES.onCleared(cache -> this.spriteSheet = null);
+  }
 
   @Override
   public int compareTo(ITileset obj) {
@@ -143,6 +151,22 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
 
     return this.spacing;
+  }
+
+  @Override
+  @XmlTransient
+  public Spritesheet getSpritesheet() {
+    if (this.spriteSheet == null) {
+      this.spriteSheet = Spritesheet.find(this.getImage().getSource());
+      if (this.spriteSheet == null) {
+        this.spriteSheet = Spritesheet.load(this);
+        if (this.spriteSheet == null) {
+          return null;
+        }
+      }
+    }
+
+    return this.spriteSheet;
   }
 
   @Override

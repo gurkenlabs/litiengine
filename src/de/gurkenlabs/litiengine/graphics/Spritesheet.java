@@ -32,11 +32,13 @@ public final class Spritesheet {
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
   private final List<Integer> emptySprites;
+
   private final int hashCode;
   private final BufferedImage image;
   private final String name;
   private final ImageFormat imageFormat;
 
+  private BufferedImage[] sprites;
   private int columns;
   private int rows;
   private int spriteHeight;
@@ -53,10 +55,14 @@ public final class Spritesheet {
 
     this.hashCode = this.getName().hashCode();
     this.updateRowsAndCols();
+    this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
 
     spritesheets.put(this.name.toLowerCase(), this);
 
-    ImageCache.SPRITES.onCleared(cache -> this.emptySprites.clear());
+    ImageCache.SPRITES.onCleared(cache -> {
+      this.emptySprites.clear();
+      this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
+    });
   }
 
   private Spritesheet(final ITileset tileset) {
@@ -236,9 +242,8 @@ public final class Spritesheet {
       return null;
     }
 
-    final String imageCacheKey = this.hashCode + "_" + index;
-    if (ImageCache.SPRITES.containsKey(imageCacheKey)) {
-      return ImageCache.SPRITES.get(imageCacheKey);
+    if (this.sprites[index] != null) {
+      return this.sprites[index];
     }
 
     if (this.getImage() == null) {
@@ -248,14 +253,14 @@ public final class Spritesheet {
 
     final Point position = this.getLocation(index);
     try {
-      final BufferedImage smallImage = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
-      if (ImageProcessing.isEmpty(smallImage)) {
+      final BufferedImage sprite = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
+      if (ImageProcessing.isEmpty(sprite)) {
         emptySprites.add(index);
         return null;
       }
 
-      ImageCache.SPRITES.put(imageCacheKey, smallImage);
-      return smallImage;
+      this.sprites[index] = sprite;
+      return sprite;
     } catch (final RasterFormatException rfe) {
       log.warning("could not read sprite of size [" + this.spriteWidth + "x" + this.spriteHeight + " at position [" + position.x + "," + position.y + "] from sprite'" + this.getName() + "'");
       return null;

@@ -161,12 +161,9 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     }
 
-    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
+    Spritesheet sprite = tileset.getSpritesheet();
     if (sprite == null) {
-      sprite = Spritesheet.load(tileset);
-      if (sprite == null) {
-        return null;
-      }
+      return null;
     }
 
     BufferedImage tileImage = sprite.getSprite(index);
@@ -276,7 +273,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final double offsetX = viewportOffsetX + (startX - startTile.x) * map.getTileSize().width;
     final double offsetY = viewportOffsetY + (startY - startTile.y) * map.getTileSize().height;
 
-    IntStream.range(startX, endX + 1).parallel().forEach(x -> {
+    for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
         ITile tile = layer.getTile(x, y);
         if (tile == null) {
@@ -286,7 +283,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         final Image tileTexture = getTileImage(map, tile);
         RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
       }
-    });
+    }
+    ;
 
     g.setComposite(oldComp);
   }
