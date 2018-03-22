@@ -12,7 +12,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -167,15 +166,20 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
 
     BufferedImage tileImage = sprite.getSprite(index);
-    if (tile.isFlippedDiagonally()) {
-      tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
-      tileImage = ImageProcessing.verticalFlip(tileImage);
-    }
-    if (tile.isFlippedHorizontally()) {
-      tileImage = ImageProcessing.horizontalFlip(tileImage);
-    }
-    if (tile.isFlippedVertically()) {
-      tileImage = ImageProcessing.verticalFlip(tileImage);
+
+    if (tile.isFlipped()) {
+      if (tile.isFlippedDiagonally()) {
+        tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
+        tileImage = ImageProcessing.verticalFlip(tileImage);
+      }
+
+      if (tile.isFlippedHorizontally()) {
+        tileImage = ImageProcessing.horizontalFlip(tileImage);
+      }
+
+      if (tile.isFlippedVertically()) {
+        tileImage = ImageProcessing.verticalFlip(tileImage);
+      }
     }
 
     return tileImage;
@@ -284,7 +288,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
       }
     }
-    ;
 
     g.setComposite(oldComp);
   }

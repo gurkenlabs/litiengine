@@ -14,12 +14,10 @@ import de.gurkenlabs.litiengine.Game;
 public final class MapUtilities {
   private static final Map<String, ITileAnimation> animations;
   private static final Map<String, Boolean> hasAnimation;
-  private static final Map<String, ITileset> tilesets;
 
   static {
     animations = new ConcurrentHashMap<>();
     hasAnimation = new ConcurrentHashMap<>();
-    tilesets = new ConcurrentHashMap<>();
   }
 
   private MapUtilities() {

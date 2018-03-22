@@ -32,5 +32,6 @@ public interface ITile extends ICustomPropertyProvider {
   public boolean isFlippedVertically();
 
   public boolean isFlippedDiagonally();
-
+  
+  public boolean isFlipped();
 }

@@ -54,6 +54,11 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   private transient boolean csv;
 
+  private transient boolean flippedDiagonally;
+  private transient boolean flippedHorizontally;
+  private transient boolean flippedVertically;
+  private transient boolean flipped;
+
   public Tile() {
   }
 
@@ -69,39 +74,40 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
     if (this.csv) {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
+      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
+      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
+      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
     } else {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
+      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
+      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
     }
+
+    this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
 
     this.gidMask = gidBitmask;
     this.gid = (int) tileId;
   }
 
   @Override
+  public boolean isFlippedDiagonally() {
+    return this.flippedDiagonally;
+  }
+
+  @Override
   public boolean isFlippedHorizontally() {
-    if (this.csv) {
-      return (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
-    } else {
-      return (this.gidMask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
-    }
+    return this.flippedHorizontally;
   }
 
   @Override
   public boolean isFlippedVertically() {
-    if (this.csv) {
-      return (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
-    } else {
-      return (this.gidMask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
-    }
+    return this.flippedVertically;
   }
 
   @Override
-  public boolean isFlippedDiagonally() {
-    if (this.csv) {
-      return (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
-    } else {
-      return (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
-    }
+  public boolean isFlipped() {
+    return this.flipped;
   }
 
   @Override
