@@ -6,8 +6,6 @@ import de.gurkenlabs.litiengine.Game;
 public class DebugConfiguration extends ConfigurationGroup {
   private boolean debugEnabled = false;
 
-  private boolean renderAStarInfo = false;
-
   private boolean renderBoundingBoxes = false;
 
   private boolean renderCollisionBoxes = false;
@@ -20,8 +18,6 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   private boolean renderHitBoxes = false;
 
-  private boolean renderPaths = false;
-  
   private boolean showMouseTargetMetric = true;
 
   private boolean showTilesMetric = false;
@@ -35,10 +31,6 @@ public class DebugConfiguration extends ConfigurationGroup {
    */
   public boolean isDebugEnabled() {
     return this.debugEnabled;
-  }
-
-  public boolean isRenderAStarInfo() {
-    return this.renderAStarInfo;
   }
 
   public boolean isRenderDebugMouse() {
@@ -77,25 +69,12 @@ public class DebugConfiguration extends ConfigurationGroup {
     return this.isDebugEnabled() && this.renderHitBoxes;
   }
 
-  /**
-   * Render paths.
-   *
-   * @return true, if successful
-   */
-  public boolean renderPaths() {
-    return this.isDebugEnabled() && this.renderPaths;
-  }
-
   public boolean renderGuiComponentBoundingBoxes() {
     return renderGuiComponentBoundingBoxes;
   }
 
   public void setDebugEnabled(final boolean debugEnabled) {
     this.debugEnabled = Game.isDebug() && debugEnabled;
-  }
-
-  public void setRenderAStarInfo(final boolean renderAStarInfo) {
-    this.renderAStarInfo = renderAStarInfo;
   }
 
   public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {
@@ -116,10 +95,6 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   public void setRenderHitBoxes(final boolean renderHitBoxes) {
     this.renderHitBoxes = renderHitBoxes;
-  }
-
-  public void setRenderPaths(final boolean renderPaths) {
-    this.renderPaths = renderPaths;
   }
 
   public void setShowMouseTargetMetric(final boolean showMouseTargetMetric) {

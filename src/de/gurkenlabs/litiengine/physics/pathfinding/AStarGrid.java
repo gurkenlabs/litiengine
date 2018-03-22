@@ -93,7 +93,7 @@ public class AStarGrid {
     percentY = Math.max(0, Math.min(1, percentY));
 
     final int x = (int) ((this.getGrid().length - 1) * percentX);
-    final int y = (int) (this.getGrid()[0].length * percentY);
+    final int y = (int) ((this.getGrid()[0].length - 1) * percentY);
     return this.getGrid()[x][y];
   }
 
