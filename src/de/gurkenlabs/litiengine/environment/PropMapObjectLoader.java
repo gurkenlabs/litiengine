@@ -124,6 +124,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
         return creature;
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
         log.log(Level.SEVERE, "Could not automatically create prop of type {0} because a matching constructor is missing.", new Object[] { customProp });
+        log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     }
 

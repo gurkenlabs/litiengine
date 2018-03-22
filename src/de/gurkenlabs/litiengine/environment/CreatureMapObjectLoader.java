@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 public class CreatureMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(CreatureMapObjectLoader.class.getName());
   private static final List<Class<? extends Creature>> customCreatureType;
-  
+
   static {
     customCreatureType = new CopyOnWriteArrayList<>();
   }
@@ -109,7 +109,8 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
         creature.setSpritePrefix(spriteSheet);
         return creature;
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-        log.log(Level.SEVERE, "Could not automatically create creature of type {0} because a matching constructor is missing.", new Object[] { customCreature });
+        log.log(Level.WARNING, "Could not automatically create creature of type {0} because a matching constructor is missing.", new Object[] { customCreature });
+        log.log(Level.SEVERE, ex.getMessage(), ex);
       }
     }
     return null;
