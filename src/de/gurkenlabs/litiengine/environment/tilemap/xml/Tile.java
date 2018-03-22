@@ -71,7 +71,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
     // Clear the flags
     long tileId = gidBitmask;
-
+    this.gidMask = gidBitmask;
     if (this.csv) {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
       this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
@@ -85,8 +85,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     }
 
     this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
-
-    this.gidMask = gidBitmask;
     this.gid = (int) tileId;
   }
 
