@@ -12,7 +12,7 @@ public class RenderLoop extends UpdateLoop {
   private static final Logger log = Logger.getLogger(RenderLoop.class.getName());
   private final IRenderComponent component;
   private final List<IRenderable> renderables;
-  
+
   private boolean gameIsRunning = true;
   private int maxFps;
 
@@ -42,7 +42,10 @@ public class RenderLoop extends UpdateLoop {
 
         final long renderTime = (System.nanoTime() - renderStart) / 1000000;
 
-        Thread.sleep(Math.max(0, fpsWait - renderTime));
+        long wait = Math.max(0, fpsWait - renderTime);
+        if (wait != 0) {
+          Thread.sleep(wait);
+        }
       } catch (final InterruptedException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
         Thread.currentThread().interrupt();

@@ -43,7 +43,7 @@ public abstract class UpdateLoop extends Thread implements ILoop {
   }
 
   protected void update() {
-    this.getUpdatables().forEach(updatable -> {
+    for (IUpdateable updatable : this.getUpdatables()) {
       try {
         if (updatable != null) {
           updatable.update();
@@ -51,6 +51,6 @@ public abstract class UpdateLoop extends Thread implements ILoop {
       } catch (final Exception e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
-    });
+    }
   }
 }
