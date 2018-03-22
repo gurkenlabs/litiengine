@@ -172,6 +172,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         }
       }
 
+      // PERFORMANCE HINT: this method call basically takes up all the time required by this method
       this.currentBufferStrategy.show();
     } while (this.currentBufferStrategy.contentsLost());
     

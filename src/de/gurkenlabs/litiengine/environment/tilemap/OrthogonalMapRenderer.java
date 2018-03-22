@@ -157,7 +157,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
           break;
         }
       }
-
     }
 
     Spritesheet sprite = tileset.getSpritesheet();
@@ -166,7 +165,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
 
     BufferedImage tileImage = sprite.getSprite(index);
-
     if (tile.isFlipped()) {
       if (tile.isFlippedDiagonally()) {
         tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));

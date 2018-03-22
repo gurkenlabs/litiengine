@@ -49,6 +49,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @XmlAttribute
   private int order = -1;
 
+  private transient RenderType renderType = RenderType.NONE;
+
   /**
    * Gets the height.
    *
@@ -100,12 +102,18 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @Override
   public RenderType getRenderType() {
-    final String renderTypeProp = this.getCustomProperty(LayerProperty.LAYER_RENDER_TYPE);
-    if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
-      return RenderType.valueOf(renderTypeProp);
+    if (this.renderType != RenderType.NONE) {
+      return this.renderType;
     }
 
-    return RenderType.NORMAL;
+    final String renderTypeProp = this.getCustomProperty(LayerProperty.LAYER_RENDER_TYPE);
+    if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
+      this.renderType = RenderType.valueOf(renderTypeProp);
+    } else {
+      this.renderType = RenderType.NORMAL;
+    }
+
+    return this.renderType;
   }
 
   @Override
