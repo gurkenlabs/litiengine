@@ -7,6 +7,7 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -66,6 +67,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.add(comp);
     this.renderCanvas = comp;
     this.getRenderComponent().addComponentListener(new ResizedEventListener());
+    this.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentMoved(final ComponentEvent evt) {
+        screenLocation = null;
+      }
+    });
 
     this.addWindowStateListener(this);
     this.addWindowFocusListener(this);
@@ -245,11 +252,6 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     public void componentResized(final ComponentEvent evt) {
       resolution = getRenderComponent().getSize();
       ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
-
-    @Override
-    public void componentMoved(final ComponentEvent evt) {
-      screenLocation = null;
     }
   }
 
