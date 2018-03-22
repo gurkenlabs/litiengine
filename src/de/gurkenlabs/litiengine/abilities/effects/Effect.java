@@ -239,9 +239,9 @@ public abstract class Effect implements IEffect {
     }
 
     affectedEntities.removeAll(Collections.singleton(null));
-
+    affectedEntities.sort(this.targetPriorityComparator);
+    
     if (!this.getAbility().isMultiTarget() && !affectedEntities.isEmpty()) {
-      affectedEntities.sort(this.targetPriorityComparator);
       final ICombatEntity target;
       if (this.getAbility().getExecutor().getTarget() != null) {
         target = this.getAbility().getExecutor().getTarget();
