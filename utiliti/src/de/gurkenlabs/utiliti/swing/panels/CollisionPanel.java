@@ -43,11 +43,9 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblHeightFactor = new JLabel(Resources.get("panel_height"));
 
-    this.spinnerWidth = new JSpinner();
-    this.spinnerWidth.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
+    this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
 
-    this.spinnerHeight = new JSpinner();
-    this.spinnerHeight.setModel(new SpinnerNumberModel(0, 0, null, 0.5f));
+    this.spinnerHeight = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
 
     this.comboBoxAlign = new JComboBox<>();
     this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
@@ -96,8 +94,8 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
   @Override
   protected void clearControls() {
     this.chckbxHasCollision.setSelected(false);
-    this.spinnerWidth.setValue(0);
-    this.spinnerHeight.setValue(0);
+    this.spinnerWidth.setValue(0.0);
+    this.spinnerHeight.setValue(0.0);
     this.comboBoxAlign.setSelectedItem(Align.CENTER);
     this.comboBoxAlign.setSelectedItem(Valign.DOWN);
   }
@@ -105,8 +103,8 @@ public class CollisionPanel extends PropertyPanel<IMapObject> {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.chckbxHasCollision.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
-    this.spinnerWidth.setValue(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
-    this.spinnerHeight.setValue(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
+    this.spinnerWidth.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.COLLISIONBOX_WIDTH));
+    this.spinnerHeight.setValue(mapObject.getCustomPropertyDouble(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
     this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)));
     this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)));
