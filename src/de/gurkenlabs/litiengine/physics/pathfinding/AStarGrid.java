@@ -1,16 +1,22 @@
 package de.gurkenlabs.litiengine.physics.pathfinding;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
-public class AStarGrid {
+public class AStarGrid implements IRenderable {
   private boolean allowDiagonalMovementOnCorners;
   private final AStarNode[][] grid;
   private final int nodeSize;
@@ -105,6 +111,42 @@ public class AStarGrid {
     return this.size;
   }
 
+  @Override
+  public void render(Graphics2D g) {
+    final Rectangle2D viewport = Game.getCamera().getViewPort();
+
+    final AStarNode startNode = this.getNode(viewport.getX(), viewport.getY());
+    final AStarNode endNode = this.getNode(viewport.getMaxX(), viewport.getMaxY());
+    final int startX = MathUtilities.clamp(startNode.getGridX(), 0, this.getGrid().length - 1);
+    final int endX = MathUtilities.clamp(endNode.getGridX(), 0, this.getGrid().length - 1);
+    final int startY = MathUtilities.clamp(startNode.getGridY(), 0, this.getGrid()[0].length - 1);
+    final int endY = MathUtilities.clamp(endNode.getGridY(), 0, this.getGrid()[0].length - 1);
+
+    g.setColor(new Color(255, 0, 255, 100));
+    for (int x = startX; x <= endX; x++) {
+      for (int y = startY; y <= endY; y++) {
+        AStarNode node = this.getGrid()[x][y];
+        if (node.isWalkable()) {
+          Game.getRenderEngine().renderShape(g, new Rectangle2D.Double(node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
+          //Game.getRenderEngine().renderOutline(g, node.getBounds());
+        } else {
+          Game.getRenderEngine().renderShape(g, node.getBounds());
+        }
+      }
+    }
+  }
+
+  public AStarNode getNode(final double x, final double y) {
+    int xNode = (int) (x / this.nodeSize);
+    int yNode = (int) (y / this.nodeSize);
+
+    if (xNode >= this.getGrid().length || yNode >= this.getGrid()[0].length) {
+      return null;
+    }
+
+    return this.getNode(xNode, yNode);
+  }
+
   public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
     this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
   }
@@ -118,7 +160,7 @@ public class AStarGrid {
    */
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
-      node.setWalkable(!this.physicsEngine.collides(node.getBounds()));
+      node.setWalkable(!this.physicsEngine.collides(node.getBounds(), CollisionType.STATIC));
     }
   }
 
@@ -148,7 +190,7 @@ public class AStarGrid {
       for (int y = 0; y < gridSizeY; y++) {
         final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
 
-        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds), nodeBounds, x, y, 0);
+        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds, CollisionType.STATIC), nodeBounds, x, y, 0);
       }
     }
   }

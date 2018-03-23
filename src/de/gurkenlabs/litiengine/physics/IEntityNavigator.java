@@ -6,12 +6,13 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 
 /**
  * The Interface IEntityNavigator.
  */
-public interface IEntityNavigator extends IUpdateable {
+public interface IEntityNavigator extends IUpdateable, IRenderable {
   public void cancelNavigation(Predicate<IMobileEntity> predicate);
 
   public IMobileEntity getEntity();

@@ -91,4 +91,9 @@ public class AStarNode {
   public void setWalkable(final boolean walkable) {
     this.walkable = walkable;
   }
+
+  @Override
+  public String toString() {
+    return "[" + this.getGridX() + "," + this.getGridY() + "] - (f:" + this.getfCost() + ", g:" + this.getgCost() + ", h:" + this.gethCost() + ")";
+  }
 }

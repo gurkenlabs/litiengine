@@ -17,6 +17,10 @@ public class AStarPathFinder extends PathFinder {
 
   private final AStarGrid grid;
 
+  public AStarPathFinder(AStarGrid grid) {
+    this.grid = grid;
+  }
+
   public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map) {
     this.grid = new AStarGrid(physicsEngine, map, map.getTileSize().width);
   }
@@ -29,7 +33,7 @@ public class AStarPathFinder extends PathFinder {
   public Path findPath(final IMobileEntity entity, final Point2D target) {
     // if there is no collision between the start and the target return a direct
     // path
-    final Point2D startLocation = new Point2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY());
+    final Point2D startLocation = entity.getCollisionBoxCenter();
     if (!this.intersectsWithAnyCollisionBox(entity, startLocation, target)) {
       return this.findDirectPath(startLocation, target);
     }

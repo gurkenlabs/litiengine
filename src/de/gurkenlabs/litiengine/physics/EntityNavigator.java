@@ -1,5 +1,7 @@
 package de.gurkenlabs.litiengine.physics;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -82,6 +84,16 @@ public class EntityNavigator implements IEntityNavigator {
     if (this.getPathFinder() != null) {
       this.path = this.getPathFinder().findPath(this.entity, target);
     }
+  }
+
+  @Override
+  public void render(Graphics2D g) {
+    if (this.getPath() == null) {
+      return;
+    }
+
+    g.setColor(Color.MAGENTA);
+    Game.getRenderEngine().renderOutline(g, this.getPath().getPath());
   }
 
   @Override
