@@ -72,7 +72,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final JPopupMenu popupMenu;
   private final JMenuItem mntmExportMap;
   private final JMenuItem mntmDeleteMap;
-  
+
   private final JPanel entityPanel;
   private final JPanel panel;
   private final JTextField textField;
@@ -150,7 +150,7 @@ public class MapSelectionPanel extends JSplitPane {
     popupMenu.add(mntmDeleteMap);
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
-    mapScrollPane.setViewportBorder(border);
+    mapScrollPane.setViewportBorder(null);
 
     layerScrollPane = new JScrollPane();
     layerScrollPane.setViewportBorder(null);
@@ -164,7 +164,7 @@ public class MapSelectionPanel extends JSplitPane {
 
     tabPane.addTab(Resources.get("panel_entities"), entityPanel);
     tabPane.add(Resources.get("panel_mapObjectLayers"), layerScrollPane);
-    
+
     panel = new JPanel();
     entityPanel.add(panel, BorderLayout.NORTH);
     panel.setBorder(new LineBorder(UIManager.getColor("Button.shadow")));
@@ -178,14 +178,30 @@ public class MapSelectionPanel extends JSplitPane {
     btnCollape.setIcon(Icons.COLLAPSE);
     panel.add(btnCollape, BorderLayout.WEST);
 
-    textField = new JTextField();
+    textField = new JTextField(Resources.get("panel_entities_search_default"));
     textField.setBorder(new EmptyBorder(0, 5, 0, 0));
     textField.setOpaque(false);
+    textField.setForeground(Color.GRAY);
     textField.addActionListener(e -> search());
     textField.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
+        if (textField.getText() != null && textField.getText().equals(Resources.get("panel_entities_search_default"))) {
+          textField.setText(null);
+          textField.setForeground(Color.BLACK);
+        }
+
         textField.selectAll();
+        super.focusGained(e);
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        if (textField.getText() == null || textField.getText().isEmpty()) {
+          textField.setText(Resources.get("panel_entities_search_default"));
+          textField.setForeground(Color.DARK_GRAY);
+        }
+        super.focusLost(e);
       }
     });
     panel.add(textField, BorderLayout.CENTER);
@@ -271,10 +287,10 @@ public class MapSelectionPanel extends JSplitPane {
     };
     tree.setModel(this.entitiesTreeModel);
     tree.addMouseListener(ml);
-    
+
     tabPane.setIconAt(0, Icons.CUBE);
     tabPane.setIconAt(1, Icons.LAYER);
-    
+
     this.setRightComponent(tabPane);
 
     listObjectLayers = new JCheckBoxList();
@@ -595,7 +611,7 @@ public class MapSelectionPanel extends JSplitPane {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
       this.nodeProps.add(node);
     }
-    
+
     for (Creature creature : Game.getEnvironment().getCreatures()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(creature));
       this.nodeCreatures.add(node);
