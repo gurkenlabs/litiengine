@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.pathfinding;
+package de.gurkenlabs.litiengine.pathfinding.astar;
 
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
@@ -10,6 +10,8 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.pathfinding.Path;
+import de.gurkenlabs.litiengine.pathfinding.PathFinder;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 public class AStarPathFinder extends PathFinder {

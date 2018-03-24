@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.pathfinding;
+package de.gurkenlabs.litiengine.pathfinding.astar;
 
 import java.awt.Color;
 import java.awt.Dimension;
