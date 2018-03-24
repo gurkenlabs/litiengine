@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.geom.Line2D;
@@ -131,13 +132,13 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
-        
+
         screen.render(g);
-        
+
         final Point locationOnScreen = this.getLocationOnScreen();
         final Rectangle rect = new Rectangle(locationOnScreen.x, locationOnScreen.y, this.getWidth(), this.getHeight());
-
-        if (this.cursorImage != null && (Input.mouse().isGrabMouse() || MouseInfo.getPointerInfo() != null && rect.contains(MouseInfo.getPointerInfo().getLocation()))) {
+        final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+        if (this.cursorImage != null && (Input.mouse().isGrabMouse() || pointerInfo != null && rect.contains(pointerInfo.getLocation()))) {
           final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
           RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
         }
@@ -175,7 +176,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
       // PERFORMANCE HINT: this method call basically takes up all the time required by this method
       this.currentBufferStrategy.show();
     } while (this.currentBufferStrategy.contentsLost());
-    
+
     Toolkit.getDefaultToolkit().sync();
     this.frameCount++;
 
