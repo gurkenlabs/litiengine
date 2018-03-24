@@ -12,15 +12,14 @@ public class AStarNode {
   private double gCost;
   private double hCost;
 
-  private final int penalty;
+  private double penalty;
   private AStarNode predecessor;
   private boolean walkable;
 
-  public AStarNode(final boolean walkable, final Rectangle bound, final int gridX, final int gridY, final int penalty) {
+  public AStarNode(final boolean walkable, final Rectangle bound, final int gridX, final int gridY) {
     this.bound = bound;
     this.gridX = gridX;
     this.gridY = gridY;
-    this.penalty = penalty;
     this.walkable = walkable;
   }
 
@@ -34,10 +33,10 @@ public class AStarNode {
     final int dstY = Math.abs(this.getGridY() - target.getGridY());
 
     if (dstX > dstY) {
-      return (DIAGONAL_COST * dstY) + (dstX - dstY);
+      return (DIAGONAL_COST * dstY) + (dstX - dstY) + this.getPenalty();
     }
 
-    return (DIAGONAL_COST * dstX) + (dstY - dstX);
+    return (DIAGONAL_COST * dstX) + (dstY - dstX) + this.getPenalty();
   }
 
   /**
@@ -79,7 +78,7 @@ public class AStarNode {
     return new Point((int) this.getBounds().getCenterX(), (int) this.getBounds().getCenterY());
   }
 
-  public int getPenalty() {
+  public double getPenalty() {
     return this.penalty;
   }
 
@@ -97,6 +96,10 @@ public class AStarNode {
 
   public void setHCost(final double hCost) {
     this.hCost = hCost;
+  }
+
+  public void setPenalty(final double penalty) {
+    this.penalty = penalty;
   }
 
   public void setPredecessor(final AStarNode predecessor) {

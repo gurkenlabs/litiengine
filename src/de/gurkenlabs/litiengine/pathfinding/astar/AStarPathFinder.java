@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.pathfinding.Path;
 import de.gurkenlabs.litiengine.pathfinding.PathFinder;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 
 public class AStarPathFinder extends PathFinder {
 
@@ -22,12 +21,12 @@ public class AStarPathFinder extends PathFinder {
     this.grid = grid;
   }
 
-  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map) {
-    this.grid = new AStarGrid(physicsEngine, map, map.getTileSize().width);
+  public AStarPathFinder(final IMap map) {
+    this.grid = new AStarGrid(map, map.getTileSize().width);
   }
 
-  public AStarPathFinder(final IPhysicsEngine physicsEngine, final IMap map, final int gridNodeSize) {
-    this.grid = new AStarGrid(physicsEngine, map, gridNodeSize);
+  public AStarPathFinder(final IMap map, final int gridNodeSize) {
+    this.grid = new AStarGrid(map, gridNodeSize);
   }
 
   @Override
@@ -40,14 +39,29 @@ public class AStarPathFinder extends PathFinder {
     }
 
     final AStarNode startNode = this.getGrid().getNode(startLocation);
-    final AStarNode targetNode = this.getGrid().getNode(target);
+    AStarNode targetNode = this.getGrid().getNode(target);
     if (startNode.equals(targetNode)) {
       return null;
     }
 
     // simple fallback if the target tile is not walkable.
+    boolean gotoNeighbor = false;
     if (!targetNode.isWalkable()) {
-      return this.findDirectPath(startLocation, target);
+      for (AStarNode neighbor : this.getGrid().getNeighbors(targetNode)) {
+        if (neighbor.isWalkable()) {
+          targetNode = neighbor;
+          gotoNeighbor = true;
+          break;
+        }
+      }
+
+      if (!gotoNeighbor) {
+        return this.findDirectPath(startLocation, target);
+      }
+    }
+
+    if (gotoNeighbor && startNode.equals(targetNode)) {
+      return null;
     }
 
     return this.findAStarPath(startNode, targetNode);

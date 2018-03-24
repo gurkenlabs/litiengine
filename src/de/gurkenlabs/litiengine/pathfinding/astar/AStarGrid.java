@@ -10,23 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.physics.CollisionType;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class AStarGrid implements IRenderable {
+  public static final double PENALTY_STATIC_PROP = 5;
+  public static final double PENALTY_NOT_WALKABLE_NEIGHBOR = 4;
   private final AStarNode[][] grid;
   private final int nodeSize;
-  private final IPhysicsEngine physicsEngine;
   private final Dimension size;
 
   private boolean allowDiagonalMovement = true;
   private boolean allowDiagonalCornersMovement;
 
-  public AStarGrid(final IPhysicsEngine physicsEngine, final IMap map, final int nodeSize) {
-    this.physicsEngine = physicsEngine;
+  public AStarGrid(final IMap map, final int nodeSize) {
     this.size = map.getSizeInPixels();
     this.nodeSize = nodeSize;
     final int gridSizeX = this.size.width / nodeSize;
@@ -69,7 +69,7 @@ public class AStarGrid implements IRenderable {
   }
 
   public List<AStarNode> getNeighbors(final AStarNode node) {
-    final List<AStarNode> neighbors = new ArrayList<>();
+    final List<AStarNode> newNeighbors = new ArrayList<>();
     final int x = node.getGridX();
     final int y = node.getGridY();
 
@@ -78,23 +78,23 @@ public class AStarGrid implements IRenderable {
     final AStarNode left = this.getNode(x - 1, y);
     final AStarNode right = this.getNode(x + 1, y);
 
-    addNode(neighbors, top);
-    addNode(neighbors, bottom);
-    addNode(neighbors, right);
-    addNode(neighbors, left);
+    addNode(newNeighbors, top);
+    addNode(newNeighbors, bottom);
+    addNode(newNeighbors, right);
+    addNode(newNeighbors, left);
 
     if (this.isDiagonalMovementAllowed()) {
       final AStarNode topLeft = this.getNode(x - 1, y - 1);
       final AStarNode topRight = this.getNode(x + 1, y - 1);
       final AStarNode bottomLeft = this.getNode(x - 1, y + 1);
       final AStarNode bottomRight = this.getNode(x + 1, y + 1);
-      this.addDiagonalNode(neighbors, topLeft, top, left);
-      this.addDiagonalNode(neighbors, topRight, top, right);
-      this.addDiagonalNode(neighbors, bottomLeft, bottom, left);
-      this.addDiagonalNode(neighbors, bottomRight, bottom, right);
+      this.addDiagonalNode(newNeighbors, topLeft, top, left);
+      this.addDiagonalNode(newNeighbors, topRight, top, right);
+      this.addDiagonalNode(newNeighbors, bottomLeft, bottom, left);
+      this.addDiagonalNode(newNeighbors, bottomRight, bottom, right);
     }
 
-    return neighbors;
+    return newNeighbors;
   }
 
   public AStarNode getNode(final Point2D point) {
@@ -157,7 +157,7 @@ public class AStarGrid implements IRenderable {
    */
   public void updateWalkable(final Rectangle2D rectangle) {
     for (final AStarNode node : this.getIntersectedNodes(rectangle)) {
-      node.setWalkable(!this.physicsEngine.collides(node.getBounds(), CollisionType.STATIC));
+      node.setWalkable(!Game.getPhysicsEngine().collides(node.getBounds(), CollisionType.STATIC));
     }
   }
 
@@ -186,9 +186,35 @@ public class AStarGrid implements IRenderable {
     for (int x = 0; x < gridSizeX; x++) {
       for (int y = 0; y < gridSizeY; y++) {
         final Rectangle nodeBounds = new Rectangle(x * this.nodeSize, y * this.nodeSize, this.nodeSize, this.nodeSize);
-
-        this.getGrid()[x][y] = new AStarNode(!this.physicsEngine.collides(nodeBounds, CollisionType.STATIC), nodeBounds, x, y, 0);
+        final AStarNode node = new AStarNode(!Game.getPhysicsEngine().collides(nodeBounds, CollisionType.STATIC), nodeBounds, x, y);
+        this.assignPenalty(node);
+        this.getGrid()[x][y] = node;
       }
     }
+  }
+
+  private void assignPenalty(AStarNode node) {
+    if (!Game.getPhysicsEngine().collides(node.getLocation(), CollisionType.ENTITY)) {
+      return;
+    }
+
+    // by default we calculate a penalty for props that cannot be destroyed
+    int penalty = 0;
+    for (Prop prop : Game.getEnvironment().getProps()) {
+      if (!prop.hasCollision() || !prop.isIndestructible() || !prop.getBoundingBox().intersects(node.getBounds())) {
+        continue;
+      }
+
+      penalty += PENALTY_STATIC_PROP;
+    }
+
+    // if neighbors are not walkable, we try to avoid this node
+    for (AStarNode neighbor : this.getNeighbors(node)) {
+      if (!neighbor.isWalkable()) {
+        penalty += PENALTY_NOT_WALKABLE_NEIGHBOR;
+      }
+    }
+
+    node.setPenalty(penalty);
   }
 }
