@@ -17,12 +17,13 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class AStarGrid implements IRenderable {
-  private boolean allowDiagonalMovementOnCorners;
   private final AStarNode[][] grid;
   private final int nodeSize;
   private final IPhysicsEngine physicsEngine;
-
   private final Dimension size;
+
+  private boolean allowDiagonalMovement = true;
+  private boolean allowDiagonalCornersMovement;
 
   public AStarGrid(final IPhysicsEngine physicsEngine, final IMap map, final int nodeSize) {
     this.physicsEngine = physicsEngine;
@@ -34,8 +35,12 @@ public class AStarGrid implements IRenderable {
     this.populateGrid(gridSizeX, gridSizeY);
   }
 
-  public boolean diagonalMovementOnCorners() {
-    return this.allowDiagonalMovementOnCorners;
+  public boolean isDiagonalMovementAllowed() {
+    return this.allowDiagonalMovement;
+  }
+
+  public boolean isDiagonalCornerMovementAllowed() {
+    return this.allowDiagonalCornersMovement;
   }
 
   public AStarNode[][] getGrid() {
@@ -46,8 +51,8 @@ public class AStarGrid implements IRenderable {
     final Point2D start = new Point2D.Double(rectangle.getMinX(), rectangle.getMinY());
     final Point2D end = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
 
-    final AStarNode startNode = this.getNodeFromMapLocation(start);
-    final AStarNode endNode = this.getNodeFromMapLocation(end);
+    final AStarNode startNode = this.getNode(start);
+    final AStarNode endNode = this.getNode(end);
 
     final List<AStarNode> nodes = new ArrayList<>();
     if (startNode == null || endNode == null) {
@@ -63,7 +68,7 @@ public class AStarGrid implements IRenderable {
     return nodes;
   }
 
-  public List<AStarNode> getNeighbours(final AStarNode node) {
+  public List<AStarNode> getNeighbors(final AStarNode node) {
     final List<AStarNode> neighbors = new ArrayList<>();
     final int x = node.getGridX();
     final int y = node.getGridY();
@@ -73,34 +78,38 @@ public class AStarGrid implements IRenderable {
     final AStarNode left = this.getNode(x - 1, y);
     final AStarNode right = this.getNode(x + 1, y);
 
-    // diagonal
-    final AStarNode topLeft = this.getNode(x - 1, y - 1);
-    final AStarNode topRight = this.getNode(x + 1, y - 1);
-    final AStarNode bottomLeft = this.getNode(x - 1, y + 1);
-    final AStarNode bottomRight = this.getNode(x + 1, y + 1);
-
     addNode(neighbors, top);
     addNode(neighbors, bottom);
     addNode(neighbors, right);
     addNode(neighbors, left);
 
-    this.addDiagonalNode(neighbors, topLeft, top, left);
-    this.addDiagonalNode(neighbors, topRight, top, right);
-    this.addDiagonalNode(neighbors, bottomLeft, bottom, left);
-    this.addDiagonalNode(neighbors, bottomRight, bottom, right);
+    if (this.isDiagonalMovementAllowed()) {
+      final AStarNode topLeft = this.getNode(x - 1, y - 1);
+      final AStarNode topRight = this.getNode(x + 1, y - 1);
+      final AStarNode bottomLeft = this.getNode(x - 1, y + 1);
+      final AStarNode bottomRight = this.getNode(x + 1, y + 1);
+      this.addDiagonalNode(neighbors, topLeft, top, left);
+      this.addDiagonalNode(neighbors, topRight, top, right);
+      this.addDiagonalNode(neighbors, bottomLeft, bottom, left);
+      this.addDiagonalNode(neighbors, bottomRight, bottom, right);
+    }
 
     return neighbors;
   }
 
-  public AStarNode getNodeFromMapLocation(final Point2D point) {
-    float percentX = (float) (point.getX() / this.getSize().getWidth());
-    float percentY = (float) (point.getY() / this.getSize().getHeight());
-    percentX = Math.max(0, Math.min(1, percentX));
-    percentY = Math.max(0, Math.min(1, percentY));
+  public AStarNode getNode(final Point2D point) {
+    return this.getNode(point.getX(), point.getY());
+  }
 
-    final int x = (int) ((this.getGrid().length - 1) * percentX);
-    final int y = (int) ((this.getGrid()[0].length - 1) * percentY);
-    return this.getGrid()[x][y];
+  public AStarNode getNode(final double x, final double y) {
+    int xNode = (int) (x / this.nodeSize);
+    int yNode = (int) (y / this.nodeSize);
+
+    if (xNode >= this.getGrid().length || yNode >= this.getGrid()[0].length) {
+      return null;
+    }
+
+    return this.getNode(xNode, yNode);
   }
 
   public int getNodeSize() {
@@ -128,7 +137,6 @@ public class AStarGrid implements IRenderable {
         AStarNode node = this.getGrid()[x][y];
         if (node.isWalkable()) {
           Game.getRenderEngine().renderShape(g, new Rectangle2D.Double(node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
-          //Game.getRenderEngine().renderOutline(g, node.getBounds());
         } else {
           Game.getRenderEngine().renderShape(g, node.getBounds());
         }
@@ -136,19 +144,8 @@ public class AStarGrid implements IRenderable {
     }
   }
 
-  public AStarNode getNode(final double x, final double y) {
-    int xNode = (int) (x / this.nodeSize);
-    int yNode = (int) (y / this.nodeSize);
-
-    if (xNode >= this.getGrid().length || yNode >= this.getGrid()[0].length) {
-      return null;
-    }
-
-    return this.getNode(xNode, yNode);
-  }
-
   public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
-    this.allowDiagonalMovementOnCorners = allowDiagonalMovementOnCorners;
+    this.allowDiagonalMovement = allowDiagonalMovementOnCorners;
   }
 
   /**
@@ -172,7 +169,7 @@ public class AStarGrid implements IRenderable {
 
   private void addDiagonalNode(final List<AStarNode> neighbors, AStarNode node, AStarNode diagonalNeighbor1, AStarNode diagonalNeighbor2) {
     // only add diagonal neighbors when they are not on a corner
-    if (node != null && this.diagonalMovementOnCorners() || node != null && diagonalNeighbor1 != null && diagonalNeighbor1.isWalkable() && diagonalNeighbor2 != null && diagonalNeighbor2.isWalkable()) {
+    if (node != null && this.isDiagonalCornerMovementAllowed() || node != null && diagonalNeighbor1 != null && diagonalNeighbor1.isWalkable() && diagonalNeighbor2 != null && diagonalNeighbor2.isWalkable()) {
       neighbors.add(node);
     }
   }
