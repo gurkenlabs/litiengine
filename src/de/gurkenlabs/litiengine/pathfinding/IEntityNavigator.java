@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.physics;
+package de.gurkenlabs.litiengine.pathfinding;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 
 /**
  * The Interface IEntityNavigator.

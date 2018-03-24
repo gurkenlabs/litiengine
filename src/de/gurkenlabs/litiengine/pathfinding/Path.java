@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.physics;
+package de.gurkenlabs.litiengine.pathfinding;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;

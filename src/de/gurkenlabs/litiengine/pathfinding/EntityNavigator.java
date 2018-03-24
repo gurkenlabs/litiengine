@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.physics;
+package de.gurkenlabs.litiengine.pathfinding;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -11,7 +11,6 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.physics.pathfinding.IPathFinder;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 /**

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.physics.pathfinding;
+package de.gurkenlabs.litiengine.pathfinding;
 
 import java.awt.Point;
 import java.awt.Rectangle;

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.physics.pathfinding;
+package de.gurkenlabs.litiengine.pathfinding;
 
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -10,7 +10,6 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
-import de.gurkenlabs.litiengine.physics.Path;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public abstract class PathFinder implements IPathFinder {

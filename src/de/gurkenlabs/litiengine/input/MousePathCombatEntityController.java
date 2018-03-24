@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.physics.IEntityNavigator;
+import de.gurkenlabs.litiengine.pathfinding.IEntityNavigator;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
 public class MousePathCombatEntityController extends MovementController<Creature> {
