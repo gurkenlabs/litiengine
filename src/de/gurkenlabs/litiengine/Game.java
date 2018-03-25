@@ -35,12 +35,14 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public final class Game {
   public static final String COMMADLINE_ARG_RELEASE = "-release";
+  public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
   protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
 
   private static boolean debug = true;
+  private static boolean noGUIMode = false;
   private static final List<Consumer<String>> startedConsumer;
   private static final List<Predicate<String>> terminatingConsumer;
   private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
@@ -102,8 +104,25 @@ public final class Game {
     debug = allow;
   }
 
+  /**
+   * This flag indicates whether the game should display the {@link ScreenManager} or not.
+   * This can only be set before the game has been initialized with the {@link #init(String...)} method. Afterwards it doesn't have an effect anymore.
+   * If set to true, the {@link ScreenManager#setVisible(boolean)} method won't be set to true and the {@link RenderLoop} won't be started.
+   * Also the {@link Camera} won't be updated.
+   * 
+   * @param noGui
+   *          If set to true, the GUI will be hidden.
+   */
+  public static void hideGUI(boolean noGui) {
+    noGUIMode = noGui;
+  }
+
   public static boolean isDebug() {
     return debug;
+  }
+
+  public static boolean isInNoGUIMode() {
+    return noGUIMode;
   }
 
   public static GameConfiguration getConfiguration() {
@@ -197,14 +216,13 @@ public final class Game {
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
     getLoop().attach(getPhysicsEngine());
+    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
 
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop(scrMgr.getRenderComponent());
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-
-    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
@@ -225,27 +243,29 @@ public final class Game {
       }
     }
 
-    if (getConfiguration().client().showGameMetrics()) {
-      getScreenManager().getRenderComponent().onRendered(g -> getMetrics().render(g));
-    }
-
-    if (getConfiguration().debug().isDebugEnabled()) {
-      getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
-    }
-
-    getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
-
-    getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
-
-    getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
-
-    // init inputs
     Input.init();
-    getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
-    getScreenManager().getRenderComponent().addMouseMotionListener(Input.mouse());
-    getScreenManager().getRenderComponent().addMouseWheelListener(Input.mouse());
 
-    Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
+    if (!isInNoGUIMode()) {
+      if (getConfiguration().client().showGameMetrics()) {
+        getScreenManager().getRenderComponent().onRendered(g -> getMetrics().render(g));
+      }
+
+      if (getConfiguration().debug().isDebugEnabled()) {
+        getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
+      }
+
+      getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
+
+      getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
+      getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
+
+      // init mouse inputs
+      getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
+      getScreenManager().getRenderComponent().addMouseMotionListener(Input.mouse());
+      getScreenManager().getRenderComponent().addMouseWheelListener(Input.mouse());
+
+      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
+    }
   }
 
   public static void load(final String gameResourceFile) {
@@ -346,7 +366,10 @@ public final class Game {
     Input.start();
 
     soundEngine.start();
-    renderLoop.start();
+
+    if (!isInNoGUIMode()) {
+      renderLoop.start();
+    }
 
     for (final Consumer<String> cons : startedConsumer) {
       cons.accept(Game.getInfo().getName());
@@ -367,7 +390,9 @@ public final class Game {
     gameLoop.terminate();
 
     soundEngine.terminate();
-    renderLoop.terminate();
+    if (!isInNoGUIMode()) {
+      renderLoop.terminate();
+    }
 
     System.exit(0);
   }
@@ -377,10 +402,12 @@ public final class Game {
       Game.getLoop().detach(camera);
     }
 
-    Game.getLoop().attach(cam);
     camera = cam;
 
-    getCamera().updateFocus();
+    if (!isInNoGUIMode()) {
+      Game.getLoop().attach(cam);
+      getCamera().updateFocus();
+    }
   }
 
   private static void handleCommandLineArguments(String[] args) {
@@ -390,6 +417,10 @@ public final class Game {
 
     if (ArrayUtilities.containsArgument(args, COMMADLINE_ARG_RELEASE)) {
       allowDebug(false);
+    }
+
+    if (ArrayUtilities.containsArgument(args, COMMADLINE_ARG_NOGUI)) {
+      hideGUI(true);
     }
   }
 }

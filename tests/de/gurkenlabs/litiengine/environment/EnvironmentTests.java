@@ -59,7 +59,7 @@ public class EnvironmentTests {
 
     // necessary because the environment need access to the game loop and other
     // stuff
-    Game.init();
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
   }
 
   @BeforeEach

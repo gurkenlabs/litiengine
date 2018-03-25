@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 public final class SoundEngine implements ISoundEngine, IUpdateable {
-  private static final int DEFAULT_MAX_DISTANCE = 250;
+  private static final int DEFAULT_MAX_DISTANCE = 150;
   private Point2D listenerLocation;
   private Function<Point2D, Point2D> listenerLocationCallback;
   private float maxDist;
