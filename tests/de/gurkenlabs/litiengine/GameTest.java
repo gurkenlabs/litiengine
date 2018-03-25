@@ -10,7 +10,7 @@ public class GameTest {
   @Test
   public void testGameInitialization() {
     try {
-      Game.init();
+      Game.init(Game.COMMADLINE_ARG_NOGUI);
 
       assertNotNull(Game.getRenderLoop());
       assertNotNull(Game.getLoop());

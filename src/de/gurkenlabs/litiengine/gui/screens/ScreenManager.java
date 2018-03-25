@@ -57,31 +57,35 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
 
-    // set default jframe stuff
-    this.setResizable(false);
-    this.setBackground(Color.BLACK);
-    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     final RenderComponent comp = new RenderComponent(Game.getConfiguration().graphics().getResolution());
-    this.add(comp);
     this.renderCanvas = comp;
-    this.getRenderComponent().addComponentListener(new ResizedEventListener());
-    this.addComponentListener(new ComponentAdapter() {
-      @Override
-      public void componentMoved(final ComponentEvent evt) {
-        screenLocation = null;
-      }
-    });
+    if (!Game.isInNoGUIMode()) {
+      // set default jframe stuff
+      this.setResizable(false);
+      this.setBackground(Color.BLACK);
+      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-    this.addWindowStateListener(this);
-    this.addWindowFocusListener(this);
-    this.addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(final WindowEvent event) {
-        // ensures that we terminate the game, when the window is being closed
-        Game.terminate();
-      }
-    });
+      this.add(comp);
+
+      this.getRenderComponent().addComponentListener(new ResizedEventListener());
+      this.addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentMoved(final ComponentEvent evt) {
+          screenLocation = null;
+        }
+      });
+
+      this.addWindowStateListener(this);
+      this.addWindowFocusListener(this);
+      this.addWindowListener(new WindowAdapter() {
+        @Override
+        public void windowClosing(final WindowEvent event) {
+          // ensures that we terminate the game, when the window is being closed
+          Game.terminate();
+        }
+      });
+    }
   }
 
   @Override
@@ -101,6 +105,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void displayScreen(final String screen) {
+
     // if the screen is already displayed or there is no screen with the
     // specified name
     if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
@@ -124,9 +129,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     }
 
     this.currentScreen = targetScreen;
-    this.getCurrentScreen().prepare();
-    this.setVisible(true);
-    Game.getRenderLoop().register(this.getCurrentScreen());
+    if (!Game.isInNoGUIMode()) {
+      this.getCurrentScreen().prepare();
+      this.setVisible(true);
+      Game.getRenderLoop().register(this.getCurrentScreen());
+    }
+    
     this.lastScreenChange = System.currentTimeMillis();
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.getCurrentScreen());
@@ -160,6 +168,12 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
 
   @Override
   public void init(final int width, final int height, final boolean fullscreen) {
+    if (Game.isInNoGUIMode()) {
+      this.resolution = new Dimension(0, 0);
+      this.setVisible(false);
+      return;
+    }
+
     if (fullscreen) {
       this.setUndecorated(true);
       this.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -171,7 +185,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     }
 
     this.getRenderComponent().init();
-    resolution = this.getRenderComponent().getSize();
+    this.resolution = this.getRenderComponent().getSize();
     this.requestFocus();
   }
 

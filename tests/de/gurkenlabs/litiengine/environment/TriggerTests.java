@@ -29,7 +29,7 @@ public class TriggerTests {
 
     IEnvironment env = mock(IEnvironment.class);
     Game.loadEnvironment(env);
-    Game.init();
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
     when(env.get(456)).thenReturn(target);
 
     assertFalse(trigger.isActivated());

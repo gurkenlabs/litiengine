@@ -49,6 +49,7 @@ public class Camera implements ICamera {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
+    this.viewPort = new Rectangle2D.Double(0, 0, 0, 0);
     this.zoom = 1;
   }
 
@@ -228,7 +229,7 @@ public class Camera implements ICamera {
   @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
-    
+
     final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
     this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
