@@ -112,7 +112,7 @@ public class Program {
     initSystemTray();
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
-    Game.init();
+    Game.init(args);
     Game.getInfo().setDefaultRenderScale(1.0f);
     JOptionPane.setDefaultLocale(Locale.getDefault());
 

@@ -21,7 +21,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   private boolean showMouseTargetMetric = true;
 
   private boolean showTilesMetric = false;
-  
+
   private boolean logDetailedRenderTimes = false;
 
   /**
@@ -30,7 +30,7 @@ public class DebugConfiguration extends ConfigurationGroup {
    * @return true, if is debug enabled
    */
   public boolean isDebugEnabled() {
-    return this.debugEnabled;
+    return Game.isDebug() && this.debugEnabled;
   }
 
   public boolean isRenderDebugMouse() {
@@ -74,7 +74,7 @@ public class DebugConfiguration extends ConfigurationGroup {
   }
 
   public void setDebugEnabled(final boolean debugEnabled) {
-    this.debugEnabled = Game.isDebug() && debugEnabled;
+    this.debugEnabled = debugEnabled;
   }
 
   public void setRenderBoundingBoxes(final boolean renderBoundingBoxes) {

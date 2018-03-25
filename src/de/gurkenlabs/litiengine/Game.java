@@ -31,8 +31,11 @@ import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public final class Game {
+  public static final String COMMADLINE_ARG_RELEASE = "-release";
+
   protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
@@ -90,7 +93,7 @@ public final class Game {
    * be set to false for release builds.
    * 
    * The default value here is true and will allow debugging unless explicitly
-   * disabled by calling this method.
+   * disabled by calling this method or providing the command line argument {@link #COMMADLINE_ARG_RELEASE} when running the game.
    * 
    * @param allow
    *          If set to true, the game will be told to allow debugging.
@@ -177,7 +180,13 @@ public final class Game {
     return gameTime;
   }
 
-  public static void init() {
+  public static boolean hasStarted() {
+    return hasStarted;
+  }
+
+  public static void init(String... args) {
+    handleCommandLineArguments(args);
+
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
     for (Consumer<GameConfiguration> cons : configLoadedConsumer) {
@@ -363,10 +372,6 @@ public final class Game {
     System.exit(0);
   }
 
-  public static boolean hasStarted() {
-    return hasStarted;
-  }
-
   public static void setCamera(final ICamera cam) {
     if (getCamera() != null) {
       Game.getLoop().detach(camera);
@@ -376,5 +381,15 @@ public final class Game {
     camera = cam;
 
     getCamera().updateFocus();
+  }
+
+  private static void handleCommandLineArguments(String[] args) {
+    if (args == null || args.length == 0) {
+      return;
+    }
+
+    if (ArrayUtilities.containsArgument(args, COMMADLINE_ARG_RELEASE)) {
+      allowDebug(false);
+    }
   }
 }
