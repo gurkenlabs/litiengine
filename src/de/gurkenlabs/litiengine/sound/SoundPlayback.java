@@ -92,9 +92,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
 
     this.initControls();
     this.initGain();
-
     this.updateControls(this.initialListenerLocation);
-
     this.dataLine.start();
     final byte[] buffer = new byte[1024];
     ByteArrayInputStream str = new ByteArrayInputStream(this.sound.getStreamData());
@@ -246,7 +244,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
       return;
     }
 
-    final Point2D loc = this.entity != null ? this.entity.getLocation() : this.location;
+    final Point2D loc = this.entity != null ? this.entity.getCenter() : this.location;
     if (loc == null) {
       return;
     }
