@@ -37,7 +37,7 @@ public final class Sound {
    * the sound file.
    * 
    * Note that the constructor is private. In order to load files use the static
-   * methods {@link #find(String)} or {@link #load(String)} methods depending on
+   * methods {@link #find(String)} or {@link #get(String)} methods depending on
    * whether you already loaded the sound or not.
    * 
    * @param is
@@ -64,30 +64,6 @@ public final class Sound {
   }
 
   /**
-   * Finds and returns a sound previously loaded by calling the
-   * {@link #load(String)} function.
-   * 
-   * @param name
-   *          The name of the sound to find (no extension needed).
-   * @return The sound that is identified by the specified name, if it was
-   *         previously loaded or null.
-   */
-  public static Sound find(final String name) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-    
-    final String fileName = FileUtilities.getFileName(name);
-    
-    if(!sounds.containsKey(fileName)) {      
-      log.log(Level.SEVERE, "Could not find sound {0} because it was not loaded..", new Object[] { name });
-      return null;
-    }
-
-    return sounds.get(fileName);
-  }
-
-  /**
    * Loads the sound from the specified path and makes it accessible via
    * {@link #find(String)} method.
    * 
@@ -95,7 +71,7 @@ public final class Sound {
    *          The path of the file to be loaded.(Can be relative or absolute)
    * @return The loaded Sound from the specified path.
    */
-  public static Sound load(final String path) {
+  public static Sound get(final String path) {
     String fileName = FileUtilities.getFileName(path);
     Sound sound = sounds.get(fileName);
     if (sound != null) {
