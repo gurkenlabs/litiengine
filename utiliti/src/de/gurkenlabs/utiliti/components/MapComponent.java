@@ -427,8 +427,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     UndoManager.instance().beginOperation();
     try {
       for (MapObject mapObject : this.getSelectedMapObjects()) {
-        UndoManager.instance().mapObjectDeleted(mapObject);
         this.delete(mapObject);
+        UndoManager.instance().mapObjectDeleted(mapObject);
       }
     } finally {
       UndoManager.instance().endOperation();
@@ -451,8 +451,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           continue;
         }
 
-        UndoManager.instance().mapObjectDeleted(deleteObject);
         this.delete(deleteObject);
+        UndoManager.instance().mapObjectDeleted(deleteObject);
       }
     } finally {
       UndoManager.instance().endOperation();

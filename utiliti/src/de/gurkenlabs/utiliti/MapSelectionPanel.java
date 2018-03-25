@@ -66,6 +66,7 @@ public class MapSelectionPanel extends JSplitPane {
   private final JCheckBoxList listObjectLayers;
   private final DefaultListModel<String> model;
   private final DefaultListModel<JCheckBox> layerModel;
+  private int lastSelection;
   private final JScrollPane mapScrollPane;
   private final JScrollPane layerScrollPane;
   private final JScrollPane entityScrollPane;
@@ -297,6 +298,17 @@ public class MapSelectionPanel extends JSplitPane {
     listObjectLayers.setModel(layerModel);
     listObjectLayers.setMaximumSize(new Dimension(0, 250));
     layerScrollPane.setViewportView(listObjectLayers);
+
+    UndoManager.onMapObjectAdded(manager -> {
+      this.populateMapObjectTree();
+      this.initLayerControl();
+    });
+    UndoManager.onMapObjectRemoved(manager -> {
+      this.populateMapObjectTree();
+      this.initLayerControl();
+    });
+    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
+
   }
 
   public synchronized void bind(List<Map> maps) {
@@ -345,9 +357,6 @@ public class MapSelectionPanel extends JSplitPane {
       mapList.setSelectedValue(mapName, true);
     }
 
-    UndoManager.onMapObjectAdded(manager -> this.populateMapObjectTree());
-    UndoManager.onMapObjectRemoved(manager -> this.populateMapObjectTree());
-    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
     this.initLayerControl();
     this.populateMapObjectTree();
   }
@@ -379,9 +388,12 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+    this.lastSelection = listObjectLayers.getSelectedIndex();
     layerModel.clear();
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
-      JCheckBox newBox = new JCheckBox(layer.getName() + " (" + layer.getMapObjects().size() + ")");
+      String layerName = layer.getName();
+      int layerSize = layer.getMapObjects().size();
+      JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
       if (layer.getColor() != null) {
         final String cacheKey = map.getFileName() + layer.getName();
         if (!ImageCache.IMAGES.containsKey(cacheKey)) {
@@ -405,7 +417,7 @@ public class MapSelectionPanel extends JSplitPane {
     int end = mapList.getModel().getSize() - 1;
     if (end >= 0) {
       listObjectLayers.setSelectionInterval(start, end);
-      this.listObjectLayers.setSelectedIndex(0);
+      this.selectLayer(this.lastSelection);
     }
   }
 
