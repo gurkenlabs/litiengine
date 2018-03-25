@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -27,6 +29,12 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
     this.setTurnOnMove(info.turnOnMove());
   }
 
+  protected static float getTickVelocity(IMobileEntity entity) {
+    // pixels per ms multiplied by the passed ms
+    // ensure that entities don't travel too far in case of lag
+    return Math.min(Game.getLoop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity() * Game.getLoop().getTimeScale();
+  }
+
   @Override
   public int getAcceleration() {
     return this.acceleration;
@@ -40,6 +48,11 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
+  }
+
+  @Override
+  public float getTickVelocity() {
+    return getTickVelocity(this);
   }
 
   @Override
@@ -98,5 +111,4 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   public boolean turnOnMove() {
     return this.turnOnMove;
   }
-
 }

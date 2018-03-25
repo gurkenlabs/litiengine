@@ -22,11 +22,18 @@ public interface IMobileEntity extends ICollisionEntity {
   public Point2D getMoveDestination();
 
   /**
-   * Gets the entitie's velocity in PIXEL / Second
+   * Gets the entitie's velocity in PIXEL / Second.
    *
-   * @return the velocity in pixel per second
+   * @return the velocity in pixel per second.
    */
   public float getVelocity();
+
+  /**
+   * Gets the entitie's velocity in PIXEL / tick
+   *
+   * @return The velocity in pixel per tick.
+   */
+  public float getTickVelocity();
 
   public void onMoved(Consumer<IMobileEntity> consumer);
 

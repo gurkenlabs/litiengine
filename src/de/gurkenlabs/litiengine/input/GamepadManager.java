@@ -21,20 +21,18 @@ import net.java.games.input.ControllerEnvironment;
 
 public class GamepadManager implements IGamepadManager {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
-  private int defaultgamePadIndex = -1;
+
   private final List<Consumer<IGamepad>> gamepadAddedConsumer;
   private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
 
   private final Map<String, List<Consumer<Float>>> componentPollConsumer;
-
   private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
-
   private final List<BiConsumer<String, Float>> pollConsumer;
-
   private final List<BiConsumer<String, Float>> pressedConsumer;
 
   private final Thread hotPlugThread;
-
+  
+  private int defaultgamePadIndex = -1;
   private boolean handleHotPluggedControllers;
 
   public GamepadManager() {

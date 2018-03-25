@@ -25,12 +25,9 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
       return;
     }
 
+    final double maxPixelsPerTick = this.getEntity().getTickVelocity();
+
     final long deltaTime = Game.getLoop().getDeltaTime();
-
-    // pixels per ms multiplied by the passed ms
-    // ensure that entities don't travel too far in case of lagg
-    final double maxPixelsPerTick = this.getEntity().getVelocity() / 1000.0 * Math.min(deltaTime, 50);
-
     double accelerationRatio = (double) deltaTime / (double) this.getEntity().getAcceleration();
     double decelerationRatio = (double) deltaTime / (double) this.getEntity().getDeceleration();
 

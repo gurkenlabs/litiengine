@@ -51,6 +51,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.IMovementController;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
@@ -899,7 +900,7 @@ public class Environment implements IEnvironment {
     Game.getRenderEngine().renderMap(g, this.getMap());
     this.informConsumers(g, this.mapRenderedConsumer);
 
-    final long mapRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double mapRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     for (final IRenderable rend : this.getGroundRenderables()) {
@@ -908,27 +909,27 @@ public class Environment implements IEnvironment {
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
 
-    final long groundRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double groundRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     if (Game.getConfiguration().graphics().getGraphicQuality() == Quality.VERYHIGH) {
       Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
     }
 
-    final long lightRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double lightRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
     this.informConsumers(g, this.entitiesRenderedConsumers);
 
-    final long normalRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double normalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
       this.getStaticShadowLayer().render(g);
     }
 
-    final long staticShadowRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double staticShadowRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
@@ -939,14 +940,14 @@ public class Environment implements IEnvironment {
 
     this.informConsumers(g, this.overlayRenderedConsumer);
 
-    final long overlayRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double overlayRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
       this.getAmbientLight().render(g);
     }
 
-    final long ambientLightRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double ambientLightRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.UI).values(), false);
@@ -954,7 +955,7 @@ public class Environment implements IEnvironment {
       rend.render(g);
     }
 
-    final long uiRenderTime = (System.nanoTime() - renderStart) / 1000000;
+    final double uiRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
     if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
       log.log(Level.INFO, "render details:\n 1. map:{0}ms\n 2. ground:{1}ms\n 3. light:{2}ms\n 4. entities({8}):{3}ms\n 5. shadows:{4}ms\n 6. overlay({9} + {10}):{5}ms\n 7. ambientLight:{6}ms\n 8. ui:{7}ms",
@@ -1092,8 +1093,8 @@ public class Environment implements IEnvironment {
     if (controller != null) {
       Game.getLoop().attach(controller);
     }
-    
-    if(entity instanceof LightSource || entity instanceof StaticShadow) {
+
+    if (entity instanceof LightSource || entity instanceof StaticShadow) {
       this.updateColorLayers(entity);
     }
   }

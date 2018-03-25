@@ -25,6 +25,10 @@ public final class TimeUtilities {
   private TimeUtilities() {
   }
 
+  public static double nanoToMs(final long nano) {
+    return nano / 1000000.0;
+  }
+
   public static long getDays(final long ms) {
     return TimeUnit.MILLISECONDS.toDays(ms);
   }

@@ -74,15 +74,18 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
-  public void navigate(final Path2D path) {
+  public boolean navigate(final Path2D path) {
     this.path = new Path(path);
+    return this.path != null;
   }
 
   @Override
-  public void navigate(final Point2D target) {
+  public boolean navigate(final Point2D target) {
     if (this.getPathFinder() != null) {
       this.path = this.getPathFinder().findPath(this.entity, target);
     }
+
+    return this.path != null;
   }
 
   @Override
@@ -159,7 +162,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    final float pixelsPerTick = Game.getLoop().getDeltaTime() * 0.001f * this.entity.getVelocity() * Game.getLoop().getTimeScale();
+    final float pixelsPerTick = this.entity.getTickVelocity();
     Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }

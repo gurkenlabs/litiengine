@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.graphics.IRenderComponent;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 public class RenderLoop extends UpdateLoop {
   private static final Logger log = Logger.getLogger(RenderLoop.class.getName());
@@ -40,7 +41,7 @@ public class RenderLoop extends UpdateLoop {
           this.component.render(render);
         }
 
-        final long renderTime = (System.nanoTime() - renderStart) / 1000000;
+        final long renderTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
         long wait = Math.max(0, fpsWait - renderTime);
         if (wait != 0) {

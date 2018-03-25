@@ -86,6 +86,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
+  public float getTickVelocity() {
+    return MobileEntity.getTickVelocity(this);
+  }
+
+  @Override
   public float getVelocity() {
     return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
   }

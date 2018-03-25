@@ -13,6 +13,6 @@ public final class Stopwatch {
   public static void trackInConsole(final String name, final Consumer<Long> consumer) {
     final long current = System.nanoTime();
     consumer.accept(current);
-    log.log(Level.INFO, "{0} took: {1} ms", new Object[] { name, (System.nanoTime() - current) / 1000000.0 });
+    log.log(Level.INFO, "{0} took: {1} ms", new Object[] { name, TimeUtilities.nanoToMs(System.nanoTime() - current) });
   }
 }

@@ -7,7 +7,19 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.util.TimeUtilities;
+
 public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
+  /**
+   * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
+   * <ul>
+   *  <li>16.6 ms -> 60 FPS</li>
+   *  <li>33.3 ms -> 30 FPS</li>
+   *  <li>66.6 ms -> 15 FPS</li>
+   * </ul>
+   */
+  public static final int TICK_DELTATIME_LAG = 67;
+
   private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private static int executionIndex = -1;
 
@@ -119,7 +131,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
       this.trackUpdateRate(currentMillis);
 
       final long lastUpdateTime = currentMillis;
-      final long updateTime = (System.nanoTime() - updateStart) / 1000000;
+      final long updateTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - updateStart);
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {

@@ -100,7 +100,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
         this.getEntity().setLocation(entityLocation);
       } else {
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final boolean success = Game.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength());
+        final boolean success = Game.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength() * Game.getLoop().getTimeScale());
         if (force.cancelOnCollision() && !success) {
           force.end();
         }
