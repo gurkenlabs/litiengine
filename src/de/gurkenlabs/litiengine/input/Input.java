@@ -8,14 +8,17 @@ import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
 public final class Input {
+  // we need an own update loop because otherwise input won't work if the game has
+  // been paused
+  private static final IGameLoop InputLoop;
   private static IGamepadManager gamePadManager;
   private static List<IGamepad> gamePads;
   private static IKeyboard keyboard;
   private static IMouse mouse;
 
-  // we need an own gameloop because otherwise input won't work if the game has
-  // been paused
-  protected static final GameLoop InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
+  static {
+    InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
+  }
 
   private Input() {
   }

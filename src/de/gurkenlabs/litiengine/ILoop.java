@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine;
 
-public interface ILoop {
+public interface ILoop extends ILaunchable {
   /**
    * Attaches the update method of the specified IUpdatable instance to be called
    * every tick. The tick rate can be configured in the client configuration and

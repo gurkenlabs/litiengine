@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine;
 
 import java.util.function.Consumer;
 
-public interface IGameLoop extends ILoop, ILaunchable {
+public interface IGameLoop extends ILoop {
 
   public long convertToMs(final long ticks);
 

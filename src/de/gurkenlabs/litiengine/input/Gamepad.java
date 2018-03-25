@@ -41,7 +41,7 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     this.index = index;
     this.controller = controller;
-    Input.InputLoop.attach(this);
+    Input.getLoop().attach(this);
   }
 
   @Override
@@ -150,7 +150,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   private void dispose() {
-    Input.InputLoop.detach(this);
+    Input.getLoop().detach(this);
     this.componentPollConsumer.clear();
     this.componentPressedConsumer.clear();
     Input.gamepadManager().remove(this);

@@ -55,7 +55,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers = new CopyOnWriteArrayList<>();
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
-    Input.InputLoop.attach(this);
+    Input.getLoop().attach(this);
   }
 
   @Override
