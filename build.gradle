@@ -52,6 +52,7 @@ dependencies {
   }
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
+  
   testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.+'
   testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.+'
   testCompile 'org.mockito:mockito-core:2.+'
@@ -72,7 +73,6 @@ jar {
   exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
-
 }
 
 javadoc {
@@ -94,20 +94,13 @@ afterEvaluate {
 
     reports {
       xml.enabled true
-      xml.destination file("${buildDir}/jacoco/report.xml")
       html.enabled true
+      xml.destination file("${buildDir}/jacoco/report.xml")
       html.destination file("${buildDir}/jacoco/html")
     }
   }
 
-  check.dependsOn jacocoJupTestReport
-}
-
-jacocoTestReport {
-  reports {
-    xml.enabled true
-    html.enabled true
-  }
+  fullbuild.dependsOn jacocoJupTestReport
 }
 
 task createJavadocs(type: Javadoc) {
@@ -118,30 +111,30 @@ task createJavadocs(type: Javadoc) {
 }
 
 task distZip(type: Zip) {
-   group 'build'
-   from 'build/libs/'
-   include '*'
-   archiveName archivesBaseName + '-' + version + '.zip'
-   exclude archiveName
-   destinationDir(file('build/libs/'))
+  group 'build'
+  from 'build/libs/'
+  include '*'
+  archiveName archivesBaseName + '-' + version + '.zip'
+  exclude archiveName
+  destinationDir(file('build/libs/'))
 }
 
 task fullbuild{
   group 'build'
-  description 'executes the build including unit tests, coverage reports and javadoc'
+  description 'executes the build including coverage reports and javadoc'
   dependsOn createJavadocs
 }
 
-fullbuild.dependsOn jacocoTestReport
-fullbuild.dependsOn distZip
-build.dependsOn includeNatives
-
-task copyNativeLibs(type: Copy) { 
+task copyLicense(type: Copy) { 
   from(new File('.')) { include 'LICENSE' }
   into new File(buildDir, 'libs')
 }
 
+fullbuild.dependsOn distZip
+fullbuild.dependsOn includeNatives
+build.dependsOn includeNatives
+includeNatives.dependsOn copyLicense
+
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    dependsOn copyNativeLibs
+  options.encoding = 'UTF-8'
 }
