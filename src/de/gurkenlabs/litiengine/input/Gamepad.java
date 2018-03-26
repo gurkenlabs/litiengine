@@ -15,6 +15,8 @@ import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
 public class Gamepad implements IGamepad, IUpdateable {
+  public static final float AXIS_DEAD_ZONE = 0.3f;
+  public static final float TRIGGER_DEAD_ZONE = 0.1f;
 
   private static final Map<String, Identifier> components = new HashMap<>();
 
@@ -23,20 +25,23 @@ public class Gamepad implements IGamepad, IUpdateable {
   private final int index;
 
   private final Map<String, List<Consumer<Float>>> componentPollConsumer;
-
   private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
+  private final Map<String, List<Consumer<Float>>> componentReleasedConsumer;
 
   private final List<BiConsumer<String, Float>> pollConsumer;
-
   private final List<BiConsumer<String, Float>> pressedConsumer;
+  private final List<BiConsumer<String, Float>> releasedConsumer;
 
   private final List<String> pressedComponents;
 
   protected Gamepad(final int index, final Controller controller) {
     this.componentPollConsumer = new ConcurrentHashMap<>();
     this.componentPressedConsumer = new ConcurrentHashMap<>();
+    this.componentReleasedConsumer = new ConcurrentHashMap<>();
     this.pollConsumer = new CopyOnWriteArrayList<>();
     this.pressedConsumer = new CopyOnWriteArrayList<>();
+    this.releasedConsumer = new CopyOnWriteArrayList<>();
+
     this.pressedComponents = new CopyOnWriteArrayList<>();
 
     this.index = index;
@@ -70,11 +75,6 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   @Override
-  public void onPressed(final String identifier, final Consumer<Float> consumer) {
-    GamepadManager.addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
-  }
-
-  @Override
   public void onPoll(BiConsumer<String, Float> consumer) {
     if (this.pollConsumer.contains(consumer)) {
       return;
@@ -84,12 +84,31 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   @Override
+  public void onPressed(final String identifier, final Consumer<Float> consumer) {
+    GamepadManager.addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
+  }
+
+  @Override
   public void onPressed(BiConsumer<String, Float> consumer) {
     if (this.pressedConsumer.contains(consumer)) {
       return;
     }
 
     this.pressedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onReleased(String identifier, Consumer<Float> consumer) {
+    GamepadManager.addComponentConsumer(this.componentReleasedConsumer, identifier, consumer);
+  }
+
+  @Override
+  public void onReleased(BiConsumer<String, Float> consumer) {
+    if (this.releasedConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.releasedConsumer.add(consumer);
   }
 
   @Override
@@ -105,39 +124,43 @@ public class Gamepad implements IGamepad, IUpdateable {
     }
 
     for (Component comp : this.controller.getComponents()) {
-      if (Math.abs(comp.getPollData()) > 0.1) {
-        for (final BiConsumer<String, Float> cons : this.pressedConsumer) {
-          cons.accept(comp.getIdentifier().getName(), event.getValue());
-        }
 
-        if (!this.pressedComponents.contains(comp.getIdentifier().getName())) {
-          this.pressedComponents.add(comp.getIdentifier().getName());
-        }
+      if (Math.abs(comp.getPollData()) > getDeadZone(comp.getIdentifier())) {
+        this.handlePressed(comp);
       } else {
-        if (this.pressedComponents.contains(comp.getIdentifier().getName())) {
-          this.handleRelease(comp);
-          this.pressedComponents.remove(comp.getIdentifier().getName());
-        }
+        this.handleRelease(comp);
+      }
+    }
+  }
+
+  private void handlePressed(Component comp) {
+    final String name = comp.getIdentifier().getName();
+    for (final BiConsumer<String, Float> cons : this.pressedConsumer) {
+      cons.accept(name, comp.getPollData());
+    }
+
+    if (this.componentPressedConsumer.containsKey(name)) {
+      for (Consumer<Float> cons : this.componentPressedConsumer.get(name)) {
+        cons.accept(comp.getPollData());
       }
     }
 
-    // TODO: implement release
-    for (final Map.Entry<String, List<Consumer<Float>>> consumers : this.componentPressedConsumer.entrySet()) {
-      final Identifier ident = get(consumers.getKey());
-      if (ident == null) {
-        continue;
-      }
-
-      final Component comp = this.controller.getComponent(ident);
-      if (comp != null && comp.getPollData() != 0) {
-
-        for (final Consumer<Float> cons : this.componentPressedConsumer.get(consumers.getKey())) {
-          if (cons != null) {
-            cons.accept(comp.getPollData());
-          }
-        }
-      }
+    if (!this.pressedComponents.contains(name)) {
+      this.pressedComponents.add(name);
     }
+  }
+
+  private static float getDeadZone(final Identifier ident) {
+    if (ident.getName().equals(Axis.X)
+        || ident.getName().equals(Axis.Y)) {
+      return AXIS_DEAD_ZONE;
+    }
+
+    if (ident.getName().equals(Axis.Z)) {
+      return TRIGGER_DEAD_ZONE;
+    }
+
+    return 0;
   }
 
   private static final String addComponent(final Identifier identifier) {
@@ -145,7 +168,7 @@ public class Gamepad implements IGamepad, IUpdateable {
     return identifier.getName();
   }
 
-  private static final Identifier get(final String name) {
+  protected static final Identifier get(final String name) {
     return components.get(name);
   }
 
@@ -171,11 +194,18 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   private void handleRelease(Component comp) {
-    for (final BiConsumer<String, Float> cons : this.pollConsumer) {
-      cons.accept(comp.getIdentifier().getName(), comp.getPollData());
+    final String name = comp.getIdentifier().getName();
+    if (!this.pressedComponents.contains(name)) {
+      return;
     }
 
-    final List<Consumer<Float>> consumers = this.componentPollConsumer.get(comp.getIdentifier().getName());
+    this.pressedComponents.remove(name);
+
+    for (final BiConsumer<String, Float> cons : this.releasedConsumer) {
+      cons.accept(name, comp.getPollData());
+    }
+
+    final List<Consumer<Float>> consumers = this.componentReleasedConsumer.get(comp.getIdentifier().getName());
     if (consumers != null) {
       for (final Consumer<Float> cons : consumers) {
         cons.accept(comp.getPollData());

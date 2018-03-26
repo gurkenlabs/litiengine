@@ -27,11 +27,13 @@ public class GamepadManager implements IGamepadManager {
 
   private final Map<String, List<Consumer<Float>>> componentPollConsumer;
   private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
+  private final Map<String, List<Consumer<Float>>> componentReleasedConsumer;
   private final List<BiConsumer<String, Float>> pollConsumer;
   private final List<BiConsumer<String, Float>> pressedConsumer;
+  private final List<BiConsumer<String, Float>> releasedConsumer;
 
   private final Thread hotPlugThread;
-  
+
   private int defaultgamePadIndex = -1;
   private boolean handleHotPluggedControllers;
 
@@ -40,8 +42,10 @@ public class GamepadManager implements IGamepadManager {
     this.gamepadAddedConsumer = new CopyOnWriteArrayList<>();
     this.componentPollConsumer = new ConcurrentHashMap<>();
     this.componentPressedConsumer = new ConcurrentHashMap<>();
+    this.componentReleasedConsumer = new ConcurrentHashMap<>();
     this.pollConsumer = new CopyOnWriteArrayList<>();
     this.pressedConsumer = new CopyOnWriteArrayList<>();
+    this.releasedConsumer = new CopyOnWriteArrayList<>();
 
     this.hotPlugThread = new Thread(() -> {
       while (true) {
@@ -96,11 +100,6 @@ public class GamepadManager implements IGamepadManager {
   }
 
   @Override
-  public void onPressed(final String identifier, final Consumer<Float> consumer) {
-    addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
-  }
-
-  @Override
   public void onPoll(BiConsumer<String, Float> consumer) {
     if (this.pollConsumer.contains(consumer)) {
       return;
@@ -110,12 +109,31 @@ public class GamepadManager implements IGamepadManager {
   }
 
   @Override
+  public void onPressed(final String identifier, final Consumer<Float> consumer) {
+    addComponentConsumer(this.componentPressedConsumer, identifier, consumer);
+  }
+
+  @Override
   public void onPressed(BiConsumer<String, Float> consumer) {
     if (this.pressedConsumer.contains(consumer)) {
       return;
     }
 
     this.pressedConsumer.add(consumer);
+  }
+
+  @Override
+  public void onReleased(String identifier, Consumer<Float> consumer) {
+    addComponentConsumer(this.componentReleasedConsumer, identifier, consumer);
+  }
+
+  @Override
+  public void onReleased(BiConsumer<String, Float> consumer) {
+    if (this.releasedConsumer.contains(consumer)) {
+      return;
+    }
+
+    this.releasedConsumer.add(consumer);
   }
 
   @Override
@@ -202,12 +220,22 @@ public class GamepadManager implements IGamepadManager {
       }
     }
 
+    for (final Map.Entry<String, List<Consumer<Float>>> entry : this.componentReleasedConsumer.entrySet()) {
+      for (final Consumer<Float> cons : entry.getValue()) {
+        pad.onReleased(entry.getKey(), cons);
+      }
+    }
+
     for (final BiConsumer<String, Float> consumer : this.pollConsumer) {
       pad.onPoll(consumer);
     }
 
     for (final BiConsumer<String, Float> consumer : this.pressedConsumer) {
       pad.onPressed(consumer);
+    }
+
+    for (final BiConsumer<String, Float> consumer : this.releasedConsumer) {
+      pad.onReleased(consumer);
     }
   }
 
