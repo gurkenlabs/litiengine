@@ -37,8 +37,7 @@ public final class Sound {
    * the sound file.
    * 
    * Note that the constructor is private. In order to load files use the static
-   * methods {@link #find(String)} or {@link #get(String)} methods depending on
-   * whether you already loaded the sound or not.
+   * {@link #get(String)} method.
    * 
    * @param is
    *          The input stream to load the sound from.
@@ -64,8 +63,7 @@ public final class Sound {
   }
 
   /**
-   * Loads the sound from the specified path and makes it accessible via
-   * {@link #find(String)} method.
+   * Loads the sound from the specified path and returns it.
    * 
    * @param path
    *          The path of the file to be loaded.(Can be relative or absolute)

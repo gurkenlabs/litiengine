@@ -139,10 +139,11 @@ public final class Resources {
    * Get a list of strings from the specified raw text files. Strings are
    * separated by a new line. <br>
    * <b>This method is not cached. Ever call will open up a new
-   * {@link InputStream} to read the strings from the textfile.</b>
+   * {@link InputStream} to read the strings from the text file.</b>
    * 
    * @param textFile
-   * @return A list with all strings that are contained by the textfile.
+   *          The text file that will be retrieved.
+   * @return A list with all strings that are contained by the text file.
    */
   public static String[] getStringList(String textFile) {
     if (textFile == null || textFile.isEmpty()) {

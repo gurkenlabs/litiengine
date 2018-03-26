@@ -13,9 +13,9 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
    * <ul>
-   *  <li>16.6 ms -> 60 FPS</li>
-   *  <li>33.3 ms -> 30 FPS</li>
-   *  <li>66.6 ms -> 15 FPS</li>
+   *  <li>16.6 ms: 60 FPS</li>
+   *  <li>33.3 ms: 30 FPS</li>
+   *  <li>66.6 ms: 15 FPS</li>
    * </ul>
    */
   public static final int TICK_DELTATIME_LAG = 67;
