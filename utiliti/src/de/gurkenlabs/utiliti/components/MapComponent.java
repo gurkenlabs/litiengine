@@ -702,6 +702,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         this.getMaps().add(map);
+        Collections.sort(this.getMaps());
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
@@ -725,9 +726,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           this.environments.remove(map.getFileName());
         }
 
-        this.loadEnvironment(map);
         EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
-
+        this.loadEnvironment(map);
         log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
     });
