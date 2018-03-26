@@ -9,9 +9,6 @@ jdk:
 sudo: false
 install: true
 addons:
-  apt:
-    packages:
-      - oracle-java8-installer
   sonarcloud:
     organization: "gurkenlabs-github"
     token:
