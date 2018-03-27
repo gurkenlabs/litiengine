@@ -41,7 +41,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void add(IEntity entity);
 
   public void addToGround(IRenderable renderable);
+
   public void addToOverlay(IRenderable renderable);
+
   public void addToUI(IRenderable renderable);
 
   public void clear();
@@ -66,7 +68,11 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IEntity get(final int mapId);
 
+  public <T extends IEntity> T get(Class<T> clss, final int mapId);
+
   public IEntity get(final String name);
+
+  public <T extends IEntity> T get(Class<T> clss, final String name);
 
   public Collection<IEntity> getByTag(final String tag);
 
@@ -169,7 +175,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public Collection<IRenderable> getOverlayRenderables();
 
   public Collection<IRenderable> getGroundRenderables();
-  
+
   public Collection<IRenderable> getUIRenderables();
 
   public boolean isLoaded();
@@ -187,7 +193,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onInitialized(final Consumer<IEnvironment> consumer);
 
   public void onLoaded(final Consumer<IEnvironment> consumer);
-  
+
   public void onUnloaded(final Consumer<IEnvironment> consumer);
 
   public void onCleared(final Consumer<IEnvironment> consumer);

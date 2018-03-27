@@ -46,6 +46,24 @@ public final class Resources {
     encoding = newEncoding;
   }
 
+  public static boolean contains(final String key) {
+    return contains(DEFAULT_BUNDLE, key);
+  }
+
+  public static boolean contains(final String bundleName, final String key) {
+    try {
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().client().getLocale());
+      return defaultBundle.containsKey(key);
+    } catch (final MissingResourceException me) {
+      final StringWriter sw = new StringWriter();
+      me.printStackTrace(new PrintWriter(sw));
+      final String stacktrace = sw.toString();
+      log.severe(stacktrace);
+    }
+
+    return false;
+  }
+
   public static String get(final String key) {
     if (key == null) {
       return null;

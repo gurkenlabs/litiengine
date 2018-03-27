@@ -112,6 +112,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     app.setFont(font);
     return new SpeechBubble(entity, text, typeSound, app);
   }
+  
+  public static boolean isActive(final IEntity entity) {
+    return activeSpeechBubbles.containsKey(entity);
+  }
 
   public IEntity getEntity() {
     return this.entity;

@@ -381,6 +381,16 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public <T extends IEntity> T get(Class<T> clss, int mapId) {
+    IEntity ent = this.get(mapId);
+    if (ent == null || !clss.isInstance(ent)) {
+      return null;
+    }
+
+    return (T) ent;
+  }
+
+  @Override
   public IEntity get(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -395,6 +405,16 @@ public class Environment implements IEnvironment {
     }
 
     return null;
+  }
+
+  @Override
+  public <T extends IEntity> T get(Class<T> clss, String name) {
+    IEntity ent = this.get(name);
+    if (ent == null || !clss.isInstance(ent)) {
+      return null;
+    }
+
+    return (T) ent;
   }
 
   @Override
