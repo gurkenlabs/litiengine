@@ -1,17 +1,15 @@
-package de.gurkenlabs.litiengine.physics.pathfinding;
+package de.gurkenlabs.litiengine.util.geom;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.geom.PointDistanceComparator;
 
-public class PathFindingTests {
+public class PointDistanceComparatorTests {
 
   @Test
   public void testPointDistanceComparator() {
@@ -38,24 +36,5 @@ public class PathFindingTests {
     final Point2D relativePoint3 = new Point2D.Double(2.4, 2.4);
     Arrays.sort(points, new PointDistanceComparator(relativePoint3));
     assertArrayEquals(new Point2D[] { point2, point3, point1, point4 }, points);
-  }
-
-  @Test
-  public void testRaycast() {
-
-    final Rectangle2D rect = new Rectangle2D.Double(1, 1, 3, 2);
-
-    final Point2D relativePoint = new Point2D.Double(0, 0);
-    final Point2D[] possiblePoints = GeometricUtilities.rayCastPoints(relativePoint, rect);
-    final Point2D expected1 = new Point2D.Double(1, 1);
-    final Point2D expected2 = new Point2D.Double(1, 3);
-    final Point2D expected3 = new Point2D.Double(4, 1);
-    assertArrayEquals(new Point2D[] { expected1, expected2, expected3 }, possiblePoints);
-
-    final Point2D relativePoint2 = new Point2D.Double(2, 0);
-    final Point2D[] possiblePoint2 = GeometricUtilities.rayCastPoints(relativePoint2, rect);
-    final Point2D expected4 = new Point2D.Double(1, 1);
-    final Point2D expected5 = new Point2D.Double(4, 1);
-    assertArrayEquals(new Point2D[] { expected4, expected5 }, possiblePoint2);
   }
 }

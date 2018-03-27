@@ -11,7 +11,6 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -26,8 +25,12 @@ public class AStarGrid implements IRenderable {
   private boolean allowDiagonalMovement = true;
   private boolean allowDiagonalCornersMovement;
 
-  public AStarGrid(final IMap map, final int nodeSize) {
-    this.size = map.getSizeInPixels();
+  public AStarGrid(int width, int height, final int nodeSize) {
+    this(new Dimension(width, height), nodeSize);
+  }
+
+  public AStarGrid(final Dimension size, final int nodeSize) {
+    this.size = size;
     this.nodeSize = nodeSize;
     final int gridSizeX = this.size.width / nodeSize;
     final int gridSizeY = this.size.height / nodeSize;

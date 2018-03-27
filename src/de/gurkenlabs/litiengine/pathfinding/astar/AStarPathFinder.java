@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.pathfinding.astar;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
@@ -21,12 +22,16 @@ public class AStarPathFinder extends PathFinder {
     this.grid = grid;
   }
 
-  public AStarPathFinder(final IMap map) {
-    this.grid = new AStarGrid(map, map.getTileSize().width);
+  public AStarPathFinder(Dimension size, int gridNodeSize) {
+    this.grid = new AStarGrid(size, gridNodeSize);
   }
 
   public AStarPathFinder(final IMap map, final int gridNodeSize) {
-    this.grid = new AStarGrid(map, gridNodeSize);
+    this(map.getSizeInPixels(), gridNodeSize);
+  }
+
+  public AStarPathFinder(final IMap map) {
+    this(map.getSizeInPixels(), map.getTileSize().width);
   }
 
   @Override
