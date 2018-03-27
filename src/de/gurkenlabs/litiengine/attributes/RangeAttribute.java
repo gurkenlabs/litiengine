@@ -7,7 +7,7 @@ import java.util.List;
 public class RangeAttribute<T extends Number> extends Attribute<T> {
   private final List<AttributeModifier<T>> maxModifiers;
   private final T minBaseValue;
-  
+
   private T maxBaseValue;
 
   public RangeAttribute(final T maxValue, final T minValue, final T baseValue) {
@@ -34,7 +34,7 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   public T getMaxValue() {
-    return this.applyModifiers(this.maxBaseValue);
+    return this.applyMaxModifiers(this.maxBaseValue);
   }
 
   public float getRelativeCurrentValue() {
@@ -50,8 +50,25 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
     this.maxBaseValue = modifier.modify(this.maxBaseValue);
   }
 
+  public void setToMaxValue() {
+    this.setBaseValue(this.getMaxValue());
+  }
+
   protected List<AttributeModifier<T>> getMaxModifiers() {
     return this.maxModifiers;
+  }
+
+  protected T applyMaxModifiers(final T maxValue) {
+    if (this.getMaxModifiers().isEmpty()) {
+      return maxValue;
+    }
+
+    T currentValue = maxValue;
+    for (final AttributeModifier<T> modifier : this.getMaxModifiers()) {
+      currentValue = modifier.modify(currentValue);
+    }
+
+    return currentValue;
   }
 
   private T valueInRange(final T value) {
@@ -63,4 +80,5 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
 
     return value;
   }
+
 }
