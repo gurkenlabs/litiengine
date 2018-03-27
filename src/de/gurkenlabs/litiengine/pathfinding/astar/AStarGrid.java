@@ -23,7 +23,7 @@ public class AStarGrid implements IRenderable {
   private final Dimension size;
 
   private boolean allowDiagonalMovement = true;
-  private boolean allowDiagonalCornersMovement;
+  private boolean allowCuttingCorners;
 
   public AStarGrid(int width, int height, final int nodeSize) {
     this(new Dimension(width, height), nodeSize);
@@ -43,7 +43,7 @@ public class AStarGrid implements IRenderable {
   }
 
   public boolean isDiagonalCornerMovementAllowed() {
-    return this.allowDiagonalCornersMovement;
+    return this.allowCuttingCorners;
   }
 
   public AStarNode[][] getGrid() {
@@ -147,8 +147,12 @@ public class AStarGrid implements IRenderable {
     }
   }
 
-  public void setAllowDiagonalMovementOnCorners(final boolean allowDiagonalMovementOnCorners) {
-    this.allowDiagonalMovement = allowDiagonalMovementOnCorners;
+  public void setAllowDiagonalMovement(final boolean allowDiagonalMovement) {
+    this.allowDiagonalMovement = allowDiagonalMovement;
+  }
+
+  public void setAllowCuttingCorners(final boolean allowCuttingCorners) {
+    this.allowCuttingCorners = allowCuttingCorners;
   }
 
   /**

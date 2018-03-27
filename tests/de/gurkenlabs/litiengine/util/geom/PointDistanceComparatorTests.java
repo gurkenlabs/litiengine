@@ -7,8 +7,6 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import de.gurkenlabs.litiengine.util.geom.PointDistanceComparator;
-
 public class PointDistanceComparatorTests {
 
   @Test

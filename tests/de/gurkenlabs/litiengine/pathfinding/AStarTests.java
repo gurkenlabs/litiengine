@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.pathfinding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
@@ -54,13 +55,30 @@ public class AStarTests {
     AStarGrid grid = new AStarGrid(320, 240, 4);
 
     AStarNode node = grid.getNode(new Point2D.Double(10, 10));
+    AStarNode nullNode = grid.getNode(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     List<AStarNode> nodes = grid.getIntersectedNodes(new Rectangle(2, 2, 12, 6));
-    
+
     assertNotNull(grid.getGrid());
     assertNotNull(grid.getGrid()[0][0]);
+
     assertEquals(2, node.getGridX());
     assertEquals(2, node.getGridY());
     assertEquals(12, nodes.size());
+    assertNull(nullNode);
+  }
+
+  @Test
+  public void testGetNeighbors() {
+    AStarGrid grid = new AStarGrid(320, 240, 4);
+
+    AStarNode node = grid.getNode(new Point2D.Double(10, 10));
+    List<AStarNode> neighbors = grid.getNeighbors(node);
+
+    grid.setAllowDiagonalMovement(false);
+    List<AStarNode> neighbors2 = grid.getNeighbors(node);
+
+    assertEquals(8, neighbors.size());
+    assertEquals(4, neighbors2.size());
   }
 }
