@@ -112,7 +112,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     app.setFont(font);
     return new SpeechBubble(entity, text, typeSound, app);
   }
-  
+
   public static boolean isActive(final IEntity entity) {
     return activeSpeechBubbles.containsKey(entity);
   }
@@ -170,6 +170,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     if (this.currentText == null || this.cancelled) {
       Game.getEnvironment().removeRenderable(this);
       Game.getRenderLoop().detach(this);
+      activeSpeechBubbles.remove(this.getEntity());
       return;
     }
 
