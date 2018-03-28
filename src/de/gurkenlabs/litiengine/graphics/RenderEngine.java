@@ -208,6 +208,36 @@ public final class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
+  public static void renderScaledImage(final Graphics2D g, final Image image, final double x, final double y, final double scale) {
+    renderScaledImage(g, image, x, y, scale, scale);
+  }
+
+  public static void renderScaledImage(final Graphics2D g, final Image image, final Point2D location, final double scale) {
+    renderScaledImage(g, image, location.getX(), location.getY(), scale, scale);
+  }
+
+  public static void renderScaledImage(final Graphics2D g, final Image image, final Point2D location, final double scaleX, final double scaleY) {
+    renderScaledImage(g, image, location.getX(), location.getY(), scaleX, scaleY);
+  }
+
+  public static void renderScaledImage(final Graphics2D g, final Image image, final double x, final double y, final double scaleX, final double scaleY) {
+    if (image == null) {
+      return;
+    }
+
+    if (scaleX == 1 && scaleY == 1) {
+      renderImage(g, image, x, y);
+      return;
+    }
+
+    final AffineTransform t = new AffineTransform();
+
+    t.translate(x, y);
+    t.scale(scaleX, scaleY);
+
+    g.drawImage(image, t, null);
+  }
+
   public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY());
   }
