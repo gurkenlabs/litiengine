@@ -152,6 +152,9 @@ public class LightSource extends Entity implements IRenderable {
 
   public void toggle() {
     this.activated = !this.activated;
+    if (Game.getEnvironment() != null && Game.getEnvironment().getAmbientLight() != null) {
+      Game.getEnvironment().getAmbientLight().updateSection(this.getBoundingBox());
+    }
   }
 
   @Override
