@@ -11,7 +11,7 @@ public class Spawnpoint extends Entity {
 
   public Spawnpoint() {
   }
-  
+
   public Spawnpoint(double x, double y) {
     this(0, x, y);
   }
@@ -33,9 +33,14 @@ public class Spawnpoint extends Entity {
     this(mapId, point);
     this.setDirection(direction);
   }
-  
+
   public Spawnpoint(Direction direction) {
     this.setDirection(direction);
+  }
+
+  public Spawnpoint(Direction direction, String spawnType) {
+    this(direction);
+    this.setSpawnType(spawnType);
   }
 
   public Direction getDirection() {

@@ -36,7 +36,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final ICustomPropertyProvider customProperties;
   private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
   private final boolean isOneTimeTrigger;
-  
+
   private String message;
   private int cooldown;
   private long lastActivation;
@@ -67,6 +67,11 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
     this(activation, message, isOneTime, customProperties);
     this.setName(name);
+  }
+
+  public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final int cooldown, ICustomPropertyProvider customProperties) {
+    this(activation, message, isOneTime, customProperties);
+    this.setCooldown(cooldown);
   }
 
   public void addActivator(final int mapId) {

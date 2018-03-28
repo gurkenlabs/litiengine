@@ -16,7 +16,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment,IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
     if (MapObjectType.get(mapObject.getType()) != MapObjectType.LIGHTSOURCE) {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
@@ -43,10 +43,14 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       lightType = LightSource.ELLIPSE;
     }
 
-    final LightSource light = new LightSource(intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
+    final LightSource light = this.createLightSource(mapObject, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
     loadDefaultProperties(light, mapObject);
 
     entities.add(light);
     return entities;
+  }
+
+  protected LightSource createLightSource(IMapObject mapObject, int intensity, Color color, String lightType, boolean active) {
+    return new LightSource(intensity, color, lightType, active);
   }
 }

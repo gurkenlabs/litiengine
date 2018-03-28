@@ -22,14 +22,17 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     }
 
     final Direction direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
-    final Spawnpoint spawn = new Spawnpoint(direction);
-    loadDefaultProperties(spawn, mapObject);
-
     final String spawnType = mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE);
-    spawn.setSpawnType(spawnType);
+
+    final Spawnpoint spawn = this.createSpawnpoint(mapObject, direction, spawnType);
+    loadDefaultProperties(spawn, mapObject);
 
     Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(spawn);
     return entities;
+  }
+
+  protected Spawnpoint createSpawnpoint(IMapObject mapObject, Direction direction, String spawnType) {
+    return new Spawnpoint(direction, spawnType);
   }
 }

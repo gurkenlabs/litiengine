@@ -20,10 +20,14 @@ public class MapAreaMapObjectLoader extends MapObjectLoader {
     }
 
     Collection<IEntity> entities = super.load(environment, mapObject);
-    MapArea mapArea = new MapArea();
+    MapArea mapArea = this.createMapArea(mapObject);
     loadDefaultProperties(mapArea, mapObject);
 
     entities.add(mapArea);
     return entities;
+  }
+
+  protected MapArea createMapArea(IMapObject mapObject) {
+    return new MapArea();
   }
 }

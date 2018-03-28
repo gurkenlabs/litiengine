@@ -22,6 +22,12 @@ public class StaticShadow extends MapArea {
   private int shadowOffset;
   private Area area;
 
+  public StaticShadow(StaticShadowType shadowType, int offset) {
+    this.shadowType = shadowType;
+    this.shadowOffset = offset;
+    this.origin = null;
+  }
+
   public StaticShadow(StaticShadowType shadowType) {
     this.shadowType = shadowType;
     this.shadowOffset = DEFAULT_OFFSET;

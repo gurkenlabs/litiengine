@@ -23,30 +23,41 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     }
 
     final String message = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE);
-
     final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
-    final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
-    final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
+    final boolean oneTime = mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME);
+    final int coolDown = mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN);
 
-    final Trigger trigger = new Trigger(act, message, mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME), mapObject);
+    final Trigger trigger = this.createTrigger(mapObject, act, message, oneTime, coolDown, mapObject);
     loadDefaultProperties(trigger, mapObject);
+    this.loadTargets(mapObject, trigger);
+    this.loadActivators(mapObject, trigger);
+
+    Collection<IEntity> entities = super.load(environment, mapObject);
+    entities.add(trigger);
+    return entities;
+  }
+
+  protected Trigger createTrigger(IMapObject mapObject, TriggerActivation act, String message, boolean oneTime, int coolDown, IMapObject mapObject2) {
+    return new Trigger(act, message, oneTime, coolDown, mapObject);
+  }
+
+  protected void loadTargets(IMapObject mapObject, Trigger trigger) {
+    final String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
 
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {
         trigger.addTarget(target);
       }
     }
+  }
+
+  protected void loadActivators(IMapObject mapObject, Trigger trigger) {
+    final String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
 
     for (final int activator : ArrayUtilities.getIntegerArray(activators)) {
       if (activator != 0) {
         trigger.addActivator(activator);
       }
     }
-
-    trigger.setCooldown(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
-
-    Collection<IEntity> entities = super.load(environment, mapObject);
-    entities.add(trigger);
-    return entities;
   }
 }

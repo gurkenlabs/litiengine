@@ -24,7 +24,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
     boolean isObstacle = mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE, true);
     boolean isObstructingLight = mapObject.getCustomPropertyBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
 
-    final CollisionBox col = new CollisionBox(isObstacle, isObstructingLight);
+    final CollisionBox col = this.createCollisionBox(mapObject, isObstacle, isObstructingLight);
     loadDefaultProperties(col, mapObject);
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
@@ -37,5 +37,9 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
     }
 
     return entities;
+  }
+
+  protected CollisionBox createCollisionBox(IMapObject mapObject, boolean isObstacle, boolean isObstructingLight) {
+    return new CollisionBox(isObstacle, isObstructingLight);
   }
 }
