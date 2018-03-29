@@ -361,7 +361,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.populateMapObjectTree();
   }
 
-  public boolean isSelectedMapObjectLayer(String name) {
+  public boolean isVisibleMapObjectLayer(String name) {
 
     // Get all the selected items using the indices
     for (int i = 0; i < listObjectLayers.getModel().getSize(); i++) {

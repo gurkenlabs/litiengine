@@ -1440,7 +1440,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       boolean somethingIsFocused = false;
       boolean currentObjectFocused = false;
       for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
-        if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+        if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isVisibleMapObjectLayer(layer.getName())) {
           continue;
         }
 
@@ -1530,7 +1530,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         continue;
       }
 
-      if (!EditorScreen.instance().getMapSelectionPanel().isSelectedMapObjectLayer(layer.getName())) {
+      if (!EditorScreen.instance().getMapSelectionPanel().isVisibleMapObjectLayer(layer.getName())) {
         continue;
       }
 
