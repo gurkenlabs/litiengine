@@ -87,6 +87,11 @@ public class PropAnimationController extends EntityAnimationController<Prop> {
     }
   }
 
+  @Override
+  public boolean isAutoScaling() {
+    return this.getEntity().isScaling();
+  }
+
   private Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = this.findSpriteSheet(prop, state);
     if (spritesheet == null) {

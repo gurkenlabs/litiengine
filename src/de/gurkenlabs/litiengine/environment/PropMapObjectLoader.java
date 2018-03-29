@@ -91,6 +91,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     prop.setFlipHorizontally(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     prop.setFlipVertically(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
+    prop.setScaling(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_SCALE));
 
     prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
 

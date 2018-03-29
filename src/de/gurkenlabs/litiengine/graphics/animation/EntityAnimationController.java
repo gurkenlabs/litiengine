@@ -1,33 +1,25 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
   private final Map<Predicate<T>, Function<T, String>> animationRules;
-  private final List<IRenderable> rendering;
-  private final List<IRenderable> rendered;
-
   private final T entity;
   private String spritePrefix;
+  private boolean autoScaling;
 
   public EntityAnimationController(final T entity) {
     super();
     this.animationRules = new ConcurrentHashMap<>();
-    this.rendered = new CopyOnWriteArrayList<>();
-    this.rendering = new CopyOnWriteArrayList<>();
-
     this.entity = entity;
 
     if (entity != null) {
@@ -38,8 +30,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
     this.animationRules = new ConcurrentHashMap<>();
-    this.rendered = new CopyOnWriteArrayList<>();
-    this.rendering = new CopyOnWriteArrayList<>();
     this.entity = entity;
 
     this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
@@ -98,5 +88,15 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   protected void setSpritePrefix(String prefix) {
     this.spritePrefix = prefix;
+  }
+
+  @Override
+  public boolean isAutoScaling() {
+    return this.autoScaling;
+  }
+
+  @Override
+  public void setAutoScaling(boolean scaling) {
+    this.autoScaling = scaling;
   }
 }

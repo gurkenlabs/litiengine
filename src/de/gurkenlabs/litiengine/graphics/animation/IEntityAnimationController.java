@@ -20,4 +20,8 @@ public interface IEntityAnimationController<T extends IEntity> extends IAnimatio
    *          applied
    */
   public void addAnimationRule(Predicate<T> rule, Function<T, String> animationName);
+
+  public boolean isAutoScaling();
+
+  public void setAutoScaling(boolean scaling);
 }

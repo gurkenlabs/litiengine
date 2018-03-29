@@ -14,6 +14,7 @@ public class Prop extends CombatEntity {
   private boolean addShadow;
   private boolean flipHorizontally;
   private boolean flipVertically;
+  private boolean scaling;
   private Rotation rotation;
 
   public Prop(final String spritesheetName) {
@@ -64,6 +65,30 @@ public class Prop extends CombatEntity {
     }
   }
 
+  public boolean isAddShadow() {
+    return this.addShadow;
+  }
+
+  public boolean isObstacle() {
+    return this.isObstacle;
+  }
+
+  public boolean isScaling() {
+    return this.scaling;
+  }
+
+  public boolean flipHorizontally() {
+    return flipHorizontally;
+  }
+
+  public boolean flipVertically() {
+    return flipVertically;
+  }
+
+  public Rotation getSpriteRotation() {
+    return rotation;
+  }
+
   public void setMaterial(final Material material) {
     this.material = material;
   }
@@ -73,48 +98,32 @@ public class Prop extends CombatEntity {
     this.updateAnimationController();
   }
 
-  public boolean isObstacle() {
-    return this.isObstacle;
-  }
-
   public void setObstacle(boolean isObstacle) {
     this.isObstacle = isObstacle;
-  }
-
-  public boolean isAddShadow() {
-    return this.addShadow;
   }
 
   public void setAddShadow(boolean addShadow) {
     this.addShadow = addShadow;
   }
 
+  public void setScaling(boolean scaling) {
+    this.scaling = scaling;
+  }
+
   @Override
   public boolean isDead() {
-    if(this.isIndestructible()) {
+    if (this.isIndestructible()) {
       return false;
     }
     return this.getAttributes().getHealth().getCurrentValue() <= 0;
-  }
-
-  public Rotation getSpriteRotation() {
-    return rotation;
   }
 
   public void setSpriteRotation(Rotation spriteRotation) {
     this.rotation = spriteRotation;
   }
 
-  public boolean flipHorizontally() {
-    return flipHorizontally;
-  }
-
   public void setFlipHorizontally(boolean flipHorizontally) {
     this.flipHorizontally = flipHorizontally;
-  }
-
-  public boolean flipVertically() {
-    return flipVertically;
   }
 
   public void setFlipVertically(boolean flipVertically) {

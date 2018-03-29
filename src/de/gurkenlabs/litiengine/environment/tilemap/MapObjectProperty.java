@@ -42,6 +42,7 @@ public final class MapObjectProperty {
   public static final String PROP_ROTATION = "rotationSprite";
   public static final String PROP_FLIPHORIZONTALLY = "flipHorizontally";
   public static final String PROP_FLIPVERTICALLY = "flipVertically";
+  public static final String PROP_SCALE = "scaling";
 
   // light source
   public static final String LIGHT_ALPHA = "lightBrightness";

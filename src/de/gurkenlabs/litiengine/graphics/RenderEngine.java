@@ -27,6 +27,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 public final class RenderEngine implements IRenderEngine {
   private final EntityYComparator entityComparator;
@@ -396,10 +397,16 @@ public final class RenderEngine implements IRenderEngine {
         return;
       }
 
-      float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
-      float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
+      if (animationController instanceof IEntityAnimationController<?> && ((IEntityAnimationController<?>) animationController).isAutoScaling()) {
+        final double ratioX = entity.getWidth() / img.getWidth();
+        final double ratioY = entity.getHeight() / img.getHeight();
+        renderScaledImage(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);
+      } else {
+        float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
+        float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
 
-      renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY));
+        renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY));
+      }
     }
 
     if (entity instanceof IRenderable) {
