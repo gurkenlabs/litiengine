@@ -84,7 +84,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     this.checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
     this.checkBoxVerticalFlip = new JCheckBox("vertical flip");
     
-    this.checkBoxScale = new JCheckBox("auto scale");
+    this.checkBoxScale = new JCheckBox("stretch sprite");
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
