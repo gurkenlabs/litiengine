@@ -17,6 +17,7 @@ import net.java.games.input.Event;
 public class Gamepad implements IGamepad, IUpdateable {
   public static final float AXIS_DEAD_ZONE = 0.3f;
   public static final float TRIGGER_DEAD_ZONE = 0.1f;
+  public static final float STICK_DEADZONE = 0.15f;
 
   private static final Map<String, Identifier> components = new HashMap<>();
 

@@ -9,8 +9,8 @@ import net.java.games.input.Component.Identifier;
 
 public class GamepadEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
   private int gamePadIndex = -1;
-  private double gamePadDeadzone = 0.15;
-  private double gamePadRightStick = 0.08;
+  private double gamePadDeadzone = Gamepad.STICK_DEADZONE;
+  private double gamePadRightStick = Gamepad.STICK_DEADZONE;
   private boolean rotateWithRightStick = false;
 
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
@@ -56,11 +56,11 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
     return this.rotateWithRightStick;
   }
 
-  public void setGamePadRightStick(double gamePadRightStick) {
+  public void setRightStickDeadzone(double gamePadRightStick) {
     this.gamePadRightStick = gamePadRightStick;
   }
 
-  public void setGamePadDeadzone(double gamePadDeadzone) {
+  public void setLeftStickDeadzone(double gamePadDeadzone) {
     this.gamePadDeadzone = gamePadDeadzone;
   }
 

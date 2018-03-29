@@ -42,7 +42,6 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private final SpeechBubbleAppearance appearance;
 
   private BufferedImage bubble;
-  private boolean cancelled;
   private String currentText;
 
   private String displayedText;
@@ -167,10 +166,14 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   @Override
   public void update() {
-    if (this.currentText == null || this.cancelled) {
+    if (this.currentText == null) {
       Game.getEnvironment().removeRenderable(this);
       Game.getRenderLoop().detach(this);
-      activeSpeechBubbles.remove(this.getEntity());
+
+      if (activeSpeechBubbles.remove(this.getEntity()) != null && activeSpeechBubbles.remove(this.getEntity()).equals(this)) {
+        activeSpeechBubbles.remove(this.getEntity());
+      }
+
       return;
     }
 
@@ -197,7 +200,11 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   }
 
   private void cancel() {
-    this.cancelled = true;
+    Game.getEnvironment().removeRenderable(this);
+    Game.getRenderLoop().detach(this);
+    if (activeSpeechBubbles.get(this.getEntity()) != null && activeSpeechBubbles.remove(this.getEntity()).equals(this)) {
+      activeSpeechBubbles.remove(this.getEntity());
+    }
   }
 
   private void createBubbleImage() {
