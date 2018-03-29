@@ -197,11 +197,13 @@ public abstract class Entity implements IEntity {
   @Override
   public void setX(double x) {
     this.getLocation().setLocation(x, this.getY());
+    this.boundingBox = null;
   }
 
   @Override
   public void setY(double y) {
     this.getLocation().setLocation(this.getX(), y);
+    this.boundingBox = null;
   }
 
   @Override

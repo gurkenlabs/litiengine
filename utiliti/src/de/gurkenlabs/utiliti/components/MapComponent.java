@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
+import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -1095,7 +1096,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       selected.setX(selected.getX() + snappedDeltaX);
       selected.setY(selected.getY() + snappedDeltaY);
 
-      Game.getEnvironment().reloadFromMap(selected.getId());
+      IEntity entity = Game.getEnvironment().get(selected.getId());
+      if (entity != null) {
+        entity.setX(selected.getLocation().getX());
+        entity.setY(selected.getLocation().getY());
+      } else {
+        Game.getEnvironment().reloadFromMap(selected.getId());
+      }
 
       if (selected.equals(this.getFocusedMapObject())) {
         EditorScreen.instance().getMapObjectPanel().bind(selected);

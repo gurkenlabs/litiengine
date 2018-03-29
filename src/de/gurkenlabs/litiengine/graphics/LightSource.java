@@ -114,10 +114,12 @@ public class LightSource extends Entity implements IRenderable {
 
   public void setColor(final Color result) {
     this.color = result;
+    this.updateAmbientLayers();
   }
 
   public void setIntensity(final int intensity) {
     this.intensity = intensity;
+    this.updateAmbientLayers();
   }
 
   public void setLightShapeType(final String shapeType) {
@@ -125,19 +127,37 @@ public class LightSource extends Entity implements IRenderable {
   }
 
   @Override
+  public void setX(double x) {
+    super.setX(x);
+    this.updateShape();
+    this.updateAmbientLayers();
+  }
+
+  @Override
+  public void setY(double y) {
+    super.setY(y);
+    this.updateShape();
+    this.updateAmbientLayers();
+  }
+
+  @Override
+  public void setWidth(float width) {
+    super.setWidth(width);
+    this.updateShape();
+    this.updateAmbientLayers();
+  }
+
+  @Override
+  public void setHeight(float height) {
+    super.setHeight(height);
+    this.updateShape();
+    this.updateAmbientLayers();
+  }
+
+  @Override
   public void setLocation(final Point2D location) {
     super.setLocation(location);
-    switch (this.getLightShapeType()) {
-    case LightSource.ELLIPSE:
-      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    case LightSource.RECTANGLE:
-      this.lightShape = new Rectangle2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    default:
-      this.lightShape = new Ellipse2D.Double(location.getX(), location.getY(), this.getWidth(), this.getHeight());
-      break;
-    }
+    this.updateShape();
   }
 
   @Override
@@ -152,9 +172,7 @@ public class LightSource extends Entity implements IRenderable {
 
   public void toggle() {
     this.activated = !this.activated;
-    if (Game.getEnvironment() != null && Game.getEnvironment().getAmbientLight() != null) {
-      Game.getEnvironment().getAmbientLight().updateSection(this.getBoundingBox());
-    }
+    this.updateAmbientLayers();
   }
 
   @Override
@@ -303,5 +321,29 @@ public class LightSource extends Entity implements IRenderable {
 
   private void setRadius(final int radius) {
     this.radius = radius;
+  }
+
+  private void updateAmbientLayers() {
+    if (Game.getEnvironment() != null && Game.getEnvironment().getAmbientLight() != null) {
+      Game.getEnvironment().getAmbientLight().updateSection(this.getBoundingBox());
+    }
+
+    if (Game.getEnvironment() != null && Game.getEnvironment().getStaticShadowLayer() != null) {
+      Game.getEnvironment().getStaticShadowLayer().updateSection(this.getBoundingBox());
+    }
+  }
+
+  private void updateShape() {
+    switch (this.getLightShapeType()) {
+    case LightSource.ELLIPSE:
+      this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+      break;
+    case LightSource.RECTANGLE:
+      this.lightShape = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+      break;
+    default:
+      this.lightShape = new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+      break;
+    }
   }
 }
