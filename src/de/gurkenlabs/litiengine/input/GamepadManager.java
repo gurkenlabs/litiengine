@@ -196,6 +196,13 @@ public class GamepadManager implements IGamepadManager {
         final String name = thread.getClass().getName();
         if (name.equals("net.java.games.input.RawInputEventQueue$QueueThread")) {
           thread.interrupt();
+
+          try {
+            thread.join();
+          } catch (InterruptedException e) {
+            log.log(Level.FINE, e.getMessage(), e);
+            Thread.currentThread().interrupt();
+          }
         }
       }
 
