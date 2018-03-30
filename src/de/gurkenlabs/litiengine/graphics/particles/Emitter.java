@@ -11,9 +11,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
@@ -36,7 +38,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private final List<Consumer<Emitter>> finishedConsumer;
   private final CopyOnWriteArrayList<Particle> particles;
   private final List<Color> colors;
-  
+
   private boolean activated;
   private final boolean activateOnInit;
   private long activationTick;
@@ -50,6 +52,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private int spawnAmount;
   private int spawnRate;
   private int timeToLive;
+  private Valign originValign;
+  private Align originAlign;
 
   private IRenderable groundRenderable;
   private IRenderable overlayRenderable;
@@ -58,10 +62,13 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.colors = new ArrayList<>();
     this.finishedConsumer = new CopyOnWriteArrayList<>();
     this.particles = new CopyOnWriteArrayList<>();
-    
+
     this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
     this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
-    
+
+    this.originAlign = Align.LEFT;
+    this.originValign = Valign.TOP;
+
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
 
     if (info != null) {
@@ -156,8 +163,15 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   public Point2D getOrigin() {
-    // TODO: implement properly https://github.com/gurkenlabs/litiengine/issues/74
-    return this.getLocation();
+    return new Point2D.Double(this.getX() + this.getOriginAlign().getValue(this.getWidth()), this.getY() + this.getOriginValign().getValue(this.getHeight()));
+  }
+
+  public Align getOriginAlign() {
+    return this.originAlign;
+  }
+
+  public Valign getOriginValign() {
+    return this.originValign;
   }
 
   public IRenderable getOverlayRenderable() {
@@ -269,6 +283,14 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void setMaxParticles(final int maxPart) {
     this.maxParticles = maxPart;
+  }
+
+  public void setOriginAlign(Align align) {
+    this.originAlign = align;
+  }
+
+  public void setOriginValign(Valign valign) {
+    this.originValign = valign;
   }
 
   public void setParticleMaxTTL(final int maxTTL) {

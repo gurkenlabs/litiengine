@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -107,6 +109,12 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   @XmlElement
   private String colorProbabilities;
+
+  @XmlElement
+  private Align originAlign;
+
+  @XmlElement
+  private Valign originValign;
 
   @XmlElement
   private CollisionType collisionType;
@@ -241,6 +249,15 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   @XmlTransient
   public String getName() {
     return this.name;
+  }
+
+  @XmlTransient
+  public Align getOriginAlign() {
+    return this.originAlign;
+  }
+
+  public Valign getOriginValign() {
+    return this.originValign;
   }
 
   @XmlTransient
@@ -394,6 +411,14 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public void setOriginAlign(Align align) {
+    this.originAlign = align;
+  }
+
+  public void setOriginValign(Valign valign) {
+    this.originValign = valign;
   }
 
   public void setParticleHeight(final ParticleParameter particleHeight) {

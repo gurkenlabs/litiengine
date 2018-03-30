@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -48,11 +50,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     EmitterData data = createEmitterData(mapObject);
 
-    // TODO: implement origin: https://github.com/gurkenlabs/litiengine/issues/74
-    // Also see Emitter.getOrigin
     CustomEmitter emitter = new CustomEmitter(data);
     loadDefaultProperties(emitter, mapObject);
-    emitter.setLocation(mapObject.getLocation().getX() + mapObject.getWidth() / 2.0, mapObject.getLocation().getY() + mapObject.getHeight() / 2.0);
 
     Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(emitter);
@@ -73,6 +72,8 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setParticleType(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE));
     data.setColorDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.Emitter.COLORDEVIATION));
     data.setAlphaDeviation(mapObject.getCustomPropertyFloat(MapObjectProperty.Emitter.ALPHADEVIATION));
+    data.setOriginAlign(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.LEFT));
+    data.setOriginValign(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.TOP));
 
     data.setColors(getColors(mapObject));
 
@@ -99,11 +100,11 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setAnimateSprite(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.ANIMATESPRITE));
     return data;
   }
-  
+
   public static IMapObject createMapObject(EmitterData emitterData) {
     MapObject newMapObject = new MapObject();
     newMapObject.setType(MapObjectType.EMITTER.toString());
-    
+
     // emitter
     newMapObject.setWidth(emitterData.getWidth());
     newMapObject.setHeight(emitterData.getHeight());
@@ -115,7 +116,9 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     newMapObject.setCustomProperty(MapObjectProperty.Emitter.PARTICLETYPE, emitterData.getParticleType().name());
     newMapObject.setCustomProperty(MapObjectProperty.Emitter.COLORDEVIATION, Float.toString(emitterData.getColorDeviation()));
     newMapObject.setCustomProperty(MapObjectProperty.Emitter.ALPHADEVIATION, Float.toString(emitterData.getAlphaDeviation()));
-    
+    newMapObject.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, emitterData.getOriginAlign().name());
+    newMapObject.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, emitterData.getOriginValign().name());
+
     String commaSeperatedColors = ArrayUtilities.getCommaSeparatedString(emitterData.getColors());
     newMapObject.setCustomProperty(MapObjectProperty.Emitter.COLORS, commaSeperatedColors);
 
@@ -131,7 +134,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MINGRAVITYY, Float.toString(emitterData.getGravityY().getMinValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MINDELTAWIDTH, Float.toString(emitterData.getDeltaWidth().getMinValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MINDELTAHEIGHT, Float.toString(emitterData.getDeltaHeight().getMinValue()));
-    
+
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXX, Float.toString(emitterData.getParticleX().getMaxValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXY, Float.toString(emitterData.getParticleY().getMaxValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXSTARTWIDTH, Float.toString(emitterData.getParticleWidth().getMaxValue()));
@@ -142,16 +145,16 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXGRAVITYY, Float.toString(emitterData.getGravityY().getMaxValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXDELTAWIDTH, Float.toString(emitterData.getDeltaWidth().getMaxValue()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXDELTAHEIGHT, Float.toString(emitterData.getDeltaHeight().getMaxValue()));
-    
+
     // particle
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MINTTL, Integer.toString(emitterData.getParticleMinTTL()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.MAXTTL, Integer.toString(emitterData.getParticleMaxTTL()));
     newMapObject.setCustomProperty(MapObjectProperty.Particle.COLLISIONTYPE, emitterData.getCollisionType().toString());
-    
+
     newMapObject.setCustomProperty(MapObjectProperty.Particle.TEXT, emitterData.getParticleText());
     newMapObject.setCustomProperty(MapObjectProperty.Particle.SPRITE, emitterData.getSpritesheet());
     newMapObject.setCustomProperty(MapObjectProperty.Particle.ANIMATESPRITE, Boolean.toString(emitterData.isAnimateSprite()));
-    
+
     return newMapObject;
   }
 }

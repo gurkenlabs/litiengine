@@ -81,6 +81,8 @@ public final class MapObjectProperty {
     public static final String PARTICLETYPE = "emitterParticleType";
     public static final String COLORDEVIATION = "emitterColorDeviation";
     public static final String ALPHADEVIATION = "emitterAlphaDeviation";
+    public static final String ORIGIN_ALIGN = "emitterOriginAlign";
+    public static final String ORIGIN_VALIGN = "emitterOriginValign";
   }
 
   public static final class Particle {
