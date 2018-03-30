@@ -23,17 +23,23 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   private final List<Rectangle2D> staticCollisionBoxes;
 
+  private final List<CollisionBox> entityCollisionBoxes;
   private final List<CollisionBox> allCollisionBoxes;
+  private final List<CollisionBox> staticBoxes;
   private final List<Rectangle2D> allCollisionBoxRectangles;
+  private final List<Rectangle2D> entityCollisionBoxesRectangles;
 
   /**
    * Instantiates a new physics engine.
    */
   public PhysicsEngine() {
+    this.entityCollisionBoxes = new CopyOnWriteArrayList<>();
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
     this.allCollisionBoxes = new CopyOnWriteArrayList<>();
+    this.staticBoxes = new CopyOnWriteArrayList<>();
     this.allCollisionBoxRectangles = new CopyOnWriteArrayList<>();
+    this.entityCollisionBoxesRectangles = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -99,9 +105,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public Point2D collides(final Line2D rayCast) {
+  public Point2D collides(Line2D rayCast, CollisionType collisionType) {
     final Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
-    final List<Rectangle2D> collBoxes = this.getAllCollisionBoxes();
+
+    final List<Rectangle2D> collBoxes = this.getAllCollisionBoxRectangles(collisionType);
     collBoxes.sort((rect1, rect2) -> {
       final Point2D rect1Center = new Point2D.Double(rect1.getCenterX(), rect1.getCenterY());
       final Point2D rect2Center = new Point2D.Double(rect2.getCenterX(), rect2.getCenterY());
@@ -136,6 +143,11 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
 
     return null;
+  }
+
+  @Override
+  public Point2D collides(final Line2D rayCast) {
+    return this.collides(rayCast, CollisionType.ALL);
   }
 
   @Override
@@ -339,6 +351,17 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.updateAllCollisionBoxes();
   }
 
+  private List<CollisionBox> getCollisionBoxes(CollisionType collisionType) {
+    switch (collisionType) {
+    case ENTITY:
+      return this.entityCollisionBoxes;
+    case STATIC:
+      return this.staticBoxes;
+    default:
+      return getAllCollisionBoxesInternal();
+    }
+  }
+
   private List<CollisionBox> getAllCollisionBoxesInternal() {
     if (this.allCollisionBoxes.isEmpty()) {
       this.updateAllCollisionBoxes();
@@ -355,12 +378,32 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return this.allCollisionBoxRectangles;
   }
 
+  private List<Rectangle2D> getAllCollisionBoxRectangles(CollisionType collisionType) {
+    switch (collisionType) {
+    case ENTITY:
+      return this.entityCollisionBoxesRectangles;
+    case STATIC:
+      return this.staticCollisionBoxes;
+    default:
+      return getAllCollisionBoxRectangles();
+    }
+  }
+
   private void updateAllCollisionBoxes() {
     this.allCollisionBoxes.clear();
-    this.allCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
-    this.allCollisionBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
+    this.entityCollisionBoxes.clear();
+    this.staticBoxes.clear();
+
+    this.entityCollisionBoxes.addAll(this.collisionEntities.stream().filter(ICollisionEntity::hasCollision).map(CollisionBox::new).collect(Collectors.toList()));
+    this.staticBoxes.addAll(this.staticCollisionBoxes.stream().map(CollisionBox::new).collect(Collectors.toList()));
+
+    this.allCollisionBoxes.addAll(entityCollisionBoxes);
+    this.allCollisionBoxes.addAll(this.staticBoxes);
 
     this.allCollisionBoxRectangles.clear();
+    this.entityCollisionBoxesRectangles.clear();
+    this.entityCollisionBoxesRectangles.addAll(this.entityCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
+
     this.allCollisionBoxRectangles.addAll(this.allCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
   }
 

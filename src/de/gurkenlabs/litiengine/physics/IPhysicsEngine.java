@@ -27,6 +27,8 @@ public interface IPhysicsEngine extends IUpdateable {
   public boolean collides(double x, double y, CollisionType collisionType);
 
   public Point2D collides(Line2D rayCast);
+  
+  public Point2D collides(Line2D rayCast, CollisionType collisionType);
 
   public boolean collides(Point2D point);
 
