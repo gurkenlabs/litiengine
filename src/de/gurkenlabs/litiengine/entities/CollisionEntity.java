@@ -37,34 +37,8 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   public static Rectangle2D getCollisionBox(final Point2D location, final double entityWidth, final double entityHeight, final double collisionBoxWidth, final double collisionBoxHeight, final Align align, final Valign valign) {
-    double x;
-    double y;
-    switch (align) {
-    case LEFT:
-      x = location.getX();
-      break;
-    case RIGHT:
-      x = location.getX() + entityWidth - collisionBoxWidth;
-      break;
-    case CENTER:
-    default:
-      x = location.getX() + entityWidth * 0.5 - collisionBoxWidth * 0.5;
-      break;
-    }
-
-    switch (valign) {
-    case MIDDLE:
-      y = location.getY() + entityHeight * 0.5 - collisionBoxHeight * 0.5;
-      break;
-    case TOP:
-      y = location.getY();
-      break;
-    case DOWN:
-    default:
-      y = location.getY() + entityHeight - collisionBoxHeight;
-      break;
-    }
-
+    double x = location.getX() + align.getLocation(entityWidth, collisionBoxWidth);
+    double y = location.getY() + valign.getLocation(entityHeight, collisionBoxHeight);
     return new Rectangle2D.Double(x, y, collisionBoxWidth, collisionBoxHeight);
   }
 
