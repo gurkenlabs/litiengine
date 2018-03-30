@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,11 +18,13 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private final List<Animation> animations;
-  private Animation currentAnimation;
-  private Animation defaultAnimation;
   private final List<IImageEffect> imageEffects;
   private final List<Consumer<Animation>> playbackConsumer;
   private final List<Consumer<Animation>> playbackFinishedConsumer;
+
+  private Animation currentAnimation;
+  private Animation defaultAnimation;
+  private AffineTransform affineTransform;
 
   public AnimationController() {
     this.animations = new CopyOnWriteArrayList<>();
@@ -87,6 +90,11 @@ public class AnimationController implements IAnimationController {
     }
     this.getAnimations().clear();
     this.getImageEffects().clear();
+  }
+
+  @Override
+  public AffineTransform getAffineTransform() {
+    return this.affineTransform;
   }
 
   @Override
@@ -297,5 +305,10 @@ public class AnimationController implements IAnimationController {
 
     this.imageEffects.removeAll(effectsToRemove);
     this.imageEffects.removeAll(Collections.singleton(null));
+  }
+
+  @Override
+  public void setAffineTransform(AffineTransform affineTransform) {
+    this.affineTransform = affineTransform;
   }
 }

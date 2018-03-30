@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
@@ -23,10 +24,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
   private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
   private final CombatAttributes attributes;
-  
+
   private boolean isIndestructible;
   private ICombatEntity target;
   private int team;
+  private long lastHit;
 
   public CombatEntity() {
     super();
@@ -130,6 +132,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       consumer.accept(arg);
     }
 
+    this.lastHit = Game.getLoop().getTicks();
+
     return this.isDead();
   }
 
@@ -213,7 +217,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
     this.setCollision(true);
   }
-  
+
   @Override
   public void setIndestructible(final boolean indestructible) {
     this.isIndestructible = indestructible;
@@ -245,5 +249,10 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   protected void setupAttributes(final CombatAttributes attributes) {
     // do nothing because this method is designed to provide the child classes
     // the possibility to implement additional functionality upon instantiation
+  }
+
+  @Override
+  public boolean wasHit(int timeSpan) {
+    return Game.getLoop().getDeltaTime(this.lastHit) < timeSpan;
   }
 }

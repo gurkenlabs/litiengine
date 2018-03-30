@@ -247,6 +247,20 @@ public final class RenderEngine implements IRenderEngine {
     renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
   }
 
+  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, AffineTransform transform) {
+    renderImage(g, image, renderLocation.getX(), renderLocation.getY(), transform);
+  }
+
+  public static void renderImage(final Graphics2D g, final Image image, double x, double y, AffineTransform transform) {
+    if (transform == null) {
+      renderImage(g, image, x, y);
+      return;
+    }
+
+    transform.translate(x, y);
+    g.drawImage(image, transform, null);
+  }
+
   @Override
   public boolean canRender(final IEntity entity) {
     if (!this.entityRenderingConditions.isEmpty()) {
@@ -405,7 +419,7 @@ public final class RenderEngine implements IRenderEngine {
         float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
         float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
 
-        renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY));
+        renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
       }
     }
 

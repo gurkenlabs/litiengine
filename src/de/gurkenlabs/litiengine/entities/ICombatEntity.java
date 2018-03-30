@@ -47,4 +47,6 @@ public interface ICombatEntity extends ICollisionEntity {
   public void setTarget(final ICombatEntity target);
 
   public void setTeam(int team);
+
+  public boolean wasHit(int timeSpan);
 }
