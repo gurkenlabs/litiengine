@@ -365,7 +365,7 @@ public class EditorScreen extends Screen {
     }
   }
 
-  public void importSpritesheets() {
+  public void importSpriteSheets() {
 
     JFileChooser chooser;
 
@@ -377,27 +377,32 @@ public class EditorScreen extends Screen {
       chooser.addChoosableFileFilter(filter);
       chooser.setMultiSelectionEnabled(true);
       if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
-        SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(chooser.getSelectedFiles());
-        int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (option != JOptionPane.OK_OPTION) {
-          return;
-        }
-        
-        // TODO: somehow improve this to allow keeping the animation frames and only update the image
-        Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
-        for (SpriteSheetInfo info : sprites) {
-          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
-          this.getGameFile().getSpriteSheets().add(info);
-          log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
-        }
-
-        this.loadSpriteSheets(sprites, true);
+        this.importSpriteSheets(chooser.getSelectedFiles());
       }
     } catch (
 
     IOException e) {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
+  }
+
+  public void importSpriteSheets(File... files) {
+    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(files);
+    int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if (option != JOptionPane.OK_OPTION) {
+      return;
+    }
+
+    // TODO: somehow improve this to allow keeping the animation frames and only
+    // update the image
+    Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
+    for (SpriteSheetInfo info : sprites) {
+      this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+      this.getGameFile().getSpriteSheets().add(info);
+      log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
+    }
+
+    this.loadSpriteSheets(sprites, true);
   }
 
   public void importEmitters() {
@@ -477,12 +482,11 @@ public class EditorScreen extends Screen {
 
   public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
-      Spritesheet.remove(info.getName());
-      if (info.getHeight() == 0 && info.getWidth() == 0) {
-        return;
+      if (Spritesheet.find(info.getName()) != null) {
+        Spritesheet.update(info);
+      } else {
+        Spritesheet.load(info);
       }
-
-      Spritesheet.load(info);
     });
 
     if (this.loading) {
@@ -632,6 +636,9 @@ public class EditorScreen extends Screen {
       Spritesheet sprite = Spritesheet.find(imageLayer.getImage().getSource());
       if (sprite == null) {
         BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+        if (img == null) {
+          continue;
+        }
 
         sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
         if (sprite == null) {

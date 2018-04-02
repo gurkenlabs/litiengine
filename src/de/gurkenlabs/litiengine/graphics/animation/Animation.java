@@ -24,7 +24,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private final String name;
   private boolean paused;
   private boolean playing;
-  private final Spritesheet spritesheet;
+  private Spritesheet spritesheet;
 
   public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(Spritesheet.find(spriteSheetName), loop, randomizeStart, keyFrameDurations);
@@ -90,6 +90,13 @@ public class Animation implements IUpdateable, ILaunchable {
   }
 
   public Spritesheet getSpritesheet() {
+    // in case the previously sprite sheet was unloaded (removed from the loaded sprite sheets),
+    // try to find an updated one by the name of the previously used sprite
+    if (this.spritesheet != null && !this.spritesheet.isLoaded()) {
+      this.spritesheet = Spritesheet.find(this.spritesheet.getName());
+      this.initKeyFrames();
+    }
+
     return this.spritesheet;
   }
 
@@ -187,11 +194,12 @@ public class Animation implements IUpdateable, ILaunchable {
     this.elapsedTicks = 0;
   }
 
-  private void initKeyFrames(final int[] keyFrames) {
+  private void initKeyFrames(final int... keyFrames) {
     if (this.getSpritesheet() == null) {
       return;
     }
-
+    
+    this.keyframes.clear();
     int[] keyFrameDurations = keyFrames;
     if (keyFrameDurations.length == 0) {
       // fallback to use custom keyframe durations if no specific durations are

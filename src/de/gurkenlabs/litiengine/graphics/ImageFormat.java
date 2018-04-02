@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.io.File;
 import java.util.ArrayList;
+
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public enum ImageFormat {
   UNDEFINED, PNG, GIF, BMP, JPG;
@@ -22,6 +25,25 @@ public enum ImageFormat {
     }
 
     return UNDEFINED;
+  }
+
+  public static boolean isSupported(File file) {
+    return isSupported(file.getAbsolutePath());
+  }
+
+  public static boolean isSupported(String fileName) {
+    String extension = FileUtilities.getExtension(fileName);
+    if (extension == null || extension.isEmpty()) {
+      return false;
+    }
+
+    for (String supported : getAllExtensions()) {
+      if (extension.equalsIgnoreCase(supported)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public static String[] getAllExtensions() {

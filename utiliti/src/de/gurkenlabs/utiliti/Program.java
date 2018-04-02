@@ -27,6 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,11 +63,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
+import de.gurkenlabs.utiliti.swing.FileDrop;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -477,17 +481,16 @@ public class Program {
     importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
 
     MenuItem importSprite = new MenuItem(Resources.get("menu_assets_importSprite"));
-    importSprite.addActionListener(a -> EditorScreen.instance().importSpritesheets());
+    importSprite.addActionListener(a -> EditorScreen.instance().importSpriteSheets());
 
     MenuItem importEmitters = new MenuItem(Resources.get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
     MenuItem importBlueprints = new MenuItem(Resources.get("menu_assets_importBlueprints"));
     importBlueprints.addActionListener(a -> EditorScreen.instance().importBlueprints());
-    
+
     MenuItem importTilesets = new MenuItem(Resources.get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
-    
 
     mnProject.add(importSprite);
     mnProject.add(importSpriteFile);
@@ -561,6 +564,20 @@ public class Program {
     assetTree = new AssetTree();
     split.setLeftComponent(assetTree);
     assetPanel = new AssetPanel();
+
+    new FileDrop(assetPanel, files -> {
+      List<File> droppedImages = new ArrayList<>();
+      for (File file : files) {
+        // handle dropped image
+        if (ImageFormat.isSupported(file)) {
+          droppedImages.add(file);
+        }
+      }
+
+      if (!droppedImages.isEmpty()) {
+        EditorScreen.instance().importSpriteSheets(droppedImages.toArray(new File[droppedImages.size()]));
+      }
+    });
 
     JScrollPane scrollPane = new JScrollPane(assetPanel);
 

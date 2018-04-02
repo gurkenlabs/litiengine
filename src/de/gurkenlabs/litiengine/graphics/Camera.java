@@ -90,6 +90,10 @@ public class Camera implements ICamera {
     }
 
     final Spritesheet spriteSheet = animationController.getCurrentAnimation().getSpritesheet();
+    if (spriteSheet == null) {
+      return viewPortLocation;
+    }
+    
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 

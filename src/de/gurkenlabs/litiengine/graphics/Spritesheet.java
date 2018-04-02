@@ -44,6 +44,8 @@ public final class Spritesheet {
   private int spriteHeight;
   private int spriteWidth;
 
+  private boolean loaded;
+
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
     this.emptySprites = new CopyOnWriteArrayList<>();
     this.image = image;
@@ -58,7 +60,7 @@ public final class Spritesheet {
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
 
     spritesheets.put(this.name.toLowerCase(), this);
-
+    this.loaded = true;
     ImageCache.SPRITES.onCleared(cache -> {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
@@ -201,9 +203,40 @@ public final class Spritesheet {
     return new Spritesheet(path, spriteWidth, spriteHeight);
   }
 
-  public static void remove(final String path) {
-    spritesheets.values().removeIf(x -> x.getName().equals(path));
+  public static Spritesheet remove(final String path) {
+    if (!spritesheets.containsKey(path.toLowerCase())) {
+      return null;
+    }
+
+    Spritesheet spriteToRemove = spritesheets.get(path.toLowerCase());
+    spritesheets.remove(path.toLowerCase());
+    spriteToRemove.loaded = false;
+
     customKeyFrameDurations.remove(path);
+    return spriteToRemove;
+  }
+
+  public static void update(final SpriteSheetInfo info) {
+    if(info == null || info.getName() == null) {
+      return;
+    }
+    
+    final String spriteName = info.getName().toLowerCase();
+    if (!spritesheets.containsKey(spriteName)) {
+      return;
+    }
+
+    Spritesheet spriteToRemove = spritesheets.get(spriteName);
+    spritesheets.remove(spriteName);
+    customKeyFrameDurations.remove(spriteName);
+    
+    if (info.getHeight() == 0 && info.getWidth() == 0) {
+      spriteToRemove.loaded = false;
+      return;
+    }
+
+    load(info);
+    spriteToRemove.loaded = false;
   }
 
   /**
@@ -292,6 +325,10 @@ public final class Spritesheet {
    */
   public int getTotalNumberOfSprites() {
     return this.getRows() * this.getColumns();
+  }
+
+  public boolean isLoaded() {
+    return this.loaded;
   }
 
   @Override
