@@ -26,7 +26,7 @@ import de.gurkenlabs.utiliti.Icons;
 @SuppressWarnings("serial")
 public class EmitterPanel extends PropertyPanel<IMapObject> {
   private JToggleButton btnPause;
-  private CustomEmitter emitter;
+  private transient CustomEmitter emitter;
 
   public EmitterPanel() {
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_emitter"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
@@ -107,7 +107,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
       this.btnPause.setSelected(false);
       return;
     }
-    
+
     this.btnPause.setSelected(!emitter.isPaused());
   }
 

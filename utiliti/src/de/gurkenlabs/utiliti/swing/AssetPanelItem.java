@@ -100,7 +100,7 @@ public class AssetPanelItem extends JPanel {
         // TODO: We might need to provide multiple JPanels that contain the
         // buttons for
         // a certain usage and swap them out
-        if (getOrigin() instanceof SpriteSheetInfo) {
+        if (getOrigin() instanceof SpriteSheetInfo || getOrigin() instanceof EmitterData) {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
@@ -109,11 +109,6 @@ public class AssetPanelItem extends JPanel {
           btnEdit.setVisible(false);
           btnAdd.setVisible(false);
           btnDelete.setVisible(false);
-          btnExport.setVisible(true);
-        } else if (getOrigin() instanceof EmitterData) {
-          btnEdit.setVisible(true);
-          btnAdd.setVisible(true);
-          btnDelete.setVisible(true);
           btnExport.setVisible(true);
         } else if (getOrigin() instanceof MapObject) {
           btnEdit.setVisible(false);

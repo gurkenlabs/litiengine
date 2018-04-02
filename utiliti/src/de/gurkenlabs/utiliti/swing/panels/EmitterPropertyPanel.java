@@ -56,7 +56,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JTextField txt;
   private final JTable table;
   private final List<ParticleColor> colors;
-  private IMapObject backupMapObject;
+  private transient IMapObject backupMapObject;
   private final JTabbedPane tabbedPanel;
   private final JPanel colorPanel;
   private final JPanel spritePanel;
@@ -875,11 +875,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     
     this.rdbtnLockStartX.setSelected(true);
     this.rdbtnLockStartY.setSelected(true);
-  }
-
-  @Override
-  public void bind(IMapObject mapObject) {
-    super.bind(mapObject);
   }
 
   public void discardChanges() {
