@@ -113,10 +113,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private static final Color COLOR_MOUSE_SELECTION_AREA_FILL = new Color(0, 130, 152, 80);
   private static final Color COLOR_MOUSE_SELECTION_AREA_BORDER = new Color(0, 130, 152, 150);
 
-  private static Color COLOR_SELECTION_BORDER;
-  private static float FOCUS_BORDER_BRIGHTNESS = 0;
-  private static boolean FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
-
   private double currentTransformRectSize = TRANSFORM_RECT_SIZE;
   private final java.util.Map<TransformType, Rectangle2D> transformRects;
 
@@ -152,6 +148,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private Rectangle2D newObjectArea;
   private Blueprint copiedBlueprint;
   private int gridSize;
+
+  private Color colorSelectionBorder;
+  private float focusBorderBrightness = 0;
+  private boolean focusBorderBrightnessIncreasing = true;
 
   private boolean snapToGrid = true;
   private boolean renderGrid = false;
@@ -655,6 +655,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     this.getMaps().removeIf(x -> x.getFileName().equals(Game.getEnvironment().getMap().getFileName()));
+
+    // TODO: remove all tile sets from the game file that are no longer needed
+    // by any other map.
     EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps());
     if (!this.maps.isEmpty()) {
       this.loadEnvironment(this.maps.get(0));
@@ -1724,7 +1727,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
-      g.setColor(COLOR_SELECTION_BORDER);
+      g.setColor(colorSelectionBorder);
       Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
   }
@@ -1798,17 +1801,18 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   @Override
   public void update() {
-    if (FOCUS_BORDER_BRIGHTNESS <= 0.4) {
-      FOCUS_BORDER_BRIGHTNESS_INCREASING = true;
-    } else if (FOCUS_BORDER_BRIGHTNESS >= 0.9) {
-      FOCUS_BORDER_BRIGHTNESS_INCREASING = false;
+    if (this.focusBorderBrightness <= 0.4) {
+      this.focusBorderBrightnessIncreasing = true;
+    } else if (this.focusBorderBrightness >= 0.9) {
+      this.focusBorderBrightnessIncreasing = false;
     }
 
-    if (FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS < 0.9) {
-      FOCUS_BORDER_BRIGHTNESS += 0.005;
-    } else if (!FOCUS_BORDER_BRIGHTNESS_INCREASING && FOCUS_BORDER_BRIGHTNESS >= 0.4) {
-      FOCUS_BORDER_BRIGHTNESS -= 0.005;
+    if (this.focusBorderBrightnessIncreasing && this.focusBorderBrightness < 0.9) {
+      this.focusBorderBrightness += 0.005;
+    } else if (!focusBorderBrightnessIncreasing && this.focusBorderBrightness >= 0.4) {
+      this.focusBorderBrightness -= 0.005;
     }
-    COLOR_SELECTION_BORDER = Color.getHSBColor(0, 0, FOCUS_BORDER_BRIGHTNESS);
+
+    this.colorSelectionBorder = Color.getHSBColor(0, 0, this.focusBorderBrightness);
   }
 }
