@@ -168,6 +168,31 @@ public class AStarGrid implements IRenderable {
     }
   }
 
+  protected void assignPenalty(AStarNode node) {
+    if (!Game.getPhysicsEngine().collides(node.getLocation(), CollisionType.ENTITY)) {
+      return;
+    }
+
+    // by default we calculate a penalty for props that cannot be destroyed
+    int penalty = 0;
+    for (Prop prop : Game.getEnvironment().getProps()) {
+      if (!prop.hasCollision() || !prop.isIndestructible() || !prop.getBoundingBox().intersects(node.getBounds())) {
+        continue;
+      }
+
+      penalty += PENALTY_STATIC_PROP;
+    }
+
+    // if neighbors are not walkable, we try to avoid this node
+    for (AStarNode neighbor : this.getNeighbors(node)) {
+      if (!neighbor.isWalkable()) {
+        penalty += PENALTY_NOT_WALKABLE_NEIGHBOR;
+      }
+    }
+
+    node.setPenalty(penalty);
+  }
+
   private static void addNode(final List<AStarNode> neighbors, AStarNode node) {
     if (node != null && node.isWalkable()) {
       neighbors.add(node);
@@ -198,30 +223,5 @@ public class AStarGrid implements IRenderable {
         this.getGrid()[x][y] = node;
       }
     }
-  }
-
-  private void assignPenalty(AStarNode node) {
-    if (!Game.getPhysicsEngine().collides(node.getLocation(), CollisionType.ENTITY)) {
-      return;
-    }
-
-    // by default we calculate a penalty for props that cannot be destroyed
-    int penalty = 0;
-    for (Prop prop : Game.getEnvironment().getProps()) {
-      if (!prop.hasCollision() || !prop.isIndestructible() || !prop.getBoundingBox().intersects(node.getBounds())) {
-        continue;
-      }
-
-      penalty += PENALTY_STATIC_PROP;
-    }
-
-    // if neighbors are not walkable, we try to avoid this node
-    for (AStarNode neighbor : this.getNeighbors(node)) {
-      if (!neighbor.isWalkable()) {
-        penalty += PENALTY_NOT_WALKABLE_NEIGHBOR;
-      }
-    }
-
-    node.setPenalty(penalty);
   }
 }
