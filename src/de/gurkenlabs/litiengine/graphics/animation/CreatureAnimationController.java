@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
@@ -27,7 +27,7 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
  * {@link de.gurkenlabs.litiengine.graphics.ImageFormat} enum.
  * 
  * @see de.gurkenlabs.litiengine.entities.Creature
- * @see de.gurkenlabs.litiengine.entities.Direction
+ * @see de.gurkenlabs.litiengine.Direction
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {

@@ -13,8 +13,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.entities.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 

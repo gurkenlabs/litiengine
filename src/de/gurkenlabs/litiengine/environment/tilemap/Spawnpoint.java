@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.entities.Direction;
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.Entity;
 
 public class Spawnpoint extends Entity {

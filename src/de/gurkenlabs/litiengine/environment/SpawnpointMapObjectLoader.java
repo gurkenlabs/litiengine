@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.util.Collection;
 
-import de.gurkenlabs.litiengine.entities.Direction;
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;

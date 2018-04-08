@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.entities;
+package de.gurkenlabs.litiengine;
 
 public enum Direction {
   DOWN((byte) 1), LEFT((byte) 2), RIGHT((byte) 4), UNDEFINED((byte) 8), UP((byte) 16);

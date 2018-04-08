@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.physics;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.entities.Direction;
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
