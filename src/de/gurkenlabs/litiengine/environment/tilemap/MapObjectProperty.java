@@ -126,6 +126,7 @@ public final class MapObjectProperty {
     public static final String MINTTL = "particleMinTTL";
     public static final String MAXTTL = "particleMaxTTL";
     public static final String TTL_RANDOM = "particleTTLRandom";
+    public static final String FADE = "particleFade";
   }
 
   private static List<Field> availableProperties = new ArrayList<>();

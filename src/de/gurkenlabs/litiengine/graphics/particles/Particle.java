@@ -47,6 +47,10 @@ public abstract class Particle implements ITimeToLive {
 
   private ParticleRenderType particleRenderType;
 
+  private float opacity;
+
+  private boolean fade;
+
   /**
    * Constructs a new particle.
    * 
@@ -67,6 +71,8 @@ public abstract class Particle implements ITimeToLive {
     this.color = color;
     this.colorAlpha = this.color.getAlpha();
     this.collisionType = CollisionType.NONE;
+    this.opacity = 1;
+    this.fade = true;
   }
 
   @Override
@@ -153,6 +159,10 @@ public abstract class Particle implements ITimeToLive {
     return this.y;
   }
 
+  public boolean isFading() {
+    return this.fade;
+  }
+
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
   public Particle setCollisionType(final CollisionType collisionType) {
@@ -213,6 +223,11 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  public Particle setFade(boolean fade) {
+    this.fade = fade;
+    return this;
+  }
+
   public Particle setHeight(final float height) {
     this.height = height;
     return this;
@@ -262,7 +277,11 @@ public abstract class Particle implements ITimeToLive {
       return;
     }
 
-    final int alpha = this.getTimeToLive() > 0 ? (int) ((this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() * this.getColorAlpha()) : this.getColorAlpha();
+    if (this.isFading()) {
+      this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
+    }
+    
+    final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
 
     if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
@@ -304,5 +323,9 @@ public abstract class Particle implements ITimeToLive {
 
   protected float getRelativeY(double effectLocationY) {
     return (float) (effectLocationY + this.getY() - this.getHeight() / 2.0);
+  }
+
+  protected float getOpacity() {
+    return this.opacity;
   }
 }

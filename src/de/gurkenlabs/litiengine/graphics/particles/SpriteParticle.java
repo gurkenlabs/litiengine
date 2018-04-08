@@ -1,6 +1,8 @@
 package de.gurkenlabs.litiengine.graphics.particles;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
@@ -24,11 +26,14 @@ public class SpriteParticle extends Particle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     final Point2D renderLocation = this.getLocation(emitterOrigin);
 
+    Composite oldComp = g.getComposite();
+    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.getOpacity()));
     if (this.getAngle() != 0) {
       RenderEngine.renderImage(g, this.image, renderLocation, this.getAngle());
     } else {
       RenderEngine.renderImage(g, this.image, renderLocation);
     }
+    g.setComposite(oldComp);
   }
 
   public void setAngle(final float angle) {

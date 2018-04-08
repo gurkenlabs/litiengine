@@ -119,6 +119,9 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   @XmlElement
   private CollisionType collisionType;
 
+  @XmlElement
+  private boolean fade;
+
   public EmitterData() {
     this.colors = new ArrayList<>();
     this.x = new ParticleParameter();
@@ -137,6 +140,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.updateRate = Emitter.DEFAULT_UPDATERATE;
     this.originValign = Valign.TOP;
     this.originAlign = Align.LEFT;
+    this.fade = true;
   }
 
   public EmitterData(EmitterData data) {
@@ -171,6 +175,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.spritesheet = data.spritesheet;
     this.originValign = data.getOriginValign();
     this.originAlign = data.getOriginAlign();
+    this.fade = data.fade;
   }
 
   @Override
@@ -323,6 +328,10 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     return animateSprite;
   }
 
+  public boolean isFading() {
+    return this.fade;
+  }
+
   public void setAnimateSprite(boolean animateSprite) {
     this.animateSprite = animateSprite;
   }
@@ -395,6 +404,10 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
 
   public void setEmitterTTL(final int emitterTTL) {
     this.emitterTTL = emitterTTL;
+  }
+
+  public void setFade(final boolean fade) {
+    this.fade = fade;
   }
 
   public void setGravityX(final ParticleParameter gravityX) {

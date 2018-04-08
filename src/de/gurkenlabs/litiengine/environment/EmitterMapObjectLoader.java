@@ -98,6 +98,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     data.setParticleText(mapObject.getCustomProperty(MapObjectProperty.Particle.TEXT));
     data.setSpritesheet(mapObject.getCustomProperty(MapObjectProperty.Particle.SPRITE));
     data.setAnimateSprite(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.ANIMATESPRITE));
+    data.setFade(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.FADE));
     return data;
   }
 
@@ -154,7 +155,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     newMapObject.setCustomProperty(MapObjectProperty.Particle.TEXT, emitterData.getParticleText());
     newMapObject.setCustomProperty(MapObjectProperty.Particle.SPRITE, emitterData.getSpritesheet());
     newMapObject.setCustomProperty(MapObjectProperty.Particle.ANIMATESPRITE, Boolean.toString(emitterData.isAnimateSprite()));
-
+    newMapObject.setCustomProperty(MapObjectProperty.Particle.FADE, Boolean.toString(emitterData.isFading()));
     return newMapObject;
   }
 }
