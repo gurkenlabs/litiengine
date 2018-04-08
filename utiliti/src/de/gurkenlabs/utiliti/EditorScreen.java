@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
 import de.gurkenlabs.utiliti.components.MapComponent;
+import de.gurkenlabs.utiliti.swing.EditorFileChooser;
 import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
@@ -245,19 +246,8 @@ public class EditorScreen extends Screen {
   }
 
   public void load() {
-    JFileChooser chooser;
-
-    try {
-      chooser = new JFileChooser(new File(".").getCanonicalPath());
-
-      FileFilter filter = new FileNameExtensionFilter(GAME_FILE_NAME, GameData.FILE_EXTENSION);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
-        this.load(chooser.getSelectedFile());
-      }
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    if (EditorFileChooser.showFileDialog(GameData.FILE_EXTENSION, GAME_FILE_NAME, false) == JFileChooser.APPROVE_OPTION) {
+      this.load(EditorFileChooser.instance().getSelectedFile());
     }
   }
 
@@ -334,55 +324,28 @@ public class EditorScreen extends Screen {
   }
 
   public void importSpriteFile() {
-    JFileChooser chooser;
-
-    try {
-      chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
-
-      FileFilter filter = new FileNameExtensionFilter(SPRITE_FILE_NAME, SpriteSheetInfo.PLAIN_TEXT_FILE_EXTENSION);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
-        File spriteFile = chooser.getSelectedFile();
-        if (spriteFile == null) {
-          return;
-        }
-
-        List<Spritesheet> loaded = Spritesheet.load(spriteFile.toString());
-        List<SpriteSheetInfo> infos = new ArrayList<>();
-        for (Spritesheet sprite : loaded) {
-          SpriteSheetInfo info = new SpriteSheetInfo(sprite);
-          infos.add(info);
-          this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
-          this.getGameFile().getSpriteSheets().add(info);
-        }
-
-        this.loadSpriteSheets(infos, true);
+    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, "Import " + SPRITE_FILE_NAME, false, SpriteSheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+      File spriteFile = EditorFileChooser.instance().getSelectedFile();
+      if (spriteFile == null) {
+        return;
       }
 
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+      List<Spritesheet> loaded = Spritesheet.load(spriteFile.toString());
+      List<SpriteSheetInfo> infos = new ArrayList<>();
+      for (Spritesheet sprite : loaded) {
+        SpriteSheetInfo info = new SpriteSheetInfo(sprite);
+        infos.add(info);
+        this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
+        this.getGameFile().getSpriteSheets().add(info);
+      }
+
+      this.loadSpriteSheets(infos, true);
     }
   }
 
   public void importSpriteSheets() {
-
-    JFileChooser chooser;
-
-    try {
-      chooser = new JFileChooser(new File(this.getProjectPath()).getCanonicalPath());
-
-      FileFilter filter = new FileNameExtensionFilter(SPRITESHEET_FILE_NAME, ImageFormat.getAllExtensions());
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      chooser.setMultiSelectionEnabled(true);
-      if (chooser.showOpenDialog(Game.getScreenManager().getRenderComponent()) == JFileChooser.APPROVE_OPTION) {
-        this.importSpriteSheets(chooser.getSelectedFiles());
-      }
-    } catch (
-
-    IOException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+    if (EditorFileChooser.showFileDialog(SPRITESHEET_FILE_NAME, "Import " + SPRITESHEET_FILE_NAME, true, ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+      this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
     }
   }
 
