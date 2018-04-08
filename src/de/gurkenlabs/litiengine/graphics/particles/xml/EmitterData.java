@@ -135,6 +135,8 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.alphaDeviation = 0;
     this.collisionType = CollisionType.NONE;
     this.updateRate = Emitter.DEFAULT_UPDATERATE;
+    this.originValign = Valign.TOP;
+    this.originAlign = Align.LEFT;
   }
 
   public EmitterData(EmitterData data) {
@@ -167,6 +169,8 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.spawnRate = data.spawnRate;
     this.animateSprite = data.animateSprite;
     this.spritesheet = data.spritesheet;
+    this.originValign = data.getOriginValign();
+    this.originAlign = data.getOriginAlign();
   }
 
   @Override
