@@ -14,6 +14,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,8 +31,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -65,6 +68,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private final JComboBox<String> comboBoxSpriteType = new JComboBox<>();
   private final JComboBox<String> comboBoxSprite = new JComboBox<>();
   private final JComboBox<CollisionType> comboBoxCollisionType = new JComboBox<>();
+  private final JComboBox<Align> comboBoxAlign = new JComboBox<>();
+  private final JComboBox<Valign> comboBoxValign = new JComboBox<>();
   
   // TODO: refactor this code to use a custom ParticleParameter JPanel implementation that wraps the controls and logic
   private final JRadioButton rdbtnLockDeltaX = new JRadioButton("");
@@ -136,6 +141,10 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   
   private final JSpinner spinnerMinParticleTTL = new JSpinner(new SpinnerNumberModel(PARTICLEMINTTL_DEFAULT_VALUE, 0, 30000, 1));
   private final JSpinner spinnerMaxParticleTTL = new JSpinner(new SpinnerNumberModel(0, 0, 30000, 1));
+  
+  private final JCheckBox checkBoxFade;
+  private final JLabel lblPivotY = new JLabel("pivot Y");
+  private final JLabel label = new JLabel("pivot X");
 
   /**
    * Create the dialog.
@@ -156,6 +165,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.comboBoxParticleType.setModel(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
     this.comboBoxCollisionType.setModel(new DefaultComboBoxModel<CollisionType>(CollisionType.values()));
+    this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
+    this.comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
     
     this.comboBoxSpriteType.addItem(Resources.get("panel_animation"));
     this.comboBoxSpriteType.addItem(Resources.get("panel_spritesheet"));
@@ -361,6 +372,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
             .addGap(10)
             .addGroup(groupLayoutSpritePanel.createParallelGroup(Alignment.LEADING).addGroup(groupLayoutSpritePanel.createSequentialGroup().addGap(3).addComponent(lblSpritesheet)).addComponent(comboBoxSprite, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))));
     spritePanel.setLayout(groupLayoutSpritePanel);
+    
+    this.checkBoxFade = new JCheckBox("fade");
+    this.checkBoxFade.setSelected(true);
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
@@ -376,76 +390,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
               .addComponent(lblLock)
               .addGap(13)
               .addComponent(lblRandom))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblSpawnRate)
-              .addGap(26)
-              .addComponent(spinnerSpawnRate, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-              .addGap(118)
-              .addComponent(lblDeltax, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMin1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMaxDeltaX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addGap(29)
-              .addComponent(rdbtnLockDeltaX)
-              .addGap(19)
-              .addComponent(rdbtnRandomDeltaX))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblSpawnAmount)
-              .addGap(10)
-              .addComponent(spinnerSpawnAmount, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-              .addGap(118)
-              .addComponent(lblDeltaY, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMin2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMinDeltaY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMax1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMaxDeltaY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addGap(29)
-              .addComponent(rdbtnLockDeltaY)
-              .addGap(19)
-              .addComponent(rdbtnRandomDeltaY))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblUpdateDelay)
-              .addGap(17)
-              .addComponent(spinnerUpdateRate, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-              .addGap(118)
-              .addComponent(lblGravityX, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMin3, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMax2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addGap(29)
-              .addComponent(rdbtnLockGravityX)
-              .addGap(19)
-              .addComponent(rdbtnRandomGravityX))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(labelTtl)
-              .addGap(28)
-              .addComponent(spinnerTTL, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-              .addGap(118)
-              .addComponent(lblGravityY, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMin4, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMinGravityY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMax3, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMaxGravityY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addGap(29)
-              .addComponent(rdbtnLockGravityY)
-              .addGap(19)
-              .addComponent(rdbtnRandomGravityY))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblMaxParticles)
-              .addGap(17)
-              .addComponent(spinnerMaxParticles, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
-              .addGap(118)
-              .addComponent(lblStartWidth, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMin5, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMinStartWidth, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblMax4, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-              .addComponent(spinnerMaxStartWidth, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-              .addGap(29)
-              .addComponent(rdbtnLockStartWidth)
-              .addGap(19)
-              .addComponent(rdbtnRandomStartWidth))
             .addGroup(groupLayout.createSequentialGroup()
               .addComponent(lblParticleType)
               .addGap(20)
@@ -467,11 +411,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                 .addGroup(groupLayout.createSequentialGroup()
                   .addComponent(lblStaticPhysics, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(ComponentPlacement.UNRELATED)
-                  .addComponent(comboBoxCollisionType, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE))
-                .addGroup(groupLayout.createSequentialGroup()
-                  .addComponent(lblText, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(comboBoxCollisionType, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(ComponentPlacement.UNRELATED)
-                  .addComponent(txt, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE))
+                  .addComponent(checkBoxFade))
                 .addGroup(groupLayout.createSequentialGroup()
                   .addComponent(lblStartY, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
                   .addComponent(label10, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
@@ -533,147 +475,256 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
                     .addGroup(groupLayout.createSequentialGroup()
                       .addComponent(rdbtnLockParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                       .addGap(19)
-                      .addComponent(rdbtnRandomParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)))))))
+                      .addComponent(rdbtnRandomParticleTTL, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addPreferredGap(ComponentPlacement.RELATED)
+                  .addComponent(lblText, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addPreferredGap(ComponentPlacement.UNRELATED)
+                  .addComponent(txt, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE))))
+            .addGroup(groupLayout.createSequentialGroup()
+              .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblMaxParticles)
+                  .addGap(17)
+                  .addComponent(spinnerMaxParticles, 0, 0, Short.MAX_VALUE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(Alignment.TRAILING, groupLayout.createParallelGroup(Alignment.LEADING)
+                      .addGroup(Alignment.TRAILING, groupLayout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+                          .addComponent(lblSpawnRate)
+                          .addGap(26))
+                        .addGroup(groupLayout.createSequentialGroup()
+                          .addComponent(lblSpawnAmount)
+                          .addGap(1)))
+                      .addGroup(groupLayout.createSequentialGroup()
+                        .addComponent(lblUpdateDelay)
+                        .addPreferredGap(ComponentPlacement.RELATED)))
+                    .addGroup(groupLayout.createSequentialGroup()
+                      .addComponent(labelTtl)
+                      .addGap(1)))
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+                    .addComponent(spinnerTTL)
+                    .addComponent(spinnerUpdateRate)
+                    .addComponent(spinnerSpawnAmount)
+                    .addComponent(spinnerSpawnRate, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE))))
+              .addPreferredGap(ComponentPlacement.UNRELATED)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+                .addComponent(lblPivotY, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(label, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+              .addGap(18)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addComponent(comboBoxAlign, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+                .addComponent(comboBoxValign, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE))
+              .addGap(16)
+              .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblStartWidth, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMin5, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMinStartWidth, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMax4, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMaxStartWidth, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addGap(29)
+                  .addComponent(rdbtnLockStartWidth)
+                  .addGap(19)
+                  .addComponent(rdbtnRandomStartWidth))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblGravityY, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMin4, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMinGravityY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMax3, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMaxGravityY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addGap(29)
+                  .addComponent(rdbtnLockGravityY)
+                  .addGap(19)
+                  .addComponent(rdbtnRandomGravityY))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblGravityX, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMin3, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMax2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addGap(29)
+                  .addComponent(rdbtnLockGravityX)
+                  .addGap(19)
+                  .addComponent(rdbtnRandomGravityX))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblDeltaY, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMin2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMinDeltaY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMax1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMaxDeltaY, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addGap(29)
+                  .addComponent(rdbtnLockDeltaY)
+                  .addGap(19)
+                  .addComponent(rdbtnRandomDeltaY))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addComponent(lblDeltax, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMin1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                  .addComponent(spinnerMaxDeltaX, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+                  .addGap(29)
+                  .addComponent(rdbtnLockDeltaX)
+                  .addGap(19)
+                  .addComponent(rdbtnRandomDeltaX)))))
           .addContainerGap(12, Short.MAX_VALUE))
     );
     groupLayout.setVerticalGroup(
       groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup()
-          .addGap(10)
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addComponent(labelEmitterData)
-            .addComponent(lblParticleData)
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(lblLock))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(lblRandom)))
-          .addGap(12)
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblSpawnRate))
+              .addGap(10)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addComponent(labelEmitterData)
+                .addComponent(lblParticleData)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(lblLock))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(lblRandom)))
+              .addGap(12)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblSpawnRate))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblDeltax))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMin1))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMax))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMaxDeltaX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(rdbtnLockDeltaX)
+                .addComponent(rdbtnRandomDeltaX)))
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerSpawnRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblDeltax))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMin1))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMinDeltaX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMax))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxDeltaX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(rdbtnLockDeltaX)
-            .addComponent(rdbtnRandomDeltaX))
-          .addGap(9)
+              .addGap(38)
+              .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(spinnerSpawnRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(label)
+                .addComponent(comboBoxAlign, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblSpawnAmount))
+              .addGap(9)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblSpawnAmount))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblDeltaY))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMin2))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMinDeltaY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMax1))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMaxDeltaY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(rdbtnLockDeltaY)
+                .addComponent(rdbtnRandomDeltaY)))
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerSpawnAmount, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblDeltaY))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMin2))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMinDeltaY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMax1))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxDeltaY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(rdbtnLockDeltaY)
-            .addComponent(rdbtnRandomDeltaY))
-          .addGap(9)
+              .addGap(10)
+              .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(spinnerSpawnAmount, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblPivotY)
+                .addComponent(comboBoxValign, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblUpdateDelay))
+              .addGap(9)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblUpdateDelay))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblGravityX))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMin3))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMax2))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(rdbtnLockGravityX)
+                .addComponent(rdbtnRandomGravityX)))
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerUpdateRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblGravityX))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMin3))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMinGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMax2))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxGravityX, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(rdbtnLockGravityX)
-            .addComponent(rdbtnRandomGravityX))
-          .addGap(9)
+              .addGap(10)
+              .addComponent(spinnerUpdateRate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(labelTtl))
+              .addGap(9)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(labelTtl))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblGravityY))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMin4))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMinGravityY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMax3))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMaxGravityY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(rdbtnLockGravityY)
+                .addComponent(rdbtnRandomGravityY)))
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerTTL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblGravityY))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMin4))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMinGravityY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMax3))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxGravityY, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(rdbtnLockGravityY)
-            .addComponent(rdbtnRandomGravityY))
-          .addGap(9)
+              .addGap(10)
+              .addComponent(spinnerTTL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+          .addPreferredGap(ComponentPlacement.RELATED)
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMaxParticles))
+              .addGap(9)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMaxParticles))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblStartWidth))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMin5))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMinStartWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(4)
+                  .addComponent(lblMax4))
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGap(1)
+                  .addComponent(spinnerMaxStartWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(rdbtnLockStartWidth)
+                .addComponent(rdbtnRandomStartWidth)))
             .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxParticles, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblStartWidth))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMin5))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMinStartWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(4)
-              .addComponent(lblMax4))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addGap(1)
-              .addComponent(spinnerMaxStartWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addComponent(rdbtnLockStartWidth)
-            .addComponent(rdbtnRandomStartWidth))
+              .addGap(10)
+              .addComponent(spinnerMaxParticles, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
           .addGap(9)
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
@@ -701,7 +752,6 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
             .addComponent(rdbtnRandomStartHeight))
           .addGap(5)
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
             .addGroup(groupLayout.createSequentialGroup()
               .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
@@ -804,12 +854,14 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
               .addPreferredGap(ComponentPlacement.UNRELATED)
               .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                 .addComponent(comboBoxCollisionType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblStaticPhysics))
-              .addGap(9)
+                .addComponent(lblStaticPhysics)
+                .addComponent(checkBoxFade))
+              .addGap(12)
               .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
                 .addComponent(txt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblText))))
-          .addGap(31))
+                .addComponent(lblText)))
+            .addComponent(tabbedPanel, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
+          .addContainerGap())
     );
     setLayout(groupLayout);
     this.setupChangedListeners();
@@ -937,7 +989,15 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       String sprite = this.comboBoxSprite.getSelectedItem().toString();
       m.setCustomProperty(MapObjectProperty.Particle.SPRITE, sprite);
     }));
-
+    
+    this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
+      m.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
+    }));
+    
+    this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
+      m.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
+    }));
+    
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
     this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNAMOUNT, this.spinnerSpawnAmount));
     this.spinnerUpdateRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.UPDATERATE, this.spinnerUpdateRate));
@@ -975,6 +1035,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHADEVIATION, this.spinnerAlphaDeviation));
 
     this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.TEXT, this.txt.getText())));
+    
+    this.checkBoxFade.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.FADE, Boolean.toString(this.checkBoxFade.isSelected()))));
   }
   
   private void updateTabbedGroup() {
@@ -995,6 +1057,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.comboBoxSprite.setSelectedItem(null);
     this.comboBoxSpriteType.setSelectedIndex(0);
     this.comboBoxCollisionType.setSelectedIndex(0);
+    this.comboBoxAlign.setSelectedIndex(0);
+    this.comboBoxValign.setSelectedIndex(0);
     
     this.spinnerSpawnRate.setValue(0);
     this.spinnerSpawnAmount.setValue(Emitter.DEFAULT_SPAWNAMOUNT);
@@ -1050,6 +1114,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.rdbtnLockStartY.setSelected(true);
     this.model.setRowCount(0);
     this.colors.clear();
+    
+    this.checkBoxFade.setSelected(true);
   }
 
   @Override
@@ -1059,7 +1125,9 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.updateTabbedGroup();
     this.comboBoxSprite.setSelectedItem(mapObject.getCustomProperty(MapObjectProperty.Particle.SPRITE));
     this.comboBoxCollisionType.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
-
+    this.comboBoxAlign.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.CENTER));
+    this.comboBoxValign.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.MIDDLE));
+    
     // TODO: implement this
     this.comboBoxSpriteType.setSelectedIndex(0);
 
@@ -1123,6 +1191,8 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
       this.colors.add(color);
       this.model.addRow(new Object[] { null, color.toString() });
     }
+    
+    this.checkBoxFade.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.Particle.FADE, true));
   }
 
   private static SpinnerNumberModel getParticleMinModel() {

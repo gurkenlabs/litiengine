@@ -166,6 +166,7 @@ public class CustomEmitter extends Emitter {
     particle.setDeltaWidth(deltaWidth);
     particle.setDeltaHeight(deltaHeight);
     particle.setCollisionType(this.getEmitterData().getCollisionType());
+    particle.setFade(this.getEmitterData().isFading());
     return particle;
   }
 
@@ -179,6 +180,8 @@ public class CustomEmitter extends Emitter {
     this.setSpawnRate(this.getEmitterData().getSpawnRate());
     this.setParticleUpdateRate(this.getEmitterData().getUpdateRate());
     this.setSize(this.getEmitterData().getWidth(), this.getEmitterData().getHeight());
+    this.setOriginAlign(this.getEmitterData().getOriginAlign());
+    this.setOriginValign(this.getEmitterData().getOriginValign());
 
     for (final ParticleColor color : this.getEmitterData().getColors()) {
       this.addParticleColor(color.toColor());
