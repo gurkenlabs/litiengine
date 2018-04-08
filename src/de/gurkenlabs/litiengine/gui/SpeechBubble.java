@@ -170,7 +170,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       Game.getEnvironment().removeRenderable(this);
       Game.getRenderLoop().detach(this);
 
-      if (activeSpeechBubbles.remove(this.getEntity()) != null && activeSpeechBubbles.remove(this.getEntity()).equals(this)) {
+      if (activeSpeechBubbles.containsKey(this.getEntity()) && activeSpeechBubbles.get(this.getEntity()).equals(this)) {
         activeSpeechBubbles.remove(this.getEntity());
       }
 
