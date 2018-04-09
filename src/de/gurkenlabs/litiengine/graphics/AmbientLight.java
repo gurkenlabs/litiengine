@@ -66,6 +66,7 @@ public class AmbientLight extends ColorLayer {
 
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension, Rectangle2D section) {
     final Point2D lightCenter = light.getCenter();
+    final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
 
     Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
@@ -94,15 +95,15 @@ public class AmbientLight extends ColorLayer {
       final Line2D[] bounds = GeometricUtilities.getLines(col.getBoundingBox());
       for (final Line2D line : bounds) {
         final Vector2D lineVector = new Vector2D(line.getP1(), line.getP2());
-        final Vector2D lightVector = new Vector2D(lightCenter, line.getP1());
+        final Vector2D lightVector = new Vector2D(lightFocus, line.getP1());
 
         if (light.getCenter().getY() < line.getY1() && light.getCenter().getY() < line.getY2() && col.getBoundingBox().contains(light.getCenter()) || lineVector.normalVector().dotProduct(lightVector) >= 0) {
           continue;
         }
 
         final Path2D shadowParallelogram = new Path2D.Double();
-        final Point2D shadowPoint1 = GeometricUtilities.project(lightCenter, line.getP1(), longerDimension);
-        final Point2D shadowPoint2 = GeometricUtilities.project(lightCenter, line.getP2(), longerDimension);
+        final Point2D shadowPoint1 = GeometricUtilities.project(lightFocus, line.getP1(), longerDimension);
+        final Point2D shadowPoint2 = GeometricUtilities.project(lightFocus, line.getP2(), longerDimension);
 
         // construct a shape from our points
         shadowParallelogram.moveTo(line.getP1().getX(), line.getP1().getY());
