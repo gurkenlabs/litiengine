@@ -15,7 +15,7 @@ public class OvalOutlineParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
     g.setColor(this.getColor());
     Stroke oldStroke = g.getStroke();
     g.setStroke(this.getStroke());

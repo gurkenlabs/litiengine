@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.particles;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -50,6 +51,12 @@ public abstract class Particle implements ITimeToLive {
   private float opacity;
 
   private boolean fade;
+
+  private boolean fadeOnCollision;
+
+  private boolean colliding;
+
+  private boolean continuousCollision;
 
   /**
    * Constructs a new particle.
@@ -131,7 +138,7 @@ public abstract class Particle implements ITimeToLive {
    *          the effect position
    * @return the location
    */
-  public Point2D getLocation(Point2D effectLocation) {
+  public Point2D getRenderLocation(Point2D effectLocation) {
     // if we have a camera, we need to render the particle relative to the
     // viewport
     Point2D newEffectLocation = Game.getScreenManager() != null ? Game.getCamera().getViewPortLocation(effectLocation) : effectLocation;
@@ -163,10 +170,30 @@ public abstract class Particle implements ITimeToLive {
     return this.fade;
   }
 
+  public boolean isFadingOnCollision() {
+    return this.fadeOnCollision;
+  }
+
+  public boolean isContinuousCollisionEnabled() {
+    return this.continuousCollision;
+  }
+
   public abstract void render(final Graphics2D g, final Point2D emitterOrigin);
 
   public Particle setCollisionType(final CollisionType collisionType) {
     this.collisionType = collisionType;
+    return this;
+  }
+
+  /**
+   * Enabling this check can be very performance hungry and should be used with caution and only for a small amount of particles.
+   * 
+   * @param ccd
+   *          If set to true, the collision will be checked continuously by a ray-cast approximation.
+   * @return This particle instance.
+   */
+  public Particle setContinuousCollision(boolean ccd) {
+    this.continuousCollision = ccd;
     return this;
   }
 
@@ -228,6 +255,11 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
+  public Particle setFadeOnCollision(boolean fadeOnCollision) {
+    this.fadeOnCollision = fadeOnCollision;
+    return this;
+  }
+
   public Particle setHeight(final float height) {
     this.height = height;
     return this;
@@ -273,27 +305,31 @@ public abstract class Particle implements ITimeToLive {
     }
 
     this.aliveTime = Game.getLoop().getDeltaTime(this.aliveTick);
-    if (this.timeToLiveReached()) {
+    if (this.timeToLiveReached() || this.colliding) {
       return;
     }
 
     if (this.isFading()) {
       this.opacity = (float) (this.getTimeToLive() > 0 ? (this.getTimeToLive() - this.getAliveTime()) / (double) this.getTimeToLive() : 1);
     }
-    
+
     final int alpha = (int) (this.getOpacity() * this.getColorAlpha());
     this.color = new Color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), alpha >= 0 ? alpha : 0);
 
-    if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+    // test for ray cast collision
+    final float targetX = this.x + this.getDx() * updateRatio;
+    final float targetY = this.y + this.getDy() * updateRatio;
+
+    if (this.checkForCollision(emitterOrigin, targetX, targetY)) {
       return;
     }
 
     if (this.getDx() != 0) {
-      this.x += this.getDx() * updateRatio;
+      this.x = targetX;
     }
 
     if (this.getDy() != 0) {
-      this.y += this.getDy() * updateRatio;
+      this.y = targetY;
     }
 
     if (this.getGravityX() != 0) {
@@ -313,7 +349,34 @@ public abstract class Particle implements ITimeToLive {
     }
   }
 
-  protected Point2D getRelativeLocation(final Point2D effectLocation) {
+  private boolean checkForCollision(final Point2D emitterOrigin, float targetX, float targetY) {
+    if (this.isContinuousCollisionEnabled()) {
+      Point2D start = this.getRelativeLocation(emitterOrigin);
+      double endX = emitterOrigin.getX() + targetX - this.getWidth() / 2.0;
+      double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
+
+      Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
+      if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(ray, this.getCollisionType()) != null) {
+        if (this.isFadingOnCollision()) {
+          this.opacity = 0;
+        }
+
+        this.colliding = true;
+        return true;
+      }
+    } else if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+      if (this.isFadingOnCollision()) {
+        this.opacity = 0;
+      }
+
+      this.colliding = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  public Point2D getRelativeLocation(final Point2D effectLocation) {
     return new Point2D.Float(getRelativeX(effectLocation.getX()), getRelativeY(effectLocation.getY()));
   }
 

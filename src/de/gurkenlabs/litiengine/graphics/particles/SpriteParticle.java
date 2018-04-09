@@ -24,7 +24,7 @@ public class SpriteParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
 
     Composite oldComp = g.getComposite();
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.getOpacity()));
@@ -36,7 +36,8 @@ public class SpriteParticle extends Particle {
     g.setComposite(oldComp);
   }
 
-  public void setAngle(final float angle) {
+  public Particle setAngle(final float angle) {
     this.angle = angle;
+    return this;
   }
 }

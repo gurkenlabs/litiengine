@@ -13,7 +13,7 @@ public class LeftLineParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
     g.setColor(this.getColor());
     g.draw(new Line2D.Double(renderLocation.getX() + this.getWidth(), renderLocation.getY(), renderLocation.getX(), renderLocation.getY() + this.getHeight()));
   }

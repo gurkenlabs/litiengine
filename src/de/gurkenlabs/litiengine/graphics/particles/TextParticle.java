@@ -29,7 +29,7 @@ public class TextParticle extends Particle {
       return;
     }
     
-    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
     g.setColor(this.getColor());
     final Font oldFont = g.getFont();
     if (this.getFont() != null) {

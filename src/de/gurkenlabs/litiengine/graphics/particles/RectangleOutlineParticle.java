@@ -20,7 +20,7 @@ public class RectangleOutlineParticle extends Particle {
 
   @Override
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
-    final Point2D renderLocation = this.getLocation(emitterOrigin);
+    final Point2D renderLocation = this.getRenderLocation(emitterOrigin);
     final Stroke oldStroke = g.getStroke();
     g.setColor(this.getColor());
     g.setStroke(new BasicStroke(this.stroke));
