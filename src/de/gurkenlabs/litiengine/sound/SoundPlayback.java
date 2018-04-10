@@ -168,6 +168,11 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     return this.paused;
   }
 
+  @Override
+  public boolean isPlaying() {
+    return this.playing;
+  }
+
   protected static void terminate() {
     closeQueue.terminate();
   }
@@ -187,10 +192,6 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
 
   protected Sound getSound() {
     return this.sound;
-  }
-
-  protected boolean isPlaying() {
-    return this.playing;
   }
 
   /**

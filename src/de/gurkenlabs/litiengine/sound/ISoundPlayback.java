@@ -9,6 +9,8 @@ public interface ISoundPlayback {
 
   public boolean isPaused();
 
+  public boolean isPlaying();
+
   public void cancel();
 
   public void onFinished(Consumer<Sound> consumer);
