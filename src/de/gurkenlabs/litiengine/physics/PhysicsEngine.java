@@ -109,23 +109,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     final Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
 
     final List<Rectangle2D> collBoxes = this.getAllCollisionBoxRectangles(collisionType);
-    collBoxes.sort((rect1, rect2) -> {
-      final Point2D rect1Center = new Point2D.Double(rect1.getCenterX(), rect1.getCenterY());
-      final Point2D rect2Center = new Point2D.Double(rect2.getCenterX(), rect2.getCenterY());
-      final double dist1 = rect1Center.distance(rayCastSource);
-      final double dist2 = rect2Center.distance(rayCastSource);
-
-      if (dist1 < dist2) {
-        return -1;
-      }
-
-      if (dist1 > dist2) {
-        return 1;
-      }
-
-      return 0;
-    });
-
     for (final Rectangle2D collisionBox : collBoxes) {
       if (collisionBox.intersectsLine(rayCast)) {
         double closestDist = -1;
