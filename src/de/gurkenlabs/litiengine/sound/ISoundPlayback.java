@@ -12,6 +12,10 @@ public interface ISoundPlayback {
   public boolean isPlaying();
 
   public void cancel();
+  
+  public float getGain();
+  
+  public void setGain(float gain);
 
   public void onFinished(Consumer<Sound> consumer);
 

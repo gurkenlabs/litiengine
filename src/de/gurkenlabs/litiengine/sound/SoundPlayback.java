@@ -42,6 +42,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
 
   private IEntity entity;
   private float gain;
+  private float actualGain;
   private FloatControl gainControl;
   private FloatControl panControl;
 
@@ -69,6 +70,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.cancelledConsumer = new CopyOnWriteArrayList<>();
     this.sound = sound;
     this.initialListenerLocation = listenerLocation;
+    this.gain = 1;
   }
 
   protected SoundPlayback(final Sound sound, final Point2D listenerLocation, final IEntity sourceEntity) {
@@ -154,6 +156,11 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   @Override
+  public float getGain() {
+    return this.gain;
+  }
+
+  @Override
   public void pausePlayback() {
     this.paused = true;
   }
@@ -171,6 +178,11 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   @Override
   public boolean isPlaying() {
     return this.playing;
+  }
+
+  @Override
+  public void setGain(float gain) {
+    this.gain = MathUtilities.clamp(gain, 0, 1);
   }
 
   protected static void terminate() {
@@ -211,20 +223,20 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
       return;
     }
 
-    this.gain = gain;
+    this.actualGain = gain;
     this.location = location;
     this.loop = loop;
     executorServie.execute(this);
   }
 
-  protected void setGain(final float g) {
+  protected void setMasterGain(final float g) {
     // Make sure there is a gain control
     if (this.gainControl == null) {
       return;
     }
 
     // make sure the value is valid (between 0 and 1)
-    final float newGain = MathUtilities.clamp(g, 0, 1);
+    final float newGain = MathUtilities.clamp(g * this.gain, 0, 1);
 
     final double minimumDB = this.gainControl.getMinimum();
     final double maximumDB = 1;
@@ -250,7 +262,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
       return;
     }
 
-    this.setGain(calculateGain(loc, listenerLocation));
+    this.setMasterGain(calculateGain(loc, listenerLocation));
     this.setPan(calculatePan(loc, listenerLocation));
   }
 
@@ -279,8 +291,8 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   private void initGain() {
-    final float initialGain = this.gain > 0 ? this.gain : Game.getConfiguration().sound().getSoundVolume();
-    SoundPlayback.this.setGain(initialGain);
+    final float initialGain = this.actualGain > 0 ? this.actualGain : Game.getConfiguration().sound().getSoundVolume();
+    SoundPlayback.this.setMasterGain(initialGain);
   }
 
   private void loadDataLine() {

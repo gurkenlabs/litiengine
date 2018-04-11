@@ -136,7 +136,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
     }
 
     if (this.music != null) {
-      this.music.setGain(Game.getConfiguration().sound().getMusicVolume());
+      this.music.setMasterGain(Game.getConfiguration().sound().getMusicVolume());
     }
 
     // music is looped by default
