@@ -65,13 +65,16 @@ public class AmbientLight extends ColorLayer {
   }
 
   private void renderLightSource(final Graphics2D g, final LightSource light, final double longerDimension, Rectangle2D section) {
+
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
+    Shape fillShape;
 
     Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
-      g.setColor(light.getColor());
-      g.fill(light.getBoundingBox());
+      g.setColor(new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getColor().getAlpha()));
+      fillShape = new Rectangle2D.Double(light.getBoundingBox().getX() - section.getX(), light.getBoundingBox().getY() - section.getY(), light.getBoundingBox().getWidth(), light.getBoundingBox().getHeight());
+      g.fill(fillShape);
       return;
     }
 
@@ -138,9 +141,9 @@ public class AmbientLight extends ColorLayer {
         new float[] { 0.0f, 1.00f },
         transColors,
         CycleMethod.NO_CYCLE);
+
     g.setPaint(paint);
 
-    Shape fillShape;
     if (lightArea != null) {
       lightArea.transform(AffineTransform.getTranslateInstance(-section.getX(), -section.getY()));
       fillShape = lightArea;
