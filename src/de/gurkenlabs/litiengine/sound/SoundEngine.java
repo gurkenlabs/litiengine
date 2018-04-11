@@ -9,6 +9,7 @@ import java.util.function.Function;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.input.Input;
 
 public final class SoundEngine implements ISoundEngine, IUpdateable {
   private static final int DEFAULT_MAX_DISTANCE = 150;
@@ -88,7 +89,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void start() {
-    Game.getLoop().attach(this);
+    Input.getLoop().attach(this);
     this.listenerLocation = Game.getCamera().getFocus();
   }
 
@@ -104,7 +105,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable {
 
   @Override
   public void terminate() {
-    Game.getLoop().detach(this);
+    Input.getLoop().detach(this);
     if (this.music != null && this.music.isPlaying()) {
       this.music.dispose();
       this.music = null;
