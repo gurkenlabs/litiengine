@@ -96,15 +96,18 @@ public abstract class ColorLayer implements IRenderable {
     final IMap map = this.getEnvironment().getMap();
     final Point startTile = MapUtilities.getTile(map, new Point2D.Double(section.getX(), section.getY()));
     final Point endTile = MapUtilities.getTile(map, new Point2D.Double(section.getMaxX(), section.getMaxY()));
-    final int startX = MathUtilities.clamp(startTile.x, 0, tiles.length - 1);
-    final int startY = MathUtilities.clamp(startTile.y, 0, tiles[0].length - 1);
+    final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(endTile.x - startTile.x, tiles.length) - 1);
+    final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(endTile.y - startTile.y, tiles[0].length) - 1);
 
-    final int endX = MathUtilities.clamp(endTile.x, 0, tiles.length - 1);
-    final int endY = MathUtilities.clamp(endTile.y, 0, tiles[0].length - 1);
+    final int endX = MathUtilities.clamp(endTile.x, 0,  Math.min(endTile.x - startTile.x, tiles.length) - 1);
+    final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(endTile.y - startTile.y, tiles[0].length) - 1);
 
-    for (int x = startX; x < endX; x++) {
-      for (int y = startY; y < endY; y++) {
-        final BufferedImage smallImage = img.getSubimage((x - startX) * map.getTileSize().width, (y - startY) * map.getTileSize().height, map.getTileSize().width, map.getTileSize().height);
+    for (int x = startX; x <= endX; x++) {
+      for (int y = startY; y <= endY; y++) {
+        final int subX = (x - startX) * map.getTileSize().width;
+        final int subY = (y - startY) * map.getTileSize().height;
+
+        final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileSize().width, map.getTileSize().height);
         this.tiles[x][y] = smallImage;
       }
     }
