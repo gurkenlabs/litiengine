@@ -20,8 +20,9 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
    *          the entity
    */
   public EntityEmitter(final IEntity entity) {
-    super((int) entity.getCenter().getX(), (int) entity.getCenter().getY());
+    super(entity.getCenter().getX() - entity.getWidth() / 2, entity.getCenter().getY() - entity.getHeight() / 2);
     this.entity = entity;
+    this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
   }
 
   @Override
@@ -35,10 +36,7 @@ public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
       return null;
     }
 
-    return this.getEntity().getCenter();
+    return super.getLocation();
   }
 
-  @Override
-  public void setLocation(final Point2D location) {
-  }
 }

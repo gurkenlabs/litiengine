@@ -174,7 +174,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public List<ICollisionEntity> collidesWithEntites(final Rectangle2D rect) {
+  public List<ICollisionEntity> collidesWithEntities(final Rectangle2D rect) {
     final List<ICollisionEntity> collEntities = new CopyOnWriteArrayList<>();
     for (final ICollisionEntity coll : this.getCollisionEntities()) {
       if (coll.getCollisionBox().intersects(rect)) {

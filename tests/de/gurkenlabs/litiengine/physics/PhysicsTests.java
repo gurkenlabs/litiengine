@@ -110,6 +110,6 @@ public class PhysicsTests {
 
     assertFalse(engine.collides(new Rectangle2D.Double(10.1, 10.1, 5, 5)));
 
-    assertTrue(engine.collidesWithEntites(new Rectangle2D.Double(9, 9, 5, 5)).contains(ent));
+    assertTrue(engine.collidesWithEntities(new Rectangle2D.Double(9, 9, 5, 5)).contains(ent));
   }
 }

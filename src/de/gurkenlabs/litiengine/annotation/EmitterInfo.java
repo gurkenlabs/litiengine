@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
 /**
@@ -33,4 +35,8 @@ public @interface EmitterInfo {
   int spawnAmount() default Emitter.DEFAULT_SPAWNAMOUNT;
 
   int spawnRate() default 0;
+
+  Align originAlign() default Align.LEFT;
+
+  Valign originVAlign() default Valign.TOP;
 }

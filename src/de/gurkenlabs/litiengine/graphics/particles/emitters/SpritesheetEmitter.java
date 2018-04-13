@@ -15,6 +15,8 @@ public abstract class SpritesheetEmitter extends Emitter {
   public SpritesheetEmitter(final Spritesheet spriteSheet, final Point2D origin) {
     super(origin);
     this.spriteSheet = spriteSheet;
+    this.setSize(this.getSpritesheet().getSpriteWidth(), this.getSpritesheet().getSpriteHeight());
+
   }
 
   public Spritesheet getSpritesheet() {

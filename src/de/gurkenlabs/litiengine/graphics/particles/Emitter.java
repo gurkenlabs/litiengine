@@ -49,6 +49,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private int particleMinTTL;
   private int particleUpdateDelay;
   private boolean paused;
+  private boolean stopped;
   private int spawnAmount;
   private int spawnRate;
   private int timeToLive;
@@ -66,9 +67,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
     this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
 
-    this.originAlign = Align.LEFT;
-    this.originValign = Valign.TOP;
-
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
 
     if (info != null) {
@@ -80,6 +78,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.particleMaxTTL = info.particleMaxTTL();
       this.particleUpdateDelay = info.particleUpdateRate();
       this.activateOnInit = info.activateOnInit();
+      this.originAlign = info.originAlign();
+      this.originValign = info.originVAlign();
     } else {
       this.maxParticles = Emitter.DEFAULT_MAXPARTICLES;
       this.spawnAmount = Emitter.DEFAULT_SPAWNAMOUNT;
@@ -89,6 +89,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.particleMaxTTL = 0;
       this.particleUpdateDelay = Emitter.DEFAULT_UPDATERATE;
       this.activateOnInit = true;
+      this.originAlign = Align.LEFT;
+      this.originValign = Valign.TOP;
     }
   }
 
@@ -118,6 +120,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *          the particle
    */
   public void addParticle(final Particle particle) {
+    if(this.isStopped()){
+      return;
+    }
     this.particles.add(particle);
   }
 
@@ -259,6 +264,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.paused;
   }
 
+  public boolean isStopped() {
+    return this.stopped;
+  }
+
   public void onFinished(Consumer<Emitter> cons) {
     this.finishedConsumer.add(cons);
   }
@@ -315,6 +324,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.paused = paused;
   }
 
+  public void setStopped(final boolean stopped) {
+    this.stopped = stopped;
+  }
+
   public void setSpawnAmount(final int spawnAmount) {
     this.spawnAmount = spawnAmount;
   }
@@ -339,6 +352,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void togglePaused() {
     this.paused = !this.paused;
+  }
+
+  public void toggleStopped() {
+    this.stopped = !this.stopped;
   }
 
   @Override

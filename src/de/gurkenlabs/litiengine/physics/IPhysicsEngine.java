@@ -55,7 +55,7 @@ public interface IPhysicsEngine extends IUpdateable {
    */
   public boolean collides(Rectangle2D rect, CollisionType collisionType);
 
-  public List<ICollisionEntity> collidesWithEntites(Rectangle2D rect);
+  public List<ICollisionEntity> collidesWithEntities(Rectangle2D rect);
 
   public List<Rectangle2D> getAllCollisionBoxes();
 
