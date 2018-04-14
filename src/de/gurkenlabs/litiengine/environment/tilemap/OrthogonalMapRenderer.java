@@ -126,12 +126,18 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {
+    
     if (tile == null) {
       return null;
     }
 
     final ITileset tileset = MapUtilities.findTileSet(map, tile);
     if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
+      return null;
+    }
+    
+    Spritesheet sprite = tileset.getSpritesheet();
+    if (sprite == null) {
       return null;
     }
 
@@ -157,11 +163,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
           break;
         }
       }
-    }
-
-    Spritesheet sprite = tileset.getSpritesheet();
-    if (sprite == null) {
-      return null;
     }
 
     BufferedImage tileImage = sprite.getSprite(index);
@@ -291,17 +292,17 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
+    Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
+    if (sprite == null) {
+      return;
+    }
+
     final Composite oldComp = g.getComposite();
     final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
     final double viewportOffsetX = -viewport.getX() + layer.getPosition().x;
     final double viewportOffsetY = -viewport.getY() + layer.getPosition().y;
-
-    Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
-    if (sprite == null) {
-      return;
-    }
 
     RenderEngine.renderImage(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
