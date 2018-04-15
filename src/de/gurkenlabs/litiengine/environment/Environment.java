@@ -418,26 +418,24 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<IEntity> getByTag(String tag) {
-    if (this.entitiesByTag.containsKey(tag.toLowerCase())) {
-      return this.entitiesByTag.get(tag);
-    }
-
-    return new ArrayList<>();
+  public <T extends IEntity> Collection<T> getByTag(String... tags) {
+    return this.getByTag(null, tags);
   }
 
   @Override
-  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String rawTag) {
+  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String... tags) {
     List<T> foundEntities = new ArrayList<>();
-    final String tag = rawTag.toLowerCase();
-    if (!this.entitiesByTag.containsKey(tag.toLowerCase())) {
-      return foundEntities;
-    }
-
-    for (IEntity ent : this.entitiesByTag.get(tag)) {
-      if (clss.isInstance(ent)) {
-        foundEntities.add((T) ent);
+    for (String rawTag : tags) {
+      String tag = rawTag.toLowerCase();
+      if (!this.entitiesByTag.containsKey(tag)) {
+        continue;
       }
+      for (IEntity ent : this.entitiesByTag.get(tag)) {
+        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains((T) ent)) {
+          foundEntities.add((T) ent);
+        }
+      }
+
     }
 
     return foundEntities;
