@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -243,7 +244,11 @@ public final class Game {
       }
     }
 
-    Input.init();
+    try {
+      Input.init();
+    } catch (AWTException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
 
     if (!isInNoGUIMode()) {
       if (getConfiguration().client().showGameMetrics()) {

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
@@ -27,6 +28,8 @@ public interface IScreenManager {
   public RenderComponent getRenderComponent();
 
   public Dimension getResolution();
+  
+  public Point2D getCenter();
 
   public float getResolutionScale();
 

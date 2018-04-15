@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.input;
 
+import java.awt.AWTException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -23,7 +24,7 @@ public final class Input {
   private Input() {
   }
 
-  public static void init() {
+  public static void init() throws AWTException {
     keyboard = new KeyBoard();
     mouse = new Mouse();
     if (Game.getConfiguration().input().isGamepadSupport()) {
