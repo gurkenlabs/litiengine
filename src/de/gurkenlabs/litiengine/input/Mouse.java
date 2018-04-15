@@ -27,44 +27,36 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
  */
 public class Mouse implements IMouse {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
+
+  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
+  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
+  private final List<MouseListener> mouseListeners;
+  private final List<MouseMotionListener> mouseMotionListeners;
+  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
+  private final List<Consumer<MouseEvent>> mousePressedConsumer;
+  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
+  private final List<MouseWheelListener> mouseWheelListeners;
+  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
+
+  private final Robot robot;
+
+  private final float sensitivity;
   private boolean grabMouse;
 
+  private boolean pressed;
   private boolean isLeftMouseButtonDown;
-
   private boolean isRightMouseButtonDown;
 
   private Point2D lastLocation;
-
-  /** The position. */
   private Point2D location;
-  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
-  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
-  /** The mouse listeners. */
-  private final List<MouseListener> mouseListeners;
-  /** The mouse motion listeners. */
-  private final List<MouseMotionListener> mouseMotionListeners;
-
-  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
-
-  private final List<Consumer<MouseEvent>> mousePressedConsumer;
-
-  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
-
-  /** The mouse wheel listeners. */
-  private final List<MouseWheelListener> mouseWheelListeners;
-
-  /** The pressed. */
-  private boolean pressed;
-  private Robot robot;
-
-  private final float sensitivity;
-
-  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
 
   /**
    * Instantiates a new mouse.
+   * 
+   * @throws AWTException
+   *           In case the {@link Robot} class could not be initialized.
    */
-  public Mouse() {
+  public Mouse() throws AWTException {
     this.mouseListeners = new CopyOnWriteArrayList<>();
     this.mouseMotionListeners = new CopyOnWriteArrayList<>();
     this.mouseWheelListeners = new CopyOnWriteArrayList<>();
@@ -79,7 +71,8 @@ public class Mouse implements IMouse {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);
     } catch (final AWTException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+      log.log(Level.SEVERE, "The mouse input could not be initialized.");
+      throw e;
     }
 
     this.location = new Point2D.Double(Game.getCamera().getViewPort().getCenterX(), Game.getCamera().getViewPort().getCenterY());
@@ -298,6 +291,11 @@ public class Mouse implements IMouse {
     for (final Consumer<MouseEvent> cons : this.mouseMovedConsumer) {
       cons.accept(wrappedEvent);
     }
+  }
+
+  @Override
+  public void setLocation(double x, double y) {
+    this.setLocation(new Point2D.Double(x, y));
   }
 
   @Override

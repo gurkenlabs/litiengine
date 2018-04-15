@@ -11,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowStateListener;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -134,11 +135,16 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       this.setVisible(true);
       Game.getRenderLoop().register(this.getCurrentScreen());
     }
-    
+
     this.lastScreenChange = System.currentTimeMillis();
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.getCurrentScreen());
     }
+  }
+
+  @Override
+  public Point2D getCenter() {
+    return new Point2D.Double(this.getResolution().width / 2.0, this.getResolution().height / 2.0);
   }
 
   @Override
