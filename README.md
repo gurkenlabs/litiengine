@@ -80,7 +80,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 ## Authors
 ![Gurkenlabs](https://gurkenlabs.de/wp-content/uploads/2017/01/logo_banner_4-1.png "Gurkenlabs")
 
-**Gurkenlabs** is an indie game development project by two brothers from bavaria:
+**Gurkenlabs** is an indie game development project by two brothers from Bavaria:
 * Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
 * Matthias Wilke ([nightm4re94](https://github.com/nightm4re94))
 
