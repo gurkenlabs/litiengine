@@ -52,23 +52,22 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 
 ## Games made with LITIengine
 
-### DR.LEPUS
-
+### ([DR.LEPUS](https://drlepus.com))
 ![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/04/page-title.png "DR.LEPUS")
 
-### DR.LEPUS - The Last Rabbit on Earth ([Ludum Dare 35](http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=67508))
+### ([Naughty Elves](https://naughtyelves.gurkenlabs.de/)) 
+![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2018/02/banner.png "Naughty Elves")
+
+### ([Naughty Gnomes](https://gurkenlabs.de/naughty-gnomes/)) ([Ludum Dare 38](https://ldjam.com/events/ludum-dare/38/naughty-gnomes)
+![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
+### ([DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/ldjam35-dr-lepus/)) ([Ludum Dare 35](http://ludumdare.com/compo/ludum-dare-35/?action=preview&uid=67508))
 
 ![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2016/09/page-title.png "DR.LEPUS - The Last Rabbit on Earth")
 
-### LITI - Stoneage Brawl
+### ([LITI - Stoneage Brawl](https://gurkenlabs.de/liti/)) 
 
 ![LITI - Stoneage Brawl](https://gurkenlabs.de/wp-content/uploads/2017/01/liti-stoneage-brawl-banner.png "LITI - Stoneage Brawl")
 
-### Naughty Gnomes ([Ludum Dare 38](https://ldjam.com/events/ludum-dare/38/naughty-gnomes)
-![Naughty Gnomes](https://gurkenlabs.de/wp-content/uploads/2017/04/banner.png "Naughty Gnomes")
-
-### Naughty Elves
-![Naughty Elves](https://gurkenlabs.de/wp-content/uploads/2018/02/banner.png "Naughty Elves")
 
 ## Contacts 
 * Website [litiengine.com](https://litiengine.com)
