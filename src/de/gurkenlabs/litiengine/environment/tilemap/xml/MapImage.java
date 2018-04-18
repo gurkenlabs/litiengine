@@ -88,6 +88,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   public void setAbsolutPath(final String mapPath) {
-    this.absolutPath = FileUtilities.combinePaths(mapPath, this.getSource());
+    this.absolutPath = FileUtilities.combine(mapPath, this.getSource());
   }
 }

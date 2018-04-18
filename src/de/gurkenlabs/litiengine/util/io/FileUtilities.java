@@ -188,13 +188,8 @@ public final class FileUtilities {
   }
 
   /**
-   * This method combines the specified basepath with the path parts provided as
-   * arguments. The output will use the same path separator as the basePath;
-   * e.g. if the basePath is a windows path, the output path will also be
-   * separated by {@value #FILE_SEPARATOR_WIN} and for linux paths,
-   * {@value #FILE_SEPARATOR_LINUX} will be used.
-   * 
-   * The output path will always have a trailing separator.
+   * This method combines the specified basepath with the parts provided as
+   * arguments. The output will use the path separator of the current system;
    * 
    * @param basePath
    *          The base path for the combined path.
@@ -202,31 +197,17 @@ public final class FileUtilities {
    *          The parts of the path to be constructed.
    * @return The combined path.
    */
-  public static String combinePaths(final String basePath, final String... paths) {
-
-    if (basePath.contains(FILE_SEPARATOR_WIN)) {
-      return combinePaths(basePath, FILE_SEPARATOR_WIN, paths);
-    } else if (basePath.contains(FILE_SEPARATOR_LINUX)) {
-      return combinePaths(basePath, FILE_SEPARATOR_LINUX, paths);
-    }
-
-    return basePath;
-  }
-
-  private static String combinePaths(final String basePath, final String separator, final String... paths) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(removeTrailingSeparator(basePath));
+  public static String combine(final String basePath, final String... paths) {
+    String combined = new File(basePath).toPath().normalize().toString();
     for (String path : paths) {
       if (path == null) {
         continue;
       }
 
-      String adjusted = removeTrailingSeparator(removeLeadingSeparator(ensurePathSeparator(path, separator)));
-      sb.append(separator);
-      sb.append(adjusted);
+      combined = new File(combined).toPath().resolve(path).normalize().toString();
     }
-    sb.append(separator);
-    return sb.toString();
+
+    return combined;
   }
 
   public static String ensurePathSeparator(final String path, final String separator) {

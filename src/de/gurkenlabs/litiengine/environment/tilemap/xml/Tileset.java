@@ -197,7 +197,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   public void setMapPath(final String path) {
     String completePath = path;
     if (this.source != null) {
-      completePath = FileUtilities.combinePaths(path, FileUtilities.getParentDirPath(this.source));
+      completePath = FileUtilities.combine(path, FileUtilities.getParentDirPath(this.source));
     }
 
     if (this.sourceTileset != null) {
@@ -316,7 +316,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    this.sourceTileset = XmlUtilities.readFromFile(Tileset.class, basePath + "\\" + this.source);
+    this.sourceTileset = XmlUtilities.readFromFile(Tileset.class, FileUtilities.combine(basePath, this.source));
   }
 
   public void saveSource(String basePath) {
@@ -324,7 +324,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    XmlUtilities.save(this.sourceTileset, basePath + "\\" + this.source, FILE_EXTENSION);
+    XmlUtilities.save(this.sourceTileset, FileUtilities.combine(basePath, this.source), FILE_EXTENSION);
   }
 
   public boolean isExternal() {

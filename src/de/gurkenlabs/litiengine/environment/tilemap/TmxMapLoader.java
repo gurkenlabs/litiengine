@@ -23,21 +23,7 @@ public final class TmxMapLoader implements IMapLoader {
     }
 
     // by default the map is named by the source file
-    String name = path;
-    final int pos = name.lastIndexOf('.');
-    if (pos > 0) {
-      name = name.substring(0, pos);
-    }
-
-    int lastBackslash = name.lastIndexOf('/');
-    if (lastBackslash != -1) {
-      name = name.substring(lastBackslash + 1, name.length());
-    } else {
-      int lastForwardSlash = name.lastIndexOf('\\');
-      if (lastForwardSlash != -1) {
-        name = name.substring(lastForwardSlash + 1, name.length());
-      }
-    }
+    String name = FileUtilities.getFileName(path);
 
     map.setFileName(name);
     map.setPath(path);

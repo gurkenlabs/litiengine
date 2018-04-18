@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.util.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Test;
 
 public class FileUtilitiesTests {
@@ -9,24 +11,30 @@ public class FileUtilitiesTests {
   @Test
   public void testCombinePaths() {
     String winPath = "C:\\test\\test2\\";
-    String linuxPath = "/somepath/123/456/";
+    String linuxPath = "somepath/123/456/";
 
-    String winPath2 = "\\test\\test2\\";
+    String winPath2 = "test\\test2\\";
 
     String linuxPath3 = "../somepath/123/456/";
     String winPath3 = "..\\test\\test2\\";
+    String somefile = "..\\file.txt";
+    String someOtherFile = "file.txt";
 
-    String combined = FileUtilities.combinePaths(winPath, linuxPath);
-    String combined2 = FileUtilities.combinePaths(linuxPath, winPath2);
-    String combined3 = FileUtilities.combinePaths(linuxPath3, winPath2);
-    String combined4 = FileUtilities.combinePaths(winPath3, winPath2);
-    String combined5 = FileUtilities.combinePaths(winPath3, winPath2, linuxPath);
+    String combined = FileUtilities.combine(winPath, linuxPath);
+    String combined2 = FileUtilities.combine(linuxPath, winPath2);
+    String combined3 = FileUtilities.combine(linuxPath3, winPath2);
+    String combined4 = FileUtilities.combine(winPath3, winPath2);
+    String combined5 = FileUtilities.combine(winPath3, winPath2, linuxPath);
+    String combined6 = FileUtilities.combine(linuxPath, somefile);
+    String combined7 = FileUtilities.combine(linuxPath, someOtherFile);
 
-    assertEquals("C:\\test\\test2\\somepath\\123\\456\\", combined);
-    assertEquals("/somepath/123/456/test/test2/", combined2);
-    assertEquals("../somepath/123/456/test/test2/", combined3);
-    assertEquals("..\\test\\test2\\test\\test2\\", combined4);
-    assertEquals("..\\test\\test2\\test\\test2\\somepath\\123\\456\\", combined5);
+    assertEquals(new File("C:\\test\\test2\\somepath\\123\\456").toPath().toString(), combined);
+    assertEquals(new File("somepath/123/456/test/test2").toPath().toString(), combined2);
+    assertEquals(new File("../somepath/123/456/test/test2").toPath().toString(), combined3);
+    assertEquals(new File("..\\test\\test2\\test\\test2").toPath().toString(), combined4);
+    assertEquals(new File("..\\test\\test2\\test\\test2\\somepath\\123\\456").toPath().toString(), combined5);
+    assertEquals(new File("somepath/123/file.txt").toPath().toString(), combined6);
+    assertEquals(new File("somepath/123/456/file.txt").toPath().toString(), combined7);
   }
 
   @Test
@@ -52,7 +60,7 @@ public class FileUtilitiesTests {
     assertEquals("test", filename5);
     assertEquals("", filename6);
   }
-  
+
   @Test
   public void testGetExtension() {
     String file1 = "C:\\test\\test2\\test.txt";
@@ -60,13 +68,13 @@ public class FileUtilitiesTests {
     String file3 = "/somepath/123/456/test";
     String file4 = "/somepath/123/456/";
     String file5 = "/somepath/1.23/4.56/";
-    
+
     String extension = FileUtilities.getExtension(file1);
     String extension2 = FileUtilities.getExtension(file2);
     String extension3 = FileUtilities.getExtension(file3);
     String extension4 = FileUtilities.getExtension(file4);
     String extension5 = FileUtilities.getExtension(file5);
-    
+
     assertEquals("txt", extension);
     assertEquals("123456789", extension2);
     assertEquals("", extension3);
