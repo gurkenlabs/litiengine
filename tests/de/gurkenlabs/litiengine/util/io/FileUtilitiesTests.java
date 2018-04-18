@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assumptions.assumeTrue;;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ public class FileUtilitiesTests {
 
   @Test
   public void testCombinePaths() {
+    assumeTrue(System.getProperty("os.name").startsWith("Windows"));
     String winPath = "\\test\\test2\\";
     String linuxPath = "somepath/123/456/";
 
