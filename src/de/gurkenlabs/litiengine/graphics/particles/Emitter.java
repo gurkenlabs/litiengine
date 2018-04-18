@@ -270,10 +270,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public void render(final Graphics2D g) {
-    if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewPort().intersects(this.getBoundingBox())) {
-      return;
-    }
-
     this.renderParticles(g, ParticleRenderType.EMITTER);
 
     if (Game.getConfiguration().debug().renderHitBoxes()) {
@@ -486,12 +482,16 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     if (Game.getConfiguration().graphics().getGraphicQuality().getValue() < this.getRequiredQuality().getValue()) {
       return;
     }
+    
+    if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewPort().intersects(this.getBoundingBox())) {
+      return;
+    }
 
     final Point2D origin = this.getOrigin();
-    this.particles.forEach(particle -> {
+    for (Particle particle : this.particles) {
       if (particle.getParticleRenderType() == renderType) {
         particle.render(g, origin);
       }
-    });
+    }
   }
 }
