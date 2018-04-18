@@ -198,13 +198,13 @@ public final class FileUtilities {
    * @return The combined path.
    */
   public static String combine(final String basePath, final String... paths) {
-    String combined = new File(ensurePathSeparator(basePath, Character.toString(File.separatorChar))).toPath().normalize().toString();
+    String combined = ensurePathSeparator(new File(basePath).toPath().normalize().toString(), Character.toString(File.separatorChar));
     for (String path : paths) {
       if (path == null) {
         continue;
       }
 
-      combined = new File(combined).toPath().resolve(ensurePathSeparator(path, Character.toString(File.separatorChar))).normalize().toString();
+      combined = ensurePathSeparator(new File(combined).toPath().resolve(path).normalize().toString(), Character.toString(File.separatorChar));
     }
 
     return combined;
