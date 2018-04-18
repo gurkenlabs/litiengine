@@ -28,11 +28,11 @@ public class FileUtilitiesTests {
     String combined6 = FileUtilities.combine(linuxPath, somefile);
     String combined7 = FileUtilities.combine(linuxPath, someOtherFile);
 
-    assertEquals(new File("\\test\\test2\\somepath\\123\\456").toPath().toString(), combined);
+    assertEquals(new File("/test/test2/somepath/123/456").toPath().toString(), combined);
     assertEquals(new File("somepath/123/456/test/test2").toPath().toString(), combined2);
     assertEquals(new File("../somepath/123/456/test/test2").toPath().toString(), combined3);
-    assertEquals(new File("..\\test\\test2\\test\\test2").toPath().toString(), combined4);
-    assertEquals(new File("..\\test\\test2\\test\\test2\\somepath\\123\\456").toPath().toString(), combined5);
+    assertEquals(new File("../test/test2/test/test2").toPath().toString(), combined4);
+    assertEquals(new File("../test/test2/test/test2/somepath/123/456").toPath().toString(), combined5);
     assertEquals(new File("somepath/123/file.txt").toPath().toString(), combined6);
     assertEquals(new File("somepath/123/456/file.txt").toPath().toString(), combined7);
   }
