@@ -10,7 +10,7 @@ public class FileUtilitiesTests {
 
   @Test
   public void testCombinePaths() {
-    String winPath = "C:\\test\\test2\\";
+    String winPath = "\\test\\test2\\";
     String linuxPath = "somepath/123/456/";
 
     String winPath2 = "test\\test2\\";
@@ -28,7 +28,7 @@ public class FileUtilitiesTests {
     String combined6 = FileUtilities.combine(linuxPath, somefile);
     String combined7 = FileUtilities.combine(linuxPath, someOtherFile);
 
-    assertEquals(new File("C:\\test\\test2\\somepath\\123\\456").toPath().toString(), combined);
+    assertEquals(new File("\\test\\test2\\somepath\\123\\456").toPath().toString(), combined);
     assertEquals(new File("somepath/123/456/test/test2").toPath().toString(), combined2);
     assertEquals(new File("../somepath/123/456/test/test2").toPath().toString(), combined3);
     assertEquals(new File("..\\test\\test2\\test\\test2").toPath().toString(), combined4);
