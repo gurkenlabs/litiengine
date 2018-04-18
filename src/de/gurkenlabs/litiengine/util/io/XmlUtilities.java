@@ -25,8 +25,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
-import de.gurkenlabs.litiengine.Resources;
-
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
 

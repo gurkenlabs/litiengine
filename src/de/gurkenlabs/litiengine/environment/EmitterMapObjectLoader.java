@@ -50,13 +50,17 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     EmitterData data = createEmitterData(mapObject);
 
-    CustomEmitter emitter = new CustomEmitter(data);
+    CustomEmitter emitter = this.createCustomEmitter(data);
     loadDefaultProperties(emitter, mapObject);
 
     Collection<IEntity> entities = super.load(environment, mapObject);
     entities.add(emitter);
 
     return entities;
+  }
+
+  protected CustomEmitter createCustomEmitter(EmitterData data) {
+    return new CustomEmitter(data);
   }
 
   public static EmitterData createEmitterData(IMapObject mapObject) {

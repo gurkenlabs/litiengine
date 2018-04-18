@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
 /**
@@ -39,4 +40,6 @@ public @interface EmitterInfo {
   Align originAlign() default Align.LEFT;
 
   Valign originVAlign() default Valign.TOP;
+
+  Quality requiredQuality() default Quality.VERYLOW;
 }

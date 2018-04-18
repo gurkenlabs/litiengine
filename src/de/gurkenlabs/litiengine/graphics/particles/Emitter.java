@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -27,6 +28,7 @@ import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
  * An abstract implementation for emitters that provide a particle effect.
  */
 @CollisionInfo(collision = false)
+@EmitterInfo
 public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive, IRenderable {
   public static final Color DEFAULT_PARTICLE_COLOR = new Color(255, 255, 255, 150);
   public static final int DEFAULT_UPDATERATE = 30;
@@ -39,8 +41,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private final CopyOnWriteArrayList<Particle> particles;
   private final List<Color> colors;
 
+  private Quality requiredQuality;
+  private boolean activateOnInit;
   private boolean activated;
-  private final boolean activateOnInit;
   private long activationTick;
   private long aliveTime;
   private long lastSpawn;
@@ -68,8 +71,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
 
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
-
     if (info != null) {
+      this.requiredQuality = info.requiredQuality();
       this.maxParticles = info.maxParticles();
       this.spawnAmount = info.spawnAmount();
       this.spawnRate = info.spawnRate();
@@ -80,17 +83,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       this.activateOnInit = info.activateOnInit();
       this.originAlign = info.originAlign();
       this.originValign = info.originVAlign();
-    } else {
-      this.maxParticles = Emitter.DEFAULT_MAXPARTICLES;
-      this.spawnAmount = Emitter.DEFAULT_SPAWNAMOUNT;
-      this.spawnRate = 0;
-      this.timeToLive = 0;
-      this.particleMinTTL = 0;
-      this.particleMaxTTL = 0;
-      this.particleUpdateDelay = Emitter.DEFAULT_UPDATERATE;
-      this.activateOnInit = true;
-      this.originAlign = Align.LEFT;
-      this.originValign = Valign.TOP;
     }
   }
 
@@ -120,7 +112,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
    *          the particle
    */
   public void addParticle(final Particle particle) {
-    if(this.isStopped()){
+    if (this.isStopped()) {
       return;
     }
     this.particles.add(particle);
@@ -215,6 +207,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public int getParticleUpdateRate() {
     return this.particleUpdateDelay;
+  }
+
+  public Quality getRequiredQuality() {
+    return this.requiredQuality;
   }
 
   public int getSpawnAmount() {
@@ -326,6 +322,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void setStopped(final boolean stopped) {
     this.stopped = stopped;
+  }
+
+  public void setRequiredQuality(Quality requiredQuality) {
+    this.requiredQuality = requiredQuality;
   }
 
   public void setSpawnAmount(final int spawnAmount) {
@@ -483,6 +483,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   private void renderParticles(final Graphics2D g, final ParticleRenderType renderType) {
+    if (Game.getConfiguration().graphics().getGraphicQuality().getValue() < this.getRequiredQuality().getValue()) {
+      return;
+    }
+
     final Point2D origin = this.getOrigin();
     this.particles.forEach(particle -> {
       if (particle.getParticleRenderType() == renderType) {
