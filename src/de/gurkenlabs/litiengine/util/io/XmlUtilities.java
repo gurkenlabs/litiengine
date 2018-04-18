@@ -25,6 +25,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
+import de.gurkenlabs.litiengine.Resources;
+
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
 
@@ -92,7 +94,8 @@ public final class XmlUtilities {
 
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
-      InputStream stream = ClassLoader.getSystemResourceAsStream(path);
+      
+      InputStream stream = FileUtilities.getGameResource(path);
       if (stream == null) {
         stream = new FileInputStream(path);
       }
