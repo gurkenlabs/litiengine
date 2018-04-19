@@ -256,7 +256,7 @@ public final class RenderEngine implements IRenderEngine {
       renderImage(g, image, x, y);
       return;
     }
-    
+
     AffineTransform t = new AffineTransform();
     t.concatenate(transform);
     t.translate(x, y);
@@ -264,6 +264,14 @@ public final class RenderEngine implements IRenderEngine {
     g.drawImage(image, t, null);
   }
 
+  public static void renderImage(final Graphics2D g, final Image image, AffineTransform transform) {
+    if (transform == null) {
+      return;
+    }
+
+    g.drawImage(image, transform, null);
+  }
+  
   @Override
   public boolean canRender(final IEntity entity) {
     if (!this.entityRenderingConditions.isEmpty()) {
