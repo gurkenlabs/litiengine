@@ -299,7 +299,9 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     final DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, this.sound.getFormat());
     try {
       this.dataLine = (SourceDataLine) AudioSystem.getLine(dataInfo);
-      this.dataLine.open();
+      if (!dataLine.isOpen()) {
+        this.dataLine.open();
+      }
     } catch (final LineUnavailableException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
