@@ -710,6 +710,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+          if(img == null) {
+            continue;
+          }
+          
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
           this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
