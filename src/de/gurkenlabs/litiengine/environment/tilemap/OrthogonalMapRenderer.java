@@ -8,7 +8,6 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +32,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null || layer.getRenderType() == RenderType.OVERLAY) {
+      if (layer == null || layer.getRenderType() == RenderType.OVERLAY || !layer.isVisible() || layer.getOpacity() == 0) {
         continue;
       }
 
@@ -56,7 +55,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null) {
+      if (layer == null || !layer.isVisible() || layer.getOpacity() == 0) {
         continue;
       }
 
@@ -126,7 +125,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {
-    
+
     if (tile == null) {
       return null;
     }
@@ -135,7 +134,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     if (tileset == null || tileset.getFirstGridId() > tile.getGridId()) {
       return null;
     }
-    
+
     Spritesheet sprite = tileset.getSpritesheet();
     if (sprite == null) {
       return null;
@@ -210,7 +209,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map, boolean includeAnimationTiles) {
     // if we have already retrived the image, use the one from the cache to
     // draw the layer
-    final String cacheKey = MessageFormat.format("{0}_{1}", getCacheKey(map), layer.getName());
+    final String cacheKey = getCacheKey(map) + "_" + layer.getName();
     if (ImageCache.MAPS.containsKey(cacheKey)) {
       return ImageCache.MAPS.get(cacheKey);
     }
@@ -292,6 +291,10 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
+    if (!layer.isVisible() || layer.getOpacity() == 0) {
+      return;
+    }
+
     Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
     if (sprite == null) {
       return;
