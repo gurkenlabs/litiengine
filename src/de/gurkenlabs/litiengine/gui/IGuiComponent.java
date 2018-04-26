@@ -50,7 +50,7 @@ public interface IGuiComponent extends IRenderable {
 
   void setDimension(double width, double height);
 
-  void setPosition(double x, double y);
+  void setLocation(double x, double y);
 
-  void setPosition(Point2D newPosition);
+  void setLocation(Point2D newPosition);
 }

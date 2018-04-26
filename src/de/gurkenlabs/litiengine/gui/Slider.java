@@ -91,7 +91,7 @@ public abstract class Slider extends GuiComponent {
   public void prepare() {
     super.prepare();
     this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
-    this.onChange(e -> this.sliderBar.setPosition(this.getRelativeSliderPosition()));
+    this.onChange(e -> this.sliderBar.setLocation(this.getRelativeSliderPosition()));
   }
 
   public void setCurrentValue(final float newValue) {

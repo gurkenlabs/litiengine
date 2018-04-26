@@ -164,13 +164,13 @@ public class ListField extends GuiComponent {
     this.onChange(s -> {
       if (this.getSlider() != null) {
         this.getSlider().setCurrentValue(this.getLowerBound());
-        this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());
+        this.getSlider().getSliderComponent().setLocation(this.getSlider().getRelativeSliderPosition());
       }
     });
     if (this.getSlider() != null) {
       this.getSlider().onChange(sliderValue -> {
         this.setLowerBound(sliderValue.intValue());
-        this.getSlider().getSliderComponent().setPosition(this.getSlider().getRelativeSliderPosition());
+        this.getSlider().getSliderComponent().setLocation(this.getSlider().getRelativeSliderPosition());
         this.refresh();
       });
     }

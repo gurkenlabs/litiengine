@@ -433,7 +433,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.isPressed = false;
 
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
-    
+
     // TODO: check if this should really call the clicked consumers...
     this.getClickConsumer().forEach(consumer -> consumer.accept(event));
     this.getMouseReleasedConsumer().forEach(consumer -> consumer.accept(event));
@@ -586,14 +586,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.hoverSound = hoverSound;
   }
 
-  public void setPosition(final double x, final double y) {
-    this.x = x;
-    this.y = y;
+  public void setLocation(final double x, final double y) {
+    this.setX(x);
+    this.setY(y);
   }
 
-  public void setPosition(final Point2D newPosition) {
-    this.x = newPosition.getX();
-    this.y = newPosition.getY();
+  public void setLocation(final Point2D location) {
+    this.setX(location.getX());
+    this.setY(location.getY());
   }
 
   public void setSelected(final boolean bool) {
@@ -667,11 +667,20 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   }
 
   public void setX(final double x) {
+    double delta = x - this.x;
     this.x = x;
+
+    for (GuiComponent component : this.getComponents()) {
+      component.setX(component.getX() + delta);
+    }
   }
 
   public void setY(final double y) {
+    double delta = y - this.y;
     this.y = y;
+    for (GuiComponent component : this.getComponents()) {
+      component.setY(component.getY() + delta);
+    }
   }
 
   /**
