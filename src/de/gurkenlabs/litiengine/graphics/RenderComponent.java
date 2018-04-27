@@ -31,6 +31,7 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 @SuppressWarnings("serial")
 public class RenderComponent extends Canvas implements IRenderComponent {
   private static final int DEBUG_MOUSE_SIZE = 5;
+  private static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   private final transient List<Consumer<Integer>> fpsChangedConsumer;
   private final transient List<Consumer<Graphics2D>> renderedConsumer;
 
@@ -55,6 +56,8 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   public RenderComponent(final Dimension size) {
     this.renderedConsumer = new CopyOnWriteArrayList<>();
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
+
+    this.setBackground(DEFAULT_BACKGROUND_COLOR);
 
     // hide default cursor
     final BufferedImage cursorImg = ImageProcessing.getCompatibleImage(16, 16);
@@ -128,7 +131,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
 
         g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
 
-        g.setColor(Color.BLACK);
+        g.setColor(this.getBackground());
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
@@ -155,7 +158,8 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         }
 
         if (this.currentAlpha != -1) {
-          g.setColor(new Color(0, 0, 0, 1 - this.currentAlpha));
+          final int visibleAlpha = MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
+          g.setColor(new Color(this.getBackground().getRed(), this.getBackground().getGreen(), this.getBackground().getBlue(), visibleAlpha));
           g.fillRect(0, 0, this.getWidth(), this.getHeight());
         }
 
