@@ -45,38 +45,36 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @Override
   public void addCombatEntityListener(CombatEntityListener listener) {
-    // TODO Auto-generated method stub
-
+    this.listeners.add(listener);
+    this.hitListeners.add(listener);
+    this.deathListeners.add(listener);
   }
 
   @Override
   public void removeCombatEntityListener(CombatEntityListener listener) {
-    // TODO Auto-generated method stub
-
+    this.listeners.remove(listener);
+    this.hitListeners.remove(listener);
+    this.deathListeners.remove(listener);
   }
 
   @Override
   public void addHitListener(CombatEntityHitListener listener) {
-    // TODO Auto-generated method stub
-
+    this.hitListeners.add(listener);
   }
 
   @Override
   public void removeHitListener(CombatEntityHitListener listener) {
-    // TODO Auto-generated method stub
-
+    this.hitListeners.remove(listener);
   }
 
   @Override
   public void addDeathListener(CombatEntityDeathListener listener) {
-    // TODO Auto-generated method stub
-
+    this.deathListeners.add(listener);
   }
 
   @Override
   public void removeDeathListener(CombatEntityDeathListener listener) {
-    // TODO Auto-generated method stub
-
+    this.deathListeners.remove(listener);
   }
 
   @Override
