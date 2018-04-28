@@ -84,9 +84,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
-    for (final CombatEntityDeathListener listener : this.deathListeners) {
-      listener.onDeath(this);
-    }
+    this.fireDeathEvent();
 
     this.setCollision(false);
   }
@@ -153,7 +151,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (this.isDead()) {
-      this.die();
+      this.fireDeathEvent();
+      this.setCollision(false);
     }
 
     final CombatEntityHitEvent event = new CombatEntityHitEvent(this, actualDamage, ability);
@@ -164,6 +163,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.lastHit = Game.getLoop().getTicks();
 
     return this.isDead();
+  }
+
+  private void fireDeathEvent() {
+    for (final CombatEntityDeathListener listener : this.deathListeners) {
+      listener.onDeath(this);
+    }
   }
 
   /**
