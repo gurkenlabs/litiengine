@@ -807,12 +807,10 @@ public class Environment implements IEnvironment {
     }
 
     for (String tag : entity.getTags()) {
-      if (this.entitiesByTag.containsKey(tag)) {
-        this.entitiesByTag.get(tag).remove(entity);
+      this.entitiesByTag.get(tag).remove(entity);
 
-        if (this.entitiesByTag.get(tag).isEmpty()) {
-          this.entitiesByTag.remove(tag);
-        }
+      if (this.entitiesByTag.get(tag).isEmpty()) {
+        this.entitiesByTag.remove(tag);
       }
     }
 
@@ -896,17 +894,9 @@ public class Environment implements IEnvironment {
 
   @Override
   public void removeRenderable(final IRenderable renderable) {
-    if (this.getGroundRenderables().contains(renderable)) {
-      this.getGroundRenderables().remove(renderable);
-    }
-
-    if (this.getOverlayRenderables().contains(renderable)) {
-      this.getOverlayRenderables().remove(renderable);
-    }
-
-    if (this.getUIRenderables().contains(renderable)) {
-      this.getUIRenderables().remove(renderable);
-    }
+    this.getGroundRenderables().remove(renderable);
+    this.getOverlayRenderables().remove(renderable);
+    this.getUIRenderables().remove(renderable);
   }
 
   @Override

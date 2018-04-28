@@ -223,9 +223,7 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    if (this.getAnimations().contains(animation)) {
-      this.animations.remove(animation);
-    }
+    this.animations.remove(animation);
 
     if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
       this.setDefaultAnimation(!this.getAnimations().isEmpty() ? this.getAnimations().get(0) : null);
@@ -238,9 +236,7 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    if (this.getImageEffects().contains(effect)) {
-      this.imageEffects.remove(effect);
-    }
+    this.imageEffects.remove(effect);
   }
 
   @Override

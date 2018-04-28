@@ -3,12 +3,17 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
 public interface IEntity {
+  public void addMessageListener(MessageListener listener);
+
+  public void addMessageListener(String message, MessageListener listener);
+
+  public void removeMessageListener(MessageListener listener);
+
   public float getAngle();
 
   public IAnimationController getAnimationController();
@@ -39,8 +44,6 @@ public interface IEntity {
   public double getY();
 
   public String sendMessage(Object sender, String message);
-
-  public void registerMessageAction(String message, Consumer<MessageArgs> action);
 
   public void setHeight(float height);
 

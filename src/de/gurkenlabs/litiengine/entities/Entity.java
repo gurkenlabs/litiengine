@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -17,7 +17,8 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  */
 @EntityInfo
 public abstract class Entity implements IEntity {
-  private final List<MessageAction> messageActions;
+  public static final String ANY_MESSAGE = "";
+  private final Map<String, List<MessageListener>> messageListeners;
   private final List<String> tags;
 
   /** The direction. */
@@ -42,7 +43,7 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
-    this.messageActions = new CopyOnWriteArrayList<>();
+    this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
@@ -64,6 +65,35 @@ public abstract class Entity implements IEntity {
   protected Entity(int mapId, String name) {
     this(mapId);
     this.name = name;
+  }
+
+  @Override
+  public void addMessageListener(MessageListener listener) {
+    if (!this.messageListeners.containsKey(ANY_MESSAGE)) {
+      this.messageListeners.put(ANY_MESSAGE, new CopyOnWriteArrayList<>());
+    }
+
+    this.messageListeners.get(ANY_MESSAGE).add(listener);
+  }
+
+  @Override
+  public void addMessageListener(String message, MessageListener listener) {
+    if (!this.messageListeners.containsKey(message)) {
+      this.messageListeners.put(message, new CopyOnWriteArrayList<>());
+    }
+
+    this.messageListeners.get(message).add(listener);
+  }
+
+  @Override
+  public void removeMessageListener(MessageListener listener) {
+    for (List<MessageListener> listeners : this.messageListeners.values()) {
+      if (listeners == null || listeners.isEmpty()) {
+        continue;
+      }
+
+      listeners.remove(listener);
+    }
   }
 
   @Override
@@ -133,9 +163,31 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
-    for (MessageAction action : this.messageActions.stream().filter(x -> x.getMessage().equals(message)).collect(Collectors.toList())) {
-      action.execute(sender);
+    if (message == null) {
+      return null;
     }
+
+    MessageEvent event = null;
+    if (this.messageListeners.containsKey(ANY_MESSAGE) && this.messageListeners.get(ANY_MESSAGE) != null) {
+      for (MessageListener listener : this.messageListeners.get(ANY_MESSAGE)) {
+        if (event == null) {
+          event = new MessageEvent(sender, this, message);
+        }
+
+        listener.messageReceived(event);
+      }
+    }
+
+    if (this.messageListeners.containsKey(message) && this.messageListeners.get(message) != null) {
+      for (MessageListener listener : this.messageListeners.get(message)) {
+        if (event == null) {
+          event = new MessageEvent(sender, this, message);
+        }
+
+        listener.messageReceived(event);
+      }
+    }
+
 
     return null;
   }
@@ -225,9 +277,7 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removeTag(String tag) {
-    if (!this.tags.contains(tag)) {
-      this.tags.remove(tag);
-    }
+    this.tags.remove(tag);
   }
 
   public void setAngle(final float angle) {
@@ -246,28 +296,5 @@ public abstract class Entity implements IEntity {
     sb.append(" #");
     sb.append(this.getMapId());
     return sb.toString();
-  }
-
-  @Override
-  public void registerMessageAction(String message, Consumer<MessageArgs> action) {
-    this.messageActions.add(new MessageAction(message, action));
-  }
-
-  private class MessageAction {
-    private final String message;
-    private final Consumer<MessageArgs> action;
-
-    public MessageAction(String message, Consumer<MessageArgs> action) {
-      this.message = message;
-      this.action = action;
-    }
-
-    public void execute(Object sender) {
-      this.action.accept(new MessageArgs(Entity.this, sender, getMessage()));
-    }
-
-    public String getMessage() {
-      return this.message;
-    }
   }
 }

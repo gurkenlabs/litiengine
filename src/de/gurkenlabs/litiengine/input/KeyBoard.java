@@ -151,10 +151,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 
   @Override
   public void unregisterFromKeyEvents(final IKeyObserver observer) {
-    if (!this.keyObservers.contains(observer)) {
-      return;
-    }
-
     this.keyObservers.remove(observer);
   }
 

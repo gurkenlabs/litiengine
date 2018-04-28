@@ -300,28 +300,16 @@ public class Mouse implements IMouse {
 
   @Override
   public void unregisterMouseListener(final MouseListener listener) {
-    if (!this.mouseListeners.contains(listener)) {
-      return;
-    }
-
     this.mouseListeners.remove(listener);
   }
 
   @Override
   public void unregisterMouseMotionListener(final MouseMotionListener listener) {
-    if (!this.mouseMotionListeners.contains(listener)) {
-      return;
-    }
-
     this.mouseMotionListeners.remove(listener);
   }
 
   @Override
   public void unregisterMouseWheelListener(final MouseWheelListener listener) {
-    if (!this.mouseWheelListeners.contains(listener)) {
-      return;
-    }
-
     this.mouseWheelListeners.remove(listener);
   }
 

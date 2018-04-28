@@ -52,10 +52,6 @@ public class Attribute<T extends Number> {
   }
 
   public void removeModifier(final AttributeModifier<T> modifier) {
-    if (!this.getModifiers().contains(modifier)) {
-      return;
-    }
-
     this.getModifiers().remove(modifier);
     Collections.sort(this.getModifiers());
   }
