@@ -141,7 +141,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
-  public void registerForKeyEvents(final IKeyObserver observer) {
+  public void addKeyObserver(final IKeyObserver observer) {
     if (this.keyObservers.contains(observer)) {
       return;
     }
@@ -150,7 +150,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
-  public void unregisterFromKeyEvents(final IKeyObserver observer) {
+  public void removeKeyObserver(final IKeyObserver observer) {
     this.keyObservers.remove(observer);
   }
 
