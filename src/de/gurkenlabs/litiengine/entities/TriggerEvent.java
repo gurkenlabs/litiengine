@@ -1,15 +1,18 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.util.EventObject;
 import java.util.List;
 
-public class TriggerEvent {
-  private final IEntity entity;
-  private final String message;
-  private final List<Integer> targets;
-  private final Trigger trigger;
+public class TriggerEvent extends EventObject {
+  private static final long serialVersionUID = 3624707673365488289L;
+
+  private final transient IEntity entity;
+  private final transient String message;
+  private final transient List<Integer> targets;
+  private final transient Trigger trigger;
 
   public TriggerEvent(final Trigger trigger, final IEntity entity, final List<Integer> targets) {
-    super();
+    super(trigger);
     this.trigger = trigger;
     this.message = trigger.getMessage();
     this.targets = targets;
