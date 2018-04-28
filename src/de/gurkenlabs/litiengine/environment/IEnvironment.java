@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +29,10 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
  * The Interface IMapContainer.
  */
 public interface IEnvironment extends IInitializable, IRenderable {
+  public void addRenderListener(EnvironmentRenderListener listener);
+
+  public void removeRenderListener(EnvironmentRenderListener listener);
+
   /**
    * Adds the specified entity to the environment container. This also loads the
    * entity (register entity and controllers for update) if the environment has
@@ -188,8 +191,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void onEntityRemoved(final Consumer<IEntity> consumer);
 
-  public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
-
   public void onInitialized(final Consumer<IEnvironment> consumer);
 
   public void onLoaded(final Consumer<IEnvironment> consumer);
@@ -197,10 +198,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onUnloaded(final Consumer<IEnvironment> consumer);
 
   public void onCleared(final Consumer<IEnvironment> consumer);
-
-  public void onMapRendered(final Consumer<Graphics2D> consumer);
-
-  public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
   public void reloadFromMap(final int mapId);
 
