@@ -29,23 +29,23 @@ public class EnvironmentEventTests {
 
   @Test
   public void testOnInitialized() {
-    Consumer<IEnvironment> initConsumer = (Consumer<IEnvironment>) mock(Consumer.class);
-    this.testEnvironment.onInitialized(initConsumer);
+    EnvironmentListener environmentListener = mock(EnvironmentListener.class);
+    this.testEnvironment.addListener(environmentListener);
 
     this.testEnvironment.init();
 
-    verify(initConsumer, times(1)).accept(this.testEnvironment);
+    verify(environmentListener, times(1)).environmentInitialized(this.testEnvironment);
 
   }
 
   @Test
   public void testOnLoaded() {
-    Consumer<IEnvironment> loadedConsumer = (Consumer<IEnvironment>) mock(Consumer.class);
-    this.testEnvironment.onLoaded(loadedConsumer);
+    EnvironmentListener environmentListener = mock(EnvironmentListener.class);
+    this.testEnvironment.addListener(environmentListener);
 
     this.testEnvironment.load();
 
-    verify(loadedConsumer, times(1)).accept(this.testEnvironment);
+    verify(environmentListener, times(1)).environmentLoaded(this.testEnvironment);
   }
 
   @Test

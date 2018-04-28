@@ -33,6 +33,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public void removeRenderListener(EnvironmentRenderListener listener);
 
+  public void addListener(EnvironmentListener listener);
+
+  public void removeListener(EnvironmentListener listener);
+
   /**
    * Adds the specified entity to the environment container. This also loads the
    * entity (register entity and controllers for update) if the environment has
@@ -190,14 +194,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void onEntityAdded(final Consumer<IEntity> consumer);
 
   public void onEntityRemoved(final Consumer<IEntity> consumer);
-
-  public void onInitialized(final Consumer<IEnvironment> consumer);
-
-  public void onLoaded(final Consumer<IEnvironment> consumer);
-
-  public void onUnloaded(final Consumer<IEnvironment> consumer);
-
-  public void onCleared(final Consumer<IEnvironment> consumer);
 
   public void reloadFromMap(final int mapId);
 

@@ -68,11 +68,7 @@ public class Environment implements IEnvironment {
   private final Map<String, List<IEntity>> entitiesByTag;
 
   private final List<EnvironmentRenderListener> renderListeners;
-
-  private final List<Consumer<IEnvironment>> initializedConsumers;
-  private final List<Consumer<IEnvironment>> loadedConsumers;
-  private final List<Consumer<IEnvironment>> unloadedConsumers;
-  private final List<Consumer<IEnvironment>> clearedConsumers;
+  private final List<EnvironmentListener> listeners;
 
   private final List<Consumer<IEntity>> entityAddedConsumers;
   private final List<Consumer<IEntity>> entityRemovedConsumers;
@@ -157,14 +153,11 @@ public class Environment implements IEnvironment {
     this.overlayRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
     this.uiRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
 
-    this.clearedConsumers = new CopyOnWriteArrayList<>();
-    this.initializedConsumers = new CopyOnWriteArrayList<>();
-    this.loadedConsumers = new CopyOnWriteArrayList<>();
-    this.unloadedConsumers = new CopyOnWriteArrayList<>();
     this.entityAddedConsumers = new CopyOnWriteArrayList<>();
     this.entityRemovedConsumers = new CopyOnWriteArrayList<>();
 
     this.renderListeners = new CopyOnWriteArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -175,6 +168,16 @@ public class Environment implements IEnvironment {
   @Override
   public void removeRenderListener(EnvironmentRenderListener listener) {
     this.renderListeners.remove(listener);
+  }
+
+  @Override
+  public void addListener(EnvironmentListener listener) {
+    this.listeners.add(listener);
+  }
+
+  @Override
+  public void removeListener(EnvironmentListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override
@@ -308,9 +311,8 @@ public class Environment implements IEnvironment {
     this.entities.get(RenderType.NORMAL).clear();
     this.entities.get(RenderType.OVERLAY).clear();
     this.initialized = false;
-    for (final Consumer<IEnvironment> cons : this.clearedConsumers) {
-      cons.accept(this);
-    }
+
+    this.fireEvent(l -> l.environmentCleared(this));
   }
 
   @Override
@@ -701,10 +703,7 @@ public class Environment implements IEnvironment {
     this.addStaticShadows();
     this.addAmbientLight();
 
-    for (final Consumer<IEnvironment> cons : this.initializedConsumers) {
-      cons.accept(this);
-    }
-
+    this.fireEvent(l -> l.environmentInitialized(this));
     this.initialized = true;
   }
 
@@ -726,9 +725,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = true;
-    for (final Consumer<IEnvironment> cons : this.loadedConsumers) {
-      cons.accept(this);
-    }
+    this.fireEvent(l -> l.environmentLoaded(this));
   }
 
   @Override
@@ -745,11 +742,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void onCleared(Consumer<IEnvironment> consumer) {
-    this.clearedConsumers.add(consumer);
-  }
-
-  @Override
   public void onEntityRemoved(Consumer<IEntity> consumer) {
     this.entityRemovedConsumers.add(consumer);
   }
@@ -757,21 +749,6 @@ public class Environment implements IEnvironment {
   @Override
   public void onEntityAdded(Consumer<IEntity> consumer) {
     this.entityAddedConsumers.add(consumer);
-  }
-
-  @Override
-  public void onInitialized(final Consumer<IEnvironment> consumer) {
-    this.initializedConsumers.add(consumer);
-  }
-
-  @Override
-  public void onLoaded(final Consumer<IEnvironment> consumer) {
-    this.loadedConsumers.add(consumer);
-  }
-
-  @Override
-  public void onUnloaded(Consumer<IEnvironment> consumer) {
-    this.unloadedConsumers.add(consumer);
   }
 
   public static void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
@@ -980,6 +957,12 @@ public class Environment implements IEnvironment {
     g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
   }
 
+  private void fireEvent(Consumer<EnvironmentListener> cons) {
+    for (EnvironmentListener listener : this.listeners) {
+      cons.accept(listener);
+    }
+  }
+
   private void fireRenderEvent(Graphics2D g, Consumer<EnvironmentRenderListener> cons) {
     for (EnvironmentRenderListener listener : this.renderListeners) {
       cons.accept(listener);
@@ -998,9 +981,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = false;
-    for (final Consumer<IEnvironment> cons : this.unloadedConsumers) {
-      cons.accept(this);
-    }
+    this.fireEvent(l -> l.environmentUnloaded(this));
   }
 
   protected void addMapObject(final IMapObject mapObject) {
