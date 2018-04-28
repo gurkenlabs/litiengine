@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Ellipse2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
@@ -20,9 +19,9 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<IEffect> appliedEffects;
-  private final List<Consumer<ICombatEntity>> entityDeathConsumer;
-  private final List<Consumer<CombatEntityHitArgument>> entityHitConsumer;
-  private final List<Consumer<ICombatEntity>> entityResurrectConsumer;
+  private final List<CombatEntityListener> listeners;
+  private final List<CombatEntityDeathListener> deathListeners;
+  private final List<CombatEntityHitListener> hitListeners;
   private final CombatAttributes attributes;
 
   private boolean isIndestructible;
@@ -32,9 +31,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   public CombatEntity() {
     super();
-    this.entityDeathConsumer = new CopyOnWriteArrayList<>();
-    this.entityResurrectConsumer = new CopyOnWriteArrayList<>();
-    this.entityHitConsumer = new CopyOnWriteArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
+    this.deathListeners = new CopyOnWriteArrayList<>();
+    this.hitListeners = new CopyOnWriteArrayList<>();
     this.appliedEffects = new CopyOnWriteArrayList<>();
 
     final CombatAttributesInfo info = this.getClass().getAnnotation(CombatAttributesInfo.class);
@@ -45,14 +44,50 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
+  public void addCombatEntityListener(CombatEntityListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void removeCombatEntityListener(CombatEntityListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addHitListener(CombatEntityHitListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void removeHitListener(CombatEntityHitListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addDeathListener(CombatEntityDeathListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void removeDeathListener(CombatEntityDeathListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
   public void die() {
     if (this.isDead()) {
       return;
     }
 
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
-    for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
-      consumer.accept(this);
+    for (final CombatEntityDeathListener listener : this.deathListeners) {
+      listener.onDeath(this);
     }
 
     this.setCollision(false);
@@ -120,16 +155,12 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (this.isDead()) {
-      this.setCollision(false);
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
-      for (final Consumer<ICombatEntity> consumer : this.entityDeathConsumer) {
-        consumer.accept(this);
-      }
+      this.die();
     }
 
-    final CombatEntityHitArgument arg = new CombatEntityHitArgument(this, actualDamage, ability);
-    for (final Consumer<CombatEntityHitArgument> consumer : this.entityHitConsumer) {
-      consumer.accept(arg);
+    final CombatEntityHitEvent event = new CombatEntityHitEvent(this, actualDamage, ability);
+    for (final CombatEntityHitListener listener : this.hitListeners) {
+      listener.onHit(event);
     }
 
     this.lastHit = Game.getLoop().getTicks();
@@ -174,33 +205,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     return this.getTeam() == 0;
   }
 
-  @Override
-  public void onDeath(final Consumer<ICombatEntity> consumer) {
-    if (this.entityDeathConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityDeathConsumer.add(consumer);
-  }
-
-  @Override
-  public void onHit(final Consumer<CombatEntityHitArgument> consumer) {
-    if (this.entityHitConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityHitConsumer.add(consumer);
-  }
-
-  @Override
-  public void onResurrect(final Consumer<ICombatEntity> consumer) {
-    if (this.entityResurrectConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityResurrectConsumer.add(consumer);
-  }
-
   /**
    * Resurrect.
    */
@@ -211,8 +215,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getAttributes().getHealth().getMaxValue()));
-    for (final Consumer<ICombatEntity> consumer : this.entityResurrectConsumer) {
-      consumer.accept(this);
+
+    for (final CombatEntityListener listener : this.listeners) {
+      listener.onResurrection(this);
     }
 
     this.setCollision(true);
