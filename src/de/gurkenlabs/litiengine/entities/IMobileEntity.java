@@ -1,9 +1,8 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
-import java.util.function.Consumer;
 
-public interface IMobileEntity extends ICollisionEntity {
+public interface IMobileEntity extends ICollisionEntity { 
   /**
    * Gets a value that defines how long it takes the entity to reach the full
    * velocity (in ms).
@@ -34,8 +33,6 @@ public interface IMobileEntity extends ICollisionEntity {
    * @return The velocity in pixel per tick.
    */
   public float getTickVelocity();
-
-  public void onMoved(Consumer<IMobileEntity> consumer);
 
   public void setAcceleration(int acceleration);
 

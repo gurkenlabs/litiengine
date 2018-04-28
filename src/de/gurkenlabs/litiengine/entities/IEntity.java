@@ -14,6 +14,10 @@ public interface IEntity {
 
   public void removeMessageListener(MessageListener listener);
 
+  public void addTransformListener(EntityTransformListener listener);
+
+  public void removeTransformListener(EntityTransformListener listener);
+
   public float getAngle();
 
   public IAnimationController getAnimationController();

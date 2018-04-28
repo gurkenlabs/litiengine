@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 @EntityInfo
 public abstract class Entity implements IEntity {
   public static final String ANY_MESSAGE = "";
+  private final List<EntityTransformListener> transformListeners;
   private final Map<String, List<MessageListener>> messageListeners;
   private final List<String> tags;
 
@@ -43,8 +44,10 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
+    this.transformListeners = new CopyOnWriteArrayList<>();
     this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
+
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.width = info.width();
@@ -65,6 +68,16 @@ public abstract class Entity implements IEntity {
   protected Entity(int mapId, String name) {
     this(mapId);
     this.name = name;
+  }
+
+  @Override
+  public void addTransformListener(EntityTransformListener listener) {
+    this.transformListeners.add(listener);
+  }
+
+  @Override
+  public void removeTransformListener(EntityTransformListener listener) {
+    this.transformListeners.remove(listener);
   }
 
   @Override
@@ -188,7 +201,6 @@ public abstract class Entity implements IEntity {
       }
     }
 
-
     return null;
   }
 
@@ -196,6 +208,7 @@ public abstract class Entity implements IEntity {
   public void setHeight(final float height) {
     this.height = height;
     this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
@@ -213,6 +226,7 @@ public abstract class Entity implements IEntity {
   public void setLocation(final Point2D location) {
     this.mapLocation = location;
     this.boundingBox = null;
+    this.fireLocationChangedEvent();
   }
 
   /**
@@ -236,26 +250,27 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void setSize(final float width, final float height) {
-    this.setWidth(width);
-    this.setHeight(height);
+    this.width = width;
+    this.height = height;
+    this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
   public void setWidth(final float width) {
     this.width = width;
     this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
   public void setX(double x) {
-    this.getLocation().setLocation(x, this.getY());
-    this.boundingBox = null;
+    this.setLocation(x, this.getY());
   }
 
   @Override
   public void setY(double y) {
-    this.getLocation().setLocation(this.getX(), y);
-    this.boundingBox = null;
+    this.setLocation(this.getX(), y);
   }
 
   @Override
@@ -296,5 +311,17 @@ public abstract class Entity implements IEntity {
     sb.append(" #");
     sb.append(this.getMapId());
     return sb.toString();
+  }
+
+  private void fireSizeChangedEvent() {
+    for (EntityTransformListener listener : this.transformListeners) {
+      listener.sizeChanged(this);
+    }
+  }
+
+  private void fireLocationChangedEvent() {
+    for (EntityTransformListener listener : this.transformListeners) {
+      listener.locationChanged(this);
+    }
   }
 }

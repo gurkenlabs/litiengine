@@ -1,9 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
@@ -16,9 +13,6 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 @MovementInfo
 public class Creature extends CombatEntity implements IMobileEntity {
   private static final int IDLE_DELAY = 100;
-
-  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
-
   private int acceleration;
   private int deceleration;
   private long lastMoved;
@@ -32,8 +26,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public Creature(String spritePrefix) {
-    this.entityMovedConsumer = new CopyOnWriteArrayList<>();
-
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = movementInfo.velocity();
@@ -106,15 +98,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public void onMoved(final Consumer<IMobileEntity> consumer) {
-    if (this.entityMovedConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityMovedConsumer.add(consumer);
-  }
-
-  @Override
   public void setAcceleration(final int acceleration) {
     this.acceleration = acceleration;
   }
@@ -138,10 +121,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
     if (Game.hasStarted()) {
       this.lastMoved = Game.getLoop().getTicks();
-    }
-
-    for (final Consumer<IMobileEntity> consumer : this.entityMovedConsumer) {
-      consumer.accept(this);
     }
   }
 
