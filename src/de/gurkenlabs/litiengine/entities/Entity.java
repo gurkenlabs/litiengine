@@ -176,30 +176,9 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
-    if (message == null) {
-      return null;
-    }
-
     MessageEvent event = null;
-    if (this.messageListeners.containsKey(ANY_MESSAGE) && this.messageListeners.get(ANY_MESSAGE) != null) {
-      for (MessageListener listener : this.messageListeners.get(ANY_MESSAGE)) {
-        if (event == null) {
-          event = new MessageEvent(sender, this, message);
-        }
-
-        listener.messageReceived(event);
-      }
-    }
-
-    if (this.messageListeners.containsKey(message) && this.messageListeners.get(message) != null) {
-      for (MessageListener listener : this.messageListeners.get(message)) {
-        if (event == null) {
-          event = new MessageEvent(sender, this, message);
-        }
-
-        listener.messageReceived(event);
-      }
-    }
+    event = this.fireMessageReceived(sender, ANY_MESSAGE, message, event);
+    this.fireMessageReceived(sender, message, message, event);
 
     return null;
   }
@@ -323,5 +302,23 @@ public abstract class Entity implements IEntity {
     for (EntityTransformListener listener : this.transformListeners) {
       listener.locationChanged(this);
     }
+  }
+
+  private MessageEvent fireMessageReceived(Object sender, String listenerMessage, String message, MessageEvent event) {
+    if (message == null) {
+      return event;
+    }
+
+    if (this.messageListeners.containsKey(listenerMessage) && this.messageListeners.get(listenerMessage) != null) {
+      for (MessageListener listener : this.messageListeners.get(listenerMessage)) {
+        if (event == null) {
+          event = new MessageEvent(sender, this, message);
+        }
+
+        listener.messageReceived(event);
+      }
+    }
+
+    return event;
   }
 }
