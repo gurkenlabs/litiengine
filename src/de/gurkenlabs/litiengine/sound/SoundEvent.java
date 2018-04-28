@@ -5,8 +5,8 @@ import java.util.EventObject;
 /**
  * This implementation is used for all events that need to pass a <code>Sound</code> object to their listeners.
  * 
- * @see {@link Sound}
- * @see {@link EventObject}
+ * @see Sound
+ * @see EventObject
  */
 public class SoundEvent extends EventObject {
   private static final long serialVersionUID = -2070316328855430839L;
