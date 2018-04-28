@@ -25,7 +25,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   private final List<TimedAction> actions;
   private final int updateRate;
-  private final List<Consumer<Integer>> upsTrackedConsumer;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
@@ -39,7 +38,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   public GameLoop(final int updateRate) {
     super();
-    this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
     this.setTimeScale(1.0F);
@@ -103,13 +101,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   @Override
   public int getUpdateRate() {
     return this.updateRate;
-  }
-
-  @Override
-  public void onUpsTracked(final Consumer<Integer> upsConsumer) {
-    if (!this.upsTrackedConsumer.contains(upsConsumer)) {
-      this.upsTrackedConsumer.add(upsConsumer);
-    }
   }
 
   @Override
@@ -184,7 +175,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   private void trackUpdateRate(long currentMillis) {
     if (currentMillis - this.lastUpsTime >= 1000) {
       this.lastUpsTime = currentMillis;
-      this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
+      Game.getMetrics().setUpdatesPerSecond(this.updateCount);
       this.updateCount = 0;
     }
   }

@@ -37,7 +37,5 @@ public interface IGameLoop extends ILoop {
 
   public int getUpdateRate();
 
-  public void onUpsTracked(final Consumer<Integer> upsConsumer);
-
   public void setTimeScale(float timeScale);
 }

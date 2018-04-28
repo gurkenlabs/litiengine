@@ -238,7 +238,6 @@ public final class Game {
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
     getLoop().attach(getPhysicsEngine());
-    getLoop().onUpsTracked(updateCount -> getMetrics().setUpdatesPerSecond(updateCount));
 
     final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
 
