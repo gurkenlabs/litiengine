@@ -14,9 +14,6 @@ public interface GameListener extends GameTerminatedListener {
    * This method gets called before the <code>Game</code> is about to be terminated.
    * Returning false prevents the terminate event to continue.
    *
-   * @param terminationPredicate
-   *          The predicate that determine whether the {@link Game} should be
-   *          terminated.
    * @return Return false to interrupt the termination process.
    */
   public boolean terminating();
