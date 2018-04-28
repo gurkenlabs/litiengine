@@ -60,6 +60,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameAdapter;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
@@ -240,15 +241,18 @@ public class Program {
   private static void setupInterface() {
     MenuBar menuBar = new MenuBar();
     JFrame window = ((JFrame) Game.getScreenManager());
-    Game.onTerminating(s -> {
-      boolean terminate = notifyPendingChanges();
-      if (terminate) {
-        getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
+    Game.addGameListener(new GameAdapter() {
+      @Override
+      public boolean terminating() {
+        boolean terminate = notifyPendingChanges();
+        if (terminate) {
+          getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
+        }
+
+        return terminate;
       }
-
-      return terminate;
     });
-
+    
     window.setResizable(true);
 
     window.setMenuBar(menuBar);

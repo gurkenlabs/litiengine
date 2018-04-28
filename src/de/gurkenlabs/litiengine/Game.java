@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
+import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -44,10 +43,9 @@ public final class Game {
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
-  private static final List<Consumer<String>> startedConsumer;
-  private static final List<Predicate<String>> terminatingConsumer;
-  private static final List<Consumer<GameConfiguration>> configLoadedConsumer;
-  private static final List<Consumer<IEnvironment>> environmentLoadedConsumer;
+  private static final List<EnvironmentLoadedListener> environmentLoadedListeners;
+  private static final List<GameListener> gameListeners;
+  private static final List<GameTerminatedListener> gameTerminatedListeners;
 
   private static final GameConfiguration configuration;
   private static final EntityControllerManager entityControllerManager;
@@ -69,10 +67,10 @@ public final class Game {
   private static boolean hasStarted;
 
   static {
-    startedConsumer = new CopyOnWriteArrayList<>();
-    terminatingConsumer = new CopyOnWriteArrayList<>();
-    environmentLoadedConsumer = new CopyOnWriteArrayList<>();
-    configLoadedConsumer = new CopyOnWriteArrayList<>();
+    environmentLoadedListeners = new CopyOnWriteArrayList<>();
+    gameListeners = new CopyOnWriteArrayList<>();
+    gameTerminatedListeners = new CopyOnWriteArrayList<>();
+
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new SoundEngine();
@@ -89,6 +87,32 @@ public final class Game {
   }
 
   private Game() {
+  }
+
+  public static void addGameListener(GameListener listener) {
+    gameListeners.add(listener);
+    gameTerminatedListeners.add(listener);
+  }
+
+  public static void removeGameListener(GameListener listener) {
+    gameListeners.remove(listener);
+    gameTerminatedListeners.remove(listener);
+  }
+
+  public static void addGameTerminatedListener(GameTerminatedListener listener) {
+    gameTerminatedListeners.add(listener);
+  }
+
+  public static void removeGameTerminatedListener(GameTerminatedListener listener) {
+    gameTerminatedListeners.remove(listener);
+  }
+
+  public static void addEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
+    environmentLoadedListeners.add(listener);
+  }
+
+  public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
+    environmentLoadedListeners.remove(listener);
   }
 
   /**
@@ -209,9 +233,6 @@ public final class Game {
 
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
-    for (Consumer<GameConfiguration> cons : configLoadedConsumer) {
-      cons.accept(getConfiguration());
-    }
 
     final GameLoop updateLoop = new GameLoop(getConfiguration().client().getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -334,36 +355,13 @@ public final class Game {
       getEnvironment().load();
     }
 
-    for (final Consumer<IEnvironment> cons : environmentLoadedConsumer) {
-      cons.accept(getEnvironment());
+    for (final EnvironmentLoadedListener listener : environmentLoadedListeners) {
+      listener.environmentLoaded(getEnvironment());
     }
 
     if (getLoop() != null) {
       environmentLoadTick = getLoop().getTicks();
     }
-  }
-
-  public static void onEnvironmentLoaded(final Consumer<IEnvironment> cons) {
-    environmentLoadedConsumer.add(cons);
-  }
-
-  public static void onStarted(final Consumer<String> cons) {
-    startedConsumer.add(cons);
-  }
-
-  /**
-   * Returning false prevents the terminate event to continue.
-   *
-   * @param terminationPredicate
-   *          The predicate that determine whether the {@link Game} should be
-   *          terminated.
-   */
-  public static void onTerminating(final Predicate<String> terminationPredicate) {
-    terminatingConsumer.add(terminationPredicate);
-  }
-
-  public static void onConfigurationLoaded(final Consumer<GameConfiguration> cons) {
-    configLoadedConsumer.add(cons);
   }
 
   public static void start() {
@@ -376,16 +374,16 @@ public final class Game {
       renderLoop.start();
     }
 
-    for (final Consumer<String> cons : startedConsumer) {
-      cons.accept(Game.getInfo().getName());
+    for (final GameListener listener : gameListeners) {
+      listener.started();
     }
 
     hasStarted = true;
   }
 
   public static void terminate() {
-    for (final Predicate<String> cons : terminatingConsumer) {
-      if (!cons.test(Game.getInfo().getName())) {
+    for (final GameListener listener : gameListeners) {
+      if (!listener.terminating()) {
         return;
       }
     }
@@ -397,6 +395,10 @@ public final class Game {
     soundEngine.terminate();
     if (!isInNoGUIMode()) {
       renderLoop.terminate();
+    }
+
+    for (final GameTerminatedListener listener : gameTerminatedListeners) {
+      listener.terminated();
     }
 
     System.exit(0);
