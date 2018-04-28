@@ -82,11 +82,7 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void addMessageListener(MessageListener listener) {
-    if (!this.messageListeners.containsKey(ANY_MESSAGE)) {
-      this.messageListeners.put(ANY_MESSAGE, new CopyOnWriteArrayList<>());
-    }
-
-    this.messageListeners.get(ANY_MESSAGE).add(listener);
+    this.addMessageListener(ANY_MESSAGE, listener);
   }
 
   @Override
