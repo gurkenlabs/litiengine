@@ -312,16 +312,12 @@ public final class PhysicsEngine implements IPhysicsEngine {
       }
     }
 
-    if (this.collisionEntities.contains(entity)) {
-      this.collisionEntities.remove(entity);
-    }
+    this.collisionEntities.remove(entity);
   }
 
   @Override
   public void remove(final Rectangle2D staticCollisionBox) {
-    if (this.staticCollisionBoxes.contains(staticCollisionBox)) {
-      this.staticCollisionBoxes.remove(staticCollisionBox);
-    }
+    this.staticCollisionBoxes.remove(staticCollisionBox);
   }
 
   @Override

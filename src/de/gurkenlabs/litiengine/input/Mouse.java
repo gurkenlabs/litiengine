@@ -246,7 +246,7 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void registerMouseListener(final MouseListener listener) {
+  public void addMouseListener(final MouseListener listener) {
     if (this.mouseListeners.contains(listener)) {
       return;
     }
@@ -255,7 +255,7 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void registerMouseMotionListener(final MouseMotionListener listener) {
+  public void addMouseMotionListener(final MouseMotionListener listener) {
     if (this.mouseMotionListeners.contains(listener)) {
       return;
     }
@@ -264,7 +264,7 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void registerMouseWheelListener(final MouseWheelListener listener) {
+  public void addMouseWheelListener(final MouseWheelListener listener) {
     if (this.mouseWheelListeners.contains(listener)) {
       return;
     }
@@ -299,29 +299,17 @@ public class Mouse implements IMouse {
   }
 
   @Override
-  public void unregisterMouseListener(final MouseListener listener) {
-    if (!this.mouseListeners.contains(listener)) {
-      return;
-    }
-
+  public void removeMouseListener(final MouseListener listener) {
     this.mouseListeners.remove(listener);
   }
 
   @Override
-  public void unregisterMouseMotionListener(final MouseMotionListener listener) {
-    if (!this.mouseMotionListeners.contains(listener)) {
-      return;
-    }
-
+  public void removeMouseMotionListener(final MouseMotionListener listener) {
     this.mouseMotionListeners.remove(listener);
   }
 
   @Override
-  public void unregisterMouseWheelListener(final MouseWheelListener listener) {
-    if (!this.mouseWheelListeners.contains(listener)) {
-      return;
-    }
-
+  public void removeMouseWheelListener(final MouseWheelListener listener) {
     this.mouseWheelListeners.remove(listener);
   }
 

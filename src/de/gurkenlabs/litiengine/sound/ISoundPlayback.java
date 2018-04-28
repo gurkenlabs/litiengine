@@ -1,8 +1,22 @@
 package de.gurkenlabs.litiengine.sound;
 
-import java.util.function.Consumer;
-
 public interface ISoundPlayback {
+  /**
+   * Adds a <code>SoundPlaybackListener</code> to this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be added.
+   */
+  public void addSoundPlaybackListener(SoundPlaybackListener listener);
+
+  /**
+   * Removes a <code>SoundPlaybackListener</code> to this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be removed.
+   */
+  public void removeSoundPlaybackListener(SoundPlaybackListener listener);
+
   public void pausePlayback();
 
   public void resumePlayback();
@@ -12,12 +26,8 @@ public interface ISoundPlayback {
   public boolean isPlaying();
 
   public void cancel();
-  
+
   public float getGain();
-  
+
   public void setGain(float gain);
-
-  public void onFinished(Consumer<Sound> consumer);
-
-  public void onCancelled(Consumer<Sound> consumer);
 }

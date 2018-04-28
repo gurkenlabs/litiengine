@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,9 +12,9 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
    * <ul>
-   *  <li>16.6 ms: 60 FPS</li>
-   *  <li>33.3 ms: 30 FPS</li>
-   *  <li>66.6 ms: 15 FPS</li>
+   * <li>16.6 ms: 60 FPS</li>
+   * <li>33.3 ms: 30 FPS</li>
+   * <li>66.6 ms: 15 FPS</li>
    * </ul>
    */
   public static final int TICK_DELTATIME_LAG = 67;
@@ -25,7 +24,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   private final List<TimedAction> actions;
   private final int updateRate;
-  private final List<Consumer<Integer>> upsTrackedConsumer;
 
   private long deltaTime;
   private boolean gameIsRunning = true;
@@ -39,7 +37,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   public GameLoop(final int updateRate) {
     super();
-    this.upsTrackedConsumer = new CopyOnWriteArrayList<>();
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
     this.setTimeScale(1.0F);
@@ -58,16 +55,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   @Override
   public long convertToTicks(final int ms) {
     return (long) (this.updateRate / 1000.0 * ms);
-  }
-
-  @Override
-  public int execute(final int delay, final Consumer<Integer> action) {
-    final long d = this.convertToTicks(delay);
-
-    TimedAction a = new TimedAction(this.getTicks() + d, action);
-    this.actions.add(a);
-
-    return a.getIndex();
   }
 
   @Override
@@ -103,13 +90,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   @Override
   public int getUpdateRate() {
     return this.updateRate;
-  }
-
-  @Override
-  public void onUpsTracked(final Consumer<Integer> upsConsumer) {
-    if (!this.upsTrackedConsumer.contains(upsConsumer)) {
-      this.upsTrackedConsumer.add(upsConsumer);
-    }
   }
 
   @Override
@@ -168,12 +148,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
     for (final TimedAction action : this.actions) {
       if (action.getExecutionTick() <= this.totalTicks) {
 
-        if (action.getConsumerAction() != null) {
-          action.getConsumerAction().accept(action.getIndex());
-        } else {
-          action.getAction().run();
-        }
-
+        action.getAction().run();
         executed.add(action);
       }
     }
@@ -184,33 +159,20 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   private void trackUpdateRate(long currentMillis) {
     if (currentMillis - this.lastUpsTime >= 1000) {
       this.lastUpsTime = currentMillis;
-      this.upsTrackedConsumer.forEach(consumer -> consumer.accept(this.updateCount));
+      Game.getMetrics().setUpdatesPerSecond(this.updateCount);
       this.updateCount = 0;
     }
   }
 
   private class TimedAction {
-    private final Consumer<Integer> consumerAction;
     private final Runnable action;
     private long execution;
     private final int index;
 
     private TimedAction(final long execution, final Runnable action) {
       this.execution = execution;
-      this.consumerAction = null;
       this.action = action;
       this.index = ++executionIndex;
-    }
-
-    private TimedAction(final long execution, final Consumer<Integer> action) {
-      this.execution = execution;
-      this.consumerAction = action;
-      this.action = null;
-      this.index = ++executionIndex;
-    }
-
-    public Consumer<Integer> getConsumerAction() {
-      return this.consumerAction;
     }
 
     public Runnable getAction() {

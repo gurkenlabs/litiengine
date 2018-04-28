@@ -34,7 +34,7 @@ public interface IKeyboard extends IUpdateable {
    * @param observer
    *          the observer
    */
-  public void registerForKeyEvents(IKeyObserver observer);
+  public void addKeyObserver(IKeyObserver observer);
 
   /**
    * Unregister from key down events.
@@ -42,5 +42,5 @@ public interface IKeyboard extends IUpdateable {
    * @param observer
    *          the observer
    */
-  public void unregisterFromKeyEvents(IKeyObserver observer);
+  public void removeKeyObserver(IKeyObserver observer);
 }

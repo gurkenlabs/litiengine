@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,13 +26,14 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private static final Logger log = Logger.getLogger(Trigger.class.getName());
 
   private List<IEntity> activated;
-  private final Collection<Consumer<TriggerEvent>> activatedConsumer;
-  private final Collection<Function<TriggerEvent, String>> activatingPredicates;
+  private final Collection<TriggerActivatedListener> activatedListeners;
+  private final Collection<TriggerDeactivatedListener> deactivatedListeners;
+  private final Collection<TriggerActivatingCondition> activatingConditions;
   private final TriggerActivation activationType;
   private final List<Integer> activators;
   private final List<Integer> targets;
   private final ICustomPropertyProvider customProperties;
-  private final Collection<Consumer<TriggerEvent>> deactivatedConsumer;
+
   private final boolean isOneTimeTrigger;
 
   private String message;
@@ -52,9 +51,9 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
     super();
-    this.activatingPredicates = new CopyOnWriteArrayList<>();
-    this.activatedConsumer = new CopyOnWriteArrayList<>();
-    this.deactivatedConsumer = new CopyOnWriteArrayList<>();
+    this.activatingConditions = new CopyOnWriteArrayList<>();
+    this.activatedListeners = new CopyOnWriteArrayList<>();
+    this.deactivatedListeners = new CopyOnWriteArrayList<>();
     this.customProperties = customProperties;
     this.activators = new CopyOnWriteArrayList<>();
     this.targets = new CopyOnWriteArrayList<>();
@@ -72,6 +71,42 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   public Trigger(final TriggerActivation activation, final String message, final boolean isOneTime, final int cooldown, ICustomPropertyProvider customProperties) {
     this(activation, message, isOneTime, customProperties);
     this.setCooldown(cooldown);
+  }
+
+  public void addTriggerListener(TriggerListener listener) {
+    this.activatedListeners.add(listener);
+    this.activatingConditions.add(listener);
+    this.deactivatedListeners.add(listener);
+  }
+
+  public void removeTriggerListener(TriggerListener listener) {
+    this.activatedListeners.remove(listener);
+    this.activatingConditions.remove(listener);
+    this.deactivatedListeners.remove(listener);
+  }
+
+  public void addActivatedListener(TriggerActivatedListener listener) {
+    this.activatedListeners.add(listener);
+  }
+
+  public void removeActivatedListener(TriggerActivatedListener listener) {
+    this.activatedListeners.remove(listener);
+  }
+
+  public void addActivatingCondition(TriggerActivatingCondition condition) {
+    this.activatingConditions.add(condition);
+  }
+
+  public void removeActivatingCondition(TriggerActivatingCondition condition) {
+    this.activatingConditions.remove(condition);
+  }
+
+  public void addDeactivatedListener(TriggerDeactivatedListener listener) {
+    this.deactivatedListeners.add(listener);
+  }
+
+  public void removeDeactivatedListener(TriggerDeactivatedListener listener) {
+    this.deactivatedListeners.remove(listener);
   }
 
   public void addActivator(final int mapId) {
@@ -123,41 +158,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public boolean isActivated() {
     return this.isActivated;
-  }
-
-  /**
-   * Allows to register functions that contain additional checks for the trigger
-   * activation. The return value of the function is considered the reason why
-   * the trigger cannot be activated. If the function returns anything else than
-   * null, the activation is cancelled and the result of the function is send to
-   * the activator entity.
-   * 
-   * @param func
-   *          The callback takes in the {@link TriggerEvent} and returns a
-   *          {@link String}
-   */
-  public void onActivating(final Function<TriggerEvent, String> func) {
-    if (this.activatingPredicates.contains(func)) {
-      return;
-    }
-
-    this.activatingPredicates.add(func);
-  }
-
-  public void onActivated(final Consumer<TriggerEvent> cons) {
-    if (this.activatedConsumer.contains(cons)) {
-      return;
-    }
-
-    this.activatedConsumer.add(cons);
-  }
-
-  public void onDeactivated(final Consumer<TriggerEvent> cons) {
-    if (this.deactivatedConsumer.contains(cons)) {
-      return;
-    }
-
-    this.deactivatedConsumer.add(cons);
   }
 
   @Override
@@ -230,14 +230,15 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     // send deactivation event
     for (final IEntity ent : this.activated) {
       if (!collEntities.contains(ent)) {
-        for (final Consumer<TriggerEvent> cons : this.deactivatedConsumer) {
-          List<Integer> triggerTargets = this.getTargets();
-          if (triggerTargets.isEmpty()) {
-            triggerTargets = new ArrayList<>();
-            triggerTargets.add(ent.getMapId());
-          }
+        List<Integer> triggerTargets = this.getTargets();
+        if (triggerTargets.isEmpty()) {
+          triggerTargets = new ArrayList<>();
+          triggerTargets.add(ent.getMapId());
+        }
 
-          cons.accept(new TriggerEvent(this, ent, triggerTargets));
+        final TriggerEvent event = new TriggerEvent(this, ent, triggerTargets);
+        for (final TriggerDeactivatedListener listener : this.deactivatedListeners) {
+          listener.deactivated(event);
         }
       }
     }
@@ -278,8 +279,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     }
 
     // also send the trigger event to all registered consumers
-    for (final Consumer<TriggerEvent> cons : this.activatedConsumer) {
-      cons.accept(te);
+    for (final TriggerActivatedListener listener : this.activatedListeners) {
+      listener.activated(te);
     }
 
     if (this.isOneTimeTrigger && this.isActivated) {
@@ -292,8 +293,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   private boolean checkActivationPredicates(TriggerEvent te) {
     // check if the trigger is allowed to be activated
-    for (Function<TriggerEvent, String> pred : this.activatingPredicates) {
-      String result = pred.apply(te);
+    for (TriggerActivatingCondition condition : this.activatingConditions) {
+      String result = condition.canActivate(te);
       if (result != null && !result.isEmpty()) {
         te.getEntity().sendMessage(this, result);
         return false;

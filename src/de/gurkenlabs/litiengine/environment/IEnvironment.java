@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine.environment;
 
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IInitializable;
@@ -30,6 +28,18 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
  * The Interface IMapContainer.
  */
 public interface IEnvironment extends IInitializable, IRenderable {
+  public void addRenderListener(EnvironmentRenderListener listener);
+
+  public void removeRenderListener(EnvironmentRenderListener listener);
+
+  public void addListener(EnvironmentListener listener);
+
+  public void removeListener(EnvironmentListener listener);
+
+  public void addEntityListener(EnvironmentEntityListener listener);
+
+  public void removeEntityListener(EnvironmentEntityListener listener);
+
   /**
    * Adds the specified entity to the environment container. This also loads the
    * entity (register entity and controllers for update) if the environment has
@@ -183,24 +193,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void load();
 
   public void loadFromMap(final int mapId);
-
-  public void onEntityAdded(final Consumer<IEntity> consumer);
-
-  public void onEntityRemoved(final Consumer<IEntity> consumer);
-
-  public void onEntitiesRendered(final Consumer<Graphics2D> consumer);
-
-  public void onInitialized(final Consumer<IEnvironment> consumer);
-
-  public void onLoaded(final Consumer<IEnvironment> consumer);
-
-  public void onUnloaded(final Consumer<IEnvironment> consumer);
-
-  public void onCleared(final Consumer<IEnvironment> consumer);
-
-  public void onMapRendered(final Consumer<Graphics2D> consumer);
-
-  public void onOverlayRendered(final Consumer<Graphics2D> consumer);
 
   public void reloadFromMap(final int mapId);
 

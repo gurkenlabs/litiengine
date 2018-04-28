@@ -53,7 +53,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void registerMouseListener(MouseListener listener);
+  public void addMouseListener(MouseListener listener);
 
   /**
    * Register mouse motion listener.
@@ -61,7 +61,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void registerMouseMotionListener(MouseMotionListener listener);
+  public void addMouseMotionListener(MouseMotionListener listener);
 
   /**
    * Register mouse wheel listener.
@@ -69,7 +69,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void registerMouseWheelListener(MouseWheelListener listener);
+  public void addMouseWheelListener(MouseWheelListener listener);
 
   /**
    * If set to true, the mouse will be locked to the render component of the game.
@@ -88,7 +88,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void unregisterMouseListener(MouseListener listener);
+  public void removeMouseListener(MouseListener listener);
 
   /**
    * Unregister mouse motion listener.
@@ -96,7 +96,7 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void unregisterMouseMotionListener(MouseMotionListener listener);
+  public void removeMouseMotionListener(MouseMotionListener listener);
 
   /**
    * Unregister mouse wheel listener.
@@ -104,5 +104,5 @@ public interface IMouse extends MouseListener, MouseMotionListener, MouseWheelLi
    * @param listener
    *          the listener
    */
-  public void unregisterMouseWheelListener(MouseWheelListener listener);
+  public void removeMouseWheelListener(MouseWheelListener listener);
 }

@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -17,7 +17,9 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
  */
 @EntityInfo
 public abstract class Entity implements IEntity {
-  private final List<MessageAction> messageActions;
+  public static final String ANY_MESSAGE = "";
+  private final List<EntityTransformListener> transformListeners;
+  private final Map<String, List<MessageListener>> messageListeners;
   private final List<String> tags;
 
   /** The direction. */
@@ -42,8 +44,10 @@ public abstract class Entity implements IEntity {
    * Instantiates a new entity.
    */
   protected Entity() {
-    this.messageActions = new CopyOnWriteArrayList<>();
+    this.transformListeners = new CopyOnWriteArrayList<>();
+    this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
+
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
     this.width = info.width();
@@ -64,6 +68,41 @@ public abstract class Entity implements IEntity {
   protected Entity(int mapId, String name) {
     this(mapId);
     this.name = name;
+  }
+
+  @Override
+  public void addTransformListener(EntityTransformListener listener) {
+    this.transformListeners.add(listener);
+  }
+
+  @Override
+  public void removeTransformListener(EntityTransformListener listener) {
+    this.transformListeners.remove(listener);
+  }
+
+  @Override
+  public void addMessageListener(MessageListener listener) {
+    this.addMessageListener(ANY_MESSAGE, listener);
+  }
+
+  @Override
+  public void addMessageListener(String message, MessageListener listener) {
+    if (!this.messageListeners.containsKey(message)) {
+      this.messageListeners.put(message, new CopyOnWriteArrayList<>());
+    }
+
+    this.messageListeners.get(message).add(listener);
+  }
+
+  @Override
+  public void removeMessageListener(MessageListener listener) {
+    for (List<MessageListener> listeners : this.messageListeners.values()) {
+      if (listeners == null || listeners.isEmpty()) {
+        continue;
+      }
+
+      listeners.remove(listener);
+    }
   }
 
   @Override
@@ -133,9 +172,9 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
-    for (MessageAction action : this.messageActions.stream().filter(x -> x.getMessage().equals(message)).collect(Collectors.toList())) {
-      action.execute(sender);
-    }
+    MessageEvent event = null;
+    event = this.fireMessageReceived(sender, ANY_MESSAGE, message, event);
+    this.fireMessageReceived(sender, message, message, event);
 
     return null;
   }
@@ -144,6 +183,7 @@ public abstract class Entity implements IEntity {
   public void setHeight(final float height) {
     this.height = height;
     this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
@@ -161,6 +201,7 @@ public abstract class Entity implements IEntity {
   public void setLocation(final Point2D location) {
     this.mapLocation = location;
     this.boundingBox = null;
+    this.fireLocationChangedEvent();
   }
 
   /**
@@ -184,26 +225,27 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void setSize(final float width, final float height) {
-    this.setWidth(width);
-    this.setHeight(height);
+    this.width = width;
+    this.height = height;
+    this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
   public void setWidth(final float width) {
     this.width = width;
     this.boundingBox = null;
+    this.fireSizeChangedEvent();
   }
 
   @Override
   public void setX(double x) {
-    this.getLocation().setLocation(x, this.getY());
-    this.boundingBox = null;
+    this.setLocation(x, this.getY());
   }
 
   @Override
   public void setY(double y) {
-    this.getLocation().setLocation(this.getX(), y);
-    this.boundingBox = null;
+    this.setLocation(this.getX(), y);
   }
 
   @Override
@@ -225,9 +267,7 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removeTag(String tag) {
-    if (!this.tags.contains(tag)) {
-      this.tags.remove(tag);
-    }
+    this.tags.remove(tag);
   }
 
   public void setAngle(final float angle) {
@@ -248,26 +288,33 @@ public abstract class Entity implements IEntity {
     return sb.toString();
   }
 
-  @Override
-  public void registerMessageAction(String message, Consumer<MessageArgs> action) {
-    this.messageActions.add(new MessageAction(message, action));
+  private void fireSizeChangedEvent() {
+    for (EntityTransformListener listener : this.transformListeners) {
+      listener.sizeChanged(this);
+    }
   }
 
-  private class MessageAction {
-    private final String message;
-    private final Consumer<MessageArgs> action;
+  private void fireLocationChangedEvent() {
+    for (EntityTransformListener listener : this.transformListeners) {
+      listener.locationChanged(this);
+    }
+  }
 
-    public MessageAction(String message, Consumer<MessageArgs> action) {
-      this.message = message;
-      this.action = action;
+  private MessageEvent fireMessageReceived(Object sender, String listenerMessage, String message, MessageEvent event) {
+    if (message == null) {
+      return event;
     }
 
-    public void execute(Object sender) {
-      this.action.accept(new MessageArgs(Entity.this, sender, getMessage()));
+    if (this.messageListeners.containsKey(listenerMessage) && this.messageListeners.get(listenerMessage) != null) {
+      for (MessageListener listener : this.messageListeners.get(listenerMessage)) {
+        if (event == null) {
+          event = new MessageEvent(sender, this, message);
+        }
+
+        listener.messageReceived(event);
+      }
     }
 
-    public String getMessage() {
-      return this.message;
-    }
+    return event;
   }
 }

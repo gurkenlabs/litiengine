@@ -1,9 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
@@ -14,25 +11,16 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 public class MobileEntity extends CollisionEntity implements IMobileEntity {
   private int acceleration;
   private int deceleration;
-  private final List<Consumer<IMobileEntity>> entityMovedConsumer;
   private Point2D moveDestination;
   private boolean turnOnMove;
-
   private short velocity;
 
   public MobileEntity() {
-    this.entityMovedConsumer = new CopyOnWriteArrayList<>();
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
     this.velocity = info.velocity();
     this.acceleration = info.acceleration();
     this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
-  }
-
-  protected static float getTickVelocity(IMobileEntity entity) {
-    // pixels per ms multiplied by the passed ms
-    // ensure that entities don't travel too far in case of lag
-    return Math.min(Game.getLoop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity() * Game.getLoop().getTimeScale();
   }
 
   @Override
@@ -61,15 +49,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   }
 
   @Override
-  public void onMoved(final Consumer<IMobileEntity> consumer) {
-    if (this.entityMovedConsumer.contains(consumer)) {
-      return;
-    }
-
-    this.entityMovedConsumer.add(consumer);
-  }
-
-  @Override
   public void setAcceleration(final int acceleration) {
     this.acceleration = acceleration;
   }
@@ -86,10 +65,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
     }
 
     super.setLocation(position);
-
-    for (final Consumer<IMobileEntity> consumer : this.entityMovedConsumer) {
-      consumer.accept(this);
-    }
   }
 
   @Override
@@ -110,5 +85,11 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
+  }
+
+  protected static float getTickVelocity(IMobileEntity entity) {
+    // pixels per ms multiplied by the passed ms
+    // ensure that entities don't travel too far in case of lag
+    return Math.min(Game.getLoop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity() * Game.getLoop().getTimeScale();
   }
 }

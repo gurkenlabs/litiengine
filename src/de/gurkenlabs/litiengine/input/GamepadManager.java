@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameAdapter;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -60,9 +61,11 @@ public class GamepadManager implements IGamepadManager {
       }
     });
 
-    Game.onTerminating(s -> {
-      hotPlugThread.interrupt();
-      return true;
+    Game.addGameListener(new GameAdapter() {
+      @Override
+      public void terminated() {
+        hotPlugThread.interrupt();
+      }
     });
 
     this.onGamepadAdded(pad -> {
