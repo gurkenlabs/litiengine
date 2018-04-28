@@ -69,9 +69,7 @@ public class Environment implements IEnvironment {
 
   private final List<EnvironmentRenderListener> renderListeners;
   private final List<EnvironmentListener> listeners;
-
-  private final List<Consumer<IEntity>> entityAddedConsumers;
-  private final List<Consumer<IEntity>> entityRemovedConsumers;
+  private final List<EnvironmentEntityListener> entityListeners;
 
   private final Collection<IRenderable> groundRenderable;
   private final Collection<IRenderable> overlayRenderable;
@@ -153,11 +151,9 @@ public class Environment implements IEnvironment {
     this.overlayRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
     this.uiRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
 
-    this.entityAddedConsumers = new CopyOnWriteArrayList<>();
-    this.entityRemovedConsumers = new CopyOnWriteArrayList<>();
-
     this.renderListeners = new CopyOnWriteArrayList<>();
     this.listeners = new CopyOnWriteArrayList<>();
+    this.entityListeners = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -178,6 +174,16 @@ public class Environment implements IEnvironment {
   @Override
   public void removeListener(EnvironmentListener listener) {
     this.listeners.remove(listener);
+  }
+
+  @Override
+  public void addEntityListener(EnvironmentEntityListener listener) {
+    this.entityListeners.add(listener);
+  }
+
+  @Override
+  public void removeEntityListener(EnvironmentEntityListener listener) {
+    this.entityListeners.remove(listener);
   }
 
   @Override
@@ -263,9 +269,7 @@ public class Environment implements IEnvironment {
 
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
 
-    for (Consumer<IEntity> cons : this.entityAddedConsumers) {
-      cons.accept(entity);
-    }
+    this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
   private void updateColorLayers(IEntity entity) {
@@ -741,16 +745,6 @@ public class Environment implements IEnvironment {
 
   }
 
-  @Override
-  public void onEntityRemoved(Consumer<IEntity> consumer) {
-    this.entityRemovedConsumers.add(consumer);
-  }
-
-  @Override
-  public void onEntityAdded(Consumer<IEntity> consumer) {
-    this.entityAddedConsumers.add(consumer);
-  }
-
   public static void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
     mapObjectLoaders.put(mapObjectType, mapObjectLoader);
   }
@@ -835,9 +829,7 @@ public class Environment implements IEnvironment {
 
     this.unload(entity);
 
-    for (Consumer<IEntity> cons : this.entityRemovedConsumers) {
-      cons.accept(entity);
-    }
+    this.fireEntityEvent(l -> l.entityRemoved(entity));
   }
 
   @Override
@@ -876,7 +868,7 @@ public class Environment implements IEnvironment {
 
     Game.getRenderEngine().renderMap(g, this.getMap());
 
-    this.fireRenderEvent(g, l -> l.mapRendered(g));
+    this.fireRenderEvent(l -> l.mapRendered(g));
 
     final double mapRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
@@ -885,7 +877,7 @@ public class Environment implements IEnvironment {
       rend.render(g);
     }
 
-    this.fireRenderEvent(g, l -> l.groundRendered(g));
+    this.fireRenderEvent(l -> l.groundRendered(g));
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
 
@@ -900,7 +892,7 @@ public class Environment implements IEnvironment {
     renderStart = System.nanoTime();
 
     Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
-    this.fireRenderEvent(g, l -> l.entitiesRendered(g));
+    this.fireRenderEvent(l -> l.entitiesRendered(g));
 
     final double normalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
@@ -918,7 +910,7 @@ public class Environment implements IEnvironment {
       rend.render(g);
     }
 
-    this.fireRenderEvent(g, l -> l.overlayRendered(g));
+    this.fireRenderEvent(l -> l.overlayRendered(g));
 
     final double overlayRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
     renderStart = System.nanoTime();
@@ -935,7 +927,7 @@ public class Environment implements IEnvironment {
       rend.render(g);
     }
 
-    this.fireRenderEvent(g, l -> l.uiRendered(g));
+    this.fireRenderEvent(l -> l.uiRendered(g));
     final double uiRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
     if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
@@ -963,8 +955,14 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private void fireRenderEvent(Graphics2D g, Consumer<EnvironmentRenderListener> cons) {
+  private void fireRenderEvent(Consumer<EnvironmentRenderListener> cons) {
     for (EnvironmentRenderListener listener : this.renderListeners) {
+      cons.accept(listener);
+    }
+  }
+
+  private void fireEntityEvent(Consumer<EnvironmentEntityListener> cons) {
+    for (EnvironmentEntityListener listener : this.entityListeners) {
       cons.accept(listener);
     }
   }

@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IInitializable;
@@ -36,6 +35,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void addListener(EnvironmentListener listener);
 
   public void removeListener(EnvironmentListener listener);
+
+  public void addEntityListener(EnvironmentEntityListener listener);
+
+  public void removeEntityListener(EnvironmentEntityListener listener);
 
   /**
    * Adds the specified entity to the environment container. This also loads the
@@ -190,10 +193,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void load();
 
   public void loadFromMap(final int mapId);
-
-  public void onEntityAdded(final Consumer<IEntity> consumer);
-
-  public void onEntityRemoved(final Consumer<IEntity> consumer);
 
   public void reloadFromMap(final int mapId);
 
