@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,8 +33,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   private static final ExecutorService executorServie;
   protected static final SourceDataLineCloseQueue closeQueue;
 
-  private final List<Consumer<Sound>> finishedConsumer;
-  private final List<Consumer<Sound>> cancelledConsumer;
+  private final List<SoundPlaybackListener> playbackListeners;
 
   private final Point2D initialListenerLocation;
   private SourceDataLine dataLine;
@@ -66,8 +64,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   protected SoundPlayback(final Sound sound, final Point2D listenerLocation) {
-    this.finishedConsumer = new CopyOnWriteArrayList<>();
-    this.cancelledConsumer = new CopyOnWriteArrayList<>();
+    this.playbackListeners = new CopyOnWriteArrayList<>();
     this.sound = sound;
     this.initialListenerLocation = listenerLocation;
     this.gain = 1;
@@ -132,27 +129,30 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     }
 
     this.playing = false;
-    for (Consumer<Sound> cons : this.finishedConsumer) {
-      cons.accept(this.getSound());
+    final SoundEvent event = new SoundEvent(this, this.sound);
+    for (SoundPlaybackListener listener : this.playbackListeners) {
+      listener.finished(event);
     }
-  }
-
-  @Override
-  public void onFinished(Consumer<Sound> cons) {
-    this.finishedConsumer.add(cons);
-  }
-
-  @Override
-  public void onCancelled(Consumer<Sound> cons) {
-    this.cancelledConsumer.add(cons);
   }
 
   @Override
   public void cancel() {
     this.cancelled = true;
-    for (Consumer<Sound> cons : this.cancelledConsumer) {
-      cons.accept(this.getSound());
+
+    final SoundEvent event = new SoundEvent(this, this.sound);
+    for (SoundPlaybackListener listener : this.playbackListeners) {
+      listener.cancelled(event);
     }
+  }
+
+  @Override
+  public void addSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
+    this.playbackListeners.add(soundPlaybackListener);
+  }
+
+  @Override
+  public void removeSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
+    this.playbackListeners.remove(soundPlaybackListener);
   }
 
   @Override
