@@ -1,14 +1,10 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.function.Consumer;
-
 public interface IGameLoop extends ILoop {
 
   public long convertToMs(final long ticks);
 
   public long convertToTicks(final int ms);
-
-  public int execute(int delay, Consumer<Integer> action);
 
   public int execute(int delay, Runnable action);
 
