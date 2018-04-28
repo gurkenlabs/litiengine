@@ -511,9 +511,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
   public void prepare() {
     this.suspended = false;
     this.visible = true;
-    Input.mouse().registerMouseListener(this);
-    Input.mouse().registerMouseWheelListener(this);
-    Input.mouse().registerMouseMotionListener(this);
+    Input.mouse().addMouseListener(this);
+    Input.mouse().addMouseWheelListener(this);
+    Input.mouse().addMouseMotionListener(this);
     for (final GuiComponent component : this.getComponents()) {
       component.prepare();
     }
@@ -687,9 +687,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * Suspend.
    */
   public void suspend() {
-    Input.mouse().unregisterMouseListener(this);
-    Input.mouse().unregisterMouseWheelListener(this);
-    Input.mouse().unregisterMouseMotionListener(this);
+    Input.mouse().removeMouseListener(this);
+    Input.mouse().removeMouseWheelListener(this);
+    Input.mouse().removeMouseMotionListener(this);
     this.suspended = true;
     this.visible = false;
     for (final GuiComponent childComp : this.getComponents()) {
