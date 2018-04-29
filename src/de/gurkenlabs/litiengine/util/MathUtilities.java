@@ -11,13 +11,7 @@ public class MathUtilities {
   }
 
   public static float round(float value, int places) {
-    if (places < 0) {
-      throw new IllegalArgumentException();
-    }
-
-    BigDecimal bd = BigDecimal.valueOf(value);
-    bd = bd.setScale(places, RoundingMode.HALF_UP);
-    return bd.floatValue();
+    return (float) round((double) value, places);
   }
 
   public static double round(double value, int places) {

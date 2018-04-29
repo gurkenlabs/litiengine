@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -131,15 +133,9 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
   public void updateSpinnerModels() {
     if (Program.getUserPreferences().isSnapPixels()) {
-      this.spinnerX.setModel(getIntegerModel());
-      this.spinnerY.setModel(getIntegerModel());
-      this.spinnerWidth.setModel(getIntegerModel());
-      this.spinnerHeight.setModel(getIntegerModel());
+      this.updateSpinnerModels(MapObjectPanel::getIntegerModel);
     } else {
-      this.spinnerX.setModel(getFloatModel());
-      this.spinnerY.setModel(getFloatModel());
-      this.spinnerWidth.setModel(getFloatModel());
-      this.spinnerHeight.setModel(getFloatModel());
+      this.updateSpinnerModels(MapObjectPanel::getFloatModel);
     }
   }
 
@@ -295,5 +291,12 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
   private static SpinnerNumberModel getIntegerModel() {
     return new SpinnerNumberModel(0, 0, 10000, 1);
+  }
+
+  private void updateSpinnerModels(Supplier<SpinnerNumberModel> supp) {
+    this.spinnerX.setModel(supp.get());
+    this.spinnerY.setModel(supp.get());
+    this.spinnerWidth.setModel(supp.get());
+    this.spinnerHeight.setModel(supp.get());
   }
 }
