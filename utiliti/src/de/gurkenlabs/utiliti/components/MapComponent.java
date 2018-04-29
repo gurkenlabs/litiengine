@@ -144,7 +144,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private boolean isMovingWithKeyboard;
   private boolean isTransforming;
   private boolean isFocussing;
-  private Dimension dragSizeMapObject;
+  private float dragSizeHeight;
+  private float dragSizeWidth;
   private Rectangle2D newObjectArea;
   private Blueprint copiedBlueprint;
   private int gridSize;
@@ -710,10 +711,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
-          if(img == null) {
+          if (img == null) {
             continue;
           }
-          
+
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
           this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
@@ -965,15 +966,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
       this.dragLocationMapObjects.put(this.getFocusedMapObject(), new Point2D.Double(transformObject.getX(), transformObject.getY()));
-      this.dragSizeMapObject = new Dimension(transformObject.getDimension());
+      this.dragSizeHeight = transformObject.getHeight();
+      this.dragSizeWidth = transformObject.getWidth();
       return;
     }
 
     Point2D dragLocationMapObject = this.dragLocationMapObjects.get(this.getFocusedMapObject());
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    double newWidth = this.dragSizeMapObject.getWidth();
-    double newHeight = this.dragSizeMapObject.getHeight();
+    double newWidth = this.dragSizeWidth;
+    double newHeight = this.dragSizeHeight;
     double newX = this.snapX(dragLocationMapObject.getX());
     double newY = this.snapY(dragLocationMapObject.getY());
 
@@ -989,12 +991,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       newHeight += deltaY;
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case LEFT:
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case RIGHT:
       newWidth += deltaX;
@@ -1002,20 +1004,20 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case UP:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       break;
     case UPLEFT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case UPRIGHT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       newWidth += deltaX;
       break;
     default:
@@ -1080,11 +1082,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     int newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
-    int snappedDeltaX = newX - minX.getX();
+    float snappedDeltaX = newX - minX.getX();
 
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
     int newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
-    int snappedDeltaY = newY - minY.getY();
+    float snappedDeltaY = newY - minY.getY();
 
     if (snappedDeltaX == 0 && snappedDeltaY == 0) {
       return;
@@ -1097,7 +1099,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
-  private void handleEntityDrag(int snappedDeltaX, int snappedDeltaY) {
+  private void handleEntityDrag(float snappedDeltaX, float snappedDeltaY) {
     for (IMapObject selected : this.getSelectedMapObjects()) {
 
       selected.setX(selected.getX() + snappedDeltaX);
@@ -1413,7 +1415,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     this.dragPoint = null;
     this.dragLocationMapObjects.clear();
-    this.dragSizeMapObject = null;
+    this.dragSizeHeight = 0;
+    this.dragSizeWidth = 0;
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
@@ -1715,7 +1718,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
@@ -1793,7 +1796,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (collisionBoxWidth != -1 && collisionBoxHeight != -1) {
 
       g.setColor(COLOR_COLLISION_FILL);
-      Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
+      Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
       Game.getRenderEngine().renderShape(g, collisionBox);
       g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);

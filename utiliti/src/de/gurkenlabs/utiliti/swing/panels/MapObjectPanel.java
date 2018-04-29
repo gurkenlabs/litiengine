@@ -212,10 +212,10 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.spinnerX.setValue((int) mapObject.getLocation().getX());
-    this.spinnerY.setValue((int) mapObject.getLocation().getY());
-    this.spinnerWidth.setValue((int) mapObject.getDimension().getWidth());
-    this.spinnerHeight.setValue((int) mapObject.getDimension().getHeight());
+    this.spinnerX.setValue(mapObject.getLocation().getX());
+    this.spinnerY.setValue(mapObject.getLocation().getY());
+    this.spinnerWidth.setValue(mapObject.getWidth());
+    this.spinnerHeight.setValue(mapObject.getHeight());
 
     MapObjectType type = MapObjectType.get(mapObject.getType());
     this.comboBoxType.setSelectedItem(type);
@@ -242,22 +242,22 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
 
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setX((int) spinnerX.getValue());
+      m.setX((float)spinnerX.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setY((int) spinnerY.getValue());
+      m.setY((float) spinnerY.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setWidth((int) spinnerWidth.getValue());
+      m.setWidth((float) spinnerWidth.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setHeight((int) spinnerHeight.getValue());
+      m.setHeight((float) spinnerHeight.getValue());
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 

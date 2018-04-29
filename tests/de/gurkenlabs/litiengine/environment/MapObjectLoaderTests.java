@@ -9,7 +9,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testProp");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+
 
     when(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
     when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
@@ -88,9 +87,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testCollider");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
-    when(mapObject.getWidth()).thenReturn(200);
-    when(mapObject.getHeight()).thenReturn(200);
+    when(mapObject.getWidth()).thenReturn(200f);
+    when(mapObject.getHeight()).thenReturn(200f);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -119,9 +117,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testTrigger");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getWidth()).thenReturn(200);
-    when(mapObject.getHeight()).thenReturn(200);
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
+    when(mapObject.getWidth()).thenReturn(200f);
+    when(mapObject.getHeight()).thenReturn(200f);
 
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
     when(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
@@ -160,7 +157,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testEmitter");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -184,7 +180,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testLight");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-    when(mapObject.getDimension()).thenReturn(new Dimension(200, 200));
 
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
     when(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);

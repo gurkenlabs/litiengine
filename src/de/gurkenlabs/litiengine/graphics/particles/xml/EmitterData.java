@@ -51,7 +51,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   private ParticleParameter gravityY;
 
   @XmlAttribute
-  private int height;
+  private float height;
 
   @XmlAttribute
   private int maxParticles;
@@ -87,7 +87,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   private int updateRate;
 
   @XmlAttribute
-  private int width;
+  private float width;
 
   @XmlElement
   private float colorDeviation;
@@ -246,7 +246,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   @XmlTransient
-  public int getHeight() {
+  public float getHeight() {
     return this.height;
   }
 
@@ -351,7 +351,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   @XmlTransient
-  public int getWidth() {
+  public float getWidth() {
     return this.width;
   }
 
@@ -418,7 +418,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.gravityY = gravityY;
   }
 
-  public void setHeight(final int height) {
+  public void setHeight(final float height) {
     this.height = height;
   }
 
@@ -482,7 +482,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.updateRate = updateRate;
   }
 
-  public void setWidth(final int width) {
+  public void setWidth(final float width) {
     this.width = width;
   }
 
