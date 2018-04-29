@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "property")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Property implements Serializable {
+public class Property implements Serializable{
   private static final long serialVersionUID = 4684901360660207599L;
 
   /** The name. */
@@ -79,5 +79,4 @@ public class Property implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
-
 }
