@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.components;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -144,7 +143,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private boolean isMovingWithKeyboard;
   private boolean isTransforming;
   private boolean isFocussing;
-  private Dimension dragSizeMapObject;
+  private float dragSizeHeight;
+  private float dragSizeWidth;
   private Rectangle2D newObjectArea;
   private Blueprint copiedBlueprint;
   private int gridSize;
@@ -152,10 +152,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private Color colorSelectionBorder;
   private float focusBorderBrightness = 0;
   private boolean focusBorderBrightnessIncreasing = true;
-
-  private boolean snapToGrid = true;
-  private boolean renderGrid = false;
-  private boolean renderMapObjectBounds = true;
 
   private final EditorScreen screen;
 
@@ -209,7 +205,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.renderGrid(g);
 
     final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
-    if (this.renderMapObjectBounds) {
+    if (Program.getUserPreferences().isRenderBoundingBoxes()) {
       this.renderMapObjectBounds(g);
     }
 
@@ -600,30 +596,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.gridSize = gridSize;
   }
 
-  public boolean isSnapToGrid() {
-    return this.snapToGrid;
-  }
-
-  public void setSnapToGrid(boolean snapToGrid) {
-    this.snapToGrid = snapToGrid;
-  }
-
-  public boolean isRenderGrid() {
-    return this.renderGrid;
-  }
-
-  public void setRenderGrid(boolean renderGrid) {
-    this.renderGrid = renderGrid;
-  }
-
-  public boolean isRenderCollisionBoxes() {
-    return this.renderMapObjectBounds;
-  }
-
-  public void setRenderCollisionBoxes(boolean renderCollisionBoxes) {
-    this.renderMapObjectBounds = renderCollisionBoxes;
-  }
-
   public void updateTransformControls() {
     final Rectangle2D focus = this.getFocus();
     if (focus == null) {
@@ -710,10 +682,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         for (IImageLayer imageLayer : map.getImageLayers()) {
           BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
-          if(img == null) {
+          if (img == null) {
             continue;
           }
-          
+
           Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
           this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
         }
@@ -965,15 +937,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (this.dragPoint == null) {
       this.dragPoint = Input.mouse().getMapLocation();
       this.dragLocationMapObjects.put(this.getFocusedMapObject(), new Point2D.Double(transformObject.getX(), transformObject.getY()));
-      this.dragSizeMapObject = new Dimension(transformObject.getDimension());
+      this.dragSizeHeight = transformObject.getHeight();
+      this.dragSizeWidth = transformObject.getWidth();
       return;
     }
 
     Point2D dragLocationMapObject = this.dragLocationMapObjects.get(this.getFocusedMapObject());
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    double newWidth = this.dragSizeMapObject.getWidth();
-    double newHeight = this.dragSizeMapObject.getHeight();
+    double newWidth = this.dragSizeWidth;
+    double newHeight = this.dragSizeHeight;
     double newX = this.snapX(dragLocationMapObject.getX());
     double newY = this.snapY(dragLocationMapObject.getY());
 
@@ -989,12 +962,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       newHeight += deltaY;
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case LEFT:
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case RIGHT:
       newWidth += deltaX;
@@ -1002,20 +975,20 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case UP:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       break;
     case UPLEFT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       newWidth -= deltaX;
       newX += deltaX;
-      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeMapObject.getWidth());
+      newX = MathUtilities.clamp(newX, 0, dragLocationMapObject.getX() + this.dragSizeWidth);
       break;
     case UPRIGHT:
       newHeight -= deltaY;
       newY += deltaY;
-      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeMapObject.getHeight());
+      newY = MathUtilities.clamp(newY, 0, dragLocationMapObject.getY() + this.dragSizeHeight);
       newWidth += deltaX;
       break;
     default:
@@ -1079,12 +1052,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    int newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
-    int snappedDeltaX = newX - minX.getX();
+    float newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
+    float snappedDeltaX = newX - minX.getX();
 
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    int newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
-    int snappedDeltaY = newY - minY.getY();
+    float newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
+    float snappedDeltaY = newY - minY.getY();
 
     if (snappedDeltaX == 0 && snappedDeltaY == 0) {
       return;
@@ -1097,7 +1070,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
-  private void handleEntityDrag(int snappedDeltaX, int snappedDeltaY) {
+  private void handleEntityDrag(float snappedDeltaX, float snappedDeltaY) {
     for (IMapObject selected : this.getSelectedMapObjects()) {
 
       selected.setX(selected.getX() + snappedDeltaX);
@@ -1413,7 +1386,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     this.dragPoint = null;
     this.dragLocationMapObjects.clear();
-    this.dragSizeMapObject = null;
+    this.dragSizeHeight = 0;
+    this.dragSizeWidth = 0;
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
@@ -1505,22 +1479,30 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.startPoint = null;
   }
 
-  private int snapX(double x) {
-    if (!this.snapToGrid) {
+  private float snapX(double x) {
+    if (Program.getUserPreferences().isSnapGrid()) {
+      double snapped = ((int) (x / this.gridSize) * this.gridSize);
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
+    }
+
+    if (Program.getUserPreferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getWidth());
     }
 
-    double snapped = ((int) (x / this.gridSize) * this.gridSize);
-    return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
+    return MathUtilities.round((float) x, 2);
   }
 
-  private int snapY(double y) {
-    if (!this.snapToGrid) {
+  private float snapY(double y) {
+    if (Program.getUserPreferences().isSnapGrid()) {
+      int snapped = (int) (y / this.gridSize) * this.gridSize;
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
+    }
+
+    if (Program.getUserPreferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getHeight());
     }
 
-    int snapped = (int) (y / this.gridSize) * this.gridSize;
-    return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
+    return MathUtilities.round((float) y, 2);
   }
 
   private boolean hasFocus() {
@@ -1625,7 +1607,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderGrid(Graphics2D g) {
     // render the grid
-    if (this.renderGrid && Game.getCamera().getRenderScale() >= 1) {
+    if (Program.getUserPreferences().isShowGrid() && Game.getCamera().getRenderScale() >= 1) {
 
       g.setColor(new Color(255, 255, 255, 70));
       final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
@@ -1715,7 +1697,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getDimension().getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
@@ -1793,7 +1775,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (collisionBoxWidth != -1 && collisionBoxHeight != -1) {
 
       g.setColor(COLOR_COLLISION_FILL);
-      Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getDimension().getWidth(), mapObject.getDimension().getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
+      Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
       Game.getRenderEngine().renderShape(g, collisionBox);
       g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);

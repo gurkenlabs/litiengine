@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -10,13 +9,6 @@ import java.awt.geom.Rectangle2D;
  * special regions on the map.
  */
 public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObject> {
-
-  /**
-   * Gets the dimension.
-   *
-   * @return the dimension
-   */
-  public Dimension getDimension();
 
   /**
    * Gets the grid id.
@@ -44,7 +36,7 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
    *
    * @return the location
    */
-  public Point getLocation();
+  public Point2D getLocation();
 
   /**
    * Gets the name.
@@ -65,20 +57,19 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
 
   public void setType(String type);
 
-  public void setX(int x);
+  public void setX(float x);
 
-  public void setY(int y);
+  public void setY(float y);
 
-  public void setWidth(int width);
+  public void setWidth(float width);
 
-  public void setHeight(int height);
+  public void setHeight(float height);
 
-  public int getX();
+  public float getX();
 
-  public int getY();
+  public float getY();
 
-  public int getWidth();
+  public float getWidth();
 
-  public int getHeight();
-
+  public float getHeight();
 }

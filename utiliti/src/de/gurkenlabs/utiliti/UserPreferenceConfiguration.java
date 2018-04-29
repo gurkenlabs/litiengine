@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
 public class UserPreferenceConfiguration extends ConfigurationGroup {
   private float zoom;
   private boolean showGrid;
+  private boolean snapPixels;
   private boolean snapGrid;
   private boolean renderBoundingBoxes;
   private boolean compressFile;
@@ -31,6 +32,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   public UserPreferenceConfiguration() {
     this.zoom = 1.0f;
     this.showGrid = true;
+    this.snapPixels = true;
     this.snapGrid = true;
     this.renderBoundingBoxes = true;
     this.lastOpenedFiles = new String[10];
@@ -205,5 +207,13 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setFrameState(int frameState) {
     this.frameState = frameState;
+  }
+
+  public boolean isSnapPixels() {
+    return snapPixels;
+  }
+
+  public void setSnapPixels(boolean snapPixels) {
+    this.snapPixels = snapPixels;
   }
 }

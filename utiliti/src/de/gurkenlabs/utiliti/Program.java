@@ -252,7 +252,7 @@ public class Program {
         return terminate;
       }
     });
-    
+
     window.setResizable(true);
 
     window.setMenuBar(menuBar);
@@ -416,31 +416,27 @@ public class Program {
   private static Menu initViewMenu() {
     Menu mnView = new Menu(Resources.get("menu_view"));
 
+    CheckboxMenuItem snapToPixels = new CheckboxMenuItem(Resources.get("menu_snapPixels"));
+    snapToPixels.setState(userPreferences.isSnapPixels());
+    snapToPixels.addItemListener(e -> {
+      userPreferences.setSnapPixels(snapToPixels.getState());
+      EditorScreen.instance().getMapObjectPanel().updateSpinnerModels();
+      EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
+    });
+
     CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
     snapToGrid.setState(userPreferences.isSnapGrid());
-    EditorScreen.instance().getMapComponent().setSnapToGrid(snapToGrid.getState());
-    snapToGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().setSnapToGrid(snapToGrid.getState());
-      userPreferences.setSnapGrid(snapToGrid.getState());
-    });
+    snapToGrid.addItemListener(e -> userPreferences.setSnapGrid(snapToGrid.getState()));
 
     CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
     renderGrid.setState(userPreferences.isShowGrid());
-    EditorScreen.instance().getMapComponent().setRenderGrid(renderGrid.getState());
     renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
-    renderGrid.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().setRenderGrid(renderGrid.getState());
-      userPreferences.setShowGrid(renderGrid.getState());
-    });
+    renderGrid.addItemListener(e -> userPreferences.setShowGrid(renderGrid.getState()));
 
     CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
     renderCollision.setState(userPreferences.isRenderBoundingBoxes());
-    EditorScreen.instance().getMapComponent().setRenderCollisionBoxes(renderCollision.getState());
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
-    renderCollision.addItemListener(e -> {
-      EditorScreen.instance().getMapComponent().setRenderCollisionBoxes(renderCollision.getState());
-      userPreferences.setRenderBoundingBoxes(renderCollision.getState());
-    });
+    renderCollision.addItemListener(e -> userPreferences.setRenderBoundingBoxes(renderCollision.getState()));
 
     MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
     setGrid.addActionListener(a -> {
@@ -459,6 +455,7 @@ public class Program {
     zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
     zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
 
+    mnView.add(snapToPixels);
     mnView.add(snapToGrid);
     mnView.add(renderGrid);
     mnView.add(renderCollision);

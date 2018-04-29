@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
@@ -11,6 +9,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
@@ -32,16 +31,20 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   private String type;
 
   @XmlAttribute
-  private int x;
+  @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  private Float x;
 
   @XmlAttribute
-  private int y;
+  @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  private Float y;
 
   @XmlAttribute
-  private int width;
+  @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  private Float width;
 
   @XmlAttribute
-  private int height;
+  @XmlJavaTypeAdapter(value = DecimalFloatAdapter.class)
+  private Float height;
 
   @XmlAttribute
   private Integer gid;
@@ -50,9 +53,14 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   private Polyline polyline;
 
   public MapObject() {
+    this.x = 0f;
+    this.y = 0f;
+    this.width = 0f;
+    this.height = 0f;
   }
 
   public MapObject(MapObject mapObject) {
+    super();
     this.gid = mapObject.gid;
     this.height = mapObject.height;
     this.width = mapObject.width;
@@ -72,15 +80,15 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return getBounds(objects);
   }
 
-  public static Rectangle getBounds(MapObject... objects) {
+  public static Rectangle2D getBounds(MapObject... objects) {
     return getBounds(Arrays.asList(objects));
   }
 
-  public static Rectangle getBounds(Iterable<MapObject> objects) {
-    int minX = -1;
-    int minY = -1;
-    int maxX = -1;
-    int maxY = -1;
+  public static Rectangle2D getBounds(Iterable<MapObject> objects) {
+    float minX = -1;
+    float minY = -1;
+    float maxX = -1;
+    float maxY = -1;
     for (MapObject item : objects) {
       if (minX == -1 || item.getX() < minX) {
         minX = item.getX();
@@ -99,7 +107,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
       }
     }
 
-    return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    return new Rectangle2D.Float(minX, minY, maxX - minX, maxY - minY);
   }
 
   @Override
@@ -117,11 +125,6 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     }
 
     return this.getName().compareTo(obj.getName());
-  }
-
-  @Override
-  public Dimension getDimension() {
-    return new Dimension(this.width, this.height);
   }
 
   @Override
@@ -144,8 +147,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public Point getLocation() {
-    return new Point(this.x, this.y);
+  public Point2D getLocation() {
+    return new Point2D.Double(this.x, this.y);
   }
 
   @Override
@@ -176,7 +179,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   @XmlTransient
-  public void setHeight(int height) {
+  public void setHeight(float height) {
     this.height = height;
   }
 
@@ -200,29 +203,29 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   @XmlTransient
-  public void setWidth(int width) {
+  public void setWidth(float width) {
     this.width = width;
   }
 
   @Override
   @XmlTransient
-  public void setX(int x) {
+  public void setX(float x) {
     this.x = x;
   }
 
   @Override
   @XmlTransient
-  public void setY(int y) {
+  public void setY(float y) {
     this.y = y;
   }
 
   @Override
-  public int getX() {
+  public float getX() {
     return this.x;
   }
 
   @Override
-  public int getY() {
+  public float getY() {
     return this.y;
   }
 
@@ -232,12 +235,12 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public int getWidth() {
+  public float getWidth() {
     return this.width;
   }
 
   @Override
-  public int getHeight() {
+  public float getHeight() {
     return this.height;
   }
 
