@@ -15,12 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 
 @SuppressWarnings("serial")
@@ -40,7 +42,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   private final JLabel labelEntityID;
   private TagPanel tagPanel;
   private JLabel lblTags;
-  
+
   public MapObjectPanel() {
     this.panels = new ConcurrentHashMap<>();
     this.panels.put(MapObjectType.PROP, new PropPanel());
@@ -57,13 +59,9 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     setMinimumSize(new Dimension(250, 500));
 
     JLabel lblX = new JLabel(Resources.get("panel_x"));
-
     JLabel lblYcoordinate = new JLabel(Resources.get("panel_y"));
-
     JLabel lblWidth = new JLabel(Resources.get("panel_width"));
-
     JLabel lblHeight = new JLabel(Resources.get("panel_height"));
-
     JLabel lblName = new JLabel(Resources.get("panel_name"));
 
     this.textFieldName = new JTextField();
@@ -77,6 +75,8 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.spinnerY = new JSpinner();
     this.spinnerWidth = new JSpinner();
     this.spinnerHeight = new JSpinner();
+
+    this.updateSpinnerModels();
 
     JLabel lblNewLabel = new JLabel("ID");
     lblNewLabel.setFont(lblNewLabel.getFont().deriveFont(Font.BOLD).deriveFont(12f));
@@ -127,6 +127,20 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     this.setupChangedListeners();
     this.comboBoxType.setSelectedItem(MapObjectType.AREA);
+  }
+
+  public void updateSpinnerModels() {
+    if (Program.getUserPreferences().isSnapPixels()) {
+      this.spinnerX.setModel(getIntegerModel());
+      this.spinnerY.setModel(getIntegerModel());
+      this.spinnerWidth.setModel(getIntegerModel());
+      this.spinnerHeight.setModel(getIntegerModel());
+    } else {
+      this.spinnerX.setModel(getFloatModel());
+      this.spinnerY.setModel(getFloatModel());
+      this.spinnerWidth.setModel(getFloatModel());
+      this.spinnerHeight.setModel(getFloatModel());
+    }
   }
 
   public MapObjectType getObjectType() {
@@ -241,26 +255,45 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
 
     this.textFieldName.addActionListener(new MapObjectPropertyActionListener(m -> m.setName(textFieldName.getText())));
 
+    // TODO: wrap the value changing with the spin controls into one undo
+    // operation.
     this.spinnerX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setX((float)spinnerX.getValue());
+
+      m.setX(getSpinnerValue(spinnerX));
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setY((float) spinnerY.getValue());
+      m.setY(getSpinnerValue(spinnerY));
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setWidth((float) spinnerWidth.getValue());
+      m.setWidth(getSpinnerValue(spinnerWidth));
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setHeight((float) spinnerHeight.getValue());
+      m.setHeight(getSpinnerValue(spinnerHeight));
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
     this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+  }
+
+  private static float getSpinnerValue(JSpinner spinner) {
+    if (spinner.getValue() instanceof Integer) {
+      return (int) spinner.getValue();
+    } else {
+      return (float) (double) spinner.getValue();
+    }
+  }
+
+  private static SpinnerNumberModel getFloatModel() {
+    return new SpinnerNumberModel(0f, 0f, 10000f, 0.01f);
+  }
+
+  private static SpinnerNumberModel getIntegerModel() {
+    return new SpinnerNumberModel(0, 0, 10000, 1);
   }
 }

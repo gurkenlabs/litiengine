@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.components;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -154,10 +153,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private float focusBorderBrightness = 0;
   private boolean focusBorderBrightnessIncreasing = true;
 
-  private boolean snapToGrid = true;
-  private boolean renderGrid = false;
-  private boolean renderMapObjectBounds = true;
-
   private final EditorScreen screen;
 
   private boolean loading;
@@ -210,7 +205,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.renderGrid(g);
 
     final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
-    if (this.renderMapObjectBounds) {
+    if (Program.getUserPreferences().isRenderBoundingBoxes()) {
       this.renderMapObjectBounds(g);
     }
 
@@ -599,30 +594,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void setGridSize(int gridSize) {
     Program.getUserPreferences().setGridSize(gridSize);
     this.gridSize = gridSize;
-  }
-
-  public boolean isSnapToGrid() {
-    return this.snapToGrid;
-  }
-
-  public void setSnapToGrid(boolean snapToGrid) {
-    this.snapToGrid = snapToGrid;
-  }
-
-  public boolean isRenderGrid() {
-    return this.renderGrid;
-  }
-
-  public void setRenderGrid(boolean renderGrid) {
-    this.renderGrid = renderGrid;
-  }
-
-  public boolean isRenderCollisionBoxes() {
-    return this.renderMapObjectBounds;
-  }
-
-  public void setRenderCollisionBoxes(boolean renderCollisionBoxes) {
-    this.renderMapObjectBounds = renderCollisionBoxes;
   }
 
   public void updateTransformControls() {
@@ -1081,11 +1052,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Point2D dragLocationMapObjectMinY = this.dragLocationMapObjects.get(minY);
 
     double deltaX = Input.mouse().getMapLocation().getX() - this.dragPoint.getX();
-    int newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
+    float newX = this.snapX(dragLocationMapObjectMinX.getX() + deltaX);
     float snappedDeltaX = newX - minX.getX();
 
     double deltaY = Input.mouse().getMapLocation().getY() - this.dragPoint.getY();
-    int newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
+    float newY = this.snapY(dragLocationMapObjectMinY.getY() + deltaY);
     float snappedDeltaY = newY - minY.getY();
 
     if (snappedDeltaX == 0 && snappedDeltaY == 0) {
@@ -1508,22 +1479,30 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.startPoint = null;
   }
 
-  private int snapX(double x) {
-    if (!this.snapToGrid) {
+  private float snapX(double x) {
+    if (Program.getUserPreferences().isSnapGrid()) {
+      double snapped = ((int) (x / this.gridSize) * this.gridSize);
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
+    }
+
+    if (Program.getUserPreferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getWidth());
     }
 
-    double snapped = ((int) (x / this.gridSize) * this.gridSize);
-    return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
+    return MathUtilities.round((float) x, 2);
   }
 
-  private int snapY(double y) {
-    if (!this.snapToGrid) {
+  private float snapY(double y) {
+    if (Program.getUserPreferences().isSnapGrid()) {
+      int snapped = (int) (y / this.gridSize) * this.gridSize;
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
+    }
+
+    if (Program.getUserPreferences().isSnapPixels()) {
       return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getHeight());
     }
 
-    int snapped = (int) (y / this.gridSize) * this.gridSize;
-    return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
+    return MathUtilities.round((float) y, 2);
   }
 
   private boolean hasFocus() {
@@ -1628,7 +1607,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderGrid(Graphics2D g) {
     // render the grid
-    if (this.renderGrid && Game.getCamera().getRenderScale() >= 1) {
+    if (Program.getUserPreferences().isShowGrid() && Game.getCamera().getRenderScale() >= 1) {
 
       g.setColor(new Color(255, 255, 255, 70));
       final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
