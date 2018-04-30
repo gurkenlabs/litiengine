@@ -17,13 +17,11 @@ public class Appearance {
   private Color foreColor;
   private Color backgroundColor1;
   private Color backgroundColor2;
-  private Font font;
   private boolean horizontalBackgroundGradient;
   private boolean transparentBackground;
 
   public Appearance() {
     this.changedConsumer = new CopyOnWriteArrayList<>();
-    this.font = new JPanel().getFont();
   }
 
   public Appearance(Color foreColor) {
@@ -49,7 +47,7 @@ public class Appearance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground(), this.getFont());
+    return Objects.hash(this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground());
   }
 
   public Color getForeColor() {
@@ -80,10 +78,6 @@ public class Appearance {
     }
   }
 
-  public Font getFont() {
-    return this.font;
-  }
-
   public boolean isHorizontalBackgroundGradient() {
     return this.horizontalBackgroundGradient;
   }
@@ -107,16 +101,6 @@ public class Appearance {
     this.fireOnChangeEvent();
   }
 
-  public void setFont(Font font) {
-    this.font = font;
-    this.fireOnChangeEvent();
-  }
-
-  public void setFontSize(float size) {
-    this.font = this.font.deriveFont(size);
-    this.fireOnChangeEvent();
-  }
-
   public void setHorizontalBackgroundGradient(boolean horizontal) {
     this.horizontalBackgroundGradient = horizontal;
     this.fireOnChangeEvent();
@@ -137,7 +121,6 @@ public class Appearance {
     this.setForeColor(updateAppearance.getForeColor());
     this.setHorizontalBackgroundGradient(updateAppearance.isHorizontalBackgroundGradient());
     this.setTransparentBackground(updateAppearance.isTransparentBackground());
-    this.setFont(updateAppearance.getFont());
   }
 
   protected void fireOnChangeEvent() {

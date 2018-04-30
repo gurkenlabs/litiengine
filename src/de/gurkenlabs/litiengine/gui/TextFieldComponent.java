@@ -97,7 +97,7 @@ public class TextFieldComponent extends ImageComponent {
   @Override
   public void render(final Graphics2D g) {
     super.render(g);
-    g.setFont(this.getAppearance().getFont());
+    g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
 
     if (this.isSelected() && Game.getLoop().getDeltaTime(this.lastToggled) > this.flickerDelay) {
@@ -105,7 +105,7 @@ public class TextFieldComponent extends ImageComponent {
       this.lastToggled = Game.getLoop().getTicks();
     }
     if (this.isSelected() && this.cursorVisible) {
-      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)), this.getY() + this.getTextY(), this.getAppearance().getFont().getSize2D() * 3 / 5, this.getAppearance().getFont().getSize2D() * 1 / 5);
+      final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);
       g.setColor(this.getAppearance().getForeColor());
       g.fill(cursor);
     }

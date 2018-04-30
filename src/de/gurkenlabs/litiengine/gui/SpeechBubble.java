@@ -34,6 +34,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private static final int DISPLAYTIME_MIN = 2000;
   private static final int DISPLAYTIME_PER_LETTER = 120;
   private static final int LETTER_WRITE_DELAY = 30;
+  private Font font;
 
   private static final double TRIANGLE_SIZE = 6;
 
@@ -52,12 +53,8 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private float textBoxWidth;
   private Sound typeSound;
   private Point2D entityCenter;
-  static {
-    float fontSize = (int) (GuiProperties.getDefaultAppearance().getFont().getSize() / Game.getCamera().getRenderScale());
-    DEFAULT_APPEARANCE.setFont(GuiProperties.getDefaultAppearance().getFont().deriveFont(fontSize));
-  }
 
-  private SpeechBubble(final IEntity entity, final String text, SpeechBubbleAppearance appearance) {
+  private SpeechBubble(final IEntity entity, final String text, SpeechBubbleAppearance appearance, Font font) {
     if (appearance == null) {
       this.appearance = DEFAULT_APPEARANCE;
     } else {
@@ -68,6 +65,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
     if (active != null) {
       active.cancel();
     }
+    this.setFont(font);
 
     this.textBoxWidth = entity.getWidth() * 4;
     this.entity = entity;
@@ -88,27 +86,25 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   }
 
   private SpeechBubble(final IEntity entity, final String text, final Sound typeSound, SpeechBubbleAppearance appearance) {
-    this(entity, text, appearance);
+    this(entity, text, appearance, GuiProperties.getDefaultFont());
     this.typeSound = typeSound;
   }
 
-  public static SpeechBubble create(final IEntity entity, final String text, SpeechBubbleAppearance appearance) {
-    return new SpeechBubble(entity, text, appearance);
+  public static SpeechBubble create(final IEntity entity, final String text, SpeechBubbleAppearance appearance, Font font) {
+    return new SpeechBubble(entity, text, appearance, font);
   }
 
   public static SpeechBubble create(final IEntity entity, final String text) {
-    return new SpeechBubble(entity, text, null);
+    return new SpeechBubble(entity, text, null, GuiProperties.getDefaultFont());
   }
 
   public static SpeechBubble create(final IEntity entity, final Font font, final String text) {
     SpeechBubbleAppearance app = new SpeechBubbleAppearance(DEFAULT_APPEARANCE.getForeColor(), DEFAULT_APPEARANCE.getBackgroundColor1(), DEFAULT_APPEARANCE.getBorderColor(), DEFAULT_APPEARANCE.getPadding());
-    app.setFont(font);
-    return new SpeechBubble(entity, text, app);
+    return new SpeechBubble(entity, text, app, GuiProperties.getDefaultFont());
   }
 
   public static SpeechBubble create(final IEntity entity, final Font font, final String text, final Sound typeSound) {
     SpeechBubbleAppearance app = new SpeechBubbleAppearance(DEFAULT_APPEARANCE.getForeColor(), DEFAULT_APPEARANCE.getBackgroundColor1(), DEFAULT_APPEARANCE.getBorderColor(), DEFAULT_APPEARANCE.getPadding());
-    app.setFont(font);
     return new SpeechBubble(entity, text, typeSound, app);
   }
 
@@ -122,6 +118,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
   public SpeechBubbleAppearance getAppearance() {
     return this.appearance;
+  }
+
+  public Font getFont() {
+    return this.font;
   }
 
   @Override
@@ -142,7 +142,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     final String text = this.displayedText;
     final AttributedString styledText = new AttributedString(text);
-    styledText.addAttribute(TextAttribute.FONT, this.getAppearance().getFont());
+    styledText.addAttribute(TextAttribute.FONT, this.getFont());
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);
@@ -162,6 +162,10 @@ public class SpeechBubble implements IUpdateable, IRenderable {
       g.setColor(Color.RED);
       Game.getRenderEngine().renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
     }
+  }
+
+  public void setFont(Font font) {
+    this.font = font;
   }
 
   @Override
@@ -210,7 +214,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
   private void createBubbleImage() {
     final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
     final Graphics2D g = img.createGraphics();
-    g.setFont(this.getAppearance().getFont());
+    g.setFont(this.getFont());
     final float stringWidth = g.getFontMetrics().stringWidth(this.currentText);
     if (stringWidth < this.textBoxWidth) {
       this.textBoxWidth = stringWidth;
@@ -218,7 +222,7 @@ public class SpeechBubble implements IUpdateable, IRenderable {
 
     final FontRenderContext frc = g.getFontRenderContext();
     final AttributedString styledText = new AttributedString(this.currentText);
-    styledText.addAttribute(TextAttribute.FONT, this.getAppearance().getFont());
+    styledText.addAttribute(TextAttribute.FONT, this.getFont());
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);

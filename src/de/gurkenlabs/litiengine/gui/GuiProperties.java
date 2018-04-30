@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 
 /**
  * This class contains globally used properties for all the
@@ -11,6 +12,8 @@ public class GuiProperties {
   private static Appearance defaultAppearance = new Appearance(new Color(255, 255, 255));
   private static Appearance defaultAppearanceDisabled = new Appearance(new Color(136, 136, 136));
   private static Appearance defaultAppearanceHovered = new Appearance(new Color(200, 200, 200));
+  
+  private static Font defaultFont;
 
   private GuiProperties() {
   }
@@ -37,5 +40,13 @@ public class GuiProperties {
 
   public static void setDefaultAppearanceHovered(Appearance app) {
     defaultAppearanceHovered = app;
+  }
+
+  public static Font getDefaultFont() {
+    return defaultFont;
+  }
+
+  public static void setDefaultFont(Font newFont) {
+    defaultFont = newFont;
   }
 }

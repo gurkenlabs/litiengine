@@ -39,16 +39,8 @@ public class ImageComponent extends GuiComponent {
     this.spritesheet = spritesheet;
 
     Font defFont = new JLabel().getFont().deriveFont((float) (this.getHeight() * 3 / 6f));
-    if (this.getAppearance().getFont() == null) {
-      this.getAppearance().setFont(defFont);
-    }
-
-    if (this.getAppearanceDisabled().getFont() == null) {
-      this.getAppearanceDisabled().setFont(defFont);
-    }
-
-    if (this.getAppearanceHovered().getFont() == null) {
-      this.getAppearanceHovered().setFont(defFont);
+    if (this.getFont() == null) {
+      this.setFont(defFont);
     }
 
     this.setText(text);

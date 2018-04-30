@@ -53,7 +53,7 @@ public class SpeechBubbleAppearance extends Appearance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getBorderColor(), this.getPadding(), this.isRenderIndicator(), this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground(), this.getFont());
+    return Objects.hash(this.getBorderColor(), this.getPadding(), this.isRenderIndicator(), this.getForeColor(), this.getBackgroundColor1(), this.getBackgroundColor2(), this.isHorizontalBackgroundGradient(), this.isTransparentBackground());
   }
 
   public void setBorderColor(Color borderColor) {

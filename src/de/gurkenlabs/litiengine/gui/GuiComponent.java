@@ -27,6 +27,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
  */
 public abstract class GuiComponent implements MouseListener, MouseMotionListener, MouseWheelListener, IRenderable {
   protected static final Font ICON_FONT;
+  private Font font;
 
   private static int componentId = 0;
 
@@ -121,16 +122,16 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     this.disabledAppearance = new Appearance();
     this.disabledAppearance.update(GuiProperties.getDefaultAppearanceDisabled());
-    this.appearance.onChange(app -> {
+    this.disabledAppearance.onChange(app -> {
       for (GuiComponent child : this.getComponents()) {
         child.getAppearanceDisabled().update(this.getAppearanceDisabled());
       }
     });
-
     this.id = ++componentId;
     this.x = x;
     this.y = y;
     this.setTextXMargin(this.getWidth() / 16);
+    this.setFont(GuiProperties.getDefaultFont());
     this.setSelected(false);
     this.setEnabled(true);
     this.initializeComponents();
@@ -195,6 +196,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    */
   public List<GuiComponent> getComponents() {
     return this.components;
+  }
+
+  public Font getFont() {
+    return this.font;
   }
 
   /**
@@ -540,7 +545,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
 
     g.setColor(currentAppearance.getForeColor());
-    g.setFont(currentAppearance.getFont());
+    g.setFont(this.getFont());
 
     this.renderText(g);
 
@@ -568,6 +573,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     for (GuiComponent comp : this.getComponents()) {
       comp.setEnabled(this.isEnabled());
     }
+  }
+
+  public void setFont(Font font) {
+    this.font = font;
+  }
+
+  public void setFontSize(float size) {
+    this.font = this.font.deriveFont(size);
   }
 
   public void setForwardMouseEvents(boolean forwardMouseEvents) {
@@ -759,6 +772,9 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.isForwardMouseEvents() && this.isVisible() && this.isEnabled() && !this.isSuspended() && e != null && this.getBoundingBox().contains(e.getPoint());
   }
 
+  /**
+   * @param g
+   */
   private void renderText(Graphics2D g) {
     if (this.getText() == null || this.getText().isEmpty()) {
       return;
@@ -798,5 +814,13 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     } else {
       RenderEngine.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
     }
+
+    /*
+     * Debugging functionality for rendering the text boundaries
+     * g.setColor(Color.RED);
+     * g.drawLine((int) (this.getX() + this.getTextX()), (int) this.getY(), (int) (this.getX() + this.getTextX()), (int) (this.getY() + this.getHeight()));
+     * g.drawLine((int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) this.getY(), (int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) (this.getY() + this.getHeight()));
+     * g.drawLine((int) this.getBoundingBox().getCenterX(), (int) this.getY(), (int) this.getBoundingBox().getCenterX(), (int) (this.getY() + this.getHeight()));
+     */
   }
 }

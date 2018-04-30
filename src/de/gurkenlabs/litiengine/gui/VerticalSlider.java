@@ -27,15 +27,10 @@ public class VerticalSlider extends Slider {
   public void prepare() {
     if (this.arrowButtonsShown()) {
       this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_UP.getText(), null));
-      this.getButton1().getAppearance().setFont(ARROW_UP.getFont());
-      this.getButton1().getAppearanceDisabled().setFont(ARROW_UP.getFont());
-      this.getButton1().getAppearanceHovered().setFont(ARROW_UP.getFont());
-
+      this.getButton1().setFont(ARROW_UP.getFont());
       this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_DOWN.getText(), null));
-      this.getButton2().getAppearance().setFont(ARROW_DOWN.getFont());
-      this.getButton2().getAppearanceDisabled().setFont(ARROW_DOWN.getFont());
-      this.getButton2().getAppearanceHovered().setFont(ARROW_DOWN.getFont());
-
+      this.getButton2().setFont(ARROW_DOWN.getFont());
+    
       this.getComponents().add(this.getButton1());
       this.getComponents().add(this.getButton2());
     }
