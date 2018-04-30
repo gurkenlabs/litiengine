@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.IInitializable;
@@ -87,6 +88,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getByTag(final String... tag);
 
   public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String... tag);
+  
+  public Map<String, List<IEntity>> getEntitiesByTag();
 
   public AmbientLight getAmbientLight();
 

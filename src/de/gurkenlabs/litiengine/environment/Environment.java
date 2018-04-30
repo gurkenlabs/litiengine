@@ -252,13 +252,13 @@ public class Environment implements IEnvironment {
         continue;
       }
 
-      if (this.entitiesByTag.containsKey(tag)) {
-        this.entitiesByTag.get(tag).add(entity);
+      if (this.getEntitiesByTag().containsKey(tag)) {
+        this.getEntitiesByTag().get(tag).add(entity);
         continue;
       }
 
-      this.entitiesByTag.put(tag, new CopyOnWriteArrayList<>());
-      this.entitiesByTag.get(tag).add(entity);
+      this.getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
+      this.getEntitiesByTag().get(tag).add(entity);
     }
 
     // if the environment has already been loaded,
@@ -309,6 +309,7 @@ public class Environment implements IEnvironment {
     this.getSpawnPoints().clear();
     this.getAreas().clear();
     this.getTriggers().clear();
+    this.getEntitiesByTag().clear();
 
     this.entities.get(RenderType.NONE).clear();
     this.entities.get(RenderType.GROUND).clear();
@@ -440,10 +441,10 @@ public class Environment implements IEnvironment {
     List<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
-      if (!this.entitiesByTag.containsKey(tag)) {
+      if (!this.getEntitiesByTag().containsKey(tag)) {
         continue;
       }
-      for (IEntity ent : this.entitiesByTag.get(tag)) {
+      for (IEntity ent : this.getEntitiesByTag().get(tag)) {
         if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains((T) ent)) {
           foundEntities.add((T) ent);
         }
@@ -532,6 +533,10 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<IEntity> getEntities(final RenderType renderType) {
     return this.entities.get(renderType).values();
+  }
+
+  public Map<String, List<IEntity>> getEntitiesByTag() {
+    return this.entitiesByTag;
   }
 
   @Override
@@ -691,7 +696,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public List<String> getUsedTags() {
-    final List<String> tags = this.entitiesByTag.keySet().stream().collect(Collectors.toList());
+    final List<String> tags = this.getEntitiesByTag().keySet().stream().collect(Collectors.toList());
     Collections.sort(tags);
 
     return tags;
@@ -770,10 +775,10 @@ public class Environment implements IEnvironment {
     }
 
     for (String tag : entity.getTags()) {
-      this.entitiesByTag.get(tag).remove(entity);
+      this.getEntitiesByTag().get(tag).remove(entity);
 
-      if (this.entitiesByTag.get(tag).isEmpty()) {
-        this.entitiesByTag.remove(tag);
+      if (this.getEntitiesByTag().get(tag).isEmpty()) {
+        this.getEntitiesByTag().remove(tag);
       }
     }
 
@@ -1033,7 +1038,6 @@ public class Environment implements IEnvironment {
       if (entity instanceof IUpdateable) {
         Game.getLoop().detach((IUpdateable) entity);
       }
-
       Game.getEntityControllerManager().disposeControllers(entity);
     }
   }

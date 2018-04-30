@@ -260,14 +260,30 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void addTag(String tag) {
-    if (!this.tags.contains(tag)) {
-      this.tags.add(tag);
+    if (!this.getTags().contains(tag)) {
+      this.getTags().add(tag);
     }
+    if (Game.getEnvironment() == null) {
+      return;
+    }
+    if (Game.getEnvironment().getEntitiesByTag().containsKey(tag)) {
+      Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
+      return;
+    }
+    Game.getEnvironment().getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
+    Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
   }
 
   @Override
   public void removeTag(String tag) {
-    this.tags.remove(tag);
+    this.getTags().remove(tag);
+    if (Game.getEnvironment() == null) {
+      return;
+    }
+    Game.getEnvironment().getEntitiesByTag().get(tag).remove(this);
+    if (Game.getEnvironment().getEntitiesByTag().get(tag).isEmpty()) {
+      Game.getEnvironment().getEntitiesByTag().remove(tag);
+    }
   }
 
   public void setAngle(final float angle) {
