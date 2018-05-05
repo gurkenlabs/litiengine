@@ -46,9 +46,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @XmlAttribute
   private Integer offsety;
 
-  @XmlAttribute
-  private int order = -1;
-
   private transient RenderType renderType = RenderType.NONE;
 
   /**
@@ -136,7 +133,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @Override
   public int getOrder() {
-    return this.order;
+    return this.getCustomPropertyInt(LayerProperty.LAYER_ORDER, -1);
   }
 
   @Override
@@ -154,14 +151,19 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.name = name;
   }
 
+  private void setOrder(int order) {
+    this.setCustomProperty(LayerProperty.LAYER_ORDER, Integer.toString(order));
+  }
+
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
+    int order = this.getCustomPropertyInt(LayerProperty.LAYER_ORDER, -1);
     if (order == -1 && parent instanceof Map) {
       Map map = (Map) parent;
       int layerCnt = map.getTileLayers().size();
       layerCnt += map.getImageLayers().size();
       layerCnt += map.getTileLayers().size();
-      this.order = layerCnt;
+      this.setOrder(layerCnt);
     }
 
     if (this.offsetx != null && this.offsetx.intValue() == 0) {
