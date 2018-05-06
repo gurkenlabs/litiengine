@@ -1,15 +1,12 @@
 package de.gurkenlabs.litiengine.gui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import javax.swing.JPanel;
 
 public class Appearance {
   private final List<Consumer<Appearance>> changedConsumer;

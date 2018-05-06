@@ -20,12 +20,12 @@ import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
+  protected boolean isFocussing;
+  private transient T dataSource;
+  
   public PropertyPanel() {
   }
-  private transient T dataSource;
-
-  protected boolean isFocussing;
-
+  
   protected T getDataSource() {
     return this.dataSource;
   }

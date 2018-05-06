@@ -9,8 +9,19 @@ import java.util.Properties;
 import java.util.TreeSet;
 
 public class CleanProperties extends Properties {
-  private static class StripFirstLineStream extends FilterOutputStream {
+  private static final long serialVersionUID = 7567765340218227372L;
 
+  @Override
+  public synchronized Enumeration<Object> keys() {
+    return Collections.enumeration(new TreeSet<>(super.keySet()));
+  }
+
+  @Override
+  public void store(final OutputStream out, final String comments) throws IOException {
+    super.store(new StripFirstLineStream(out), null);
+  }
+
+  private static class StripFirstLineStream extends FilterOutputStream {
     private boolean firstlineseen = false;
 
     public StripFirstLineStream(final OutputStream out) {
@@ -25,17 +36,5 @@ public class CleanProperties extends Properties {
         firstlineseen = true;
       }
     }
-  }
-
-  private static final long serialVersionUID = 7567765340218227372L;
-
-  @Override
-  public synchronized Enumeration<Object> keys() {
-    return Collections.enumeration(new TreeSet<>(super.keySet()));
-  }
-
-  @Override
-  public void store(final OutputStream out, final String comments) throws IOException {
-    super.store(new StripFirstLineStream(out), null);
   }
 }

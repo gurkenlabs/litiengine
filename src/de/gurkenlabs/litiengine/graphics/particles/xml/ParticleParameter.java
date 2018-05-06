@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.graphics.particles.xml;
 
 import java.io.Serializable;
-import java.util.Random;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,10 +12,6 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class ParticleParameter implements Serializable {
   public static final int MAX_VALUE_UNDEFINED = -1;
   private static final long serialVersionUID = 4893417265998349179L;
-
-  public static int randomInRange(final int min, final int max) {
-    return min + new Random().nextInt(max - min + 1);
-  }
 
   @XmlAttribute
   private float maxValue;

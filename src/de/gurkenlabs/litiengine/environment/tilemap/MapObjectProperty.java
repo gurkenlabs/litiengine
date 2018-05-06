@@ -67,10 +67,9 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  public static final class Emitter {
-    private Emitter() {
-    }
+  private static List<Field> availableProperties = new ArrayList<>();
 
+  public static final class Emitter {
     public static final String COLORS = "emitterColors";
     public static final String COLORPROBABILITIES = "emitterColorProbabilities";
     public static final String SPAWNRATE = "emitterSpawnRate";
@@ -83,12 +82,12 @@ public final class MapObjectProperty {
     public static final String ALPHADEVIATION = "emitterAlphaDeviation";
     public static final String ORIGIN_ALIGN = "emitterOriginAlign";
     public static final String ORIGIN_VALIGN = "emitterOriginValign";
+    
+    private Emitter() {
+    }
   }
 
   public static final class Particle {
-    private Particle() {
-    }
-
     public static final String MINX = "particleMinX";
     public static final String MAXX = "particleMaxX";
     public static final String X_RANDOM = "particleXRandom";
@@ -127,9 +126,10 @@ public final class MapObjectProperty {
     public static final String MAXTTL = "particleMaxTTL";
     public static final String TTL_RANDOM = "particleTTLRandom";
     public static final String FADE = "particleFade";
+    
+    private Particle() {
+    }
   }
-
-  private static List<Field> availableProperties = new ArrayList<>();
 
   private MapObjectProperty() {
   }
