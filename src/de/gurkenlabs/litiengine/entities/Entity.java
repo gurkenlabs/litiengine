@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +54,7 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
+    this.tags.addAll(Arrays.asList(info.tags()));
   }
 
   protected Entity(int mapId) {
