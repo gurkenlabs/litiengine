@@ -37,7 +37,7 @@ public class ConfigurationTests {
   }
 
   @Test
-  public void TestDefaultFileCreation() {
+  public void testDefaultFileCreation() {
     Configuration config = null;
     try {
       config = new Configuration();

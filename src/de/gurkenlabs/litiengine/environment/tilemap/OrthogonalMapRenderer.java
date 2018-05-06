@@ -219,7 +219,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final Graphics2D imageGraphics = bufferedImage.createGraphics();
 
     // set alpha value of the tiles by the layers value
-    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
 
     layer.getTiles().parallelStream().forEach(tile -> {

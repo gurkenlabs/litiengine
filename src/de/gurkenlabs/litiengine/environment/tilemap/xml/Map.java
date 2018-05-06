@@ -209,6 +209,10 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return new Dimension(this.width, this.height);
   }
 
+  public String getTiledversion() {
+    return this.tiledversion;
+  }
+
   @Override
   public List<ITileLayer> getTileLayers() {
     final List<ITileLayer> lay = new ArrayList<>();
@@ -367,6 +371,11 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   @XmlTransient
   public void setRenderorder(String renderorder) {
     this.renderorder = renderorder;
+  }
+
+  @XmlTransient
+  public void setTiledVersion(String tiledversion) {
+    this.tiledversion = tiledversion;
   }
 
   @XmlTransient

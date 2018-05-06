@@ -857,16 +857,16 @@ public class Program {
     JMenuItem copy = new JMenuItem("Copy Entity", new ImageIcon(Resources.getImage("button-copyx16.png")));
     copy.addActionListener(e -> EditorScreen.instance().getMapComponent().copy());
     copy.setEnabled(false);
-    copy.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.Event.CTRL_MASK));
+    copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, java.awt.Event.CTRL_MASK));
 
     JMenuItem cut = new JMenuItem("Cut Entity", new ImageIcon(Resources.getImage("button-cutx16.png")));
     cut.addActionListener(e -> EditorScreen.instance().getMapComponent().cut());
     cut.setEnabled(false);
-    cut.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Event.CTRL_MASK));
+    cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, java.awt.Event.CTRL_MASK));
 
     JMenuItem paste = new JMenuItem("Paste Entity", new ImageIcon(Resources.getImage("button-pastex16.png")));
     paste.addActionListener(e -> EditorScreen.instance().getMapComponent().paste());
-    paste.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.Event.CTRL_MASK));
+    paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, java.awt.Event.CTRL_MASK));
     paste.setEnabled(false);
 
     JMenuItem blueprint = new JMenuItem("Define Blueprint", new ImageIcon(Resources.getImage("blueprint.png")));

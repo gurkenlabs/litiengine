@@ -119,7 +119,8 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
     this.keyframes = ArrayUtilities.getCommaSeparatedString(keyframes);
   }
 
-  void beforeMarshal(Marshaller m) {
+  @SuppressWarnings("unused")
+  private void beforeMarshal(Marshaller m) {
     if (this.keyframes != null && this.keyframes.isEmpty()) {
       this.keyframes = null;
     }

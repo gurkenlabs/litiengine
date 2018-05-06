@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.DefaultComboBoxModel;

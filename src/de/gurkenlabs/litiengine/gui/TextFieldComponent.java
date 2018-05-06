@@ -74,7 +74,7 @@ public class TextFieldComponent extends ImageComponent {
       this.handleBackSpace();
       break;
     case KeyEvent.VK_SPACE:
-      if (this.getText() != "") {
+      if (!this.getText().equals("")) {
         this.setText(this.getText() + " ");
       }
       break;
