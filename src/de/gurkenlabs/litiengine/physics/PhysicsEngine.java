@@ -330,17 +330,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.updateAllCollisionBoxes();
   }
 
-  private List<CollisionBox> getCollisionBoxes(CollisionType collisionType) {
-    switch (collisionType) {
-    case ENTITY:
-      return this.entityCollisionBoxes;
-    case STATIC:
-      return this.staticBoxes;
-    default:
-      return getAllCollisionBoxesInternal();
-    }
-  }
-
   private List<CollisionBox> getAllCollisionBoxesInternal() {
     if (this.allCollisionBoxes.isEmpty()) {
       this.updateAllCollisionBoxes();

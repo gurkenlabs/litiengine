@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 public class PhysicsTests {
 
   @Test
-  public void testBasicCollisionDetection() {
+  public void testBasicCollisionDetection() throws InterruptedException {
     try (GameLoop loop = new GameLoop(30)) {
       Creature ent = new Creature();
       ent.setSize(16, 16);
@@ -32,24 +32,24 @@ public class PhysicsTests {
       engine.add(ent);
 
       loop.start();
-      loop.attach(() -> {
-        assertFalse(engine.collides(9, 9));
-        assertFalse(engine.collides(27, 27));
-        assertTrue(engine.collides(10.00001, 10.00001));
-        assertTrue(engine.collides(25.99999, 25.99999));
+      Thread.sleep(100);
+      
+      assertFalse(engine.collides(9, 9));
+      assertFalse(engine.collides(27, 27));
+      assertTrue(engine.collides(10.00001, 10.00001));
+      assertTrue(engine.collides(25.99999, 25.99999));
 
-        Rectangle2D rect1 = new Rectangle2D.Double(0, 0, 10, 10);
-        Rectangle2D rect2 = new Rectangle2D.Double(10, 10, 0, 0);
-        Rectangle2D rect3 = new Rectangle2D.Double(10, 10, 1, 1);
-        Rectangle2D rect4 = new Rectangle2D.Double(8, 8, 3, 3);
-        Rectangle2D rect5 = new Rectangle2D.Double(25.99999, 10, 10, 20);
+      Rectangle2D rect1 = new Rectangle2D.Double(0, 0, 10, 10);
+      Rectangle2D rect2 = new Rectangle2D.Double(10, 10, 0, 0);
+      Rectangle2D rect3 = new Rectangle2D.Double(10, 10, 1, 1);
+      Rectangle2D rect4 = new Rectangle2D.Double(8, 8, 3, 3);
+      Rectangle2D rect5 = new Rectangle2D.Double(25.99999, 10, 10, 20);
 
-        assertFalse(engine.collides(rect1));
-        assertFalse(engine.collides(rect2));
-        assertTrue(engine.collides(rect3));
-        assertTrue(engine.collides(rect4));
-        assertTrue(engine.collides(rect5));
-      });
+      assertFalse(engine.collides(rect1));
+      assertFalse(engine.collides(rect2));
+      assertTrue(engine.collides(rect3));
+      assertTrue(engine.collides(rect4));
+      assertTrue(engine.collides(rect5));
     }
   }
 

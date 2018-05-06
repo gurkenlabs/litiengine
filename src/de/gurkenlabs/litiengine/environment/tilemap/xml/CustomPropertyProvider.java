@@ -181,29 +181,34 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
   }
 
+  private static int sortPropertiesByName(Property prop1, Property prop2) {
+    if (prop1 == null) {
+      return -1;
+    }
+
+    if (prop2 == null) {
+      return 1;
+    }
+
+    if (prop1.getName() == null) {
+      if (prop2.getName() == null) {
+        return 0;
+      }
+
+      return -1;
+    }
+
+    return prop1.getName().compareTo(prop2.getName());
+  }
+  
   void beforeMarshal(Marshaller m) {
     if (this.properties != null && this.properties.isEmpty()) {
       this.properties = null;
-    } else if (this.properties != null) {
-      this.properties.sort((prop1, prop2) -> {
-        if (prop1 == null) {
-          return -1;
-        }
+      return;
+    }
 
-        if (prop2 == null) {
-          return 1;
-        }
-
-        if (prop1.getName() == null) {
-          if (prop2.getName() == null) {
-            return 0;
-          }
-
-          return -1;
-        }
-
-        return prop1.getName().compareTo(prop2.getName());
-      });
+    if (this.properties != null) {
+      this.properties.sort(CustomPropertyProvider::sortPropertiesByName);
     }
   }
 }
