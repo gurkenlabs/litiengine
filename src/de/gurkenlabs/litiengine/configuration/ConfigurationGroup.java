@@ -66,29 +66,30 @@ public abstract class ConfigurationGroup {
         if (!field.isAccessible()) {
           field.setAccessible(true);
         }
-
+        
+        final String propertyKey = this.getPrefix() + field.getName();
         if (field.getType().equals(boolean.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Boolean.toString(field.getBoolean(this)));
+          properties.setProperty(propertyKey, Boolean.toString(field.getBoolean(this)));
         } else if (field.getType().equals(int.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Integer.toString(field.getInt(this)));
+          properties.setProperty(propertyKey, Integer.toString(field.getInt(this)));
         } else if (field.getType().equals(float.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Float.toString(field.getFloat(this)));
+          properties.setProperty(propertyKey, Float.toString(field.getFloat(this)));
         } else if (field.getType().equals(double.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Double.toString(field.getDouble(this)));
+          properties.setProperty(propertyKey, Double.toString(field.getDouble(this)));
         } else if (field.getType().equals(byte.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Byte.toString(field.getByte(this)));
+          properties.setProperty(propertyKey, Byte.toString(field.getByte(this)));
         } else if (field.getType().equals(short.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Short.toString(field.getShort(this)));
+          properties.setProperty(propertyKey, Short.toString(field.getShort(this)));
         } else if (field.getType().equals(long.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), Long.toString(field.getLong(this)));
+          properties.setProperty(propertyKey, Long.toString(field.getLong(this)));
         } else if (field.getType().equals(String.class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? (String) field.get(this) : "");
+          properties.setProperty(propertyKey, field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType().equals(String[].class)) {
-          properties.setProperty(this.getPrefix() + field.getName(), field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
+          properties.setProperty(propertyKey, field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
         } else if (field.getType() instanceof Class && field.getType().isEnum()) {
           Object val = field.get(this);
           final String value = val == null && field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
-          properties.setProperty(this.getPrefix() + field.getName(), val != null ? val.toString() : value);
+          properties.setProperty(propertyKey, val != null ? val.toString() : value);
         }
       }
     } catch (final IllegalArgumentException | IllegalAccessException e) {
