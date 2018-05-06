@@ -67,7 +67,7 @@ public final class MapObjectProperty {
   public static final String TRIGGER_TARGETS = "triggerTarget";
   public static final String TRIGGER_COOLDOWN = "triggerCooldown";
 
-  private static List<Field> availableProperties = new ArrayList<>();
+  private static List<String> availableProperties = new ArrayList<>();
 
   public static final class Emitter {
     public static final String COLORS = "emitterColors";
@@ -82,7 +82,7 @@ public final class MapObjectProperty {
     public static final String ALPHADEVIATION = "emitterAlphaDeviation";
     public static final String ORIGIN_ALIGN = "emitterOriginAlign";
     public static final String ORIGIN_VALIGN = "emitterOriginValign";
-    
+
     private Emitter() {
     }
   }
@@ -126,7 +126,7 @@ public final class MapObjectProperty {
     public static final String MAXTTL = "particleMaxTTL";
     public static final String TTL_RANDOM = "particleTTLRandom";
     public static final String FADE = "particleFade";
-    
+
     private Particle() {
     }
   }
@@ -134,34 +134,29 @@ public final class MapObjectProperty {
   private MapObjectProperty() {
   }
 
-  public static boolean isCustom(final String name) {
+  public static List<String> getAvailableProperties() {
     if (availableProperties.isEmpty()) {
-      for (final Field field : MapObjectProperty.class.getDeclaredFields()) {
-        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
-          availableProperties.add(field);
-        }
-      }
+      addAvailableProperties(MapObjectProperty.class);
+      addAvailableProperties(MapObjectProperty.Emitter.class);
+      addAvailableProperties(MapObjectProperty.Particle.class);
+    }
+    
+    return availableProperties;
+  }
 
-      for (final Field field : MapObjectProperty.Emitter.class.getDeclaredFields()) {
-        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
-          availableProperties.add(field);
-        }
-      }
+  public static boolean isCustom(final String name) {
+    return getAvailableProperties().stream().noneMatch(x -> x.equalsIgnoreCase(name));
+  }
 
-      for (final Field field : MapObjectProperty.Particle.class.getDeclaredFields()) {
-        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
-          availableProperties.add(field);
+  private static void addAvailableProperties(Class<?> clz) {
+    for (final Field field : clz.getDeclaredFields()) {
+      if (field.getType() == String.class && Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+        try {
+          availableProperties.add((String) field.get(null));
+        } catch (final IllegalArgumentException | IllegalAccessException e) {
+          log.log(Level.SEVERE, e.getMessage(), e);
         }
       }
     }
-
-    return availableProperties.stream().noneMatch(x -> {
-      try {
-        return x.get(null).equals(name);
-      } catch (final IllegalArgumentException | IllegalAccessException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-      }
-      return false;
-    });
   }
 }
