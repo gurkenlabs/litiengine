@@ -58,7 +58,7 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(
       groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
+                .addGroup(groupLayout.createSequentialGroup()
           .addContainerGap()
           .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
             .addGroup(groupLayout.createSequentialGroup()
@@ -174,10 +174,8 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Spritesheet.getSpritesheets()) {
       String creatureSpriteName = getCreatureSpriteName(s.getName());
-      if (creatureSpriteName != null) {
-        if (!m.containsKey(creatureSpriteName)) {
-          m.put(creatureSpriteName, s.getName());
-        }
+      if (creatureSpriteName != null && !m.containsKey(creatureSpriteName)) {
+        m.put(creatureSpriteName, s.getName());
       }
     }
 

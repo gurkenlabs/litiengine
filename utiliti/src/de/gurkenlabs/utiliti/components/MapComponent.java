@@ -617,7 +617,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    if (Game.getEnvironment() == null && Game.getEnvironment().getMap() == null) {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return;
     }
 

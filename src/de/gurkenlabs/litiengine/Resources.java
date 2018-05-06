@@ -81,9 +81,10 @@ public final class Resources {
   }
 
   public static String getFrom(final String bundleName, final String key, Object... args) {
-    if (key == bundleName) {
+    if (bundleName == null || key == null) {
       return null;
     }
+    
     try {
       final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().client().getLocale());
 

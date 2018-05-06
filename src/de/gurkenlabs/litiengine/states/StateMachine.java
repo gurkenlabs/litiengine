@@ -35,14 +35,12 @@ public class StateMachine implements IStateMachine {
     Collections.sort(transitions);
 
     for (final ITransition transition : transitions) {
-      if (!transition.conditionsFullfilled()) {
-        continue;
+      if (transition.conditionsFullfilled()) {
+        this.currentState.exit();
+        this.currentState = transition.getNextState();
+        this.currentState.enter();
+        return;
       }
-
-      this.currentState.exit();
-      this.currentState = transition.getNextState();
-      this.currentState.enter();
-      return;
     }
   }
 }
