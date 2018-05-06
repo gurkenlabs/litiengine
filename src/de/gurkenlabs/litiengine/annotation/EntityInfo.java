@@ -19,6 +19,6 @@ public @interface EntityInfo {
   float height() default 32;
 
   RenderType renderType() default RenderType.NORMAL;
-  
+
   float width() default 32;
 }

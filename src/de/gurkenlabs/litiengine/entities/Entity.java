@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
@@ -53,6 +54,11 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
+    
+    final Tag [] tagAnnotations =this.getClass().getAnnotationsByType(Tag.class);
+    for (Tag t : tagAnnotations) {
+      this.addTag(t.value());
+    }
   }
 
   protected Entity(int mapId) {
