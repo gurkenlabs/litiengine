@@ -54,8 +54,8 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
-    
-    final Tag [] tagAnnotations =this.getClass().getAnnotationsByType(Tag.class);
+
+    final Tag[] tagAnnotations = this.getClass().getAnnotationsByType(Tag.class);
     for (Tag t : tagAnnotations) {
       this.addTag(t.value());
     }
@@ -328,12 +328,13 @@ public abstract class Entity implements IEntity {
     }
 
     if (this.messageListeners.containsKey(listenerMessage) && this.messageListeners.get(listenerMessage) != null) {
+      MessageEvent receivedEvent = event;
       for (MessageListener listener : this.messageListeners.get(listenerMessage)) {
-        if (event == null) {
-          event = new MessageEvent(sender, this, message);
+        if (receivedEvent == null) {
+          receivedEvent = new MessageEvent(sender, this, message);
         }
 
-        listener.messageReceived(event);
+        listener.messageReceived(receivedEvent);
       }
     }
 
