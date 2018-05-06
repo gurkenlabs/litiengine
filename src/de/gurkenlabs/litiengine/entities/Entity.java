@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
@@ -54,7 +54,11 @@ public abstract class Entity implements IEntity {
     this.width = info.width();
     this.height = info.height();
     this.renderType = info.renderType();
-    this.tags.addAll(Arrays.asList(info.tags()));
+    
+    final Tag [] tagAnnotations =this.getClass().getAnnotationsByType(Tag.class);
+    for (Tag t : tagAnnotations) {
+      this.addTag(t.value());
+    }
   }
 
   protected Entity(int mapId) {
