@@ -264,7 +264,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     // set alpha value of the tiles by the layers value
     final Composite oldComp = g.getComposite();
-    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
     final int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
