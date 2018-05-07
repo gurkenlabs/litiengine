@@ -124,8 +124,6 @@ public class Program {
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
     Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
-    // Game.getScreenManager().setIconImage(Resources.getImage("pixel-icon-utility.png"));
-
     Game.getScreenManager().addScreen(EditorScreen.instance());
     Game.getScreenManager().displayScreen("EDITOR");
 
@@ -239,23 +237,61 @@ public class Program {
   }
 
   private static void setupInterface() {
-    MenuBar menuBar = new MenuBar();
+    JFrame window = initWindow();
+    
+    Canvas canvas = Game.getScreenManager().getRenderComponent();
+    canvas.setFocusable(true);
+    canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
+    
+    // remove canvas because we want to add a wrapping panel
+    window.remove(canvas);
+
+    initCanvasPopupMenu(canvas);
+
+    JPanel renderPanel = new JPanel(new BorderLayout());
+    renderPanel.add(canvas);
+    renderPanel.setMinimumSize(new Dimension(300, 0));
+    initScrollBars(renderPanel);
+
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, initRenderSplitPanel(renderPanel, window), initRightSplitPanel());
+    split.setContinuousLayout(true);
+    split.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        userPreferences.setWidth(window.getWidth());
+        userPreferences.setHeight(window.getHeight());
+      }
+    });
+
+    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setMainSplitter(split.getDividerLocation()));
+
+    JPanel rootPanel = new JPanel(new BorderLayout());
+    window.setContentPane(rootPanel);
+
+    rootPanel.add(split, BorderLayout.CENTER);
+    split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
+
+    JToolBar toolbar = initToolBar();
+    rootPanel.add(toolbar, BorderLayout.NORTH);
+
+    window.setMenuBar(initMenuBar());
+  }
+
+  private static JFrame initWindow() {
     JFrame window = ((JFrame) Game.getScreenManager());
+    window.setResizable(true);
+
     Game.addGameListener(new GameAdapter() {
       @Override
       public boolean terminating() {
         boolean terminate = notifyPendingChanges();
         if (terminate) {
-          getUserPreferences().setFrameState(((JFrame) Game.getScreenManager()).getExtendedState());
+          getUserPreferences().setFrameState(window.getExtendedState());
         }
 
         return terminate;
       }
     });
-
-    window.setResizable(true);
-
-    window.setMenuBar(menuBar);
 
     if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
       window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
@@ -265,53 +301,57 @@ public class Program {
       window.setExtendedState(userPreferences.getFrameState());
     }
 
-    Canvas canvas = Game.getScreenManager().getRenderComponent();
-    canvas.setFocusable(true);
-    canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
-    window.remove(canvas);
-    JPanel renderPane = new JPanel(new BorderLayout());
-    renderPane.add(canvas);
-    renderPane.setMinimumSize(new Dimension(300, 0));
+    return window;
+  }
 
-    initCanvasPopupMenu(canvas);
+  private static MenuBar initMenuBar() {
+    MenuBar menuBar = new MenuBar();
+    Menu mnFile = initFileMenu();
+    menuBar.add(mnFile);
 
-    JPanel contentPane = new JPanel(new BorderLayout());
+    Menu mnView = initViewMenu();
+    menuBar.add(mnView);
 
-    window.setContentPane(contentPane);
+    Menu mnProject = initProjectMenu();
+    menuBar.add(mnProject);
 
-    horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL);
-    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
-    verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
-    renderPane.add(verticalScroll, BorderLayout.EAST);
+    Menu mnMap = initMapMenu();
+    menuBar.add(mnMap);
+    return menuBar;
+  }
 
-    horizontalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
-        return;
-      }
-
-      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
-      Game.getCamera().setFocus(newFocus);
-    });
-
-    verticalScroll.addAdjustmentListener(e -> {
-      if (EditorScreen.instance().getMapComponent().isLoading()) {
-        return;
-      }
-      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), verticalScroll.getValue());
-      Game.getCamera().setFocus(newFocus);
-    });
-
-    MapObjectPanel mapEditorPanel = new MapObjectPanel();
-    MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
-    JSplitPane mapWrap = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    mapWrap.setMinimumSize(new Dimension(300, 0));
-    mapWrap.setBottomComponent(mapEditorPanel);
-    mapWrap.setTopComponent(mapSelectionPanel);
-    mapWrap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setSelectionEditSplitter(mapWrap.getDividerLocation()));
-    if (userPreferences.getSelectionEditSplitter() != 0) {
-      mapWrap.setDividerLocation(userPreferences.getSelectionEditSplitter());
+  private static Component initRenderSplitPanel(JPanel renderPanel, JFrame window) {
+    JSplitPane renderSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPanel, initBottomPanel());
+    if (userPreferences.getBottomSplitter() != 0) {
+      renderSplitPanel.setDividerLocation(userPreferences.getBottomSplitter());
+    } else {
+      renderSplitPanel.setDividerLocation((int) (window.getSize().height * 0.75));
     }
 
+    renderSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setBottomSplitter(renderSplitPanel.getDividerLocation()));
+    renderSplitPanel.setContinuousLayout(true);
+    return renderSplitPanel;
+  }
+
+  private static Component initRightSplitPanel() {
+    final MapObjectPanel mapEditorPanel = new MapObjectPanel();
+    final MapSelectionPanel mapSelectionPanel = new MapSelectionPanel();
+    EditorScreen.instance().setMapEditorPanel(mapEditorPanel);
+    EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
+
+    JSplitPane rightSplitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    rightSplitPanel.setMinimumSize(new Dimension(300, 0));
+    rightSplitPanel.setBottomComponent(mapEditorPanel);
+    rightSplitPanel.setTopComponent(mapSelectionPanel);
+    rightSplitPanel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setSelectionEditSplitter(rightSplitPanel.getDividerLocation()));
+    if (userPreferences.getSelectionEditSplitter() != 0) {
+      rightSplitPanel.setDividerLocation(userPreferences.getSelectionEditSplitter());
+    }
+
+    return rightSplitPanel;
+  }
+
+  private static JPanel initBottomPanel() {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
@@ -334,48 +374,31 @@ public class Program {
       }
     });
 
-    JSplitPane rendersplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, renderPane, bottomPanel);
-    if (userPreferences.getBottomSplitter() != 0) {
-      rendersplit.setDividerLocation(userPreferences.getBottomSplitter());
-    } else {
-      rendersplit.setDividerLocation((int) (window.getSize().height * 0.75));
-    }
+    return bottomPanel;
+  }
 
-    rendersplit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setBottomSplitter(rendersplit.getDividerLocation()));
-    rendersplit.setContinuousLayout(true);
+  private static void initScrollBars(JPanel renderPane) {
+    horizontalScroll = new JScrollBar(JScrollBar.HORIZONTAL);
+    renderPane.add(horizontalScroll, BorderLayout.SOUTH);
+    verticalScroll = new JScrollBar(JScrollBar.VERTICAL);
+    renderPane.add(verticalScroll, BorderLayout.EAST);
 
-    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rendersplit, mapWrap);
-    split.setContinuousLayout(true);
-    split.addComponentListener(new ComponentAdapter() {
-      @Override
-      public void componentResized(ComponentEvent e) {
-        userPreferences.setWidth(window.getWidth());
-        userPreferences.setHeight(window.getHeight());
+    horizontalScroll.addAdjustmentListener(e -> {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
+        return;
       }
+
+      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
+      Game.getCamera().setFocus(newFocus);
     });
 
-    split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> userPreferences.setMainSplitter(split.getDividerLocation()));
-
-    contentPane.add(split, BorderLayout.CENTER);
-    split.setDividerLocation(userPreferences.getMainSplitterPosition() != 0 ? userPreferences.getMainSplitterPosition() : (int) (window.getSize().width * 0.75));
-
-    JToolBar toolbar = initToolBar();
-    contentPane.add(toolbar, BorderLayout.NORTH);
-
-    EditorScreen.instance().setMapEditorPanel(mapEditorPanel);
-    EditorScreen.instance().setMapSelectionPanel(mapSelectionPanel);
-
-    Menu mnFile = initFileMenu();
-    menuBar.add(mnFile);
-
-    Menu mnView = initViewMenu();
-    menuBar.add(mnView);
-
-    Menu mnProject = initProjectMenu();
-    menuBar.add(mnProject);
-
-    Menu mnMap = initMapMenu();
-    menuBar.add(mnMap);
+    verticalScroll.addAdjustmentListener(e -> {
+      if (EditorScreen.instance().getMapComponent().isLoading()) {
+        return;
+      }
+      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), verticalScroll.getValue());
+      Game.getCamera().setFocus(newFocus);
+    });
   }
 
   private static Menu initFileMenu() {
