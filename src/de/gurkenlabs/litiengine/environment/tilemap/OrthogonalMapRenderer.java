@@ -301,7 +301,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
 
     final Composite oldComp = g.getComposite();
-    final AlphaComposite ac = java.awt.AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
+    final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
     final double viewportOffsetX = -viewport.getX() + layer.getPosition().x;

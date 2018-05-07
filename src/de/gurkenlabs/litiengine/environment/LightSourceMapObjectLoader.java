@@ -33,14 +33,13 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
 
     String lightType;
     switch (lightShape) {
-    case LightSource.ELLIPSE:
-      lightType = LightSource.ELLIPSE;
-      break;
     case LightSource.RECTANGLE:
       lightType = LightSource.RECTANGLE;
       break;
+    case LightSource.ELLIPSE:
     default:
       lightType = LightSource.ELLIPSE;
+      break;
     }
 
     final LightSource light = this.createLightSource(mapObject, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);

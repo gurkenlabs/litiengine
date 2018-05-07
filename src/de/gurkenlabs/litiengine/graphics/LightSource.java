@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.GROUND)
 public class LightSource extends Entity implements IRenderable {
+  // TODO: Why are these string values and not an enum?
   public static final String ELLIPSE = "ellipse";
   public static final String RECTANGLE = "rectangle";
   public static final String TOGGLE_MESSAGE = "toggle";

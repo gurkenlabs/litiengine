@@ -28,15 +28,15 @@ import de.gurkenlabs.utiliti.swing.ColorChooser;
 @SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
 
-  private JTextField textFieldDescription;
-  private JTextField textFieldTitle;
+  private final JTextField textFieldDescription;
+  private final JTextField textFieldTitle;
   private JTextField textFieldAmbientColor;
   private JSpinner spinnerAmbientAlpha;
   private JSpinner spinnerShadow;
   private JTextField textFieldName;
   private JTable table;
   private transient IMap dataSource;
-  DefaultTableModel model;
+  private DefaultTableModel model;
   private JTextField textFieldShadowColor;
 
   /**

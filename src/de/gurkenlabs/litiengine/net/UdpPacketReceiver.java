@@ -15,7 +15,7 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
   private static final Logger log = Logger.getLogger(UdpPacketReceiver.class.getName());
 
   /** The incoming packet observers. */
-  ArrayList<IIncomingPacketObserver> incomingPacketObservers;
+  private final ArrayList<IIncomingPacketObserver> incomingPacketObservers;
 
   /** The is terminated. */
   private boolean isTerminated;

@@ -15,10 +15,11 @@ import javax.swing.SwingUtilities;
 
 public class SpinnerCellEditor extends DefaultCellEditor {
   private static final long serialVersionUID = 9136956833481466003L;
-  JSpinner spinner;
-  JSpinner.DefaultEditor editor;
-  JTextField textField;
-  boolean valueSet;
+
+  private final JSpinner spinner;
+  private final JSpinner.DefaultEditor editor;
+  private final JTextField textField;
+  private boolean valueSet;
 
   // Initializes the spinner.
   public SpinnerCellEditor() {
@@ -47,7 +48,7 @@ public class SpinnerCellEditor extends DefaultCellEditor {
       spinner.setValue(value);
     }
 
-    SwingUtilities.invokeLater(() -> textField.requestFocus());
+    SwingUtilities.invokeLater(textField::requestFocus);
     return spinner;
   }
 
