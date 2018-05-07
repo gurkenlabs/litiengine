@@ -20,6 +20,7 @@ import javax.swing.event.ChangeListener;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.UndoManager;
@@ -56,8 +57,7 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
     for (Map.Entry<String, String> entry : m.entrySet()) {
       JLabel label = new JLabel();
       label.setText(entry.getKey());
-      String value = m.get(entry.getValue());
-      Spritesheet sprite = Spritesheet.find(value);
+      Spritesheet sprite = Spritesheet.find(entry.getValue());
       if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
         BufferedImage scaled = sprite.getPreview(24);
         if (scaled != null) {
@@ -69,6 +69,18 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
     }
   }
 
+  protected static void selectSpriteSheet(JComboBox<JLabel> comboBox, IMapObject mapObject) {
+    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
+      for (int i = 0; i < comboBox.getModel().getSize(); i++) {
+        JLabel label = comboBox.getModel().getElementAt(i);
+        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
+          comboBox.setSelectedItem(label);
+          break;
+        }
+      }
+    }
+  }
+  
   protected abstract void clearControls();
 
   protected abstract void setControlValues(T mapObject);

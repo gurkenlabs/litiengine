@@ -198,15 +198,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
-      for (int i = 0; i < this.comboBoxSpriteSheets.getModel().getSize(); i++) {
-        JLabel label = this.comboBoxSpriteSheets.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
-          this.comboBoxSpriteSheets.setSelectedItem(label);
-          break;
-        }
-      }
-    }
+    selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
 
     final Material material = mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);

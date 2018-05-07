@@ -138,16 +138,7 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
-      for (int i = 0; i < this.comboBoxSpriteSheets.getModel().getSize(); i++) {
-        JLabel label = this.comboBoxSpriteSheets.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
-          this.comboBoxSpriteSheets.setSelectedItem(label);
-          break;
-        }
-      }
-    }
-
+    selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
     this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
     this.comboBoxDirection.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
   }
