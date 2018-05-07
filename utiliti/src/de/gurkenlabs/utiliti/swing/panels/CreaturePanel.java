@@ -2,14 +2,12 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -21,10 +19,8 @@ import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -179,35 +175,6 @@ public class CreaturePanel extends PropertyPanel<IMapObject> {
       }
     }
 
-    this.comboBoxSpriteSheets.removeAllItems();
-    for (Map.Entry<String, String> entry : m.entrySet()) {
-      JLabel label = new JLabel();
-      label.setText(entry.getKey());
-      String value = entry.getValue();
-      Spritesheet sprite = Spritesheet.find(value);
-      if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
-        BufferedImage img = sprite.getSprite(0);
-
-        BufferedImage scaled;
-        String cacheKey = "iconx24" + sprite.getName();
-        if (ImageCache.SPRITES.containsKey(cacheKey)) {
-          scaled = ImageCache.SPRITES.get(cacheKey);
-        } else {
-          if (img != null) {
-            scaled = ImageProcessing.scaleImage(img, 24, 24, true);
-          } else {
-            scaled = ImageProcessing.getCompatibleImage(24, 24);
-          }
-
-          ImageCache.SPRITES.put(cacheKey, scaled);
-        }
-
-        if (scaled != null) {
-          label.setIcon(new ImageIcon(scaled));
-        }
-      }
-
-      this.comboBoxSpriteSheets.addItem(label);
-    }
+    populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
   }
 }

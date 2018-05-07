@@ -6,8 +6,13 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
+import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
@@ -16,16 +21,17 @@ import javax.swing.event.ChangeListener;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
   protected boolean isFocussing;
   private transient T dataSource;
-  
+
   public PropertyPanel() {
   }
-  
+
   protected T getDataSource() {
     return this.dataSource;
   }
@@ -42,6 +48,25 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
 
     this.setControlValues(mapObject);
     this.isFocussing = false;
+  }
+
+  protected static void populateComboBoxWithSprites(JComboBox<JLabel> comboBox, Map<String, String> m) {
+    comboBox.removeAllItems();
+
+    for (Map.Entry<String, String> entry : m.entrySet()) {
+      JLabel label = new JLabel();
+      label.setText(entry.getKey());
+      String value = m.get(entry.getValue());
+      Spritesheet sprite = Spritesheet.find(value);
+      if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
+        BufferedImage scaled = sprite.getPreview(24);
+        if (scaled != null) {
+          label.setIcon(new ImageIcon(scaled));
+        }
+      }
+
+      comboBox.addItem(label);
+    }
   }
 
   protected abstract void clearControls();
@@ -109,7 +134,7 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
     }
   }
 
-  protected class SpinnerListener extends MapObjectPropertyChangeListener{
+  protected class SpinnerListener extends MapObjectPropertyChangeListener {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
       super(m -> m.setCustomProperty(mapObjectProperty, spinner.getValue().toString()));
     }
@@ -143,6 +168,5 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
         Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
       }
     }
-
   }
 }

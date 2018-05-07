@@ -217,10 +217,10 @@ public final class Spritesheet {
   }
 
   public static void update(final SpriteSheetInfo info) {
-    if(info == null || info.getName() == null) {
+    if (info == null || info.getName() == null) {
       return;
     }
-    
+
     final String spriteName = info.getName().toLowerCase();
     if (!spritesheets.containsKey(spriteName)) {
       return;
@@ -229,7 +229,7 @@ public final class Spritesheet {
     Spritesheet spriteToRemove = spritesheets.get(spriteName);
     spritesheets.remove(spriteName);
     customKeyFrameDurations.remove(spriteName);
-    
+
     if (info.getHeight() == 0 && info.getWidth() == 0) {
       spriteToRemove.loaded = false;
       return;
@@ -246,6 +246,25 @@ public final class Spritesheet {
    */
   public int getColumns() {
     return this.columns;
+  }
+
+  public BufferedImage getPreview(int dimension) {
+    final BufferedImage img = this.getSprite(0);
+    BufferedImage scaled = null;
+    String cacheKey = "iconx" + dimension + this.getName();
+    if (ImageCache.SPRITES.containsKey(cacheKey)) {
+      scaled = ImageCache.SPRITES.get(cacheKey);
+    } else {
+      if (img != null) {
+        scaled = ImageProcessing.scaleImage(img, dimension, dimension, true);
+      } else {
+        scaled = ImageProcessing.getCompatibleImage(dimension, dimension);
+      }
+
+      ImageCache.SPRITES.put(cacheKey, scaled);
+    }
+
+    return scaled;
   }
 
   public BufferedImage getImage() {

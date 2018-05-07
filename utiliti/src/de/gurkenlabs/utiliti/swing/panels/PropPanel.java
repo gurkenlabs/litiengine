@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,7 +9,6 @@ import java.util.TreeMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -29,7 +27,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -83,7 +80,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
 
     this.checkBoxHorizontalFlip = new JCheckBox("horizontal flip");
     this.checkBoxVerticalFlip = new JCheckBox("vertical flip");
-    
+
     this.checkBoxScale = new JCheckBox("stretch sprite");
 
     GroupLayout groupLayout = new GroupLayout(this);
@@ -271,35 +268,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       }
     }
 
-    this.comboBoxSpriteSheets.removeAllItems();
-    for (String key : m.keySet()) {
-      JLabel label = new JLabel();
-      label.setText(key);
-      String value = m.get(key);
-      Spritesheet sprite = Spritesheet.find(value);
-      if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
-        BufferedImage img = sprite.getSprite(0);
-        BufferedImage scaled;
-        String cacheKey = "iconx24" + sprite.getName();
-        if (ImageCache.SPRITES.containsKey(cacheKey)) {
-          scaled = ImageCache.SPRITES.get(cacheKey);
-        } else {
-          if (img != null) {
-            scaled = ImageProcessing.scaleImage(img, 24, 24, true);
-          } else {
-            scaled = ImageProcessing.getCompatibleImage(24, 24);
-          }
-
-          ImageCache.SPRITES.put(cacheKey, scaled);
-        }
-
-        if (scaled != null) {
-          label.setIcon(new ImageIcon(scaled));
-        }
-      }
-
-      this.comboBoxSpriteSheets.addItem(label);
-    }
+    populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
 
     this.propsLoaded = true;
   }
