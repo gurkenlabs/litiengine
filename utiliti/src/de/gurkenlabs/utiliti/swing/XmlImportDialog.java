@@ -11,13 +11,16 @@ public final class XmlImportDialog {
   private XmlImportDialog() {
   }
 
-  public static void importXml(String name, Consumer<File[]> consumer) {
+  public static void importXml(String name, Consumer<File> consumer) {
     importXml(name, "xml", consumer);
   }
 
-  public static void importXml(String name, String extension, Consumer<File[]> consumer) {
+  public static void importXml(String name, String extension, Consumer<File> consumer) {
     if (EditorFileChooser.showFileDialog("." + extension + " - " + name + " XML", "Import " + name + " XML", true, extension) == JFileChooser.APPROVE_OPTION) {
-      consumer.accept(EditorFileChooser.instance().getSelectedFiles());
+      for (File file : EditorFileChooser.instance().getSelectedFiles()) {
+        consumer.accept(file);
+      }
+
       Program.getAssetTree().forceUpdate();
     }
   }

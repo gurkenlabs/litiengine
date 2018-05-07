@@ -646,70 +646,67 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     final IMapLoader tmxLoader = new TmxMapLoader();
-    XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, files -> {
-      for (File file : files) {
+    XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
+      String mapPath = file.toString();
+      Map map = (Map) tmxLoader.loadMap(mapPath);
+      if (map == null) {
+        log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
+        return;
+      }
 
-        String mapPath = file.toString();
-        Map map = (Map) tmxLoader.loadMap(mapPath);
-        if (map == null) {
-          log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
+      if (map.getMapObjectLayers().isEmpty()) {
+
+        // make sure there's a map object layer on the map because we need one
+        // to add any kind of entities
+        MapObjectLayer layer = new MapObjectLayer();
+        layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
+        map.addMapObjectLayer(layer);
+      }
+
+      Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
+      if (current.isPresent()) {
+        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getFileName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
+
+        if (n == JOptionPane.YES_OPTION) {
+          this.getMaps().remove(current.get());
+
+        } else {
           return;
         }
-
-        if (map.getMapObjectLayers().isEmpty()) {
-
-          // make sure there's a map object layer on the map because we need one
-          // to add any kind of entities
-          MapObjectLayer layer = new MapObjectLayer();
-          layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
-          map.addMapObjectLayer(layer);
-        }
-
-        Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
-        if (current.isPresent()) {
-          int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getFileName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
-
-          if (n == JOptionPane.YES_OPTION) {
-            this.getMaps().remove(current.get());
-
-          } else {
-            return;
-          }
-        }
-
-        this.getMaps().add(map);
-        Collections.sort(this.getMaps());
-
-        for (IImageLayer imageLayer : map.getImageLayers()) {
-          BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
-          if (img == null) {
-            continue;
-          }
-
-          Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-          this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
-        }
-
-        // remove old spritesheets
-        for (ITileset tileSet : map.getTilesets()) {
-          this.loadTileset(tileSet, true);
-        }
-
-        // remove old tilesets
-        for (ITileset tileset : map.getExternalTilesets()) {
-          this.loadTileset(tileset, false);
-        }
-
-        EditorScreen.instance().updateGameFileMaps();
-        ImageCache.clearAll();
-        if (this.environments.containsKey(map.getFileName())) {
-          this.environments.remove(map.getFileName());
-        }
-
-        EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
-        this.loadEnvironment(map);
-        log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
       }
+
+      this.getMaps().add(map);
+      Collections.sort(this.getMaps());
+
+      for (IImageLayer imageLayer : map.getImageLayers()) {
+        BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+        if (img == null) {
+          continue;
+        }
+
+        Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
+        this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
+      }
+
+      // remove old spritesheets
+      for (ITileset tileSet : map.getTilesets()) {
+        this.loadTileset(tileSet, true);
+      }
+
+      // remove old tilesets
+      for (ITileset tileset : map.getExternalTilesets()) {
+        this.loadTileset(tileset, false);
+      }
+
+      EditorScreen.instance().updateGameFileMaps();
+      ImageCache.clearAll();
+      if (this.environments.containsKey(map.getFileName())) {
+        this.environments.remove(map.getFileName());
+      }
+
+      EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
+      this.loadEnvironment(map);
+      log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
     });
   }
 

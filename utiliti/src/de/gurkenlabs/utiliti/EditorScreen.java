@@ -369,73 +369,68 @@ public class EditorScreen extends Screen {
   }
 
   public void importEmitters() {
-    XmlImportDialog.importXml("Emitter", files -> {
-      for (File file : files) {
-        EmitterData emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
-        if (emitter == null) {
-          continue;
-        }
-
-        if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_emitter_question", emitter.getName()), Resources.get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
-          if (result == JOptionPane.NO_OPTION) {
-            continue;
-          }
-
-          this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
-        }
-
-        this.gameFile.getEmitters().add(emitter);
-        log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] { emitter.getName(), file });
+    XmlImportDialog.importXml("Emitter", file -> {
+      EmitterData emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
+      if (emitter == null) {
+        return;
       }
+
+      if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_emitter_question", emitter.getName()), Resources.get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.NO_OPTION) {
+          return;
+        }
+
+        this.gameFile.getEmitters().removeIf(x -> x.getName().equals(emitter.getName()));
+      }
+
+      this.gameFile.getEmitters().add(emitter);
+      log.log(Level.INFO, "imported emitter {0} from {1}", new Object[] { emitter.getName(), file });
     });
   }
 
   public void importBlueprints() {
-    XmlImportDialog.importXml("Blueprint", files -> {
-      for (File file : files) {
-        Blueprint blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
-        if (blueprint == null) {
-          continue;
-        }
-
-        if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
-          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_blueprint_question", blueprint.getName()), Resources.get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
-          if (result == JOptionPane.NO_OPTION) {
-            continue;
-          }
-
-          this.gameFile.getBluePrints().removeIf(x -> x.getName().equals(blueprint.getName()));
-        }
-
-        this.gameFile.getBluePrints().add(blueprint);
-        log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
+    XmlImportDialog.importXml("Blueprint", file -> {
+      Blueprint blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
+      if (blueprint == null) {
+        return;
       }
+
+      if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_blueprint_question", blueprint.getName()), Resources.get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.NO_OPTION) {
+          return;
+        }
+
+        this.gameFile.getBluePrints().removeIf(x -> x.getName().equals(blueprint.getName()));
+      }
+
+      this.gameFile.getBluePrints().add(blueprint);
+      log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
+
     });
   }
 
   public void importTilesets() {
-    XmlImportDialog.importXml("Tilesets", Tileset.FILE_EXTENSION, files -> {
-      for (File file : files) {
-        Tileset tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
-        if (tileset == null) {
-          continue;
-        }
-
-        String path = FileUtilities.getParentDirPath(file.getPath());
-        tileset.setMapPath(path);
-
-        if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-          int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_tileset_title", tileset.getName()), Resources.get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
-          if (result == JOptionPane.NO_OPTION) {
-            continue;
-          }
-
-          this.getMapComponent().loadTileset(tileset, false);
-        }
-
-        log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
+    XmlImportDialog.importXml("Tilesets", Tileset.FILE_EXTENSION, file -> {
+      Tileset tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
+      if (tileset == null) {
+        return;
       }
+
+      String path = FileUtilities.getParentDirPath(file.getPath());
+      tileset.setMapPath(path);
+
+      if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_tileset_title", tileset.getName()), Resources.get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.NO_OPTION) {
+          return;
+        }
+
+        this.getMapComponent().loadTileset(tileset, false);
+      }
+
+      log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
     });
   }
 
