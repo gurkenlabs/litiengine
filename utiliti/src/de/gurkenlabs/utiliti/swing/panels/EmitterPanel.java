@@ -98,6 +98,8 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
 
   @Override
   protected void clearControls() {
+    // this panel doesn't really contain controls that are bound and need to be
+    // cleared
   }
 
   @Override

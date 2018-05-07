@@ -110,11 +110,6 @@ public abstract class Slider extends GuiComponent {
 
   public abstract void setValueRelativeToMousePosition();
 
-  @Override
-  protected void initializeComponents() {
-
-  }
-
   protected void setButton1(final ImageComponent button1) {
     this.button1 = button1;
     this.button1.onClicked(e -> {

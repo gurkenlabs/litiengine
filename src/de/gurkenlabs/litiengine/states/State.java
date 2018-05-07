@@ -16,10 +16,12 @@ public abstract class State implements IState {
 
   @Override
   public void enter() {
+    // this method is just implemented for convenient purposes
   }
 
   @Override
   public void exit() {
+    // this method is just implemented for convenient purposes
   }
 
   @Override

@@ -755,10 +755,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     return this.mouseWheelConsumer;
   }
 
-  /**
-   * Initialize components.
-   */
   protected void initializeComponents() {
+    // nothing to do in the base class
   }
 
   /**
