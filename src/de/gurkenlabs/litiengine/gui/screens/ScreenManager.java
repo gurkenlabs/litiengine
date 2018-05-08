@@ -249,9 +249,9 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   private void setResolution(Dimension dim) {
     Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
 
-    if (Game.getConfiguration().graphics().enableResolutionScale()) {
+    if (Game.getConfiguration().graphics().enableResolutionScaling()) {
       this.resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
-      Game.getInfo().setDefaultRenderScale(Game.getInfo().getDefaultRenderScale() * this.resolutionScale);
+      Game.getRenderEngine().setBaseRenderScale(Game.getRenderEngine().getBaseRenderScale() * this.resolutionScale);
     }
 
     this.setSize(insetAwareDimension);

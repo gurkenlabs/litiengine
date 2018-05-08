@@ -4,43 +4,41 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-@XmlRootElement(name = "info")
+@XmlRootElement(name = "gameinfo")
 public class GameInfo {
   @XmlElement
-  private String cooperation;
+  private String name;
+
+  @XmlElement
+  private String subTitle;
 
   @XmlElement
   private String description;
 
-  private String[] developers;
-  private String icon;
-
-  private String logo;
-  @XmlElement
-  private String name;
-  private float renderScale;
-
-  @XmlElement
-  private String subTitle;
   @XmlElement
   private String version;
 
+  @XmlElement
+  private String company;
+
+  @XmlElement
+  private String publisher;
+
+  @XmlElement(name = "developer")
+  private String[] developers;
+
   public GameInfo() {
-    this.cooperation = "gurkenlabs";
+    this.company = "gurkenlabs";
     this.name = "LITIengine Game";
     this.subTitle = "The pure 2D java game engine";
     this.description = "A game, created with the allmighty LITIengine.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
-    this.icon = "";
-    this.logo = "";
     this.version = "v1.0";
-
-    this.renderScale = 3.0f;
   }
 
   @XmlTransient
-  public String getCooperation() {
-    return this.cooperation;
+  public String getCompany() {
+    return this.company;
   }
 
   @XmlTransient
@@ -54,23 +52,13 @@ public class GameInfo {
   }
 
   @XmlTransient
-  public String getIcon() {
-    return this.icon;
-  }
-
-  @XmlTransient
-  public String getLogo() {
-    return this.logo;
-  }
-
-  @XmlTransient
   public String getName() {
     return this.name;
   }
 
   @XmlTransient
-  public float getDefaultRenderScale() {
-    return this.renderScale;
+  public String getPublisher() {
+    return this.publisher;
   }
 
   @XmlTransient
@@ -83,8 +71,8 @@ public class GameInfo {
     return this.version;
   }
 
-  public void setCooperation(final String cooperation) {
-    this.cooperation = cooperation;
+  public void setCompany(final String company) {
+    this.company = company;
   }
 
   public void setDescription(final String description) {
@@ -95,20 +83,8 @@ public class GameInfo {
     this.developers = developers;
   }
 
-  public void setIcon(final String icon) {
-    this.icon = icon;
-  }
-
-  public void setLogo(final String logo) {
-    this.logo = logo;
-  }
-
   public void setName(final String name) {
     this.name = name;
-  }
-
-  public void setDefaultRenderScale(final float renderScale) {
-    this.renderScale = renderScale;
   }
 
   public void setSubTitle(final String subTitle) {
