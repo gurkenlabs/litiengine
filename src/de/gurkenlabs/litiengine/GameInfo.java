@@ -1,11 +1,21 @@
 package de.gurkenlabs.litiengine;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
+
 @XmlRootElement(name = "gameinfo")
-public class GameInfo {
+public class GameInfo extends CustomPropertyProvider {
+  private static final Logger log = Logger.getLogger(GameInfo.class.getName());
+  private static final long serialVersionUID = 3340166298303962177L;
+
   @XmlElement
   private String name;
 
@@ -14,6 +24,9 @@ public class GameInfo {
 
   @XmlElement
   private String description;
+
+  @XmlElement
+  private String website;
 
   @XmlElement
   private String version;
@@ -34,6 +47,7 @@ public class GameInfo {
     this.description = "A game, created with the allmighty LITIengine.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
     this.version = "v1.0";
+    this.website = "https://litiengine.com";
   }
 
   @XmlTransient
@@ -44,6 +58,25 @@ public class GameInfo {
   @XmlTransient
   public String getDescription() {
     return this.description;
+  }
+
+  @XmlTransient
+  public String getWebsite() {
+    return this.website;
+  }
+
+  @XmlTransient
+  public URL getWebsiteURL() {
+    if (this.getWebsite() == null || this.getWebsite().isEmpty()) {
+      return null;
+    }
+
+    try {
+      return new URL(this.getWebsite());
+    } catch (MalformedURLException e) {
+      log.log(Level.WARNING, this.getWebsite() + ": " + e.getMessage(), e);
+      return null;
+    }
   }
 
   @XmlTransient
@@ -95,8 +128,11 @@ public class GameInfo {
     this.version = version;
   }
 
-  @Override
-  public String toString() {
+  public void setWebsite(final String website) {
+    this.website = website;
+  }
+
+  public String getTitle() {
     return this.getSubTitle() != null && !this.getSubTitle().isEmpty() ? this.getName() + " " + this.getVersion() + " - " + this.getSubTitle() : this.getName() + " " + this.getVersion();
   }
 }
