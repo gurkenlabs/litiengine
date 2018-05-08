@@ -25,9 +25,6 @@ import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
-/**
- * The Interface IMapContainer.
- */
 public interface IEnvironment extends IInitializable, IRenderable {
   public void addRenderListener(EnvironmentRenderListener listener);
 

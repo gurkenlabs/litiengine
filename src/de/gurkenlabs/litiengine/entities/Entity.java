@@ -178,8 +178,7 @@ public abstract class Entity implements IEntity {
 
   @Override
   public String sendMessage(final Object sender, final String message) {
-    MessageEvent event = null;
-    event = this.fireMessageReceived(sender, ANY_MESSAGE, message, event);
+    MessageEvent event = this.fireMessageReceived(sender, ANY_MESSAGE, message, null);
     this.fireMessageReceived(sender, message, message, event);
 
     return null;
