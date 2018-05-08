@@ -116,7 +116,7 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionWidth = resolutionWidth;
   }
 
-  public boolean enableResolutionScale() {
+  public boolean enableResolutionScaling() {
     return this.enableResolutionScale;
   }
 

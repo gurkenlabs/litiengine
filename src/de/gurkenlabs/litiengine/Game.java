@@ -32,6 +32,7 @@ import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 public final class Game {
   public static final String COMMADLINE_ARG_RELEASE = "-release";
@@ -50,7 +51,7 @@ public final class Game {
   private static final GameConfiguration configuration;
   private static final EntityControllerManager entityControllerManager;
   private static final IRenderEngine graphicsEngine;
-  private static final GameInfo info;
+
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
@@ -58,6 +59,7 @@ public final class Game {
   private static final ISoundEngine soundEngine;
   private static final GameTime gameTime;
 
+  private static GameInfo gameInfo;
   private static IEnvironment environment;
   private static ICamera camera;
   private static IGameLoop gameLoop;
@@ -76,7 +78,7 @@ public final class Game {
     soundEngine = new SoundEngine();
     metrics = new GameMetrics();
     entityControllerManager = new EntityControllerManager();
-    info = new GameInfo();
+    gameInfo = new GameInfo();
     maps = new CopyOnWriteArrayList<>();
     tilesets = new CopyOnWriteArrayList<>();
     gameTime = new GameTime();
@@ -163,7 +165,7 @@ public final class Game {
   }
 
   public static GameInfo getInfo() {
-    return info;
+    return gameInfo;
   }
 
   public static IGameLoop getLoop() {
@@ -239,7 +241,7 @@ public final class Game {
     gameLoop = updateLoop;
     getLoop().attach(getPhysicsEngine());
 
-    final ScreenManager scrMgr = new ScreenManager(getInfo().toString());
+    final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop(scrMgr.getRenderComponent());
@@ -414,6 +416,19 @@ public final class Game {
       Game.getLoop().attach(cam);
       getCamera().updateFocus();
     }
+  }
+
+  public static void setInfo(final GameInfo info) {
+    gameInfo = info;
+  }
+
+  public static void setInfo(final String gameInfoFile) {
+    GameInfo info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
+    if (info == null) {
+      log.log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
+    }
+    
+    setInfo(info);
   }
 
   private static void handleCommandLineArguments(String[] args) {

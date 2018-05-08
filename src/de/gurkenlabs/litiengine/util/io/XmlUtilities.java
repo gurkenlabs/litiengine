@@ -92,7 +92,6 @@ public final class XmlUtilities {
 
       final Unmarshaller um = jaxbContext.createUnmarshaller();
 
-      
       InputStream stream = FileUtilities.getGameResource(path);
       if (stream == null) {
         stream = new FileInputStream(path);
@@ -106,17 +105,12 @@ public final class XmlUtilities {
     return null;
   }
 
-  public static <T> String save(T object, String fileName, String extension) {
+  public static <T> String save(T object, String fileName) {
     if (fileName == null || fileName.isEmpty()) {
       return null;
     }
 
-    String fileNameWithExtension = fileName;
-    if (!fileNameWithExtension.endsWith("." + extension)) {
-      fileNameWithExtension += "." + extension;
-    }
-
-    File newFile = new File(fileNameWithExtension);
+    File newFile = new File(fileName);
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile)) {
       JAXBContext jaxbContext = getContext(object.getClass());
@@ -145,4 +139,12 @@ public final class XmlUtilities {
     return newFile.toString();
   }
 
+  public static <T> String save(T object, String fileName, String extension) {
+    String fileNameWithExtension = fileName;
+    if (!fileNameWithExtension.endsWith("." + extension)) {
+      fileNameWithExtension += "." + extension;
+    }
+
+    return save(object, fileNameWithExtension);
+  }
 }

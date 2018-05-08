@@ -30,12 +30,16 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 public final class RenderEngine implements IRenderEngine {
+  private static final float DEFAULT_RENDERSCALE = 3.0f;
+
   private final EntityYComparator entityComparator;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
   private final List<Predicate<IEntity>> entityRenderingConditions;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
   private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
   private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
+
+  private float baseRenderScale;
 
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
@@ -46,6 +50,8 @@ public final class RenderEngine implements IRenderEngine {
     this.entityComparator = new EntityYComparator();
 
     this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
+
+    this.baseRenderScale = DEFAULT_RENDERSCALE;
   }
 
   /**
@@ -271,7 +277,7 @@ public final class RenderEngine implements IRenderEngine {
 
     g.drawImage(image, transform, null);
   }
-  
+
   @Override
   public boolean canRender(final IEntity entity) {
     if (!this.entityRenderingConditions.isEmpty()) {
@@ -290,6 +296,11 @@ public final class RenderEngine implements IRenderEngine {
     if (!this.entityRenderingConditions.contains(predicate)) {
       this.entityRenderingConditions.add(predicate);
     }
+  }
+
+  @Override
+  public float getBaseRenderScale() {
+    return this.baseRenderScale;
   }
 
   @Override
@@ -467,5 +478,10 @@ public final class RenderEngine implements IRenderEngine {
     for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
       consumer.accept(new RenderEvent<>(g, map));
     }
+  }
+
+  @Override
+  public void setBaseRenderScale(float scale) {
+    this.baseRenderScale = scale;
   }
 }

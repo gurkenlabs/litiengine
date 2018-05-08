@@ -118,7 +118,7 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
-    Game.getInfo().setDefaultRenderScale(1.0f);
+    Game.getRenderEngine().setBaseRenderScale(1.0f);
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
@@ -238,11 +238,11 @@ public class Program {
 
   private static void setupInterface() {
     JFrame window = initWindow();
-    
+
     Canvas canvas = Game.getScreenManager().getRenderComponent();
     canvas.setFocusable(true);
     canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
-    
+
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
 
@@ -933,7 +933,7 @@ public class Program {
       exitItem.addActionListener(a -> Game.terminate());
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(Resources.getImage("pixel-icon-utility.png"), Game.getInfo().toString(), menu);
+      trayIcon = new TrayIcon(Resources.getImage("litiengine-icon.png"), Game.getInfo().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);

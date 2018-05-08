@@ -119,7 +119,7 @@ public class Camera implements ICamera {
 
   @Override
   public float getRenderScale() {
-    return Game.getInfo().getDefaultRenderScale() * this.getZoom();
+    return Game.getRenderEngine().getBaseRenderScale() * this.getZoom();
   }
 
   @Override

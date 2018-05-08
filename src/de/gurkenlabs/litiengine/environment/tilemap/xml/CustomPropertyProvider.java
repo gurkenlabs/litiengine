@@ -17,7 +17,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
 
-  /** The properties. */
   @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
   private List<Property> properties = new CopyOnWriteArrayList<>();
