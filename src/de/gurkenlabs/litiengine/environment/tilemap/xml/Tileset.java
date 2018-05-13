@@ -354,7 +354,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     }
 
-    if (this.getAllCustomProperties() != null && this.getAllCustomProperties().isEmpty()) {
+    if (this.getCustomProperties() != null && this.getCustomProperties().isEmpty()) {
       this.setCustomProperties(null);
     }
   }

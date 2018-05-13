@@ -61,7 +61,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   @XmlTransient
-  public List<Property> getAllCustomProperties() {
+  public List<Property> getCustomProperties() {
     if (this.properties == null) {
       return new CopyOnWriteArrayList<>();
     }

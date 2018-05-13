@@ -44,7 +44,7 @@ public interface ICustomPropertyProvider {
 
   public void setCustomProperty(String name, String value);
 
-  public List<Property> getAllCustomProperties();
+  public List<Property> getCustomProperties();
 
   public void setCustomProperties(List<Property> props);
 }

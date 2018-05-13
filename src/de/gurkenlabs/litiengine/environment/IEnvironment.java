@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
@@ -47,7 +48,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
    *          The entity to add to the environment.
    */
   public void add(IEntity entity);
-
+  
   public void addToGround(IRenderable renderable);
 
   public void addToOverlay(IRenderable renderable);
@@ -195,6 +196,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void loadFromMap(final int mapId);
 
   public void reloadFromMap(final int mapId);
+  
+  public Collection<IEntity> load(IMapObject mapObject);
 
   public void remove(final IEntity entity);
 

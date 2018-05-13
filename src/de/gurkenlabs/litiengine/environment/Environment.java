@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
@@ -732,12 +733,10 @@ public class Environment implements IEnvironment {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       Optional<IMapObject> opt = layer.getMapObjects().stream().filter(mapObject -> mapObject.getType() != null && !mapObject.getType().isEmpty() && mapObject.getId() == mapId).findFirst();
       if (opt.isPresent()) {
-        IMapObject mapObject = opt.get();
-        this.addMapObject(mapObject);
+        this.load(opt.get());
         break;
       }
     }
-
   }
 
   /**
@@ -754,6 +753,55 @@ public class Environment implements IEnvironment {
    */
   public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
     mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
+  }
+
+  /**
+   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+   * 
+   * This is an overload of the {@link #registerCustomEntityType(Class)} method that allows to explicitly specify the <code>MapObjectType</code>
+   * without
+   * having to provide an <code>EntityInfo</code> annotation containing this information.
+   * 
+   * @param <T>
+   *          The type of the custom entity.
+   * @param mapObjectType
+   *          The custom mapobjectType that is used by <code>IMapObjects</code> to determine the target entity implementation.
+   * @param entityType
+   *          The class type of the custom entity implementation.
+   * 
+   * @see IMapObject#getType()
+   * @see EntityInfo#customMapObjectType()
+   */
+  public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
+    CustomMapObjectLoader<T> mapObjectLoader = new CustomMapObjectLoader<>(mapObjectType, entityType);
+    registerMapObjectLoader(mapObjectLoader);
+  }
+
+  /**
+   * Registers a custom <code>IEntity</code> implementation to support being loaded from an <code>IMap</code> instance.
+   * Note that the specified class needs to be accessible in a static manner. Inner classes that aren't declared statically are not supported.
+   * 
+   * This implementation uses the provided <code>EntityInfo.customMapObjectType()</code> to determine for which type the specified class should be
+   * used.
+   * 
+   * @param <T>
+   *          The type of the custom entity.
+   * @param entityType
+   *          The class type of the custom entity implementation.
+   * 
+   * @see Environment#registerCustomEntityType(String, Class)
+   * @see IMapObject#getType()
+   * @see EntityInfo#customMapObjectType()
+   */
+  public static <T extends IEntity> void registerCustomEntityType(Class<T> entityType) {
+    EntityInfo info = entityType.getAnnotation(EntityInfo.class);
+    if (info == null || info.customMapObjectType().isEmpty()) {
+      throw new IllegalArgumentException(
+          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\n Add an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
+    }
+
+    registerCustomEntityType(info.customMapObjectType(), entityType);
   }
 
   @Override
@@ -985,7 +1033,8 @@ public class Environment implements IEnvironment {
     this.fireEvent(l -> l.environmentUnloaded(this));
   }
 
-  protected void addMapObject(final IMapObject mapObject) {
+  @Override
+  public Collection<IEntity> load(final IMapObject mapObject) {
     if (mapObjectLoaders.containsKey(mapObject.getType())) {
       Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(this, mapObject);
       for (IEntity entity : loadedEntities) {
@@ -993,7 +1042,11 @@ public class Environment implements IEnvironment {
           this.add(entity);
         }
       }
+
+      return loadedEntities;
     }
+
+    return new ArrayList<>();
   }
 
   private static <T extends IEntity> T getById(Collection<T> entities, int mapId) {
@@ -1118,7 +1171,7 @@ public class Environment implements IEnvironment {
           continue;
         }
 
-        this.addMapObject(mapObject);
+        this.load(mapObject);
       }
     }
   }

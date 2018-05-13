@@ -17,7 +17,7 @@ public class CustomPropertyProviderTests {
 
     assertEquals("testvalue", propProvider.getCustomProperty("test"));
     assertNull(propProvider.getCustomProperty("test2"));
-    assertEquals(1, propProvider.getAllCustomProperties().size());
+    assertEquals(1, propProvider.getCustomProperties().size());
 
     propProvider.setCustomProperty("test", "testvalue2");
 
@@ -29,12 +29,12 @@ public class CustomPropertyProviderTests {
 
     propProvider.setCustomProperties(props);
 
-    assertEquals(2, propProvider.getAllCustomProperties().size());
+    assertEquals(2, propProvider.getCustomProperties().size());
     assertEquals("testvalue3", propProvider.getCustomProperty("test2"));
     assertEquals("testvalue4", propProvider.getCustomProperty("test3"));
 
     propProvider.setCustomProperties(null);
-    assertNotNull(propProvider.getAllCustomProperties());
-    assertEquals(0, propProvider.getAllCustomProperties().size());
+    assertNotNull(propProvider.getCustomProperties());
+    assertEquals(0, propProvider.getCustomProperties().size());
   }
 }

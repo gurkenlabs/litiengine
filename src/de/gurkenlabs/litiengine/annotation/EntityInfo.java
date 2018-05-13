@@ -21,4 +21,6 @@ public @interface EntityInfo {
   RenderType renderType() default RenderType.NORMAL;
 
   float width() default 32;
+
+  String customMapObjectType() default "";
 }

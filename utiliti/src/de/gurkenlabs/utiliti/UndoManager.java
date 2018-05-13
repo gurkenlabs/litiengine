@@ -267,8 +267,8 @@ public class UndoManager {
     target.setY(restore.getY());
     target.setWidth(restore.getWidth());
     target.setHeight(restore.getHeight());
-    target.getAllCustomProperties().clear();
-    for (Property prop : restore.getAllCustomProperties()) {
+    target.getCustomProperties().clear();
+    for (Property prop : restore.getCustomProperties()) {
       target.setCustomProperty(prop.getName(), prop.getValue());
     }
 
@@ -293,7 +293,7 @@ public class UndoManager {
     clonedObject.setY(mapObject.getY());
     clonedObject.setWidth(mapObject.getWidth());
     clonedObject.setHeight(mapObject.getHeight());
-    clonedObject.setCustomProperties(mapObject.getAllCustomProperties().stream().collect(Collectors.toList()));
+    clonedObject.setCustomProperties(mapObject.getCustomProperties().stream().collect(Collectors.toList()));
 
     return clonedObject;
   }

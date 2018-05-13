@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 
 /**
  * This interface provides methods that are required for loading an <code>IEntity</code> from an <code>IMapObject</code>.

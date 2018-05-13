@@ -9,23 +9,31 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
+import de.gurkenlabs.litiengine.annotation.CustomMapObjectProperty;
+import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
+import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 
 public class MapObjectLoaderTests {
@@ -39,7 +47,6 @@ public class MapObjectLoaderTests {
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testProp");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-
 
     when(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
     when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
@@ -207,5 +214,57 @@ public class MapObjectLoaderTests {
     assertEquals(100, light.getColor().getAlpha());
     assertEquals(100, light.getIntensity());
     assertEquals(LightSource.ELLIPSE, light.getLightShapeType());
+  }
+
+  @Test
+  public void testCustomMapObjectLoader() {
+    Environment.registerCustomEntityType(CustomEntity.class);
+    
+    IMapObject mapObject = mock(IMapObject.class);
+    when(mapObject.getType()).thenReturn("customEntity");
+    when(mapObject.getId()).thenReturn(111);
+    when(mapObject.getName()).thenReturn("somethin");
+    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
+    when(mapObject.getWidth()).thenReturn(50f);
+    when(mapObject.getHeight()).thenReturn(150f);
+
+    List<Property> customProps = Arrays.asList(new Property("foo", "foovalue"), new Property("bar", "111"));
+    when(mapObject.getCustomProperties()).thenReturn(customProps);
+    when(mapObject.getCustomProperty("foo")).thenReturn("foovalue");
+    when(mapObject.getCustomProperty("bar")).thenReturn("111");
+
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    Environment env = new Environment(map);
+
+    Collection<IEntity> loaded = env.load(mapObject);
+
+    assertEquals(1, loaded.size());
+
+    IEntity ent = loaded.iterator().next();
+    assertTrue(ent instanceof CustomEntity);
+
+    CustomEntity customEntity = (CustomEntity) ent;
+    assertEquals("foovalue", customEntity.getFoo());
+    assertEquals(111, customEntity.getBar());
+  }
+
+  @EntityInfo(customMapObjectType = "customEntity")
+  @CustomMapObjectProperty(keys = { "foo", "bar" })
+  public static class CustomEntity extends Entity {
+    private String foo;
+    private int bar;
+
+    public CustomEntity(IMapObject mo) {
+    }
+
+    public String getFoo() {
+      return this.foo;
+    }
+
+    public int getBar() {
+      return this.bar;
+    }
   }
 }

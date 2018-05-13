@@ -69,7 +69,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     this.type = mapObject.type;
     this.x = mapObject.x;
     this.y = mapObject.y;
-    this.setCustomProperties(mapObject.getAllCustomProperties());
+    this.setCustomProperties(mapObject.getCustomProperties());
   }
 
   public static Rectangle2D getBounds2D(MapObject... objects) {
