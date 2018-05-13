@@ -36,7 +36,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
-import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
@@ -750,12 +749,8 @@ public class Environment implements IEnvironment {
 
   }
 
-  public static void registerMapObjectLoader(String mapObjectType, IMapObjectLoader mapObjectLoader) {
-    mapObjectLoaders.put(mapObjectType, mapObjectLoader);
-  }
-
-  public static void registerMapObjectLoader(MapObjectType mapObjectType, IMapObjectLoader mapObjectLoader) {
-    registerMapObjectLoader(mapObjectType.name(), mapObjectLoader);
+  public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
+    mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
   }
 
   @Override
@@ -1126,15 +1121,15 @@ public class Environment implements IEnvironment {
   }
 
   private static void registerDefaultMapObjectLoaders() {
-    registerMapObjectLoader(MapObjectType.PROP, new PropMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.COLLISIONBOX, new CollisionBoxMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.TRIGGER, new TriggerMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.EMITTER, new EmitterMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.LIGHTSOURCE, new LightSourceMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.SPAWNPOINT, new SpawnpointMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.AREA, new MapAreaMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.STATICSHADOW, new StaticShadowMapObjectLoader());
-    registerMapObjectLoader(MapObjectType.CREATURE, new CreatureMapObjectLoader());
+    registerMapObjectLoader(new PropMapObjectLoader());
+    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
+    registerMapObjectLoader(new TriggerMapObjectLoader());
+    registerMapObjectLoader(new EmitterMapObjectLoader());
+    registerMapObjectLoader(new LightSourceMapObjectLoader());
+    registerMapObjectLoader(new SpawnpointMapObjectLoader());
+    registerMapObjectLoader(new MapAreaMapObjectLoader());
+    registerMapObjectLoader(new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   /**
