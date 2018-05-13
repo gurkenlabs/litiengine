@@ -45,6 +45,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
    * <li>tags</li>
    * </ul>
    * Also, this supports predefined <code>CustomMapObjectProperties</code>. It loads the specified custom properties via reflection.
+   * 
    * @param entity
    *          The entity instance that will be initialized.
    * @param mapObject
@@ -87,8 +88,13 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
       if (field == null) {
         return;
       }
+      
+      String value = mapObject.getCustomProperty(key);
+      if (value == null) {
+        continue;
+      }
 
-      ReflectionUtilities.setFieldValue(entity.getClass(), entity, key, mapObject.getCustomProperty(key));
+      ReflectionUtilities.setFieldValue(entity.getClass(), entity, key, value);
     }
   }
 
