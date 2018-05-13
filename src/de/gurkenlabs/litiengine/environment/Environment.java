@@ -54,9 +54,6 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-/**
- * The Class MapContainerBase.
- */
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
@@ -104,12 +101,6 @@ public class Environment implements IEnvironment {
     Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
   }
 
-  /**
-   * Instantiates a new map container base.
-   *
-   * @param mapPath
-   *          the mapPath
-   */
   public Environment(final String mapPath) {
     this();
     final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
