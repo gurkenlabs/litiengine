@@ -740,6 +740,18 @@ public class Environment implements IEnvironment {
 
   }
 
+  /**
+   * Registers a custom loader instance that is responsible for loading and initializing entities of the defined
+   * MapObjectType.
+   * <br>
+   * <br>
+   * There can only be one loader for a particular type. Calling this method again for the same type will overwrite the previously registered loader.
+   * 
+   * @param mapObjectLoader
+   *          The MapObjectLoader instance to be registered.
+   * 
+   * @see IMapObjectLoader#getMapObjectType()
+   */
   public static void registerMapObjectLoader(IMapObjectLoader mapObjectLoader) {
     mapObjectLoaders.put(mapObjectLoader.getMapObjectType(), mapObjectLoader);
   }

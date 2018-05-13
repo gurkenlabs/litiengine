@@ -35,6 +35,23 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     return new ArrayList<>();
   }
 
+  /**
+   * Loads engine default properties to the specified <code>IEntity</code> instance:
+   * <ul>
+   * <li>width, height</li>
+   * <li>mapId</li>
+   * <li>name</li>
+   * <li>location</li>
+   * <li>tags</li>
+   * </ul>
+   * Also, this supports predefined <code>CustomMapObjectProperties</code>. It loads the specified custom properties via reflection.
+   * @param entity
+   *          The entity instance that will be initialized.
+   * @param mapObject
+   *          The mapObject that provides the static information for the new entity.
+   * 
+   * @see CustomMapObjectProperty
+   */
   public static void loadDefaultProperties(IEntity entity, IMapObject mapObject) {
     entity.setMapId(mapObject.getId());
     entity.setWidth(mapObject.getWidth());
