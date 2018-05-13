@@ -13,9 +13,6 @@ import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 
-/**
- * The Class Entity.
- */
 @EntityInfo
 public abstract class Entity implements IEntity {
   public static final String ANY_MESSAGE = "";
@@ -23,7 +20,6 @@ public abstract class Entity implements IEntity {
   private final Map<String, List<MessageListener>> messageListeners;
   private final List<String> tags;
 
-  /** The direction. */
   private float angle;
 
   private Rectangle2D boundingBox;
@@ -32,7 +28,6 @@ public abstract class Entity implements IEntity {
 
   private int mapId;
 
-  /** The map location. */
   private Point2D mapLocation;
 
   private String name;
