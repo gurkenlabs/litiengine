@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
+import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -114,6 +115,11 @@ public abstract class Entity implements IEntity {
   @Override
   public IEntityAnimationController getAnimationController() {
     return Game.getEntityControllerManager().getAnimationController(this);
+  }
+  
+  @Override
+  public IBehaviorController getBehaviorController() {
+    return Game.getEntityControllerManager().getBehaviorController(this);
   }
 
   @Override

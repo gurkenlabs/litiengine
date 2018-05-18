@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -21,6 +22,8 @@ public interface IEntity {
   public float getAngle();
 
   public IEntityAnimationController getAnimationController();
+  
+  public IBehaviorController getBehaviorController();
 
   public Rectangle2D getBoundingBox();
 

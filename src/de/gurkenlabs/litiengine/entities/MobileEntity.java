@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
@@ -46,6 +47,11 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   @Override
   public float getVelocity() {
     return this.velocity;
+  }
+
+  @Override
+  public IMovementController getMovementController() {
+    return Game.getEntityControllerManager().getMovementController(this);
   }
 
   @Override

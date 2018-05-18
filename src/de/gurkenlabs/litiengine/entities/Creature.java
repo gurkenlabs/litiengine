@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -60,6 +61,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
+  }
+
+  @Override
+  public IMovementController getMovementController() {
+    return Game.getEntityControllerManager().getMovementController(this);
   }
 
   /**
