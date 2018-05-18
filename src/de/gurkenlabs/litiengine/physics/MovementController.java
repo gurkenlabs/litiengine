@@ -25,6 +25,16 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   @Override
+  public void attach() {
+    Game.getLoop().attach(this);
+  }
+
+  @Override
+  public void detach() {
+    Game.getLoop().detach(this);
+  }
+
+  @Override
   public void apply(final Force force) {
     if (!this.activeForces.contains(force)) {
       this.activeForces.add(force);

@@ -51,7 +51,7 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
 
   @Override
   public IMovementController getMovementController() {
-    return Game.getEntityControllerManager().getMovementController(this);
+    return this.getController(IMovementController.class);
   }
 
   @Override

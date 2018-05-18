@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.graphics.particles.emitters;
 
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
@@ -23,9 +22,9 @@ public class AnimationEmitter extends SpritesheetEmitter {
     super(spriteSheet, origin);
     this.setWidth(spriteSheet.getSpriteWidth());
     this.setHeight(spriteSheet.getSpriteHeight());
-    EntityAnimationController controller = new EntityAnimationController(this, spriteSheet, false);
-    this.setTimeToLive(controller.getDefaultAnimation().getTotalDuration());
-    Game.getEntityControllerManager().addController(this, controller);
+    EntityAnimationController<AnimationEmitter> animationController = new EntityAnimationController<>(this, spriteSheet, false);
+    this.setTimeToLive(animationController.getDefaultAnimation().getTotalDuration());
+    this.getControllers().addController(animationController);
   }
 
   @Override

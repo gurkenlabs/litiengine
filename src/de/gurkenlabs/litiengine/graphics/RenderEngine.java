@@ -426,7 +426,7 @@ public final class RenderEngine implements IRenderEngine {
       }
     }
 
-    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = entity.getAnimationController();
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
       if (img == null) {

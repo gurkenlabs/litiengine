@@ -4,9 +4,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IEntityProvider;
+import de.gurkenlabs.litiengine.entities.IEntityController;
 
-public interface IEntityAnimationController extends IAnimationController, IEntityProvider {
+public interface IEntityAnimationController extends IAnimationController, IEntityController {
   /**
    * Registers an animation rule that will be evaluated if there is currently no
    * animation playing that is defined to loop. This allows to specify

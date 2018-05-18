@@ -22,8 +22,18 @@ public interface IEntity {
   public float getAngle();
 
   public IEntityAnimationController getAnimationController();
-  
+
   public IBehaviorController getBehaviorController();
+
+  public void addController(IEntityController controller);
+
+  public <T extends IEntityController> void setController(Class<T> clss, T controller);
+
+  public <T extends IEntityController> T getController(Class<T> clss);
+
+  public void detachControllers();
+
+  public void attachControllers();
 
   public Rectangle2D getBoundingBox();
 

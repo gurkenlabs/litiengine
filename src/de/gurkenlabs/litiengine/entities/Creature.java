@@ -27,6 +27,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public Creature(String spritePrefix) {
+    super();
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = movementInfo.velocity();
@@ -41,7 +42,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
 
-    Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
+    this.addController(new CreatureAnimationController<Creature>(this, true));
   }
 
   @Override
@@ -65,7 +66,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @Override
   public IMovementController getMovementController() {
-    return Game.getEntityControllerManager().getMovementController(this);
+    return this.getController(IMovementController.class);
   }
 
   /**
