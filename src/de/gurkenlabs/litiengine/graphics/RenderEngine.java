@@ -426,14 +426,14 @@ public final class RenderEngine implements IRenderEngine {
       }
     }
 
-    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = entity.getAnimationController();
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
       if (img == null) {
         return;
       }
 
-      if (animationController instanceof IEntityAnimationController<?> && ((IEntityAnimationController<?>) animationController).isAutoScaling()) {
+      if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
         renderScaledImage(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);

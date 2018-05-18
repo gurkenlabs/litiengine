@@ -13,7 +13,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
-import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -49,7 +48,6 @@ public final class Game {
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
   private static final GameConfiguration configuration;
-  private static final EntityControllerManager entityControllerManager;
   private static final IRenderEngine graphicsEngine;
 
   private static final List<IMap> maps;
@@ -77,7 +75,6 @@ public final class Game {
     physicsEngine = new PhysicsEngine();
     soundEngine = new SoundEngine();
     metrics = new GameMetrics();
-    entityControllerManager = new EntityControllerManager();
     gameInfo = new GameInfo();
     maps = new CopyOnWriteArrayList<>();
     tilesets = new CopyOnWriteArrayList<>();
@@ -154,10 +151,6 @@ public final class Game {
 
   public static GameConfiguration getConfiguration() {
     return configuration;
-  }
-
-  public static EntityControllerManager getEntityControllerManager() {
-    return entityControllerManager;
   }
 
   public static IEnvironment getEnvironment() {

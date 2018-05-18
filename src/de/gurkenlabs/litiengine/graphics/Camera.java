@@ -84,7 +84,7 @@ public class Camera implements ICamera {
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
 
-    final IAnimationController animationController = Game.getEntityControllerManager().getAnimationController(entity);
+    final IAnimationController animationController = entity.getAnimationController();
     if (animationController == null || animationController.getCurrentAnimation() == null) {
       return new Point2D.Double(viewPortLocation.getX() + entity.getWidth() * 0.5, viewPortLocation.getY() + entity.getHeight() * 0.5);
     }
@@ -93,7 +93,7 @@ public class Camera implements ICamera {
     if (spriteSheet == null) {
       return viewPortLocation;
     }
-    
+
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 

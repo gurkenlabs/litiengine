@@ -82,14 +82,11 @@ public class AnimationController implements IAnimationController {
     Collections.sort(this.getImageEffects());
   }
 
-  @Override
-  public void dispose() {
+  public void detach() {
     Game.getLoop().detach(this);
     for (final Animation animation : this.getAnimations()) {
       Game.getLoop().detach(animation);
     }
-    this.getAnimations().clear();
-    this.getImageEffects().clear();
   }
 
   @Override

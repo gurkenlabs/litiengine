@@ -10,8 +10,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
+import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 @EntityInfo
 public abstract class Entity implements IEntity {
@@ -19,6 +20,8 @@ public abstract class Entity implements IEntity {
   private final List<EntityTransformListener> transformListeners;
   private final Map<String, List<MessageListener>> messageListeners;
   private final List<String> tags;
+
+  private final EntityControllers controllers;
 
   private float angle;
 
@@ -43,6 +46,8 @@ public abstract class Entity implements IEntity {
     this.transformListeners = new CopyOnWriteArrayList<>();
     this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
+
+    this.controllers = new EntityControllers();
 
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
@@ -74,6 +79,14 @@ public abstract class Entity implements IEntity {
   @Override
   public void addTransformListener(EntityTransformListener listener) {
     this.transformListeners.add(listener);
+  }
+
+  public void attachControllers() {
+    this.controllers.attachAll();
+  }
+
+  public void detachControllers() {
+    this.controllers.detachAll();
   }
 
   @Override
@@ -112,8 +125,28 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public IAnimationController getAnimationController() {
-    return Game.getEntityControllerManager().getAnimationController(this);
+  public IEntityAnimationController getAnimationController() {
+    return this.getController(IEntityAnimationController.class);
+  }
+
+  @Override
+  public IBehaviorController getBehaviorController() {
+    return this.getController(IBehaviorController.class);
+  }
+
+  @Override
+  public void addController(IEntityController controller) {
+    this.controllers.addController(controller);
+  }
+  
+  @Override
+  public <T extends IEntityController> void setController(Class<T> clss, T controller) {
+    this.controllers.setController(clss, controller);
+  }
+
+  @Override
+  public <T extends IEntityController> T getController(Class<T> clss) {
+    return this.controllers.getController(clss);
   }
 
   @Override
@@ -302,6 +335,10 @@ public abstract class Entity implements IEntity {
     sb.append(" #");
     sb.append(this.getMapId());
     return sb.toString();
+  }
+
+  protected EntityControllers getControllers() {
+    return this.controllers;
   }
 
   private void fireSizeChangedEvent() {

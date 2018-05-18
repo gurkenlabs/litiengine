@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -26,6 +27,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   public Creature(String spritePrefix) {
+    super();
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
       this.velocity = movementInfo.velocity();
@@ -40,7 +42,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
 
-    Game.getEntityControllerManager().addController(this, new CreatureAnimationController<Creature>(this, true));
+    this.addController(new CreatureAnimationController<Creature>(this, true));
   }
 
   @Override
@@ -60,6 +62,11 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public Point2D getMoveDestination() {
     return this.moveDestination;
+  }
+
+  @Override
+  public IMovementController getMovementController() {
+    return this.getController(IMovementController.class);
   }
 
   /**

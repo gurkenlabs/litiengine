@@ -13,8 +13,6 @@ public interface IAnimationController extends IUpdateable {
 
   public void add(IImageEffect effect);
 
-  public void dispose();
-
   public List<Animation> getAnimations();
 
   public Animation getAnimation(String animationName);

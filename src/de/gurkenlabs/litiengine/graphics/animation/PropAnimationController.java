@@ -9,13 +9,14 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
-public class PropAnimationController extends EntityAnimationController<Prop> {
+public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
   private static final String INTACT = "intact";
 
-  public PropAnimationController(final Prop prop) {
+  public PropAnimationController(final T prop) {
     super(prop);
+    
     this.setDefaultAnimation(this.createAnimation(this.getEntity(), PropState.INTACT));
     this.add(createAnimation(this.getEntity(), PropState.DAMAGED));
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));

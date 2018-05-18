@@ -31,7 +31,6 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
-import de.gurkenlabs.litiengine.entities.ai.IEntityController;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -48,9 +47,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadow;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -1089,12 +1086,13 @@ public class Environment implements IEnvironment {
       if (entity instanceof IUpdateable) {
         Game.getLoop().detach((IUpdateable) entity);
       }
-      Game.getEntityControllerManager().disposeControllers(entity);
+      
+      entity.detachControllers();
     }
   }
 
   /**
-   * Loads the specified entiy by performing the following steps:
+   * Loads the specified entity by performing the following steps:
    * <ol>
    * <li>add to physics engine</li>
    * <li>register entity for update</li>
@@ -1112,25 +1110,8 @@ public class Environment implements IEnvironment {
     // 2. register for update or activate
     this.loadUpdatableOrEmitterEntity(entity);
 
-    // 3. register animation controller for update
-    final IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
-    if (animation != null) {
-      Game.getLoop().attach(animation);
-    }
-
-    // 4. register movement controller for update
-    if (entity instanceof IMobileEntity) {
-      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
-      if (movementController != null) {
-        Game.getLoop().attach(movementController);
-      }
-    }
-
-    // 5. register ai controller for update
-    final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
-    if (controller != null) {
-      Game.getLoop().attach(controller);
-    }
+    // 3. attach all controllers
+    entity.attachControllers();
 
     if (entity instanceof LightSource || entity instanceof StaticShadow) {
       this.updateColorLayers(entity);
@@ -1218,26 +1199,9 @@ public class Environment implements IEnvironment {
     if (entity instanceof IUpdateable) {
       Game.getLoop().detach((IUpdateable) entity);
     }
-
-    // 3. unregister ai controller from update
-    final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
-    if (controller != null) {
-      Game.getLoop().detach(controller);
-    }
-
-    // 4. unregister animation controller from update
-    final IAnimationController animation = Game.getEntityControllerManager().getAnimationController(entity);
-    if (animation != null) {
-      Game.getLoop().detach(animation);
-    }
-
-    // 5. unregister movement controller from update
-    if (entity instanceof IMobileEntity) {
-      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
-      if (movementController != null) {
-        Game.getLoop().detach(movementController);
-      }
-    }
+    
+    // 3. detach all controllers
+    entity.detachControllers();
 
     if (entity instanceof Emitter) {
       Emitter em = (Emitter) entity;
