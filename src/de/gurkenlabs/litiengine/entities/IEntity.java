@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 public interface IEntity {
   public void addMessageListener(MessageListener listener);
@@ -20,7 +20,7 @@ public interface IEntity {
 
   public float getAngle();
 
-  public IAnimationController getAnimationController();
+  public IEntityAnimationController<? extends IEntity> getAnimationController();
 
   public Rectangle2D getBoundingBox();
 

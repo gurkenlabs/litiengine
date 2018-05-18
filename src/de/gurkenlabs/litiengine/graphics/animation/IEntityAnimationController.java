@@ -24,4 +24,8 @@ public interface IEntityAnimationController<T extends IEntity> extends IAnimatio
   public boolean isAutoScaling();
 
   public void setAutoScaling(boolean scaling);
+  
+  public void scaleSprite(float scaleX, float scaleY);
+  
+  public void scaleSprite(float scale);
 }

@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 
 /**
@@ -14,12 +15,12 @@ import de.gurkenlabs.litiengine.physics.IMovementController;
  * a single hub to access and manage all the controllers.
  */
 public class EntityControllerManager {
-  private final Map<IEntity, IEntityController<? extends IEntity>> aiControllers;
-  private final Map<IEntity, IAnimationController> animationControllers;
+  private final Map<IEntity, IBehaviorController<? extends IEntity>> behaviorControllers;
+  private final Map<IEntity, IEntityAnimationController<? extends IEntity>> animationControllers;
   private final Map<IEntity, IMovementController<? extends IMobileEntity>> movementControllers;
 
   public EntityControllerManager() {
-    this.aiControllers = new ConcurrentHashMap<>();
+    this.behaviorControllers = new ConcurrentHashMap<>();
     this.animationControllers = new ConcurrentHashMap<>();
     this.movementControllers = new ConcurrentHashMap<>();
   }
@@ -33,7 +34,7 @@ public class EntityControllerManager {
    * @param controller
    *          The {@link IAnimationController} that is added to this manager.
    */
-  public void addController(final IEntity entity, final IAnimationController controller) {
+  public <T extends IEntity> void addController(final T entity, final IEntityAnimationController<T> controller) {
     if (entity == null || controller == null) {
       return;
     }
@@ -45,16 +46,16 @@ public class EntityControllerManager {
     this.animationControllers.put(entity, controller);
   }
 
-  public <T extends IEntity> void addController(final T entity, final IEntityController<T> controller) {
+  public <T extends IEntity> void addController(final T entity, final IBehaviorController<T> controller) {
     if (entity == null || controller == null) {
       return;
     }
 
-    if (this.aiControllers.containsKey(entity)) {
-      Game.getLoop().detach(this.getAIController(entity));
+    if (this.behaviorControllers.containsKey(entity)) {
+      Game.getLoop().detach(this.getBehaviorController(entity));
     }
 
-    this.aiControllers.put(entity, controller);
+    this.behaviorControllers.put(entity, controller);
   }
 
   public <T extends IMobileEntity> void addController(final T entity, final IMovementController<T> controller) {
@@ -70,11 +71,11 @@ public class EntityControllerManager {
   }
 
   public void disposeControllers(final IEntity entity) {
-    final IEntityController<? extends IEntity> aiController = this.getAIController(entity);
+    final IBehaviorController<? extends IEntity> aiController = this.getBehaviorController(entity);
     if (aiController != null) {
 
       Game.getLoop().detach(aiController);
-      this.aiControllers.remove(entity);
+      this.behaviorControllers.remove(entity);
     }
 
     if (entity instanceof IMobileEntity) {
@@ -93,15 +94,15 @@ public class EntityControllerManager {
     }
   }
 
-  public IEntityController<? extends IEntity> getAIController(final IEntity entity) {
-    if (this.aiControllers.containsKey(entity)) {
-      return this.aiControllers.get(entity);
+  public IBehaviorController<? extends IEntity> getBehaviorController(final IEntity entity) {
+    if (this.behaviorControllers.containsKey(entity)) {
+      return this.behaviorControllers.get(entity);
     }
 
     return null;
   }
 
-  public IAnimationController getAnimationController(final IEntity entity) {
+  public IEntityAnimationController<? extends IEntity> getAnimationController(final IEntity entity) {
     if (this.animationControllers.containsKey(entity)) {
       return this.animationControllers.get(entity);
     }

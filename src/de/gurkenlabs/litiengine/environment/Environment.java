@@ -31,7 +31,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
-import de.gurkenlabs.litiengine.entities.ai.IEntityController;
+import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -1127,7 +1127,7 @@ public class Environment implements IEnvironment {
     }
 
     // 5. register ai controller for update
-    final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
+    final IBehaviorController<? extends IEntity> controller = Game.getEntityControllerManager().getBehaviorController(entity);
     if (controller != null) {
       Game.getLoop().attach(controller);
     }
@@ -1220,7 +1220,7 @@ public class Environment implements IEnvironment {
     }
 
     // 3. unregister ai controller from update
-    final IEntityController<? extends IEntity> controller = Game.getEntityControllerManager().getAIController(entity);
+    final IBehaviorController<? extends IEntity> controller = Game.getEntityControllerManager().getBehaviorController(entity);
     if (controller != null) {
       Game.getLoop().detach(controller);
     }

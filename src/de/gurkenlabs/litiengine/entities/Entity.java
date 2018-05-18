@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 @EntityInfo
 public abstract class Entity implements IEntity {
@@ -112,7 +112,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public IAnimationController getAnimationController() {
+  public IEntityAnimationController<? extends IEntity> getAnimationController() {
     return Game.getEntityControllerManager().getAnimationController(this);
   }
 
