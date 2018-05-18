@@ -16,12 +16,10 @@ public final class EntityControllers {
 
   @SuppressWarnings("unchecked")
   public <T extends IEntityController> T getController(Class<T> clss) {
-    // if there's an exact match, return it
-    if (this.controllers.containsKey(clss)) {
-      IEntityController controller = this.controllers.get(clss);
-      if (controller != null && clss.isInstance(controller)) {
-        return (T) this.controllers.get(clss);
-      }
+
+    T explicitController = this.getExplicitController(clss);
+    if (explicitController != null) {
+      return explicitController;
     }
 
     // else check for controllers that are an instance of the specified class and return the first
@@ -61,5 +59,18 @@ public final class EntityControllers {
 
   public void clear() {
     this.controllers.clear();
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IEntityController> T getExplicitController(Class<T> clss) {
+    // if there's an exact match, return it
+    if (this.controllers.containsKey(clss)) {
+      IEntityController controller = this.controllers.get(clss);
+      if (controller != null && clss.isInstance(controller)) {
+        return (T) this.controllers.get(clss);
+      }
+    }
+
+    return null;
   }
 }
