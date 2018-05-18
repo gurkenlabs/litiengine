@@ -7,7 +7,7 @@ import java.util.EventObject;
  * 
  * @see IEntity#sendMessage(Object, String)
  */
-public class MessageEvent extends EventObject {
+public class MessageEvent extends EventObject implements IEntityProvider {
   private static final long serialVersionUID = 5131621546037429725L;
   private final transient IEntity entity;
   private final String message;
@@ -23,6 +23,7 @@ public class MessageEvent extends EventObject {
    * 
    * @return The entity that received the message.
    */
+  @Override
   public IEntity getEntity() {
     return this.entity;
   }

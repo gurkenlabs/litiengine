@@ -433,7 +433,7 @@ public final class RenderEngine implements IRenderEngine {
         return;
       }
 
-      if (animationController instanceof IEntityAnimationController<?> && ((IEntityAnimationController<?>) animationController).isAutoScaling()) {
+      if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
         renderScaledImage(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.entities;
 import java.util.EventObject;
 import java.util.List;
 
-public class TriggerEvent extends EventObject {
+public class TriggerEvent extends EventObject implements IEntityProvider {
   private static final long serialVersionUID = 3624707673365488289L;
 
   private final transient IEntity entity;
@@ -19,6 +19,7 @@ public class TriggerEvent extends EventObject {
     this.entity = entity;
   }
 
+  @Override
   public IEntity getEntity() {
     return this.entity;
   }

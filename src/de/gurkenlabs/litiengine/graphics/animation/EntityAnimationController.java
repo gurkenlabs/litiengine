@@ -15,8 +15,8 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
-public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController<T> {
-  private final Map<Predicate<T>, Function<T, String>> animationRules;
+public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController {
+  private final Map<Predicate<IEntity>, Function<IEntity, String>> animationRules;
   private final T entity;
   private String spritePrefix;
   private boolean autoScaling;
@@ -57,7 +57,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void addAnimationRule(Predicate<T> rule, Function<T, String> animationName) {
+  public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
     this.animationRules.put(rule, animationName);
   }
 
@@ -82,7 +82,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return;
     }
 
-    for (Entry<Predicate<T>, Function<T, String>> animationRule : this.animationRules.entrySet()) {
+    for (Entry<Predicate<IEntity>, Function<IEntity, String>> animationRule : this.animationRules.entrySet()) {
       if (animationRule.getKey().test(this.getEntity())) {
         final String animationName = animationRule.getValue().apply(this.getEntity());
         if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {

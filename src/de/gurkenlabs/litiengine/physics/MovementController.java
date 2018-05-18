@@ -10,11 +10,11 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public class MovementController<T extends IMobileEntity> implements IMovementController<T> {
+public class MovementController<T extends IMobileEntity> implements IMovementController {
   private static final double FORCE_APPLY_ACCEPTED_ERROR = 0.1;
   private final List<Force> activeForces;
   private final T mobileEntity;
-  private final List<Predicate<T>> movementPredicates;
+  private final List<Predicate<IMobileEntity>> movementPredicates;
   private final List<Consumer<Point2D>> movedConsumer;
 
   public MovementController(final T mobileEntity) {
@@ -42,7 +42,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   @Override
-  public void onMovementCheck(final Predicate<T> predicate) {
+  public void onMovementCheck(final Predicate<IMobileEntity> predicate) {
     if (!this.movementPredicates.contains(predicate)) {
       this.movementPredicates.add(predicate);
     }
@@ -70,7 +70,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   protected boolean isMovementAllowed() {
-    for (final Predicate<T> predicate : this.movementPredicates) {
+    for (final Predicate<IMobileEntity> predicate : this.movementPredicates) {
       if (!predicate.test(this.getEntity())) {
         return false;
       }

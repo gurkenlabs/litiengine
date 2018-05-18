@@ -3,12 +3,13 @@ package de.gurkenlabs.litiengine.graphics.particles;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
 
 /**
  * An abstract implementation for emitters that are bound to
  * {@link de.gurkenlabs.litiengine.entities.IEntity#getLocation()}.
  */
-public abstract class EntityEmitter extends Emitter implements IEntityEmitter {
+public abstract class EntityEmitter extends Emitter implements IEntityProvider {
 
   /** The entity. */
   private final IEntity entity;

@@ -20,7 +20,7 @@ public interface IEntity {
 
   public float getAngle();
 
-  public IEntityAnimationController<? extends IEntity> getAnimationController();
+  public IEntityAnimationController getAnimationController();
 
   public Rectangle2D getBoundingBox();
 

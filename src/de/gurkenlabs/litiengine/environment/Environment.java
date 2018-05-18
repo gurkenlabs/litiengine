@@ -1120,14 +1120,14 @@ public class Environment implements IEnvironment {
 
     // 4. register movement controller for update
     if (entity instanceof IMobileEntity) {
-      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
+      final IMovementController movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().attach(movementController);
       }
     }
 
     // 5. register ai controller for update
-    final IBehaviorController<? extends IEntity> controller = Game.getEntityControllerManager().getBehaviorController(entity);
+    final IBehaviorController controller = Game.getEntityControllerManager().getBehaviorController(entity);
     if (controller != null) {
       Game.getLoop().attach(controller);
     }
@@ -1220,7 +1220,7 @@ public class Environment implements IEnvironment {
     }
 
     // 3. unregister ai controller from update
-    final IBehaviorController<? extends IEntity> controller = Game.getEntityControllerManager().getBehaviorController(entity);
+    final IBehaviorController controller = Game.getEntityControllerManager().getBehaviorController(entity);
     if (controller != null) {
       Game.getLoop().detach(controller);
     }
@@ -1233,7 +1233,7 @@ public class Environment implements IEnvironment {
 
     // 5. unregister movement controller from update
     if (entity instanceof IMobileEntity) {
-      final IMovementController<? extends IMobileEntity> movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
+      final IMovementController movementController = Game.getEntityControllerManager().getMovementController((IMobileEntity) entity);
       if (movementController != null) {
         Game.getLoop().detach(movementController);
       }

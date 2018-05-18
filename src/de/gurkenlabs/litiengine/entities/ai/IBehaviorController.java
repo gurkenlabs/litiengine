@@ -1,9 +1,7 @@
 package de.gurkenlabs.litiengine.entities.ai;
 
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
 
-public interface IBehaviorController<T extends IEntity> extends IUpdateable {
-
-  public T getEntity();
+public interface IBehaviorController extends IUpdateable, IEntityProvider {
 }

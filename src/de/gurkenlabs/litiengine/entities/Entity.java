@@ -112,7 +112,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public IEntityAnimationController<? extends IEntity> getAnimationController() {
+  public IEntityAnimationController getAnimationController() {
     return Game.getEntityControllerManager().getAnimationController(this);
   }
 

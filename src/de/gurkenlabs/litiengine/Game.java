@@ -13,7 +13,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
-import de.gurkenlabs.litiengine.entities.ai.EntityControllerManager;
+import de.gurkenlabs.litiengine.entities.EntityControllerManager;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;

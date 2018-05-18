@@ -5,12 +5,12 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.graphics.particles.IEntityEmitter;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 @EntityInfo(renderType = RenderType.OVERLAY)
-public class CustomEntityEmitter extends CustomEmitter implements IEntityEmitter {
+public class CustomEntityEmitter extends CustomEmitter implements IEntityProvider {
   private final IEntity entity;
 
   public CustomEntityEmitter(final IEntity entity, final String emitterXml) {
