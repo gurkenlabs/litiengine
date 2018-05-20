@@ -1,5 +1,12 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import de.gurkenlabs.litiengine.environment.IEnvironment;
+
+/**
+ * The RenderType defines how and when something is being rendered by the rendering pipeline of the <code>Environment</code>.
+ * 
+ * @see IEnvironment#render(java.awt.Graphics2D)
+ */
 public enum RenderType {
   NONE(-1), BACKGROUND(0), GROUND(1), SURFACE(2), NORMAL(3), OVERLAY(4), UI(5);
 
