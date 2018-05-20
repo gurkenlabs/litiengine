@@ -78,16 +78,20 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
   private static boolean shouldBeRendered(ILayer layer, RenderType[] renderTypes) {
     if (renderTypes == null || renderTypes.length == 0) {
-      return layer.isVisible() && layer.getOpacity() > 0;
+      return isVisible(layer);
     }
 
     for (RenderType alloc : renderTypes) {
       if (alloc == layer.getRenderType()) {
-        return layer.isVisible() && layer.getOpacity() > 0;
+        return isVisible(layer);
       }
     }
 
     return false;
+  }
+
+  private static boolean isVisible(ILayer layer) {
+    return layer.isVisible() && layer.getOpacity() > 0;
   }
 
   /**

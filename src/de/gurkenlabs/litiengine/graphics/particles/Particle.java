@@ -8,13 +8,10 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public abstract class Particle implements ITimeToLive {
-  public enum ParticleRenderType {
-    NONE, EMITTER, GROUND, OVERLAY
-  }
-
   private long aliveTick;
   private long aliveTime;
   private CollisionType collisionType;
@@ -46,7 +43,8 @@ public abstract class Particle implements ITimeToLive {
   /** The current location of the particle on the Y-axis. */
   private float y;
 
-  private ParticleRenderType particleRenderType;
+  private RenderType customRenderType;
+  private boolean useCustomRenderType;
 
   private float opacity;
 
@@ -71,7 +69,7 @@ public abstract class Particle implements ITimeToLive {
    *          The color of the effect.
    */
   public Particle(final float width, final float height, final Color color, final int ttl) {
-    this.setParticleRenderType(ParticleRenderType.EMITTER);
+    this.setCustomRenderType(RenderType.NONE);
     this.setWidth(width);
     this.setHeight(height);
     this.timeToLive = ttl;
@@ -145,8 +143,8 @@ public abstract class Particle implements ITimeToLive {
     return this.getRelativeLocation(newEffectLocation);
   }
 
-  public ParticleRenderType getParticleRenderType() {
-    return particleRenderType;
+  public RenderType getCustomRenderType() {
+    return this.customRenderType;
   }
 
   @Override
@@ -265,8 +263,9 @@ public abstract class Particle implements ITimeToLive {
     return this;
   }
 
-  public Particle setParticleRenderType(ParticleRenderType particleRenderType) {
-    this.particleRenderType = particleRenderType;
+  public Particle setCustomRenderType(RenderType renderType) {
+    this.customRenderType = renderType;
+    this.useCustomRenderType = true;
     return this;
   }
 
@@ -390,5 +389,9 @@ public abstract class Particle implements ITimeToLive {
 
   protected float getOpacity() {
     return this.opacity;
+  }
+
+  public boolean usesCustomRenderType() {
+    return this.useCustomRenderType;
   }
 }

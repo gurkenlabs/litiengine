@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -187,9 +188,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
-      this.getRenderables(RenderType.GROUND).add(emitter.getGroundRenderable());
-      this.getRenderables(RenderType.OVERLAY).add(emitter.getOverlayRenderable());
-      this.emitters.add(emitter);
+      this.addEmitter(emitter);
     }
 
     if (entity instanceof ICombatEntity) {
@@ -258,6 +257,31 @@ public class Environment implements IEnvironment {
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
 
     this.fireEntityEvent(l -> l.entityAdded(entity));
+  }
+
+  private void addEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.add(instance));
+    this.emitters.add(emitter);
+  }
+
+  private void removeEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.remove(instance));
+    this.emitters.remove(emitter);
+  }
+
+  private void manageEmitterRenderables(Emitter emitter, BiConsumer<Collection<IRenderable>, IRenderable> cons) {
+    for (RenderType renderType : RenderType.values()) {
+      if (renderType == RenderType.NONE) {
+        continue;
+      }
+
+      IRenderable renderable = emitter.getRenderable(renderType);
+      if (renderable != null) {
+        cons.accept(this.getRenderables(renderType), renderable);
+      }
+    }
+
+    this.emitters.remove(emitter);
   }
 
   private void updateColorLayers(IEntity entity) {
@@ -807,9 +831,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
-      this.getRenderables(RenderType.GROUND).remove(emitter.getGroundRenderable());
-      this.getRenderables(RenderType.OVERLAY).remove(emitter.getOverlayRenderable());
-      this.emitters.remove(emitter);
+      this.removeEmitter(emitter);
     }
 
     if (entity instanceof MapArea) {
@@ -894,9 +916,9 @@ public class Environment implements IEnvironment {
 
     StringBuilder renderDetails = new StringBuilder();
     long renderStart = System.nanoTime();
-    
+
     renderDetails.append(this.render(g, RenderType.BACKGROUND));
-    
+
     renderDetails.append(this.render(g, RenderType.GROUND));
     if (Game.getConfiguration().debug().isDebug()) {
       DebugRenderer.renderMapDebugInfo(g, this.getMap());
