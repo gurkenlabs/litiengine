@@ -8,9 +8,6 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -23,16 +20,17 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class OrthogonalMapRenderer implements IMapRenderer {
 
   @Override
-  public BufferedImage getMapImage(final IMap map) {
-    if (ImageCache.MAPS.containsKey(getCacheKey(map))) {
-      return ImageCache.MAPS.get(getCacheKey(map));
+  public BufferedImage getImage(IMap map, RenderType... renderTypes) {
+    final String cacheKey = getCacheKey(map) + "_" + renderTypes;
+    if (ImageCache.MAPS.containsKey(cacheKey)) {
+      return ImageCache.MAPS.get(cacheKey);
     }
 
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null || layer.getRenderType() == RenderType.OVERLAY || !layer.isVisible() || layer.getOpacity() == 0) {
+      if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
       }
 
@@ -41,30 +39,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     g.dispose();
 
-    ImageCache.MAPS.put(getCacheKey(map), img);
-    return img;
-  }
-
-  @Override
-  public BufferedImage getMapImageWithOverlayLayers(final IMap map) {
-    if (ImageCache.MAPS.containsKey(getCacheKey(map))) {
-      return ImageCache.MAPS.get(getCacheKey(map));
-    }
-
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
-
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null || !layer.isVisible() || layer.getOpacity() == 0) {
-        continue;
-      }
-
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map, true), layer.getPosition());
-    }
-
-    g.dispose();
-
-    ImageCache.MAPS.put(getCacheKey(map), img);
+    ImageCache.MAPS.put(cacheKey, img);
     return img;
   }
 
@@ -74,21 +49,20 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
-  public void renderImage(final Graphics2D g, final IMap map) {
-    this.renderImage(g, map, 0, 0);
+  public void render(final Graphics2D g, final IMap map, RenderType... renderTypes) {
+    this.render(g, map, 0, 0, renderTypes);
   }
 
   @Override
-  public void renderImage(final Graphics2D g, final IMap map, final double offsetX, final double offsetY) {
-    final BufferedImage mapImage = this.getMapImage(map);
+  public void render(final Graphics2D g, final IMap map, final double offsetX, final double offsetY, RenderType... renderTypes) {
+    final BufferedImage mapImage = this.getImage(map, renderTypes);
     RenderEngine.renderImage(g, mapImage, offsetX, offsetY);
   }
 
   @Override
-  public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
-
-    for (final ILayer layer : this.getAllRenderLayers(map)) {
-      if (layer == null || layer.getRenderType() == RenderType.OVERLAY) {
+  public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
+    for (final ILayer layer : map.getRenderLayers()) {
+      if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
       }
 
@@ -102,15 +76,22 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
   }
 
-  @Override
-  public void renderOverlay(final Graphics2D g, final IMap map, final Rectangle2D viewport) {
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null || layer.getRenderType() != RenderType.OVERLAY) {
-        continue;
-      }
-
-      this.renderTileLayerImage(g, layer, map, viewport);
+  private static boolean shouldBeRendered(ILayer layer, RenderType[] renderTypes) {
+    if (renderTypes == null || renderTypes.length == 0) {
+      return isVisible(layer);
     }
+
+    for (RenderType alloc : renderTypes) {
+      if (alloc == layer.getRenderType()) {
+        return isVisible(layer);
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean isVisible(ILayer layer) {
+    return layer.isVisible() && layer.getOpacity() > 0;
   }
 
   /**
@@ -125,7 +106,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {
-
     if (tile == null) {
       return null;
     }
@@ -181,20 +161,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     }
 
     return tileImage;
-  }
-
-  private List<ILayer> getAllRenderLayers(IMap map) {
-    ArrayList<ILayer> layers = new ArrayList<>();
-    for (ITileLayer tileLayer : map.getTileLayers()) {
-      layers.add(tileLayer);
-    }
-
-    for (IImageLayer imageLayer : map.getImageLayers()) {
-      layers.add(imageLayer);
-    }
-    layers.sort(Comparator.comparing(ILayer::getOrder));
-
-    return layers;
   }
 
   /**
@@ -291,10 +257,6 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
-    if (!layer.isVisible() || layer.getOpacity() == 0) {
-      return;
-    }
-
     Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
     if (sprite == null) {
       return;

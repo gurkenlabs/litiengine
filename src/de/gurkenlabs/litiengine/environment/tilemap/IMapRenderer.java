@@ -4,28 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-/**
- * The Interface IMapRenderer.
- */
-public interface IMapRenderer {
-  /**
-   * Gets the map image.
-   *
-   * @param map
-   *          the map
-   * @return the map image
-   */
-  public BufferedImage getMapImage(IMap map);
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
-  /**
-   * Gets the map image with all layers, including overlay layers (Useful for minimaps, for example). 
-   *
-   * @param map
-   *          the map
-   * @return the map image
-   */
-  public BufferedImage getMapImageWithOverlayLayers(IMap map);
-  
+public interface IMapRenderer {
+  public BufferedImage getImage(IMap map, RenderType... renderTypes);
+
   /**
    * Gets the supported orientation.
    *
@@ -34,21 +17,23 @@ public interface IMapRenderer {
   public MapOrientation getSupportedOrientation();
 
   /**
-   * Renders the entire map (without overlay layers) onto the specified graphics
-   * object. The resulting map image of this method is cached and therefore
-   * animation of tiles is not supported, using this method.
+   * Renders all layers of the specified <code>Map</code> onto the graphics object that meet the specified render types.
    *
    * @param g
    *          the graphics object
    * @param map
    *          the map
+   * @param renderTypes
+   *          All layers that have one of the specified render types will be rendered.
+   *          If nothing is specified, layers will be rendered independently of their render type.
+   * 
+   * @see ILayer#getRenderType()
+   * 
    */
-  public void renderImage(Graphics2D g, IMap map);
+  public void render(Graphics2D g, IMap map, RenderType... renderTypes);
 
   /**
-   * Renders the entire map (without overlay layers) onto the specified graphics
-   * object. The resulting map image of this method is cached and therefore
-   * animation of tiles is not supported, using this method.
+   * Renders all layers of the specified <code>Map</code> onto the graphics object that meet the specified render types.
    *
    * @param g
    *          the graphics object
@@ -60,14 +45,28 @@ public interface IMapRenderer {
    * @param offsetY
    *          The vertical offset in pixels for the map image that is applied
    *          when rendering on the graphics object.
+   * @param renderTypes
+   *          All layers that have one of the specified render types will be rendered.
+   *          If nothing is specified, layers will be rendered independently of their render type.
+   * 
+   * @see ILayer#getRenderType()
    */
-  public void renderImage(Graphics2D g, IMap map, double offsetX, double offsetY);
+  public void render(Graphics2D g, IMap map, double offsetX, double offsetY, RenderType... renderTypes);
 
-  /*
-   * Renders all layers (without the overlay layers) of the specified map. The
-   * viewport defines the region of the map that is about to be rendered.
+  /**
+   * Renders all layers of the specified <code>Map</code> onto the graphics object that meet the specified render types.
+   * 
+   * @param g
+   *          the graphics object
+   * @param map
+   *          the map
+   * @param viewport
+   *          The viewport that defines the bound for the tiles to be rendered.
+   * @param renderTypes
+   *          All layers that have one of the specified render types will be rendered.
+   *          If nothing is specified, layers will be rendered independently of their render type.
+   * 
+   * @see ILayer#getRenderType()
    */
-  public void render(Graphics2D g, IMap map, Rectangle2D viewport);
-
-  public void renderOverlay(Graphics2D g, IMap map, Rectangle2D viewport);
+  public void render(Graphics2D g, IMap map, Rectangle2D viewport, RenderType... renderTypes);
 }

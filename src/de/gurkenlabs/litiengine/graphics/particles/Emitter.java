@@ -6,7 +6,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -22,7 +24,7 @@ import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.particles.Particle.ParticleRenderType;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 /**
  * An abstract implementation for emitters that provide a particle effect.
@@ -59,16 +61,21 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private Valign originValign;
   private Align originAlign;
 
-  private IRenderable groundRenderable;
-  private IRenderable overlayRenderable;
+  private Map<RenderType, IRenderable> renderables;
 
   public Emitter() {
     this.colors = new ArrayList<>();
     this.finishedConsumer = new CopyOnWriteArrayList<>();
     this.particles = new CopyOnWriteArrayList<>();
+    this.renderables = new ConcurrentHashMap<>();
 
-    this.groundRenderable = g -> renderParticles(g, ParticleRenderType.GROUND);
-    this.overlayRenderable = g -> renderParticles(g, ParticleRenderType.OVERLAY);
+    for (RenderType type : RenderType.values()) {
+      if (type == RenderType.NONE) {
+        continue;
+      }
+
+      this.renderables.put(type, g -> renderParticles(g, type));
+    }
 
     final EmitterInfo info = this.getClass().getAnnotation(EmitterInfo.class);
     if (info != null) {
@@ -155,10 +162,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.colors;
   }
 
-  public IRenderable getGroundRenderable() {
-    return this.groundRenderable;
-  }
-
   public Point2D getOrigin() {
     return new Point2D.Double(this.getX() + this.getOriginAlign().getValue(this.getWidth()), this.getY() + this.getOriginValign().getValue(this.getHeight()));
   }
@@ -171,8 +174,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     return this.originValign;
   }
 
-  public IRenderable getOverlayRenderable() {
-    return this.overlayRenderable;
+  public IRenderable getRenderable(RenderType type) {
+    if (type == RenderType.NONE) {
+      return null;
+    }
+
+    return this.renderables.get(type);
   }
 
   /**
@@ -270,7 +277,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   @Override
   public void render(final Graphics2D g) {
-    this.renderParticles(g, ParticleRenderType.EMITTER);
+    this.renderParticles(g, RenderType.NONE);
 
     if (Game.getConfiguration().debug().renderHitBoxes()) {
       DebugRenderer.renderEntityDebugInfo(g, this);
@@ -478,18 +485,19 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
   }
 
-  private void renderParticles(final Graphics2D g, final ParticleRenderType renderType) {
+  private void renderParticles(final Graphics2D g, final RenderType renderType) {
     if (Game.getConfiguration().graphics().getGraphicQuality().getValue() < this.getRequiredQuality().getValue()) {
       return;
     }
-    
+
     if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewPort().intersects(this.getBoundingBox())) {
       return;
     }
 
     final Point2D origin = this.getOrigin();
     for (Particle particle : this.particles) {
-      if (particle.getParticleRenderType() == renderType) {
+      if (!particle.usesCustomRenderType() && renderType == RenderType.NONE
+          || particle.usesCustomRenderType() && particle.getCustomRenderType() == renderType) {
         particle.render(g, origin);
       }
     }

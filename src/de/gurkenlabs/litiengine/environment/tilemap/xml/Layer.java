@@ -46,7 +46,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @XmlAttribute
   private Integer offsety;
 
-  private transient RenderType renderType = RenderType.NONE;
+  private transient RenderType renderType;
+  private boolean renderTypeLoaded;
 
   /**
    * Gets the height.
@@ -99,7 +100,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @Override
   public RenderType getRenderType() {
-    if (this.renderType != RenderType.NONE) {
+    if (this.renderTypeLoaded) {
       return this.renderType;
     }
 
@@ -107,9 +108,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
       this.renderType = RenderType.valueOf(renderTypeProp);
     } else {
-      this.renderType = RenderType.NORMAL;
+      this.renderType = RenderType.GROUND;
     }
 
+    this.renderTypeLoaded = true;
     return this.renderType;
   }
 
@@ -160,9 +162,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     int order = this.getCustomPropertyInt(LayerProperty.LAYER_ORDER, -1);
     if (order == -1 && parent instanceof Map) {
       Map map = (Map) parent;
-      int layerCnt = map.getTileLayers().size();
-      layerCnt += map.getImageLayers().size();
-      layerCnt += map.getTileLayers().size();
+      int layerCnt = map.getRawImageLayers().size();
+      layerCnt += map.getRawMapObjectLayers().size();
+      layerCnt += map.getRawTileLayers().size();
       this.setOrder(layerCnt);
     }
 

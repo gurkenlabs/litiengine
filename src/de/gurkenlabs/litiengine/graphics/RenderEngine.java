@@ -36,7 +36,6 @@ public final class RenderEngine implements IRenderEngine {
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
   private final List<Predicate<IEntity>> entityRenderingConditions;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-  private final List<Consumer<RenderEvent<IMap>>> mapRenderedConsumer;
   private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
   private float baseRenderScale;
@@ -45,7 +44,6 @@ public final class RenderEngine implements IRenderEngine {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderedConsumer = new CopyOnWriteArrayList<>();
     this.mapRenderer = new EnumMap<>(MapOrientation.class);
     this.entityComparator = new EntityYComparator();
 
@@ -327,13 +325,6 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void onMapRendered(final Consumer<RenderEvent<IMap>> map) {
-    if (!this.mapRenderedConsumer.contains(map)) {
-      this.mapRenderedConsumer.add(map);
-    }
-  }
-
-  @Override
   public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
@@ -457,27 +448,13 @@ public final class RenderEngine implements IRenderEngine {
   }
 
   @Override
-  public void renderLayers(final Graphics2D g, final IMap map, final RenderType type) {
+  public void render(final Graphics2D g, final IMap map, final RenderType... renderTypes) {
     if (map == null) {
       return;
     }
 
-    // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).renderOverlay(g, map, Game.getCamera().getViewPort());
-  }
-
-  @Override
-  public void renderMap(final Graphics2D g, final IMap map) {
-    if (map == null) {
-      return;
-    }
-
-    // draw tile layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort());
-
-    for (final Consumer<RenderEvent<IMap>> consumer : this.mapRenderedConsumer) {
-      consumer.accept(new RenderEvent<>(g, map));
-    }
+    // draw layers
+    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort(), renderTypes);
   }
 
   @Override

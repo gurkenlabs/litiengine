@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -41,6 +42,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
+import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -61,13 +63,11 @@ public class Environment implements IEnvironment {
   private final Map<RenderType, Map<Integer, IEntity>> entities;
   private final Map<String, List<IEntity>> entitiesByTag;
 
-  private final List<EnvironmentRenderListener> renderListeners;
+  private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners;
   private final List<EnvironmentListener> listeners;
   private final List<EnvironmentEntityListener> entityListeners;
 
-  private final Collection<IRenderable> groundRenderable;
-  private final Collection<IRenderable> overlayRenderable;
-  private final Collection<IRenderable> uiRenderable;
+  private final Map<RenderType, Collection<IRenderable>> renderables;
   private final Collection<CollisionBox> colliders;
   private final Collection<LightSource> lightSources;
   private final Collection<StaticShadow> staticShadows;
@@ -116,11 +116,6 @@ public class Environment implements IEnvironment {
   private Environment() {
     this.entitiesByTag = new ConcurrentHashMap<>();
     this.entities = new ConcurrentHashMap<>();
-    this.entities.put(RenderType.NONE, new ConcurrentHashMap<>());
-    this.entities.put(RenderType.GROUND, new ConcurrentHashMap<>());
-    this.entities.put(RenderType.NORMAL, new ConcurrentHashMap<>());
-    this.entities.put(RenderType.OVERLAY, new ConcurrentHashMap<>());
-    this.entities.put(RenderType.UI, new ConcurrentHashMap<>());
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.mobileEntities = new ConcurrentHashMap<>();
@@ -135,23 +130,29 @@ public class Environment implements IEnvironment {
     this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
     this.spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<Spawnpoint, Boolean>());
 
-    this.groundRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
-    this.overlayRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
-    this.uiRenderable = Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>());
+    this.renderables = new ConcurrentHashMap<>();
 
-    this.renderListeners = new CopyOnWriteArrayList<>();
+    this.renderListeners = new ConcurrentHashMap<>();
     this.listeners = new CopyOnWriteArrayList<>();
     this.entityListeners = new CopyOnWriteArrayList<>();
+
+    for (RenderType renderType : RenderType.values()) {
+      this.entities.put(renderType, new ConcurrentHashMap<>());
+      this.renderListeners.put(renderType, Collections.newSetFromMap(new ConcurrentHashMap<EnvironmentRenderListener, Boolean>()));
+      this.renderables.put(renderType, Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>()));
+    }
   }
 
   @Override
-  public void addRenderListener(EnvironmentRenderListener listener) {
-    this.renderListeners.add(listener);
+  public void addRenderListener(RenderType renderType, EnvironmentRenderListener listener) {
+    this.renderListeners.get(renderType).add(listener);
   }
 
   @Override
   public void removeRenderListener(EnvironmentRenderListener listener) {
-    this.renderListeners.remove(listener);
+    for (Collection<EnvironmentRenderListener> rends : this.renderListeners.values()) {
+      rends.remove(listener);
+    }
   }
 
   @Override
@@ -187,9 +188,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
-      this.getGroundRenderables().add(emitter.getGroundRenderable());
-      this.getOverlayRenderables().add(emitter.getOverlayRenderable());
-      this.emitters.add(emitter);
+      this.addEmitter(emitter);
     }
 
     if (entity instanceof ICombatEntity) {
@@ -260,6 +259,31 @@ public class Environment implements IEnvironment {
     this.fireEntityEvent(l -> l.entityAdded(entity));
   }
 
+  private void addEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.add(instance));
+    this.emitters.add(emitter);
+  }
+
+  private void removeEmitter(Emitter emitter) {
+    this.manageEmitterRenderables(emitter, (rends, instance) -> rends.remove(instance));
+    this.emitters.remove(emitter);
+  }
+
+  private void manageEmitterRenderables(Emitter emitter, BiConsumer<Collection<IRenderable>, IRenderable> cons) {
+    for (RenderType renderType : RenderType.values()) {
+      if (renderType == RenderType.NONE) {
+        continue;
+      }
+
+      IRenderable renderable = emitter.getRenderable(renderType);
+      if (renderable != null) {
+        cons.accept(this.getRenderables(renderType), renderable);
+      }
+    }
+
+    this.emitters.remove(emitter);
+  }
+
   private void updateColorLayers(IEntity entity) {
     if (this.staticShadowLayer != null) {
       this.staticShadowLayer.updateSection(entity.getBoundingBox());
@@ -271,18 +295,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public void addToGround(IRenderable renderable) {
-    this.getGroundRenderables().add(renderable);
-  }
-
-  @Override
-  public void addToOverlay(IRenderable renderable) {
-    this.getOverlayRenderables().add(renderable);
-  }
-
-  @Override
-  public void addToUI(IRenderable renderable) {
-    this.getUIRenderables().add(renderable);
+  public void add(IRenderable renderable, RenderType renderType) {
+    this.getRenderables(renderType).add(renderable);
   }
 
   @Override
@@ -540,16 +554,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<IRenderable> getGroundRenderables() {
-    return this.groundRenderable;
-  }
-
-  @Override
-  public Collection<IRenderable> getUIRenderables() {
-    return this.uiRenderable;
-  }
-
-  @Override
   public Collection<LightSource> getLightSources() {
     return this.lightSources;
   }
@@ -598,8 +602,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public Collection<IRenderable> getOverlayRenderables() {
-    return this.overlayRenderable;
+  public Collection<IRenderable> getRenderables(RenderType renderType) {
+    return this.renderables.get(renderType);
   }
 
   @Override
@@ -827,9 +831,7 @@ public class Environment implements IEnvironment {
 
     if (entity instanceof Emitter) {
       Emitter emitter = (Emitter) entity;
-      this.groundRenderable.remove(emitter.getGroundRenderable());
-      this.overlayRenderable.remove(emitter.getOverlayRenderable());
-      this.emitters.remove(emitter);
+      this.removeEmitter(emitter);
     }
 
     if (entity instanceof MapArea) {
@@ -903,97 +905,52 @@ public class Environment implements IEnvironment {
 
   @Override
   public void removeRenderable(final IRenderable renderable) {
-    this.getGroundRenderables().remove(renderable);
-    this.getOverlayRenderables().remove(renderable);
-    this.getUIRenderables().remove(renderable);
+    for (Collection<IRenderable> rends : this.renderables.values()) {
+      rends.remove(renderable);
+    }
   }
 
   @Override
   public void render(final Graphics2D g) {
     g.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
 
+    StringBuilder renderDetails = new StringBuilder();
     long renderStart = System.nanoTime();
 
-    Game.getRenderEngine().renderMap(g, this.getMap());
+    renderDetails.append(this.render(g, RenderType.BACKGROUND));
 
-    this.fireRenderEvent(l -> l.mapRendered(g));
-
-    final double mapRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
-
-    for (final IRenderable rend : this.getGroundRenderables()) {
-      rend.render(g);
+    renderDetails.append(this.render(g, RenderType.GROUND));
+    if (Game.getConfiguration().debug().isDebug()) {
+      DebugRenderer.renderMapDebugInfo(g, this.getMap());
     }
 
-    this.fireRenderEvent(l -> l.groundRendered(g));
+    renderDetails.append(this.render(g, RenderType.SURFACE));
 
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.GROUND).values(), false);
+    renderDetails.append(this.render(g, RenderType.NORMAL));
 
-    final double groundRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
-
-    if (Game.getConfiguration().graphics().getGraphicQuality() == Quality.VERYHIGH) {
-      Game.getRenderEngine().renderEntities(g, this.getLightSources(), false);
-    }
-
-    final double lightRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
-
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.NORMAL).values());
-    this.fireRenderEvent(l -> l.entitiesRendered(g));
-
-    final double normalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
-
+    long shadowRenderStart = System.nanoTime();
     if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
       this.getStaticShadowLayer().render(g);
     }
 
-    final double staticShadowRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
+    final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
 
-    Game.getRenderEngine().renderLayers(g, this.getMap(), RenderType.OVERLAY);
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.OVERLAY).values(), false);
-    for (final IRenderable rend : this.getOverlayRenderables()) {
-      rend.render(g);
-    }
+    renderDetails.append(this.render(g, RenderType.OVERLAY));
 
-    this.fireRenderEvent(l -> l.overlayRendered(g));
-
-    final double overlayRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
-
+    long ambientStart = System.nanoTime();
     if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
       this.getAmbientLight().render(g);
     }
 
-    final double ambientLightRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-    renderStart = System.nanoTime();
+    final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
 
-    Game.getRenderEngine().renderEntities(g, this.entities.get(RenderType.UI).values(), false);
-    for (final IRenderable rend : this.getUIRenderables()) {
-      rend.render(g);
-    }
-
-    this.fireRenderEvent(l -> l.uiRendered(g));
-    final double uiRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+    renderDetails.append(this.render(g, RenderType.UI));
 
     if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
-      log.log(Level.INFO, "render details:\n 1. map:{0}ms\n 2. ground:{1}ms\n 3. light:{2}ms\n 4. entities({8}):{3}ms\n 5. shadows:{4}ms\n 6. overlay({9} + {10}):{5}ms\n 7. ambientLight:{6}ms\n 8. ui:{7}ms",
-          new Object[] {
-              mapRenderTime,
-              groundRenderTime,
-              lightRenderTime,
-              normalRenderTime,
-              staticShadowRenderTime,
-              overlayRenderTime,
-              ambientLightRenderTime,
-              uiRenderTime,
-              this.getEntities(RenderType.NORMAL).size(),
-              this.getEntities(RenderType.OVERLAY).size(),
-              this.getOverlayRenderables().size(),
-          });
+      final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+      log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails.toString(), shadowTime, ambientTime });
     }
+
     g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
   }
 
@@ -1003,9 +960,9 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private void fireRenderEvent(Consumer<EnvironmentRenderListener> cons) {
-    for (EnvironmentRenderListener listener : this.renderListeners) {
-      cons.accept(listener);
+  private void fireRenderEvent(Graphics2D g, RenderType type) {
+    for (EnvironmentRenderListener listener : this.renderListeners.get(type)) {
+      listener.rendered(g, type);
     }
   }
 
@@ -1069,6 +1026,34 @@ public class Environment implements IEnvironment {
     return null;
   }
 
+  private String render(Graphics2D g, RenderType renderType) {
+    long renderStart = System.nanoTime();
+
+    // 1. Render map layers
+    Game.getRenderEngine().render(g, this.getMap(), renderType);
+
+    // 2. Render renderables
+    for (final IRenderable rend : this.getRenderables(renderType)) {
+      rend.render(g);
+    }
+
+    // 3. Render entities
+    Game.getRenderEngine().renderEntities(g, this.entities.get(renderType).values(), renderType == RenderType.NORMAL);
+
+    // 4. fire event
+    this.fireRenderEvent(g, renderType);
+
+    if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
+      final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+      return "\t" + renderType + ": " + renderTime + "ms ("
+          + this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count() + " layers, "
+          + this.getRenderables(renderType).size() + " renderables, "
+          + this.entities.get(renderType).size() + " entities)\n";
+    }
+
+    return null;
+  }
+
   private void addAmbientLight() {
     final int ambientAlpha = this.getMap().getCustomPropertyInt(MapProperty.AMBIENTALPHA);
     final Color ambientColor = this.getMap().getCustomPropertyColor(MapProperty.AMBIENTCOLOR, Color.WHITE);
@@ -1086,7 +1071,7 @@ public class Environment implements IEnvironment {
       if (entity instanceof IUpdateable) {
         Game.getLoop().detach((IUpdateable) entity);
       }
-      
+
       entity.detachControllers();
     }
   }
@@ -1199,7 +1184,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof IUpdateable) {
       Game.getLoop().detach((IUpdateable) entity);
     }
-    
+
     // 3. detach all controllers
     entity.detachControllers();
 
