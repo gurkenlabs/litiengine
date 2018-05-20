@@ -7,10 +7,12 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -19,6 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -28,83 +31,69 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-/**
- * The Class Map.
- */
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
+public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
   private static final long serialVersionUID = 402776584608365440L;
 
-  /** The version. */
   @XmlAttribute
   private double version;
 
   @XmlAttribute
   private String tiledversion;
 
-  /** The orientation. */
   @XmlAttribute
   private String orientation;
 
   @XmlTransient
   private MapOrientation mapOrientation = MapOrientation.UNDEFINED;
 
-  /** The renderorder. */
   @XmlAttribute
   private String renderorder;
 
-  /** The width. */
   @XmlAttribute
   private int width;
 
-  /** The height. */
   @XmlAttribute
   private int height;
 
-  /** The tilewidth. */
   @XmlAttribute
   private int tilewidth;
 
-  /** The tileheight. */
   @XmlAttribute
   private int tileheight;
 
-  /** The next object id. */
   @XmlAttribute
   private int nextObjectId;
 
-  /** The tilesets. */
-  @XmlElement(name = "tileset")
-  private List<Tileset> tilesets;
-
-  /** The imagelayers. */
-  @XmlElement(name = "imagelayer")
-  private List<ImageLayer> imagelayers;
-
-  /** The layers. */
-  @XmlElement(name = "layer")
-  private List<TileLayer> layers;
-
-  /** The name. */
   @XmlAttribute(required = false)
   private String name;
 
-  /** The objectgroups. */
+  @XmlElement(name = "tileset")
+  private List<Tileset> rawTilesets;
+
+  @XmlElement(name = "imagelayer")
+  private List<ImageLayer> rawImageLayers;
+
+  @XmlElement(name = "layer")
+  private List<TileLayer> rawTileLayers;
+
   @XmlElement(name = "objectgroup")
-  private List<MapObjectLayer> objectgroups;
+  private List<MapObjectLayer> rawMapObjectLayers;
 
   @XmlTransient
   private String path;
 
+  private transient List<ITileset> tilesets;
+  private transient List<ITileLayer> tileLayers;
+  private transient List<IMapObjectLayer> mapObjectLayers;
+  private transient List<IImageLayer> imageLayers;
+  private transient List<ILayer> allRenderLayers;
+
   @Override
   public List<IImageLayer> getImageLayers() {
-    final List<IImageLayer> imageLayers = new CopyOnWriteArrayList<>();
-    if (this.imagelayers != null) {
-      imageLayers.addAll(this.imagelayers);
-    }
-    return imageLayers;
+    return this.imageLayers;
   }
 
   @Override
@@ -119,19 +108,6 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
    */
   public int getNextObjectId() {
     return this.nextObjectId;
-  }
-
-  /**
-   * Gets the objectgroups.
-   *
-   * @return the objectgroups
-   */
-  public List<MapObjectLayer> getObjectgroups() {
-    if (this.objectgroups == null) {
-      this.objectgroups = new ArrayList<>();
-    }
-
-    return this.objectgroups;
   }
 
   @Override
@@ -156,11 +132,16 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
 
   @Override
   public List<IMapObjectLayer> getMapObjectLayers() {
-    final List<IMapObjectLayer> shapeLayers = new CopyOnWriteArrayList<>();
-    if (this.getObjectgroups() != null) {
-      shapeLayers.addAll(this.getObjectgroups());
+    if (this.mapObjectLayers == null) {
+      ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
+      if (this.rawMapObjectLayers != null) {
+        tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
+      }
+
+      this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
     }
-    return shapeLayers;
+
+    return this.mapObjectLayers;
   }
 
   @Override
@@ -215,20 +196,12 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
 
   @Override
   public List<ITileLayer> getTileLayers() {
-    final List<ITileLayer> lay = new ArrayList<>();
-    if (this.layers != null) {
-      lay.addAll(this.layers);
-    }
-    return lay;
+    return this.tileLayers;
   }
 
   @Override
   public List<ITileset> getTilesets() {
-    final List<ITileset> tileSets = new ArrayList<>();
-    if (this.tilesets != null) {
-      tileSets.addAll(this.tilesets);
-    }
-    return tileSets;
+    return this.tilesets;
   }
 
   @Override
@@ -314,8 +287,8 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
 
   public void setPath(final String path) {
     this.path = path;
-    if (this.imagelayers != null && !this.imagelayers.isEmpty()) {
-      for (final ImageLayer imgLayer : this.imagelayers) {
+    if (this.rawImageLayers != null && !this.rawImageLayers.isEmpty()) {
+      for (final ImageLayer imgLayer : this.rawImageLayers) {
         if (imgLayer == null) {
           continue;
         }
@@ -324,8 +297,8 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
       }
     }
 
-    if (this.tilesets != null && !this.tilesets.isEmpty()) {
-      for (final Tileset tileSet : this.tilesets) {
+    if (this.rawTilesets != null && !this.rawTilesets.isEmpty()) {
+      for (final Tileset tileSet : this.rawTilesets) {
         if (tileSet == null) {
           continue;
         }
@@ -336,7 +309,7 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
   }
 
   public void updateTileTerrain() {
-    for (TileLayer layer : this.layers) {
+    for (TileLayer layer : this.rawTileLayers) {
       for (Tile tile : layer.getData()) {
         tile.setTerrains(MapUtilities.getTerrain(this, tile.getGridId()));
       }
@@ -345,17 +318,20 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
 
   @Override
   public void addMapObjectLayer(IMapObjectLayer layer) {
-    this.getObjectgroups().add((MapObjectLayer) layer);
+    this.getRawMapObjectLayers().add((MapObjectLayer) layer);
+    this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(IMapObjectLayer layer) {
-    this.getObjectgroups().remove(layer);
+    this.getRawMapObjectLayers().remove(layer);
+    this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(int index) {
-    this.getObjectgroups().remove(index);
+    this.getRawMapObjectLayers().remove(index);
+    this.mapObjectLayers = null;
   }
 
   @XmlTransient
@@ -403,8 +379,9 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     return this.name.compareTo(o.name);
   }
 
-  public List<Tileset> getRawTileSets() {
-    return this.tilesets;
+  @Override
+  public List<ILayer> getRenderLayers() {
+    return this.allRenderLayers;
   }
 
   public List<Tileset> getExternalTilesets() {
@@ -416,5 +393,71 @@ public class Map extends CustomPropertyProvider implements IMap, Serializable, C
     }
 
     return externalTilesets;
+  }
+
+  public List<Tileset> getRawTileSets() {
+    if (this.rawTilesets == null) {
+      this.rawTilesets = new ArrayList<>();
+    }
+
+    return this.rawTilesets;
+  }
+
+  protected List<TileLayer> getRawTileLayers() {
+    if (this.rawTileLayers == null) {
+      this.rawTileLayers = new ArrayList<>();
+    }
+
+    return this.rawTileLayers;
+  }
+
+  protected List<ImageLayer> getRawImageLayers() {
+    if (this.rawImageLayers == null) {
+      this.rawImageLayers = new ArrayList<>();
+    }
+
+    return this.rawImageLayers;
+  }
+
+  protected List<MapObjectLayer> getRawMapObjectLayers() {
+    if (this.rawMapObjectLayers == null) {
+      this.rawMapObjectLayers = new ArrayList<>();
+    }
+
+    return this.rawMapObjectLayers;
+  }
+
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    ArrayList<ITileset> tmpSets = new ArrayList<>();
+    if (this.rawTilesets != null) {
+      tmpSets.addAll(this.rawTilesets);
+    }
+
+    ArrayList<ITileLayer> tmpTileLayers = new ArrayList<>();
+    if (this.rawTileLayers != null) {
+      tmpTileLayers.addAll(this.rawTileLayers);
+    }
+
+    ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
+    if (this.rawMapObjectLayers != null) {
+      tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
+    }
+
+    ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
+    if (this.rawImageLayers != null) {
+      tmpImageLayers.addAll(this.rawImageLayers);
+    }
+
+    ArrayList<ILayer> tmprenderLayers = new ArrayList<>();
+    tmprenderLayers.addAll(tmpTileLayers);
+    tmprenderLayers.addAll(tmpImageLayers);
+    tmprenderLayers.sort(Comparator.comparing(ILayer::getOrder));
+
+    this.tilesets = Collections.unmodifiableList(tmpSets);
+    this.tileLayers = Collections.unmodifiableList(tmpTileLayers);
+    this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
+    this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
+    this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
   }
 }

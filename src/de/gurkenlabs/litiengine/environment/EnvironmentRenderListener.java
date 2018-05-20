@@ -6,50 +6,13 @@ import java.util.EventListener;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 /**
- * This listener provides callbacks for different points during rendering an <code>IEnvironment</code>.
+ * This listener provides call backs for different points during rendering an <code>IEnvironment</code>.
  * 
  * @see IEnvironment#render(Graphics2D)
  */
 public interface EnvironmentRenderListener extends EventListener {
   /**
-   * This method is called after <code>IMap</code> has been rendered.
-   * 
-   * @param g
-   *          The graphics object of the rendering process.
-   * 
-   * @see IEnvironment#getMap()
+   * This method is called after the <code>IEnvironment</code> rendered everything of the specified <code>RenderType</code>.
    */
-  public void mapRendered(Graphics2D g);
-
-  /**
-   * This method is called after everything with the {@link RenderType#GROUND} has been rendered.
-   * 
-   * @param g
-   *          The graphics object of the rendering process.
-   */
-  public void groundRendered(Graphics2D g);
-
-  /**
-   * This method is called after all entities and everything with the {@link RenderType#NORMAL} has been rendered.
-   * 
-   * @param g
-   *          The graphics object of the rendering process.
-   */
-  public void entitiesRendered(Graphics2D g);
-
-  /**
-   * This method is called after everything with the {@link RenderType#OVERLAY} has been rendered.
-   * 
-   * @param g
-   *          The graphics object of the rendering process.
-   */
-  public void overlayRendered(Graphics2D g);
-
-  /**
-   * This method is called after the UI and everything with the {@link RenderType#UI} has been rendered.
-   * 
-   * @param g
-   *          The graphics object of the rendering process.
-   */
-  public void uiRendered(Graphics2D g);
+  public void rendered(Graphics2D g, RenderType type);
 }

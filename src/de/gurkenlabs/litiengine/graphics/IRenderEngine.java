@@ -32,8 +32,6 @@ public interface IRenderEngine {
 
   public void onEntityRendering(Consumer<RenderEvent<IEntity>> entity);
 
-  public void onMapRendered(Consumer<RenderEvent<IMap>> map);
-
   public void render(Graphics2D g, Collection<? extends IRenderable> renderables);
 
   public void render(Graphics2D g, Collection<? extends IRenderable> renderables, Shape clip);
@@ -50,9 +48,7 @@ public interface IRenderEngine {
 
   public void renderEntity(Graphics2D g, IEntity entity);
 
-  public void renderLayers(Graphics2D g, final IMap map, RenderType type);
-
-  public void renderMap(Graphics2D g, final IMap map);
+  public void render(Graphics2D g, final IMap map, RenderType...type);
 
   public void renderShape(final Graphics2D g, final Shape shape);
 

@@ -4,28 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-/**
- * The Interface IMapRenderer.
- */
-public interface IMapRenderer {
-  /**
-   * Gets the map image.
-   *
-   * @param map
-   *          the map
-   * @return the map image
-   */
-  public BufferedImage getMapImage(IMap map);
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
-  /**
-   * Gets the map image with all layers, including overlay layers (Useful for minimaps, for example). 
-   *
-   * @param map
-   *          the map
-   * @return the map image
-   */
-  public BufferedImage getMapImageWithOverlayLayers(IMap map);
-  
+public interface IMapRenderer {
+  public BufferedImage getImage(IMap map, RenderType...renderTypes);
+
   /**
    * Gets the supported orientation.
    *
@@ -43,7 +26,7 @@ public interface IMapRenderer {
    * @param map
    *          the map
    */
-  public void renderImage(Graphics2D g, IMap map);
+  public void render(Graphics2D g, IMap map, RenderType...renderTypes);
 
   /**
    * Renders the entire map (without overlay layers) onto the specified graphics
@@ -61,13 +44,11 @@ public interface IMapRenderer {
    *          The vertical offset in pixels for the map image that is applied
    *          when rendering on the graphics object.
    */
-  public void renderImage(Graphics2D g, IMap map, double offsetX, double offsetY);
+  public void render(Graphics2D g, IMap map, double offsetX, double offsetY, RenderType...renderTypes);
 
   /*
    * Renders all layers (without the overlay layers) of the specified map. The
    * viewport defines the region of the map that is about to be rendered.
    */
-  public void render(Graphics2D g, IMap map, Rectangle2D viewport);
-
-  public void renderOverlay(Graphics2D g, IMap map, Rectangle2D viewport);
+  public void render(Graphics2D g, IMap map, Rectangle2D viewport, RenderType...renderTypes);
 }

@@ -273,9 +273,7 @@ public final class Game {
       if (getConfiguration().debug().isDebugEnabled()) {
         getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
       }
-
-      getRenderEngine().onMapRendered(e -> DebugRenderer.renderMapDebugInfo(e.getGraphics(), e.getRenderedObject()));
-
+      
       getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
       getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
 

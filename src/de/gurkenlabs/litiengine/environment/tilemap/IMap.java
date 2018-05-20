@@ -46,6 +46,8 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the renderorder
    */
   public String getRenderorder();
+  
+  public List<ILayer> getRenderLayers();
 
   /**
    * Gets the shape layers.

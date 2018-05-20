@@ -27,7 +27,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 
 public interface IEnvironment extends IInitializable, IRenderable {
-  public void addRenderListener(EnvironmentRenderListener listener);
+  public void addRenderListener(RenderType renderType, EnvironmentRenderListener listener);
 
   public void removeRenderListener(EnvironmentRenderListener listener);
 
@@ -49,11 +49,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
    */
   public void add(IEntity entity);
   
-  public void addToGround(IRenderable renderable);
-
-  public void addToOverlay(IRenderable renderable);
-
-  public void addToUI(IRenderable renderable);
+  public void add(IRenderable renderable, RenderType renderType);
 
   public void clear();
 
@@ -183,11 +179,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Trigger> getTriggers();
 
-  public Collection<IRenderable> getOverlayRenderables();
-
-  public Collection<IRenderable> getGroundRenderables();
-
-  public Collection<IRenderable> getUIRenderables();
+  public Collection<IRenderable> getRenderables(RenderType renderType);
 
   public boolean isLoaded();
 
