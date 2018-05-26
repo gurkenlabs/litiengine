@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
@@ -40,6 +41,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   private float currentAlpha;
 
   private transient Image cursorImage;
+  private transient AffineTransform cursorTransform;
   private int cursorOffsetX;
   private int cursorOffsetY;
 
@@ -88,6 +90,11 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public Image getCursorImage() {
     return this.cursorImage;
+  }
+
+  @Override
+  public AffineTransform getCursorTransform() {
+    return this.cursorTransform;
   }
 
   public int getCursorOffsetX() {
@@ -143,7 +150,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
         if (this.cursorImage != null && (Input.mouse().isGrabMouse() || pointerInfo != null && rect.contains(pointerInfo.getLocation()))) {
           final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
-          RenderEngine.renderImage(g, this.cursorImage, locationWithOffset);
+          RenderEngine.renderImage(g, this.cursorImage, locationWithOffset, this.getCursorTransform());
         }
 
         if (Game.getConfiguration().debug().isRenderDebugMouse()) {
@@ -224,6 +231,11 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   @Override
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
+  }
+
+  @Override
+  public void setCursorTransform(AffineTransform transform) {
+    this.cursorTransform = transform;
   }
 
   @Override
