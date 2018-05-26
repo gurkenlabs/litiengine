@@ -262,8 +262,8 @@ public final class RenderEngine implements IRenderEngine {
     }
 
     AffineTransform t = new AffineTransform();
-    t.concatenate(transform);
     t.translate(x, y);
+    t.concatenate(transform);
 
     g.drawImage(image, t, null);
   }
