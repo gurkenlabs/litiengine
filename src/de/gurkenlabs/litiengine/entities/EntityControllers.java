@@ -57,10 +57,6 @@ public final class EntityControllers {
     }
   }
 
-  public void clear() {
-    this.controllers.clear();
-  }
-
   @SuppressWarnings("unchecked")
   private <T extends IEntityController> T getExplicitController(Class<T> clss) {
     // if there's an exact match, return it

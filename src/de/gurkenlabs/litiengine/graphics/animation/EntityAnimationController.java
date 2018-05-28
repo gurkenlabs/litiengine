@@ -57,11 +57,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   @Override
-  public void attach() {
-    Game.getLoop().attach(this);
-  }
-
-  @Override
   public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
     this.animationRules.put(rule, animationName);
   }

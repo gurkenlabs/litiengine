@@ -82,6 +82,13 @@ public class AnimationController implements IAnimationController {
     Collections.sort(this.getImageEffects());
   }
 
+  public void attach() {
+    Game.getLoop().attach(this);
+    for (final Animation animation : this.getAnimations()) {
+      Game.getLoop().attach(animation);
+    }
+  }
+  
   public void detach() {
     Game.getLoop().detach(this);
     for (final Animation animation : this.getAnimations()) {

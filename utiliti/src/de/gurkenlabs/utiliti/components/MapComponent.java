@@ -370,6 +370,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
+    if (layer == null || mapObject == null) {
+      return;
+    }
+
     layer.addMapObject(mapObject);
     Game.getEnvironment().loadFromMap(mapObject.getId());
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
