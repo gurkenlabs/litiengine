@@ -139,9 +139,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         g = (Graphics2D) this.currentBufferStrategy.getDrawGraphics();
 
         g.setColor(this.getBackground());
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-        g.setClip(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
+        final Rectangle bounds = new Rectangle(0, 0, this.getWidth(), this.getHeight());
+        g.setClip(bounds);
+        g.fill(bounds);
 
         screen.render(g);
 
@@ -167,7 +168,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         if (this.currentAlpha != -1) {
           final int visibleAlpha = MathUtilities.clamp(Math.round(255 * (1 - this.currentAlpha)), 0, 255);
           g.setColor(new Color(this.getBackground().getRed(), this.getBackground().getGreen(), this.getBackground().getBlue(), visibleAlpha));
-          g.fillRect(0, 0, this.getWidth(), this.getHeight());
+          g.fill(bounds);
         }
 
         if (this.takeScreenShot) {
@@ -196,7 +197,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
       this.fpsChangedConsumer.forEach(consumer -> consumer.accept(this.frameCount));
       this.frameCount = 0;
     }
-
   }
 
   @Override

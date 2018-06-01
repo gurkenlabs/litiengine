@@ -10,7 +10,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowStateListener;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ import javax.swing.JFrame;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
-public class ScreenManager extends JFrame implements IScreenManager, WindowStateListener, WindowFocusListener {
+public class ScreenManager extends JFrame implements IScreenManager {
 
   private static final int SCREENCHANGETIMEOUT = 200;
   private static final int ICONIFIED_MAX_FPS = 1;
@@ -58,8 +57,7 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
 
-    final RenderComponent comp = new RenderComponent(Game.getConfiguration().graphics().getResolution());
-    this.renderCanvas = comp;
+    this.renderCanvas = new RenderComponent(Game.getConfiguration().graphics().getResolution());
     if (!Game.isInNoGUIMode()) {
       // set default jframe stuff
       this.setResizable(false);
@@ -67,33 +65,18 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-      this.add(comp);
+      this.add(this.renderCanvas);
 
-      this.getRenderComponent().addComponentListener(new ResizedEventListener());
-      this.addComponentListener(new ComponentAdapter() {
-        @Override
-        public void componentMoved(final ComponentEvent evt) {
-          screenLocation = null;
-        }
-      });
-
-      this.addWindowStateListener(this);
-      this.addWindowFocusListener(this);
-      this.addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(final WindowEvent event) {
-          // ensures that we terminate the game, when the window is being closed
-          Game.terminate();
-        }
-      });
+      this.initializeEventListeners();
     }
   }
 
   @Override
   public void addScreen(final IScreen screen) {
-    this.screens.add(screen);
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
+    this.screens.add(screen);
+    
     if (this.getCurrentScreen() == null) {
       this.displayScreen(screen);
     }
@@ -226,24 +209,8 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
   }
 
   @Override
-  public void windowStateChanged(WindowEvent e) {
-    if (e.getNewState() == Frame.ICONIFIED) {
-      Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
-    } else {
-      Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
-    }
-  }
-
-  @Override
-  public void windowGainedFocus(WindowEvent e) {
-    Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
-  }
-
-  @Override
-  public void windowLostFocus(WindowEvent e) {
-    if (Game.getConfiguration().graphics().reduceFramesWhenNotFocused()) {
-      Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
-    }
+  public float getResolutionScale() {
+    return this.resolutionScale;
   }
 
   private void setResolution(Dimension dim) {
@@ -257,25 +224,50 @@ public class ScreenManager extends JFrame implements IScreenManager, WindowState
     this.setSize(insetAwareDimension);
   }
 
-  /**
-   * The listener interface for receiving resizedEvent events. The class that is
-   * interested in processing a resizedEvent event implements this interface, and
-   * the object created with that class is registered with a component using the
-   * component's <code>addResizedEventListener<code> method. When the resizedEvent
-   * event occurs, that object's appropriate method is invoked.
-   *
-   * @see ResizedEventEvent
-   */
-  private class ResizedEventListener extends ComponentAdapter {
-    @Override
-    public void componentResized(final ComponentEvent evt) {
-      resolution = getRenderComponent().getSize();
-      ScreenManager.this.resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
-    }
-  }
+  private void initializeEventListeners() {
+    this.getRenderComponent().addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(final ComponentEvent evt) {
+        resolution = getRenderComponent().getSize();
+        resolutionChangedConsumer.forEach(consumer -> consumer.accept(ScreenManager.this.getSize()));
+      }
+    });
 
-  @Override
-  public float getResolutionScale() {
-    return this.resolutionScale;
+    this.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentMoved(final ComponentEvent evt) {
+        screenLocation = null;
+      }
+    });
+
+    this.addWindowStateListener(e -> {
+      if (e.getNewState() == Frame.ICONIFIED) {
+        Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
+      } else {
+        Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
+      }
+    });
+
+    this.addWindowFocusListener(new WindowFocusListener() {
+      @Override
+      public void windowLostFocus(WindowEvent e) {
+        if (Game.getConfiguration().graphics().reduceFramesWhenNotFocused()) {
+          Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+        }
+      }
+
+      @Override
+      public void windowGainedFocus(WindowEvent e) {
+        Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
+      }
+    });
+
+    this.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(final WindowEvent event) {
+        // ensures that we terminate the game, when the window is being closed
+        Game.terminate();
+      }
+    });
   }
 }
