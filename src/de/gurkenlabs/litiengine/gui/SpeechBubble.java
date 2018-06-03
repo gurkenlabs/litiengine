@@ -87,8 +87,8 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     activeSpeechBubbles.put(entity, this);
   }
 
-  private SpeechBubble(final IEntity entity, final String text, final Sound typeSound, SpeechBubbleAppearance appearance) {
-    this(entity, text, appearance, GuiProperties.getDefaultFont());
+  private SpeechBubble(final IEntity entity, final String text, final Sound typeSound, SpeechBubbleAppearance appearance, Font font) {
+    this(entity, text, appearance, font);
     this.typeSound = typeSound;
   }
 
@@ -102,12 +102,12 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
 
   public static SpeechBubble create(final IEntity entity, final Font font, final String text) {
     SpeechBubbleAppearance app = new SpeechBubbleAppearance(DEFAULT_APPEARANCE.getForeColor(), DEFAULT_APPEARANCE.getBackgroundColor1(), DEFAULT_APPEARANCE.getBorderColor(), DEFAULT_APPEARANCE.getPadding());
-    return new SpeechBubble(entity, text, app, GuiProperties.getDefaultFont());
+    return new SpeechBubble(entity, text, app, font);
   }
 
   public static SpeechBubble create(final IEntity entity, final Font font, final String text, final Sound typeSound) {
     SpeechBubbleAppearance app = new SpeechBubbleAppearance(DEFAULT_APPEARANCE.getForeColor(), DEFAULT_APPEARANCE.getBackgroundColor1(), DEFAULT_APPEARANCE.getBorderColor(), DEFAULT_APPEARANCE.getPadding());
-    return new SpeechBubble(entity, text, typeSound, app);
+    return new SpeechBubble(entity, text, typeSound, app, font);
   }
 
   public static boolean isActive(final IEntity entity) {
