@@ -54,6 +54,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
   private static final double PARTICLEDELTA_MAX_VALUE = 1.0;
   private static final double PARTICLEDELTA_DEFAULT_VALUE = 0.1;
   private static final int PARTICLEMINTTL_DEFAULT_VALUE = 2000;
+  private static final String TAHOMA = "Tahoma";
 
   private final DefaultTableModel model;
   private final JTextField txt;
@@ -199,87 +200,91 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
     this.spritePanel = new JPanel();
     this.tabbedPanel.addTab(Resources.get("panel_sprite"), null, spritePanel, null);
     this.tabbedPanel.setEnabledAt(1, false);
-
+    
+    final String min = Resources.get("panel_min");
+    final String max = Resources.get("panel_max");
+ 
+    
     // init all labels
     JLabel labelEmitterData = new JLabel(Resources.get("panel_emitterData"));
-    labelEmitterData.setFont(new Font("Tahoma", Font.BOLD, 12));
+    labelEmitterData.setFont(new Font(TAHOMA, Font.BOLD, 12));
 
     JLabel lblSpawnRate = new JLabel(Resources.get("panel_emitterSpawnRate"));
     JLabel lblSpawnAmount = new JLabel(Resources.get("panel_emitterSpawnAmount"));
     JLabel lblParticleData = new JLabel(Resources.get("panel_particleData"));
-    lblParticleData.setFont(new Font("Tahoma", Font.BOLD, 12));
+    lblParticleData.setFont(new Font(TAHOMA, Font.BOLD, 12));
 
     JLabel lblDeltax = new JLabel(Resources.get("panel_particleDeltaX"));
 
     JLabel lblDeltaY = new JLabel(Resources.get("panel_particleDeltaY"));
 
-    JLabel lblMin1 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin1 = new JLabel(min);
     lblMin1.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin1.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin1.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMin2 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin2 = new JLabel(min);
     lblMin2.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin2.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin2.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblLock = new JLabel(Resources.get("panel_lock"));
 
     JLabel lblRandom = new JLabel(Resources.get("panel_random"));
 
-    JLabel lblMax = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax = new JLabel(max);
     lblMax.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax1 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax1 = new JLabel(max);
     lblMax1.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax1.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax1.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblUpdateDelay = new JLabel(Resources.get("panel_emitterUpdateDelay"));
 
     JLabel lblGravityX = new JLabel(Resources.get("panel_particleGravityX"));
 
-    JLabel lblMin3 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin3 = new JLabel(min);
     lblMin3.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin3.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin3.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax2 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax2 = new JLabel(max);
     lblMax2.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax2.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax2.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel labelTtl = new JLabel(Resources.get("panel_emitterTTL"));
 
     JLabel lblGravityY = new JLabel(Resources.get("panel_particleGravityY"));
 
-    JLabel lblMin4 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin4 = new JLabel(min);
     lblMin4.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin4.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin4.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax3 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax3 = new JLabel(max);
     lblMax3.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax3.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax3.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblMaxParticles = new JLabel(Resources.get("panel_emitterMaxParticles"));
 
     JLabel lblStartWidth = new JLabel(Resources.get("panel_particleStartWidth"));
 
-    JLabel lblMin5 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin5 = new JLabel(min);
     lblMin5.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin5.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin5.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax4 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax4 = new JLabel(max);
     lblMax4.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax4.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax4.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblParticleType = new JLabel(Resources.get("panel_particleType"));
 
     JLabel lblStartHeight = new JLabel(Resources.get("panel_particleStartHeight"));
 
-    JLabel lblMin6 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin6 = new JLabel(min);
     lblMin6.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin6.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin6.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax5 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax5 = new JLabel(max);
     lblMax5.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax5.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax5.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblColorDeviation = new JLabel(Resources.get("panel_colorDeviation"));
 
@@ -291,58 +296,58 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
 
-    JLabel lblMin7 = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin7 = new JLabel(min);
     lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin7.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin7.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax6 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax6 = new JLabel(max);
     lblMax6.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax6.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax6.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
 
-    JLabel lblMin = new JLabel(Resources.get("panel_min"));
+    JLabel lblMin = new JLabel(min);
     lblMin.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMin.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMin.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMax7 = new JLabel(Resources.get("panel_max"));
+    JLabel lblMax7 = new JLabel(max);
     lblMax7.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMax7.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMax7.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     JLabel lblStaticPhysics = new JLabel("collision type");
     lblStaticPhysics.setHorizontalAlignment(SwingConstants.LEFT);
-    lblStaticPhysics.setFont(new Font("Tahoma", Font.PLAIN, 11));
+    lblStaticPhysics.setFont(new Font(TAHOMA, Font.PLAIN, 11));
 
     JLabel lblText = new JLabel(Resources.get("panel_particleText"));
 
     JLabel lblParticleTtl = new JLabel("particle ttl");
 
-    JLabel labelMinParticleTtl = new JLabel(Resources.get("panel_min"));
+    JLabel labelMinParticleTtl = new JLabel(min);
     labelMinParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
-    labelMinParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    labelMinParticleTtl.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMaxParticleTtl = new JLabel(Resources.get("panel_max"));
+    JLabel lblMaxParticleTtl = new JLabel(max);
     lblMaxParticleTtl.setHorizontalAlignment(SwingConstants.CENTER);
-    lblMaxParticleTtl.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    lblMaxParticleTtl.setFont(new Font(TAHOMA, Font.ITALIC, 11));
     
     JLabel lblStartX = new JLabel("start x");
     JLabel lblStartY = new JLabel("start y");
     
-    JLabel label8 = new JLabel(Resources.get("panel_min"));
+    JLabel label8 = new JLabel(min);
     label8.setHorizontalAlignment(SwingConstants.CENTER);
-    label8.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    label8.setFont(new Font(TAHOMA, Font.ITALIC, 11));
     
-    JLabel label9 = new JLabel(Resources.get("panel_max"));
+    JLabel label9 = new JLabel(max);
     label9.setHorizontalAlignment(SwingConstants.CENTER);
-    label9.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    label9.setFont(new Font(TAHOMA, Font.ITALIC, 11));
     
-    JLabel label10 = new JLabel(Resources.get("panel_min"));
+    JLabel label10 = new JLabel(min);
     label10.setHorizontalAlignment(SwingConstants.CENTER);
-    label10.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    label10.setFont(new Font(TAHOMA, Font.ITALIC, 11));
     
-    JLabel label11 = new JLabel(Resources.get("panel_max"));
+    JLabel label11 = new JLabel(max);
     label11.setHorizontalAlignment(SwingConstants.CENTER);
-    label11.setFont(new Font("Tahoma", Font.ITALIC, 11));
+    label11.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
     GroupLayout groupLayoutcolorPanel = new GroupLayout(colorPanel);
     groupLayoutcolorPanel.setHorizontalGroup(groupLayoutcolorPanel.createParallelGroup(Alignment.LEADING)
