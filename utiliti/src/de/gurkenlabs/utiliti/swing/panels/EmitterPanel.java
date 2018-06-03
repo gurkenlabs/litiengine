@@ -112,9 +112,4 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
 
     this.btnPause.setSelected(!emitter.isPaused());
   }
-
-  @Override
-  protected IMapObject getDataSource() {
-    return super.getDataSource();
-  }
 }
