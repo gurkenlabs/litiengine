@@ -88,7 +88,7 @@ public class AnimationController implements IAnimationController {
       Game.getLoop().attach(animation);
     }
   }
-  
+
   public void detach() {
     Game.getLoop().detach(this);
     for (final Animation animation : this.getAnimations()) {
@@ -177,11 +177,16 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public boolean hasAnimation(String animationName) {
-    if (animationName == null || animationName.isEmpty()) {
+    if (animationName == null || animationName.isEmpty() || this.getAnimations() == null) {
       return false;
     }
 
-    return this.getAnimations().stream().anyMatch(x -> x.getName().equalsIgnoreCase(animationName));
+    return this.getAnimations().stream().anyMatch(x -> x.getName() != null && x.getName().equalsIgnoreCase(animationName));
+  }
+
+  @Override
+  public boolean isPlaying(String animationName) {
+    return this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName);
   }
 
   @Override
@@ -196,10 +201,8 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public void playAnimation(final String animationName) {
-    // if we have no animation with the name or it is already playing, do
-    // nothing
-    if (animationName == null || animationName.isEmpty() || this.getAnimations() == null || this.getAnimations().stream().noneMatch(x -> x != null && x.getName() != null && x.getName().equalsIgnoreCase(animationName))
-        || this.getCurrentAnimation() != null && this.getCurrentAnimation().getName() != null && this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
+    // if we have no animation with the name or it is already playing, do nothing
+    if (this.isPlaying(animationName) || !this.hasAnimation(animationName)) {
       return;
     }
 

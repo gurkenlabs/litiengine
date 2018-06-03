@@ -31,6 +31,8 @@ public interface IAnimationController extends IUpdateable {
 
   public boolean hasAnimation(String animationName);
 
+  public boolean isPlaying(String animationName);
+
   public void onPlayback(Consumer<Animation> cons);
 
   public void onPlaybackEnded(Consumer<Animation> cons);
