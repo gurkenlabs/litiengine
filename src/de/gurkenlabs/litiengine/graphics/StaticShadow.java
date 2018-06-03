@@ -134,82 +134,58 @@ public class StaticShadow extends MapArea {
     }
 
     final Path2D parallelogram = new Path2D.Double();
+    final double right = this.getX() + this.getWidth();
+    final double bottom = this.getY() + this.getHeight();
+
+    parallelogram.moveTo(this.getX(), this.getY());
+    parallelogram.lineTo(right, this.getY());
     if (shadowType.equals(StaticShadowType.DOWN)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom + this.getOffset());
     } else if (shadowType.equals(StaticShadowType.DOWNLEFT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom + this.getOffset());
     } else if (shadowType.equals(StaticShadowType.DOWNRIGHT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom + this.getOffset());
     } else if (shadowType.equals(StaticShadowType.LEFT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.LEFTDOWN)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.LEFTRIGHT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.RIGHTLEFT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() - this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right - this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.RIGHT)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.RIGHTDOWN)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, this.getY() + this.getHeight() + this.getOffset());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(right, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX() + this.getOffset() / 2.0, bottom + this.getOffset());
+      parallelogram.lineTo(this.getX(), bottom);
     } else if (shadowType.equals(StaticShadowType.NOOFFSET)) {
-      parallelogram.moveTo(this.getX(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY());
-      parallelogram.lineTo(this.getX() + this.getWidth(), this.getY() + this.getHeight());
-      parallelogram.lineTo(this.getX(), this.getY() + this.getHeight());
-      parallelogram.closePath();
+      parallelogram.lineTo(right, bottom);
+      parallelogram.lineTo(this.getX(), bottom);
     }
 
+    parallelogram.closePath();
     this.area = new Area(parallelogram);
   }
 
