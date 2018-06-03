@@ -948,7 +948,7 @@ public class Environment implements IEnvironment {
 
     if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
       final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-      log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails.toString(), shadowTime, ambientTime });
+      log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails, shadowTime, ambientTime });
     }
 
     g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
