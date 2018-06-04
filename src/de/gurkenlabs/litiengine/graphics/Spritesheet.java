@@ -418,7 +418,7 @@ public final class Spritesheet {
     }
 
     if (this.columns == 0 || this.rows == 0) {
-      String error = "The spritesheet " + this.getName() + " doesn't provide the correct dimensions: Sprite(" + this.spriteWidth + "/" + this.spriteHeight + ")";
+      String error = String.format("The spritesheet %s doesn't provide the correct dimensions. Provided dimensions: (%dx%d).", this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
       if (sprite != null) {
         error += ", Spritesheet(" + sprite.getWidth() + "/" + sprite.getHeight() + ")";
       }
