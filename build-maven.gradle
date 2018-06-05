@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-  compile 'net.java.jinput:jinput:2.0.7'
+  compile 'net.java.jinput:jinput:2.0.9'
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
@@ -44,7 +44,7 @@ jar {
   
   from('resources') { include '**/*' }
   
-  version = 'v0.4.11-alpha'
+  version = 'v0.4.12-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.so'
@@ -76,13 +76,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
-    version = 'v0.4.11-alpha'
+    version = 'v0.4.12-alpha'
 }
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
-    version = 'v0.4.11-alpha'
+    version = 'v0.4.12-alpha'
 }
 
 artifacts {
@@ -96,7 +96,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.11"
+version = "0.4.12"
 
 uploadArchives {
   repositories {
