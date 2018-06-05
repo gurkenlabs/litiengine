@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-  compile 'net.java.jinput:jinput:2.0.7'
+  compile 'net.java.jinput:jinput:2.0.9'
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
