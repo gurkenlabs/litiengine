@@ -134,6 +134,8 @@ public class Camera implements ICamera {
 
   @Override
   public void setFocus(final Point2D focus) {
+    this.focus = this.clampToMap(focus);
+    
     // dunno why but without the factor of 0.01 sometimes everything starts to
     // get wavy while rendering ...
     // it seems to be an issue with the focus location being exactly dividable
@@ -143,12 +145,11 @@ public class Camera implements ICamera {
     // renderscale of 6 only has an issue with 1 and 0.5)
     // seems like java cannot place certain images onto their exact pixel
     // location with an AffineTransform...
-    final double fraction = focus.getY() - Math.floor(focus.getY());
+    final double fraction = this.focus.getY() - Math.floor(this.focus.getY());
     if (MathUtilities.isInt(fraction * 4)) {
-      focus.setLocation(focus.getX(), focus.getY() + 0.01);
+      this.focus.setLocation(this.focus.getX(), this.focus.getY() + 0.01);
     }
-
-    this.focus = this.clampToMap(focus);
+    
     for (Consumer<Point2D> consumer : this.focusChangedConsumer) {
       consumer.accept(this.focus);
     }
