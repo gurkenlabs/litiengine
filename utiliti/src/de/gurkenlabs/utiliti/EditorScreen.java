@@ -127,10 +127,10 @@ public class EditorScreen extends Screen {
       String mapName = Game.getEnvironment() != null && Game.getEnvironment().getMap() != null ? "\nMap: " + Game.getEnvironment().getMap().getName() : "";
       Program.getTrayIcon().setToolTip(Game.getInfo().getName() + " " + Game.getInfo().getVersion() + "\n" + this.currentResourceFile + mapName);
     } else if (this.getProjectPath() != null) {
-      Game.getScreenManager().setTitle(Game.getInfo().toString() + " - " + NEW_GAME_STRING);
-      Program.getTrayIcon().setToolTip(Game.getInfo().toString() + "\n" + NEW_GAME_STRING);
+      Game.getScreenManager().setTitle(Game.getInfo().getTitle() + " - " + NEW_GAME_STRING);
+      Program.getTrayIcon().setToolTip(Game.getInfo().getTitle() + "\n" + NEW_GAME_STRING);
     } else {
-      Game.getScreenManager().setTitle(Game.getInfo().toString());
+      Game.getScreenManager().setTitle(Game.getInfo().getTitle());
     }
 
     super.render(g);
