@@ -7,7 +7,7 @@ public class InputConfiguration extends ConfigurationGroup {
 
   public InputConfiguration() {
     this.setMouseSensitivity(1.0F);
-    this.setGamepadSupport(true);
+    this.setGamepadSupport(false);
   }
 
   public float getMouseSensitivity() {
