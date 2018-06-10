@@ -324,6 +324,18 @@ public class Environment {
     return this.findCombatEntities(shape, entity -> true);
   }
 
+  /**
+   * Searches for all combat entities whose hitBox intersect the specified
+   * shape.
+   * 
+   * @param shape
+   *          The shape to check intersection for.
+   * @param condition
+   *          An additional condition that allows to specify a condition which
+   *          determines if a {@link ICombatEntity} should be considered.
+   * @return A list of all combat entities that intersect the specified
+   *         {@link Shape}.
+   */
   public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
     final ArrayList<ICombatEntity> foundCombatEntities = new ArrayList<>();
     if (shape == null) {
@@ -538,7 +550,9 @@ public class Environment {
   }
 
   /**
-   * Negative map ids are only used locally.
+   * Gets the next unique local map id. (All local map ids are negative).
+   * 
+   * @return The next unique local map id.
    */
   public synchronized int getLocalMapId() {
     return --localIdSequence;
@@ -560,6 +574,11 @@ public class Environment {
     return getByName(this.getMobileEntities(), name);
   }
 
+  /**
+   * Gets the next unique global map id.
+   *
+   * @return The next unique global map id.
+   */
   public synchronized int getNextMapId() {
     return ++mapIdSequence;
   }
