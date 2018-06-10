@@ -523,10 +523,8 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<IEntity> getEntities() {
     final ArrayList<IEntity> ent = new ArrayList<>();
-    ent.addAll(this.entities.get(RenderType.NONE).values());
-    ent.addAll(this.entities.get(RenderType.GROUND).values());
-    ent.addAll(this.entities.get(RenderType.NORMAL).values());
-    ent.addAll(this.entities.get(RenderType.OVERLAY).values());
+    for (Map<Integer, IEntity> type : this.entities.values())
+      ent.addAll(type.values());
     return ent;
   }
 
