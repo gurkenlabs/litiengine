@@ -7,9 +7,15 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -29,6 +35,14 @@ import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
+/**
+ * @author Matze
+ *
+ */
+/**
+ * @author Matze
+ *
+ */
 public final class RenderEngine implements IRenderEngine {
   private static final float DEFAULT_RENDERSCALE = 3.0f;
 
@@ -129,6 +143,16 @@ public final class RenderEngine implements IRenderEngine {
     g.setStroke(oldStroke);
   }
 
+  /**
+   * @param g
+   *          the Graphics2D object to draw on
+   * @param text
+   *          the String to be distributed over all generated lines
+   * @param x
+   *          the min x coordinate
+   * @param y
+   *          the min y coordinate
+   */
   public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
       return;
@@ -138,6 +162,40 @@ public final class RenderEngine implements IRenderEngine {
 
     g.drawString(text, (float) x, (float) y);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  /**
+   * 
+   * @param g
+   *          the Graphics2D object to draw on
+   * @param text
+   *          the String to be distributed over all generated lines
+   * @param x
+   *          the min x coordinate
+   * @param y
+   *          the min y coordinate
+   * @param lineWidth
+   *          thie max line width
+   */
+  public static void drawTextWithAutomaticLinebreaks(final Graphics2D g, final String text, final float x, final float y, final float lineWidth) {
+    if (text == null || text.isEmpty()) {
+      return;
+    }
+    final FontRenderContext frc = g.getFontRenderContext();
+
+    final AttributedString styledText = new AttributedString(text);
+    styledText.addAttribute(TextAttribute.FONT, g.getFont());
+    final AttributedCharacterIterator iterator = styledText.getIterator();
+    final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
+    measurer.setPosition(0);
+    float textY = y;
+    while (measurer.getPosition() < text.length()) {
+      final TextLayout nextLayout = measurer.nextLayout(lineWidth);
+      textY += nextLayout.getAscent();
+      final float dx = nextLayout.isLeftToRight() ? 0 : lineWidth - nextLayout.getAdvance();
+      nextLayout.draw(g, x + dx, textY);
+      textY += nextLayout.getDescent() + nextLayout.getLeading();
+    }
   }
 
   /**
