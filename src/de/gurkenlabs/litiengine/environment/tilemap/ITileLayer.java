@@ -8,6 +8,11 @@ import java.util.List;
  */
 public interface ITileLayer extends ILayer {
 
+  @Deprecated
+  default ITile getTileByLoctaion(Point2D location) {
+    return getTileByLocation(location);
+  }
+  
   /**
    * Gets the tile by loctaion.
    *
@@ -15,14 +20,14 @@ public interface ITileLayer extends ILayer {
    *          the location
    * @return the tile by loctaion
    */
-  public ITile getTileByLoctaion(Point2D location);
+  ITile getTileByLocation(Point2D location);
 
-  public ITile getTile(int x, int y);
+  ITile getTile(int x, int y);
 
   /**
    * Gets the tiles.
    *
    * @return the tiles
    */
-  public List<ITile> getTiles();
+  List<ITile> getTiles();
 }
