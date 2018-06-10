@@ -313,10 +313,8 @@ public class Environment implements IEnvironment {
     this.getTriggers().clear();
     this.getEntitiesByTag().clear();
 
-    this.entities.get(RenderType.NONE).clear();
-    this.entities.get(RenderType.GROUND).clear();
-    this.entities.get(RenderType.NORMAL).clear();
-    this.entities.get(RenderType.OVERLAY).clear();
+    for (Map<Integer, IEntity> type : this.entities.values())
+      type.clear();
     this.initialized = false;
 
     this.fireEvent(l -> l.environmentCleared(this));
