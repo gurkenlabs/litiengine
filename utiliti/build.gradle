@@ -1,5 +1,5 @@
 plugins {
-  id 'edu.sc.seis.launch4j' version '2.4.2'
+  id 'edu.sc.seis.launch4j' version '2.4.4'
 }
 
 apply plugin: 'java'
