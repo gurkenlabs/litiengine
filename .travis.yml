@@ -1,14 +1,18 @@
 language: java
+sudo: false
+
+jdk: oraclejdk8
+install: true
+
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-  
-jdk:
-  - oraclejdk8
 
-sudo: false
-install: true
+
 addons:
+  apt:
+    packages:
+      - oracle-java8-installer
   sonarcloud:
     organization: "gurkenlabs-github"
     token:
@@ -17,12 +21,14 @@ before_install:
   - chmod +x gradlew
 
 script: 
-- ./gradlew fullbuild
+- ./gradlew fullbuild --scan -s
 - sonar-scanner
+- rm -f "$HOME/.gradle/caches/modules-2/modules-2.lock"
+- rm -rf "$HOME/.gradle/caches/$GRADLE_VERSION/plugin-resolution"
 
 cache:
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
-    - '$HOME/.gradle'
-    - '.gradle'
+    - '$HOME/.gradle/caches/'
+    - '$HOME/.gradle/wrapper/'
