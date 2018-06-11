@@ -94,7 +94,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void run() {
-    while (this.gameIsRunning) {
+    while (!interrupted()) {
       final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
       final long tickWait = (long) (1.0 / (this.getUpdateRate() * scale) * 1000);
       final long updateStart = System.nanoTime();
@@ -115,8 +115,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        Thread.currentThread().interrupt();
         break;
       }
 
@@ -131,7 +129,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void terminate() {
-    this.gameIsRunning = false;
+    this.interrupt();
   }
 
   @Override
