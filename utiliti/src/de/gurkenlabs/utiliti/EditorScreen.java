@@ -246,7 +246,7 @@ public class EditorScreen extends Screen {
   }
 
   public void load() {
-    if (EditorFileChooser.showFileDialog(GameData.FILE_EXTENSION, GAME_FILE_NAME, false) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(GameData.FILE_EXTENSION, GAME_FILE_NAME, false, GameData.FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       this.load(EditorFileChooser.instance().getSelectedFile());
     }
   }
