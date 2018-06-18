@@ -109,14 +109,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
     final IScreen targetScreen = opt.get();
     if (this.getCurrentScreen() != null) {
       this.getCurrentScreen().suspend();
-      Game.getRenderLoop().unregister(this.getCurrentScreen());
     }
 
     this.currentScreen = targetScreen;
     if (!Game.isInNoGUIMode()) {
       this.getCurrentScreen().prepare();
       this.setVisible(true);
-      Game.getRenderLoop().register(this.getCurrentScreen());
     }
 
     this.lastScreenChange = System.currentTimeMillis();

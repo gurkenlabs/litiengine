@@ -285,7 +285,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop(scrMgr.getRenderComponent());
+    renderLoop = new RenderLoop();
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
