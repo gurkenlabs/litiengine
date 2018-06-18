@@ -231,7 +231,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
-      final IMapLoader tmxLoader = new TmxMapLoader();
+      final IMapLoader tmxLoader = TmxMapLoader.INSTANCE;
       Map map = (Map) tmxLoader.loadMap(mapFile);
       loadedMaps.add(map);
       log.log(Level.INFO, "map found: {0}", new Object[] { map.getFileName() });
