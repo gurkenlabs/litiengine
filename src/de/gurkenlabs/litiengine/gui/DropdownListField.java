@@ -26,12 +26,10 @@ public class DropdownListField extends GuiComponent {
 
   private final int numberOfShownElements;
 
-  public DropdownListField(final double x, final double y, final double width, final double height, final Object[] content, final int elementsShown, final Spritesheet entrySprite, final Spritesheet buttonSprite) {
+  public DropdownListField(final double x, final double y, final double width, final double height, final Object[] content, final int elementsShown) {
     super(x, y, width, height);
     this.content = content;
     this.numberOfShownElements = elementsShown;
-    this.entrySprite = entrySprite;
-    this.buttonSprite = buttonSprite;
     this.changeConsumer = new CopyOnWriteArrayList<>();
 
   }
