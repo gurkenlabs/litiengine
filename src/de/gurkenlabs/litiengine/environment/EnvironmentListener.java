@@ -1,12 +1,12 @@
 package de.gurkenlabs.litiengine.environment;
 
 /**
- * This listener provides callbacks for different points over the life cycle of an <code>IEnvironment</code> (loaded/unloaded/cleared/initialized).
+ * This listener provides callbacks for different points over the life cycle of an <code>Environment</code> (loaded/unloaded/cleared/initialized).
  * 
- * @see IEnvironment#load()
- * @see IEnvironment#unload()
- * @see IEnvironment#clear()
- * @see IEnvironment#init()
+ * @see Environment#load()
+ * @see Environment#unload()
+ * @see Environment#clear()
+ * @see Environment#init()
  */
 public interface EnvironmentListener extends EnvironmentLoadedListener {
   /**
@@ -15,7 +15,7 @@ public interface EnvironmentListener extends EnvironmentLoadedListener {
    * @param environment
    *          The environment that was unloaded.
    */
-  public void environmentUnloaded(IEnvironment environment);
+  public void environmentUnloaded(Environment environment);
 
   /**
    * This method was called after the environment was cleared.
@@ -23,7 +23,7 @@ public interface EnvironmentListener extends EnvironmentLoadedListener {
    * @param environment
    *          The environment that was cleared.
    */
-  public void environmentCleared(IEnvironment environment);
+  public void environmentCleared(Environment environment);
 
   /**
    * This method was called after the environment was initialized.
@@ -31,5 +31,5 @@ public interface EnvironmentListener extends EnvironmentLoadedListener {
    * @param environment
    *          The environment that was initialized.
    */
-  public void environmentInitialized(IEnvironment environment);
+  public void environmentInitialized(Environment environment);
 }
