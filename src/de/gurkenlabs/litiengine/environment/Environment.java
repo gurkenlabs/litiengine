@@ -891,6 +891,16 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public void remove(String name) {
+    final IEntity ent = this.get(name);
+    if (ent == null) {
+      return;
+    }
+
+    this.remove(ent);
+  }
+
+  @Override
   public <T extends IEntity> void remove(Collection<T> entities) {
     if (entities == null) {
       return;
