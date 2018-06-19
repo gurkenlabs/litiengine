@@ -56,8 +56,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
     when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
 
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN)).thenReturn("LEFT");
-    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN)).thenReturn("MIDDLE");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
+    when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
     when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);

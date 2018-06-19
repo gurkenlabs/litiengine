@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -29,12 +28,7 @@ public class TileLayer extends Layer implements ITileLayer {
   private transient Tile[][] tiles;
 
   @Override
-  public Dimension getSizeInTiles() {
-    return new Dimension(this.getWidth(), this.getHeight());
-  }
-
-  @Override
-  public ITile getTileByLoctaion(final Point2D location) {
+  public ITile getTileByLocation(final Point2D location) {
     final Optional<ITile> tile = this.getTiles().stream().filter(x -> x.getTileCoordinate().equals(location)).findFirst();
     return tile.isPresent() ? tile.get() : null;
   }

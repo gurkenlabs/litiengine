@@ -3,8 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
@@ -19,14 +17,12 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
    */
   public static final int TICK_DELTATIME_LAG = 67;
 
-  private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private static int executionIndex = -1;
 
   private final List<TimedAction> actions;
   private final int updateRate;
 
   private long deltaTime;
-  private boolean gameIsRunning = true;
 
   private long lastUpsTime;
 
@@ -44,7 +40,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void close() {
-    this.gameIsRunning = false;
+    this.terminate();
   }
 
   @Override
@@ -94,7 +90,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void run() {
-    while (this.gameIsRunning) {
+    while (!interrupted()) {
       final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
       final long tickWait = (long) (1.0 / (this.getUpdateRate() * scale) * 1000);
       final long updateStart = System.nanoTime();
@@ -115,8 +111,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
       try {
         Thread.sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        Thread.currentThread().interrupt();
         break;
       }
 
@@ -131,7 +125,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void terminate() {
-    this.gameIsRunning = false;
+    this.interrupt();
   }
 
   @Override

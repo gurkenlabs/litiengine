@@ -9,20 +9,20 @@ import java.util.List;
 public interface ITileLayer extends ILayer {
 
   /**
-   * Gets the tile by loctaion.
+   * Gets the tile by location.
    *
    * @param location
    *          the location
-   * @return the tile by loctaion
+   * @return the tile by location
    */
-  public ITile getTileByLoctaion(Point2D location);
+  ITile getTileByLocation(Point2D location);
 
-  public ITile getTile(int x, int y);
+  ITile getTile(int x, int y);
 
   /**
    * Gets the tiles.
    *
    * @return the tiles
    */
-  public List<ITile> getTiles();
+  List<ITile> getTiles();
 }
