@@ -21,11 +21,11 @@ public final class CustomMapObjectLoader<T extends IEntity> extends MapObjectLoa
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
+  public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
     T entity = null;
     try {
-      // check for constructor with IEnvironment and IMapObject parameter
-      Constructor<T> constructor = entityType.getConstructor(IEnvironment.class, IMapObject.class);
+      // check for constructor with Environment and IMapObject parameter
+      Constructor<T> constructor = entityType.getConstructor(Environment.class, IMapObject.class);
       entity = constructor.newInstance(environment, mapObject);
     } catch (Exception e1) {
       try {
