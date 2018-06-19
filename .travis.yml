@@ -16,8 +16,7 @@ script:
 - ./gradlew fullbuild
 
 after_success:
-- test $TRAVIS_PULL_REQUEST = false \
-  && sonar-scanner
+- if [ $TRAVIS_BRANCH = 'master' ]; sonar-scanner; fi'
 
 cache:
   directories:
