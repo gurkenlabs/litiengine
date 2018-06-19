@@ -41,7 +41,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
+    Environment environment = mock(Environment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.PROP.name());
     when(mapObject.getId()).thenReturn(111);
@@ -88,7 +88,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testColliderMapObjectLoader() {
     CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
+    Environment environment = mock(Environment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
     when(mapObject.getId()).thenReturn(111);
@@ -118,7 +118,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testTriggerMapObjectLoader() {
     TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
+    Environment environment = mock(Environment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -158,7 +158,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testEmitterMapObjectLoader() {
     EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
+    Environment environment = mock(Environment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -181,7 +181,7 @@ public class MapObjectLoaderTests {
   @Test
   public void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
+    Environment environment = mock(Environment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
     when(mapObject.getId()).thenReturn(111);
