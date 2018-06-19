@@ -3,9 +3,9 @@ package de.gurkenlabs.litiengine.environment;
 import java.util.EventListener;
 
 /**
- * This listener provides callbacks for when an <code>IEnvironment</code> was loaded.
+ * This listener provides callbacks for when an <code>Environment</code> was loaded.
  * 
- * @see IEnvironment#load()
+ * @see Environment#load()
  */
 public interface EnvironmentLoadedListener extends EventListener {
 
@@ -15,5 +15,5 @@ public interface EnvironmentLoadedListener extends EventListener {
    * @param environment
    *          The environment that was loaded.
    */
-  public void environmentLoaded(IEnvironment environment);
+  public void environmentLoaded(Environment environment);
 }
