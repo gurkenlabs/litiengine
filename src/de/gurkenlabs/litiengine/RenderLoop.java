@@ -1,31 +1,19 @@
 package de.gurkenlabs.litiengine;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.graphics.IRenderComponent;
-import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 public class RenderLoop extends UpdateLoop {
   private static final Logger log = Logger.getLogger(RenderLoop.class.getName());
-  private final IRenderComponent component;
-  private final List<IRenderable> renderables;
 
   private boolean gameIsRunning = true;
   private int maxFps;
 
-  public RenderLoop(final IRenderComponent component) {
+  public RenderLoop() {
     super();
-    this.renderables = new CopyOnWriteArrayList<>();
-    this.component = component;
     this.maxFps = Game.getConfiguration().client().getMaxFps();
-  }
-
-  public void register(final IRenderable render) {
-    this.renderables.add(render);
   }
 
   @Override
@@ -37,9 +25,7 @@ public class RenderLoop extends UpdateLoop {
         Game.getCamera().updateFocus();
         this.update();
 
-        for (final IRenderable render : this.renderables) {
-          this.component.render(render);
-        }
+        Game.getScreenManager().getRenderComponent().render();
 
         final long renderTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
@@ -57,10 +43,6 @@ public class RenderLoop extends UpdateLoop {
 
   public void terminate() {
     this.gameIsRunning = false;
-  }
-
-  public void unregister(final IRenderable render) {
-    this.renderables.remove(render);
   }
 
   public int getMaxFps() {

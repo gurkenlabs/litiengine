@@ -33,6 +33,29 @@ import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
+/***
+ * <p>
+ * The <code>Game</code> class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
+ * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the <code>GameInfo</code>,
+ * the <code>RenderEngine</code>, the <code>SoundEngine</code> and many other major components.
+ * </p>
+ * <p>
+ * We designed the API such that all important parts that make up the game are directly accessible via the <code>Game</code> class in a static manner.
+ * To be a little bit more technical, it is essentially a collection of core Singleton instances.
+ * </p>
+ * <p>
+ * This class will also be your starting point when setting up a new LITIengine project. In order to launch your game,
+ * you need to at least call {@link Game#init(String...)} and {@link Game#start()} from your programs <code>main(String[])</code> method.
+ * </p>
+ * <p>
+ * Additionally, it provides an interface to hook up event listeners (e.g. <code>GameListener</code> or <code>EnvironmentLoadedListener</code>) for
+ * the most basic operations of a Game life cycle. 
+ * </p>
+ * 
+ * @see GameListener
+ * @see GameTerminatedListener
+ * @see EnvironmentLoadedListener
+ */
 public final class Game {
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
@@ -65,6 +88,7 @@ public final class Game {
   private static IScreenManager screenManager;
 
   private static boolean hasStarted;
+  private static boolean initialized;
 
   static {
     environmentLoadedListeners = new CopyOnWriteArrayList<>();
@@ -223,7 +247,31 @@ public final class Game {
     return hasStarted;
   }
 
+  /***
+   * Initializes the infrastructure of the LITIengine game. 
+   * 
+   * The following tasks are carried out by this method:
+   * <ul>
+   *  <li>load the <code>GameConfiguration</code></li>
+   *  <li>handle the specified program parameters</li>
+   *  <li>configure the logging</li>
+   *  <li>set the programs <code>Locale</code> according to the configured values.</li>
+   *  <li>initialize and attach core components like the <code>PhysicsEngine</code></li>
+   *  <li>initialize the <code>ScreenManger</code></li>
+   *  <li>initialize the <code>Input</code></li>
+   *  <li>initialize the <code>GameLoop</code> and <code>RenderLoop</code></li>
+   *  <li>set a default camera</li>
+   * </ul> 
+   * 
+   * @param args
+   *          The arguments passed to the programs entry point.
+   */
   public static void init(String... args) {
+    if(initialized) {
+      log.log(Level.INFO, "The game has already been initialized.");
+      return;
+    }
+    
     handleCommandLineArguments(args);
 
     getConfiguration().load();
@@ -237,7 +285,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop(scrMgr.getRenderComponent());
+    renderLoop = new RenderLoop();
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -273,7 +321,7 @@ public final class Game {
       if (getConfiguration().debug().isDebugEnabled()) {
         getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
       }
-      
+
       getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
       getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
 
@@ -284,6 +332,8 @@ public final class Game {
 
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
     }
+    
+    initialized = true;
   }
 
   public static void load(final String gameResourceFile) {
@@ -356,7 +406,27 @@ public final class Game {
     }
   }
 
+  /***
+   * <p>
+   * Starts the <code>GameLoops</code> and other components. 
+   * After this method is called, the engine will start to render contents of the current <code>Screen</code> of the <code>ScreenManager</code>, 
+   * the <code>SoundEngine</code> will start to playback <code>Sounds</code> 
+   * and the different input devices (e.g. <code>Mouse</code>, <code>Keyboard</code>) will start to process player input.
+   * </p>
+   * <p>
+   * When the <code>Game</code> has started up successfully, it'll callback to the registered <code>GameListeners</code>.
+   * </p>
+   * 
+   * @see ScreenManager#getCurrentScreen()
+   * @see SoundEngine
+   * @see Input
+   * @see GameListener#started()
+   */
   public static void start() {
+    if(!initialized) {
+      throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
+    }
+    
     gameLoop.start();
     Input.start();
 
@@ -418,7 +488,7 @@ public final class Game {
     if (info == null) {
       log.log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
     }
-    
+
     setInfo(info);
   }
 
