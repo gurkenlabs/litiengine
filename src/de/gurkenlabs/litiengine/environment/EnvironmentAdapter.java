@@ -9,18 +9,18 @@ package de.gurkenlabs.litiengine.environment;
 public abstract class EnvironmentAdapter implements EnvironmentListener {
 
   @Override
-  public void environmentLoaded(IEnvironment environment) {
+  public void environmentLoaded(Environment environment) {
   }
 
   @Override
-  public void environmentUnloaded(IEnvironment environment) {
+  public void environmentUnloaded(Environment environment) {
   }
 
   @Override
-  public void environmentCleared(IEnvironment environment) {
+  public void environmentCleared(Environment environment) {
   }
 
   @Override
-  public void environmentInitialized(IEnvironment environment) {
+  public void environmentInitialized(Environment environment) {
   }
 }
