@@ -14,7 +14,9 @@ addons:
       secure: G0KkiaIo+eBOrLgnvH5R6OLxhp7KWXEhP4VYuIo+yF0to4ZI3xLpmWL8ILQy9y//1QY6srbvTD6plpir3j7pToquko0GSpJwrcbQYjs+8WisH8f3WHFNGZoi3Y0BGwk3ozlcAwsxjpFvx/b1LPx5uPQpKNPaV35ag+IajholPXSwRi86/LvL12IxI5UgNfpEXwLiEquUJp9IGLGWFNT4Nb6TsZdD5EBerjkRJGyVV3MZvASiTLZLnV8CswFucbz5+SUBRmqNfSHzzryXnTwgFS7CNp3TRyNHWh5xBE2bbAvkgy3G/xSECQ3qUglxNleZ/AYqYyAbQfCX2q9WEwYD3OvZOZ3qyjzxdJ3NBa50KnKduiSF6GQDmmrUS6n6pu6R77NVz1fzkD4oz0Uny5BeiB5fkhn4rEVk9QmCOnfAFOj6MjSgFVTMGV3nmh6bHJlKhbHXPiYJAp7dwPWczOj2jevnJ4WO5yoNaAxHQWUMqkaukDjPkQGqF9/GPBElriOBM4CdQ/CGClpa82HexYuiGL+TCChZgcEWgBNLzt5BqMuckdVzmRB6AYXIJQZ0ZdTbDVIAioU6l08oDXM5Y3wd0yDTqKieIyof6lWqGc+hPdyN9wlY6BNGCR2g9wpUTBNPHXULVEixfnaeEUotd87hx26HC0wryuh+ZzY4GTCufQs=
 script: 
 - ./gradlew fullbuild
-- if [ $TRAVIS_BRANCH = 'master' ]; sonar-scanner; fi
+- if [ $TRAVIS_BRANCH = 'master' ]; then 
+    sonar-scanner; 
+  fi
 
 cache:
   directories:
