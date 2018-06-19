@@ -8,13 +8,11 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 /**
  * This class allows to deserialize a tmx file into an IMap instance.
  */
-public final class TmxMapLoader implements IMapLoader {
-  public static final TmxMapLoader INSTANCE = new TmxMapLoader();
-  
-  private TmxMapLoader() {}
-  
-  @Override
-  public IMap loadMap(final String path) {
+public final class MapLoader {
+  private MapLoader() {
+  }
+
+  public static IMap load(final String path) {
     final Map map = XmlUtilities.readFromFile(Map.class, path);
     if (map == null) {
       return null;

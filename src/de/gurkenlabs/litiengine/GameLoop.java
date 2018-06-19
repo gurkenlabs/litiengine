@@ -3,8 +3,6 @@ package de.gurkenlabs.litiengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
@@ -19,14 +17,12 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
    */
   public static final int TICK_DELTATIME_LAG = 67;
 
-  private static final Logger log = Logger.getLogger(GameLoop.class.getName());
   private static int executionIndex = -1;
 
   private final List<TimedAction> actions;
   private final int updateRate;
 
   private long deltaTime;
-  private boolean gameIsRunning = true;
 
   private long lastUpsTime;
 
@@ -44,7 +40,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   @Override
   public void close() {
-    this.gameIsRunning = false;
+    this.terminate();
   }
 
   @Override

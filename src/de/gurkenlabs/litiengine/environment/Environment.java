@@ -33,14 +33,13 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -103,8 +102,7 @@ public class Environment implements IEnvironment {
     this();
     final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
     if (loadedMap == null) {
-      final IMapLoader tmxLoader = TmxMapLoader.INSTANCE;
-      this.map = tmxLoader.loadMap(mapPath);
+      this.map = MapLoader.load(mapPath);
     } else {
       this.map = loadedMap;
     }
@@ -313,8 +311,10 @@ public class Environment implements IEnvironment {
     this.getTriggers().clear();
     this.getEntitiesByTag().clear();
 
-    for (Map<Integer, IEntity> type : this.entities.values())
+    for (Map<Integer, IEntity> type : this.entities.values()) {
       type.clear();
+    }
+
     this.initialized = false;
 
     this.fireEvent(l -> l.environmentCleared(this));
@@ -523,8 +523,10 @@ public class Environment implements IEnvironment {
   @Override
   public Collection<IEntity> getEntities() {
     final ArrayList<IEntity> ent = new ArrayList<>();
-    for (Map<Integer, IEntity> type : this.entities.values())
+    for (Map<Integer, IEntity> type : this.entities.values()) {
       ent.addAll(type.values());
+    }
+
     return ent;
   }
 

@@ -48,14 +48,13 @@ import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
@@ -231,8 +230,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
-      final IMapLoader tmxLoader = TmxMapLoader.INSTANCE;
-      Map map = (Map) tmxLoader.loadMap(mapFile);
+      Map map = (Map) MapLoader.load(mapFile);
       loadedMaps.add(map);
       log.log(Level.INFO, "map found: {0}", new Object[] { map.getFileName() });
     }
@@ -649,10 +647,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    final IMapLoader tmxLoader = new TmxMapLoader();
     XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
       String mapPath = file.toString();
-      Map map = (Map) tmxLoader.loadMap(mapPath);
+      Map map = (Map) MapLoader.load(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
         return;
@@ -1764,8 +1761,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     boolean collision = mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION, false);
     float collisionBoxWidth = mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
     float collisionBoxHeight = mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
-    final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALGIN));
-    final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALGIN));
+    final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN));
+    final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN));
 
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
       collisionBoxWidth = mapObject.getWidth();
