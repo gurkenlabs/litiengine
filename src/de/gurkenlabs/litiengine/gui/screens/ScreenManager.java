@@ -163,8 +163,15 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     if (fullscreen) {
       this.setUndecorated(true);
-      this.setExtendedState(Frame.MAXIMIZED_BOTH);
-      this.setVisible(true);
+      GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+      if (gd.isFullScreenSupported()) {
+        gd.setFullScreenWindow(this);
+      } else {
+        System.err.println("Full screen is not supported on this device.");
+        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+        setVisible(true);
+      }
       this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
     } else {
       this.setResolution(Game.getConfiguration().graphics().getResolution());
