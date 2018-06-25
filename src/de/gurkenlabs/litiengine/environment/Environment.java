@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -113,7 +114,7 @@ public class Environment implements IEnvironment {
 
   private Environment() {
     this.entitiesByTag = new ConcurrentHashMap<>();
-    this.entities = new ConcurrentHashMap<>();
+    this.entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.mobileEntities = new ConcurrentHashMap<>();
@@ -128,9 +129,9 @@ public class Environment implements IEnvironment {
     this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
     this.spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<Spawnpoint, Boolean>());
 
-    this.renderables = new ConcurrentHashMap<>();
+    this.renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
 
-    this.renderListeners = new ConcurrentHashMap<>();
+    this.renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
     this.listeners = new CopyOnWriteArrayList<>();
     this.entityListeners = new CopyOnWriteArrayList<>();
 
