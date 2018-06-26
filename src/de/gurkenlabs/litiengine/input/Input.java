@@ -13,7 +13,7 @@ public final class Input {
   // been paused
   private static final IGameLoop InputLoop;
   private static IGamepadManager gamePadManager;
-  private static List<IGamepad> gamePads;
+  private static List<Gamepad> gamePads;
   private static Keyboard keyboard;
   private static Mouse mouse;
 
@@ -63,7 +63,7 @@ public final class Input {
     return mouse;
   }
 
-  public static List<IGamepad> gamepads() {
+  public static List<Gamepad> gamepads() {
     return gamePads;
   }
 
@@ -72,7 +72,7 @@ public final class Input {
    *
    * @return The first available {@link IGamepad} instance
    */
-  public static IGamepad getGamepad() {
+  public static Gamepad getGamepad() {
     if (gamePads.isEmpty()) {
       return null;
     }
@@ -88,12 +88,12 @@ public final class Input {
    *          The index of the {@link IGamepad}.
    * @return The {@link IGamepad} with the specified index.
    */
-  public static IGamepad getGamepad(final int index) {
+  public static Gamepad getGamepad(final int index) {
     if (gamePads.isEmpty()) {
       return null;
     }
 
-    for (final IGamepad gamepad : gamePads) {
+    for (final Gamepad gamepad : gamePads) {
       if (gamepad.getIndex() == index) {
         return gamepad;
       }

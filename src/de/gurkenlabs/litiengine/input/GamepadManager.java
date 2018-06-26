@@ -23,8 +23,8 @@ import net.java.games.input.ControllerEnvironment;
 public class GamepadManager implements IGamepadManager {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
-  private final List<Consumer<IGamepad>> gamepadAddedConsumer;
-  private final List<Consumer<IGamepad>> gamepadRemovedConsumer;
+  private final List<Consumer<Gamepad>> gamepadAddedConsumer;
+  private final List<Consumer<Gamepad>> gamepadRemovedConsumer;
 
   private final Map<String, List<Consumer<Float>>> componentPollConsumer;
   private final Map<String, List<Consumer<Float>>> componentPressedConsumer;
@@ -78,7 +78,7 @@ public class GamepadManager implements IGamepadManager {
     this.onGamepadRemoved(pad -> {
       if (this.defaultgamePadIndex == pad.getIndex()) {
         this.defaultgamePadIndex = -1;
-        final IGamepad newGamePad = Input.getGamepad();
+        final Gamepad newGamePad = Input.getGamepad();
         if (newGamePad != null) {
           this.defaultgamePadIndex = newGamePad.getIndex();
           this.hookupToGamepad(newGamePad);
@@ -88,12 +88,12 @@ public class GamepadManager implements IGamepadManager {
   }
 
   @Override
-  public void onGamepadAdded(final Consumer<IGamepad> cons) {
+  public void onGamepadAdded(final Consumer<Gamepad> cons) {
     this.gamepadAddedConsumer.add(cons);
   }
 
   @Override
-  public void onGamepadRemoved(final Consumer<IGamepad> cons) {
+  public void onGamepadRemoved(final Consumer<Gamepad> cons) {
     this.gamepadRemovedConsumer.add(cons);
   }
 
@@ -140,13 +140,13 @@ public class GamepadManager implements IGamepadManager {
   }
 
   @Override
-  public void remove(final IGamepad gamepad) {
+  public void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
     }
 
     Input.gamepads().remove(gamepad);
-    for (final Consumer<IGamepad> cons : this.gamepadRemovedConsumer) {
+    for (final Consumer<Gamepad> cons : this.gamepadRemovedConsumer) {
       cons.accept(gamepad);
     }
   }
@@ -217,7 +217,7 @@ public class GamepadManager implements IGamepadManager {
     }
   }
 
-  private void hookupToGamepad(final IGamepad pad) {
+  private void hookupToGamepad(final Gamepad pad) {
     for (final Map.Entry<String, List<Consumer<Float>>> entry : this.componentPollConsumer.entrySet()) {
       for (final Consumer<Float> cons : entry.getValue()) {
         pad.onPoll(entry.getKey(), cons);
@@ -261,16 +261,16 @@ public class GamepadManager implements IGamepadManager {
           continue;
         }
 
-        final IGamepad existing = Input.getGamepad(i);
+        final Gamepad existing = Input.getGamepad(i);
         if (existing != null && existing.getName().equals(controller.getName())) {
           // already added
           continue;
         }
 
         // add new gamepads
-        final IGamepad newGamepad = new Gamepad(i, controller);
+        final Gamepad newGamepad = new Gamepad(i, controller);
         Input.gamepads().add(newGamepad);
-        for (final Consumer<IGamepad> cons : this.gamepadAddedConsumer) {
+        for (final Consumer<Gamepad> cons : this.gamepadAddedConsumer) {
           cons.accept(newGamepad);
         }
       }
