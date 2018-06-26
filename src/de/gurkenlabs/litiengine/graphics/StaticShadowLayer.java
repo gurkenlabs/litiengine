@@ -6,10 +6,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 
 public class StaticShadowLayer extends ColorLayer {
-  public StaticShadowLayer(IEnvironment env, int alpha, Color color) {
+  public StaticShadowLayer(Environment env, int alpha, Color color) {
     super(env, color, alpha);
   }
 

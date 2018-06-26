@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class EnvironmentEventTests {
-  private IEnvironment testEnvironment;
+  private Environment testEnvironment;
 
   @BeforeEach
   public void initEnvironment() {

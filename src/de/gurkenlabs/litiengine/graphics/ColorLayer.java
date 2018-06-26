@@ -9,20 +9,20 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public abstract class ColorLayer implements IRenderable {
-  private final IEnvironment environment;
+  private final Environment environment;
   private final Image[][] tiles;
 
   private int alpha;
   private Color color;
 
-  protected ColorLayer(IEnvironment env, final Color color, final int alpha) {
+  protected ColorLayer(Environment env, final Color color, final int alpha) {
     this.environment = env;
     this.color = color;
     this.alpha = alpha;
@@ -115,7 +115,7 @@ public abstract class ColorLayer implements IRenderable {
 
   protected abstract void renderSection(Graphics2D g, Rectangle2D section);
 
-  protected IEnvironment getEnvironment() {
+  protected Environment getEnvironment() {
     return this.environment;
   }
 }

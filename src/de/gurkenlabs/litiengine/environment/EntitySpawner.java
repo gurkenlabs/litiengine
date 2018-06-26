@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
   private int amount;
-  private IEnvironment environment;
+  private Environment environment;
   private int interval;
   private long lastSpawn;
   private int spawnDelay;
@@ -22,7 +22,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
   private List<Spawnpoint> spawnpoints;
 
-  public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
+  public EntitySpawner(final Environment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.environment = environment;
     this.interval = interval;
     this.spawnDelay = 1000;
@@ -86,7 +86,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.lastSpawn = Game.getLoop().getTicks();
   }
 
-  protected abstract void addToEnvironment(final IEnvironment env, T newEntity);
+  protected abstract void addToEnvironment(final Environment env, T newEntity);
 
   protected void spawnNewEntities() {
     if (this.getSpawnPoints().isEmpty()) {

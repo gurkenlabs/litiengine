@@ -14,14 +14,14 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.geom.Vector2D;
 
 public class AmbientLight extends ColorLayer {
 
-  public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
+  public AmbientLight(final Environment env, final Color ambientColor, final int ambientAlpha) {
     super(env, ambientColor, ambientAlpha);
   }
 

@@ -27,7 +27,7 @@ public class TriggerTests {
     when(target.sendMessage(any(Object.class), any(String.class))).thenReturn("answer");
     trigger.addTarget(456);
 
-    IEnvironment env = mock(IEnvironment.class);
+    Environment env = mock(Environment.class);
     Game.loadEnvironment(env);
     Game.init(Game.COMMADLINE_ARG_NOGUI);
     when(env.get(456)).thenReturn(target);

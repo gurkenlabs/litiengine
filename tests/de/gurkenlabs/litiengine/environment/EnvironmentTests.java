@@ -42,7 +42,7 @@ import de.gurkenlabs.litiengine.graphics.particles.Emitter;
 import de.gurkenlabs.litiengine.graphics.particles.Particle;
 
 public class EnvironmentTests {
-  private IEnvironment testEnvironment;
+  private Environment testEnvironment;
 
   @Test
   public void testInitialization() {
