@@ -13,8 +13,8 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
@@ -58,7 +58,7 @@ public final class Game {
   private static final GameTime gameTime;
 
   private static GameInfo gameInfo;
-  private static IEnvironment environment;
+  private static Environment environment;
   private static ICamera camera;
   private static IGameLoop gameLoop;
   private static RenderLoop renderLoop;
@@ -153,7 +153,7 @@ public final class Game {
     return configuration;
   }
 
-  public static IEnvironment getEnvironment() {
+  public static Environment getEnvironment() {
     return environment;
   }
 
@@ -337,7 +337,7 @@ public final class Game {
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
-  public static void loadEnvironment(final IEnvironment env) {
+  public static void loadEnvironment(final Environment env) {
     if (getEnvironment() != null) {
       getEnvironment().unload();
     }

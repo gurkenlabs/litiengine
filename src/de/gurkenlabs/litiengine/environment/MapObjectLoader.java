@@ -31,7 +31,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
+  public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
     return new ArrayList<>();
   }
 

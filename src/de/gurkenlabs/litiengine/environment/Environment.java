@@ -295,7 +295,6 @@ public class Environment {
     }
   }
 
-  @Override
   public void add(IRenderable renderable, RenderType renderType) {
     this.getRenderables(renderType).add(renderable);
   }
@@ -436,7 +435,6 @@ public class Environment {
     return (T) ent;
   }
 
-  @Override
   public <T extends IEntity> Collection<T> getByTag(String... tags) {
     return this.getByTag(null, tags);
   }

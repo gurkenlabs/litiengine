@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.entities.ai;
 
 import de.gurkenlabs.litiengine.entities.Entity;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.states.State;
 
