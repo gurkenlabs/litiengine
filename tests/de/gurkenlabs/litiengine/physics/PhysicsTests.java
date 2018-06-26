@@ -28,7 +28,7 @@ public class PhysicsTests {
       ent.setCollisionBoxHeight(16);
       ent.setLocation(10, 10);
 
-      IPhysicsEngine engine = new PhysicsEngine();
+      PhysicsEngine engine = new PhysicsEngine();
       engine.add(ent);
 
       loop.start();
@@ -59,7 +59,7 @@ public class PhysicsTests {
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
     engine.update();
 
@@ -81,7 +81,7 @@ public class PhysicsTests {
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
     engine.add(new Rectangle2D.Double(5, 5, 10, 10));
     engine.update();
@@ -97,7 +97,7 @@ public class PhysicsTests {
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
     engine.update();
 

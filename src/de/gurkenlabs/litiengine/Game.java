@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
@@ -73,7 +72,7 @@ public final class Game {
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
-  private static final IPhysicsEngine physicsEngine;
+  private static final PhysicsEngine physicsEngine;
   private static final ISoundEngine soundEngine;
   private static final GameTime gameTime;
 
@@ -212,7 +211,7 @@ public final class Game {
     return metrics;
   }
 
-  public static IPhysicsEngine getPhysicsEngine() {
+  public static PhysicsEngine getPhysicsEngine() {
     return physicsEngine;
   }
 
