@@ -50,7 +50,7 @@ public final class XmlUtilities {
    * @param indentation
    *          The indentation with which the XML should be saved.
    */
-  public static void saveWithCustomIndetation(ByteArrayInputStream input, FileOutputStream fos, int indentation) {
+  public static void saveWithCustomIndentation(ByteArrayInputStream input, FileOutputStream fos, int indentation) {
     try {
       Transformer transformer = SAXTransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
@@ -97,7 +97,7 @@ public final class XmlUtilities {
         stream = new FileInputStream(path);
       }
 
-      return (T) um.unmarshal(stream);
+      return cls.cast(um.unmarshal(stream));
     } catch (final JAXBException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
@@ -128,7 +128,7 @@ public final class XmlUtilities {
       out.flush();
 
       // second: postprocess xml and then write it to the file
-      XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+      XmlUtilities.saveWithCustomIndentation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
       out.close();
 
       jaxbMarshaller.marshal(object, out);

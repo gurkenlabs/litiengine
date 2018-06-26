@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.gui.screens.IScreen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -129,7 +130,7 @@ public class RenderComponent extends Canvas implements IRenderComponent {
   }
 
   @Override
-  public void render(final IRenderable screen) {
+  public void render() {
     final long currentMillis = System.currentTimeMillis();
     this.handleFade();
     Graphics2D g = null;
@@ -144,7 +145,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         g.setClip(bounds);
         g.fill(bounds);
 
-        screen.render(g);
+        final IScreen currentScreen = Game.getScreenManager().getCurrentScreen();
+        if (currentScreen != null) {
+          currentScreen.render(g);
+        }
 
         final Point locationOnScreen = this.getLocationOnScreen();
         final Rectangle rect = new Rectangle(locationOnScreen.x, locationOnScreen.y, this.getWidth(), this.getHeight());
@@ -171,10 +175,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
           g.fill(bounds);
         }
 
-        if (this.takeScreenShot) {
+        if (this.takeScreenShot && currentScreen != null) {
           final BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
           final Graphics2D imgGraphics = img.createGraphics();
-          screen.render(imgGraphics);
+          currentScreen.render(imgGraphics);
 
           imgGraphics.dispose();
           this.saveScreenShot(img);

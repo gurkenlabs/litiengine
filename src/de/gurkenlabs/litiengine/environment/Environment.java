@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,14 +34,13 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
-import de.gurkenlabs.litiengine.environment.tilemap.TmxMapLoader;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -103,8 +103,7 @@ public class Environment {
     this();
     final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
     if (loadedMap == null) {
-      final IMapLoader tmxLoader = new TmxMapLoader();
-      this.map = tmxLoader.loadMap(mapPath);
+      this.map = MapLoader.load(mapPath);
     } else {
       this.map = loadedMap;
     }
@@ -115,7 +114,7 @@ public class Environment {
 
   private Environment() {
     this.entitiesByTag = new ConcurrentHashMap<>();
-    this.entities = new ConcurrentHashMap<>();
+    this.entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
 
     this.combatEntities = new ConcurrentHashMap<>();
     this.mobileEntities = new ConcurrentHashMap<>();
@@ -130,9 +129,9 @@ public class Environment {
     this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
     this.spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<Spawnpoint, Boolean>());
 
-    this.renderables = new ConcurrentHashMap<>();
+    this.renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
 
-    this.renderListeners = new ConcurrentHashMap<>();
+    this.renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
     this.listeners = new CopyOnWriteArrayList<>();
     this.entityListeners = new CopyOnWriteArrayList<>();
 
@@ -312,8 +311,10 @@ public class Environment {
     this.getTriggers().clear();
     this.getEntitiesByTag().clear();
 
-    for (Map<Integer, IEntity> type : this.entities.values())
+    for (Map<Integer, IEntity> type : this.entities.values()) {
       type.clear();
+    }
+
     this.initialized = false;
 
     this.fireEvent(l -> l.environmentCleared(this));
@@ -407,7 +408,7 @@ public class Environment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   public IEntity get(final String name) {
@@ -432,7 +433,7 @@ public class Environment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   public <T extends IEntity> Collection<T> getByTag(String... tags) {
@@ -447,8 +448,8 @@ public class Environment {
         continue;
       }
       for (IEntity ent : this.getEntitiesByTag().get(tag)) {
-        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains((T) ent)) {
-          foundEntities.add((T) ent);
+        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains(ent)) {
+          foundEntities.add(clss.cast(ent));
         }
       }
 
@@ -511,8 +512,10 @@ public class Environment {
 
   public Collection<IEntity> getEntities() {
     final ArrayList<IEntity> ent = new ArrayList<>();
-    for (Map<Integer, IEntity> type : this.entities.values())
+    for (Map<Integer, IEntity> type : this.entities.values()) {
       ent.addAll(type.values());
+    }
+
     return ent;
   }
 
@@ -528,7 +531,7 @@ public class Environment {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
-        foundEntities.add((T) ent);
+        foundEntities.add(cls.cast(ent));
       }
     }
 

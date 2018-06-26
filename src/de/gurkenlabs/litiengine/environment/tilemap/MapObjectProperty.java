@@ -14,11 +14,8 @@ public final class MapObjectProperty {
 
   // collision entity
   public static final String COLLISION = "collision";
-  @Deprecated
-  public static final String COLLISION_ALGIN = COLLISION_ALIGN;
+
   public static final String COLLISION_ALIGN = "collisionAlign";
-  @Deprecated
-  public static final String COLLISION_VALGIN = COLLISION_VALIGN;
   public static final String COLLISION_VALIGN = "collisionValign";
 
   // collision box

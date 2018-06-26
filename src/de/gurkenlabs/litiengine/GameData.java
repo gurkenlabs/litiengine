@@ -158,7 +158,7 @@ public class GameData implements Serializable {
         out.flush();
 
         // second: postprocess xml and then write it to the file
-        XmlUtilities.saveWithCustomIndetation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
+        XmlUtilities.saveWithCustomIndentation(new ByteArrayInputStream(out.toByteArray()), fileOut, 1);
         out.close();
       }
     } catch (final JAXBException | IOException e) {

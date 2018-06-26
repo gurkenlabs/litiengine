@@ -24,7 +24,9 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 
 ## Getting Started
 
-* [Setup Eclipse Project manually](https://github.com/gurkenlabs/litiengine/wiki/Setup-Eclipse-Project-Manually)
+1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
+2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
+3. Load a .tmx Map and add a controllable Player
 * *More Documentation coming soon...*
 
 ## Features

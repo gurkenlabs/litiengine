@@ -22,7 +22,7 @@ public interface IRenderComponent extends IInitializable {
 
   public void onRendered(Consumer<Graphics2D> renderedConsumer);
 
-  public void render(IRenderable screen);
+  public void render();
 
   public void setBackground(Color color);
 

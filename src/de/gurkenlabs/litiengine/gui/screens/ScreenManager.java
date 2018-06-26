@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -109,14 +111,12 @@ public class ScreenManager extends JFrame implements IScreenManager {
     final IScreen targetScreen = opt.get();
     if (this.getCurrentScreen() != null) {
       this.getCurrentScreen().suspend();
-      Game.getRenderLoop().unregister(this.getCurrentScreen());
     }
 
     this.currentScreen = targetScreen;
     if (!Game.isInNoGUIMode()) {
       this.getCurrentScreen().prepare();
       this.setVisible(true);
-      Game.getRenderLoop().register(this.getCurrentScreen());
     }
 
     this.lastScreenChange = System.currentTimeMillis();
@@ -165,8 +165,15 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     if (fullscreen) {
       this.setUndecorated(true);
-      this.setExtendedState(Frame.MAXIMIZED_BOTH);
-      this.setVisible(true);
+      GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+      if (gd.isFullScreenSupported()) {
+        gd.setFullScreenWindow(this);
+      } else {
+        System.err.println("Full screen is not supported on this device.");
+        this.setExtendedState(Frame.MAXIMIZED_BOTH);
+        setVisible(true);
+      }
       this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
     } else {
       this.setResolution(Game.getConfiguration().graphics().getResolution());
