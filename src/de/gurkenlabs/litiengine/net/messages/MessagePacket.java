@@ -16,9 +16,9 @@ import de.gurkenlabs.litiengine.util.io.Serializer;
  * @param <T>
  *          the generic type
  */
-public class MessagePackage<T> extends Packet {
+public class MessagePacket<T> extends Packet {
 
-  private static final Logger log = Logger.getLogger(MessagePackage.class.getName());
+  private static final Logger log = Logger.getLogger(MessagePacket.class.getName());
   /**
    * The Content length byte count. UDP does only support up to 64k.
    */
@@ -36,7 +36,7 @@ public class MessagePackage<T> extends Packet {
    * @param packetId
    *          the packet id
    */
-  public MessagePackage(final byte packetId) {
+  public MessagePacket(final byte packetId) {
     super(packetId);
   }
 
@@ -47,7 +47,7 @@ public class MessagePackage<T> extends Packet {
    *          the content
    */
   @SuppressWarnings("unchecked")
-  public MessagePackage(final byte[] content) {
+  public MessagePacket(final byte[] content) {
     super(content);
     final int headerOffset = TYPEBYTECOUNT;
     final int dataOffset = headerOffset + CONTENTLENGTHBYTECOUNT;
@@ -78,7 +78,7 @@ public class MessagePackage<T> extends Packet {
    * @param object
    *          the object
    */
-  public MessagePackage(final MessageType type, final T object) {
+  public MessagePacket(final MessageType type, final T object) {
     super(type.getId());
     this.object = object;
   }
