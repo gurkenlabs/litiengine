@@ -86,34 +86,18 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   @Override
   public void displayScreen(final IScreen screen) {
-    this.displayScreen(screen.getName());
-  }
-
-  @Override
-  public void displayScreen(final String screen) {
-
-    // if the screen is already displayed or there is no screen with the
-    // specified name
-    if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
-      // TODO: provide reasonable log, why the screen was not switched
-      return;
-    }
-
     if (Game.hasStarted() && System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
       return;
     }
-
-    Optional<IScreen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
-    if (!opt.isPresent()) {
-      return;
-    }
-
-    final IScreen targetScreen = opt.get();
+    
     if (this.getCurrentScreen() != null) {
       this.getCurrentScreen().suspend();
     }
+    
+    if (!screens.contains(screen))
+      screens.add(screen);
 
-    this.currentScreen = targetScreen;
+    this.currentScreen = screen;
     if (!Game.isInNoGUIMode()) {
       this.getCurrentScreen().prepare();
       this.setVisible(true);
@@ -123,6 +107,23 @@ public class ScreenManager extends JFrame implements IScreenManager {
     for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.getCurrentScreen());
     }
+  }
+
+  @Override
+  public void displayScreen(final String screen) {
+    // if the screen is already displayed or there is no screen with the
+    // specified name
+    if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
+      // TODO: provide reasonable log, why the screen was not switched
+      return;
+    }
+
+    Optional<IScreen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
+    if (!opt.isPresent()) {
+      return;
+    }
+
+    displayScreen(opt.get());
   }
 
   @Override
