@@ -14,7 +14,7 @@ public final class Input {
   private static final IGameLoop InputLoop;
   private static IGamepadManager gamePadManager;
   private static List<IGamepad> gamePads;
-  private static IKeyboard keyboard;
+  private static Keyboard keyboard;
   private static Mouse mouse;
 
   static {
@@ -25,7 +25,7 @@ public final class Input {
   }
 
   public static void init() throws AWTException {
-    keyboard = new KeyBoard();
+    keyboard = new Keyboard();
     mouse = new Mouse();
     if (Game.getConfiguration().input().isGamepadSupport()) {
       gamePads = new CopyOnWriteArrayList<>();
@@ -55,7 +55,7 @@ public final class Input {
     return gamePadManager;
   }
 
-  public static IKeyboard keyboard() {
+  public static Keyboard keyboard() {
     return keyboard;
   }
 

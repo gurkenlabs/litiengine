@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.IUpdateable;
+
 /**
  * The listener interface for receiving userKey events. The class that is
  * interested in processing a userKey event implements this interface, and the
@@ -17,7 +19,7 @@ import java.util.function.Consumer;
  * component's <code>addUserKeyListener</code> method. When the userKey event
  * occurs, that object's appropriate method is invoked.
  */
-public class KeyBoard implements KeyEventDispatcher, IKeyboard {
+public class Keyboard implements KeyEventDispatcher, IUpdateable {
 
   private boolean consumeAlt;
   /** The key observers. */
@@ -41,7 +43,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   /**
    * Instantiates a new key board.
    */
-  public KeyBoard() {
+  public Keyboard() {
     this.keySpecificTypedConsumer = new CopyOnWriteArrayList<>();
     this.keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
     this.keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
@@ -58,7 +60,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     Input.getLoop().attach(this);
   }
 
-  @Override
   public void consumeAlt(final boolean consume) {
     this.consumeAlt = consume;
   }
@@ -88,7 +89,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     return false;
   }
 
-  @Override
   public String getText(final KeyEvent e) {
     if (this.isPressed(KeyEvent.VK_SHIFT) || Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
       return this.getShiftText(e);
@@ -99,7 +99,6 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     }
   }
 
-  @Override
   public boolean isPressed(final int keyCode) {
     for (final KeyEvent key : this.pressedKeys) {
       if (key.getKeyCode() == keyCode) {
@@ -110,37 +109,36 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     return false;
   }
 
-  @Override
   public void onKeyPressed(final int keyCode, final Consumer<KeyEvent> consumer) {
     this.keySpecificPressedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
-  @Override
   public void onKeyReleased(final int keyCode, final Consumer<KeyEvent> consumer) {
     this.keySpecificReleasedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
-  @Override
   public void onKeyTyped(final int keyCode, final Consumer<KeyEvent> consumer) {
     this.keySpecificTypedConsumer.add(new AbstractMap.SimpleEntry<>(keyCode, consumer));
   }
 
-  @Override
   public void onKeyPressed(Consumer<KeyEvent> consumer) {
     this.keyPressedConsumer.add(consumer);
   }
 
-  @Override
   public void onKeyReleased(Consumer<KeyEvent> consumer) {
     this.keyReleasedConsumer.add(consumer);
   }
 
-  @Override
   public void onKeyTyped(Consumer<KeyEvent> consumer) {
     this.keyTypedConsumer.add(consumer);
   }
 
-  @Override
+  /**
+   * Register for key events.
+   *
+   * @param observer
+   *          the observer
+   */
   public void addKeyObserver(final IKeyObserver observer) {
     if (this.keyObservers.contains(observer)) {
       return;
@@ -149,12 +147,16 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
     this.keyObservers.add(observer);
   }
 
-  @Override
+  /**
+   * Unregister from key down events.
+   *
+   * @param observer
+   *          the observer
+   */
   public void removeKeyObserver(final IKeyObserver observer) {
     this.keyObservers.remove(observer);
   }
 
-  @Override
   public void update() {
     this.executePressedKeys();
     this.executeReleasedKeys();
