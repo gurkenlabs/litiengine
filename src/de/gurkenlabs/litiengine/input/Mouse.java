@@ -22,10 +22,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
- * This implementation provides information about the mouse input in the
+ * This class provides information about the mouse input in the
  * litiengine.
  */
-public class Mouse implements IMouse {
+public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
   private final List<Consumer<MouseEvent>> mouseClickedConsumer;
@@ -80,43 +80,40 @@ public class Mouse implements IMouse {
     this.sensitivity = Game.getConfiguration().input().getMouseSensitivity();
     this.grabMouse = true;
   }
-
-  @Override
+  
+  /**
+   * Gets the render location.
+   *
+   * @return the render location
+   */
   public Point2D getLocation() {
     return this.location;
   }
 
-  @Override
   public Point2D getMapLocation() {
     return Game.getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getCamera().getRenderScale(), this.getLocation().getY() / Game.getCamera().getRenderScale()));
   }
 
-  @Override
   public Point getTile() {
     return MapUtilities.getTile(this.getMapLocation());
   }
 
-  @Override
   public boolean isGrabMouse() {
     return this.grabMouse;
   }
 
-  @Override
   public boolean isLeftMouseButtonDown() {
     return this.isLeftMouseButtonDown;
   }
 
-  @Override
   public boolean isPressed() {
     return this.pressed;
   }
 
-  @Override
   public boolean isRightMouseButtonDown() {
     return this.isRightMouseButtonDown;
   }
 
-  @Override
   public void mouseClicked(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -127,7 +124,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void mouseDragged(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -138,7 +134,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void mouseEntered(final MouseEvent e) {
     if (!this.grabMouse) {
       this.lastLocation = e.getPoint();
@@ -151,14 +146,12 @@ public class Mouse implements IMouse {
     this.mouseListeners.forEach(listener -> listener.mouseEntered(wrappedEvent));
   }
 
-  @Override
   public void mouseExited(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseExited(wrappedEvent));
   }
 
-  @Override
   public void mouseMoved(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -169,7 +162,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void mousePressed(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(true);
@@ -189,7 +181,6 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void mouseReleased(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(false);
@@ -209,43 +200,41 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
     this.wheelMovedConsumer.forEach(cons -> cons.accept(e));
   }
 
-  @Override
   public void onClicked(final Consumer<MouseEvent> consumer) {
     this.mouseClickedConsumer.add(consumer);
   }
 
-  @Override
   public void onDragged(final Consumer<MouseEvent> consumer) {
     this.mouseDraggedConsumer.add(consumer);
   }
 
-  @Override
   public void onMoved(final Consumer<MouseEvent> consumer) {
     this.mouseMovedConsumer.add(consumer);
   }
 
-  @Override
   public void onPressed(final Consumer<MouseEvent> consumer) {
     this.mousePressedConsumer.add(consumer);
   }
 
-  @Override
   public void onReleased(final Consumer<MouseEvent> consumer) {
     this.mouseReleasedConsumer.add(consumer);
   }
 
-  @Override
   public void onWheelMoved(final Consumer<MouseWheelEvent> consumer) {
     this.wheelMovedConsumer.add(consumer);
   }
-
-  @Override
+  
+  /**
+   * Register mouse listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void addMouseListener(final MouseListener listener) {
     if (this.mouseListeners.contains(listener)) {
       return;
@@ -254,7 +243,12 @@ public class Mouse implements IMouse {
     this.mouseListeners.add(listener);
   }
 
-  @Override
+  /**
+   * Register mouse motion listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void addMouseMotionListener(final MouseMotionListener listener) {
     if (this.mouseMotionListeners.contains(listener)) {
       return;
@@ -263,7 +257,12 @@ public class Mouse implements IMouse {
     this.mouseMotionListeners.add(listener);
   }
 
-  @Override
+  /**
+   * Register mouse wheel listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void addMouseWheelListener(final MouseWheelListener listener) {
     if (this.mouseWheelListeners.contains(listener)) {
       return;
@@ -272,12 +271,15 @@ public class Mouse implements IMouse {
     this.mouseWheelListeners.add(listener);
   }
 
-  @Override
+  /**
+   * If set to true, the mouse will be locked to the render component of the game.
+   * 
+   * @param grab True if the mouse should be grabbed to the {@link RenderComponent}, otherwise false.
+   */
   public void setGrabMouse(final boolean grab) {
     this.grabMouse = grab;
   }
 
-  @Override
   public void setLocation(final Point2D adjustMouse) {
     if (adjustMouse == null) {
       return;
@@ -293,22 +295,36 @@ public class Mouse implements IMouse {
     }
   }
 
-  @Override
   public void setLocation(double x, double y) {
     this.setLocation(new Point2D.Double(x, y));
   }
 
-  @Override
+  /**
+   * Unregister mouse listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void removeMouseListener(final MouseListener listener) {
     this.mouseListeners.remove(listener);
   }
 
-  @Override
+  /**
+   * Unregister mouse motion listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void removeMouseMotionListener(final MouseMotionListener listener) {
     this.mouseMotionListeners.remove(listener);
   }
 
-  @Override
+  /**
+   * Unregister mouse wheel listener.
+   *
+   * @param listener
+   *          the listener
+   */
   public void removeMouseWheelListener(final MouseWheelListener listener) {
     this.mouseWheelListeners.remove(listener);
   }

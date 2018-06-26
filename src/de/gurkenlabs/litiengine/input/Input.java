@@ -15,7 +15,7 @@ public final class Input {
   private static IGamepadManager gamePadManager;
   private static List<IGamepad> gamePads;
   private static IKeyboard keyboard;
-  private static IMouse mouse;
+  private static Mouse mouse;
 
   static {
     InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
@@ -59,7 +59,7 @@ public final class Input {
     return keyboard;
   }
 
-  public static IMouse mouse() {
+  public static Mouse mouse() {
     return mouse;
   }
 
