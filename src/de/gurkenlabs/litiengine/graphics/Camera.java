@@ -8,11 +8,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
-public class Camera implements ICamera {
+public class Camera implements IUpdateable {
   private final List<Consumer<Float>> zoomChangedConsumer;
   private final List<Consumer<Point2D>> focusChangedConsumer;
   /**
@@ -53,34 +54,55 @@ public class Camera implements ICamera {
     this.zoom = 1;
   }
 
-  @Override
+  /**
+   * Gets the map location that is focused by this camera.
+   *
+   * @return the focus map location
+   */
   public Point2D getFocus() {
     return this.focus;
   }
 
-  @Override
+  /**
+   * Gets the map location.
+   *
+   * @param point
+   *          the point
+   * @return the map location
+   */
   public Point2D getMapLocation(final Point2D viewPortLocation) {
     final double x = viewPortLocation.getX() - this.getPixelOffsetX();
     final double y = viewPortLocation.getY() - this.getPixelOffsetY();
     return new Point2D.Double(x, y);
   }
 
-  @Override
+  /**
+   * Gets the pixel offset x.
+   *
+   * @return the pixel offset x
+   */
   public double getPixelOffsetX() {
     return this.getViewPortCenterX() - (this.getFocus() != null ? this.getFocus().getX() : 0);
   }
 
-  @Override
+  /**
+   * Gets the pixel offset y.
+   *
+   * @return the pixel offset y
+   */
   public double getPixelOffsetY() {
     return this.getViewPortCenterY() - (this.getFocus() != null ? this.getFocus().getY() : 0);
   }
 
-  @Override
+  /**
+   * Gets the camera region.
+   *
+   * @return the camera region
+   */
   public Rectangle2D getViewPort() {
     return this.viewPort;
   }
 
-  @Override
   public Point2D getViewPortDimensionCenter(final IEntity entity) {
     final Point2D viewPortLocation = this.getViewPortLocation(entity);
 
@@ -97,42 +119,59 @@ public class Camera implements ICamera {
     return new Point2D.Double(viewPortLocation.getX() + spriteSheet.getSpriteWidth() * 0.5, viewPortLocation.getY() + spriteSheet.getSpriteHeight() * 0.5);
   }
 
-  @Override
+  /**
+   * Gets the render location.
+   *
+   * @param x
+   *          the x
+   * @param y
+   *          the y
+   * @return the render location
+   */
   public Point2D getViewPortLocation(final double x, final double y) {
     return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
 
-  @Override
+  /**
+   * This method calculates to location for the specified entity in relation to
+   * the focus map location of the camera.
+   *
+   * @param entity
+   *          the entity
+   * @return the render location
+   */
   public Point2D getViewPortLocation(final IEntity entity) {
     return this.getViewPortLocation(entity.getLocation());
   }
 
-  @Override
+  /**
+   * This method calculates to location for the specified point in relation to
+   * the focus map location of the camera.
+   *
+   * @param point
+   *          the point
+   * @return the render location
+   */
   public Point2D getViewPortLocation(final Point2D mapLocation) {
     return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
   }
 
-  @Override
   public float getZoom() {
     return this.zoom;
   }
 
-  @Override
   public float getRenderScale() {
     return Game.getRenderEngine().getBaseRenderScale() * this.getZoom();
   }
 
-  @Override
   public void onZoomChanged(final Consumer<Float> zoomCons) {
     this.zoomChangedConsumer.add(zoomCons);
   }
 
-  @Override
   public void onFocusChanged(Consumer<Point2D> focusCons) {
     this.focusChangedConsumer.add(focusCons);
   }
 
-  @Override
   public void setFocus(final Point2D focus) {
     this.focus = this.clampToMap(focus);
     
@@ -155,12 +194,10 @@ public class Camera implements ICamera {
     }
   }
 
-  @Override
   public void setFocus(double x, double y) {
     this.setFocus(new Point2D.Double(x, y));
   }
 
-  @Override
   public void setZoom(final float targetZoom, final int delay) {
     if (delay == 0) {
       for (final Consumer<Float> cons : this.zoomChangedConsumer) {
@@ -184,7 +221,6 @@ public class Camera implements ICamera {
     }
   }
 
-  @Override
   public void shake(final double intensity, final int delay, final int shakeDuration) {
     this.shakeTick = Game.getLoop().getTicks();
     this.shakeDelay = delay;
@@ -231,7 +267,6 @@ public class Camera implements ICamera {
     }
   }
 
-  @Override
   public void updateFocus() {
     this.setFocus(this.applyShakeEffect(this.getFocus()));
 
@@ -240,12 +275,10 @@ public class Camera implements ICamera {
     this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
   }
 
-  @Override
   public boolean isClampToMap() {
     return clampToMap;
   }
 
-  @Override
   public void setClampToMap(boolean clampToMap) {
     this.clampToMap = clampToMap;
   }

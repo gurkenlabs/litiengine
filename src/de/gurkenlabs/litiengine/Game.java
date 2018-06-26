@@ -19,7 +19,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
-import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
@@ -80,7 +79,7 @@ public final class Game {
 
   private static GameInfo gameInfo;
   private static Environment environment;
-  private static ICamera camera;
+  private static Camera camera;
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
   private static ScreenManager screenManager;
@@ -233,7 +232,7 @@ public final class Game {
     return soundEngine;
   }
 
-  public static ICamera getCamera() {
+  public static Camera getCamera() {
     return camera;
   }
 
@@ -464,7 +463,7 @@ public final class Game {
     System.exit(0);
   }
 
-  public static void setCamera(final ICamera cam) {
+  public static void setCamera(final Camera cam) {
     if (getCamera() != null) {
       Game.getLoop().detach(camera);
     }
