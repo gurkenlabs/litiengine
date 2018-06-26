@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -54,7 +55,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-public class Environment {
+public class Environment implements IInitializable, IRenderable {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
@@ -659,6 +660,7 @@ public class Environment {
     return tags;
   }
 
+  @Override
   public final void init() {
     if (this.initialized) {
       return;
@@ -866,6 +868,7 @@ public class Environment {
     }
   }
 
+  @Override
   public void render(final Graphics2D g) {
     g.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
 
