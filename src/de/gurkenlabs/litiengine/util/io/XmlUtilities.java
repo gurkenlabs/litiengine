@@ -97,7 +97,7 @@ public final class XmlUtilities {
         stream = new FileInputStream(path);
       }
 
-      return (T) um.unmarshal(stream);
+      return cls.cast(um.unmarshal(stream));
     } catch (final JAXBException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }

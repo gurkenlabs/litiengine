@@ -92,6 +92,7 @@ public class ConfigurationTests {
   }
 
   @ConfigurationGroupInfo(prefix = "test-prefix")
+  @SuppressWarnings("unused")
   private class TestConfigurationGroup extends ConfigurationGroup {
 
     private boolean testBoolean;

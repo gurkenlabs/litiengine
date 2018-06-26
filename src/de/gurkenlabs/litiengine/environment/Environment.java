@@ -402,7 +402,7 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   @Override
@@ -429,7 +429,7 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   @Override
@@ -446,8 +446,8 @@ public class Environment implements IEnvironment {
         continue;
       }
       for (IEntity ent : this.getEntitiesByTag().get(tag)) {
-        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains((T) ent)) {
-          foundEntities.add((T) ent);
+        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains(ent)) {
+          foundEntities.add(clss.cast(ent));
         }
       }
 
@@ -545,7 +545,7 @@ public class Environment implements IEnvironment {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
-        foundEntities.add((T) ent);
+        foundEntities.add(cls.cast(ent));
       }
     }
 
