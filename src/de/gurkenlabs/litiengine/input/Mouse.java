@@ -114,6 +114,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     return this.isRightMouseButtonDown;
   }
 
+  @Override
   public void mouseClicked(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -124,6 +125,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
   }
 
+  @Override
   public void mouseDragged(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -134,6 +136,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
   }
 
+  @Override
   public void mouseEntered(final MouseEvent e) {
     if (!this.grabMouse) {
       this.lastLocation = e.getPoint();
@@ -146,12 +149,14 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     this.mouseListeners.forEach(listener -> listener.mouseEntered(wrappedEvent));
   }
 
+  @Override
   public void mouseExited(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
     this.mouseListeners.forEach(listener -> listener.mouseExited(wrappedEvent));
   }
 
+  @Override
   public void mouseMoved(final MouseEvent e) {
     this.setLocation(e);
     final MouseEvent wrappedEvent = this.createEvent(e);
@@ -162,6 +167,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
   }
 
+  @Override
   public void mousePressed(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(true);
@@ -181,6 +187,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
   }
 
+  @Override
   public void mouseReleased(final MouseEvent e) {
     this.setLocation(e);
     this.setPressed(false);
@@ -200,6 +207,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     }
   }
 
+  @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     this.mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
     this.wheelMovedConsumer.forEach(cons -> cons.accept(e));
