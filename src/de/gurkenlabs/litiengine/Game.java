@@ -82,7 +82,7 @@ public final class Game {
   private static GameInfo gameInfo;
   private static Environment environment;
   private static ICamera camera;
-  private static IGameLoop gameLoop;
+  private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
   private static ScreenManager screenManager;
 
@@ -184,7 +184,7 @@ public final class Game {
     return gameInfo;
   }
 
-  public static IGameLoop getLoop() {
+  public static GameLoop getLoop() {
     return gameLoop;
   }
 

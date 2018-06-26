@@ -41,6 +41,7 @@ public class RenderLoop extends UpdateLoop {
     }
   }
 
+  @Override
   public void terminate() {
     this.gameIsRunning = false;
   }
