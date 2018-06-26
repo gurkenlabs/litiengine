@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.net.Package;
+import de.gurkenlabs.litiengine.net.Packet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.CompressionUtilities;
 import de.gurkenlabs.litiengine.util.io.Serializer;
@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.util.io.Serializer;
  * @param <T>
  *          the generic type
  */
-public class MessagePackage<T> extends Package {
+public class MessagePackage<T> extends Packet {
 
   private static final Logger log = Logger.getLogger(MessagePackage.class.getName());
   /**
