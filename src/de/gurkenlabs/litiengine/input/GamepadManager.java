@@ -16,11 +16,12 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
+import de.gurkenlabs.litiengine.ILaunchable;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
 
-public class GamepadManager implements IGamepadManager {
+public class GamepadManager implements ILaunchable, IGamepadEvents {
   private static final Logger log = Logger.getLogger(GamepadManager.class.getName());
 
   private final List<Consumer<Gamepad>> gamepadAddedConsumer;
@@ -87,12 +88,10 @@ public class GamepadManager implements IGamepadManager {
     });
   }
 
-  @Override
   public void onGamepadAdded(final Consumer<Gamepad> cons) {
     this.gamepadAddedConsumer.add(cons);
   }
 
-  @Override
   public void onGamepadRemoved(final Consumer<Gamepad> cons) {
     this.gamepadRemovedConsumer.add(cons);
   }
@@ -139,7 +138,6 @@ public class GamepadManager implements IGamepadManager {
     this.releasedConsumer.add(consumer);
   }
 
-  @Override
   public void remove(final Gamepad gamepad) {
     if (gamepad == null) {
       return;
