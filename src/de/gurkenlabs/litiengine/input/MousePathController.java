@@ -41,7 +41,7 @@ public class MousePathController extends MovementController<IMobileEntity> {
   public void update() {
     super.update();
     // can only walk if no forces are active
-    if (!this.isMovementAllowed() || !this.getActiceForces().isEmpty()) {
+    if (!this.isMovementAllowed() || !this.getActiveForces().isEmpty()) {
       this.navigator.stop();
       return;
     }

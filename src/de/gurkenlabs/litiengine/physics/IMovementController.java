@@ -12,7 +12,7 @@ public interface IMovementController extends IEntityController {
 
   public void apply(Force force);
 
-  public List<Force> getActiceForces();
+  public List<Force> getActiveForces();
 
   public void onMovementCheck(Predicate<IMobileEntity> predicate);
 
