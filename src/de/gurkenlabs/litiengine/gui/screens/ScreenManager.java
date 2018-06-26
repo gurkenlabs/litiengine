@@ -23,7 +23,12 @@ import javax.swing.JFrame;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
-public class ScreenManager extends JFrame implements IScreenManager {
+/**
+ * The screen manager manages all screens of a game. The method
+ * renderCurrentScreen is called from the render loop of the game and renders
+ * the current screen to the getRenderComponent() of this manager.
+ */
+public class ScreenManager extends JFrame {
 
   private static final int SCREENCHANGETIMEOUT = 200;
   private static final int ICONIFIED_MAX_FPS = 1;
@@ -73,7 +78,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
   }
 
-  @Override
   public void addScreen(final IScreen screen) {
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
@@ -84,12 +88,10 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
   }
 
-  @Override
   public void displayScreen(final IScreen screen) {
     this.displayScreen(screen.getName());
   }
 
-  @Override
   public void displayScreen(final String screen) {
 
     // if the screen is already displayed or there is no screen with the
@@ -125,27 +127,22 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
   }
 
-  @Override
   public Point2D getCenter() {
     return new Point2D.Double(this.getResolution().width / 2.0, this.getResolution().height / 2.0);
   }
 
-  @Override
   public IScreen getCurrentScreen() {
     return this.currentScreen;
   }
 
-  @Override
   public RenderComponent getRenderComponent() {
     return this.renderCanvas;
   }
 
-  @Override
   public Dimension getResolution() {
     return this.resolution;
   }
 
-  @Override
   public Point getScreenLocation() {
     if (this.screenLocation != null) {
       return this.screenLocation;
@@ -155,7 +152,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     return this.screenLocation;
   }
 
-  @Override
   public void init(final int width, final int height, final boolean fullscreen) {
     if (Game.isInNoGUIMode()) {
       this.resolution = new Dimension(0, 0);
@@ -194,7 +190,6 @@ public class ScreenManager extends JFrame implements IScreenManager {
     return super.isFocusOwner();
   }
 
-  @Override
   public void onResolutionChanged(final Consumer<Dimension> resolutionConsumer) {
     if (this.resolutionChangedConsumer.contains(resolutionConsumer)) {
       return;
@@ -203,19 +198,16 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.resolutionChangedConsumer.add(resolutionConsumer);
   }
 
-  @Override
   public void onScreenChanged(final Consumer<IScreen> screenConsumer) {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
     }
   }
 
-  @Override
   public void setResolution(Resolution res) {
     this.setResolution(res.getDimension());
   }
 
-  @Override
   public float getResolutionScale() {
     return this.resolutionScale;
   }

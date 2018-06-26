@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
@@ -85,7 +84,7 @@ public final class Game {
   private static ICamera camera;
   private static IGameLoop gameLoop;
   private static RenderLoop renderLoop;
-  private static IScreenManager screenManager;
+  private static ScreenManager screenManager;
 
   private static boolean hasStarted;
   private static boolean initialized;
@@ -227,7 +226,7 @@ public final class Game {
     return renderLoop;
   }
 
-  public static IScreenManager getScreenManager() {
+  public static ScreenManager getScreenManager() {
     return screenManager;
   }
 
