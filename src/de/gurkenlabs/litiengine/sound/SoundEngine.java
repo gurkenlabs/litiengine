@@ -54,7 +54,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playMusic(final Sound sound) {
+  public SoundPlayback playMusic(final Sound sound) {
     if (sound == null || this.music != null && sound.equals(this.music.getSound())) {
       return null;
     }
@@ -80,7 +80,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
+  public SoundPlayback playSound(final IEntity entity, final Sound sound) {
     if (sound == null) {
       return null;
     }
@@ -103,7 +103,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Point2D location, final Sound sound) {
+  public SoundPlayback playSound(final Point2D location, final Sound sound) {
     if (sound == null) {
       return null;
     }
@@ -124,7 +124,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Sound sound) {
+  public SoundPlayback playSound(final Sound sound) {
     if (sound == null) {
       return null;
     }
