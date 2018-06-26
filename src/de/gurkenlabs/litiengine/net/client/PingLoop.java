@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.net.messages.handlers.ClientMessageHandler;
 /**
  * The Class PingThread.
  */
-public class PingLoop extends ClientMessageHandler<PingResponseMessage> implements IPingLoop {
+public class PingLoop extends ClientMessageHandler<PingResponseMessage> implements ILaunchable {
   private static final Logger log = Logger.getLogger(PingLoop.class.getName());
   private final int clientId;
   private PingThread pingThread;
@@ -42,7 +42,6 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     provider.register(MessageType.PING, this);
   }
 
-  @Override
   public void onPingRecorded(final Consumer<Long> consumer) {
     if (this.pingRecordConsumer.contains(consumer)) {
       return;
