@@ -437,11 +437,11 @@ public class Environment implements IInitializable, IRenderable {
     return clss.cast(ent);
   }
 
-  public <T extends IEntity> Collection<T> getByTag(String... tags) {
-    return this.getByTag(null, tags);
+  public Collection<IEntity> getByTag(String... tags) {
+    return this.getByTag(IEntity.class, tags);
   }
 
-  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String... tags) {
+  public <T> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
     List<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
@@ -449,7 +449,7 @@ public class Environment implements IInitializable, IRenderable {
         continue;
       }
       for (IEntity ent : this.getEntitiesByTag().get(tag)) {
-        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains(ent)) {
+        if (clss.isInstance(ent) && !foundEntities.contains(ent)) {
           foundEntities.add(clss.cast(ent));
         }
       }
@@ -528,7 +528,7 @@ public class Environment implements IInitializable, IRenderable {
     return this.entitiesByTag;
   }
 
-  public <T extends IEntity> Collection<T> getByType(Class<T> cls) {
+  public <T> Collection<T> getByType(Class<? extends T> cls) {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
@@ -738,8 +738,7 @@ public class Environment implements IInitializable, IRenderable {
    * @see EntityInfo#customMapObjectType()
    */
   public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
-    CustomMapObjectLoader<T> mapObjectLoader = new CustomMapObjectLoader<>(mapObjectType, entityType);
-    registerMapObjectLoader(mapObjectLoader);
+    registerMapObjectLoader(new CustomMapObjectLoader<>(mapObjectType, entityType));
   }
 
   /**
