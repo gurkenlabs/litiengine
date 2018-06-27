@@ -1,47 +1,71 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
 public final class CustomMapObjectLoader<T extends IEntity> extends MapObjectLoader {
-  private static final Logger log = Logger.getLogger(CustomMapObjectLoader.class.getName());
+  @FunctionalInterface
+  private interface ConstructorInvocation<T> {
+    T invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+  }
 
-  private final Class<T> entityType;
+  private final ConstructorInvocation<T> invoke;
 
   protected CustomMapObjectLoader(String mapObjectType, Class<T> entityType) {
     super(mapObjectType);
-    this.entityType = entityType;
+    if (entityType.isInterface())
+      throw new IllegalArgumentException("Cannot create loader for interface or abstract class");
+    ConstructorInvocation<T> invoke;
+    try {
+      final Constructor<T> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
+      invoke = (e, o) -> constructor.newInstance(e, o);
+    } catch (NoSuchMethodException e1) {
+      try {
+        final Constructor<T> constructor = entityType.getConstructor(IMapObject.class, IEnvironment.class);
+        invoke = (e, o) -> constructor.newInstance(o, e);
+      } catch (NoSuchMethodException e2) {
+        try {
+          final Constructor<T> constructor = entityType.getConstructor(IMapObject.class);
+          invoke = (e, o) -> constructor.newInstance(o);
+        } catch (NoSuchMethodException e3) {
+          try {
+            final Constructor<T> constructor = entityType.getConstructor(IEnvironment.class);
+            invoke = (e, o) -> constructor.newInstance(e);
+          } catch (NoSuchMethodException e4) {
+            try {
+              final Constructor<T> constructor = entityType.getConstructor();
+              invoke = (e, o) -> constructor.newInstance();
+            } catch (NoSuchMethodException e5) {
+              throw new IllegalArgumentException("Entity class is missing a usable constructor");
+            }
+          }
+        }
+      }
+    }
+    this.invoke = invoke;
   }
 
   @Override
   public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
-    T entity = null;
+    T entity;
     try {
-      // check for constructor with IEnvironment and IMapObject parameter
-      Constructor<T> constructor = entityType.getConstructor(IEnvironment.class, IMapObject.class);
-      entity = constructor.newInstance(environment, mapObject);
-    } catch (Exception e1) {
-      try {
-        // check for constructor with IMapObject parameter
-        Constructor<T> constructor = entityType.getConstructor(IMapObject.class);
-        entity = constructor.newInstance(mapObject);
-      } catch (Exception e2) {
-        try {
-          // check for empty constructor
-          Constructor<T> constructor = entityType.getConstructor();
-          entity = constructor.newInstance();
-        } catch (Exception e3) {
-          log.log(Level.SEVERE, "Could not create an entity from a mapobject of type " + this.getMapObjectType() + ". Are you missing a matching constructor?", e3);
-          return new ArrayList<>();
-        }
-      }
+      entity = invoke.invoke(environment, mapObject);
+    } catch (InvocationTargetException e) {
+      // propagate the exception
+      Throwable cause = e.getCause();
+      if (cause instanceof RuntimeException)
+        throw (RuntimeException)cause;
+      if (cause instanceof Error)
+        throw (Error)cause;
+      
+      throw new RuntimeException(cause);
+    } catch (IllegalAccessException | InstantiationException e) {
+      throw new Error(e); // we shouldn't be getting these here
     }
 
     loadDefaultProperties(entity, mapObject);
