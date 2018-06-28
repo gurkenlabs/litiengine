@@ -48,7 +48,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
    *          The entity to add to the environment.
    */
   public void add(IEntity entity);
-  
+
   public void add(IRenderable renderable, RenderType renderType);
 
   public void clear();
@@ -73,6 +73,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public IEntity get(final int mapId);
 
+  public List<IEntity> get(final int... mapIds);
+
   public <T extends IEntity> T get(Class<T> clss, final int mapId);
 
   public IEntity get(final String name);
@@ -82,7 +84,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> Collection<T> getByTag(final String... tag);
 
   public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String... tag);
-  
+
   public Map<String, List<IEntity>> getEntitiesByTag();
 
   public AmbientLight getAmbientLight();
@@ -188,7 +190,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void loadFromMap(final int mapId);
 
   public void reloadFromMap(final int mapId);
-  
+
   public Collection<IEntity> load(IMapObject mapObject);
 
   public void remove(final IEntity entity);
@@ -196,7 +198,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public <T extends IEntity> void remove(final Collection<T> entities);
 
   public void remove(final int mapId);
-  
+
   public void remove(final String name);
 
   public void removeRenderable(IRenderable renderable);

@@ -112,10 +112,9 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.get("test"));
     assertNull(this.testEnvironment.get(""));
-    assertNull(this.testEnvironment.get(null));
+    int[] nullArray = null;
+    assertNull(this.testEnvironment.get(nullArray));
   }
-
-
 
   @Test
   public void testMobileEntity() {
@@ -348,7 +347,8 @@ public class EnvironmentTests {
     assertNull(this.testEnvironment.getCombatEntity(123456789));
     assertNull(this.testEnvironment.getMobileEntity(123456789));
     assertNull(this.testEnvironment.get(""));
-    assertNull(this.testEnvironment.get(null));
+    int[] nullArray = null;
+    assertNull(this.testEnvironment.get(nullArray));
   }
 
   @ParameterizedTest

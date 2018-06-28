@@ -125,4 +125,13 @@ public final class ArrayUtilities {
     return false;
   }
 
+  public static int[] toIntegerArray(List<Integer> intList) {
+    Object[] objArray = intList.toArray();
+    int[] intArray = new int[objArray.length];
+    for (int i = 0; i < intArray.length; i++) {
+      intArray[i] = (int) objArray[i];
+    }
+    return intArray;
+  }
+
 }
