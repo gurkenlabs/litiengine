@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -68,7 +69,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CreatureMapObjectLoader.class);
     }
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     final String spriteSheet = mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME);
     if (spriteSheet == null) {
       return entities;

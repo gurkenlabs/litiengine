@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -95,7 +96,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
 
     prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     entities.add(prop);
     return entities;
   }

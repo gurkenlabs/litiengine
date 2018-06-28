@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
@@ -28,11 +26,6 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   @Override
   public String getMapObjectType() {
     return this.mapObjectType;
-  }
-
-  @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
-    return new ArrayList<>();
   }
 
   /**

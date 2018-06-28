@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.Direction;
@@ -27,7 +28,7 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
     final Spawnpoint spawn = this.createSpawnpoint(mapObject, direction, spawnType);
     loadDefaultProperties(spawn, mapObject);
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     entities.add(spawn);
     return entities;
   }

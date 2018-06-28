@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -26,7 +27,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final Color color = mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     if (color == null || lightShape == null) {
       return entities;
     }
