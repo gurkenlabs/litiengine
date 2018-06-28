@@ -20,6 +20,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
   private List<Property> properties = new CopyOnWriteArrayList<>();
+  
+  @Override
+  public boolean hasCustomProperty(final String name) {
+    return properties != null && properties.stream().anyMatch(p -> p.getName().equals(name));
+  }
 
   @Override
   public String getCustomProperty(final String name) {
