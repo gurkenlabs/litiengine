@@ -10,12 +10,12 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
 public final class CustomMapObjectLoader extends MapObjectLoader {
+  private final ConstructorInvocation invoke;
+
   @FunctionalInterface
   private interface ConstructorInvocation {
     IEntity invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
-
-  private final ConstructorInvocation invoke;
 
   protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
@@ -64,9 +64,9 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
       if (cause instanceof Error)
         throw (Error)cause;
       
-      throw new RuntimeException(cause);
+      throw new MapObjectException(cause);
     } catch (IllegalAccessException | InstantiationException e) {
-      throw new Error(e); // we shouldn't be getting these here
+      throw new MapObjectException(e); // we shouldn't be getting these here
     }
 
     loadDefaultProperties(entity, mapObject);
