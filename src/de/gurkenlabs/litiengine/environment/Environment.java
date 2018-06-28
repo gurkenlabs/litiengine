@@ -752,7 +752,7 @@ public class Environment implements IEnvironment {
    * @see EntityInfo#customMapObjectType()
    */
   public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
-    CustomMapObjectLoader<T> mapObjectLoader = new CustomMapObjectLoader<>(mapObjectType, entityType);
+    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
     registerMapObjectLoader(mapObjectLoader);
   }
 

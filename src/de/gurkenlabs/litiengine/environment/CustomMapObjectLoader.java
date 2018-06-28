@@ -8,37 +8,37 @@ import java.util.Collection;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
-public final class CustomMapObjectLoader<T extends IEntity> extends MapObjectLoader {
+public final class CustomMapObjectLoader extends MapObjectLoader {
   @FunctionalInterface
-  private interface ConstructorInvocation<T> {
-    T invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+  private interface ConstructorInvocation {
+    IEntity invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
-  private final ConstructorInvocation<T> invoke;
+  private final ConstructorInvocation invoke;
 
-  protected CustomMapObjectLoader(String mapObjectType, Class<T> entityType) {
+  protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
     if (entityType.isInterface())
       throw new IllegalArgumentException("Cannot create loader for interface or abstract class");
-    ConstructorInvocation<T> invoke;
+    ConstructorInvocation invoke;
     try {
-      final Constructor<T> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
+      final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
       invoke = (e, o) -> constructor.newInstance(e, o);
     } catch (NoSuchMethodException e1) {
       try {
-        final Constructor<T> constructor = entityType.getConstructor(IMapObject.class, IEnvironment.class);
+        final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class, IEnvironment.class);
         invoke = (e, o) -> constructor.newInstance(o, e);
       } catch (NoSuchMethodException e2) {
         try {
-          final Constructor<T> constructor = entityType.getConstructor(IMapObject.class);
+          final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class);
           invoke = (e, o) -> constructor.newInstance(o);
         } catch (NoSuchMethodException e3) {
           try {
-            final Constructor<T> constructor = entityType.getConstructor(IEnvironment.class);
+            final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class);
             invoke = (e, o) -> constructor.newInstance(e);
           } catch (NoSuchMethodException e4) {
             try {
-              final Constructor<T> constructor = entityType.getConstructor();
+              final Constructor<? extends IEntity> constructor = entityType.getConstructor();
               invoke = (e, o) -> constructor.newInstance();
             } catch (NoSuchMethodException e5) {
               throw new IllegalArgumentException("Entity class is missing a usable constructor");
@@ -52,7 +52,7 @@ public final class CustomMapObjectLoader<T extends IEntity> extends MapObjectLoa
 
   @Override
   public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
-    T entity;
+    IEntity entity;
     try {
       entity = invoke.invoke(environment, mapObject);
     } catch (InvocationTargetException e) {
