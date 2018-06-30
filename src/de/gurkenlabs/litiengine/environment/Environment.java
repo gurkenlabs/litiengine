@@ -397,6 +397,10 @@ public class Environment implements IEnvironment {
   @Override
   public List<IEntity> get(final int... mapIds) {
     final ArrayList<IEntity> foundEntities = new ArrayList<>();
+    if (mapIds == null) {
+      return foundEntities;
+    }
+
     for (RenderType type : RenderType.values()) {
       for (int id : mapIds) {
         IEntity entity = this.entities.get(type).get(id);

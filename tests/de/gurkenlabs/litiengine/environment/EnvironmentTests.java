@@ -112,8 +112,34 @@ public class EnvironmentTests {
 
     assertNotNull(this.testEnvironment.get("test"));
     assertNull(this.testEnvironment.get(""));
-    int[] nullArray = null;
-    assertNull(this.testEnvironment.get(nullArray));
+  }
+
+  @Test
+  public void testGetById() {
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+
+    List<IEntity> noEntities = this.testEnvironment.get((int[]) null);
+    List<IEntity> entities = this.testEnvironment.get(1, 2);
+
+    assertNotNull(this.testEnvironment.get(1));
+    assertNotNull(this.testEnvironment.get(2));
+
+    assertNotNull(noEntities);
+    assertEquals(0, noEntities.size());
+    
+    assertNotNull(entities);
+    assertEquals(2, entities.size());
+    assertTrue(entities.contains(combatEntity));
+    assertTrue(entities.contains(combatEntity2));
   }
 
   @Test
@@ -347,8 +373,6 @@ public class EnvironmentTests {
     assertNull(this.testEnvironment.getCombatEntity(123456789));
     assertNull(this.testEnvironment.getMobileEntity(123456789));
     assertNull(this.testEnvironment.get(""));
-    int[] nullArray = null;
-    assertNull(this.testEnvironment.get(nullArray));
   }
 
   @ParameterizedTest
