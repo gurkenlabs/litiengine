@@ -18,20 +18,29 @@ public class TriggerEvent extends EventObject implements IEntityProvider {
     this.targets = targets;
     this.entity = entity;
   }
-
+  
+  /**
+   * Get the entity that activated the Trigger.
+   */
   @Override
   public IEntity getEntity() {
     return this.entity;
   }
-
+  /**
+   * Get this Trigger's message.
+   */
   public String getMessage() {
     return this.message;
   }
-
+  /**
+   * Get the entities that are affected by the Trigger.
+   */
   public List<Integer> getTargets() {
     return this.targets;
   }
-
+  /**
+   * Get the Trigger affected by this event.
+   */
   public Trigger getTrigger() {
     return trigger;
   }

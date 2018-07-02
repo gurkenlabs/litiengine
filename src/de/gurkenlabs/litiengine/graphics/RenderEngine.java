@@ -83,7 +83,6 @@ public final class RenderEngine implements IRenderEngine {
     if (text == null || text.isEmpty()) {
       return;
     }
-
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
@@ -181,8 +180,9 @@ public final class RenderEngine implements IRenderEngine {
     if (text == null || text.isEmpty()) {
       return;
     }
-    final FontRenderContext frc = g.getFontRenderContext();
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
+    final FontRenderContext frc = g.getFontRenderContext();
     final AttributedString styledText = new AttributedString(text);
     styledText.addAttribute(TextAttribute.FONT, g.getFont());
     final AttributedCharacterIterator iterator = styledText.getIterator();
@@ -196,6 +196,7 @@ public final class RenderEngine implements IRenderEngine {
       nextLayout.draw(g, x + dx, textY);
       textY += nextLayout.getDescent() + nextLayout.getLeading();
     }
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
   /**
