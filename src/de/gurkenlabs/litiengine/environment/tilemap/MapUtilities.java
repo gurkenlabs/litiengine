@@ -254,14 +254,14 @@ public final class MapUtilities {
   }
 
   public static Path2D convertPolylineToPath(final IMapObject mapObject) {
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().isEmpty()) {
       return null;
     }
 
     Path2D path = new Path2D.Float();
     path.moveTo(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-    for (int i = 1; i < mapObject.getPolyline().getPoints().size(); i++) {
-      Point2D point = mapObject.getPolyline().getPoints().get(i);
+    for (int i = 1; i < mapObject.getPolyline().size(); i++) {
+      Point2D point = mapObject.getPolyline().get(i);
       path.lineTo(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY());
     }
 
@@ -270,12 +270,12 @@ public final class MapUtilities {
 
   public static List<Point2D> convertPolylineToPointList(final IMapObject mapObject) {
     List<Point2D> points = new ArrayList<>();
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().isEmpty()) {
       return points;
     }
 
-    for (int i = 1; i < mapObject.getPolyline().getPoints().size(); i++) {
-      Point2D point = mapObject.getPolyline().getPoints().get(i);
+    for (int i = 1; i < mapObject.getPolyline().size(); i++) {
+      Point2D point = mapObject.getPolyline().get(i);
       points.add(new Point2D.Double(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY()));
     }
 

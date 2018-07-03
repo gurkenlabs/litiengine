@@ -10,10 +10,10 @@ import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
 @XmlRootElement(name = "polyline")
-public class Polyline implements IPolyline, Serializable {
+public class Polyline implements Serializable {
   private static final Logger log = Logger.getLogger(Polyline.class.getName());
   private static final long serialVersionUID = -9046398175130339L;
 
@@ -26,7 +26,12 @@ public class Polyline implements IPolyline, Serializable {
     this.points = new ArrayList<>();
   }
 
-  @Override
+  /**
+   * Gets all points of a polyline. The points are relative to the x and y
+   * coordiante of the parent {@link IMapObject}.
+   * 
+   * @return A list containing all points of the polyline.
+   */
   public List<Point2D> getPoints() {
     if (this.points.isEmpty()) {
       this.populateList();

@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -12,7 +13,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
 /**
  * The Class MapObject.
@@ -167,8 +167,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public IPolyline getPolyline() {
-    return this.polyline;
+  public List<Point2D> getPolyline() {
+    if (this.polyline == null)
+      return null;
+    return this.polyline.getPoints();
   }
 
   @Override
