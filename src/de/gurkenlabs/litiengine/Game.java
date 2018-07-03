@@ -333,6 +333,8 @@ public final class Game {
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
     }
     
+    Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
+    
     initialized = true;
   }
 
