@@ -79,7 +79,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public <T extends IEntity> T get(Class<T> clss, final String name);
 
-  public <T extends IEntity> Collection<T> getByTag(final String... tag);
+  public Collection<IEntity> getByTag(final String... tag);
 
   public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String... tag);
   
