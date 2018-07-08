@@ -61,11 +61,11 @@ public class CustomPanel extends PropertyPanel<IMapObject> {
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.scrollPane.setViewportView(tableCustomProperties);
     this.tableCustomProperties.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_name"), Resources.get("panel_value") }) {
-      Class[] columnTypes = new Class[] { String.class, String.class };
+      Class<?>[] columnTypes = new Class<?>[] { String.class, String.class };
       boolean[] columnEditables = new boolean[] { true, true };
 
       @Override
-      public Class getColumnClass(int columnIndex) {
+      public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
 

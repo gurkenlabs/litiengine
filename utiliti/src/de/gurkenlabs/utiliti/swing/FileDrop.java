@@ -247,6 +247,7 @@ public class FileDrop {
       // target.
     }
 
+    @SuppressWarnings("unchecked")
     public void drop(DropTargetDropEvent evt) {
       LOG.log(Level.FINE, "FileDrop: drop event.");
       try {

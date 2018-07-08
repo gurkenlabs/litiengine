@@ -531,6 +531,7 @@ public class MapSelectionPanel extends JSplitPane {
       return false;
     }
 
+    @SuppressWarnings("rawtypes")
     Enumeration en = parent.depthFirstEnumeration();
     while (en.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
