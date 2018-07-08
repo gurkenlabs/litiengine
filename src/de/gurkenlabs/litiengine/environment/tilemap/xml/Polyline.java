@@ -28,7 +28,7 @@ public class Polyline implements Serializable {
 
   /**
    * Gets all points of a polyline. The points are relative to the x and y
-   * coordiante of the parent {@link IMapObject}.
+   * coordinate of the parent {@link IMapObject}.
    * 
    * @return A list containing all points of the polyline.
    */
