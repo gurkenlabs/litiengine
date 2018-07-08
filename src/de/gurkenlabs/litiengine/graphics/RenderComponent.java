@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.gui.screens.IScreen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
@@ -31,7 +32,7 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
-public class RenderComponent extends Canvas implements IRenderComponent {
+public class RenderComponent extends Canvas implements IInitializable {
   private static final int DEBUG_MOUSE_SIZE = 5;
   private static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   private final transient List<Consumer<Integer>> fpsChangedConsumer;
@@ -72,7 +73,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.setPreferredSize(size);
   }
 
-  @Override
   public void fadeIn(final int ms) {
     this.fadeOutStart = -1;
     this.fadeOutTime = -1;
@@ -80,7 +80,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.fadeInTime = ms;
   }
 
-  @Override
   public void fadeOut(final int ms) {
     this.fadeInStart = -1;
     this.fadeInTime = -1;
@@ -88,12 +87,10 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.fadeOutTime = ms;
   }
 
-  @Override
   public Image getCursorImage() {
     return this.cursorImage;
   }
 
-  @Override
   public AffineTransform getCursorTransform() {
     return this.cursorTransform;
   }
@@ -113,7 +110,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.currentAlpha = 1.1f;
   }
 
-  @Override
   public void onFpsChanged(final Consumer<Integer> fpsConsumer) {
     if (this.fpsChangedConsumer.contains(fpsConsumer)) {
       return;
@@ -122,14 +118,12 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     this.fpsChangedConsumer.add(fpsConsumer);
   }
 
-  @Override
   public void onRendered(final Consumer<Graphics2D> renderedConsumer) {
     if (!this.renderedConsumer.contains(renderedConsumer)) {
       this.renderedConsumer.add(renderedConsumer);
     }
   }
 
-  @Override
   public void render() {
     final long currentMillis = System.currentTimeMillis();
     this.handleFade();
@@ -203,7 +197,6 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     }
   }
 
-  @Override
   public void setCursor(final Image image) {
     this.cursorImage = image;
     if (this.cursorImage != null) {
@@ -215,34 +208,28 @@ public class RenderComponent extends Canvas implements IRenderComponent {
     }
   }
 
-  @Override
   public void setCursor(final Image image, final int offsetX, final int offsetY) {
     this.setCursor(image);
     this.setCursorOffset(offsetX, offsetY);
   }
 
-  @Override
   public void setCursorOffset(final int x, final int y) {
     this.setCursorOffsetX(x);
     this.setCursorOffsetY(y);
   }
 
-  @Override
   public void setCursorOffsetX(final int cursorOffsetX) {
     this.cursorOffsetX = cursorOffsetX;
   }
 
-  @Override
   public void setCursorOffsetY(final int cursorOffsetY) {
     this.cursorOffsetY = cursorOffsetY;
   }
 
-  @Override
   public void setCursorTransform(AffineTransform transform) {
     this.cursorTransform = transform;
   }
 
-  @Override
   public void takeScreenshot() {
     this.takeScreenShot = true;
   }

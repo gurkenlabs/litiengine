@@ -13,22 +13,17 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
-import de.gurkenlabs.litiengine.graphics.ICamera;
-import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
-import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -71,21 +66,21 @@ public final class Game {
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
   private static final GameConfiguration configuration;
-  private static final IRenderEngine graphicsEngine;
+  private static final RenderEngine graphicsEngine;
 
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
-  private static final IPhysicsEngine physicsEngine;
-  private static final ISoundEngine soundEngine;
+  private static final PhysicsEngine physicsEngine;
+  private static final SoundEngine soundEngine;
   private static final GameTime gameTime;
 
   private static GameInfo gameInfo;
-  private static IEnvironment environment;
-  private static ICamera camera;
-  private static IGameLoop gameLoop;
+  private static Environment environment;
+  private static Camera camera;
+  private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
-  private static IScreenManager screenManager;
+  private static ScreenManager screenManager;
 
   private static boolean hasStarted;
   private static boolean initialized;
@@ -177,7 +172,7 @@ public final class Game {
     return configuration;
   }
 
-  public static IEnvironment getEnvironment() {
+  public static Environment getEnvironment() {
     return environment;
   }
 
@@ -185,7 +180,7 @@ public final class Game {
     return gameInfo;
   }
 
-  public static IGameLoop getLoop() {
+  public static GameLoop getLoop() {
     return gameLoop;
   }
 
@@ -215,11 +210,11 @@ public final class Game {
     return metrics;
   }
 
-  public static IPhysicsEngine getPhysicsEngine() {
+  public static PhysicsEngine getPhysicsEngine() {
     return physicsEngine;
   }
 
-  public static IRenderEngine getRenderEngine() {
+  public static RenderEngine getRenderEngine() {
     return graphicsEngine;
   }
 
@@ -227,15 +222,15 @@ public final class Game {
     return renderLoop;
   }
 
-  public static IScreenManager getScreenManager() {
+  public static ScreenManager getScreenManager() {
     return screenManager;
   }
 
-  public static ISoundEngine getSoundEngine() {
+  public static SoundEngine getSoundEngine() {
     return soundEngine;
   }
 
-  public static ICamera getCamera() {
+  public static Camera getCamera() {
     return camera;
   }
 
@@ -389,7 +384,7 @@ public final class Game {
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
-  public static void loadEnvironment(final IEnvironment env) {
+  public static void loadEnvironment(final Environment env) {
     if (getEnvironment() != null) {
       getEnvironment().unload();
     }
@@ -466,7 +461,7 @@ public final class Game {
     }
   }
 
-  public static void setCamera(final ICamera cam) {
+  public static void setCamera(final Camera cam) {
     if (getCamera() != null) {
       Game.getLoop().detach(camera);
     }

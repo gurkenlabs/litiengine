@@ -28,7 +28,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * specified, it calculates the sound volume and pan depending to the assigned
  * entity or location.
  */
-public final class SoundPlayback implements Runnable, ISoundPlayback {
+public final class SoundPlayback implements Runnable {
   private static final Logger log = Logger.getLogger(SoundPlayback.class.getName());
   private static final ExecutorService executorServie;
   protected static final SourceDataLineCloseQueue closeQueue;
@@ -135,7 +135,6 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     }
   }
 
-  @Override
   public void cancel() {
     this.cancelled = true;
 
@@ -145,42 +144,46 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     }
   }
 
-  @Override
+  /**
+   * Adds a <code>SoundPlaybackListener</code> to this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be added.
+   */
   public void addSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
     this.playbackListeners.add(soundPlaybackListener);
   }
 
-  @Override
+  /**
+   * Removes a <code>SoundPlaybackListener</code> to this instance.
+   *
+   * @param listener
+   *          The <code>SoundPlaybackListener</code> to be removed.
+   */
   public void removeSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
     this.playbackListeners.remove(soundPlaybackListener);
   }
 
-  @Override
   public float getGain() {
     return this.gain;
   }
 
-  @Override
   public void pausePlayback() {
     this.paused = true;
   }
 
-  @Override
   public void resumePlayback() {
     this.paused = false;
   }
 
-  @Override
   public boolean isPaused() {
     return this.paused;
   }
 
-  @Override
   public boolean isPlaying() {
     return this.playing;
   }
 
-  @Override
   public void setGain(float gain) {
     this.gain = MathUtilities.clamp(gain, 0, 1);
   }

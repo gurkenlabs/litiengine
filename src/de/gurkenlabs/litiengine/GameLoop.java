@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 
-public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
+public class GameLoop extends UpdateLoop implements AutoCloseable {
   /**
    * The tick {@link #getDeltaTime()} at which we consider the game not to run fluently anymore.
    * <ul>
@@ -43,17 +43,14 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
     this.terminate();
   }
 
-  @Override
   public long convertToMs(final long ticks) {
     return (long) (ticks / (this.updateRate / 1000.0));
   }
 
-  @Override
   public long convertToTicks(final int ms) {
     return (long) (this.updateRate / 1000.0 * ms);
   }
 
-  @Override
   public int execute(int delay, Runnable action) {
     final long d = this.convertToTicks(delay);
 
@@ -63,27 +60,35 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
     return a.getIndex();
   }
 
-  @Override
+  /**
+   * Gets the time that passed since the last tick in ms.
+   *
+   * @return The delta time in ms.
+   */
   public long getDeltaTime() {
     return this.deltaTime;
   }
 
-  @Override
+  /**
+   * Calculates the deltatime between the current game time and the specified
+   * ticks in ms.
+   *
+   * @param ticks
+   *          The ticks for which to calculate the delta time.
+   * @return The delta time in ms.
+   */
   public long getDeltaTime(final long ticks) {
     return this.convertToMs(this.totalTicks - ticks);
   }
 
-  @Override
   public long getTicks() {
     return this.totalTicks;
   }
 
-  @Override
   public float getTimeScale() {
     return this.timeScale;
   }
 
-  @Override
   public int getUpdateRate() {
     return this.updateRate;
   }
@@ -118,7 +123,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
     }
   }
 
-  @Override
   public void setTimeScale(final float timeScale) {
     this.timeScale = timeScale;
   }
@@ -128,7 +132,6 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
     this.interrupt();
   }
 
-  @Override
   public void updateExecutionTime(int index, long ticks) {
     for (TimedAction action : this.actions) {
       if (action.getIndex() == index) {

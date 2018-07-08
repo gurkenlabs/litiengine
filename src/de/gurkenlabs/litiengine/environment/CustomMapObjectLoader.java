@@ -14,7 +14,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
 
   @FunctionalInterface
   private interface ConstructorInvocation {
-    IEntity invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+    IEntity invoke(Environment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
   protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
@@ -23,11 +23,11 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot create loader for interface or abstract class");
     ConstructorInvocation invoke;
     try {
-      final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
+      final Constructor<? extends IEntity> constructor = entityType.getConstructor(Environment.class, IMapObject.class);
       invoke = (e, o) -> constructor.newInstance(e, o);
     } catch (NoSuchMethodException e1) {
       try {
-        final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class, IEnvironment.class);
+        final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class, Environment.class);
         invoke = (e, o) -> constructor.newInstance(o, e);
       } catch (NoSuchMethodException e2) {
         try {
@@ -35,7 +35,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
           invoke = (e, o) -> constructor.newInstance(o);
         } catch (NoSuchMethodException e3) {
           try {
-            final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class);
+            final Constructor<? extends IEntity> constructor = entityType.getConstructor(Environment.class);
             invoke = (e, o) -> constructor.newInstance(e);
           } catch (NoSuchMethodException e4) {
             try {
@@ -52,8 +52,8 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
-    IEntity entity;
+  public Collection<IEntity> load(Environment environment, IMapObject mapObject) {
+    IEntity entity = null;
     try {
       entity = invoke.invoke(environment, mapObject);
     } catch (InvocationTargetException e) {

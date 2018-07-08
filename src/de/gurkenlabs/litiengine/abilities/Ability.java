@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
@@ -144,7 +144,7 @@ public abstract class Ability implements IRenderable {
     return this.executor.getLocation();
   }
 
-  public float getRemainingCooldownInSeconds(final IGameLoop loop) {
+  public float getRemainingCooldownInSeconds(final GameLoop loop) {
     if (this.getCurrentExecution() == null || this.getExecutor() == null || this.getExecutor().isDead()) {
       return 0;
     }
@@ -153,7 +153,7 @@ public abstract class Ability implements IRenderable {
     return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
-  public boolean isCasting(final IGameLoop gameLoop) {
+  public boolean isCasting(final GameLoop gameLoop) {
     return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 

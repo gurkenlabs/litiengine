@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 /**
  * This interface represents an instance on a map that can define various things
@@ -47,7 +48,7 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
 
   public String getType();
 
-  public IPolyline getPolyline();
+  public List<Point2D> getPolyline();
 
   public void setGid(int gid);
 

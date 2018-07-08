@@ -1,14 +1,15 @@
 package de.gurkenlabs.litiengine.entities.ai;
 
 import de.gurkenlabs.litiengine.entities.Entity;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.states.State;
 
-public abstract class EntityState<T extends Entity> extends State implements IEntityState {
+public abstract class EntityState<T extends Entity> extends State implements IEntityProvider {
   private final T entity;
-  private final IEnvironment environment;
+  private final Environment environment;
 
-  protected EntityState(final String name, final T entity, final IEnvironment env) {
+  protected EntityState(final String name, final T entity, final Environment env) {
     super(name);
     this.entity = entity;
     this.environment = env;
@@ -19,7 +20,7 @@ public abstract class EntityState<T extends Entity> extends State implements IEn
     return this.entity;
   }
 
-  public IEnvironment getEnvironment() {
+  public Environment getEnvironment() {
     return this.environment;
   }
 }

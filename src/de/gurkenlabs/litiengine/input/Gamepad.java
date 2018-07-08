@@ -14,7 +14,7 @@ import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
-public class Gamepad implements IGamepad, IUpdateable {
+public class Gamepad implements IGamepadEvents, IUpdateable {
   public static final float AXIS_DEAD_ZONE = 0.3f;
   public static final float TRIGGER_DEAD_ZONE = 0.1f;
   public static final float STICK_DEADZONE = 0.15f;
@@ -50,17 +50,14 @@ public class Gamepad implements IGamepad, IUpdateable {
     Input.getLoop().attach(this);
   }
 
-  @Override
   public int getIndex() {
     return this.index;
   }
 
-  @Override
   public String getName() {
     return this.controller.getName();
   }
 
-  @Override
   public float getPollData(final Identifier identifier) {
     final Component comp = this.controller.getComponent(identifier);
     if (comp == null) {

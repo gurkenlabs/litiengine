@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -54,7 +55,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
-public class Environment implements IEnvironment {
+public class Environment implements IInitializable, IRenderable {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
@@ -120,39 +121,40 @@ public class Environment implements IEnvironment {
     }
   }
 
-  @Override
   public void addRenderListener(RenderType renderType, EnvironmentRenderListener listener) {
     this.renderListeners.get(renderType).add(listener);
   }
 
-  @Override
   public void removeRenderListener(EnvironmentRenderListener listener) {
     for (Collection<EnvironmentRenderListener> rends : this.renderListeners.values()) {
       rends.remove(listener);
     }
   }
 
-  @Override
   public void addListener(EnvironmentListener listener) {
     this.listeners.add(listener);
   }
 
-  @Override
   public void removeListener(EnvironmentListener listener) {
     this.listeners.remove(listener);
   }
 
-  @Override
   public void addEntityListener(EnvironmentEntityListener listener) {
     this.entityListeners.add(listener);
   }
 
-  @Override
   public void removeEntityListener(EnvironmentEntityListener listener) {
     this.entityListeners.remove(listener);
   }
 
-  @Override
+  /**
+   * Adds the specified entity to the environment container. This also loads the
+   * entity (register entity and controllers for update) if the environment has
+   * already been loaded.
+   *
+   * @param entity
+   *          The entity to add to the environment.
+   */
   public void add(final IEntity entity) {
     if (entity == null) {
       return;
@@ -271,12 +273,10 @@ public class Environment implements IEnvironment {
     }
   }
 
-  @Override
   public void add(IRenderable renderable, RenderType renderType) {
     this.getRenderables(renderType).add(renderable);
   }
 
-  @Override
   public void clear() {
     Game.getPhysicsEngine().clear();
     this.dispose(this.getEntities());
@@ -299,12 +299,22 @@ public class Environment implements IEnvironment {
     this.fireEvent(l -> l.environmentCleared(this));
   }
 
-  @Override
   public List<ICombatEntity> findCombatEntities(final Shape shape) {
     return this.findCombatEntities(shape, entity -> true);
   }
 
-  @Override
+  /**
+   * Searches for all combat entities whose hitBox intersect the specified
+   * shape.
+   * 
+   * @param shape
+   *          The shape to check intersection for.
+   * @param condition
+   *          An additional condition that allows to specify a condition which
+   *          determines if a {@link ICombatEntity} should be considered.
+   * @return A list of all combat entities that intersect the specified
+   *         {@link Shape}.
+   */
   public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
     final ArrayList<ICombatEntity> foundCombatEntities = new ArrayList<>();
     if (shape == null) {
@@ -334,7 +344,6 @@ public class Environment implements IEnvironment {
     return foundCombatEntities;
   }
 
-  @Override
   public List<IEntity> findEntities(final Shape shape) {
     final ArrayList<IEntity> foundEntities = new ArrayList<>();
     if (shape == null) {
@@ -361,7 +370,6 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
-  @Override
   public IEntity get(final int mapId) {
     for (RenderType type : RenderType.values()) {
       IEntity entity = this.entities.get(type).get(mapId);
@@ -373,7 +381,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  @Override
   public <T extends IEntity> T get(Class<T> clss, int mapId) {
     IEntity ent = this.get(mapId);
     if (ent == null || !clss.isInstance(ent)) {
@@ -383,7 +390,6 @@ public class Environment implements IEnvironment {
     return clss.cast(ent);
   }
 
-  @Override
   public IEntity get(final String name) {
     if (name == null || name.isEmpty()) {
       return null;
@@ -400,7 +406,6 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  @Override
   public <T extends IEntity> T get(Class<T> clss, String name) {
     IEntity ent = this.get(name);
     if (ent == null || !clss.isInstance(ent)) {
@@ -410,7 +415,6 @@ public class Environment implements IEnvironment {
     return clss.cast(ent);
   }
 
-  @Override
   public Collection<IEntity> getByTag(String... tags) {
     List<IEntity> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
@@ -425,8 +429,7 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
-  @Override
-  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String... tags) {
+  public <T> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
     List<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
@@ -445,72 +448,58 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
-  @Override
   public AmbientLight getAmbientLight() {
     return this.ambientLight;
   }
 
-  @Override
   public Collection<MapArea> getAreas() {
     return this.mapAreas;
   }
 
-  @Override
   public MapArea getArea(final int mapId) {
     return getById(this.getAreas(), mapId);
   }
 
-  @Override
   public MapArea getArea(final String name) {
     return getByName(this.getAreas(), name);
   }
 
-  @Override
   public Collection<Emitter> getEmitters() {
     return this.emitters;
   }
 
-  @Override
   public Emitter getEmitter(int mapId) {
     return getById(this.getEmitters(), mapId);
   }
 
-  @Override
   public Emitter getEmitter(String name) {
     return getByName(this.getEmitters(), name);
   }
 
-  @Override
   public Collection<CollisionBox> getCollisionBoxes() {
     return this.colliders;
   }
 
-  @Override
   public CollisionBox getCollisionBox(int mapId) {
     return getById(this.getCollisionBoxes(), mapId);
   }
 
-  @Override
   public CollisionBox getCollisionBox(String name) {
     return getByName(this.getCollisionBoxes(), name);
   }
 
-  @Override
   public Collection<ICombatEntity> getCombatEntities() {
     return this.combatEntities.values();
   }
 
-  @Override
   public ICombatEntity getCombatEntity(final int mapId) {
     return getById(this.getCombatEntities(), mapId);
   }
 
-  @Override
   public ICombatEntity getCombatEntity(String name) {
     return getByName(this.getCombatEntities(), name);
   }
 
-  @Override
   public Collection<IEntity> getEntities() {
     final ArrayList<IEntity> ent = new ArrayList<>();
     for (Map<Integer, IEntity> type : this.entities.values()) {
@@ -520,7 +509,6 @@ public class Environment implements IEnvironment {
     return ent;
   }
 
-  @Override
   public Collection<IEntity> getEntities(final RenderType renderType) {
     return this.entities.get(renderType).values();
   }
@@ -529,8 +517,7 @@ public class Environment implements IEnvironment {
     return this.entitiesByTag;
   }
 
-  @Override
-  public <T extends IEntity> Collection<T> getByType(Class<T> cls) {
+  public <T> Collection<T> getByType(Class<? extends T> cls) {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
@@ -541,140 +528,120 @@ public class Environment implements IEnvironment {
     return foundEntities;
   }
 
-  @Override
   public Collection<LightSource> getLightSources() {
     return this.lightSources;
   }
 
-  @Override
   public LightSource getLightSource(final int mapId) {
     return getById(this.getLightSources(), mapId);
   }
 
-  @Override
   public LightSource getLightSource(String name) {
     return getByName(this.getLightSources(), name);
   }
 
   /**
-   * Negative map ids are only used locally.
+   * Gets the next unique local map id. (All local map ids are negative).
+   * 
+   * @return The next unique local map id.
    */
-  @Override
   public synchronized int getLocalMapId() {
     return --localIdSequence;
   }
 
-  @Override
   public IMap getMap() {
     return this.map;
   }
 
-  @Override
   public Collection<IMobileEntity> getMobileEntities() {
     return this.mobileEntities.values();
   }
 
-  @Override
   public IMobileEntity getMobileEntity(final int mapId) {
     return getById(this.getMobileEntities(), mapId);
   }
 
-  @Override
   public IMobileEntity getMobileEntity(String name) {
     return getByName(this.getMobileEntities(), name);
   }
 
-  @Override
+  /**
+   * Gets the next unique global map id.
+   *
+   * @return The next unique global map id.
+   */
   public synchronized int getNextMapId() {
     return ++mapIdSequence;
   }
 
-  @Override
   public Collection<IRenderable> getRenderables(RenderType renderType) {
     return this.renderables.get(renderType);
   }
 
-  @Override
   public Collection<Prop> getProps() {
     return this.props;
   }
 
-  @Override
   public Prop getProp(int mapId) {
     return getById(this.getProps(), mapId);
   }
 
-  @Override
   public Prop getProp(String name) {
     return getByName(this.getProps(), name);
   }
 
-  @Override
   public Creature getCreature(int mapId) {
     return getById(this.getCreatures(), mapId);
   }
 
-  @Override
   public Creature getCreature(String name) {
     return getByName(this.getCreatures(), name);
   }
 
-  @Override
   public Collection<Creature> getCreatures() {
     return this.creatures;
   }
 
-  @Override
   public Spawnpoint getSpawnpoint(final int mapId) {
     return getById(this.getSpawnPoints(), mapId);
   }
 
-  @Override
   public Spawnpoint getSpawnpoint(final String name) {
     return getByName(this.getSpawnPoints(), name);
   }
 
-  @Override
   public Collection<Spawnpoint> getSpawnPoints() {
     return this.spawnPoints;
   }
 
-  @Override
   public Collection<StaticShadow> getStaticShadows() {
     return this.staticShadows;
   }
 
-  @Override
   public StaticShadow getStaticShadow(int mapId) {
     return getById(this.getStaticShadows(), mapId);
   }
 
-  @Override
   public StaticShadow getStaticShadow(String name) {
     return getByName(this.getStaticShadows(), name);
   }
 
-  @Override
   public StaticShadowLayer getStaticShadowLayer() {
     return this.staticShadowLayer;
   }
 
-  @Override
   public Trigger getTrigger(final int mapId) {
     return getById(this.getTriggers(), mapId);
   }
 
-  @Override
   public Trigger getTrigger(final String name) {
     return getByName(this.getTriggers(), name);
   }
 
-  @Override
   public Collection<Trigger> getTriggers() {
     return this.triggers;
   }
 
-  @Override
   public List<String> getUsedTags() {
     final List<String> tags = this.getEntitiesByTag().keySet().stream().collect(Collectors.toList());
     Collections.sort(tags);
@@ -696,12 +663,10 @@ public class Environment implements IEnvironment {
     this.initialized = true;
   }
 
-  @Override
   public boolean isLoaded() {
     return this.loaded;
   }
 
-  @Override
   public void load() {
     this.init();
     if (this.loaded) {
@@ -717,7 +682,6 @@ public class Environment implements IEnvironment {
     this.fireEvent(l -> l.environmentLoaded(this));
   }
 
-  @Override
   public void loadFromMap(final int mapId) {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       Optional<IMapObject> opt = layer.getMapObjects().stream().filter(mapObject -> mapObject.getType() != null && !mapObject.getType().isEmpty() && mapObject.getId() == mapId).findFirst();
@@ -763,8 +727,7 @@ public class Environment implements IEnvironment {
    * @see EntityInfo#customMapObjectType()
    */
   public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
-    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
-    registerMapObjectLoader(mapObjectLoader);
+    registerMapObjectLoader(new CustomMapObjectLoader(mapObjectType, entityType));
   }
 
   /**
@@ -793,13 +756,11 @@ public class Environment implements IEnvironment {
     registerCustomEntityType(info.customMapObjectType(), entityType);
   }
 
-  @Override
   public void reloadFromMap(final int mapId) {
     this.remove(mapId);
     this.loadFromMap(mapId);
   }
 
-  @Override
   public void remove(final IEntity entity) {
     if (entity == null) {
       return;
@@ -870,7 +831,6 @@ public class Environment implements IEnvironment {
     this.fireEntityEvent(l -> l.entityRemoved(entity));
   }
 
-  @Override
   public void remove(final int mapId) {
     final IEntity ent = this.get(mapId);
     if (ent == null) {
@@ -880,7 +840,6 @@ public class Environment implements IEnvironment {
     this.remove(ent);
   }
 
-  @Override
   public <T extends IEntity> void remove(Collection<T> entities) {
     if (entities == null) {
       return;
@@ -891,7 +850,6 @@ public class Environment implements IEnvironment {
     }
   }
 
-  @Override
   public void removeRenderable(final IRenderable renderable) {
     for (Collection<IRenderable> rends : this.renderables.values()) {
       rends.remove(renderable);
@@ -960,7 +918,6 @@ public class Environment implements IEnvironment {
     }
   }
 
-  @Override
   public void unload() {
     if (!this.loaded) {
       return;
@@ -975,7 +932,6 @@ public class Environment implements IEnvironment {
     this.fireEvent(l -> l.environmentUnloaded(this));
   }
 
-  @Override
   public Collection<IEntity> load(final IMapObject mapObject) {
     if (mapObjectLoaders.containsKey(mapObject.getType())) {
       Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(this, mapObject);

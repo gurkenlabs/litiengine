@@ -6,16 +6,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
-import de.gurkenlabs.litiengine.IGameLoop;
 
 public final class Input {
   // we need an own update loop because otherwise input won't work if the game has
   // been paused
-  private static final IGameLoop InputLoop;
-  private static IGamepadManager gamePadManager;
-  private static List<IGamepad> gamePads;
-  private static IKeyboard keyboard;
-  private static IMouse mouse;
+  private static final GameLoop InputLoop;
+  private static GamepadManager gamePadManager;
+  private static List<Gamepad> gamePads;
+  private static Keyboard keyboard;
+  private static Mouse mouse;
 
   static {
     InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
@@ -25,7 +24,7 @@ public final class Input {
   }
 
   public static void init() throws AWTException {
-    keyboard = new KeyBoard();
+    keyboard = new Keyboard();
     mouse = new Mouse();
     if (Game.getConfiguration().input().isGamepadSupport()) {
       gamePads = new CopyOnWriteArrayList<>();
@@ -47,23 +46,23 @@ public final class Input {
     }
   }
 
-  public static IGameLoop getLoop() {
+  public static GameLoop getLoop() {
     return InputLoop;
   }
 
-  public static IGamepadManager gamepadManager() {
+  public static GamepadManager gamepadManager() {
     return gamePadManager;
   }
 
-  public static IKeyboard keyboard() {
+  public static Keyboard keyboard() {
     return keyboard;
   }
 
-  public static IMouse mouse() {
+  public static Mouse mouse() {
     return mouse;
   }
 
-  public static List<IGamepad> gamepads() {
+  public static List<Gamepad> gamepads() {
     return gamePads;
   }
 
@@ -72,7 +71,7 @@ public final class Input {
    *
    * @return The first available {@link IGamepad} instance
    */
-  public static IGamepad getGamepad() {
+  public static Gamepad getGamepad() {
     if (gamePads.isEmpty()) {
       return null;
     }
@@ -88,12 +87,12 @@ public final class Input {
    *          The index of the {@link IGamepad}.
    * @return The {@link IGamepad} with the specified index.
    */
-  public static IGamepad getGamepad(final int index) {
+  public static Gamepad getGamepad(final int index) {
     if (gamePads.isEmpty()) {
       return null;
     }
 
-    for (final IGamepad gamepad : gamePads) {
+    for (final Gamepad gamepad : gamePads) {
       if (gamepad.getIndex() == index) {
         return gamepad;
       }
