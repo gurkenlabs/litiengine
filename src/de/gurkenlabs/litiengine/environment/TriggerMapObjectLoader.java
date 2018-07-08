@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -32,7 +33,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
     this.loadTargets(mapObject, trigger);
     this.loadActivators(mapObject, trigger);
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     entities.add(trigger);
     return entities;
   }

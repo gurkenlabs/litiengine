@@ -357,7 +357,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   private static class SourceDataLineCloseQueue implements Runnable {
-    private boolean isRunning = true;
+    private volatile boolean isRunning = true;
     private final Queue<SourceDataLine> queue = new ConcurrentLinkedQueue<>();
 
     public void enqueue(final SourceDataLine clip) {
@@ -371,9 +371,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
         try {
           Thread.sleep(50);
         } catch (final InterruptedException e) {
-          this.terminate();
-          log.log(Level.SEVERE, e.getMessage(), e);
-          Thread.currentThread().interrupt();
+          break;
         }
       }
 

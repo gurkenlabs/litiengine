@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,10 +53,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
     when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(true);
+    when(mapObject.getCustomPropertyBool(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
     when(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH)).thenReturn(100);
 
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH)).thenReturn(100.0f);
-    when(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT)).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(eq(MapObjectProperty.COLLISIONBOX_WIDTH), any(float.class))).thenReturn(100.0f);
+    when(mapObject.getCustomPropertyFloat(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
 
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");

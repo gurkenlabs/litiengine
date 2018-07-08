@@ -6,6 +6,7 @@ import java.util.List;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 
 public interface ICustomPropertyProvider {
+  boolean hasCustomProperty(String name);
 
   /**
    * Gets the custom property.

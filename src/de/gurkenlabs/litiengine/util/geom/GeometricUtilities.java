@@ -443,16 +443,7 @@ public class GeometricUtilities {
    * @return the point2 d
    */
   public static Point2D project(final Point2D start, final double angle, final double delta) {
-    double x = start.getX();
-    double y = start.getY();
-
-    // calculate delta
-    final double xDelta = getXDelta(angle, delta);
-    final double yDelta = getYDelta(angle, delta);
-    x += xDelta;
-    y += yDelta;
-
-    return new Point2D.Double(x, y);
+    return new Point2D.Double(start.getX() + delta * Math.cos(angle), start.getY() + delta * Math.sin(angle));
   }
 
   /**
@@ -472,16 +463,9 @@ public class GeometricUtilities {
     double dy = end.getY() - start.getY();
 
     // euclidean length
-    final float len = (float) Math.sqrt(dx * dx + dy * dy);
-    // normalize to unit vector
-    if (len != 0) { // avoid division by 0
-      dx /= len;
-      dy /= len;
-    }
-    // multiply by scalar amount
-    dx *= scalar;
-    dy *= scalar;
-    return new Point2D.Double(start.getX() + dx, start.getY() + dy);
+    final double len = Math.hypot(dx, dy);
+    
+    return new Point2D.Double(start.getX() + dx * scalar / len, start.getY() + dy * scalar / len);
   }
 
   public static Point2D[] rayCastPoints(final Point2D point, final Rectangle2D rectangle) {
@@ -580,13 +564,5 @@ public class GeometricUtilities {
     t.translate(renderLocation.getX(), renderLocation.getY());
     return shape;
 
-  }
-
-  private static double getXDelta(final double angle, final double delta) {
-    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
-  }
-
-  private static double getYDelta(final double angle, final double delta) {
-    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }

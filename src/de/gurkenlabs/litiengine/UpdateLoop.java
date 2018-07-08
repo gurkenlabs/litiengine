@@ -25,12 +25,10 @@ public abstract class UpdateLoop extends Thread implements ILoop {
       return;
     }
 
-    if (this.updatables.contains(updatable)) {
+    if (!this.updatables.add(updatable)) {
       log.log(Level.FINE, "Updatable {0} already registered for update!", new Object[] { updatable });
       return;
     }
-
-    this.updatables.add(updatable);
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,25 +58,25 @@ public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders;
 
-  private final Map<Integer, ICombatEntity> combatEntities;
-  private final Map<Integer, IMobileEntity> mobileEntities;
-  private final Map<RenderType, Map<Integer, IEntity>> entities;
-  private final Map<String, List<IEntity>> entitiesByTag;
+  private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
+  private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
+  private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final Map<String, List<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
 
-  private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners;
-  private final List<EnvironmentListener> listeners;
-  private final List<EnvironmentEntityListener> entityListeners;
+  private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
+  private final List<EnvironmentEntityListener> entityListeners = new CopyOnWriteArrayList<>();
 
-  private final Map<RenderType, Collection<IRenderable>> renderables;
-  private final Collection<CollisionBox> colliders;
-  private final Collection<LightSource> lightSources;
-  private final Collection<StaticShadow> staticShadows;
-  private final Collection<Trigger> triggers;
-  private final Collection<Prop> props;
-  private final Collection<Emitter> emitters;
-  private final Collection<Creature> creatures;
-  private final Collection<Spawnpoint> spawnPoints;
-  private final Collection<MapArea> mapAreas;
+  private final Map<RenderType, Collection<IRenderable>> renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
+  private final Collection<CollisionBox> colliders = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<LightSource> lightSources = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<StaticShadow> staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<Trigger> triggers = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<Prop> props = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<Emitter> emitters = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<Creature> creatures = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<Spawnpoint> spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<MapArea> mapAreas = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
   private AmbientLight ambientLight;
   private StaticShadowLayer staticShadowLayer;
@@ -112,28 +113,6 @@ public class Environment implements IEnvironment {
   }
 
   private Environment() {
-    this.entitiesByTag = new ConcurrentHashMap<>();
-    this.entities = new ConcurrentHashMap<>();
-
-    this.combatEntities = new ConcurrentHashMap<>();
-    this.mobileEntities = new ConcurrentHashMap<>();
-
-    this.lightSources = Collections.newSetFromMap(new ConcurrentHashMap<LightSource, Boolean>());
-    this.colliders = Collections.newSetFromMap(new ConcurrentHashMap<CollisionBox, Boolean>());
-    this.triggers = Collections.newSetFromMap(new ConcurrentHashMap<Trigger, Boolean>());
-    this.mapAreas = Collections.newSetFromMap(new ConcurrentHashMap<MapArea, Boolean>());
-    this.staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<StaticShadow, Boolean>());
-    this.props = Collections.newSetFromMap(new ConcurrentHashMap<Prop, Boolean>());
-    this.emitters = Collections.newSetFromMap(new ConcurrentHashMap<Emitter, Boolean>());
-    this.creatures = Collections.newSetFromMap(new ConcurrentHashMap<Creature, Boolean>());
-    this.spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<Spawnpoint, Boolean>());
-
-    this.renderables = new ConcurrentHashMap<>();
-
-    this.renderListeners = new ConcurrentHashMap<>();
-    this.listeners = new CopyOnWriteArrayList<>();
-    this.entityListeners = new CopyOnWriteArrayList<>();
-
     for (RenderType renderType : RenderType.values()) {
       this.entities.put(renderType, new ConcurrentHashMap<>());
       this.renderListeners.put(renderType, Collections.newSetFromMap(new ConcurrentHashMap<EnvironmentRenderListener, Boolean>()));
@@ -420,7 +399,7 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   @Override
@@ -447,12 +426,22 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    return (T) ent;
+    return clss.cast(ent);
   }
 
   @Override
-  public <T extends IEntity> Collection<T> getByTag(String... tags) {
-    return this.getByTag(null, tags);
+  public Collection<IEntity> getByTag(String... tags) {
+    List<IEntity> foundEntities = new ArrayList<>();
+    for (String rawTag : tags) {
+      String tag = rawTag.toLowerCase();
+      if (!this.getEntitiesByTag().containsKey(tag)) {
+        continue;
+      }
+
+      foundEntities.addAll(this.getEntitiesByTag().get(tag));
+    }
+
+    return foundEntities;
   }
 
   @Override
@@ -463,9 +452,10 @@ public class Environment implements IEnvironment {
       if (!this.getEntitiesByTag().containsKey(tag)) {
         continue;
       }
+
       for (IEntity ent : this.getEntitiesByTag().get(tag)) {
-        if ((clss == null || clss.isInstance(ent)) && !foundEntities.contains((T) ent)) {
-          foundEntities.add((T) ent);
+        if (!foundEntities.contains(ent) && clss.isInstance(ent)) {
+          foundEntities.add(clss.cast(ent));
         }
       }
 
@@ -563,7 +553,7 @@ public class Environment implements IEnvironment {
     List<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
-        foundEntities.add((T) ent);
+        foundEntities.add(cls.cast(ent));
       }
     }
 
@@ -792,7 +782,7 @@ public class Environment implements IEnvironment {
    * @see EntityInfo#customMapObjectType()
    */
   public static <T extends IEntity> void registerCustomEntityType(String mapObjectType, Class<T> entityType) {
-    CustomMapObjectLoader<T> mapObjectLoader = new CustomMapObjectLoader<>(mapObjectType, entityType);
+    CustomMapObjectLoader mapObjectLoader = new CustomMapObjectLoader(mapObjectType, entityType);
     registerMapObjectLoader(mapObjectLoader);
   }
 

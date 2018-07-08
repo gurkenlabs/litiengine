@@ -38,9 +38,8 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   private transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
   private transient boolean added;
-
-  @Override
-  public List<IMapObject> getMapObjects() {
+  
+  private void loadMapObjects() {
     if (!this.added) {
       if (this.objects != null) {
         this.mapObjects.addAll(this.objects);
@@ -48,7 +47,11 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
       this.added = true;
     }
+  }
 
+  @Override
+  public List<IMapObject> getMapObjects() {
+    loadMapObjects();
     return mapObjects;
   }
 
@@ -70,6 +73,7 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   @Override
   public void addMapObject(IMapObject mapObject) {
+    loadMapObjects();
     this.mapObjects.add(mapObject);
     if (mapObject instanceof MapObject) {
       this.objects.add((MapObject) mapObject);

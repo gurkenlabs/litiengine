@@ -12,7 +12,6 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
   private static final Logger log = Logger.getLogger(ConsoleCommandListener.class.getName());
 
   private final List<ICommandManager> commandManagers;
-  private boolean gameIsRunning = true;
 
   public ConsoleCommandListener(final ICommandManager... commandManagers) {
     this.commandManagers = new ArrayList<>();
@@ -35,7 +34,7 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
 
   @Override
   public void run() {
-    while (this.gameIsRunning) {
+    while (!interrupted()) {
 
       final BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
       String s;
@@ -51,14 +50,13 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
       try {
         Thread.sleep(500);
       } catch (final InterruptedException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        this.interrupt();
+        break;
       }
     }
   }
 
   @Override
   public void terminate() {
-    this.gameIsRunning = false;
+    interrupt();
   }
 }

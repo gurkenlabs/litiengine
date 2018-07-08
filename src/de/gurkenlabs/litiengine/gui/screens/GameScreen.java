@@ -3,12 +3,14 @@ package de.gurkenlabs.litiengine.gui.screens;
 import java.awt.Graphics2D;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 
-@ScreenInfo(name = "GAME")
 public class GameScreen extends Screen {
   public GameScreen() {
-    super();
+    super("GAME");
+  }
+  
+  protected GameScreen(String name) {
+    super(name);
   }
 
   @Override

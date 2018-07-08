@@ -53,7 +53,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     CustomEmitter emitter = this.createCustomEmitter(data);
     loadDefaultProperties(emitter, mapObject);
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     entities.add(emitter);
 
     return entities;

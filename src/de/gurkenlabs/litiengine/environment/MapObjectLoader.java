@@ -1,8 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
@@ -28,11 +26,6 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   @Override
   public String getMapObjectType() {
     return this.mapObjectType;
-  }
-
-  @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
-    return new ArrayList<>();
   }
 
   /**
@@ -99,9 +92,9 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   public static void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
-    entity.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION));
-    entity.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH));
-    entity.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT));
+    entity.setCollision(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION, true));
+    entity.setCollisionBoxWidth(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
+    entity.setCollisionBoxHeight(mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
     entity.setCollisionBoxAlign(Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN)));
     entity.setCollisionBoxValign(Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN)));
   }

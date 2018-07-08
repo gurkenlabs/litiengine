@@ -333,6 +333,8 @@ public final class Game {
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
     }
     
+    Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
+    
     initialized = true;
   }
 
@@ -462,8 +464,6 @@ public final class Game {
     for (final GameTerminatedListener listener : gameTerminatedListeners) {
       listener.terminated();
     }
-
-    System.exit(0);
   }
 
   public static void setCamera(final ICamera cam) {

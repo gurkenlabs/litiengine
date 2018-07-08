@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.CollisionBox;
@@ -29,7 +30,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
     col.setCollisionBoxWidth(col.getWidth());
     col.setCollisionBoxHeight(col.getHeight());
 
-    Collection<IEntity> entities = super.load(environment, mapObject);
+    Collection<IEntity> entities = new ArrayList<>();
     entities.add(col);
 
     if (isObstructingLight) {

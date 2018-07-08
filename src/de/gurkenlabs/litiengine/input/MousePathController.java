@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.pathfinding.IEntityNavigator;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
-public class MousePathController extends MovementController {
+public class MousePathController extends MovementController<IMobileEntity> {
   /** The player is navigating. */
   private boolean navigating;
 
@@ -41,7 +41,7 @@ public class MousePathController extends MovementController {
   public void update() {
     super.update();
     // can only walk if no forces are active
-    if (!this.isMovementAllowed() || !this.getActiceForces().isEmpty()) {
+    if (!this.isMovementAllowed() || !this.getActiveForces().isEmpty()) {
       this.navigator.stop();
       return;
     }

@@ -42,7 +42,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   @Override
-  public List<Force> getActiceForces() {
+  public List<Force> getActiveForces() {
     return this.activeForces;
   }
 
