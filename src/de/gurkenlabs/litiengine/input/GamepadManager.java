@@ -49,13 +49,12 @@ public class GamepadManager implements IGamepadManager {
     this.releasedConsumer = new CopyOnWriteArrayList<>();
 
     this.hotPlugThread = new Thread(() -> {
-      while (true) {
+      while (!Thread.interrupted()) {
         this.updateGamepads();
 
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
           break;
         }
       }

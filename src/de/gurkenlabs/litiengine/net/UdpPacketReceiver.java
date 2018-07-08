@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.net;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -16,9 +17,6 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
 
   /** The incoming packet observers. */
   private final ArrayList<IIncomingPacketObserver> incomingPacketObservers;
-
-  /** The is terminated. */
-  private boolean isTerminated;
 
   /** The socket. */
   private DatagramSocket socket;
@@ -56,11 +54,13 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
 
   @Override
   public void run() {
-    while (!this.isTerminated) {
+    while (!interrupted()) {
       final byte[] data = new byte[10000];
       final DatagramPacket packet = new DatagramPacket(data, data.length);
       try {
         this.socket.receive(packet);
+      } catch (InterruptedIOException e) {
+        break;
       } catch (final IOException e) {
         log.log(Level.SEVERE, e.getMessage(), e);
       }
@@ -75,6 +75,6 @@ public class UdpPacketReceiver extends Thread implements IPacketReceiver {
 
   @Override
   public void terminate() {
-    this.isTerminated = true;
+    interrupt();
   }
 }
