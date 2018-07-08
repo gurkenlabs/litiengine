@@ -24,7 +24,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
-import de.gurkenlabs.litiengine.annotation.ScreenInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -49,7 +48,6 @@ import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 
-@ScreenInfo(name = "Editor")
 public class EditorScreen extends Screen {
   private static final Logger log = Logger.getLogger(EditorScreen.class.getName());
   private static final int STATUS_DURATION = 5000;
@@ -84,6 +82,7 @@ public class EditorScreen extends Screen {
   private boolean loading;
 
   private EditorScreen() {
+    super("Editor");
     this.comps = new ArrayList<>();
   }
 
