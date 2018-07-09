@@ -63,8 +63,9 @@ public class Appearance {
     if (this.isTransparentBackground()) {
       return null;
     }
-
-    if (this.backgroundColor2 == null) {
+    if (this.backgroundColor1 == null) {
+      return this.backgroundColor2;
+    } else if (this.backgroundColor2 == null) {
       return this.backgroundColor1;
     }
 

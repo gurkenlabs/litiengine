@@ -381,6 +381,24 @@ public class Environment implements IInitializable, IRenderable {
     return null;
   }
 
+  public List<IEntity> get(final int... mapIds) {
+    final ArrayList<IEntity> foundEntities = new ArrayList<>();
+    if (mapIds == null) {
+      return foundEntities;
+    }
+
+    for (RenderType type : RenderType.values()) {
+      for (int id : mapIds) {
+        IEntity entity = this.entities.get(type).get(id);
+        if (entity != null) {
+          foundEntities.add(entity);
+        }
+      }
+
+    }
+    return foundEntities;
+  }
+
   public <T extends IEntity> T get(Class<T> clss, int mapId) {
     IEntity ent = this.get(mapId);
     if (ent == null || !clss.isInstance(ent)) {
@@ -833,6 +851,15 @@ public class Environment implements IInitializable, IRenderable {
 
   public void remove(final int mapId) {
     final IEntity ent = this.get(mapId);
+    if (ent == null) {
+      return;
+    }
+
+    this.remove(ent);
+  }
+
+  public void remove(String name) {
+    final IEntity ent = this.get(name);
     if (ent == null) {
       return;
     }
