@@ -69,7 +69,7 @@ public final class Input {
   /**
    * Gets the first game pad that is currently available.
    *
-   * @return The first available {@link IGamepad} instance
+   * @return The first available {@link Gamepad} instance
    */
   public static Gamepad getGamepad() {
     if (gamePads.isEmpty()) {
@@ -84,8 +84,8 @@ public final class Input {
    * re-plugging a controller while the game is running, its index might change.
    *
    * @param index
-   *          The index of the {@link IGamepad}.
-   * @return The {@link IGamepad} with the specified index.
+   *          The index of the {@link Gamepad}.
+   * @return The {@link Gamepad} with the specified index.
    */
   public static Gamepad getGamepad(final int index) {
     if (gamePads.isEmpty()) {

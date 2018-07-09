@@ -51,7 +51,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * 
    * @param sound
    *          The sound from which to play the background music.
-   * @return A {@link ISoundPlayback} instance that allows to further process
+   * @return A {@link SoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
   public SoundPlayback playMusic(final Sound sound) {
@@ -77,7 +77,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @param sound
    *          The sound to play.
    * 
-   * @return A {@link ISoundPlayback} instance that allows to further process
+   * @return A {@link SoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
   public SoundPlayback playSound(final IEntity entity, final Sound sound) {
@@ -100,7 +100,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @param sound
    *          The sound to play.
    * 
-   * @return A {@link ISoundPlayback} instance that allows to further process
+   * @return A {@link SoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
   public SoundPlayback playSound(final Point2D location, final Sound sound) {
@@ -121,7 +121,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * @param sound
    *          The sound to play.
    * 
-   * @return A {@link ISoundPlayback} instance that allows to further process
+   * @return A {@link SoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
   public SoundPlayback playSound(final Sound sound) {
@@ -141,7 +141,7 @@ public final class SoundEngine implements ILaunchable, IUpdateable {
    * still be heard. If the distance between the sound source and the listener
    * is greater than the specified value, the volume is set to 0.
    * 
-   * @param distance
+   * @param radius
    *          The maximum distance at which sounds can still be heard.
    */
   public void setMaxDistance(final float radius) {

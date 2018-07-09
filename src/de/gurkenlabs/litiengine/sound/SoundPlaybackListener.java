@@ -4,7 +4,7 @@ import java.util.EventListener;
 
 /**
  * This event listener implementation provides callbacks for when a
- * {@link ISoundPlayback} instance gets cancelled or finished.
+ * {@link SoundPlayback} instance gets cancelled or finished.
  *
  */
 public interface SoundPlaybackListener extends EventListener {

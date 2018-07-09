@@ -507,7 +507,7 @@ public final class RenderEngine {
    * @param scale
    *          The base render scale for the game.
    * 
-   * @see ICamera#getRenderScale()
+   * @see Camera#getRenderScale()
    */
   public void setBaseRenderScale(float scale) {
     this.baseRenderScale = scale;

@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**

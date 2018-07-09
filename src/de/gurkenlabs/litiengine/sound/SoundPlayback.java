@@ -150,8 +150,8 @@ public final class SoundPlayback implements Runnable {
    * @param listener
    *          The <code>SoundPlaybackListener</code> to be added.
    */
-  public void addSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
-    this.playbackListeners.add(soundPlaybackListener);
+  public void addSoundPlaybackListener(SoundPlaybackListener listener) {
+    this.playbackListeners.add(listener);
   }
 
   /**
@@ -160,8 +160,8 @@ public final class SoundPlayback implements Runnable {
    * @param listener
    *          The <code>SoundPlaybackListener</code> to be removed.
    */
-  public void removeSoundPlaybackListener(SoundPlaybackListener soundPlaybackListener) {
-    this.playbackListeners.remove(soundPlaybackListener);
+  public void removeSoundPlaybackListener(SoundPlaybackListener listener) {
+    this.playbackListeners.remove(listener);
   }
 
   public float getGain() {

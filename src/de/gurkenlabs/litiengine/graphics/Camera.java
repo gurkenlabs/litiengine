@@ -148,7 +148,7 @@ public class Camera implements IUpdateable {
    * This method calculates to location for the specified point in relation to
    * the focus map location of the camera.
    *
-   * @param point
+   * @param mapLocation
    *          the point
    * @return the render location
    */
