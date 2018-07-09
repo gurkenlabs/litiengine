@@ -66,7 +66,7 @@ public class Camera implements IUpdateable {
   /**
    * Gets the map location.
    *
-   * @param point
+   * @param viewPortLocation
    *          the point
    * @return the map location
    */
