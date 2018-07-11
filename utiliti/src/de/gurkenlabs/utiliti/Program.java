@@ -421,7 +421,7 @@ public class Program {
 
     MenuItem exit = new MenuItem(Resources.get("menu_exit"));
     exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
-    exit.addActionListener(a -> Game.terminate());
+    exit.addActionListener(a -> System.exit(0));
 
     mnFile.add(load);
     mnFile.add(create);
@@ -930,7 +930,7 @@ public class Program {
       SystemTray tray = SystemTray.getSystemTray();
       PopupMenu menu = new PopupMenu();
       MenuItem exitItem = new MenuItem(Resources.get("menu_exit"));
-      exitItem.addActionListener(a -> Game.terminate());
+      exitItem.addActionListener(a -> System.exit(0));
       menu.add(exitItem);
 
       trayIcon = new TrayIcon(Resources.getImage("litiengine-icon.png"), Game.getInfo().toString(), menu);

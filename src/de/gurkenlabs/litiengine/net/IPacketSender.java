@@ -17,7 +17,7 @@ public interface IPacketSender {
    * @param port
    *          the port
    */
-  public void sendData(Package packet, InetAddress ipAddress, int port);
+  public void sendData(Packet packet, InetAddress ipAddress, int port);
 
   /**
    * Send data.
@@ -29,5 +29,5 @@ public interface IPacketSender {
    * @param port
    *          the port
    */
-  public void sendData(Package packet, String ipAddress, int port);
+  public void sendData(Packet packet, String ipAddress, int port);
 }

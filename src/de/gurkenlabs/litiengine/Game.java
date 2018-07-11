@@ -445,7 +445,7 @@ public final class Game {
     hasStarted = true;
   }
 
-  public static void terminate() {
+  private static void terminate() {
     for (final GameListener listener : gameListeners) {
       if (!listener.terminating()) {
         return;

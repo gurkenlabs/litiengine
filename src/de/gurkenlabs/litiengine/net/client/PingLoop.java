@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.net.IPacketSender;
 import de.gurkenlabs.litiengine.net.messages.ClientMessage;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
-import de.gurkenlabs.litiengine.net.messages.MessagePackage;
+import de.gurkenlabs.litiengine.net.messages.MessagePacket;
 import de.gurkenlabs.litiengine.net.messages.MessageType;
 import de.gurkenlabs.litiengine.net.messages.PingResponseMessage;
 import de.gurkenlabs.litiengine.net.messages.handlers.ClientMessageHandler;
@@ -103,7 +103,7 @@ public class PingLoop extends ClientMessageHandler<PingResponseMessage> implemen
     public void run() {
       while (!this.isTerminated) {
         this.lastPing = System.currentTimeMillis();
-        final MessagePackage<ClientMessage> packet = new MessagePackage<>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
+        final MessagePacket<ClientMessage> packet = new MessagePacket<>(MessageType.PING, new ClientMessage(PingLoop.this.clientId));
         PingLoop.this.sender.sendData(packet, PingLoop.this.serverIpAdress, PingLoop.this.port);
 
         try {

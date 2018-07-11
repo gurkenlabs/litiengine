@@ -1,9 +1,9 @@
 package de.gurkenlabs.litiengine.net;
 
 /**
- * The Class Package.
+ * The Class Packet.
  */
-public abstract class Package {
+public abstract class Packet {
 
   /** The Type byte count. */
   protected static final int TYPEBYTECOUNT = 1;
@@ -15,22 +15,22 @@ public abstract class Package {
   private final byte packetId;
 
   /**
-   * Instantiates a new package.
+   * Instantiates a new packet.
    *
    * @param packetId
    *          the packet id
    */
-  protected Package(final byte packetId) {
+  protected Packet(final byte packetId) {
     this.packetId = packetId;
   }
 
   /**
-   * Instantiates a new package.
+   * Instantiates a new packet.
    *
    * @param content
    *          the content
    */
-  protected Package(final byte[] content) {
+  protected Packet(final byte[] content) {
     this(content[0]);
   }
 
