@@ -10,7 +10,8 @@ public abstract class UpdateLoop extends Thread implements ILoop {
   private static final Logger log = Logger.getLogger(UpdateLoop.class.getName());
   private final Set<IUpdateable> updatables;
 
-  protected UpdateLoop() {
+  protected UpdateLoop(String name) {
+    super(name);
     this.updatables = Collections.newSetFromMap(new ConcurrentHashMap<IUpdateable, Boolean>());
   }
 

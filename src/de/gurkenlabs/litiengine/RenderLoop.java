@@ -6,8 +6,8 @@ public class RenderLoop extends UpdateLoop {
 
   private int maxFps;
 
-  public RenderLoop() {
-    super();
+  public RenderLoop(String name) {
+    super(name);
     this.maxFps = Game.getConfiguration().client().getMaxFps();
   }
 
