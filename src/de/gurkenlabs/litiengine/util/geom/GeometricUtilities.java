@@ -443,7 +443,16 @@ public class GeometricUtilities {
    * @return the point2 d
    */
   public static Point2D project(final Point2D start, final double angle, final double delta) {
-    return new Point2D.Double(start.getX() + delta * Math.cos(angle), start.getY() + delta * Math.sin(angle));
+    double x = start.getX();
+    double y = start.getY();
+
+    // calculate delta
+    final double xDelta = getXDelta(angle, delta);
+    final double yDelta = getYDelta(angle, delta);
+    x += xDelta;
+    y += yDelta;
+
+    return new Point2D.Double(x, y);
   }
 
   /**
@@ -563,6 +572,14 @@ public class GeometricUtilities {
     final AffineTransform t = new AffineTransform();
     t.translate(renderLocation.getX(), renderLocation.getY());
     return shape;
+  }
+  
 
+  private static double getXDelta(final double angle, final double delta) {
+    return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  }
+
+  private static double getYDelta(final double angle, final double delta) {
+    return Trigonometry.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }
