@@ -57,6 +57,9 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * @see EnvironmentLoadedListener
  */
 public final class Game {
+  public static final int EXIT_GAME_CLOSED = 0;
+  public static final int EXIT_GAME_CRASHED = -1;
+  
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
