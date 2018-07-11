@@ -31,8 +31,8 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
 
   private int updateCount;
 
-  public GameLoop(final int updateRate) {
-    super();
+  public GameLoop(String name, final int updateRate) {
+    super(name);
     this.actions = new CopyOnWriteArrayList<>();
     this.updateRate = updateRate;
     this.setTimeScale(1.0F);

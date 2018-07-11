@@ -18,7 +18,7 @@ public final class Input {
   private static IMouse mouse;
 
   static {
-    InputLoop = new GameLoop(Game.getLoop().getUpdateRate());
+    InputLoop = new GameLoop("Input Loop", Game.getLoop().getUpdateRate());
   }
 
   private Input() {

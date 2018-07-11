@@ -280,7 +280,7 @@ public final class Game {
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
 
-    final GameLoop updateLoop = new GameLoop(getConfiguration().client().getUpdaterate());
+    final GameLoop updateLoop = new GameLoop("Main Update Loop", getConfiguration().client().getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
     getLoop().attach(getPhysicsEngine());
@@ -288,7 +288,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop();
+    renderLoop = new RenderLoop("Render Loop");
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
