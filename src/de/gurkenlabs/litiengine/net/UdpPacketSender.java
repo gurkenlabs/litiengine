@@ -39,7 +39,7 @@ public class UdpPacketSender implements IPacketSender {
   }
 
   @Override
-  public void sendData(final Package packet, final InetAddress ipAddress, final int port) {
+  public void sendData(final Packet packet, final InetAddress ipAddress, final int port) {
     final DatagramPacket datagramPacket = new DatagramPacket(packet.getData(), packet.getData().length, ipAddress, port);
     try {
       this.socket.send(datagramPacket);
@@ -49,7 +49,7 @@ public class UdpPacketSender implements IPacketSender {
   }
 
   @Override
-  public void sendData(final Package packet, final String ipAddress, final int port) {
+  public void sendData(final Packet packet, final String ipAddress, final int port) {
     try {
       this.sendData(packet, InetAddress.getByName(ipAddress), port);
     } catch (final UnknownHostException e) {

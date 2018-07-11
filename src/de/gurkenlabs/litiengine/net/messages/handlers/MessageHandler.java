@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
-import de.gurkenlabs.litiengine.net.messages.MessagePackage;
+import de.gurkenlabs.litiengine.net.messages.MessagePacket;
 
 /**
  * The Class MessageHandler is an abstract implementation for all existing
@@ -20,7 +20,7 @@ public abstract class MessageHandler<T extends Serializable> implements IMessage
 
   @Override
   public void handle(final byte[] data, final InetAddress address, final int port) {
-    final T message = new MessagePackage<T>(data).getObject();
+    final T message = new MessagePacket<T>(data).getObject();
     if (message == null) {
       return;
     }
