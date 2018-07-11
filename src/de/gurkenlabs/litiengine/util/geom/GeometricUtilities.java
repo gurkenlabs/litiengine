@@ -431,17 +431,6 @@ public class GeometricUtilities {
     return Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5 && Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5;
   }
 
-  /**
-   * Project.
-   *
-   * @param start
-   *          the start
-   * @param angle
-   *          the angle
-   * @param delta
-   *          the delta
-   * @return the point2 d
-   */
   public static Point2D project(final Point2D start, final double angle, final double delta) {
     double x = start.getX();
     double y = start.getY();

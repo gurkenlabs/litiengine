@@ -74,4 +74,50 @@ public class GeometricUtilitiesTests {
     final Point2D expected5 = new Point2D.Double(4, 1);
     assertArrayEquals(new Point2D[] { expected4, expected5 }, possiblePoint2);
   }
+  
+  @Test
+  public void testProjectionByAngle() {
+    final Point2D start = new Point2D.Double(0, 0);
+    
+    Point2D end = GeometricUtilities.project(start, 90, 1);
+    Point2D end2 = GeometricUtilities.project(start, 180, 1);
+    Point2D end3 = GeometricUtilities.project(start, 270, 1);
+    Point2D end4 = GeometricUtilities.project(start, 360, 1);
+
+    assertEquals(1, end.getX(), 0.001);
+    assertEquals(0, end.getY(), 0.001);
+    
+    assertEquals(0, end2.getX(), 0.001);
+    assertEquals(-1, end2.getY(), 0.001);
+    
+    assertEquals(-1, end3.getX(), 0.001);
+    assertEquals(0, end3.getY(), 0.001);
+    
+    assertEquals(0, end4.getX(), 0.001);
+    assertEquals(1, end4.getY(), 0.001);
+  }
+  
+  @Test
+  public void testProjectionByScalar() {
+    final Point2D start = new Point2D.Double(0, 0);
+    final Point2D target = new Point2D.Double(10, 10);
+    final Point2D target2 = new Point2D.Double(-10, -10);
+    
+    Point2D end = GeometricUtilities.project(start, target, 1.414);
+    Point2D end2 = GeometricUtilities.project(start, target2, 3.536);
+    Point2D end3 = GeometricUtilities.project(start, target, 14.142);
+    Point2D end4 = GeometricUtilities.project(start, target2, 14.142);
+    
+    assertEquals(1, end.getX(), 0.001);
+    assertEquals(1, end.getY(), 0.001);
+    
+    assertEquals(-2.5, end2.getX(), 0.001);
+    assertEquals(-2.5, end2.getY(), 0.001);
+    
+    assertEquals(10, end3.getX(), 0.001);
+    assertEquals(10, end3.getY(), 0.001);
+    
+    assertEquals(-10, end4.getX(), 0.001);
+    assertEquals(-10, end4.getY(), 0.001);
+  }
 }
