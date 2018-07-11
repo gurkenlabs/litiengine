@@ -273,8 +273,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent event) {
-        // ensures that we terminate the game, when the window is being closed
-        Game.terminate();
+        System.exit(0);
       }
     });
   }
