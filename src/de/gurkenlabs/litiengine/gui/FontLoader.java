@@ -23,30 +23,24 @@ public class FontLoader {
   }
 
   /**
-   * Gets the font.
+   * Loads a custom font with the specified name from game's resources.
    *
    * @param fontName
-   *          the font name
-   * @return the font
+   *          The name of the font
+   * @return The loaded font.
    */
   public static Font load(final String fontName) {
     if (fonts.containsKey(fontName)) {
       return fonts.get(fontName);
     }
 
-    final String[] f = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-    for (final String font : f) {
-      final String name = FileUtilities.getFileName(fontName);
-      if (font.equals(name)) {
-        return new Font(name, Font.PLAIN, 8);
-      }
-    }
     try {
       final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
       final InputStream fontStream = FileUtilities.getGameResource(fontName);
       if (fontStream == null) {
         log.log(Level.SEVERE, "font {0} could not be loaded", fontName);
+        return null;
       }
 
       final Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream);
@@ -56,6 +50,7 @@ public class FontLoader {
     } catch (final FontFormatException | IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
+
     return null;
   }
 }
