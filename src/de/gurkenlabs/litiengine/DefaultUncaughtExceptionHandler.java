@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,13 +14,14 @@ public class DefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
     if (e instanceof ThreadDeath)
       return;
     
-    try {
-      log.addHandler(new FileHandler("crash.txt"));
-    } catch (SecurityException | IOException e2) {
+    try (PrintStream stream = new PrintStream("crash.txt")) {
+      stream.println(t.getName() + " threw an exception:");
+      e.printStackTrace(stream);
+    } catch (FileNotFoundException e2) {
       log.log(Level.WARNING, "Could not create crash report file.", e);
     }
     
-    log.log(Level.SEVERE, String.format("Game crashed! :(%n%s threw an exception:%n", t.getName()), e);
+    log.log(Level.SEVERE, "Game crashed! :(", e);
     System.exit(Game.EXIT_GAME_CRASHED);
   }
 }
