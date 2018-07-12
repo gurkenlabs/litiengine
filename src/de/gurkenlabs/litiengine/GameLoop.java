@@ -30,6 +30,8 @@ public class GameLoop extends UpdateLoop implements AutoCloseable {
   private long totalTicks;
 
   private int updateCount;
+  
+  private volatile boolean paused = false;
 
   public GameLoop(final int updateRate) {
     super();
@@ -96,6 +98,9 @@ public class GameLoop extends UpdateLoop implements AutoCloseable {
   @Override
   public void run() {
     while (!interrupted()) {
+      if (paused)
+        continue;
+      
       final float scale = this.getTimeScale() > 0 ? this.getTimeScale() : 1;
       final long tickWait = (long) (1.0 / (this.getUpdateRate() * scale) * 1000);
       final long updateStart = System.nanoTime();
@@ -125,6 +130,16 @@ public class GameLoop extends UpdateLoop implements AutoCloseable {
 
   public void setTimeScale(final float timeScale) {
     this.timeScale = timeScale;
+  }
+  
+  public boolean isPaused()
+  {
+    return paused;
+  }
+  
+  public void setPaused(boolean value)
+  {
+    paused = value;
   }
 
   @Override
