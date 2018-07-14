@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles.xml;
+package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.io.Serializable;
 

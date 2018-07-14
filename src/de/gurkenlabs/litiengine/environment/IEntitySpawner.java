@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
 public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
   public enum SpawnMode {

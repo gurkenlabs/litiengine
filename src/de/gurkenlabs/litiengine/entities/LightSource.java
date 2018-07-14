@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,9 +15,8 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.entities.Entity;
-import de.gurkenlabs.litiengine.entities.ICombatEntity;
-import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.GROUND)

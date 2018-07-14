@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 
 /**
  * An abstract implementation for emitters that provide a particle effect.

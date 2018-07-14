@@ -19,9 +19,9 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 @SuppressWarnings("serial")

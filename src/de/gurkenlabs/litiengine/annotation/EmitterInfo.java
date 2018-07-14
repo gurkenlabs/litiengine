@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.configuration.Quality;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 
 /**
  * This annotation contains default values for the initialization of an emitter.

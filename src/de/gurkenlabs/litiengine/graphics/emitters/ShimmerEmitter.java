@@ -1,13 +1,12 @@
-package de.gurkenlabs.litiengine.graphics.particles.emitters;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Color;
 import java.util.Random;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
 
 /**
  * The Class ShimmerEmitter.

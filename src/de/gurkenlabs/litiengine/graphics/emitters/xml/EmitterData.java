@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles.xml;
+package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -15,7 +15,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;

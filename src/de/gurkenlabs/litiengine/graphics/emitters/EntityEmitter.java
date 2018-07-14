@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.geom.Point2D;
 

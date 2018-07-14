@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());

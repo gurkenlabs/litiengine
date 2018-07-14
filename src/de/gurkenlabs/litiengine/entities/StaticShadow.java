@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.entities;
 
 import java.awt.Color;
 import java.awt.geom.Area;
@@ -7,8 +7,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.entities.CollisionBox;
-import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
+import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class StaticShadow extends MapArea {

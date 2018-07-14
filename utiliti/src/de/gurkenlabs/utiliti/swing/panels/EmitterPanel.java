@@ -18,8 +18,8 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
 

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles;
+package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

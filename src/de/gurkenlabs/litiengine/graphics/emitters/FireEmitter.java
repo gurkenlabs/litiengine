@@ -1,13 +1,12 @@
-package de.gurkenlabs.litiengine.graphics.particles.emitters;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
 
 /**
  * Represents a fire.

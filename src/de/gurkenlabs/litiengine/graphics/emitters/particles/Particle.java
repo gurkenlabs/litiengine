@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles;
+package de.gurkenlabs.litiengine.graphics.emitters.particles;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ITimeToLive;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 
 public abstract class Particle implements ITimeToLive {

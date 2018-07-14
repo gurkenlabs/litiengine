@@ -1,11 +1,11 @@
-package de.gurkenlabs.litiengine.graphics.particles.emitters;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 
 /**
  * This class provides the possibility to spawn an animation similar to a usual

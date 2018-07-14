@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics.particles.xml;
+package de.gurkenlabs.litiengine.graphics.emitters.xml;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.LeftLineParticle;
-import de.gurkenlabs.litiengine.graphics.particles.OvalParticle;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.particles.RectangleFillParticle;
-import de.gurkenlabs.litiengine.graphics.particles.RectangleOutlineParticle;
-import de.gurkenlabs.litiengine.graphics.particles.RightLineParticle;
-import de.gurkenlabs.litiengine.graphics.particles.ShimmerParticle;
-import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
-import de.gurkenlabs.litiengine.graphics.particles.TextParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.OvalParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;

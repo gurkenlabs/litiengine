@@ -1,7 +1,6 @@
-package de.gurkenlabs.litiengine.environment.tilemap;
+package de.gurkenlabs.litiengine.entities;
 
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 @EntityInfo(renderType = RenderType.NONE)

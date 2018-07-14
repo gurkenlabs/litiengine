@@ -11,12 +11,12 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
-import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleColor;
-import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleParameter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.ParticleType;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 

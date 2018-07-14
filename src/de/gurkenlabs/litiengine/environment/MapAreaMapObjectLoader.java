@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 public class MapAreaMapObjectLoader extends MapObjectLoader {

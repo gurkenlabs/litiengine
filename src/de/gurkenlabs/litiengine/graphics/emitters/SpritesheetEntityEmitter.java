@@ -1,13 +1,12 @@
-package de.gurkenlabs.litiengine.graphics.particles.emitters;
+package de.gurkenlabs.litiengine.graphics.emitters;
 
 import java.awt.Image;
 import java.util.Random;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.particles.EntityEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.Particle;
-import de.gurkenlabs.litiengine.graphics.particles.SpriteParticle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 
 public class SpritesheetEntityEmitter extends EntityEmitter {
 
