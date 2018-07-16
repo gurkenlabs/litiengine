@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.input.Input;
@@ -87,7 +88,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   private double xMargin;
   static {
-    Font icon = FontLoader.load("fontello.ttf");
+    Font icon = Resources.getFont("fontello.ttf");
     ICON_FONT = icon != null ? icon.deriveFont(16f) : null;
   }
 
