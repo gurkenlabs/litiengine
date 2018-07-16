@@ -56,6 +56,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
     Input.getLoop().attach(this);
+    this.consumeAlt = true;
   }
 
   @Override
