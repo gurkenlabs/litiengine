@@ -26,7 +26,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 
 1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
 2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
-3. Configuring the Game
+3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
 4. Loading a .tmx Map
 5. Working with Entities
 
