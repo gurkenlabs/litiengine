@@ -59,7 +59,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   private transient boolean flippedVertically;
   private transient boolean flipped;
   
-  private transient Tile customPropertySource;
+  private transient ITile customPropertySource;
 
   public Tile() {
   }
@@ -183,7 +183,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     this.terrains = terrains;
   }
   
-  void setCustomPropertySource(Tile source) {
+  void setCustomPropertySource(ITile source) {
     customPropertySource = source;
   }
 
