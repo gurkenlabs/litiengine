@@ -386,7 +386,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   public List<Tileset> getExternalTilesets() {
     List<Tileset> externalTilesets = new ArrayList<>();
-    for (Tileset set : this.getRawTileSets()) {
+    for (Tileset set : this.getRawTilesets()) {
       if (set.sourceTileset != null) {
         externalTilesets.add(set.sourceTileset);
       }
@@ -395,7 +395,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return externalTilesets;
   }
 
-  public List<Tileset> getRawTileSets() {
+  public List<Tileset> getRawTilesets() {
     if (this.rawTilesets == null) {
       this.rawTilesets = new ArrayList<>();
     }
