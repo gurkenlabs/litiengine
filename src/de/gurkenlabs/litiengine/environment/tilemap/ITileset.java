@@ -16,6 +16,13 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
    * @return the first grid id
    */
   public int getFirstGridId();
+  
+  /**
+   * Gets a tile in the tileset.
+   * 
+   * @return The tile with the provided local id
+   */
+  public ITile getTile(int id);
 
   /**
    * Gets the image.

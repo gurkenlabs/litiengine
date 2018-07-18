@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
 /**
  * The Class TileLayer.
@@ -75,5 +78,16 @@ public class TileLayer extends Layer implements ITileLayer {
 
   protected List<Tile> getData() {
     return this.data.parseTiles();
+  }
+  
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller m, Object parent) {
+    IMap map = (IMap)parent;
+    for (Tile tile : getData())
+      for (ITileset tileset : map.getTilesets())
+        if (tileset.containsTile(tile)) {
+          tile.setCustomPropertySource(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
+          break;
+        }
   }
 }

@@ -369,4 +369,9 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.spacing = null;
     }
   }
+
+  @Override
+  public ITile getTile(int id) {
+    return tiles.get(id);
+  }
 }
