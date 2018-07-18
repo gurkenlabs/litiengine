@@ -10,7 +10,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -82,11 +81,11 @@ public class TileLayer extends Layer implements ITileLayer {
   
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller m, Object parent) {
-    IMap map = (IMap)parent;
+    Map map = (Map)parent;
     for (Tile tile : getData())
-      for (ITileset tileset : map.getTilesets())
+      for (ITileset tileset : map.getRawTilesets())
         if (tileset.containsTile(tile)) {
-          tile.setCustomPropertySource(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
+          tile.setCustomPropertySource(tileset.getTile(tile.getId()));
           break;
         }
   }

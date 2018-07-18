@@ -371,7 +371,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public ITile getTile(int id) {
-    return tiles.get(id);
+  public ITile getTile(final int id) {
+    return tiles.stream().filter(t -> t.getId() == id).findAny().get();
   }
 }
