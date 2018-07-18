@@ -58,6 +58,8 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   private transient boolean flippedHorizontally;
   private transient boolean flippedVertically;
   private transient boolean flipped;
+  
+  private transient Tile customPropertySource;
 
   public Tile() {
   }
@@ -150,6 +152,11 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   public ITileAnimation getAnimation() {
     return this.animation;
   }
+  
+  @Override
+  public String getCustomProperty(String name, String defaultValue) {
+    return customPropertySource == null ? super.getCustomProperty(name, defaultValue) : customPropertySource.getCustomProperty(name, defaultValue);
+  }
 
   @Override
   public String toString() {
@@ -174,6 +181,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
+  }
+  
+  void setCustomPropertySource(Tile source) {
+    customPropertySource = source;
   }
 
   @SuppressWarnings("unused")
