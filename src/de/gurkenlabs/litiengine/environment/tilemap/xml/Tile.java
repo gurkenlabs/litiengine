@@ -38,6 +38,9 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @XmlAttribute
   private Integer id;
+  
+  @XmlAttribute
+  private String type;
 
   @XmlAttribute
   private String terrain;
@@ -204,5 +207,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     if (this.id != null && this.id == 0) {
       this.id = null;
     }
+  }
+
+  @Override
+  public String getType() {
+    return type;
   }
 }

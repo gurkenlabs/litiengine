@@ -8,6 +8,8 @@ import java.awt.Point;
 public interface ITile extends ICustomPropertyProvider {
 
   public int getId();
+  
+  public String getType();
 
   public ITerrain[] getTerrain();
 
