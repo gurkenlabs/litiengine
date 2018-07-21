@@ -32,8 +32,9 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
 public class RenderComponent extends Canvas implements IRenderComponent {
+  public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   private static final int DEBUG_MOUSE_SIZE = 5;
-  private static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
+  
   private final transient List<Consumer<Integer>> fpsChangedConsumer;
   private final transient List<Consumer<Graphics2D>> renderedConsumer;
 
