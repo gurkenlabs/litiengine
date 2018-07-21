@@ -512,12 +512,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
       EditorScreen.instance().getMapObjectPanel().bind(null);
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-      break;
-    case EDITMODE_MOVE:
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
     default:
       break;
@@ -827,10 +825,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private IMapObject createNewMapObject(MapObjectType type) {
     IMapObject mo = new MapObject();
     mo.setType(type.toString());
-    mo.setX((int) this.newObjectArea.getX());
-    mo.setY((int) this.newObjectArea.getY());
-    mo.setWidth((int) this.newObjectArea.getWidth());
-    mo.setHeight((int) this.newObjectArea.getHeight());
+    mo.setX((float) this.newObjectArea.getX());
+    mo.setY((float) this.newObjectArea.getY());
+
+    // ensure a minimum size for the new object
+    float width = (float) this.newObjectArea.getWidth();
+    float height = (float) this.newObjectArea.getHeight();
+    mo.setWidth(width == 0 ? 16 : width);
+    mo.setHeight(height == 0 ? 16 : height);
     mo.setId(Game.getEnvironment().getNextMapId());
     mo.setName("");
 
@@ -1120,6 +1122,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.setEditMode(EDITMODE_MOVE);
       }
     });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_ESCAPE, e -> {
+      if (this.currentEditMode == EDITMODE_CREATE) {
+        this.setEditMode(EDITMODE_EDIT);
+      }
+    });
+
     Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> this.setEditMode(EDITMODE_EDIT));
 
     Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
@@ -1283,7 +1292,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
     if (this.getFocus() == null) {
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      if (this.currentEditMode != EDITMODE_CREATE) {
+        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      }
       this.currentTransform = TransformType.NONE;
       return;
     }
@@ -1325,7 +1336,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      this.startPoint = Input.mouse().getMapLocation();
+      if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
+        this.startPoint = Input.mouse().getMapLocation();
+      }
       break;
     case EDITMODE_MOVE:
       break;
@@ -1353,7 +1366,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      newObjectArea = this.getCurrentMouseSelectionArea(true);
+      if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
+        newObjectArea = this.getCurrentMouseSelectionArea(true);
+      }
+
       break;
     case EDITMODE_EDIT:
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
@@ -1390,9 +1406,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      if (this.newObjectArea == null) {
+      if (this.newObjectArea == null || !SwingUtilities.isLeftMouseButton(e.getEvent())) {
         break;
       }
+
       IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
       this.newObjectArea = null;
       this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));

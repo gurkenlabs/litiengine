@@ -15,7 +15,7 @@ public final class Icons {
   public static final Icon FOLDER = new ImageIcon(Resources.getImage("object_cube-10x10.png"));
   public static final Icon LIGHT = new ImageIcon(Resources.getImage("bulb.png"));
   public static final Icon TRIGGER = new ImageIcon(Resources.getImage("trigger.png"));
-  public static final Icon SPAWMPOINT = new ImageIcon(Resources.getImage("spawnpoint.png"));
+  public static final Icon SPAWNPOINT = new ImageIcon(Resources.getImage("spawnpoint.png"));
   public static final Icon COLLISIONBOX = new ImageIcon(Resources.getImage("collisionbox.png"));
   public static final Icon MAPAREA = new ImageIcon(Resources.getImage("maparea.png"));
   public static final Icon SHADOWBOX = new ImageIcon(Resources.getImage("shadowbox.png"));

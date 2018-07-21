@@ -52,7 +52,6 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -265,7 +264,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
     this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), Icons.LIGHT));
     this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
-    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
     this.nodeCollisionBoxes = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
     this.nodeMapAreas = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
     this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));
@@ -634,7 +633,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), Icons.PROP));
     this.nodeCreatures.setUserObject(new IconTreeListItem(Game.getEnvironment().getCreatures().size() + " " + Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
     this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
-    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
     this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
     this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
     this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));

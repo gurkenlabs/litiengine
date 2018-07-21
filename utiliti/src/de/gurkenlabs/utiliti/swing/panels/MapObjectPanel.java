@@ -203,6 +203,10 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
     this.componentPanel.repaint();
   }
 
+  public void setMapObjectType(MapObjectType type) {
+    this.comboBoxType.setSelectedItem(type);
+  }
+
   @Override
   protected void clearControls() {
     // clear controls

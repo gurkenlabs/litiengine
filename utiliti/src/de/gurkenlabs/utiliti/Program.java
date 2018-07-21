@@ -40,6 +40,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -62,6 +63,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
@@ -79,6 +81,7 @@ import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
   public static final BufferedImage CURSOR = Resources.getImage("cursor.png");
+  public static final BufferedImage CURSOR_ADD = Resources.getImage("cursor-add.png");
   public static final BufferedImage CURSOR_MOVE = Resources.getImage("cursor-move.png");
   public static final BufferedImage CURSOR_SELECT = Resources.getImage("cursor-select.png");
   public static final BufferedImage CURSOR_LOAD = Resources.getImage("cursor-load.png");
@@ -98,6 +101,7 @@ public class Program {
   private static AssetPanel assetPanel;
   private static AssetTree assetTree;
   private static JPopupMenu canvasPopup;
+  private static JPopupMenu addPopupMenu;
   private static JLabel statusBar;
   private static boolean isChanging;
 
@@ -247,7 +251,7 @@ public class Program {
     // remove canvas because we want to add a wrapping panel
     window.remove(canvas);
 
-    initCanvasPopupMenu(canvas);
+    initPopupMenus(canvas);
 
     JPanel renderPanel = new JPanel(new BorderLayout());
     renderPanel.add(canvas);
@@ -693,7 +697,7 @@ public class Program {
     basicMenu.add(mv);
 
     place.addActionListener(a -> {
-
+      addPopupMenu.show(place, 0, place.getHeight());
       place.setSelected(true);
       ed.setSelected(false);
       mv.setSelected(false);
@@ -722,19 +726,27 @@ public class Program {
         ed.setSelected(false);
         mv.setSelected(false);
         place.setSelected(true);
+        place.requestFocus();
+        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {
         place.setSelected(false);
         mv.setSelected(false);
         ed.setSelected(true);
+        ed.requestFocus();
         Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_MOVE) {
+        if(!mv.isEnabled()) {
+          return;
+        }
+        
         ed.setSelected(false);
         place.setSelected(false);
         mv.setSelected(true);
+        mv.requestFocus();
         Game.getScreenManager().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
       }
     });
@@ -871,8 +883,58 @@ public class Program {
     return basicMenu;
   }
 
-  private static void initCanvasPopupMenu(Canvas canvas) {
+  private static void initAddMenu(JComponent addMenu) {
+    JMenuItem addProp = new JMenuItem(Resources.get("add_prop"), Icons.PROP);
+    addProp.addActionListener(a -> setCreateMode(MapObjectType.PROP));
+
+    JMenuItem addCreature = new JMenuItem(Resources.get("add_creature"), Icons.CREATURE);
+    addCreature.addActionListener(a -> setCreateMode(MapObjectType.CREATURE));
+
+    JMenuItem addLight = new JMenuItem(Resources.get("add_light"), Icons.LIGHT);
+    addLight.addActionListener(a -> setCreateMode(MapObjectType.LIGHTSOURCE));
+
+    JMenuItem addTrigger = new JMenuItem(Resources.get("add_trigger"), Icons.TRIGGER);
+    addTrigger.addActionListener(a -> setCreateMode(MapObjectType.TRIGGER));
+
+    JMenuItem addSpawnpoint = new JMenuItem(Resources.get("add_spawnpoint"), Icons.SPAWNPOINT);
+    addSpawnpoint.addActionListener(a -> setCreateMode(MapObjectType.SPAWNPOINT));
+
+    JMenuItem addCollisionBox = new JMenuItem(Resources.get("add_collisionbox"), Icons.COLLISIONBOX);
+    addCollisionBox.addActionListener(a -> setCreateMode(MapObjectType.COLLISIONBOX));
+
+    JMenuItem addMapArea = new JMenuItem(Resources.get("add_area"), Icons.MAPAREA);
+    addMapArea.addActionListener(a -> setCreateMode(MapObjectType.AREA));
+
+    JMenuItem addShadow = new JMenuItem(Resources.get("add_shadow"), Icons.SHADOWBOX);
+    addShadow.addActionListener(a -> setCreateMode(MapObjectType.STATICSHADOW));
+
+    JMenuItem addEmitter = new JMenuItem(Resources.get("add_emitter"), Icons.EMITTER);
+    addEmitter.addActionListener(a -> setCreateMode(MapObjectType.EMITTER));
+
+    addMenu.add(addProp);
+    addMenu.add(addCreature);
+    addMenu.add(addLight);
+    addMenu.add(addTrigger);
+    addMenu.add(addSpawnpoint);
+    addMenu.add(addCollisionBox);
+    addMenu.add(addMapArea);
+    addMenu.add(addShadow);
+    addMenu.add(addEmitter);
+  }
+
+  private static void setCreateMode(MapObjectType tpye) {
+    EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_CREATE);
+    EditorScreen.instance().getMapObjectPanel().setMapObjectType(tpye);
+  }
+
+  private static void initPopupMenus(Canvas canvas) {
     canvasPopup = new JPopupMenu();
+    addPopupMenu = new JPopupMenu();
+    JMenu addSubMenu = new JMenu("Add ...");
+    addSubMenu.setIcon(Icons.ADD);
+    initAddMenu(addPopupMenu);
+    initAddMenu(addSubMenu);
+
     JMenuItem delete = new JMenuItem("Delete Entity", new ImageIcon(Resources.getImage("button-deletex16.png")));
     delete.addActionListener(e -> EditorScreen.instance().getMapComponent().delete());
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -897,6 +959,7 @@ public class Program {
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 
+    canvasPopup.add(addSubMenu);
     canvasPopup.add(paste);
     canvasPopup.addSeparator();
     canvasPopup.add(copy);
