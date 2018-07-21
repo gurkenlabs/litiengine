@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
@@ -118,4 +119,6 @@ public interface IMap extends ICustomPropertyProvider {
   public void setFileName(String name);
 
   public String getName();
+  
+  public Color getBackgroundColor();
 }

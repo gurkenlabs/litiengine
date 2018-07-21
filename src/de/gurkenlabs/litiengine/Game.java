@@ -464,6 +464,9 @@ public final class Game {
     for (final GameTerminatedListener listener : gameTerminatedListeners) {
       listener.terminated();
     }
+    
+    hasStarted = false;
+    initialized = false;
   }
 
   public static void setCamera(final ICamera cam) {

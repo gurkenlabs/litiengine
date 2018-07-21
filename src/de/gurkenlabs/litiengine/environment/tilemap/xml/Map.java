@@ -1,6 +1,7 @@
 
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -29,6 +30,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
@@ -65,6 +67,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int tileheight;
 
   @XmlAttribute
+  private String backgroundcolor;
+
+  @XmlAttribute
   private int nextObjectId;
 
   @XmlAttribute(required = false)
@@ -90,6 +95,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<IMapObjectLayer> mapObjectLayers;
   private transient List<IImageLayer> imageLayers;
   private transient List<ILayer> allRenderLayers;
+
+  private transient Color decodedBackgroundColor;
 
   @Override
   public List<IImageLayer> getImageLayers() {
@@ -401,6 +408,20 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     }
 
     return this.rawTilesets;
+  }
+
+  @Override
+  public Color getBackgroundColor() {
+    if (this.backgroundcolor == null || this.backgroundcolor.isEmpty()) {
+      return null;
+    }
+
+    if (this.decodedBackgroundColor != null) {
+      return this.decodedBackgroundColor;
+    }
+
+    this.decodedBackgroundColor = ColorHelper.decode(this.backgroundcolor, true);
+    return this.decodedBackgroundColor;
   }
 
   protected List<TileLayer> getRawTileLayers() {

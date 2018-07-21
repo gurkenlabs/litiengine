@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.util.ColorHelper;
+
 @XmlRootElement(name = "color")
 public class ParticleColor implements Serializable {
   private static final long serialVersionUID = -5962060934939835282L;
@@ -42,7 +44,7 @@ public class ParticleColor implements Serializable {
     }
     Color rgba;
     try {
-      Color solid = Color.decode(split[0]);
+      Color solid = ColorHelper.decode(split[0]);
       rgba = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), Integer.parseInt(split[1]));
     } catch (NumberFormatException e) {
       return null;

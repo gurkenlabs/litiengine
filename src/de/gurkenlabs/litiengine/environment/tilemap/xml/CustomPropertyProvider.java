@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
@@ -163,7 +164,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
       return defaultValue;
     }
 
-    return Color.decode(value);
+    return ColorHelper.decode(value);
   }
 
   @Override

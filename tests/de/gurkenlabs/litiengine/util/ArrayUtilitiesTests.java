@@ -4,10 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.logging.Logger;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ArrayUtilitiesTests {
 
+  @BeforeEach
+  public void setup() {
+    Logger.getLogger(ArrayUtilities.class.getName()).setUseParentHandlers(false);
+  }
+  
   @Test
   public void testByteArrayConcat() {
     byte[] arr1 = new byte[] { 1, 2, 3, 4, 5 };

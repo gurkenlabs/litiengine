@@ -52,6 +52,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -130,11 +131,12 @@ public class MapSelectionPanel extends JSplitPane {
       }
 
       if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
-        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex()))) {
+        Map map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
+        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(map)) {
           return;
         }
 
-        EditorScreen.instance().getMapComponent().loadEnvironment(EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex()));
+        EditorScreen.instance().getMapComponent().loadEnvironment(map);
       }
     });
 

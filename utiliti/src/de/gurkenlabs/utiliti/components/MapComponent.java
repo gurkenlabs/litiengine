@@ -69,6 +69,7 @@ import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -1740,7 +1741,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     } else if (type == MapObjectType.LIGHTSOURCE) {
       final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
-        Color lightColor = Color.decode(mapObjectColor);
+        Color lightColor = ColorHelper.decode(mapObjectColor);
         borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
       }
     } else if (type == MapObjectType.STATICSHADOW) {

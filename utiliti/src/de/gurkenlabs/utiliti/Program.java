@@ -66,6 +66,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
@@ -562,7 +563,7 @@ public class Program {
           }
 
           if (colorProp != null && !colorProp.isEmpty()) {
-            Color ambientColor = Color.decode(colorProp);
+            Color ambientColor = ColorHelper.decode(colorProp);
             Game.getEnvironment().getAmbientLight().setColor(ambientColor);
           }
         } catch (final NumberFormatException nfe) {
@@ -830,7 +831,7 @@ public class Program {
 
       Color color = null;
       if (colorText.getText() != null && !colorText.getText().isEmpty()) {
-        Color solid = Color.decode(colorText.getText());
+        Color solid = ColorHelper.decode(colorText.getText());
         color = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) spinnerAmbientAlpha.getValue());
       }
 

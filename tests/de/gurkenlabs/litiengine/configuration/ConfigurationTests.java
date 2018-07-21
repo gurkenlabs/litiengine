@@ -5,8 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.UUID;
+import java.util.logging.Logger;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public class ConfigurationTests {
 
@@ -17,6 +21,12 @@ public class ConfigurationTests {
         configFile.delete();
       }
     }
+  }
+  
+  @BeforeEach
+  public void setup() {
+    Logger.getLogger(FileUtilities.class.getName()).setUseParentHandlers(false);
+    Logger.getLogger(Configuration.class.getName()).setUseParentHandlers(false);
   }
 
   @Test
