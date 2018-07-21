@@ -38,6 +38,9 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @XmlAttribute
   private Integer id;
+  
+  @XmlAttribute
+  private String type;
 
   @XmlAttribute
   private String terrain;
@@ -58,6 +61,8 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   private transient boolean flippedHorizontally;
   private transient boolean flippedVertically;
   private transient boolean flipped;
+  
+  private transient ITile customPropertySource;
 
   public Tile() {
   }
@@ -150,6 +155,19 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   public ITileAnimation getAnimation() {
     return this.animation;
   }
+  
+  @Override
+  public String getCustomProperty(String name, String defaultValue) {
+    return customPropertySource == null ? super.getCustomProperty(name, defaultValue) : customPropertySource.getCustomProperty(name, defaultValue);
+  }
+  
+  @Override
+  public void setCustomProperty(String name, String value) {
+    if (customPropertySource == null)
+      super.setCustomProperty(name, value);
+    else
+      customPropertySource.setCustomProperty(name, value);
+  }
 
   @Override
   public String toString() {
@@ -175,6 +193,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
   }
+  
+  void setCustomPropertySource(ITile source) {
+    customPropertySource = source;
+  }
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
@@ -185,5 +207,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     if (this.id != null && this.id == 0) {
       this.id = null;
     }
+  }
+
+  @Override
+  public String getType() {
+    return type;
   }
 }

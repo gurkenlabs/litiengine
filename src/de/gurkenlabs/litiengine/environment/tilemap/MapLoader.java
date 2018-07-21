@@ -19,7 +19,7 @@ public final class MapLoader {
     }
 
     String basePath = FileUtilities.getParentDirPath(path);
-    for (Tileset tilesets : map.getRawTileSets()) {
+    for (Tileset tilesets : map.getRawTilesets()) {
       tilesets.loadFromSource(basePath);
     }
 
