@@ -1406,7 +1406,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      if (this.newObjectArea == null || !SwingUtilities.isLeftMouseButton(e.getEvent())) {
+      if(SwingUtilities.isRightMouseButton(e.getEvent())) {
+        this.newObjectArea = null;
+        this.setEditMode(EDITMODE_EDIT);
+        break;
+      }
+      
+      if (this.newObjectArea == null) {
         break;
       }
 

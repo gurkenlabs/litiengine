@@ -643,16 +643,19 @@ public class Program {
     cr.setIcon(new ImageIcon(Resources.getImage("button-create.png")));
     basicMenu.add(cr);
     cr.addActionListener(a -> EditorScreen.instance().create());
+    requestFocusOnMouseDown(cr);
 
     JButton op = new JButton();
     op.setIcon(new ImageIcon(Resources.getImage("button-load.png")));
     basicMenu.add(op);
     op.addActionListener(a -> EditorScreen.instance().load());
+    requestFocusOnMouseDown(op);
 
     JButton sv = new JButton();
     sv.setIcon(new ImageIcon(Resources.getImage("button-save.png")));
     basicMenu.add(sv);
     sv.addActionListener(a -> EditorScreen.instance().save(false));
+    requestFocusOnMouseDown(sv);
 
     basicMenu.addSeparator();
 
@@ -660,11 +663,13 @@ public class Program {
     undo.setIcon(new ImageIcon(Resources.getImage("button-undo.png")));
     basicMenu.add(undo);
     undo.addActionListener(a -> UndoManager.instance().undo());
+    requestFocusOnMouseDown(undo);
 
     JButton redo = new JButton();
     redo.setIcon(new ImageIcon(Resources.getImage("button-redo.png")));
     basicMenu.add(redo);
     redo.addActionListener(a -> UndoManager.instance().redo());
+    requestFocusOnMouseDown(redo);
 
     undo.setEnabled(false);
     redo.setEnabled(false);
@@ -674,14 +679,17 @@ public class Program {
     JToggleButton place = new JToggleButton();
     place.setIcon(new ImageIcon(Resources.getImage("button-placeobject.png")));
     basicMenu.add(place);
+    requestFocusOnMouseDown(place);
 
     JToggleButton ed = new JToggleButton();
     ed.setIcon(new ImageIcon(Resources.getImage("button-edit.png")));
     ed.setSelected(true);
+    requestFocusOnMouseDown(ed);
 
     JToggleButton mv = new JToggleButton();
     mv.setIcon(new ImageIcon(Resources.getImage("button-move.png")));
     mv.setEnabled(false);
+    requestFocusOnMouseDown(mv);
 
     ed.addActionListener(a -> {
       ed.setSelected(true);
@@ -739,10 +747,10 @@ public class Program {
       }
 
       if (i == MapComponent.EDITMODE_MOVE) {
-        if(!mv.isEnabled()) {
+        if (!mv.isEnabled()) {
           return;
         }
-        
+
         ed.setSelected(false);
         place.setSelected(false);
         mv.setSelected(true);
@@ -881,6 +889,19 @@ public class Program {
     basicMenu.add(spinnerAmbientAlpha);
 
     return basicMenu;
+  }
+
+  private static void requestFocusOnMouseDown(JComponent button) {
+    button.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        super.mousePressed(e);
+
+        if (button.isEnabled()) {
+          button.requestFocus();
+        }
+      }
+    });
   }
 
   private static void initAddMenu(JComponent addMenu) {
