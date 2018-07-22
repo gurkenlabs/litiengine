@@ -12,7 +12,8 @@ public class CustomPropertyProviderTests {
 
   @Test
   public void testSetCustomProperty() {
-    CustomPropertyProvider propProvider = new CustomPropertyProvider();
+    @SuppressWarnings("serial")
+    CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
     propProvider.setCustomProperty("test", "testvalue");
 
     assertEquals("testvalue", propProvider.getCustomProperty("test"));

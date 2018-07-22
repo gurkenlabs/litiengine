@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 
-public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
+public abstract class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
 
   @XmlElementWrapper(name = "properties")
