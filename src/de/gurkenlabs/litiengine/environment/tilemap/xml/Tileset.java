@@ -295,6 +295,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
     return this.tilecount != null ? this.tilecount : 0;
   }
+  
+  @Override
+  public ITile getTile(int id) {
+    if (sourceTileset != null)
+      return sourceTileset.getTile(id);
+    for (Tile tile : tiles)
+      if (tile.getId() == id)
+        return tile;
+    return null;
+  }
 
   @Override
   public boolean containsTile(ITile tile) {

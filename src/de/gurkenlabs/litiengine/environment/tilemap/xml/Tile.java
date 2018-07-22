@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -49,6 +50,8 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   private transient Point tileCoordinate;
 
   private transient ITerrain[] terrains;
+  
+  private transient ITile customPropertySource;
 
   private transient boolean flippedDiagonally;
   private transient boolean flippedHorizontally;
@@ -79,6 +82,37 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
     this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
     this.gid = (int) tileId;
+  }
+  
+  @Override
+  public boolean hasCustomProperty(String name) {
+    return customPropertySource == null ? super.hasCustomProperty(name) : customPropertySource.hasCustomProperty(name);
+  }
+  
+  @Override
+  public List<Property> getCustomProperties() {
+    return customPropertySource == null ? super.getCustomProperties() : customPropertySource.getCustomProperties();
+  }
+  
+  @Override
+  public void setCustomProperties(List<Property> props) {
+    if (customPropertySource == null)
+      super.setCustomProperties(props);
+    else
+      customPropertySource.setCustomProperties(props);
+  }
+  
+  @Override
+  public String getCustomProperty(String name, String defaultValue) {
+    return customPropertySource == null ? super.getCustomProperty(name, defaultValue) : customPropertySource.getCustomProperty(name, defaultValue);
+  }
+  
+  @Override
+  public void setCustomProperty(String name, String value) {
+    if (customPropertySource == null)
+      super.setCustomProperty(name, value);
+    else
+      customPropertySource.setCustomProperty(name, value);
   }
 
   @Override
@@ -136,12 +170,12 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public ITerrain[] getTerrain() {
-    return this.terrains;
+    return customPropertySource == null ? this.terrains : customPropertySource.getTerrain();
   }
 
   @Override
   public ITileAnimation getAnimation() {
-    return this.animation;
+    return customPropertySource == null ? this.animation : customPropertySource.getAnimation();
   }
 
   @Override
@@ -167,6 +201,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
+  }
+  
+  void setCustomPropertySource(ITile source) {
+    customPropertySource = source;
   }
 
   @SuppressWarnings("unused")
