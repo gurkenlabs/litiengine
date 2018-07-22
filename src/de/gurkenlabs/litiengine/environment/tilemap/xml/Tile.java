@@ -50,10 +50,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   private transient ITerrain[] terrains;
 
-  private transient long gidMask;
-
-  private transient boolean csv;
-
   private transient boolean flippedDiagonally;
   private transient boolean flippedHorizontally;
   private transient boolean flippedVertically;
@@ -67,21 +63,18 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   }
 
   public Tile(long gidBitmask, boolean csv) {
-    this.csv = csv;
-
     // Clear the flags
     long tileId = gidBitmask;
-    this.gidMask = gidBitmask;
-    if (this.csv) {
+    if (csv) {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
-      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
-      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
-      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
+      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
+      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
+      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
     } else {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
-      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
-      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
-      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
+      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
+      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
+      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
     }
 
     this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
