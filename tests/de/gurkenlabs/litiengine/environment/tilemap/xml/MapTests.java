@@ -41,7 +41,8 @@ public class MapTests {
     assertEquals(1, ((Map) map).getExternalTilesets().size());
     assertEquals("tiles-test", map.getTilesets().get(1).getName());
     assertEquals(1, map.getTileLayers().size());
-    assertEquals(1, map.getTileLayers().get(0).getSizeInTiles());
+    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().width);
+    assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().height);
     assertEquals(0, map.getImageLayers().size());
     assertEquals(1, map.getRenderLayers().size());
     assertEquals(0, map.getMapObjectLayers().size());

@@ -153,26 +153,32 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.name = name;
   }
 
+  @XmlTransient
   public void setWidth(int width) {
     this.width = width;
   }
 
+  @XmlTransient
   public void setHeight(int height) {
     this.height = height;
   }
 
+  @XmlTransient
   public void setOpacity(float opacity) {
     this.opacity = opacity;
   }
 
+  @XmlTransient
   public void setVisible(boolean visible) {
     this.visible = visible ? 1 : 0;
   }
 
+  @XmlTransient
   public void setOffsetX(int offsetX) {
     this.offsetx = offsetX;
   }
 
+  @XmlTransient
   public void setOffsetY(int offsetY) {
     this.offsety = offsetY;
   }
