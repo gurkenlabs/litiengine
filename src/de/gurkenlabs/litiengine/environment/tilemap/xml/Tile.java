@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -50,9 +51,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   private transient ITerrain[] terrains;
 
-  private transient long gidMask;
-
-  private transient boolean csv;
+  private transient ITile customPropertySource;
 
   private transient boolean flippedDiagonally;
   private transient boolean flippedHorizontally;
@@ -67,25 +66,55 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   }
 
   public Tile(long gidBitmask, boolean csv) {
-    this.csv = csv;
-
     // Clear the flags
     long tileId = gidBitmask;
-    this.gidMask = gidBitmask;
-    if (this.csv) {
+    if (csv) {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
-      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
-      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
-      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
+      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
+      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
+      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
     } else {
       tileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
-      this.flippedDiagonally = (this.gidMask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
-      this.flippedHorizontally = (this.gidMask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
-      this.flippedVertically = (this.gidMask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
+      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
+      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
+      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
     }
 
     this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
     this.gid = (int) tileId;
+  }
+
+  @Override
+  public boolean hasCustomProperty(String name) {
+    return customPropertySource == null ? super.hasCustomProperty(name) : customPropertySource.hasCustomProperty(name);
+  }
+
+  @Override
+  public List<Property> getCustomProperties() {
+    return customPropertySource == null ? super.getCustomProperties() : customPropertySource.getCustomProperties();
+  }
+
+  @Override
+  public void setCustomProperties(List<Property> props) {
+    if (customPropertySource == null) {
+      super.setCustomProperties(props);
+    } else {
+      customPropertySource.setCustomProperties(props);
+    }
+  }
+
+  @Override
+  public String getCustomProperty(String name, String defaultValue) {
+    return customPropertySource == null ? super.getCustomProperty(name, defaultValue) : customPropertySource.getCustomProperty(name, defaultValue);
+  }
+
+  @Override
+  public void setCustomProperty(String name, String value) {
+    if (customPropertySource == null) {
+      super.setCustomProperty(name, value);
+    } else {
+      customPropertySource.setCustomProperty(name, value);
+    }
   }
 
   @Override
@@ -143,12 +172,12 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public ITerrain[] getTerrain() {
-    return this.terrains;
+    return customPropertySource == null ? this.terrains : customPropertySource.getTerrain();
   }
 
   @Override
   public ITileAnimation getAnimation() {
-    return this.animation;
+    return customPropertySource == null ? this.animation : customPropertySource.getAnimation();
   }
 
   @Override
@@ -174,6 +203,10 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   protected void setTerrains(ITerrain[] terrains) {
     this.terrains = terrains;
+  }
+
+  protected void setCustomPropertySource(ITile source) {
+    customPropertySource = source;
   }
 
   @SuppressWarnings("unused")

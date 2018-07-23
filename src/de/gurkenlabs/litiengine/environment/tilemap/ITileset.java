@@ -51,7 +51,9 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
    */
   public int getTileWidth();
 
-  public int getTilecount();
+  public int getTileCount();
+  
+  public ITile getTile(int id);
 
   public List<ITerrain> getTerrainTypes();
 

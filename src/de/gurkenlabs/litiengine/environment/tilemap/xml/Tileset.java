@@ -288,12 +288,22 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public int getTilecount() {
+  public int getTileCount() {
     if (this.sourceTileset != null) {
-      return this.sourceTileset.getTilecount();
+      return this.sourceTileset.getTileCount();
     }
 
     return this.tilecount != null ? this.tilecount : 0;
+  }
+  
+  @Override
+  public ITile getTile(int id) {
+    if (sourceTileset != null)
+      return sourceTileset.getTile(id);
+    for (Tile tile : tiles)
+      if (tile.getId() == id)
+        return tile;
+    return null;
   }
 
   @Override
@@ -303,7 +313,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public boolean containsTile(int tileId) {
-    final int lastGridId = this.getFirstGridId() - 1 + this.getTilecount();
+    final int lastGridId = this.getFirstGridId() - 1 + this.getTileCount();
     if (this.getFirstGridId() - 1 > tileId) {
       return false;
     }

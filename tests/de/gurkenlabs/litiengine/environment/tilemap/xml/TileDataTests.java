@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
+
 import org.junit.jupiter.api.Test;
 
 public class TileDataTests {
@@ -99,5 +102,11 @@ public class TileDataTests {
     assertTrue(tiles.get(127).isFlippedVertically());
     assertFalse(tiles.get(127).isFlippedDiagonally());
     assertEquals(18, tiles.get(127).getGridId());
+  }
+  
+  @Test
+  public void testTileCustomProperties() {
+    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    assertEquals(map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("foo"), "bar");
   }
 }
