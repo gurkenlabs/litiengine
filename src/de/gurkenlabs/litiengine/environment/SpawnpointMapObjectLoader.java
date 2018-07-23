@@ -5,10 +5,10 @@ import java.util.Collection;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 
 public class SpawnpointMapObjectLoader extends MapObjectLoader {
 

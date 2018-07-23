@@ -57,6 +57,9 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * @see EnvironmentLoadedListener
  */
 public final class Game {
+  public static final int EXIT_GAME_CLOSED = 0;
+  public static final int EXIT_GAME_CRASHED = -1;
+  
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
@@ -195,7 +198,7 @@ public final class Game {
     }
 
     for (final IMap map : maps) {
-      if (map.getFileName().equals(mapName)) {
+      if (map.getName().equals(mapName)) {
         return map;
       }
     }
@@ -277,7 +280,7 @@ public final class Game {
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
 
-    final GameLoop updateLoop = new GameLoop(getConfiguration().client().getUpdaterate());
+    final GameLoop updateLoop = new GameLoop("Main Update Loop", getConfiguration().client().getUpdaterate());
     updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     gameLoop = updateLoop;
     getLoop().attach(getPhysicsEngine());
@@ -285,7 +288,7 @@ public final class Game {
     final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
-    renderLoop = new RenderLoop();
+    renderLoop = new RenderLoop("Render Loop");
     renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -346,7 +349,7 @@ public final class Game {
 
     int mapCnt = 0;
     for (final IMap m : file.getMaps()) {
-      if (getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))) {
+      if (getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
         continue;
       }
 
@@ -464,6 +467,9 @@ public final class Game {
     for (final GameTerminatedListener listener : gameTerminatedListeners) {
       listener.terminated();
     }
+    
+    hasStarted = false;
+    initialized = false;
   }
 
   public static void setCamera(final ICamera cam) {

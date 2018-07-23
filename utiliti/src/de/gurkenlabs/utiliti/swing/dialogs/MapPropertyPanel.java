@@ -17,11 +17,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
-import de.gurkenlabs.litiengine.graphics.StaticShadow;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
@@ -65,7 +66,7 @@ public class MapPropertyPanel extends JPanel {
     JButton button = new JButton("...");
     button.addActionListener(a -> {
 
-      Color result = ColorChooser.showRgbDialog("Select an ambient color.", Color.decode(textFieldAmbientColor.getText()));
+      Color result = ColorChooser.showRgbDialog("Select an ambient color.", ColorHelper.decode(textFieldAmbientColor.getText()));
       if (result == null) {
         return;
       }
@@ -144,7 +145,7 @@ public class MapPropertyPanel extends JPanel {
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {
 
-      Color result = ColorChooser.showRgbDialog("Select an ambient color.", Color.decode(textFieldShadowColor.getText()));
+      Color result = ColorChooser.showRgbDialog("Select an ambient color.", ColorHelper.decode(textFieldShadowColor.getText()));
       if (result == null) {
         return;
       }
@@ -224,7 +225,7 @@ public class MapPropertyPanel extends JPanel {
   private void setControlValues(IMap map) {
     this.textFieldDescription.setText(map.getCustomProperty(MapProperty.MAP_DESCRIPTION));
     this.textFieldTitle.setText(map.getCustomProperty(MapProperty.MAP_TITLE));
-    this.textFieldName.setText(map.getFileName());
+    this.textFieldName.setText(map.getName());
     this.spinnerAmbientAlpha.setValue(map.getCustomPropertyInt(MapProperty.AMBIENTALPHA));
     if (map.getCustomProperty(MapProperty.AMBIENTCOLOR) != null) {
       this.textFieldAmbientColor.setText(map.getCustomProperty(MapProperty.AMBIENTCOLOR));
@@ -245,7 +246,7 @@ public class MapPropertyPanel extends JPanel {
     this.dataSource.setCustomProperty(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
     this.dataSource.setCustomProperty(MapProperty.SHADOWALPHA, this.spinnerShadow.getValue().toString());
     this.dataSource.setCustomProperty(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
-    this.dataSource.setFileName(this.textFieldName.getText());
+    this.dataSource.setName(this.textFieldName.getText());
 
     for (int row = 0; row < model.getRowCount(); row++) {
       String value = (String) model.getValueAt(row, 0);

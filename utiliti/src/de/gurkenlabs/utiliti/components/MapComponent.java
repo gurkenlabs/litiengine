@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
@@ -62,13 +63,13 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.graphics.LightSource;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -232,7 +233,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     for (final String mapFile : files) {
       Map map = (Map) MapLoader.load(mapFile);
       loadedMaps.add(map);
-      log.log(Level.INFO, "map found: {0}", new Object[] { map.getFileName() });
+      log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
     }
 
     this.loadMaps(loadedMaps);
@@ -259,14 +260,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public IMapObject getFocusedMapObject() {
     if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-      return this.focusedObjects.get(Game.getEnvironment().getMap().getFileName());
+      return this.focusedObjects.get(Game.getEnvironment().getMap().getName());
     }
 
     return null;
   }
 
   public List<MapObject> getSelectedMapObjects() {
-    final String map = Game.getEnvironment().getMap().getFileName();
+    final String map = Game.getEnvironment().getMap().getName();
     if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null && this.selectedObjects.containsKey(map)) {
       return this.selectedObjects.get(map);
     }
@@ -307,7 +308,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.loading = true;
     try {
       if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-        final String mapName = Game.getEnvironment().getMap().getFileName();
+        final String mapName = Game.getEnvironment().getMap().getName();
         double x = Game.getCamera().getFocus().getX();
         double y = Game.getCamera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
@@ -317,30 +318,30 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Point2D newFocus = null;
 
-      if (this.cameraFocus.containsKey(map.getFileName())) {
-        newFocus = this.cameraFocus.get(map.getFileName());
+      if (this.cameraFocus.containsKey(map.getName())) {
+        newFocus = this.cameraFocus.get(map.getName());
       } else {
         newFocus = new Point2D.Double(map.getSizeInPixels().getWidth() / 2, map.getSizeInPixels().getHeight() / 2);
-        this.cameraFocus.put(map.getFileName(), newFocus);
+        this.cameraFocus.put(map.getName(), newFocus);
       }
 
       Game.getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
       this.ensureUniqueIds(map);
 
-      if (!this.environments.containsKey(map.getFileName())) {
+      if (!this.environments.containsKey(map.getName())) {
         Environment env = new Environment(map);
         env.init();
-        this.environments.put(map.getFileName(), env);
+        this.environments.put(map.getName(), env);
       }
 
-      Game.loadEnvironment(this.environments.get(map.getFileName()));
+      Game.loadEnvironment(this.environments.get(map.getName()));
 
       Program.updateScrollBars();
 
-      EditorScreen.instance().getMapSelectionPanel().setSelection(map.getFileName());
-      if (this.selectedLayers.containsKey(map.getFileName())) {
-        EditorScreen.instance().getMapSelectionPanel().selectLayer(this.selectedLayers.get(map.getFileName()));
+      EditorScreen.instance().getMapSelectionPanel().setSelection(map.getName());
+      if (this.selectedLayers.containsKey(map.getName())) {
+        EditorScreen.instance().getMapSelectionPanel().selectLayer(this.selectedLayers.get(map.getName()));
       }
 
       EditorScreen.instance().getMapObjectPanel().bind(this.getFocusedMapObject());
@@ -511,12 +512,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
       EditorScreen.instance().getMapObjectPanel().bind(null);
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
-      break;
-    case EDITMODE_MOVE:
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
     default:
       break;
@@ -550,9 +549,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       EditorScreen.instance().getMapObjectPanel().bind(mapObject);
       EditorScreen.instance().getMapSelectionPanel().focus(mapObject);
       if (mapObject == null) {
-        this.focusedObjects.remove(Game.getEnvironment().getMap().getFileName());
+        this.focusedObjects.remove(Game.getEnvironment().getMap().getName());
       } else {
-        this.focusedObjects.put(Game.getEnvironment().getMap().getFileName(), mapObject);
+        this.focusedObjects.put(Game.getEnvironment().getMap().getName(), mapObject);
       }
 
       for (Consumer<IMapObject> cons : this.focusChangedConsumer) {
@@ -575,7 +574,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    final String map = Game.getEnvironment().getMap().getFileName();
+    final String map = Game.getEnvironment().getMap().getName();
     if (!this.selectedObjects.containsKey(map)) {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
@@ -628,7 +627,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    this.getMaps().removeIf(x -> x.getFileName().equals(Game.getEnvironment().getMap().getFileName()));
+    this.getMaps().removeIf(x -> x.getName().equals(Game.getEnvironment().getMap().getName()));
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
@@ -664,9 +663,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         map.addMapObjectLayer(layer);
       }
 
-      Optional<Map> current = this.maps.stream().filter(x -> x.getFileName().equals(map.getFileName())).findFirst();
+      Optional<Map> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
       if (current.isPresent()) {
-        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getFileName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
+        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
 
         if (n == JOptionPane.YES_OPTION) {
           this.getMaps().remove(current.get());
@@ -701,13 +700,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       EditorScreen.instance().updateGameFileMaps();
       ImageCache.clearAll();
-      if (this.environments.containsKey(map.getFileName())) {
-        this.environments.remove(map.getFileName());
+      if (this.environments.containsKey(map.getName())) {
+        this.environments.remove(map.getName());
       }
 
       EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
       this.loadEnvironment(map);
-      log.log(Level.INFO, "imported map {0}", new Object[] { map.getFileName() });
+      log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
     });
   }
 
@@ -754,7 +753,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       FileFilter filter = new FileNameExtensionFilter("tmx - Tilemap XML", Map.FILE_EXTENSION);
       chooser.setFileFilter(filter);
       chooser.addChoosableFileFilter(filter);
-      chooser.setSelectedFile(new File(map.getFileName() + "." + Map.FILE_EXTENSION));
+      chooser.setSelectedFile(new File(map.getName() + "." + Map.FILE_EXTENSION));
 
       int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
@@ -773,7 +772,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           }
         }
 
-        log.log(Level.INFO, "exported {0} to {1}", new Object[] { map.getFileName(), newFile });
+        log.log(Level.INFO, "exported {0} to {1}", new Object[] { map.getName(), newFile });
       }
     } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
@@ -826,10 +825,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private IMapObject createNewMapObject(MapObjectType type) {
     IMapObject mo = new MapObject();
     mo.setType(type.toString());
-    mo.setX((int) this.newObjectArea.getX());
-    mo.setY((int) this.newObjectArea.getY());
-    mo.setWidth((int) this.newObjectArea.getWidth());
-    mo.setHeight((int) this.newObjectArea.getHeight());
+    mo.setX((float) this.newObjectArea.getX());
+    mo.setY((float) this.newObjectArea.getY());
+
+    // ensure a minimum size for the new object
+    float width = (float) this.newObjectArea.getWidth();
+    float height = (float) this.newObjectArea.getHeight();
+    mo.setWidth(width == 0 ? 16 : width);
+    mo.setHeight(height == 0 ? 16 : height);
     mo.setId(Game.getEnvironment().getNextMapId());
     mo.setName("");
 
@@ -1119,6 +1122,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.setEditMode(EDITMODE_MOVE);
       }
     });
+
+    Input.keyboard().onKeyPressed(KeyEvent.VK_ESCAPE, e -> {
+      if (this.currentEditMode == EDITMODE_CREATE) {
+        this.setEditMode(EDITMODE_EDIT);
+      }
+    });
+
     Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> this.setEditMode(EDITMODE_EDIT));
 
     Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
@@ -1282,7 +1292,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
    */
   private void handleMouseMoved(ComponentMouseEvent e) {
     if (this.getFocus() == null) {
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      if (this.currentEditMode != EDITMODE_CREATE) {
+        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      }
       this.currentTransform = TransformType.NONE;
       return;
     }
@@ -1324,7 +1336,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      this.startPoint = Input.mouse().getMapLocation();
+      if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
+        this.startPoint = Input.mouse().getMapLocation();
+      }
       break;
     case EDITMODE_MOVE:
       break;
@@ -1352,7 +1366,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      newObjectArea = this.getCurrentMouseSelectionArea(true);
+      if (SwingUtilities.isLeftMouseButton(e.getEvent())) {
+        newObjectArea = this.getCurrentMouseSelectionArea(true);
+      }
+
       break;
     case EDITMODE_EDIT:
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
@@ -1389,9 +1406,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
+      if(SwingUtilities.isRightMouseButton(e.getEvent())) {
+        this.newObjectArea = null;
+        this.setEditMode(EDITMODE_EDIT);
+        break;
+      }
+      
       if (this.newObjectArea == null) {
         break;
       }
+
       IMapObject mo = this.createNewMapObject(EditorScreen.instance().getMapObjectPanel().getObjectType());
       this.newObjectArea = null;
       this.setFocus(mo, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
@@ -1740,7 +1764,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     } else if (type == MapObjectType.LIGHTSOURCE) {
       final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
-        Color lightColor = Color.decode(mapObjectColor);
+        Color lightColor = ColorHelper.decode(mapObjectColor);
         borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
       }
     } else if (type == MapObjectType.STATICSHADOW) {

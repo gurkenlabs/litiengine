@@ -14,7 +14,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import javax.swing.DefaultListModel;
@@ -44,18 +46,18 @@ import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.LightSource;
+import de.gurkenlabs.litiengine.entities.MapArea;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.entities.Spawnpoint;
+import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapArea;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.Spawnpoint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
-import de.gurkenlabs.litiengine.graphics.LightSource;
-import de.gurkenlabs.litiengine.graphics.StaticShadow;
-import de.gurkenlabs.litiengine.graphics.particles.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
@@ -63,6 +65,7 @@ import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
 public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
+  private final java.util.Map<String, java.util.Map<String, Boolean>> layerVisibility;
   private final JCheckBoxList listObjectLayers;
   private final DefaultListModel<String> model;
   private final DefaultListModel<JCheckBox> layerModel;
@@ -114,30 +117,32 @@ public class MapSelectionPanel extends JSplitPane {
 
     model = new DefaultListModel<>();
     layerModel = new DefaultListModel<>();
-    mapList = new JList<>();
-    mapList.setModel(model);
-    mapList.setVisibleRowCount(8);
-    mapList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    mapList.setMaximumSize(new Dimension(0, 250));
+    this.layerVisibility = new ConcurrentHashMap<>();
+    this.mapList = new JList<>();
+    this.mapList.setModel(model);
+    this.mapList.setVisibleRowCount(8);
+    this.mapList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    this.mapList.setMaximumSize(new Dimension(0, 250));
 
-    mapList.getSelectionModel().addListSelectionListener(e -> {
+    this.mapList.getSelectionModel().addListSelectionListener(e -> {
       if (EditorScreen.instance().isLoading() || EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
 
-      if (mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && mapList.getSelectedIndex() >= 0) {
-        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex()))) {
+      if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
+        Map map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
+        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(map)) {
           return;
         }
 
-        EditorScreen.instance().getMapComponent().loadEnvironment(EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex()));
+        EditorScreen.instance().getMapComponent().loadEnvironment(map);
       }
     });
 
-    mapScrollPane.setViewportView(mapList);
+    mapScrollPane.setViewportView(this.mapList);
 
     popupMenu = new JPopupMenu();
-    addPopup(mapList, popupMenu);
+    addPopup(this.mapList, popupMenu);
 
     mntmExportMap = new JMenuItem(Resources.get("hud_exportMap"));
     mntmExportMap.setIcon(Icons.MAP_EXPORT);
@@ -259,7 +264,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
     this.nodeLights = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_lights"), Icons.LIGHT));
     this.nodeTriggers = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
-    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeSpawnpoints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
     this.nodeCollisionBoxes = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
     this.nodeMapAreas = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
     this.nodeStaticShadows = new DefaultMutableTreeNode(new IconTreeListItem(Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));
@@ -300,15 +305,16 @@ public class MapSelectionPanel extends JSplitPane {
     layerScrollPane.setViewportView(listObjectLayers);
 
     UndoManager.onMapObjectAdded(manager -> {
-      this.populateMapObjectTree();
-      this.initLayerControl();
+      this.updateMapObjectTree();
+      this.updateMapLayerControl();
     });
-    UndoManager.onMapObjectRemoved(manager -> {
-      this.populateMapObjectTree();
-      this.initLayerControl();
-    });
-    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
 
+    UndoManager.onMapObjectRemoved(manager -> {
+      this.updateMapObjectTree();
+      this.updateMapLayerControl();
+    });
+
+    UndoManager.onUndoStackChanged(manager -> this.bind(EditorScreen.instance().getMapComponent().getMaps()));
   }
 
   public synchronized void bind(List<Map> maps) {
@@ -321,13 +327,13 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     for (Map map : maps) {
-      String name = map.getFileName();
+      String name = map.getName();
       if (UndoManager.hasChanges(map)) {
         name += " *";
       }
 
       // update existing strings
-      int indexToReplace = getIndexToReplace(map.getFileName());
+      int indexToReplace = getIndexToReplace(map.getName());
       if (indexToReplace != -1) {
         this.model.set(indexToReplace, name);
       } else {
@@ -339,7 +345,7 @@ public class MapSelectionPanel extends JSplitPane {
     // remove maps that are no longer present
     for (int i = 0; i < this.model.getSize(); i++) {
       final String current = this.model.get(i);
-      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getFileName()))) {
+      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getName()))) {
         this.model.remove(i);
       }
     }
@@ -357,27 +363,28 @@ public class MapSelectionPanel extends JSplitPane {
       mapList.setSelectedValue(mapName, true);
     }
 
-    this.initLayerControl();
-    this.populateMapObjectTree();
+    this.updateMapLayerControl();
+    this.updateMapObjectTree();
   }
 
   public boolean isVisibleMapObjectLayer(String name) {
 
     // Get all the selected items using the indices
-    for (int i = 0; i < listObjectLayers.getModel().getSize(); i++) {
-      if (i >= listObjectLayers.getModel().getSize()) {
+    for (int i = 0; i < this.listObjectLayers.getModel().getSize(); i++) {
+      if (i >= this.listObjectLayers.getModel().getSize()) {
         return false;
       }
-      Object sel = listObjectLayers.getModel().getElementAt(i);
+      Object sel = this.listObjectLayers.getModel().getElementAt(i);
       JCheckBox check = (JCheckBox) sel;
-      if (check.getText().startsWith(name) && check.isSelected()) {
+      String layerName = getLayerName(check);
+      if (layerName!= null && layerName.equals(name) && check.isSelected()) {
         return true;
       }
     }
     return false;
   }
 
-  private void initLayerControl() {
+  private void updateMapLayerControl() {
     if (mapList.getSelectedIndex() == -1 && this.model.size() > 0) {
       this.mapList.setSelectedIndex(0);
     }
@@ -389,13 +396,16 @@ public class MapSelectionPanel extends JSplitPane {
 
     Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
     this.lastSelection = listObjectLayers.getSelectedIndex();
+    this.saveLayerVisibility();
     layerModel.clear();
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
       String layerName = layer.getName();
       int layerSize = layer.getMapObjects().size();
       JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
+      newBox.setName(map.getName() + "/" + layerName);
+
       if (layer.getColor() != null) {
-        final String cacheKey = map.getFileName() + layer.getName();
+        final String cacheKey = map.getName() + layer.getName();
         if (!ImageCache.IMAGES.containsKey(cacheKey)) {
           BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();
@@ -412,6 +422,8 @@ public class MapSelectionPanel extends JSplitPane {
       newBox.setSelected(true);
       layerModel.addElement(newBox);
     }
+
+    this.loadLayerVisibility(map);
 
     int start = 0;
     int end = mapList.getModel().getSize() - 1;
@@ -467,6 +479,19 @@ public class MapSelectionPanel extends JSplitPane {
     default:
       return;
     }
+  }
+
+  private static String getLayerInfo(JCheckBox layer, int index) {
+    if (layer == null) {
+      return null;
+    }
+
+    String[] layerInfo = layer.getName().split("/");
+    if (layerInfo.length < 2) {
+      return null;
+    }
+
+    return layerInfo[index];
   }
 
   private void collapseAll() {
@@ -598,7 +623,7 @@ public class MapSelectionPanel extends JSplitPane {
     });
   }
 
-  private void populateMapObjectTree() {
+  private void updateMapObjectTree() {
     this.nodeRoot.setUserObject(new IconTreeListItem(Game.getEnvironment().getEntities().size() + " " + Resources.get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
@@ -608,7 +633,7 @@ public class MapSelectionPanel extends JSplitPane {
     this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.get("panel_mapselection_props"), Icons.PROP));
     this.nodeCreatures.setUserObject(new IconTreeListItem(Game.getEnvironment().getCreatures().size() + " " + Resources.get("panel_mapselection_creatures"), Icons.CREATURE));
     this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.get("panel_mapselection_triggers"), Icons.TRIGGER));
-    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWMPOINT));
+    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
     this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
     this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.get("panel_mapselection_areas"), Icons.MAPAREA));
     this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.get("panel_mapselection_shadow"), Icons.SHADOWBOX));
@@ -672,4 +697,51 @@ public class MapSelectionPanel extends JSplitPane {
 
     return -1;
   }
+
+  private void saveLayerVisibility() {
+    if (this.listObjectLayers.getModel().getSize() == 0) {
+      return;
+    }
+
+    for (int i = 0; i < this.listObjectLayers.getModel().getSize(); i++) {
+      JCheckBox layer = this.listObjectLayers.getModel().getElementAt(i);
+      if (layer == null) {
+        continue;
+      }
+
+      this.saveLayerVisibility(getMapName(layer), getLayerName(layer), layer.isSelected());
+    }
+  }
+
+  private void saveLayerVisibility(String mapName, String layerName, boolean selected) {
+    if (!this.layerVisibility.containsKey(mapName)) {
+      this.layerVisibility.put(mapName, new HashMap<>());
+    }
+
+    this.layerVisibility.get(mapName).put(layerName, selected);
+  }
+
+  private static String getMapName(JCheckBox layer) {
+    return getLayerInfo(layer, 0);
+  }
+
+  private static String getLayerName(JCheckBox layer) {
+    return getLayerInfo(layer, 1);
+  }
+
+  private void loadLayerVisibility(Map map) {
+    if (map == null || !this.layerVisibility.containsKey(map.getName())) {
+      return;
+    }
+
+    for (int i = 0; i < this.listObjectLayers.getModel().getSize(); i++) {
+      JCheckBox layer = this.listObjectLayers.getModel().getElementAt(i);
+
+      String layerName = getLayerName(layer);
+      if (layerName != null && this.layerVisibility.get(map.getName()).containsKey(layerName)) {
+        layer.setSelected(this.layerVisibility.get(map.getName()).get(layerName));
+      }
+    }
+  }
+
 }

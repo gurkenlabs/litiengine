@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
-import de.gurkenlabs.litiengine.graphics.particles.emitters.AnimationEmitter;
+import de.gurkenlabs.litiengine.graphics.emitters.AnimationEmitter;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class AnimationEmitterTests {

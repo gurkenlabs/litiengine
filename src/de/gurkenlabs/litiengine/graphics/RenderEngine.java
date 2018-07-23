@@ -36,16 +36,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
-/**
- * @author Matze
- *
- */
-/**
- * @author Matze
- *
- */
 public final class RenderEngine implements IRenderEngine {
-  private static final float DEFAULT_RENDERSCALE = 3.0f;
+  public static final float DEFAULT_RENDERSCALE = 3.0f;
 
   private final EntityYComparator entityComparator;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;

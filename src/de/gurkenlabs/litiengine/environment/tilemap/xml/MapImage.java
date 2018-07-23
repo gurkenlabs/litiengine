@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
@@ -72,7 +73,7 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @Override
   public Color getTransparentColor() {
     if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {
-      return Color.decode("#" + this.transparentcolor);
+      return ColorHelper.decode(this.transparentcolor);
     }
 
     return null;

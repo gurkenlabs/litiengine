@@ -1,6 +1,7 @@
 
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -29,6 +30,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
@@ -65,6 +67,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int tileheight;
 
   @XmlAttribute
+  private String backgroundcolor;
+
+  @XmlAttribute(name = "nextobjectid")
   private int nextObjectId;
 
   @XmlAttribute(required = false)
@@ -91,14 +96,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<IImageLayer> imageLayers;
   private transient List<ILayer> allRenderLayers;
 
+  private transient Color decodedBackgroundColor;
+
   @Override
   public List<IImageLayer> getImageLayers() {
     return this.imageLayers;
-  }
-
-  @Override
-  public String getFileName() {
-    return this.name;
   }
 
   /**
@@ -106,6 +108,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
    *
    * @return the next object id
    */
+  @Override
   public int getNextObjectId() {
     return this.nextObjectId;
   }
@@ -126,7 +129,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public String getRenderorder() {
+  public String getRenderOrder() {
     return this.renderorder;
   }
 
@@ -190,10 +193,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return new Dimension(this.width, this.height);
   }
 
-  public String getTiledversion() {
-    return this.tiledversion;
-  }
-
   @Override
   public List<ITileLayer> getTileLayers() {
     return this.tileLayers;
@@ -215,12 +214,17 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
+  public String getTiledVersion() {
+    return this.tiledversion;
+  }
+
+  @Override
   public String getName() {
     return this.name;
   }
 
   @Override
-  public void setFileName(final String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -355,12 +359,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
-  public void setTileheight(int tileheight) {
+  public void setTileHeight(int tileheight) {
     this.tileheight = tileheight;
   }
 
   @XmlTransient
-  public void setTilewidth(int tilewidth) {
+  public void setTileWidth(int tilewidth) {
     this.tilewidth = tilewidth;
   }
 
@@ -403,6 +407,20 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawTilesets;
   }
 
+  @Override
+  public Color getBackgroundColor() {
+    if (this.backgroundcolor == null || this.backgroundcolor.isEmpty()) {
+      return null;
+    }
+
+    if (this.decodedBackgroundColor != null) {
+      return this.decodedBackgroundColor;
+    }
+
+    this.decodedBackgroundColor = ColorHelper.decode(this.backgroundcolor, true);
+    return this.decodedBackgroundColor;
+  }
+
   protected List<TileLayer> getRawTileLayers() {
     if (this.rawTileLayers == null) {
       this.rawTileLayers = new ArrayList<>();
@@ -441,11 +459,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
     if (this.rawMapObjectLayers != null) {
+      this.rawMapObjectLayers.forEach(layer -> {
+        layer.setWidth(this.width);
+        layer.setHeight(this.height);
+      });
+      
       tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
     }
 
     ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
     if (this.rawImageLayers != null) {
+      this.rawImageLayers.forEach(layer -> {
+        layer.setWidth(this.width);
+        layer.setHeight(this.height);
+      });
+      
       tmpImageLayers.addAll(this.rawImageLayers);
     }
 
@@ -459,5 +487,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
     this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
     this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
+
   }
 }

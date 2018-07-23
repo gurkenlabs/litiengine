@@ -33,8 +33,8 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.particles.xml.CustomEmitter;
-import de.gurkenlabs.litiengine.graphics.particles.xml.EmitterData;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
+import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -618,7 +618,7 @@ public class EditorScreen extends Screen {
     }
 
     if (cnt > 0) {
-      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getFileName() });
+      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getName() });
     }
   }
 }

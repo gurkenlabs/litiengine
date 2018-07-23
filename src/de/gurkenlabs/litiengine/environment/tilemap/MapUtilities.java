@@ -199,7 +199,7 @@ public final class MapUtilities {
 
   public static ITileAnimation getAnimation(final IMap map, final int gId) {
 
-    String cacheKey = map.getFileName() + "[" + gId + "]";
+    String cacheKey = map.getName() + "[" + gId + "]";
     if (hasAnimation.containsKey(cacheKey) && !hasAnimation.get(cacheKey)) {
       return null;
     }

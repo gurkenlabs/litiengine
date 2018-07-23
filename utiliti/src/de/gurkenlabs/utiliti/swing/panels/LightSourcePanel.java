@@ -19,9 +19,10 @@ import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.graphics.LightSource;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
 @SuppressWarnings("serial")
@@ -114,7 +115,7 @@ public class LightSourcePanel extends PropertyPanel<IMapObject> {
 
   private void setupChangedListeners() {
     btnSelectColor.addActionListener(a -> {
-      Color solid = Color.decode(textFieldColor.getText());
+      Color solid = ColorHelper.decode(textFieldColor.getText());
       Color current = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) this.spinnerBrightness.getValue());
 
       Color result = ColorChooser.showRgbDialog(Resources.get("panel_selectAmbientColor"), current);

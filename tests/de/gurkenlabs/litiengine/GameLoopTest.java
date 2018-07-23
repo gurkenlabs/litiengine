@@ -9,7 +9,7 @@ public class GameLoopTest {
   public void testTimeCalculation100() {
     final int updateRate = 100;
 
-    try (final GameLoop loop = new GameLoop(updateRate)) {
+    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
       assertEquals(1000, loop.convertToMs(100));
       assertEquals(500, loop.convertToMs(50));
       assertEquals(2000, loop.convertToMs(200));
@@ -22,7 +22,7 @@ public class GameLoopTest {
   public void testTimeCalculation50() {
     final int updateRate = 50;
 
-    try (final GameLoop loop = new GameLoop(updateRate)) {
+    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
       assertEquals(2000, loop.convertToMs(100));
       assertEquals(1000, loop.convertToMs(50));
       assertEquals(4000, loop.convertToMs(200));
@@ -35,7 +35,7 @@ public class GameLoopTest {
   public void testTimeCalculation33() {
     final int updateRate = 33;
 
-    try (final GameLoop loop = new GameLoop(updateRate)) {
+    try (final GameLoop loop = new GameLoop("Test Loop", updateRate)) {
       assertEquals(3030, loop.convertToMs(100));
       assertEquals(1515, loop.convertToMs(50));
       assertEquals(6060, loop.convertToMs(200));

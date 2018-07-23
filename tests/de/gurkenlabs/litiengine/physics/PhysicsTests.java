@@ -20,7 +20,7 @@ public class PhysicsTests {
 
   @Test
   public void testBasicCollisionDetection() throws InterruptedException {
-    try (GameLoop loop = new GameLoop(30)) {
+    try (GameLoop loop = new GameLoop("Test Loop", 30)) {
       Creature ent = new Creature();
       ent.setSize(16, 16);
       ent.setCollision(true);

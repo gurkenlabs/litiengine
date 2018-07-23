@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 
 /**
  * The Class ShapeLayer.
@@ -35,10 +36,12 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   @XmlAttribute
   private String color;
 
+  private transient Color decodedColor;
+
   private transient List<IMapObject> mapObjects = new CopyOnWriteArrayList<>();
 
   private transient boolean added;
-  
+
   private void loadMapObjects() {
     if (!this.added) {
       if (this.objects != null) {
@@ -86,18 +89,18 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
       return null;
     }
 
-    try {
-      return Color.decode(this.color);
-    } catch (NumberFormatException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    if (this.decodedColor != null) {
+      return this.decodedColor;
     }
 
-    return null;
+    this.decodedColor = ColorHelper.decode(this.color);
+    return this.decodedColor;
   }
 
   @Override
   public void setColor(String color) {
     this.color = color;
+    this.decodedColor = null;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
@@ -25,13 +26,6 @@ public interface IMap extends ICustomPropertyProvider {
   public List<IImageLayer> getImageLayers();
 
   /**
-   * Gets the name of the map.
-   *
-   * @return the name
-   */
-  public String getFileName();
-
-  /**
    * Gets the orientation.
    *
    * @return the orientation
@@ -45,8 +39,8 @@ public interface IMap extends ICustomPropertyProvider {
    *
    * @return the renderorder
    */
-  public String getRenderorder();
-  
+  public String getRenderOrder();
+
   public List<ILayer> getRenderLayers();
 
   /**
@@ -85,7 +79,7 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the sizein tiles
    */
   public Dimension getSizeInTiles();
-  
+
   public Rectangle2D getBounds();
 
   /**
@@ -109,13 +103,19 @@ public interface IMap extends ICustomPropertyProvider {
    */
   public double getVersion();
 
+  public String getTiledVersion();
+
   /**
    * Sets the name.
    *
    * @param name
    *          the new name
    */
-  public void setFileName(String name);
+  public void setName(String name);
 
   public String getName();
+
+  public int getNextObjectId();
+
+  public Color getBackgroundColor();
 }
