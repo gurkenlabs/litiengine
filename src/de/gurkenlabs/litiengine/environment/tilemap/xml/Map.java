@@ -193,10 +193,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return new Dimension(this.width, this.height);
   }
 
-  public String getTiledversion() {
-    return this.tiledversion;
-  }
-
   @Override
   public List<ITileLayer> getTileLayers() {
     return this.tileLayers;
