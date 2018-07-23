@@ -39,7 +39,7 @@ public interface IMap extends ICustomPropertyProvider {
    *
    * @return the renderorder
    */
-  public String getRenderorder();
+  public String getRenderOrder();
 
   public List<ILayer> getRenderLayers();
 

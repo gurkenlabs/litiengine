@@ -129,7 +129,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public String getRenderorder() {
+  public String getRenderOrder() {
     return this.renderorder;
   }
 
@@ -459,11 +459,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
     if (this.rawMapObjectLayers != null) {
+      this.rawMapObjectLayers.forEach(layer -> {
+        layer.setWidth(this.width);
+        layer.setHeight(this.height);
+      });
+      
       tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
     }
 
     ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
     if (this.rawImageLayers != null) {
+      this.rawImageLayers.forEach(layer -> {
+        layer.setWidth(this.width);
+        layer.setHeight(this.height);
+      });
+      
       tmpImageLayers.addAll(this.rawImageLayers);
     }
 
@@ -477,5 +487,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
     this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
     this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
+
   }
 }

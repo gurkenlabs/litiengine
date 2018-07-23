@@ -153,6 +153,30 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.name = name;
   }
 
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public void setOpacity(float opacity) {
+    this.opacity = opacity;
+  }
+
+  public void setVisible(boolean visible) {
+    this.visible = visible ? 1 : 0;
+  }
+
+  public void setOffsetX(int offsetX) {
+    this.offsetx = offsetX;
+  }
+
+  public void setOffsetY(int offsetY) {
+    this.offsety = offsetY;
+  }
+
   private void setOrder(int order) {
     this.setCustomProperty(LayerProperty.LAYER_ORDER, Integer.toString(order));
   }
