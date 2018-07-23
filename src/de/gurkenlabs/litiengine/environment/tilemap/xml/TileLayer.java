@@ -78,15 +78,17 @@ public class TileLayer extends Layer implements ITileLayer {
   protected List<Tile> getData() {
     return this.data.parseTiles();
   }
-  
+
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller m, Object parent) {
-    Map map = (Map)parent;
-    for (Tile tile : getData())
-      for (ITileset tileset : map.getRawTilesets())
+    Map map = (Map) parent;
+    for (Tile tile : getData()) {
+      for (ITileset tileset : map.getRawTilesets()) {
         if (tileset.containsTile(tile)) {
           tile.setCustomPropertySource(tileset.getTile(tile.getId()));
           break;
         }
+      }
+    }
   }
 }
