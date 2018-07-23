@@ -246,7 +246,7 @@ public class MapPropertyPanel extends JPanel {
     this.dataSource.setCustomProperty(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
     this.dataSource.setCustomProperty(MapProperty.SHADOWALPHA, this.spinnerShadow.getValue().toString());
     this.dataSource.setCustomProperty(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
-    this.dataSource.setFileName(this.textFieldName.getText());
+    this.dataSource.setName(this.textFieldName.getText());
 
     for (int row = 0; row < model.getRowCount(); row++) {
       String value = (String) model.getValueAt(row, 0);

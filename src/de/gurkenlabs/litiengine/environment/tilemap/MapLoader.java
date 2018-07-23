@@ -26,7 +26,7 @@ public final class MapLoader {
     // by default the map is named by the source file
     String name = FileUtilities.getFileName(path);
 
-    map.setFileName(name);
+    map.setName(name);
     map.setPath(path);
     map.updateTileTerrain();
 

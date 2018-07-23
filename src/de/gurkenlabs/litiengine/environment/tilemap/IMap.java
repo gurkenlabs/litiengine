@@ -111,7 +111,7 @@ public interface IMap extends ICustomPropertyProvider {
    * @param name
    *          the new name
    */
-  public void setFileName(String name);
+  public void setName(String name);
 
   public String getName();
 

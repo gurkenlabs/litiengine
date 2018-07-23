@@ -224,7 +224,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public void setFileName(final String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -359,12 +359,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
-  public void setTileheight(int tileheight) {
+  public void setTileHeight(int tileheight) {
     this.tileheight = tileheight;
   }
 
   @XmlTransient
-  public void setTilewidth(int tilewidth) {
+  public void setTileWidth(int tilewidth) {
     this.tilewidth = tilewidth;
   }
 
