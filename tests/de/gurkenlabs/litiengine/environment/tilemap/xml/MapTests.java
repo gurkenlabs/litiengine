@@ -101,6 +101,6 @@ public class MapTests {
     
     map.removeMapObjectLayer(layer);
     
-    assertEquals(0, map.getMapObjectLayers().size());
+    assertEquals(1, map.getMapObjectLayers().size());
   }
 }
