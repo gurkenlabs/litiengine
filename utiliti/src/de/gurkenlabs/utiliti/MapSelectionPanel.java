@@ -327,13 +327,13 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     for (Map map : maps) {
-      String name = map.getFileName();
+      String name = map.getName();
       if (UndoManager.hasChanges(map)) {
         name += " *";
       }
 
       // update existing strings
-      int indexToReplace = getIndexToReplace(map.getFileName());
+      int indexToReplace = getIndexToReplace(map.getName());
       if (indexToReplace != -1) {
         this.model.set(indexToReplace, name);
       } else {
@@ -345,7 +345,7 @@ public class MapSelectionPanel extends JSplitPane {
     // remove maps that are no longer present
     for (int i = 0; i < this.model.getSize(); i++) {
       final String current = this.model.get(i);
-      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getFileName()))) {
+      if (current == null || maps.stream().noneMatch(x -> current.startsWith(x.getName()))) {
         this.model.remove(i);
       }
     }
@@ -405,7 +405,7 @@ public class MapSelectionPanel extends JSplitPane {
       newBox.setName(map.getName() + "/" + layerName);
 
       if (layer.getColor() != null) {
-        final String cacheKey = map.getFileName() + layer.getName();
+        final String cacheKey = map.getName() + layer.getName();
         if (!ImageCache.IMAGES.containsKey(cacheKey)) {
           BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();

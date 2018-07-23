@@ -69,7 +69,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute
   private String backgroundcolor;
 
-  @XmlAttribute
+  @XmlAttribute(name = "nextobjectid")
   private int nextObjectId;
 
   @XmlAttribute(required = false)
@@ -103,16 +103,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.imageLayers;
   }
 
-  @Override
-  public String getFileName() {
-    return this.name;
-  }
-
   /**
    * Gets the next object id.
    *
    * @return the next object id
    */
+  @Override
   public int getNextObjectId() {
     return this.nextObjectId;
   }
@@ -219,6 +215,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public double getVersion() {
     return this.version;
+  }
+
+  @Override
+  public String getTiledVersion() {
+    return this.tiledversion;
   }
 
   @Override

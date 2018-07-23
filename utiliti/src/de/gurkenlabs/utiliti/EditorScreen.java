@@ -618,7 +618,7 @@ public class EditorScreen extends Screen {
     }
 
     if (cnt > 0) {
-      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getFileName() });
+      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { cnt, map.getName() });
     }
   }
 }

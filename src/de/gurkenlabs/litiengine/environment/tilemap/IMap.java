@@ -26,13 +26,6 @@ public interface IMap extends ICustomPropertyProvider {
   public List<IImageLayer> getImageLayers();
 
   /**
-   * Gets the name of the map.
-   *
-   * @return the name
-   */
-  public String getFileName();
-
-  /**
    * Gets the orientation.
    *
    * @return the orientation
@@ -47,7 +40,7 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the renderorder
    */
   public String getRenderorder();
-  
+
   public List<ILayer> getRenderLayers();
 
   /**
@@ -86,7 +79,7 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the sizein tiles
    */
   public Dimension getSizeInTiles();
-  
+
   public Rectangle2D getBounds();
 
   /**
@@ -110,6 +103,8 @@ public interface IMap extends ICustomPropertyProvider {
    */
   public double getVersion();
 
+  public String getTiledVersion();
+
   /**
    * Sets the name.
    *
@@ -119,6 +114,8 @@ public interface IMap extends ICustomPropertyProvider {
   public void setFileName(String name);
 
   public String getName();
-  
+
+  public int getNextObjectId();
+
   public Color getBackgroundColor();
 }

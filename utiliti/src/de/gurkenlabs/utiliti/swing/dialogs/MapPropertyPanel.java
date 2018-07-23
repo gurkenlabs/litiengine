@@ -225,7 +225,7 @@ public class MapPropertyPanel extends JPanel {
   private void setControlValues(IMap map) {
     this.textFieldDescription.setText(map.getCustomProperty(MapProperty.MAP_DESCRIPTION));
     this.textFieldTitle.setText(map.getCustomProperty(MapProperty.MAP_TITLE));
-    this.textFieldName.setText(map.getFileName());
+    this.textFieldName.setText(map.getName());
     this.spinnerAmbientAlpha.setValue(map.getCustomPropertyInt(MapProperty.AMBIENTALPHA));
     if (map.getCustomProperty(MapProperty.AMBIENTCOLOR) != null) {
       this.textFieldAmbientColor.setText(map.getCustomProperty(MapProperty.AMBIENTCOLOR));

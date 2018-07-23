@@ -102,7 +102,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
    * @return the cache key
    */
   private static String getCacheKey(final IMap map) {
-    return "map_" + map.getFileName();
+    return "map_" + map.getName();
   }
 
   private static Image getTileImage(final IMap map, final ITile tile) {

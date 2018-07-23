@@ -198,7 +198,7 @@ public final class Game {
     }
 
     for (final IMap map : maps) {
-      if (map.getFileName().equals(mapName)) {
+      if (map.getName().equals(mapName)) {
         return map;
       }
     }
@@ -349,7 +349,7 @@ public final class Game {
 
     int mapCnt = 0;
     for (final IMap m : file.getMaps()) {
-      if (getMaps().stream().anyMatch(x -> x.getFileName().equals(m.getFileName()))) {
+      if (getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
         continue;
       }
 
