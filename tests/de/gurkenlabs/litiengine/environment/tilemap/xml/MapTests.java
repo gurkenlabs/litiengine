@@ -49,6 +49,14 @@ public class MapTests {
     assertEquals(0, map.getCustomProperties().size());
     assertEquals(0, map.getMapObjects().size());
   }
+  
+  @Test
+  public void testTileCustomProperties() {
+    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+
+    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("foo"));
+    assertEquals("bap", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("baz"));
+  }
 
   @Test
   public void testSettingProperties() {
