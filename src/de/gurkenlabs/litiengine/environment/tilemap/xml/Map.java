@@ -444,9 +444,28 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     return this.rawMapObjectLayers;
   }
+  
+  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 4}; // 1.1.4
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
+    String[] version = tiledversion.split("\\.");
+    int[] vNumbers = new int[version.length];
+    try {
+      for (int i = 0; i < version.length; i++) {
+        vNumbers[i] = Integer.parseInt(version[i]);
+      }
+    } catch (NumberFormatException e) {
+      throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion, e);
+    }
+    for (int i = 0; i < Math.min(vNumbers.length, MAX_SUPPORTED_VERSION.length); i++) {
+      if (vNumbers[i] > MAX_SUPPORTED_VERSION[i]) {
+        throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion);
+      } else if (vNumbers[i] < MAX_SUPPORTED_VERSION[i]) {
+        break;
+      }
+    }
+    
     ArrayList<ITileset> tmpSets = new ArrayList<>();
     if (this.rawTilesets != null) {
       tmpSets.addAll(this.rawTilesets);
