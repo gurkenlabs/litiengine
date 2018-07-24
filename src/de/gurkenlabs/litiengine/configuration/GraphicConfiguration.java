@@ -21,6 +21,10 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   private boolean reduceFramesWhenNotFocused;
 
+  private boolean antiAliasing;
+
+  private boolean colorInterpolation;
+
   /**
    * Instantiates a new graphic configuration.
    */
@@ -32,6 +36,8 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.resolutionWidth = 1600;
     this.setEnableResolutionScale(true);
     this.setReduceFramesWhenNotFocused(true);
+    this.setAntiAliasing(false);
+    this.setColorInterpolation(false);
   }
 
   /**
@@ -78,6 +84,14 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public boolean renderDynamicShadows() {
     return this.renderDynamicShadows;
+  }
+
+  public boolean antiAlising() {
+    return this.antiAliasing;
+  }
+
+  public boolean colorInterpolation() {
+    return this.colorInterpolation;
   }
 
   /**
@@ -130,5 +144,13 @@ public class GraphicConfiguration extends ConfigurationGroup {
 
   public void setReduceFramesWhenNotFocused(boolean reduceFramesWhenNotFocused) {
     this.reduceFramesWhenNotFocused = reduceFramesWhenNotFocused;
+  }
+
+  public void setAntiAliasing(boolean antiAliasing) {
+    this.antiAliasing = antiAliasing;
+  }
+
+  public void setColorInterpolation(boolean colorInterpolation) {
+    this.colorInterpolation = colorInterpolation;
   }
 }

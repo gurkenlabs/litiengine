@@ -10,6 +10,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -34,7 +35,7 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 public class RenderComponent extends Canvas implements IRenderComponent {
   public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   private static final int DEBUG_MOUSE_SIZE = 5;
-  
+
   private final transient List<Consumer<Integer>> fpsChangedConsumer;
   private final transient List<Consumer<Graphics2D>> renderedConsumer;
 
@@ -145,6 +146,9 @@ public class RenderComponent extends Canvas implements IRenderComponent {
         final Rectangle bounds = new Rectangle(0, 0, this.getWidth(), this.getHeight());
         g.setClip(bounds);
         g.fill(bounds);
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         final IScreen currentScreen = Game.getScreenManager().getCurrentScreen();
         if (currentScreen != null) {
