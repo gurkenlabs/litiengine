@@ -475,7 +475,7 @@ public class ImageProcessing {
     final double width = image.getWidth();
     final double height = image.getHeight();
 
-    return scaleImage(image, (int) (width * factor), (int) (height * factor));
+    return scaleImage(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)));
   }
 
   /**
