@@ -153,7 +153,7 @@ public final class FileUtilities {
    */
   public static InputStream getGameResource(String file) {
     InputStream stream = findGameResource(file);
-    return stream.markSupported() ? stream : new BufferedInputStream(stream);
+    return stream == null ? null : stream.markSupported() ? stream : new BufferedInputStream(stream);
   }
   
   private static InputStream findGameResource(final String file) {
