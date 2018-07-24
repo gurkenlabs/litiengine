@@ -55,7 +55,7 @@ public class MapTests {
     IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("foo"));
-    assertEquals("bap", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("baz"));
+    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getCustomProperty("baz"));
   }
 
   @Test
