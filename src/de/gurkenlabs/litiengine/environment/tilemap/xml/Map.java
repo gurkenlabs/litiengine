@@ -421,7 +421,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.decodedBackgroundColor;
   }
 
-  protected List<TileLayer> getRawTileLayers() {
+  public List<TileLayer> getRawTileLayers() {
     if (this.rawTileLayers == null) {
       this.rawTileLayers = new ArrayList<>();
     }
