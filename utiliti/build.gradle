@@ -58,9 +58,40 @@ task copyDistFiles(type: Copy) {
   def buildFolder = new File(buildDir, 'libs')
   from('/dist/'){
     include 'pixel-icon-utiliti.ico'
+    include 'config.properties'
   }
   
   into buildFolder
+}
+
+task distZipWindows(type: Zip) {
+  group 'build'
+  from 'build/libs/'
+  include '*.exe'
+  include 'config.properties'
+
+  archiveName archivesBaseName + '-' + version + '-win.zip'
+  destinationDir(file('build/libs/'))
+}
+
+task distZipMac(type: Zip) {
+  group 'build'
+  from 'build/libs/'
+  include '*.jar'
+  include 'config.properties'
+
+  archiveName archivesBaseName + '-' + version + '-osx.zip'
+  destinationDir(file('build/libs/'))
+}
+
+task distZipLinux(type: Zip) {
+  group 'build'
+  from 'build/libs/'
+  include '*.jar'
+  include 'config.properties'
+
+  archiveName archivesBaseName + '-' + version + '-linux.zip'
+  destinationDir(file('build/libs/'))
 }
 
 build.dependsOn copyDistFiles

@@ -63,6 +63,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
 import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
@@ -123,7 +124,9 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
-    Game.getRenderEngine().setBaseRenderScale(1.0f);
+    
+    forceBasicEditorConfiguration();
+
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.getConfiguration().getConfigurationGroup("user_");
@@ -144,6 +147,14 @@ public class Program {
     if (!EditorScreen.instance().fileLoaded() && userPreferences.getLastGameFile() != null) {
       EditorScreen.instance().load(new File(userPreferences.getLastGameFile()));
     }
+  }
+
+  private static void forceBasicEditorConfiguration() {
+    // force configuration elements that are crucial for the editor
+    Game.getRenderEngine().setBaseRenderScale(1.0f);
+    Game.getConfiguration().debug().setDebugEnabled(true);
+    Game.getConfiguration().graphics().setGraphicQuality(Quality.VERYHIGH);
+    Game.getConfiguration().graphics().setReduceFramesWhenNotFocused(false);
   }
 
   public static void loadRecentFiles() {
