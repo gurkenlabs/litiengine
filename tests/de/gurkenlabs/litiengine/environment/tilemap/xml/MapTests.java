@@ -25,8 +25,8 @@ public class MapTests {
     assertEquals("1.1.4", map.getTiledVersion());
     assertEquals(MapOrientation.ORTHOGONAL, map.getOrientation());
     assertEquals("right-down", map.getRenderOrder());
-    assertEquals(16, map.getSizeInPixels().width);
-    assertEquals(16, map.getSizeInPixels().height);
+    assertEquals(256, map.getSizeInPixels().width);
+    assertEquals(256, map.getSizeInPixels().height);
     assertEquals(1, map.getTileSize().width);
     assertEquals(1, map.getTileSize().height);
     assertEquals(16, map.getSizeInTiles().width);
