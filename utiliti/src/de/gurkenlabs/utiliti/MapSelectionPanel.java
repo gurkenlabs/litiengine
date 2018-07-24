@@ -455,6 +455,9 @@ public class MapSelectionPanel extends JSplitPane {
     case PROP:
       this.selectById(nodeProps, mapObject.getId());
       break;
+    case CREATURE:
+      this.selectById(nodeCreatures, mapObject.getId());
+      break;
     case TRIGGER:
       this.selectById(nodeTriggers, mapObject.getId());
       break;
