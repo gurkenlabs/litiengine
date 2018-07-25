@@ -25,10 +25,10 @@ public class MapTests {
     assertEquals("1.1.4", map.getTiledVersion());
     assertEquals(MapOrientation.ORTHOGONAL, map.getOrientation());
     assertEquals("right-down", map.getRenderOrder());
-    assertEquals(16, map.getSizeInPixels().width);
-    assertEquals(16, map.getSizeInPixels().height);
-    assertEquals(1, map.getTileSize().width);
-    assertEquals(1, map.getTileSize().height);
+    assertEquals(256, map.getSizeInPixels().width);
+    assertEquals(256, map.getSizeInPixels().height);
+    assertEquals(16, map.getTileSize().width);
+    assertEquals(16, map.getTileSize().height);
     assertEquals(16, map.getSizeInTiles().width);
     assertEquals(16, map.getSizeInTiles().height);
     assertEquals(1, map.getNextObjectId());
@@ -36,7 +36,7 @@ public class MapTests {
     assertEquals("test-map", map.getName());
     assertEquals("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx", map.getPath());
     assertEquals(new Color(200, 0, 0), map.getBackgroundColor());
-    assertEquals(new Rectangle2D.Double(0, 0, 16, 16), map.getBounds());
+    assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
     assertEquals(1, ((Map) map).getExternalTilesets().size());
     assertEquals("tiles-test", map.getTilesets().get(1).getName());
@@ -48,6 +48,14 @@ public class MapTests {
     assertEquals(0, map.getMapObjectLayers().size());
     assertEquals(0, map.getCustomProperties().size());
     assertEquals(0, map.getMapObjects().size());
+  }
+  
+  @Test
+  public void testTileCustomProperties() {
+    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+
+    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("foo"));
+    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getCustomProperty("baz"));
   }
 
   @Test

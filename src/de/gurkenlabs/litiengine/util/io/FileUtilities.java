@@ -151,22 +151,27 @@ public final class FileUtilities {
    *          The path to the file.
    * @return The contents of the specified file as {@link InputStream}.
    */
-  public static InputStream getGameResource(final String file) {
+  public static InputStream getGameResource(String file) {
+    InputStream stream = findGameResource(file);
+    return stream == null ? null : stream.markSupported() ? stream : new BufferedInputStream(stream);
+  }
+  
+  private static InputStream findGameResource(final String file) {
     try {
       InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
       if (resourceStream != null) {
-        return new BufferedInputStream(resourceStream);
+        return resourceStream;
       }
 
       resourceStream = FileUtilities.class.getResourceAsStream(file);
       if (resourceStream != null) {
-        return new BufferedInputStream(resourceStream);
+        return resourceStream;
       }
 
       File f = new File(file);
       if (f.exists()) {
         resourceStream = new FileInputStream(file);
-        return new BufferedInputStream(resourceStream);
+        return resourceStream;
       } else {
         log.log(Level.INFO, "{0} could not be found.", file);
         return null;

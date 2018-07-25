@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -79,9 +78,7 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.data.parseTiles();
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller m, Object parent) {
-    Map map = (Map) parent;
+  public void setCustomPropertySources(Map map) {
     for (Tile tile : getData()) {
       for (ITileset tileset : map.getRawTilesets()) {
         if (tileset.containsTile(tile)) {
