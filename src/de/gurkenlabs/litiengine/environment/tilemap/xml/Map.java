@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
   private static final long serialVersionUID = 402776584608365440L;
+  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 4}; // 1.1.4
 
   @XmlAttribute
   private double version;
@@ -444,16 +445,14 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     return this.rawMapObjectLayers;
   }
-  
-  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 4}; // 1.1.4
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
-    String[] version = tiledversion.split("\\.");
-    int[] vNumbers = new int[version.length];
+    String[] ver = this.tiledversion.split("\\.");
+    int[] vNumbers = new int[ver.length];
     try {
-      for (int i = 0; i < version.length; i++) {
-        vNumbers[i] = Integer.parseInt(version[i]);
+      for (int i = 0; i < ver.length; i++) {
+        vNumbers[i] = Integer.parseInt(ver[i]);
       }
     } catch (NumberFormatException e) {
       throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion, e);
