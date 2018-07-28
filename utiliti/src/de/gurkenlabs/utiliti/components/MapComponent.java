@@ -240,6 +240,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadMaps(List<Map> maps) {
+    if (maps == null) {
+      return;
+    }
     EditorScreen.instance().getMapObjectPanel().bind(null);
     this.setFocus(null, true);
     this.getMaps().clear();
@@ -546,6 +549,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (this.isMoving || this.isTransforming) {
         return;
       }
+
       EditorScreen.instance().getMapObjectPanel().bind(mapObject);
       EditorScreen.instance().getMapSelectionPanel().focus(mapObject);
       if (mapObject == null) {
@@ -1406,12 +1410,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (this.currentEditMode) {
     case EDITMODE_CREATE:
-      if(SwingUtilities.isRightMouseButton(e.getEvent())) {
+      if (SwingUtilities.isRightMouseButton(e.getEvent())) {
         this.newObjectArea = null;
         this.setEditMode(EDITMODE_EDIT);
         break;
       }
-      
+
       if (this.newObjectArea == null) {
         break;
       }
@@ -1481,9 +1485,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
             this.setSelection(mapObject, false);
             continue;
           }
-
-          this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
-          EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+          if (this.getSelectedMapObjects().contains((MapObject) mapObject)) {
+            this.getSelectedMapObjects().remove((MapObject) mapObject);
+          } else {
+            this.setFocus(mapObject, !Input.keyboard().isPressed(KeyEvent.VK_SHIFT));
+            EditorScreen.instance().getMapObjectPanel().bind(mapObject);
+          }
           somethingIsFocused = true;
         }
       }

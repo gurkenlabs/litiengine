@@ -38,7 +38,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 4}; // 1.1.4
+  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 5}; // 1.1.5
 
   @XmlAttribute
   private double version;
