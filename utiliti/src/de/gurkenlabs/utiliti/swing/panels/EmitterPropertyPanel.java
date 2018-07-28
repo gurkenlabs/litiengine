@@ -44,6 +44,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.ColorChooser;
 
@@ -160,7 +161,7 @@ public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
 
     this.initRadioButtons();
 
-    this.btnSelectColor.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
+    this.btnSelectColor.setIcon(Icons.COLOR);
     this.btnSelectColor.setMinimumSize(new Dimension(30, 10));
     this.btnSelectColor.setMaximumSize(new Dimension(30, 10));
 

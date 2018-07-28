@@ -326,6 +326,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.getRawMapObjectLayers().add((MapObjectLayer) layer);
     this.mapObjectLayers = null;
   }
+  
+  @Override
+  public void addMapObjectLayer(int index, IMapObjectLayer layer) {
+    this.getRawMapObjectLayers().add(index, (MapObjectLayer) layer);
+    this.mapObjectLayers = null;
+  }
 
   @Override
   public void removeMapObjectLayer(IMapObjectLayer layer) {

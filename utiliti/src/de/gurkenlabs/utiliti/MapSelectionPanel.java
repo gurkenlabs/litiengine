@@ -52,16 +52,20 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
+import javax.swing.Box;
+import java.awt.Component;
 
 public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
@@ -97,6 +101,15 @@ public class MapSelectionPanel extends JSplitPane {
   private final DefaultMutableTreeNode[] entityNodes;
 
   private boolean isFocussing;
+  private Box layerButtonBox;
+  private JButton buttonAddLayer;
+  private JButton buttonRemoveLayer;
+  private JButton buttonSetColor;
+  private JButton buttonDuplicateLayer;
+  private JButton buttonHideOtherLayers;
+  private JButton buttonLiftLayer;
+  private JButton buttonLowerLayer;
+  private Component horizontalGlue_4;
 
   /**
    * Create the panel.
@@ -304,6 +317,109 @@ public class MapSelectionPanel extends JSplitPane {
     listObjectLayers.setMaximumSize(new Dimension(0, 250));
     layerScrollPane.setViewportView(listObjectLayers);
 
+    layerButtonBox = Box.createHorizontalBox();
+    layerScrollPane.setColumnHeaderView(layerButtonBox);
+
+    buttonAddLayer = new JButton("");
+    buttonAddLayer.setPreferredSize(new Dimension(24, 24));
+    buttonAddLayer.setMinimumSize(new Dimension(24, 24));
+    buttonAddLayer.setMaximumSize(new Dimension(24, 24));
+    buttonAddLayer.setIcon(Icons.ADD);
+
+    buttonAddLayer.addActionListener(a -> {
+      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      MapObjectLayer layer = new MapObjectLayer();
+      layer.setName("new layer");
+      JCheckBox newBox = new JCheckBox(layer.getName() + " (" + layer.getMapObjects().size() + ")");
+      String mapName = currentMap.getName();
+
+      newBox.setName(mapName + "/" + layer.getName());
+
+      if (layer.getColor() != null) {
+        final String cacheKey = mapName + layer.getName();
+        if (!ImageCache.IMAGES.containsKey(cacheKey)) {
+          BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
+          Graphics2D g = (Graphics2D) img.getGraphics();
+          g.setColor(layer.getColor());
+          g.fillRect(0, 0, 9, 9);
+          g.setColor(Color.BLACK);
+          g.drawRect(0, 0, 9, 9);
+          g.dispose();
+          ImageCache.IMAGES.put(cacheKey, img);
+        }
+
+        newBox.setIcon(new ImageIcon(ImageCache.IMAGES.get(cacheKey)));
+      }
+      newBox.setSelected(true);
+      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
+        currentMap.addMapObjectLayer(layer);
+        layerModel.addElement(newBox);
+      } else {
+        currentMap.addMapObjectLayer(this.getSelectedLayerIndex(), layer);
+        layerModel.add(this.getSelectedLayerIndex(), newBox);
+      }
+    });
+    layerButtonBox.add(buttonAddLayer);
+
+    buttonRemoveLayer = new JButton("");
+    buttonRemoveLayer.setPreferredSize(new Dimension(24, 24));    
+    buttonRemoveLayer.setMinimumSize(new Dimension(24, 24));
+    buttonRemoveLayer.setMaximumSize(new Dimension(24, 24));
+
+    buttonRemoveLayer.setIcon(Icons.DELETE);
+    buttonRemoveLayer.addActionListener(a -> {
+      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
+        return;
+      }
+      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      currentMap.removeMapObjectLayer(this.getSelectedLayerIndex());
+      layerModel.remove(this.getSelectedLayerIndex());
+    });
+    layerButtonBox.add(buttonRemoveLayer);
+    
+    buttonSetColor = new JButton("");
+    buttonSetColor.setPreferredSize(new Dimension(24, 24));
+    buttonSetColor.setMinimumSize(new Dimension(24, 24));
+    buttonSetColor.setMaximumSize(new Dimension(24, 24));
+    buttonSetColor.setIcon(Icons.COLORX16);
+
+    layerButtonBox.add(buttonSetColor);
+
+    buttonDuplicateLayer = new JButton("");
+    buttonDuplicateLayer.setPreferredSize(new Dimension(24, 24));
+    buttonDuplicateLayer.setMinimumSize(new Dimension(24, 24));
+    buttonDuplicateLayer.setMaximumSize(new Dimension(24, 24));
+    buttonDuplicateLayer.setIcon(Icons.COPYX16);
+
+    layerButtonBox.add(buttonDuplicateLayer);
+
+    buttonHideOtherLayers = new JButton("");
+    buttonHideOtherLayers.setPreferredSize(new Dimension(24, 24));
+    buttonHideOtherLayers.setMinimumSize(new Dimension(24, 24));
+    buttonHideOtherLayers.setMaximumSize(new Dimension(24, 24));
+    buttonHideOtherLayers.setIcon(Icons.HIDEOTHER);
+
+    layerButtonBox.add(buttonHideOtherLayers);
+
+    buttonLiftLayer = new JButton("");
+    buttonLiftLayer.setPreferredSize(new Dimension(24, 24));
+    buttonLiftLayer.setMinimumSize(new Dimension(24, 24));
+    buttonLiftLayer.setMaximumSize(new Dimension(24, 24));
+    buttonLiftLayer.setIcon(Icons.LIFT);
+
+    layerButtonBox.add(buttonLiftLayer);
+
+    buttonLowerLayer = new JButton("");
+    buttonLowerLayer.setPreferredSize(new Dimension(24, 24));
+    buttonLowerLayer.setMinimumSize(new Dimension(24, 24));
+    buttonLowerLayer.setMaximumSize(new Dimension(24, 24));
+    buttonLowerLayer.setIcon(Icons.LOWER);
+
+    layerButtonBox.add(buttonLowerLayer);
+    
+        horizontalGlue_4 = Box.createHorizontalGlue();
+        layerButtonBox.add(horizontalGlue_4);
+
     UndoManager.onMapObjectAdded(manager -> {
       this.updateMapObjectTree();
       this.updateMapLayerControl();
@@ -377,7 +493,7 @@ public class MapSelectionPanel extends JSplitPane {
       Object sel = this.listObjectLayers.getModel().getElementAt(i);
       JCheckBox check = (JCheckBox) sel;
       String layerName = getLayerName(check);
-      if (layerName!= null && layerName.equals(name) && check.isSelected()) {
+      if (layerName != null && layerName.equals(name) && check.isSelected()) {
         return true;
       }
     }
@@ -559,7 +675,7 @@ public class MapSelectionPanel extends JSplitPane {
       return false;
     }
 
-    Enumeration en = parent.depthFirstEnumeration();
+    Enumeration<?> en = parent.depthFirstEnumeration();
     while (en.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
       IEntity ent = null;

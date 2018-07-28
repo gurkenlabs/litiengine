@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -124,7 +123,7 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
-    
+
     forceBasicEditorConfiguration();
 
     JOptionPane.setDefaultLocale(Locale.getDefault());
@@ -373,8 +372,8 @@ public class Program {
 
     bottomTab.addTab(Resources.get("assettree_assets"), initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
-    bottomTab.setIconAt(0, new ImageIcon(Resources.getImage("asset.png")));
-    bottomTab.setIconAt(1, new ImageIcon(Resources.getImage("console.png")));
+    bottomTab.setIconAt(0, Icons.ASSET);
+    bottomTab.setIconAt(1, Icons.CONSOLE);
 
     bottomPanel.add(bottomTab, BorderLayout.CENTER);
 
@@ -651,19 +650,19 @@ public class Program {
     JToolBar basicMenu = new JToolBar();
 
     JButton cr = new JButton();
-    cr.setIcon(new ImageIcon(Resources.getImage("button-create.png")));
+    cr.setIcon(Icons.CREATE);
     basicMenu.add(cr);
     cr.addActionListener(a -> EditorScreen.instance().create());
     requestFocusOnMouseDown(cr);
 
     JButton op = new JButton();
-    op.setIcon(new ImageIcon(Resources.getImage("button-load.png")));
+    op.setIcon(Icons.LOAD);
     basicMenu.add(op);
     op.addActionListener(a -> EditorScreen.instance().load());
     requestFocusOnMouseDown(op);
 
     JButton sv = new JButton();
-    sv.setIcon(new ImageIcon(Resources.getImage("button-save.png")));
+    sv.setIcon(Icons.SAVE);
     basicMenu.add(sv);
     sv.addActionListener(a -> EditorScreen.instance().save(false));
     requestFocusOnMouseDown(sv);
@@ -671,13 +670,13 @@ public class Program {
     basicMenu.addSeparator();
 
     JButton undo = new JButton();
-    undo.setIcon(new ImageIcon(Resources.getImage("button-undo.png")));
+    undo.setIcon(Icons.UNDO);
     basicMenu.add(undo);
     undo.addActionListener(a -> UndoManager.instance().undo());
     requestFocusOnMouseDown(undo);
 
     JButton redo = new JButton();
-    redo.setIcon(new ImageIcon(Resources.getImage("button-redo.png")));
+    redo.setIcon(Icons.REDO);
     basicMenu.add(redo);
     redo.addActionListener(a -> UndoManager.instance().redo());
     requestFocusOnMouseDown(redo);
@@ -688,17 +687,17 @@ public class Program {
     basicMenu.addSeparator();
 
     JToggleButton place = new JToggleButton();
-    place.setIcon(new ImageIcon(Resources.getImage("button-placeobject.png")));
+    place.setIcon(Icons.PLACEOBJECT);
     basicMenu.add(place);
     requestFocusOnMouseDown(place);
 
     JToggleButton ed = new JToggleButton();
-    ed.setIcon(new ImageIcon(Resources.getImage("button-edit.png")));
+    ed.setIcon(Icons.EDIT);
     ed.setSelected(true);
     requestFocusOnMouseDown(ed);
 
     JToggleButton mv = new JToggleButton();
-    mv.setIcon(new ImageIcon(Resources.getImage("button-move.png")));
+    mv.setIcon(Icons.MOVE);
     mv.setEnabled(false);
     requestFocusOnMouseDown(mv);
 
@@ -771,14 +770,14 @@ public class Program {
     });
 
     JButton del = new JButton();
-    del.setIcon(new ImageIcon(Resources.getImage("button-delete.png")));
+    del.setIcon(Icons.DELETE);
     basicMenu.add(del);
     del.setEnabled(false);
     del.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
 
     // copy
     JButton cop = new JButton();
-    cop.setIcon(new ImageIcon(Resources.getImage("button-copy.png")));
+    cop.setIcon(Icons.COPY);
     basicMenu.add(cop);
     cop.setEnabled(false);
     ActionListener copyAction = a -> EditorScreen.instance().getMapComponent().copy();
@@ -789,7 +788,7 @@ public class Program {
 
     // paste
     JButton paste = new JButton();
-    paste.setIcon(new ImageIcon(Resources.getImage("button-paste.png")));
+    paste.setIcon(Icons.PASTE);
     basicMenu.add(paste);
     ActionListener pasteAction = a -> EditorScreen.instance().getMapComponent().paste();
     paste.addActionListener(pasteAction);
@@ -799,7 +798,7 @@ public class Program {
 
     // cut
     JButton cut = new JButton();
-    cut.setIcon(new ImageIcon(Resources.getImage("button-cut.png")));
+    cut.setIcon(Icons.CUT);
     basicMenu.add(cut);
     cut.setEnabled(false);
     ActionListener cutAction = a -> EditorScreen.instance().getMapComponent().cut();
@@ -834,7 +833,7 @@ public class Program {
     basicMenu.addSeparator();
 
     JButton colorButton = new JButton();
-    colorButton.setIcon(new ImageIcon(Resources.getImage("button-color.png")));
+    colorButton.setIcon(Icons.COLOR);
     colorButton.setEnabled(false);
 
     JTextField colorText = new JTextField();
@@ -967,27 +966,27 @@ public class Program {
     initAddMenu(addPopupMenu);
     initAddMenu(addSubMenu);
 
-    JMenuItem delete = new JMenuItem("Delete Entity", new ImageIcon(Resources.getImage("button-deletex16.png")));
+    JMenuItem delete = new JMenuItem("Delete Entity", Icons.DELETEX16);
     delete.addActionListener(e -> EditorScreen.instance().getMapComponent().delete());
     delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     delete.setEnabled(false);
 
-    JMenuItem copy = new JMenuItem("Copy Entity", new ImageIcon(Resources.getImage("button-copyx16.png")));
+    JMenuItem copy = new JMenuItem("Copy Entity", Icons.COPYX16);
     copy.addActionListener(e -> EditorScreen.instance().getMapComponent().copy());
     copy.setEnabled(false);
     copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK));
 
-    JMenuItem cut = new JMenuItem("Cut Entity", new ImageIcon(Resources.getImage("button-cutx16.png")));
+    JMenuItem cut = new JMenuItem("Cut Entity", Icons.CUTX16);
     cut.addActionListener(e -> EditorScreen.instance().getMapComponent().cut());
     cut.setEnabled(false);
     cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK));
 
-    JMenuItem paste = new JMenuItem("Paste Entity", new ImageIcon(Resources.getImage("button-pastex16.png")));
+    JMenuItem paste = new JMenuItem("Paste Entity", Icons.PASTEX16);
     paste.addActionListener(e -> EditorScreen.instance().getMapComponent().paste());
     paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
     paste.setEnabled(false);
 
-    JMenuItem blueprint = new JMenuItem("Define Blueprint", new ImageIcon(Resources.getImage("blueprint.png")));
+    JMenuItem blueprint = new JMenuItem("Define Blueprint", Icons.BLUEPRINT);
     blueprint.addActionListener(e -> EditorScreen.instance().getMapComponent().defineBlueprint());
     blueprint.setEnabled(false);
 

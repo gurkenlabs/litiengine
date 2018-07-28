@@ -36,7 +36,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
     Box horizontalBox = Box.createHorizontalBox();
 
     JButton btnCustomize = new JButton("Customize");
-    btnCustomize.setIcon(new ImageIcon(Resources.getImage("pencil.png")));
+    btnCustomize.setIcon(Icons.PENCIL);
     btnCustomize.addActionListener(a -> {
       EmitterPropertyPanel panel = new EmitterPropertyPanel();
       panel.bind(this.getDataSource());
@@ -65,7 +65,7 @@ public class EmitterPanel extends PropertyPanel<IMapObject> {
       EditorScreen.instance().getGameFile().getEmitters().add(data);
     });
 
-    btnSave.setIcon(new ImageIcon(Resources.getImage("emitter.png")));
+    btnSave.setIcon(Icons.EMITTER);
     this.btnPause = new JToggleButton();
     this.btnPause.setSelected(true);
     this.btnPause.setPreferredSize(new Dimension(40, 23));
