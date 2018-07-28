@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -19,10 +20,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -64,8 +67,6 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
-import javax.swing.Box;
-import java.awt.Component;
 
 public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
@@ -109,7 +110,7 @@ public class MapSelectionPanel extends JSplitPane {
   private JButton buttonHideOtherLayers;
   private JButton buttonLiftLayer;
   private JButton buttonLowerLayer;
-  private Component horizontalGlue_4;
+  private Component horizontalGlue4;
 
   /**
    * Create the panel.
@@ -330,39 +331,21 @@ public class MapSelectionPanel extends JSplitPane {
       IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
       MapObjectLayer layer = new MapObjectLayer();
       layer.setName("new layer");
-      JCheckBox newBox = new JCheckBox(layer.getName() + " (" + layer.getMapObjects().size() + ")");
-      String mapName = currentMap.getName();
-
-      newBox.setName(mapName + "/" + layer.getName());
-
-      if (layer.getColor() != null) {
-        final String cacheKey = mapName + layer.getName();
-        if (!ImageCache.IMAGES.containsKey(cacheKey)) {
-          BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
-          Graphics2D g = (Graphics2D) img.getGraphics();
-          g.setColor(layer.getColor());
-          g.fillRect(0, 0, 9, 9);
-          g.setColor(Color.BLACK);
-          g.drawRect(0, 0, 9, 9);
-          g.dispose();
-          ImageCache.IMAGES.put(cacheKey, img);
-        }
-
-        newBox.setIcon(new ImageIcon(ImageCache.IMAGES.get(cacheKey)));
-      }
-      newBox.setSelected(true);
-      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
+      int selIndex = this.getSelectedLayerIndex();
+      if (selIndex < 0 || selIndex >= this.layerModel.size()) {
         currentMap.addMapObjectLayer(layer);
-        layerModel.addElement(newBox);
+        this.updateMapLayerControl();
+        this.listObjectLayers.setSelectedIndex(selIndex);
       } else {
         currentMap.addMapObjectLayer(this.getSelectedLayerIndex(), layer);
-        layerModel.add(this.getSelectedLayerIndex(), newBox);
+        this.updateMapLayerControl();
+        this.listObjectLayers.setSelectedIndex(selIndex);
       }
     });
     layerButtonBox.add(buttonAddLayer);
 
     buttonRemoveLayer = new JButton("");
-    buttonRemoveLayer.setPreferredSize(new Dimension(24, 24));    
+    buttonRemoveLayer.setPreferredSize(new Dimension(24, 24));
     buttonRemoveLayer.setMinimumSize(new Dimension(24, 24));
     buttonRemoveLayer.setMaximumSize(new Dimension(24, 24));
 
@@ -376,13 +359,23 @@ public class MapSelectionPanel extends JSplitPane {
       layerModel.remove(this.getSelectedLayerIndex());
     });
     layerButtonBox.add(buttonRemoveLayer);
-    
+
     buttonSetColor = new JButton("");
     buttonSetColor.setPreferredSize(new Dimension(24, 24));
     buttonSetColor.setMinimumSize(new Dimension(24, 24));
     buttonSetColor.setMaximumSize(new Dimension(24, 24));
     buttonSetColor.setIcon(Icons.COLORX16);
+    buttonSetColor.addActionListener(a -> {
+      if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
+        return;
+      }
+      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      Color newColor = JColorChooser.showDialog(null, Resources.get("panel_selectLayerColor"), currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).getColor());
 
+      String hex = "#" + Integer.toHexString(newColor.getRGB());
+      currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).setColor(hex);
+      this.updateMapLayerControl();
+    });
     layerButtonBox.add(buttonSetColor);
 
     buttonDuplicateLayer = new JButton("");
@@ -390,6 +383,12 @@ public class MapSelectionPanel extends JSplitPane {
     buttonDuplicateLayer.setMinimumSize(new Dimension(24, 24));
     buttonDuplicateLayer.setMaximumSize(new Dimension(24, 24));
     buttonDuplicateLayer.setIcon(Icons.COPYX16);
+
+    buttonDuplicateLayer.addActionListener(a -> {
+      // TODO We need a thorough implementation for copying MapObjectLayers.
+      // Maybe we should implement "Cloneable" or use reflection to copy all
+      // fields.
+    });
 
     layerButtonBox.add(buttonDuplicateLayer);
 
@@ -399,6 +398,17 @@ public class MapSelectionPanel extends JSplitPane {
     buttonHideOtherLayers.setMaximumSize(new Dimension(24, 24));
     buttonHideOtherLayers.setIcon(Icons.HIDEOTHER);
 
+    buttonHideOtherLayers.addActionListener(a -> {
+      for (int i = 0; i < this.layerModel.getSize(); i++) {
+        if (i != this.getSelectedLayerIndex()) {
+          layerModel.get(i).setSelected(false);
+        } else if (!layerModel.get(i).isSelected()) {
+          layerModel.get(i).setSelected(true);
+        }
+      }
+      this.updateMapLayerControl();
+    });
+
     layerButtonBox.add(buttonHideOtherLayers);
 
     buttonLiftLayer = new JButton("");
@@ -406,6 +416,19 @@ public class MapSelectionPanel extends JSplitPane {
     buttonLiftLayer.setMinimumSize(new Dimension(24, 24));
     buttonLiftLayer.setMaximumSize(new Dimension(24, 24));
     buttonLiftLayer.setIcon(Icons.LIFT);
+
+    buttonLiftLayer.addActionListener(a -> {
+      int selLayerIndex = this.getSelectedLayerIndex();
+      if (selLayerIndex <= 0) {
+        return;
+      }
+      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      IMapObjectLayer selectedLayer = currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex());
+      currentMap.removeMapObjectLayer(selLayerIndex);
+      currentMap.addMapObjectLayer(selLayerIndex - 1, selectedLayer);
+      this.listObjectLayers.setSelectedIndex(selLayerIndex - 1);
+      this.updateMapLayerControl();
+    });
 
     layerButtonBox.add(buttonLiftLayer);
 
@@ -415,10 +438,23 @@ public class MapSelectionPanel extends JSplitPane {
     buttonLowerLayer.setMaximumSize(new Dimension(24, 24));
     buttonLowerLayer.setIcon(Icons.LOWER);
 
+    buttonLowerLayer.addActionListener(a -> {
+      int selLayerIndex = this.getSelectedLayerIndex();
+      if (selLayerIndex >= this.layerModel.getSize()-1) {
+        return;
+      }
+      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      IMapObjectLayer selectedLayer = currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex());
+      currentMap.removeMapObjectLayer(selLayerIndex);
+      currentMap.addMapObjectLayer(selLayerIndex + 1, selectedLayer);
+      this.listObjectLayers.setSelectedIndex(selLayerIndex + 1);
+      this.updateMapLayerControl();
+    });
+
     layerButtonBox.add(buttonLowerLayer);
-    
-        horizontalGlue_4 = Box.createHorizontalGlue();
-        layerButtonBox.add(horizontalGlue_4);
+
+    horizontalGlue4 = Box.createHorizontalGlue();
+    layerButtonBox.add(horizontalGlue4);
 
     UndoManager.onMapObjectAdded(manager -> {
       this.updateMapObjectTree();
@@ -519,9 +555,9 @@ public class MapSelectionPanel extends JSplitPane {
       int layerSize = layer.getMapObjects().size();
       JCheckBox newBox = new JCheckBox(layerName + " (" + layerSize + ")");
       newBox.setName(map.getName() + "/" + layerName);
-
-      if (layer.getColor() != null) {
-        final String cacheKey = map.getName() + layer.getName();
+      Color layerColor = layer.getColor();
+      if (layerColor != null) {
+        final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
         if (!ImageCache.IMAGES.containsKey(cacheKey)) {
           BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();
@@ -532,7 +568,6 @@ public class MapSelectionPanel extends JSplitPane {
           g.dispose();
           ImageCache.IMAGES.put(cacheKey, img);
         }
-
         newBox.setIcon(new ImageIcon(ImageCache.IMAGES.get(cacheKey)));
       }
       newBox.setSelected(true);

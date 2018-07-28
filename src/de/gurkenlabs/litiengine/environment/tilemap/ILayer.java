@@ -51,6 +51,8 @@ public interface ILayer extends ICustomPropertyProvider {
    */
   public boolean isVisible();
 
+  public void setVisible(boolean visible);
+
   public void setName(String name);
 
   public RenderType getRenderType();

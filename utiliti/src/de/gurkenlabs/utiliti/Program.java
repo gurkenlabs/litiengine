@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -72,7 +73,6 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
-import de.gurkenlabs.utiliti.swing.ColorChooser;
 import de.gurkenlabs.utiliti.swing.FileDrop;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
@@ -864,8 +864,7 @@ public class Program {
         Color solid = ColorHelper.decode(colorText.getText());
         color = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) spinnerAmbientAlpha.getValue());
       }
-
-      Color result = ColorChooser.showRgbDialog("Select an ambient color.", color);
+      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), color);
       if (result == null) {
         return;
       }
