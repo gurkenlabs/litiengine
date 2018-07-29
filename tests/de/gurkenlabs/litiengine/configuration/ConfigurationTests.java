@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.configuration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.io.File;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class ConfigurationTests {
       }
     }
   }
-  
+
   @BeforeEach
   public void setup() {
     Logger.getLogger(FileUtilities.class.getName()).setUseParentHandlers(false);
@@ -71,14 +72,19 @@ public class ConfigurationTests {
 
       config.load();
       final TestConfigurationGroup configGroup = config.getConfigurationGroup(TestConfigurationGroup.class);
-      assertEquals(10, configGroup.getTestInt());
-      assertEquals(10, configGroup.getTestByte());
-      assertEquals(10, configGroup.getTestShort());
-      assertEquals(10, configGroup.getTestLong());
-      assertEquals(10.0, configGroup.getTestDouble(), 0.00001);
-      assertEquals(10, configGroup.getTestFloat(), 0.00001f);
+      assertEquals(100, configGroup.getTestInt());
+      assertEquals(101, configGroup.getTestByte());
+      assertEquals(102, configGroup.getTestShort());
+      assertEquals(103, configGroup.getTestLong());
+      assertEquals(104.0d, configGroup.getTestDouble(), 0.00001);
+      assertEquals(105.0f, configGroup.getTestFloat(), 0.00001f);
       assertEquals("test", configGroup.getTestString());
       assertEquals(true, configGroup.isTestBoolean());
+      assertEquals(TEST.TEST1, configGroup.getTestEnum());
+      assertEquals("", configGroup.getTestWithNoSetter());
+      System.out.println(new String[] { "test", "testicle" });
+      System.out.println(configGroup.getTestStringArray());
+      assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
     } finally {
       deleteTempConfigFile(config);
     }
@@ -104,17 +110,16 @@ public class ConfigurationTests {
   @ConfigurationGroupInfo(prefix = "test-prefix")
   @SuppressWarnings("unused")
   private class TestConfigurationGroup extends ConfigurationGroup {
-
-    private boolean testBoolean;
-    private byte testByte;
-    private double testDouble;
-    private TEST testEnum;
-    private float testFloat;
-    private int testInt;
-    private long testLong;
-    private short testShort;
-    private String testString;
-    private String[] testStringArray;
+    private int testInt = 100;
+    private byte testByte = 101;
+    private short testShort = 102;
+    private long testLong = 103;
+    private double testDouble = 104.0d;
+    private float testFloat = 105.0f;
+    private String testString = "test";
+    private boolean testBoolean = true;
+    private TEST testEnum = TEST.TEST1;
+    private String[] testStringArray = new String[] { "test", "testicle" };
 
     private String testWithNoSetter;
 
@@ -155,39 +160,39 @@ public class ConfigurationTests {
     }
 
     public void setTestBoolean(final boolean testBoolean) {
-      this.testBoolean = true;
+      this.testBoolean = testBoolean;
     }
 
     public void setTestByte(final byte testByte) {
-      this.testByte = 10;
+      this.testByte = testByte;
     }
 
     public void setTestDouble(final double testDouble) {
-      this.testDouble = 10.0;
+      this.testDouble = testDouble;
     }
 
     public void setTestEnum(final TEST testEnum) {
-      this.testEnum = TEST.TEST2;
+      this.testEnum = testEnum;
     }
 
     public void setTestFloat(final float testFloat) {
-      this.testFloat = 10.0f;
+      this.testFloat = testFloat;
     }
 
     public void setTestInt(final int test1) {
-      this.testInt = 10;
+      this.testInt = test1;
     }
 
     public void setTestLong(final long testLong) {
-      this.testLong = 10;
+      this.testLong = testLong;
     }
 
     public void setTestShort(final short testShort) {
-      this.testShort = 10;
+      this.testShort = testShort;
     }
 
     public void setTestString(final String testString) {
-      this.testString = "test";
+      this.testString = testString;
     }
 
     public String[] getTestStringArray() {
