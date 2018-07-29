@@ -28,12 +28,12 @@ import java.util.logging.Logger;
  * a Java program. Any <tt>java.awt.Component</tt> can be dropped onto, but only
  * <tt>javax.swing.JComponent</tt>s will indicate the drop event with a changed
  * border.
- * <p/>
+ *
  * To use this class, construct a new <tt>FileDrop</tt> by passing it the target
  * component and a <tt>Listener</tt> to receive notification when file(s) have
  * been dropped. Here is an example:
- * <p/>
- * <code><pre>
+ * 
+ * <code>
  *      JPanel myPanel = new JPanel();
  *      new FileDrop( myPanel, new FileDrop.Listener()
  *      {   public void filesDropped( java.io.File[] files )
@@ -42,17 +42,17 @@ import java.util.logging.Logger;
  *              ...
  *          }   // end filesDropped
  *      }); // end FileDrop.Listener
- * </pre></code>
- * <p/>
+ * </code>
+ * 
  * You can specify the border that will appear when files are being dragged by
  * calling the constructor with a <tt>javax.swing.border.Border</tt>. Only
  * <tt>JComponent</tt>s will show any indication with a border.
- * <p/>
+ * 
  * You can turn on some debugging features by passing a <tt>PrintStream</tt>
  * object (such as <tt>System.out</tt>) into the full constructor. A
  * <tt>null</tt> value will result in no extra debugging information being
  * output.
- * <p/>
+ * 
  */
 public class FileDrop {
   private static final Logger LOG = Logger.getLogger(FileDrop.class.getName());
@@ -70,12 +70,8 @@ public class FileDrop {
    * <tt>System.out</tt> or <tt>System.err</tt>. A <tt>null</tt> value for the
    * parameter <tt>out</tt> will result in no debugging output.
    *
-   * @param out
-   *          PrintStream to record debugging info or null for no debugging.
    * @param c
    *          Component on which files will be dropped.
-   * @param dragBorder
-   *          Border to use on <tt>JComponent</tt> when dragging occurs.
    * @param listener
    *          Listens for <tt>filesDropped</tt>.
    * @since 1.0
@@ -91,12 +87,8 @@ public class FileDrop {
    * <tt>System.out</tt> or <tt>System.err</tt>. A <tt>null</tt> value for the
    * parameter <tt>out</tt> will result in no debugging output.
    *
-   * @param out
-   *          PrintStream to record debugging info or null for no debugging.
    * @param c
    *          Component on which files will be dropped.
-   * @param dragBorder
-   *          Border to use on <tt>JComponent</tt> when dragging occurs.
    * @param recursive
    *          Recursively set children as drop targets.
    * @param listener
@@ -180,6 +172,7 @@ public class FileDrop {
    *
    * @param c
    *          The component to unregister as a drop target
+   * @return Was the operation successful?
    * @since 1.0
    */
   public static boolean remove(Component c) {
@@ -191,13 +184,11 @@ public class FileDrop {
    * all children. You should call this if you add and remove components after
    * you've set up the drag-and-drop.
    *
-   * @param out
-   *          Optional {@link java.io.PrintStream} for logging drag and drop
-   *          messages
    * @param c
    *          The component to unregister
    * @param recursive
    *          Recursively unregister components within a container
+   * @return Was the operation successful?
    * @since 1.0
    */
   public static boolean remove(Component c, boolean recursive) {
@@ -380,7 +371,7 @@ public class FileDrop {
 
   /**
    * Implement this inner interface to listen for when files are dropped. For
-   * example your class declaration may begin like this: <code><pre>
+   * example your class declaration may begin like this: <code>
    *      public class MyClass implements FileDrop.Listener
    *      ...
    *      public void filesDropped( java.io.File[] files )
@@ -388,7 +379,7 @@ public class FileDrop {
    *          ...
    *      }   // end filesDropped
    *      ...
-   * </pre></code>
+   * </code>
    *
    * @since 1.1
    */
@@ -405,9 +396,7 @@ public class FileDrop {
   }
 
   /**
-   * This is the event that is passed to the
-   * {@link FileDropListener#filesDropped filesDropped(...)} method in your
-   * {@link FileDropListener} when files are dropped onto a registered drop
+   * This is the event that fires when files are dropped onto a registered drop
    * target.
    *
    * <p>
@@ -428,7 +417,8 @@ public class FileDrop {
      *
      * @param files
      *          The array of files that were dropped
-     * @source The event source
+     * @param source
+     *          The event source
      * @since 1.1
      */
     public Event(File[] files, Object source) {
@@ -585,7 +575,7 @@ public class FileDrop {
      * Returns a two- or three-element array containing first the custom data
      * flavor, if one was created in the constructors, second the default
      * {@link #DATA_FLAVOR} associated with {@link TransferableObject}, and
-     * third the {@link java.awt.datatransfer.DataFlavor.stringFlavor}.
+     * third the stringFlavor.
      *
      * @return An array of supported data flavors
      * @since 1.1
@@ -651,7 +641,6 @@ public class FileDrop {
      * {@link #getObject getObject()} method will be called.
      *
      * @author Robert Harder
-     * @copyright 2001
      * @version 1.1
      * @since 1.1
      */

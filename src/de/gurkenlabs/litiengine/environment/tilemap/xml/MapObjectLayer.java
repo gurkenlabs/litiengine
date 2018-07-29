@@ -51,7 +51,6 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
    *
    * @param layerToBeCopied
    *          the layer we want to copy
-   * @see CustomPropertyProvider()
    */
   public MapObjectLayer(IMapObjectLayer layerToBeCopied) {
     super(layerToBeCopied);
