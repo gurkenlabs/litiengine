@@ -70,6 +70,10 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Prop prop) {
+    if(prop == null || prop.getSpritesheetName() == null) {
+      return null;
+    }
+    
     String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
     BufferedImage propImag;
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
