@@ -371,6 +371,40 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     UndoManager.instance().mapObjectAdded(mapObject);
   }
 
+  public void add(IMapObjectLayer layer) {
+    if (layer == null) {
+      return;
+    }
+    this.getSelectedMapObjects().clear();
+    this.setFocus(null, true);
+    for (IMapObject mapObject : layer.getMapObjects()) {
+      Game.getEnvironment().loadFromMap(mapObject.getId());
+      if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
+        Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+      }
+      this.setSelection(mapObject, false);
+      this.setFocus(mapObject, false);
+    }
+    this.updateTransformControls();
+    this.setEditMode(EDITMODE_MOVE);
+  }
+
+  public void delete(IMapObjectLayer layer) {
+    if (layer == null) {
+      return;
+    }
+    for (IMapObject mapObject : layer.getMapObjects()) {
+      if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
+        Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+      }
+      Game.getEnvironment().remove(mapObject.getId());
+      if (mapObject.equals(this.getFocusedMapObject())) {
+        this.setFocus(null, true);
+      }
+      this.getSelectedMapObjects().remove(mapObject);
+    }
+  }
+
   public void add(IMapObject mapObject, IMapObjectLayer layer) {
     if (layer == null || mapObject == null) {
       return;
@@ -520,6 +554,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_EDIT:
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       break;
+    case EDITMODE_MOVE:
+      EditorScreen.instance().getMapObjectPanel().bind(null);
+      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
+      break;
     default:
       break;
     }
@@ -589,6 +627,35 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     if (!this.getSelectedMapObjects().contains(mapObject)) {
       this.getSelectedMapObjects().add((MapObject) mapObject);
+    }
+
+    for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+      cons.accept(this.getSelectedMapObjects());
+    }
+  }
+
+  public void setSelection(List<IMapObject> mapObjects, boolean clearSelection) {
+    if (mapObjects == null || mapObjects.isEmpty()) {
+      this.getSelectedMapObjects().clear();
+      for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+        cons.accept(this.getSelectedMapObjects());
+      }
+      return;
+    }
+
+    final String map = Game.getEnvironment().getMap().getName();
+    if (!this.selectedObjects.containsKey(map)) {
+      this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
+    }
+
+    if (clearSelection) {
+      this.getSelectedMapObjects().clear();
+    }
+
+    for (IMapObject mapObject : mapObjects) {
+      if (!this.getSelectedMapObjects().contains(mapObject)) {
+        this.getSelectedMapObjects().add((MapObject) mapObject);
+      }
     }
 
     for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {

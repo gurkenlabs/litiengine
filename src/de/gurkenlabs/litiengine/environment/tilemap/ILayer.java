@@ -56,4 +56,12 @@ public interface ILayer extends ICustomPropertyProvider {
   public void setName(String name);
 
   public RenderType getRenderType();
+
+  public int getWidth();
+
+  public int getHeight();
+
+  public void setWidth(int newWidth);
+
+  public void setHeight(int newWidth);
 }

@@ -22,7 +22,9 @@ public interface IMapObjectLayer extends ILayer {
 
   public Color getColor();
 
-  public void setColor(String color);
+  public String getColorHexString();
+
+  public void setColor(String colorHexString);
 
   public Collection<IMapObject> getMapObjects(String... type);
 }

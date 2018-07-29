@@ -42,6 +42,27 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
   private transient boolean added;
 
+  public MapObjectLayer() {
+    super();
+  }
+
+  /**
+   * Copy Constructor for copying instances of MapObjectLayers.
+   *
+   * @param layerToBeCopied
+   *          the layer we want to copy
+   * @see CustomPropertyProvider()
+   */
+  public MapObjectLayer(IMapObjectLayer layerToBeCopied) {
+    super(layerToBeCopied);
+    for (IMapObject obj : layerToBeCopied.getMapObjects()) {
+      this.addMapObject(new MapObject(obj));
+    }
+    if (layerToBeCopied.getColor() != null) {
+      this.setColor(layerToBeCopied.getColorHexString());
+    }
+  }
+
   private void loadMapObjects() {
     if (!this.added) {
       if (this.objects != null) {
@@ -95,6 +116,11 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
 
     this.decodedColor = ColorHelper.decode(this.color);
     return this.decodedColor;
+  }
+
+  @Override
+  public String getColorHexString() {
+    return this.color;
   }
 
   @Override

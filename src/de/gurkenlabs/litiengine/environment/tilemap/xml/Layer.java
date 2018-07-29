@@ -49,11 +49,35 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   private transient RenderType renderType;
   private boolean renderTypeLoaded;
 
+  public Layer() {
+    super();
+  }
+
+  /**
+   * Copy Constructor for copying instances of Layers.
+   *
+   * @param layerToBeCopied
+   *          the layer we want to copy
+   * @see CustomPropertyProvider()
+   */
+  public Layer(ILayer layerToBeCopied) {
+    super(layerToBeCopied);
+    this.setWidth(layerToBeCopied.getWidth());
+    this.setHeight(layerToBeCopied.getHeight());
+    this.setName(layerToBeCopied.getName());
+    this.setOffsetX(layerToBeCopied.getOffsetX());
+    this.setOffsetY(layerToBeCopied.getOffsetY());
+    this.setOpacity(layerToBeCopied.getOpacity());
+    this.setOrder(layerToBeCopied.getOrder());
+    this.setVisible(layerToBeCopied.isVisible());
+  }
+
   /**
    * Gets the height.
    *
    * @return the height
    */
+  @Override
   public int getHeight() {
     if (this.height == null) {
       return 0;
@@ -125,6 +149,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
    *
    * @return the width
    */
+  @Override
   public int getWidth() {
     if (this.width == null) {
       return 0;
@@ -152,12 +177,12 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   public void setName(String name) {
     this.name = name;
   }
-
+  @Override
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
   }
-
+  @Override
   @XmlTransient
   public void setHeight(int height) {
     this.height = height;

@@ -18,10 +18,27 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 public abstract class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
 
+  public CustomPropertyProvider() {
+    super();
+  }
+
+  /**
+   * Copy Constructor for copying instances of CustomPropertyProviders.
+   *
+   * @param propertyProviderToBeCopied
+   *          the PropertyProvider we want to copy
+   */
+  public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
+    super();
+    for (Property p : propertyProviderToBeCopied.getCustomProperties()) {
+      this.getCustomProperties().add(new Property(p));
+    }
+  }
+
   @XmlElementWrapper(name = "properties")
   @XmlElement(name = "property")
   private List<Property> properties = new CopyOnWriteArrayList<>();
-  
+
   @Override
   public boolean hasCustomProperty(final String name) {
     return properties != null && properties.stream().anyMatch(p -> p.getName().equals(name));
@@ -205,7 +222,7 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
 
     return prop1.getName().compareTo(prop2.getName());
   }
-  
+
   void beforeMarshal(Marshaller m) {
     if (this.properties != null && this.properties.isEmpty()) {
       this.properties = null;

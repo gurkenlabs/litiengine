@@ -171,7 +171,7 @@ public class UndoManager {
       return;
     }
 
-    this.changing.add(clone(mapObject));
+    this.changing.add(new MapObject(mapObject));
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
@@ -190,7 +190,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), clone(mapObject), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject(mapObject), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
@@ -281,21 +281,6 @@ public class UndoManager {
       EditorScreen.instance().getMapObjectPanel().bind(target);
       EditorScreen.instance().getMapSelectionPanel().focus(target);
     }
-  }
-
-  private static IMapObject clone(IMapObject mapObject) {
-    MapObject clonedObject = new MapObject();
-    clonedObject.setId(mapObject.getId());
-    clonedObject.setName(mapObject.getName() != null ? mapObject.getName() : "");
-    clonedObject.setType(mapObject.getType() != null ? mapObject.getType() : "");
-
-    clonedObject.setX(mapObject.getX());
-    clonedObject.setY(mapObject.getY());
-    clonedObject.setWidth(mapObject.getWidth());
-    clonedObject.setHeight(mapObject.getHeight());
-    clonedObject.setCustomProperties(mapObject.getCustomProperties().stream().collect(Collectors.toList()));
-
-    return clonedObject;
   }
 
   private void ensureStackSize() {

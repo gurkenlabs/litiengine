@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
 /**
  * The Class MapObject.
@@ -53,23 +53,29 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   private Polyline polyline;
 
   public MapObject() {
-    this.x = 0f;
-    this.y = 0f;
-    this.width = 0f;
-    this.height = 0f;
+    super();
+    this.setX(0f);
+    this.setY(0f);
+    this.setWidth(0f);
+    this.setHeight(0f);
   }
 
-  public MapObject(MapObject mapObject) {
-    super();
-    this.gid = mapObject.gid;
-    this.height = mapObject.height;
-    this.width = mapObject.width;
-    this.name = mapObject.name;
-    this.polyline = mapObject.polyline;
-    this.type = mapObject.type;
-    this.x = mapObject.x;
-    this.y = mapObject.y;
-    this.setCustomProperties(mapObject.getCustomProperties());
+  /**
+   * Copy Constructor for copying instances of MapObjects.
+   *
+   * @param mapObjectToBeCopied
+   *          the MapObject we want to copy
+   */
+  public MapObject(IMapObject mapObjectToBeCopied) {
+    super(mapObjectToBeCopied);
+    this.setName(mapObjectToBeCopied.getName());
+    this.setId(Game.getEnvironment().getNextMapId());
+    this.setPolyline((Polyline) mapObjectToBeCopied.getPolyline());
+    this.setType(mapObjectToBeCopied.getType());
+    this.setX(mapObjectToBeCopied.getX());
+    this.setY(mapObjectToBeCopied.getY());
+    this.setWidth(mapObjectToBeCopied.getWidth());
+    this.setHeight(mapObjectToBeCopied.getHeight());
   }
 
   public static Rectangle2D getBounds2D(MapObject... objects) {
@@ -167,13 +173,13 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public IPolyline getPolyline() {
+  public Polyline getPolyline() {
     return this.polyline;
   }
 
   @Override
   @XmlTransient
-  public void setGid(int gid) {
+  public void setGridId(int gid) {
     this.gid = gid;
   }
 

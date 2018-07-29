@@ -23,7 +23,16 @@ public class Polyline implements IPolyline, Serializable {
   private final transient List<Point2D> points;
 
   public Polyline() {
+    super();
     this.points = new ArrayList<>();
+  }
+
+  public Polyline(Polyline polyLineToBeCopied) {
+    super();
+    this.points = new ArrayList<>();
+    for (Point2D point : polyLineToBeCopied.getPoints()) {
+      this.points.add(new Point2D.Float((float) point.getX(), (float) point.getY()));
+    }
   }
 
   @Override

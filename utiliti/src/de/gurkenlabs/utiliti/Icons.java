@@ -53,6 +53,7 @@ public final class Icons {
   public static final Icon PLAY = new ImageIcon(Resources.getImage("button-play.png"));
   public static final Icon PROP = new ImageIcon(Resources.getImage("entity.png"));
   public static final Icon REDO = new ImageIcon(Resources.getImage("button-redo.png"));
+  public static final Icon RENAMEX16 = new ImageIcon(Resources.getImage("button-renamex16.png"));
   public static final Icon SAVE = new ImageIcon(Resources.getImage("button-save.png"));
   public static final Icon SEARCH = new ImageIcon(Resources.getImage("search.png"));
   public static final Icon SHADOWBOX = new ImageIcon(Resources.getImage("shadowbox.png"));

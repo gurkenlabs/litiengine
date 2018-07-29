@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "property")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Property implements Serializable{
+public class Property implements Serializable {
   private static final long serialVersionUID = 4684901360660207599L;
 
   /** The name. */
@@ -27,6 +27,20 @@ public class Property implements Serializable{
   private String value;
 
   public Property() {
+    super();
+  }
+
+  /**
+   * Copy Constructor for copying instances of Properties.
+   *
+   * @param propertyToBeCopied
+   *          the Property we want to copy
+   */
+  public Property(Property propertyToBeCopied) {
+    super();
+    this.setName(propertyToBeCopied.getName());
+    this.setType(propertyToBeCopied.getName());
+    this.setValue(propertyToBeCopied.getValue());
   }
 
   public Property(String name, String value) {
