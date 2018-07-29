@@ -483,21 +483,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
     if (this.rawMapObjectLayers != null) {
-      this.rawMapObjectLayers.forEach(layer -> {
-        layer.setWidth(this.width);
-        layer.setHeight(this.height);
-      });
-      
       tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
     }
 
     ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
-    if (this.rawImageLayers != null) {
-      this.rawImageLayers.forEach(layer -> {
-        layer.setWidth(this.width);
-        layer.setHeight(this.height);
-      });
-      
+    if (this.rawImageLayers != null) {      
       tmpImageLayers.addAll(this.rawImageLayers);
     }
 

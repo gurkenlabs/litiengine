@@ -46,8 +46,9 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @XmlAttribute
   private Integer offsety;
 
+  private transient Map parentMap;
   private transient RenderType renderType;
-  private boolean renderTypeLoaded;
+  private transient boolean renderTypeLoaded;
 
   public Layer() {
     super();
@@ -79,7 +80,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @Override
   public int getHeight() {
     if (this.height == null) {
-      return 0;
+      if (this.parentMap == null) {
+        return 0;
+      } else {
+        return this.parentMap.getSizeInTiles().height;
+      }
     }
 
     return this.height;
@@ -151,7 +156,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   @Override
   public int getWidth() {
     if (this.width == null) {
-      return 0;
+      if (this.parentMap == null) {
+        return 0;
+      } else {
+        return this.parentMap.getSizeInTiles().width;
+      }
     }
 
     return this.width;
@@ -176,11 +185,13 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   public void setName(String name) {
     this.name = name;
   }
+
   @Override
   @XmlTransient
   public void setWidth(int width) {
     this.width = width;
   }
+
   @Override
   @XmlTransient
   public void setHeight(int height) {
@@ -214,12 +225,15 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
+    if (parent instanceof Map) {
+      this.parentMap = (Map) parent;
+    }
+    
     int order = this.getCustomPropertyInt(LayerProperty.LAYER_ORDER, -1);
-    if (order == -1 && parent instanceof Map) {
-      Map map = (Map) parent;
-      int layerCnt = map.getRawImageLayers().size();
-      layerCnt += map.getRawMapObjectLayers().size();
-      layerCnt += map.getRawTileLayers().size();
+    if (order == -1 && parentMap != null) {
+      int layerCnt = this.parentMap.getRawImageLayers().size();
+      layerCnt += this.parentMap.getRawMapObjectLayers().size();
+      layerCnt += this.parentMap.getRawTileLayers().size();
       this.setOrder(layerCnt);
     }
 
