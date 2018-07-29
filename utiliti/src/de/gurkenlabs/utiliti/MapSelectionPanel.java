@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -67,7 +66,6 @@ import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
-import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
@@ -379,6 +377,9 @@ public class MapSelectionPanel extends JSplitPane {
       }
       IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
       Color newColor = JColorChooser.showDialog(null, Resources.get("panel_selectLayerColor"), currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).getColor());
+      if (newColor == null) {
+        return;
+      }
       currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).setColor(ColorHelper.encode(newColor));
       this.updateMapLayerControl();
     });
@@ -458,7 +459,7 @@ public class MapSelectionPanel extends JSplitPane {
 
     buttonLiftLayer.addActionListener(a -> {
       int selLayerIndex = this.getSelectedLayerIndex();
-      if (selLayerIndex < 0 || selLayerIndex >= this.layerModel.getSize()) {
+      if (selLayerIndex < 1 || selLayerIndex >= this.layerModel.getSize()) {
         return;
       }
       IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
