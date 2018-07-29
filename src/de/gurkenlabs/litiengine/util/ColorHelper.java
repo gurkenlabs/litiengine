@@ -34,6 +34,10 @@ public final class ColorHelper {
    * @see Integer#toHexString(int)
    */
   public static String encode(Color color) {
+    if (color == null) {
+      return null;
+    }
+
     if (color.getAlpha() == MAX_RGB_VALUE) {
       return "#" + Integer.toHexString(color.getRGB()).substring(2);
     } else {
