@@ -2,12 +2,12 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;

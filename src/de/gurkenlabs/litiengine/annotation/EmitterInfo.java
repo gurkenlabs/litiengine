@@ -25,8 +25,6 @@ public @interface EmitterInfo {
 
   int maxParticles() default Emitter.DEFAULT_MAXPARTICLES;
 
-  boolean particleFade() default true;
-
   int particleMaxTTL() default 0;
 
   int particleMinTTL() default 0;

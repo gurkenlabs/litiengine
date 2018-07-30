@@ -1,8 +1,8 @@
 package de.gurkenlabs.litiengine.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.io.File;
 import java.util.UUID;

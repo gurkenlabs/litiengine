@@ -45,8 +45,12 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private final List<Color> colors;
 
   private Quality requiredQuality;
+
   private boolean activateOnInit;
   private boolean activated;
+  private boolean paused;
+  private boolean stopped;
+
   private long activationTick;
   private long aliveTime;
   private long lastSpawn;
@@ -54,8 +58,6 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   private int particleMaxTTL;
   private int particleMinTTL;
   private int particleUpdateDelay;
-  private boolean paused;
-  private boolean stopped;
   private int spawnAmount;
   private int spawnRate;
   private int timeToLive;
@@ -246,6 +248,10 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public boolean isActivateOnInit() {
     return this.activateOnInit;
+  }
+
+  public boolean isActivated() {
+    return this.activated;
   }
 
   /**
