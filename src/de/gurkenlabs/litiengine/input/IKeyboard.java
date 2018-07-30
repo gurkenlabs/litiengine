@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.input;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
@@ -34,7 +35,7 @@ public interface IKeyboard extends IUpdateable {
    * @param observer
    *          the observer
    */
-  public void addKeyObserver(IKeyObserver observer);
+  public void addKeyListener(KeyListener observer);
 
   /**
    * Unregister from key down events.
@@ -42,5 +43,5 @@ public interface IKeyboard extends IUpdateable {
    * @param observer
    *          the observer
    */
-  public void removeKeyObserver(IKeyObserver observer);
+  public void removeKeyListener(KeyListener observer);
 }

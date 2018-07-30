@@ -4,6 +4,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -18,43 +19,26 @@ import java.util.function.Consumer;
  * occurs, that object's appropriate method is invoked.
  */
 public class KeyBoard implements KeyEventDispatcher, IKeyboard {
+  private final List<KeyListener> keyListeners = new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyPressedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyReleasedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyTypedConsumer= new CopyOnWriteArrayList<>();
+
+  private final List<KeyEvent> pressedKeys= new CopyOnWriteArrayList<>();
+  private final List<KeyEvent> releasedKeys= new CopyOnWriteArrayList<>();
+  private final List<KeyEvent> typedKeys= new CopyOnWriteArrayList<>();
 
   private boolean consumeAlt;
-  /** The key observers. */
-  private final List<IKeyObserver> keyObservers;
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer;
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer;
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer;
-  private final List<Consumer<KeyEvent>> keyPressedConsumer;
-  private final List<Consumer<KeyEvent>> keyReleasedConsumer;
-  private final List<Consumer<KeyEvent>> keyTypedConsumer;
-
-  /** The pressed keys. */
-  private final List<KeyEvent> pressedKeys;
-
-  /** The released keys. */
-  private final List<KeyEvent> releasedKeys;
-
-  /** The typed keys. */
-  private final List<KeyEvent> typedKeys;
-
+  
   /**
    * Instantiates a new key board.
    */
   public KeyBoard() {
-    this.keySpecificTypedConsumer = new CopyOnWriteArrayList<>();
-    this.keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
-    this.keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
-    this.keyPressedConsumer = new CopyOnWriteArrayList<>();
-    this.keyReleasedConsumer = new CopyOnWriteArrayList<>();
-    this.keyTypedConsumer = new CopyOnWriteArrayList<>();
-
-    this.pressedKeys = new CopyOnWriteArrayList<>();
-    this.releasedKeys = new CopyOnWriteArrayList<>();
-    this.typedKeys = new CopyOnWriteArrayList<>();
-    this.keyObservers = new CopyOnWriteArrayList<>();
-
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+    
     Input.getLoop().attach(this);
     this.consumeAlt = true;
   }
@@ -142,17 +126,17 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   }
 
   @Override
-  public void addKeyObserver(final IKeyObserver observer) {
-    if (this.keyObservers.contains(observer)) {
+  public void addKeyListener(final KeyListener listener) {
+    if (this.keyListeners.contains(listener)) {
       return;
     }
 
-    this.keyObservers.add(observer);
+    this.keyListeners.add(listener);
   }
 
   @Override
-  public void removeKeyObserver(final IKeyObserver observer) {
-    this.keyObservers.remove(observer);
+  public void removeKeyListener(final KeyListener listener) {
+    this.keyListeners.remove(listener);
   }
 
   @Override
@@ -217,7 +201,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       });
 
       this.keyPressedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyObservers.forEach(observer -> observer.handlePressedKey(key));
+      this.keyListeners.forEach(listener -> listener.keyPressed(key));
     });
   }
 
@@ -233,7 +217,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       });
 
       this.keyReleasedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyObservers.forEach(observer -> observer.handleReleasedKey(key));
+      this.keyListeners.forEach(listener -> listener.keyReleased(key));
     });
 
     this.releasedKeys.clear();
@@ -251,7 +235,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
       });
 
       this.keyTypedConsumer.forEach(consumer -> consumer.accept(key));
-      this.keyObservers.forEach(observer -> observer.handleTypedKey(key));
+      this.keyListeners.forEach(listener -> listener.keyTyped(key));
     });
 
     this.typedKeys.clear();
