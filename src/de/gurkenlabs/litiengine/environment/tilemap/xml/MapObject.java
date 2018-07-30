@@ -62,6 +62,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   /**
    * Copy Constructor for copying instances of MapObjects.
+   * This variant of the constructor will assign an entirely new ID to the newly created MapObject.
    *
    * @param mapObjectToBeCopied
    *          the MapObject we want to copy
@@ -70,12 +71,27 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     super(mapObjectToBeCopied);
     this.setName(mapObjectToBeCopied.getName());
     this.setId(Game.getEnvironment().getNextMapId());
-    this.setPolyline((Polyline) mapObjectToBeCopied.getPolyline());
+    this.setPolyline(new Polyline (mapObjectToBeCopied.getPolyline()));
     this.setType(mapObjectToBeCopied.getType());
     this.setX(mapObjectToBeCopied.getX());
     this.setY(mapObjectToBeCopied.getY());
     this.setWidth(mapObjectToBeCopied.getWidth());
     this.setHeight(mapObjectToBeCopied.getHeight());
+  }
+  
+  /**
+   * Copy Constructor for copying instances of MapObjects.
+   * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
+   * @param mapObjectToBeCopied
+   *          the MapObject we want to copy
+   * @param keepID
+   *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
+   */
+  public MapObject(IMapObject mapObjectToBeCopied, boolean keepID) {
+    this(mapObjectToBeCopied);
+    if(keepID) {
+      this.setId(mapObjectToBeCopied.getId());
+    }   
   }
 
   public static Rectangle2D getBounds2D(MapObject... objects) {

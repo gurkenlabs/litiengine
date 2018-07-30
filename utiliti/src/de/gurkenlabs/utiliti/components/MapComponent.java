@@ -487,9 +487,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         if (deleteObject == null) {
           continue;
         }
-
-        this.delete(deleteObject);
         UndoManager.instance().mapObjectDeleted(deleteObject);
+        this.delete(deleteObject);
       }
     } finally {
       UndoManager.instance().endOperation();

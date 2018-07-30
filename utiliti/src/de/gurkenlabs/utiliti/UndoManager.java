@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -171,7 +170,7 @@ public class UndoManager {
       return;
     }
 
-    this.changing.add(new MapObject(mapObject));
+    this.changing.add(new MapObject(mapObject,true));
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
@@ -190,7 +189,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject(mapObject), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject(mapObject,true), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
