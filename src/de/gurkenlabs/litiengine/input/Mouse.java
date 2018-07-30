@@ -28,15 +28,15 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 public class Mouse implements IMouse {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
 
-  private final List<Consumer<MouseEvent>> mouseClickedConsumer;
-  private final List<Consumer<MouseEvent>> mouseDraggedConsumer;
-  private final List<MouseListener> mouseListeners;
-  private final List<MouseMotionListener> mouseMotionListeners;
-  private final List<Consumer<MouseEvent>> mouseMovedConsumer;
-  private final List<Consumer<MouseEvent>> mousePressedConsumer;
-  private final List<Consumer<MouseEvent>> mouseReleasedConsumer;
-  private final List<MouseWheelListener> mouseWheelListeners;
-  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer;
+  private final List<Consumer<MouseEvent>> mouseClickedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<MouseEvent>> mouseDraggedConsumer = new CopyOnWriteArrayList<>();
+  private final List<MouseListener> mouseListeners = new CopyOnWriteArrayList<>();
+  private final List<MouseMotionListener> mouseMotionListeners = new CopyOnWriteArrayList<>();
+  private final List<Consumer<MouseEvent>> mouseMovedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<MouseEvent>> mousePressedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<MouseEvent>> mouseReleasedConsumer = new CopyOnWriteArrayList<>();
+  private final List<MouseWheelListener> mouseWheelListeners = new CopyOnWriteArrayList<>();
+  private final List<Consumer<MouseWheelEvent>> wheelMovedConsumer = new CopyOnWriteArrayList<>();
 
   private final Robot robot;
 
@@ -57,16 +57,6 @@ public class Mouse implements IMouse {
    *           In case the {@link Robot} class could not be initialized.
    */
   public Mouse() throws AWTException {
-    this.mouseListeners = new CopyOnWriteArrayList<>();
-    this.mouseMotionListeners = new CopyOnWriteArrayList<>();
-    this.mouseWheelListeners = new CopyOnWriteArrayList<>();
-    this.wheelMovedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseClickedConsumer = new CopyOnWriteArrayList<>();
-    this.mousePressedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseMovedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseDraggedConsumer = new CopyOnWriteArrayList<>();
-    this.mouseReleasedConsumer = new CopyOnWriteArrayList<>();
-
     try {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);
