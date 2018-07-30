@@ -1,6 +1,12 @@
 package de.gurkenlabs.litiengine.graphics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Color;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +32,9 @@ public class EmitterTests {
     assertEquals(500, testEmitter.getMaxParticles());
     assertEquals(1000, testEmitter.getParticleMaxTTL());
     assertEquals(100, testEmitter.getParticleMinTTL());
+    assertTrue(testEmitter.getRandomParticleTTL() >= 100);
+    assertTrue(testEmitter.getRandomParticleTTL() <= 1000);
+    
     assertEquals(10, testEmitter.getParticleUpdateRate());
     assertEquals(Quality.HIGH, testEmitter.getRequiredQuality());
     assertEquals(15, testEmitter.getSpawnAmount());
@@ -37,6 +46,18 @@ public class EmitterTests {
     assertEquals(Valign.MIDDLE, testEmitter.getOriginValign());
     assertEquals(25, testEmitter.getOrigin().getX());
     assertEquals(25, testEmitter.getOrigin().getY());
+  }
+  
+  @Test
+  public void testRandomValueGeneration() {
+    TestEmitter testEmitter = new TestEmitter();
+    assertTrue(testEmitter.getRandomParticleTTL() >= 100);
+    assertTrue(testEmitter.getRandomParticleTTL() <= 1000);
+    
+    Color [] colors = new Color [] {Color.RED, Color.ORANGE, Color.YELLOW};
+    testEmitter.setColors(colors);
+    
+    assertTrue(Arrays.asList(colors).contains(testEmitter.getRandomParticleColor()));
   }
   
   @EmitterInfo(
@@ -57,6 +78,16 @@ public class EmitterTests {
     @Override
     protected Particle createNewParticle() {
       return null;
+    }
+    
+    @Override
+    public int getRandomParticleTTL() {
+      return super.getRandomParticleTTL();
+    }
+    
+    @Override
+    public Color getRandomParticleColor() {
+      return super.getRandomParticleColor();
     }
   }
 }
