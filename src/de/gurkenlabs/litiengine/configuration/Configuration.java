@@ -69,6 +69,10 @@ public class Configuration {
     return this.configurationGroups;
   }
 
+  public void add(ConfigurationGroup group) {
+    this.getConfigurationGroups().add(group);
+  }
+
   public String getFileName() {
     return this.fileName;
   }
