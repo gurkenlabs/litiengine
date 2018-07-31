@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 
 public class SpriteParticle extends Particle {
   private float angle;
@@ -29,9 +29,9 @@ public class SpriteParticle extends Particle {
     Composite oldComp = g.getComposite();
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.getOpacity()));
     if (this.getAngle() != 0) {
-      RenderEngine.renderImage(g, this.image, renderLocation, this.getAngle());
+      ImageRenderer.renderImage(g, this.image, renderLocation, this.getAngle());
     } else {
-      RenderEngine.renderImage(g, this.image, renderLocation);
+      ImageRenderer.renderImage(g, this.image, renderLocation);
     }
     g.setComposite(oldComp);
   }

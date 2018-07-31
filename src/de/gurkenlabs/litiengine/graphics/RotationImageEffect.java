@@ -23,7 +23,7 @@ public class RotationImageEffect extends ImageEffect {
     final int size = Math.max(image.getWidth(), image.getHeight()) * 2;
     final BufferedImage img = ImageProcessing.getCompatibleImage(size, size);
     final Graphics2D g = img.createGraphics();
-    RenderEngine.renderImage(g, image, new Point2D.Double(0, 0), this.getAngle());
+    ImageRenderer.renderImage(g, image, new Point2D.Double(0, 0), this.getAngle());
     g.dispose();
 
     return img;

@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -130,12 +130,12 @@ public class ImageComponent extends GuiComponent {
 
     final Image bg = this.getBackground();
     if (bg != null) {
-      RenderEngine.renderImage(g, bg, this.getLocation());
+      ImageRenderer.renderImage(g, bg, this.getLocation());
     }
 
     final Image img = this.getImage();
     if (img != null) {
-      RenderEngine.renderImage(g, img, this.getImageLocation(img));
+      ImageRenderer.renderImage(g, img, this.getImageLocation(img));
     }
 
     super.render(g);
