@@ -77,7 +77,7 @@ public class FontIcon {
     } else {
       g.setFont(this.getFont().deriveFont(fontSize));
     }
-    TextRenderer.drawText(g, this.getText(), x, y);
+    TextRenderer.render(g, this.getText(), x, y);
     g.setColor(oldColor);
     g.setFont(oldFont);
   }

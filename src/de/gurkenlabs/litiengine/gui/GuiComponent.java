@@ -804,14 +804,14 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     }
     if (this.getTextAngle() == 0) {
       if (this.drawTextShadow()) {
-        TextRenderer.drawTextWithOutline(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
+        TextRenderer.renderWithOutline(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
       } else {
-        TextRenderer.drawText(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
+        TextRenderer.render(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
       }
     } else if (this.getTextAngle() == 90) {
-      TextRenderer.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), this.getTextToRender(g));
+      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle());
     } else {
-      TextRenderer.drawRotatedText(g, this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), this.getTextToRender(g));
+      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle());
     }
 
     /*

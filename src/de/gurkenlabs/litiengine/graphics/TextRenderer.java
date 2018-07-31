@@ -12,13 +12,14 @@ import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
 public final class TextRenderer {
   private TextRenderer() {
   }
-  
+
   /**
    * Draw text at the given coordinates. This variant of drawText() uses RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by
    * standard. For other Anti-Aliasing options, please use the drawText()-variant with five parameters.
@@ -32,16 +33,12 @@ public final class TextRenderer {
    * @param y
    *          the min y coordinate
    */
-  public static void drawText(final Graphics2D g, final String text, final double x, final double y) {
-    drawText(g, text, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  public static void render(final Graphics2D g, final String text, final double x, final double y) {
+    render(g, text, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
-  
-  public static void drawRotatedText(final Graphics2D g, final double x, final double y, final int angle, final String text) {
-    // TODO: does this actually work as expected if we're rendering on the copy?
-    final Graphics2D g2 = (Graphics2D) g.create();
-    g2.rotate(Math.toRadians(angle), x, y);
-    drawText(g2, text, x, y);
-    g2.dispose();
+
+  public static void render(final Graphics2D g, final String text, Point2D location) {
+    render(g, text, location.getX(), location.getY());
   }
 
   /**
@@ -59,15 +56,32 @@ public final class TextRenderer {
    *          the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
    * @see RenderingHints
    */
-  public static void drawText(final Graphics2D g, final String text, final double x, final double y, Object antiAliasing) {
+  public static void render(final Graphics2D g, final String text, final double x, final double y, Object antiAliasing) {
     if (text == null || text.isEmpty()) {
       return;
     }
+
     RenderingHints originalHints = g.getRenderingHints();
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasing);
 
     g.drawString(text, (float) x, (float) y);
     g.setRenderingHints(originalHints);
+  }
+
+  public static void render(final Graphics2D g, final String text, Point2D location, Object antiAliasing) {
+    render(g, text, location.getX(), location.getY(), antiAliasing);
+  }
+
+  public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle) {
+    // TODO: does this actually work as expected if we're rendering on the copy?
+    final Graphics2D g2 = (Graphics2D) g.create();
+    g2.rotate(Math.toRadians(angle), x, y);
+    render(g2, text, x, y);
+    g2.dispose();
+  }
+
+  public static void renderRotated(final Graphics2D g, final String text, Point2D location, final double angle) {
+    renderRotated(g, text, location.getX(), location.getY(), angle);
   }
 
   /**
@@ -86,8 +100,12 @@ public final class TextRenderer {
    * @param lineWidth
    *          the max line width
    */
-  public static void drawTextWithAutomaticLinebreaks(final Graphics2D g, final String text, final float x, final float y, final float lineWidth) {
-    drawTextWithAutomaticLinebreaks(g, text, x, y, lineWidth, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth) {
+    renderWithLinebreaks(g, text, x, y, lineWidth, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+  }
+
+  public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth) {
+    renderWithLinebreaks(g, text, location.getX(), location.getY(), lineWidth);
   }
 
   /**
@@ -107,7 +125,7 @@ public final class TextRenderer {
    *          the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
    * @see RenderingHints
    */
-  public static void drawTextWithAutomaticLinebreaks(final Graphics2D g, final String text, final float x, final float y, final float lineWidth, final Object antiAliasing) {
+  public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth, final Object antiAliasing) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -120,15 +138,19 @@ public final class TextRenderer {
     final AttributedCharacterIterator iterator = styledText.getIterator();
     final LineBreakMeasurer measurer = new LineBreakMeasurer(iterator, frc);
     measurer.setPosition(0);
-    float textY = y;
+    float textY = (float) y;
     while (measurer.getPosition() < text.length()) {
-      final TextLayout nextLayout = measurer.nextLayout(lineWidth);
+      final TextLayout nextLayout = measurer.nextLayout((float) lineWidth);
       textY += nextLayout.getAscent();
-      final float dx = nextLayout.isLeftToRight() ? 0 : lineWidth - nextLayout.getAdvance();
-      nextLayout.draw(g, x + dx, textY);
+      final float dx = (float) (nextLayout.isLeftToRight() ? 0 : lineWidth - nextLayout.getAdvance());
+      nextLayout.draw(g, (float) (x + dx), textY);
       textY += nextLayout.getDescent() + nextLayout.getLeading();
     }
     g.setRenderingHints(originalHints);
+  }
+
+  public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth, final Object antiAliasing) {
+    renderWithLinebreaks(g, text, location.getX(), location.getY(), lineWidth, antiAliasing);
   }
 
   /**
@@ -148,8 +170,12 @@ public final class TextRenderer {
    *          the outline color
    * @see RenderingHints
    */
-  public static void drawTextWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor) {
-    drawTextWithOutline(g, text, x, y, outlineColor, RenderingHints.VALUE_ANTIALIAS_OFF);
+  public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor) {
+    renderWithOutline(g, text, x, y, outlineColor, RenderingHints.VALUE_ANTIALIAS_OFF);
+  }
+  
+  public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor) {
+    renderWithOutline(g, text, location.getX(), location.getY(), outlineColor);
   }
 
   /**
@@ -169,7 +195,7 @@ public final class TextRenderer {
    *          the Anti-Aliasing object (e.g. RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
    * @see RenderingHints
    */
-  public static void drawTextWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final Object antiAliasing) {
+  public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final Object antiAliasing) {
     Color fillColor = g.getColor();
     BasicStroke outlineStroke = new BasicStroke(g.getFont().getSize() * 1 / 10f);
 
@@ -201,5 +227,9 @@ public final class TextRenderer {
     g.setColor(originalColor);
     g.setStroke(originalStroke);
     g.setRenderingHints(originalHints);
+  }
+  
+  public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor, final Object antiAliasing) {
+    renderWithOutline(g, text, location.getX(), location.getY(), outlineColor, antiAliasing);
   }
 }

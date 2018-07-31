@@ -21,7 +21,7 @@ public class RenderEngineTests {
   public void testDrawText() {
     Graphics2D graphics = mock(Graphics2D.class);
 
-    TextRenderer.drawText(graphics, "abc", 50.0, 100.0);
+    TextRenderer.render(graphics, "abc", 50.0, 100.0);
     verify(graphics).drawString("abc", 50f, 100f);
   }
 

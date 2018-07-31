@@ -139,9 +139,9 @@ public class EditorScreen extends Screen {
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
-    TextRenderer.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
+    TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
         Game.getScreenManager().getResolution().getHeight() - 40);
-    TextRenderer.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
+    TextRenderer.render(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
@@ -160,7 +160,7 @@ public class EditorScreen extends Screen {
 
       Font old = g.getFont();
       g.setFont(g.getFont().deriveFont(20.0f));
-      TextRenderer.drawText(g, this.currentStatus, 10, Game.getScreenManager().getResolution().getHeight() - 60);
+      TextRenderer.render(g, this.currentStatus, 10, Game.getScreenManager().getResolution().getHeight() - 60);
       g.setFont(old);
     }
   }
