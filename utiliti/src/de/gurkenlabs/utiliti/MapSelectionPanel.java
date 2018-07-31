@@ -358,6 +358,10 @@ public class MapSelectionPanel extends JSplitPane {
       if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
         return;
       }
+      if (JOptionPane.showConfirmDialog(null, Resources.get("panel_confirmDeleteLayer"), "", JOptionPane.YES_NO_OPTION) != 0) {
+        return;
+      }
+
       IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
       EditorScreen.instance().getMapComponent().delete(currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
       currentMap.removeMapObjectLayer(this.getSelectedLayerIndex());
