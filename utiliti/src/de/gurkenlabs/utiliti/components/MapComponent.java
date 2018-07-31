@@ -63,8 +63,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
@@ -1796,7 +1796,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
-      RenderEngine.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
+      TextRenderer.drawText(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
     }
   }
 

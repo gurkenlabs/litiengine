@@ -31,8 +31,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -139,9 +139,9 @@ public class EditorScreen extends Screen {
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
-    RenderEngine.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
+    TextRenderer.drawText(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
         Game.getScreenManager().getResolution().getHeight() - 40);
-    RenderEngine.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
+    TextRenderer.drawText(g, Game.getMetrics().getFramesPerSecond() + " FPS", 10, Game.getScreenManager().getResolution().getHeight() - 20);
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
@@ -160,7 +160,7 @@ public class EditorScreen extends Screen {
 
       Font old = g.getFont();
       g.setFont(g.getFont().deriveFont(20.0f));
-      RenderEngine.drawText(g, this.currentStatus, 10, Game.getScreenManager().getResolution().getHeight() - 60);
+      TextRenderer.drawText(g, this.currentStatus, 10, Game.getScreenManager().getResolution().getHeight() - 60);
       g.setFont(old);
     }
   }
