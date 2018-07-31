@@ -462,12 +462,12 @@ public final class RenderEngine implements IRenderEngine {
       if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
-        ImageRenderer.renderScaledImage(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);
+        ImageRenderer.renderScaled(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);
       } else {
         float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
         float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
 
-        ImageRenderer.renderImage(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+        ImageRenderer.renderTransformed(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
       }
     }
 

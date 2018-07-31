@@ -9,15 +9,18 @@ public final class ImageRenderer {
 
   private ImageRenderer() {
   }
-  
 
-  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y) {
+  public static void render(final Graphics2D g, final Image image, final double x, final double y) {
     if (image == null) {
       return;
     }
 
     final AffineTransform t = AffineTransform.getTranslateInstance(x, y);
     g.drawImage(image, t, null);
+  }
+
+  public static void render(final Graphics2D g, final Image image, final Point2D renderLocation) {
+    render(g, image, renderLocation.getX(), renderLocation.getY());
   }
 
   /***
@@ -35,13 +38,13 @@ public final class ImageRenderer {
    * @param angle
    *          The angle by which the image will be rotated.s
    */
-  public static void renderImage(final Graphics2D g, final Image image, final double x, final double y, final double angle) {
+  public static void renderRotated(final Graphics2D g, final Image image, final double x, final double y, final double angle) {
     if (image == null) {
       return;
     }
 
     if (angle == 0 || angle % 360 == 0) {
-      renderImage(g, image, x, y);
+      render(g, image, x, y);
       return;
     }
 
@@ -53,25 +56,29 @@ public final class ImageRenderer {
     g.drawImage(image, t, null);
   }
 
-  public static void renderScaledImage(final Graphics2D g, final Image image, final double x, final double y, final double scale) {
-    renderScaledImage(g, image, x, y, scale, scale);
+  public static void renderRotated(final Graphics2D g, final Image image, final Point2D renderLocation, final double angle) {
+    renderRotated(g, image, renderLocation.getX(), renderLocation.getY(), angle);
   }
 
-  public static void renderScaledImage(final Graphics2D g, final Image image, final Point2D location, final double scale) {
-    renderScaledImage(g, image, location.getX(), location.getY(), scale, scale);
+  public static void renderScaled(final Graphics2D g, final Image image, final double x, final double y, final double scale) {
+    renderScaled(g, image, x, y, scale, scale);
   }
 
-  public static void renderScaledImage(final Graphics2D g, final Image image, final Point2D location, final double scaleX, final double scaleY) {
-    renderScaledImage(g, image, location.getX(), location.getY(), scaleX, scaleY);
+  public static void renderScaled(final Graphics2D g, final Image image, final Point2D location, final double scale) {
+    renderScaled(g, image, location.getX(), location.getY(), scale, scale);
   }
 
-  public static void renderScaledImage(final Graphics2D g, final Image image, final double x, final double y, final double scaleX, final double scaleY) {
+  public static void renderScaled(final Graphics2D g, final Image image, final Point2D location, final double scaleX, final double scaleY) {
+    renderScaled(g, image, location.getX(), location.getY(), scaleX, scaleY);
+  }
+
+  public static void renderScaled(final Graphics2D g, final Image image, final double x, final double y, final double scaleX, final double scaleY) {
     if (image == null) {
       return;
     }
 
     if (scaleX == 1 && scaleY == 1) {
-      renderImage(g, image, x, y);
+      render(g, image, x, y);
       return;
     }
 
@@ -83,21 +90,13 @@ public final class ImageRenderer {
     g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation) {
-    renderImage(g, image, renderLocation.getX(), renderLocation.getY());
+  public static void renderTransformed(final Graphics2D g, final Image image, final Point2D renderLocation, AffineTransform transform) {
+    renderTransformed(g, image, renderLocation.getX(), renderLocation.getY(), transform);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, final double angle) {
-    renderImage(g, image, renderLocation.getX(), renderLocation.getY(), angle);
-  }
-
-  public static void renderImage(final Graphics2D g, final Image image, final Point2D renderLocation, AffineTransform transform) {
-    renderImage(g, image, renderLocation.getX(), renderLocation.getY(), transform);
-  }
-
-  public static void renderImage(final Graphics2D g, final Image image, double x, double y, AffineTransform transform) {
+  public static void renderTransformed(final Graphics2D g, final Image image, double x, double y, AffineTransform transform) {
     if (transform == null) {
-      renderImage(g, image, x, y);
+      render(g, image, x, y);
       return;
     }
 
@@ -108,12 +107,11 @@ public final class ImageRenderer {
     g.drawImage(image, t, null);
   }
 
-  public static void renderImage(final Graphics2D g, final Image image, AffineTransform transform) {
+  public static void renderTransformed(final Graphics2D g, final Image image, AffineTransform transform) {
     if (transform == null) {
       return;
     }
 
     g.drawImage(image, transform, null);
   }
-
 }
