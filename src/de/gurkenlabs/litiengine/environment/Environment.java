@@ -606,7 +606,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public synchronized int getNextMapId() {
-    return ++mapIdSequence;
+    return ++this.mapIdSequence;
   }
 
   @Override

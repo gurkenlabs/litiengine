@@ -36,19 +36,15 @@ public class Blueprint extends MapObject {
     this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
     this.setName(name);
-    
+
     final Rectangle2D bounds = MapObject.getBounds(items);
-    this.setWidth((float)bounds.getWidth());
-    this.setHeight((float)bounds.getHeight());
+    this.setWidth((float) bounds.getWidth());
+    this.setHeight((float) bounds.getHeight());
 
     for (MapObject item : items) {
-      MapObject newItem = new MapObject(item);
-      newItem.setX((float)(item.getX() - bounds.getX()));
-      newItem.setY((float)(item.getY() - bounds.getY()));
-      if (keepIds) {
-        newItem.setId(item.getId());
-      }
-
+      MapObject newItem = new MapObject(item, this.keepIds());
+      newItem.setX((float) (item.getX() - bounds.getX()));
+      newItem.setY((float) (item.getY() - bounds.getY()));
       this.items.add(newItem);
     }
   }
@@ -77,14 +73,9 @@ public class Blueprint extends MapObject {
     List<MapObject> builtObjects = new ArrayList<>();
 
     for (MapObject item : this.getItems()) {
-      MapObject newObject = new MapObject(item);
+      MapObject newObject = new MapObject(item, this.keepIds());
       newObject.setX(newObject.getX() + x);
       newObject.setY(newObject.getY() + y);
-      newObject.setId(Game.getEnvironment().getNextMapId());
-      if (this.keepIds) {
-        newObject.setId(item.getId());
-      }
-
       builtObjects.add(newObject);
     }
 
