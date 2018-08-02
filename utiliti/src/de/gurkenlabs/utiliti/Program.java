@@ -552,6 +552,12 @@ public class Program {
     MenuItem exp = new MenuItem(Resources.get("menu_export"));
     exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
+    MenuItem saveMapSnapshot = new MenuItem(Resources.get("menu_exportMapSnapshot"));
+    saveMapSnapshot.setShortcut(new MenuShortcut(KeyEvent.VK_ENTER));
+    saveMapSnapshot.addActionListener(a -> {
+      EditorScreen.instance().saveMapSnapshot();
+    });
+    
     MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
     del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
@@ -591,6 +597,7 @@ public class Program {
 
     mnMap.add(imp);
     mnMap.add(exp);
+    mnMap.add(saveMapSnapshot);
     mnMap.add(del2);
     mnMap.addSeparator();
     mnMap.add(mapProps);

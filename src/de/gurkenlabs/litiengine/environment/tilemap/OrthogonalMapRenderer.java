@@ -44,6 +44,11 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   }
 
   @Override
+  public BufferedImage getImage(IMap map) {
+    return this.getImage(map, RenderType.BACKGROUND, RenderType.GROUND, RenderType.SURFACE, RenderType.NORMAL, RenderType.OVERLAY);
+  }
+
+  @Override
   public MapOrientation getSupportedOrientation() {
     return MapOrientation.ORTHOGONAL;
   }

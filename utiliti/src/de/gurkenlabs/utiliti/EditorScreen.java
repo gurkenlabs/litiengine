@@ -8,8 +8,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +27,9 @@ import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -39,6 +43,7 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.components.EditorComponent;
 import de.gurkenlabs.utiliti.components.EditorComponent.ComponentType;
@@ -455,6 +460,23 @@ public class EditorScreen extends Screen {
 
     if (forceAssetTreeUpdate) {
       Program.getAssetTree().forceUpdate();
+    }
+  }
+
+  public void saveMapSnapshot() {
+    IMap currentMap = Game.getEnvironment().getMap();
+    BufferedImage img = Game.getRenderEngine().getMapRenderer(MapOrientation.ORTHOGONAL).getImage(currentMap);
+    
+    try {
+      final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+      final File folder = new File("./screenshots/");
+      if (!folder.exists()) {
+        folder.mkdirs();
+      }
+
+      ImageSerializer.saveImage(new File("./screenshots/" + timeStamp + ImageFormat.PNG.toExtension()).toString(), img);
+    } catch (Exception e) {
+      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
   }
 

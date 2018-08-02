@@ -7,7 +7,26 @@ import java.awt.image.BufferedImage;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public interface IMapRenderer {
+
+  /**
+   * Gets a bufferedImage of the current map containing all tile layers.
+   * 
+   * @param map
+   *          the map
+   * @param renderTypes
+   *          the renderTypes we want to be displayed in our image
+   * @return an image containing all the map's tile layers with the specified {@link RenderType}s
+   */
   public BufferedImage getImage(IMap map, RenderType... renderTypes);
+
+  /**
+   * Gets a bufferedImage of the current map containing all tile layers.
+   * 
+   * @param map
+   *          the map
+   * @return an image containing all the map's tile layers
+   */
+  public BufferedImage getImage(IMap map);
 
   /**
    * Gets the supported orientation.
