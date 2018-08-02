@@ -4,8 +4,6 @@ import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,10 +26,10 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  * specified, it calculates the sound volume and pan depending to the assigned
  * entity or location.
  */
-public final class SoundPlayback implements Runnable, ISoundPlayback {
+final class SoundPlayback implements Runnable, ISoundPlayback {
   private static final Logger log = Logger.getLogger(SoundPlayback.class.getName());
   private static final ExecutorService executorServie;
-  protected static final SourceDataLineCloseQueue closeQueue;
+  private static final SourceCloseQueue closeQueue;
 
   private final List<SoundPlaybackListener> playbackListeners;
 
@@ -54,28 +52,28 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
   private boolean paused;
 
   static {
-    closeQueue = new SourceDataLineCloseQueue();
+    closeQueue = new SourceCloseQueue();
     executorServie = Executors.newCachedThreadPool();
     executorServie.execute(closeQueue);
   }
 
-  protected SoundPlayback(final Sound sound) {
+  SoundPlayback(final Sound sound) {
     this(sound, null);
   }
 
-  protected SoundPlayback(final Sound sound, final Point2D listenerLocation) {
+  SoundPlayback(final Sound sound, final Point2D listenerLocation) {
     this.playbackListeners = new CopyOnWriteArrayList<>();
     this.sound = sound;
     this.initialListenerLocation = listenerLocation;
     this.gain = 1;
   }
 
-  protected SoundPlayback(final Sound sound, final Point2D listenerLocation, final IEntity sourceEntity) {
+  SoundPlayback(final Sound sound, final Point2D listenerLocation, final IEntity sourceEntity) {
     this(sound, listenerLocation);
     this.entity = sourceEntity;
   }
 
-  protected SoundPlayback(final Sound sound, final Point2D listenerLocation, final Point2D location) {
+  SoundPlayback(final Sound sound, final Point2D listenerLocation, final Point2D location) {
     this(sound, listenerLocation);
     this.location = location;
   }
@@ -93,12 +91,12 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.initGain();
     this.updateControls(this.initialListenerLocation);
     this.dataLine.start();
-    final byte[] buffer = new byte[1024];
+    final byte[] buffer = new byte[64];
     ByteArrayInputStream str = new ByteArrayInputStream(this.sound.getStreamData());
     while (!this.cancelled) {
       while (this.isPaused() && this.isPlaying() && !this.cancelled) {
         try {
-          Thread.sleep(10);
+          Thread.sleep(1000 / Game.getConfiguration().client().getUpdaterate());
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
         }
@@ -189,7 +187,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     closeQueue.terminate();
   }
 
-  protected void dispose() {
+  void dispose() {
     if (this.isPlaying()) {
       this.cancel();
     }
@@ -202,22 +200,22 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     }
   }
 
-  protected Sound getSound() {
+  Sound getSound() {
     return this.sound;
   }
 
   /**
    * Plays the sound without any volume or pan adjustments.
    */
-  protected void play() {
+  void play() {
     this.play(false, null, -1);
   }
 
-  protected void play(final boolean loop, final float volume) {
+  void play(final boolean loop, final float volume) {
     this.play(loop, null, volume);
   }
 
-  protected void play(final boolean loop, final Point2D location, final float gain) {
+  void play(final boolean loop, final Point2D location, final float gain) {
     // clip must be disposed
     if (this.dataLine != null) {
       return;
@@ -229,7 +227,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     executorServie.execute(this);
   }
 
-  protected void setMasterGain(final float g) {
+  void setMasterGain(final float g) {
     // Make sure there is a gain control
     if (this.gainControl == null) {
       return;
@@ -252,7 +250,7 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     this.gainControl.setValue(valueDB);
   }
 
-  protected void updateControls(final Point2D listenerLocation) {
+  void updateControls(final Point2D listenerLocation) {
     if (listenerLocation == null) {
       return;
     }
@@ -354,45 +352,5 @@ public final class SoundPlayback implements Runnable, ISoundPlayback {
     final float pan = MathUtilities.clamp(p, -1, 1);
     // Update the pan:
     this.panControl.setValue(pan);
-  }
-
-  private static class SourceDataLineCloseQueue implements Runnable {
-    private volatile boolean isRunning = true;
-    private final Queue<SourceDataLine> queue = new ConcurrentLinkedQueue<>();
-
-    public void enqueue(final SourceDataLine clip) {
-      this.queue.add(clip);
-    }
-
-    @Override
-    public void run() {
-      while (this.isRunning) {
-        this.closeAllSoundSources();
-        try {
-          Thread.sleep(50);
-        } catch (final InterruptedException e) {
-          break;
-        }
-      }
-
-      this.closeAllSoundSources();
-    }
-
-    public void terminate() {
-      this.isRunning = false;
-    }
-
-    private void closeAllSoundSources() {
-      if (this.queue.isEmpty()) {
-        return;
-      }
-
-      while (this.queue.peek() != null) {
-        final SourceDataLine clip = this.queue.poll();
-        clip.stop();
-        clip.flush();
-        clip.close();
-      }
-    }
   }
 }
