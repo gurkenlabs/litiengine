@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.sound.Sound;
@@ -560,7 +561,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
     if (Game.getConfiguration().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
-      g.draw(this.getBoundingBox());
+      ShapeRenderer.renderOutline(g, this.getBoundingBox());
     }
   }
 

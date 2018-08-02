@@ -84,14 +84,11 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
 
-    final AffineTransform oldTransForm = g.getTransform();
     final AffineTransform t = new AffineTransform();
     t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
     t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
-    g.setTransform(t);
-    g.fill(shape);
-    g.setTransform(oldTransForm);
+    ShapeRenderer.renderTransformed(g, shape, t);
   }
 
   @Override
@@ -105,17 +102,11 @@ public final class RenderEngine implements IRenderEngine {
       return;
     }
 
-    final AffineTransform oldTransForm = g.getTransform();
-    final Stroke oldStroke = g.getStroke();
     final AffineTransform t = new AffineTransform();
     t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
     t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
 
-    g.setTransform(t);
-    g.setStroke(stroke);
-    g.draw(shape);
-    g.setTransform(oldTransForm);
-    g.setStroke(oldStroke);
+    ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
   }
 
   @Override
