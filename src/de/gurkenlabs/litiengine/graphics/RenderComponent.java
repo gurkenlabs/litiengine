@@ -154,7 +154,7 @@ public class RenderComponent extends Canvas implements IInitializable {
         final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
         if (this.cursorImage != null && (Input.mouse().isGrabMouse() || pointerInfo != null && rect.contains(pointerInfo.getLocation()))) {
           final Point2D locationWithOffset = new Point2D.Double(Input.mouse().getLocation().getX() - this.getCursorOffsetX(), Input.mouse().getLocation().getY() - this.getCursorOffsetY());
-          RenderEngine.renderImage(g, this.cursorImage, locationWithOffset, this.getCursorTransform());
+          ImageRenderer.renderTransformed(g, this.cursorImage, locationWithOffset, this.getCursorTransform());
         }
 
         if (Game.getConfiguration().debug().isRenderDebugMouse()) {

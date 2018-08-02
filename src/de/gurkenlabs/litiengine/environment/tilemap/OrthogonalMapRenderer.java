@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
@@ -34,7 +34,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      RenderEngine.renderImage(g, this.getLayerImage(layer, map, true), layer.getPosition());
+      ImageRenderer.render(g, this.getLayerImage(layer, map, true), layer.getPosition());
     }
 
     g.dispose();
@@ -56,7 +56,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   @Override
   public void render(final Graphics2D g, final IMap map, final double offsetX, final double offsetY, RenderType... renderTypes) {
     final BufferedImage mapImage = this.getImage(map, renderTypes);
-    RenderEngine.renderImage(g, mapImage, offsetX, offsetY);
+    ImageRenderer.render(g, mapImage, offsetX, offsetY);
   }
 
   @Override
@@ -204,7 +204,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
       // draw the tile on the layer image
       final int x = index % layer.getSizeInTiles().width * map.getTileSize().width;
       final int y = index / layer.getSizeInTiles().width * map.getTileSize().height;
-      RenderEngine.renderImage(imageGraphics, tileTexture, x, y);
+      ImageRenderer.render(imageGraphics, tileTexture, x, y);
     });
 
     ImageCache.MAPS.put(cacheKey, bufferedImage);
@@ -249,7 +249,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         }
 
         final Image tileTexture = getTileImage(map, tile);
-        RenderEngine.renderImage(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
+        ImageRenderer.render(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height);
       }
     }
 
@@ -269,7 +269,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     final double viewportOffsetX = -viewport.getX() + layer.getPosition().x;
     final double viewportOffsetY = -viewport.getY() + layer.getPosition().y;
 
-    RenderEngine.renderImage(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
+    ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
   }
 }

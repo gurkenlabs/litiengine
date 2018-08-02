@@ -1,9 +1,7 @@
 package de.gurkenlabs.litiengine.gui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -11,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
@@ -159,12 +158,9 @@ public class ListField extends GuiComponent {
   public void render(final Graphics2D g) {
     super.render(g);
     if (this.selectedComponent != null) {
-      final Stroke oldStroke = g.getStroke();
-      g.setStroke(new BasicStroke(2));
       final Rectangle2D border = new Rectangle2D.Double(this.selectedComponent.getX() - 1, this.selectedComponent.getY() - 1, this.selectedComponent.getWidth() + 2, this.selectedComponent.getHeight() + 2);
       g.setColor(Color.WHITE);
-      g.draw(border);
-      g.setStroke(oldStroke);
+      ShapeRenderer.renderOutline(g, border, 2);
     }
   }
 

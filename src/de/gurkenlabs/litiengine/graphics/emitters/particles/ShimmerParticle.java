@@ -42,7 +42,7 @@ public class ShimmerParticle extends RectangleFillParticle {
   public void update(final Point2D emitterOrigin, final float updateRateFactor) {
     super.update(emitterOrigin, updateRateFactor);
     final Point2D emitterLocation = new Point2D.Double(this.getBoundingBox().getX(), this.getBoundingBox().getY());
-    final Point2D relativeParticleLocation = this.getRelativeLocation(emitterLocation);
+    final Point2D relativeParticleLocation = this.getAbsoluteLocation(emitterLocation);
     if (relativeParticleLocation.getX() < this.getBoundingBox().getX()) {
       this.setDeltaX(-this.getDx());
     }
@@ -59,5 +59,4 @@ public class ShimmerParticle extends RectangleFillParticle {
       this.setDeltaY(-this.getDy());
     }
   }
-
 }

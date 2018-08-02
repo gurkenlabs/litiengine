@@ -141,7 +141,7 @@ public abstract class Particle implements ITimeToLive {
     // if we have a camera, we need to render the particle relative to the
     // viewport
     Point2D newEffectLocation = Game.getScreenManager() != null ? Game.getCamera().getViewPortLocation(effectLocation) : effectLocation;
-    return this.getRelativeLocation(newEffectLocation);
+    return this.getAbsoluteLocation(newEffectLocation);
   }
 
   public RenderType getCustomRenderType() {
@@ -351,7 +351,7 @@ public abstract class Particle implements ITimeToLive {
 
   private boolean checkForCollision(final Point2D emitterOrigin, float targetX, float targetY) {
     if (this.isContinuousCollisionEnabled()) {
-      Point2D start = this.getRelativeLocation(emitterOrigin);
+      Point2D start = this.getAbsoluteLocation(emitterOrigin);
       double endX = emitterOrigin.getX() + targetX - this.getWidth() / 2.0;
       double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
 
@@ -376,16 +376,16 @@ public abstract class Particle implements ITimeToLive {
     return false;
   }
 
-  public Point2D getRelativeLocation(final Point2D effectLocation) {
-    return new Point2D.Float(getRelativeX(effectLocation.getX()), getRelativeY(effectLocation.getY()));
+  public Point2D getAbsoluteLocation(final Point2D effectLocation) {
+    return new Point2D.Float(getAbsoluteX(effectLocation), getAbsoluteY(effectLocation));
   }
 
-  protected float getRelativeX(double effectLocationX) {
-    return (float) (effectLocationX + this.getX() - this.getWidth() / 2.0);
+  protected float getAbsoluteX(Point2D emitterOrigin) {
+    return (float) (emitterOrigin.getX() + this.getX() - this.getWidth() / 2.0);
   }
 
-  protected float getRelativeY(double effectLocationY) {
-    return (float) (effectLocationY + this.getY() - this.getHeight() / 2.0);
+  protected float getAbsoluteY(Point2D emitterOrigin) {
+    return (float) (emitterOrigin.getY() + this.getY() - this.getHeight() / 2.0);
   }
 
   protected float getOpacity() {

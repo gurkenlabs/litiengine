@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @EntityInfo(renderType = RenderType.GROUND)
@@ -312,7 +313,7 @@ public class LightSource extends Entity implements IRenderable {
       final Shape obstructedVision = this.getObstructedVisionArea(mob, Game.getCamera().getViewPortDimensionCenter(this));
       // fill the polygon with the gradient paint
 
-      g.fill(obstructedVision);
+      ShapeRenderer.render(g, obstructedVision);
     }
 
     // reset to old Paint object

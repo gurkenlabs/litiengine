@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
 
 /**
  * A fonticon is an class that represents a single character of an icon font.
@@ -77,7 +77,7 @@ public class FontIcon {
     } else {
       g.setFont(this.getFont().deriveFont(fontSize));
     }
-    RenderEngine.drawText(g, this.getText(), x, y);
+    TextRenderer.render(g, this.getText(), x, y);
     g.setColor(oldColor);
     g.setFont(oldFont);
   }

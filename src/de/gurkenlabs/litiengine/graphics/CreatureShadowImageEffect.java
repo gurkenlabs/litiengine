@@ -42,7 +42,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
 
     this.drawShadow(graphics, image.getWidth(), image.getHeight(), offsetX, offsetY);
 
-    RenderEngine.renderImage(graphics, image, offsetX, offsetY);
+    ImageRenderer.render(graphics, image, offsetX, offsetY);
     graphics.dispose();
     return buffer;
   }

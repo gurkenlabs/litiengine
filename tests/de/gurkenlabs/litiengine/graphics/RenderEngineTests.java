@@ -21,7 +21,7 @@ public class RenderEngineTests {
   public void testDrawText() {
     Graphics2D graphics = mock(Graphics2D.class);
 
-    RenderEngine.drawText(graphics, "abc", 50.0, 100.0);
+    TextRenderer.render(graphics, "abc", 50.0, 100.0);
     verify(graphics).drawString("abc", 50f, 100f);
   }
 
@@ -30,7 +30,7 @@ public class RenderEngineTests {
     Graphics2D graphics = mock(Graphics2D.class);
 
     final Image img = ImageProcessing.getCompatibleImage(5, 5);
-    RenderEngine.renderImage(graphics, img, new Point2D.Double(10, 20));
+    ImageRenderer.render(graphics, img, new Point2D.Double(10, 20));
 
     ArgumentCaptor<Image> captor = ArgumentCaptor.forClass(Image.class);
     ArgumentCaptor<AffineTransform> transCaptor = ArgumentCaptor.forClass(AffineTransform.class);

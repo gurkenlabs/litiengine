@@ -24,8 +24,9 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -138,7 +139,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
 
     final float startX = (float) (entityCenter.getX() - deltaX);
     final float startY = (float) (entityCenter.getY() - deltaY);
-    RenderEngine.renderImage(g, this.bubble, new Point2D.Double(startX, startY));
+    ImageRenderer.render(g, this.bubble, new Point2D.Double(startX, startY));
 
     g.setColor(this.getAppearance().getForeColor());
     final FontRenderContext frc = g.getFontRenderContext();
@@ -251,10 +252,10 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     int width = ar.getBounds().width;
     int height = ar.getBounds().height;
     g.setPaint(this.getAppearance().getBackgroundPaint(width, height));
-    g.fill(ar);
+    ShapeRenderer.render(g, ar);
 
     g.setColor(this.getAppearance().getBorderColor());
-    g.draw(ar);
+    ShapeRenderer.renderOutline(g, ar);
     g.dispose();
 
     this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, height + 1);

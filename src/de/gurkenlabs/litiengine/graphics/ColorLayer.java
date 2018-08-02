@@ -47,7 +47,7 @@ public abstract class ColorLayer implements IRenderable {
     // draw the tile on the layer image
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
-        RenderEngine.renderImage(g, tiles[x][y], origin.getX() + x * map.getTileSize().width, origin.getY() + y * map.getTileSize().height);
+        ImageRenderer.render(g, tiles[x][y], origin.getX() + x * map.getTileSize().width, origin.getY() + y * map.getTileSize().height);
       }
     }
   }

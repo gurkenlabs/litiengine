@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.graphics.emitters.particles.EllipseParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.LeftLineParticle;
-import de.gurkenlabs.litiengine.graphics.emitters.particles.OvalParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.Particle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleFillParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlineParticle;
@@ -132,7 +132,7 @@ public class CustomEmitter extends Emitter {
       particle = new LeftLineParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
       break;
     case DISC:
-      particle = new OvalParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
+      particle = new EllipseParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
       break;
     case RECTANGLE:
       particle = new RectangleFillParticle(width, height, this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
