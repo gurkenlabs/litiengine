@@ -27,7 +27,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
-public final class RenderEngine implements IRenderEngine {
+public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
   private final EntityYComparator entityComparator;
@@ -62,7 +62,6 @@ public final class RenderEngine implements IRenderEngine {
    * @param y
    *          The y-coordinate of the text
    */
-  @Override
   public void renderText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
       return;
@@ -73,12 +72,10 @@ public final class RenderEngine implements IRenderEngine {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
-  @Override
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
     this.renderText(g, text, location.getX(), location.getY());
   }
 
-  @Override
   public void renderShape(final Graphics2D g, final Shape shape) {
     if (shape == null) {
       return;
@@ -91,12 +88,10 @@ public final class RenderEngine implements IRenderEngine {
     ShapeRenderer.renderTransformed(g, shape, t);
   }
 
-  @Override
   public void renderOutline(final Graphics2D g, final Shape shape) {
     renderOutline(g, shape, new BasicStroke(1 / Game.getCamera().getRenderScale()));
   }
 
-  @Override
   public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     if (shape == null) {
       return;
@@ -109,7 +104,6 @@ public final class RenderEngine implements IRenderEngine {
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
   }
 
-  @Override
   public boolean canRender(final IEntity entity) {
     if (!this.entityRenderingConditions.isEmpty()) {
       for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
@@ -122,19 +116,21 @@ public final class RenderEngine implements IRenderEngine {
     return true;
   }
 
-  @Override
   public void entityRenderingCondition(final Predicate<IEntity> predicate) {
     if (!this.entityRenderingConditions.contains(predicate)) {
       this.entityRenderingConditions.add(predicate);
     }
   }
 
-  @Override
+  /**
+   * Gets the base render scale of the game.
+   * 
+   * @return The base render scale.
+   */
   public float getBaseRenderScale() {
     return this.baseRenderScale;
   }
 
-  @Override
   public IMapRenderer getMapRenderer(final MapOrientation mapOrientation) {
     if (!this.mapRenderer.containsKey(mapOrientation)) {
       throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
@@ -143,26 +139,22 @@ public final class RenderEngine implements IRenderEngine {
     return this.mapRenderer.get(mapOrientation);
   }
 
-  @Override
   public void onEntityRendered(final Consumer<RenderEvent<IEntity>> entity) {
     if (!this.entityRenderedConsumer.contains(entity)) {
       this.entityRenderedConsumer.add(entity);
     }
   }
 
-  @Override
   public void onEntityRendering(final Consumer<RenderEvent<IEntity>> entity) {
     if (!this.entityRenderingConsumer.contains(entity)) {
       this.entityRenderingConsumer.add(entity);
     }
   }
 
-  @Override
   public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
     renderables.forEach(r -> this.render(g, r));
   }
 
-  @Override
   public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
@@ -174,7 +166,6 @@ public final class RenderEngine implements IRenderEngine {
     g.setClip(oldClip);
   }
 
-  @Override
   public void render(final Graphics2D g, final IRenderable renderable) {
     if (renderable == null) {
       return;
@@ -183,12 +174,10 @@ public final class RenderEngine implements IRenderEngine {
     renderable.render(g);
   }
 
-  @Override
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities) {
     this.renderEntities(g, entities, true);
   }
 
-  @Override
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
@@ -215,7 +204,6 @@ public final class RenderEngine implements IRenderEngine {
     }
   }
 
-  @Override
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
@@ -229,12 +217,10 @@ public final class RenderEngine implements IRenderEngine {
     g.setClip(oldClip);
   }
 
-  @Override
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final Shape clip) {
     this.renderEntities(g, entities, true, clip);
   }
 
-  @Override
   public void renderEntity(final Graphics2D g, final IEntity entity) {
     if (entity == null) {
       return;
@@ -280,7 +266,6 @@ public final class RenderEngine implements IRenderEngine {
     }
   }
 
-  @Override
   public void render(final Graphics2D g, final IMap map, final RenderType... renderTypes) {
     if (map == null) {
       return;
@@ -290,7 +275,14 @@ public final class RenderEngine implements IRenderEngine {
     this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort(), renderTypes);
   }
 
-  @Override
+  /**
+   * Sets the global base scale that is used to calculate the actual render scale of the game.
+   * 
+   * @param scale
+   *          The base render scale for the game.
+   * 
+   * @see ICamera#getRenderScale()
+   */
   public void setBaseRenderScale(float scale) {
     this.baseRenderScale = scale;
   }

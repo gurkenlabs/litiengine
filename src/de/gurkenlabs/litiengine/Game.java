@@ -20,7 +20,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.ICamera;
-import de.gurkenlabs.litiengine.graphics.IRenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
@@ -74,7 +73,7 @@ public final class Game {
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
   private static final GameConfiguration configuration;
-  private static final IRenderEngine graphicsEngine;
+  private static final RenderEngine graphicsEngine;
 
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
@@ -222,7 +221,7 @@ public final class Game {
     return physicsEngine;
   }
 
-  public static IRenderEngine getRenderEngine() {
+  public static RenderEngine getRenderEngine() {
     return graphicsEngine;
   }
 
