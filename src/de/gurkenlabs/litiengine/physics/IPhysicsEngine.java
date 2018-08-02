@@ -9,9 +9,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
-/**
- * The Interface IPhysicsEngine.
- */
 public interface IPhysicsEngine extends IUpdateable {
 
   public void add(ICollisionEntity entity);

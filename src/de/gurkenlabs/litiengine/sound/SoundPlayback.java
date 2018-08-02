@@ -87,10 +87,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       return;
     }
 
-    this.initControls();
-    this.initGain();
-    this.updateControls(this.initialListenerLocation);
-    this.dataLine.start();
+    this.startDataLine();
+
     final byte[] buffer = new byte[64];
     ByteArrayInputStream str = new ByteArrayInputStream(this.sound.getStreamData());
     while (!this.cancelled) {
@@ -111,7 +109,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
             break;
           }
 
-          restartDataLine();
+          this.restartDataLine();
           str = new ByteArrayInputStream(this.sound.getStreamData());
 
         } else if (this.dataLine != null) {
@@ -290,7 +288,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
   private void initGain() {
     final float initialGain = this.actualGain > 0 ? this.actualGain : Game.getConfiguration().sound().getSoundVolume();
-    SoundPlayback.this.setMasterGain(initialGain);
+    this.setMasterGain(initialGain);
   }
 
   private void loadDataLine() {
@@ -304,12 +302,17 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
-
+  
+  private void startDataLine() {
+    this.initControls();
+    this.updateControls(this.initialListenerLocation);
+    this.dataLine.start();
+  }
+  
   private void restartDataLine() {
     this.dataLine.drain();
     this.loadDataLine();
     this.initControls();
-    this.initGain();
     this.dataLine.start();
   }
 
@@ -342,6 +345,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     } catch (final IllegalArgumentException iae) {
       this.gainControl = null;
     }
+    
+    this.initGain();
   }
 
   private void setPan(final float p) {
