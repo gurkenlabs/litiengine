@@ -7,11 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.input.Input;
 
-public final class SoundEngine implements ISoundEngine, IUpdateable {
+public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable {
   public static final int DEFAULT_MAX_DISTANCE = 150;
   private Point2D listenerLocation;
   private Function<Point2D, Point2D> listenerLocationCallback;

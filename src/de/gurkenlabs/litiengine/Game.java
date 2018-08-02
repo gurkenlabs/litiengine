@@ -74,12 +74,13 @@ public final class Game {
 
   private static final GameConfiguration configuration;
   private static final RenderEngine graphicsEngine;
-
+  private static final SoundEngine soundEngine;
+  private static final IPhysicsEngine physicsEngine;
+  
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
-  private static final IPhysicsEngine physicsEngine;
-  private static final ISoundEngine soundEngine;
+
   private static final GameTime gameTime;
 
   private static GameInfo gameInfo;

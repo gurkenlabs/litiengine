@@ -3,7 +3,6 @@ package de.gurkenlabs.litiengine.sound;
 import java.awt.geom.Point2D;
 import java.util.function.Function;
 
-import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
@@ -14,7 +13,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  * .ogg by default. If you need other file extensions, you have to write an own
  * SPI implementation and inject it in your project.
  */
-public interface ISoundEngine extends ILaunchable {
+public interface ISoundEngine {
 
   /**
    * Gets the maximum distance from the listener at which a sound source can
