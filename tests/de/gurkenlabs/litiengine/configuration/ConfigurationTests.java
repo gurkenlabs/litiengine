@@ -86,6 +86,7 @@ public class ConfigurationTests {
       System.out.println(configGroup.getTestStringArray());
       assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
     } finally {
+
       deleteTempConfigFile(config);
     }
   }
@@ -120,8 +121,7 @@ public class ConfigurationTests {
     private boolean testBoolean = true;
     private TEST testEnum = TEST.TEST1;
     private String[] testStringArray = new String[] { "test", "testicle" };
-
-    private String testWithNoSetter;
+    private String testWithNoSetter = "";
 
     public byte getTestByte() {
       return this.testByte;
