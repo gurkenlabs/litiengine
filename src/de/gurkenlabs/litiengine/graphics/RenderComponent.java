@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IInitializable;
-import de.gurkenlabs.litiengine.gui.screens.IScreen;
+import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -144,7 +144,7 @@ public class RenderComponent extends Canvas implements IInitializable {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        final IScreen currentScreen = Game.getScreenManager().getCurrentScreen();
+        final Screen currentScreen = Game.getScreenManager().getCurrentScreen();
         if (currentScreen != null) {
           currentScreen.render(g);
         }

@@ -31,21 +31,16 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
   private static final long serialVersionUID = 7958549828482285935L;
 
-  /** The resolution observers. */
   private final transient List<Consumer<Dimension>> resolutionChangedConsumer;
 
-  private final transient List<Consumer<IScreen>> screenChangedConsumer;
+  private final transient List<Consumer<Screen>> screenChangedConsumer;
 
-  /** The screens. */
-  private final transient List<IScreen> screens;
+  private final transient List<Screen> screens;
 
-  /** The current screen. */
-  private transient IScreen currentScreen;
+  private transient Screen currentScreen;
 
-  /** The last screen change. */
   private long lastScreenChange = 0;
 
-  /** The Render canvas. */
   private final RenderComponent renderCanvas;
 
   private float resolutionScale = 1;
@@ -74,26 +69,26 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void addScreen(final IScreen screen) {
+  public void addScreen(final Screen screen) {
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
     this.screens.add(screen);
-    
+
     if (this.getCurrentScreen() == null) {
       this.displayScreen(screen);
     }
   }
 
   @Override
-  public void displayScreen(final IScreen screen) {
+  public void displayScreen(final Screen screen) {
     if (Game.hasStarted() && System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
       return;
     }
-    
+
     if (this.getCurrentScreen() != null) {
       this.getCurrentScreen().suspend();
     }
-    
+
     if (!screens.contains(screen))
       screens.add(screen);
 
@@ -104,7 +99,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     }
 
     this.lastScreenChange = System.currentTimeMillis();
-    for (final Consumer<IScreen> consumer : this.screenChangedConsumer) {
+    for (final Consumer<Screen> consumer : this.screenChangedConsumer) {
       consumer.accept(this.getCurrentScreen());
     }
   }
@@ -118,7 +113,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       return;
     }
 
-    Optional<IScreen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
+    Optional<Screen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
     if (!opt.isPresent()) {
       return;
     }
@@ -132,7 +127,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public IScreen getCurrentScreen() {
+  public Screen getCurrentScreen() {
     return this.currentScreen;
   }
 
@@ -205,7 +200,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void onScreenChanged(final Consumer<IScreen> screenConsumer) {
+  public void onScreenChanged(final Consumer<Screen> screenConsumer) {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
     }

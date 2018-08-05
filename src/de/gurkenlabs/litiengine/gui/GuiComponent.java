@@ -71,6 +71,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   private Object tag;
 
+  private String name;
   private String text;
 
   private Align textAlignment = Align.CENTER;
@@ -215,6 +216,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
 
   public Sound getHoverSound() {
     return this.hoverSound;
+  }
+
+  public String getName() {
+    return this.name;
   }
 
   public Point2D getLocation() {
@@ -606,6 +611,10 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     this.setY(y);
   }
 
+  public void setName(final String name) {
+    this.name = name;
+  }
+
   public void setLocation(final Point2D location) {
     this.setX(location.getX());
     this.setY(location.getY());
@@ -818,9 +827,12 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     /*
      * Debugging functionality for rendering the text boundaries
      * g.setColor(Color.RED);
-     * g.drawLine((int) (this.getX() + this.getTextX()), (int) this.getY(), (int) (this.getX() + this.getTextX()), (int) (this.getY() + this.getHeight()));
-     * g.drawLine((int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) this.getY(), (int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) (this.getY() + this.getHeight()));
-     * g.drawLine((int) this.getBoundingBox().getCenterX(), (int) this.getY(), (int) this.getBoundingBox().getCenterX(), (int) (this.getY() + this.getHeight()));
+     * g.drawLine((int) (this.getX() + this.getTextX()), (int) this.getY(), (int) (this.getX() + this.getTextX()), (int) (this.getY() +
+     * this.getHeight()));
+     * g.drawLine((int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) this.getY(), (int) (this.getX() + this.getTextX() +
+     * fm.stringWidth(this.getText())), (int) (this.getY() + this.getHeight()));
+     * g.drawLine((int) this.getBoundingBox().getCenterX(), (int) this.getY(), (int) this.getBoundingBox().getCenterX(), (int) (this.getY() +
+     * this.getHeight()));
      */
   }
 }

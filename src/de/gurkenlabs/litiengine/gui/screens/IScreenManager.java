@@ -15,15 +15,15 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * the current screen to the getRenderComponent() of this manager.
  */
 public interface IScreenManager {
-  public void addScreen(final IScreen screen);
+  public void addScreen(final Screen screen);
 
-  public void displayScreen(IScreen screen);
+  public void displayScreen(Screen screen);
 
   public void displayScreen(String screenName);
 
   public Rectangle getBounds();
 
-  public IScreen getCurrentScreen();
+  public Screen getCurrentScreen();
 
   public RenderComponent getRenderComponent();
 
@@ -43,7 +43,7 @@ public interface IScreenManager {
 
   public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
 
-  public void onScreenChanged(Consumer<IScreen> screenConsumer);
+  public void onScreenChanged(Consumer<Screen> screenConsumer);
 
   public void setIconImage(Image image);
 
