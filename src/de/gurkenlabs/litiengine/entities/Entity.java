@@ -20,6 +20,8 @@ import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 public abstract class Entity implements IEntity {
   public static final String ANY_MESSAGE = "";
   private final List<EntityTransformListener> transformListeners;
+  private final List<EntityListener> listeners;
+
   private final Map<String, List<MessageListener>> messageListeners;
 
   @TmxProperty(name = MapObjectProperty.TAGS)
@@ -48,6 +50,7 @@ public abstract class Entity implements IEntity {
    */
   protected Entity() {
     this.transformListeners = new CopyOnWriteArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
     this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
 
@@ -96,6 +99,16 @@ public abstract class Entity implements IEntity {
   @Override
   public void removeTransformListener(EntityTransformListener listener) {
     this.transformListeners.remove(listener);
+  }
+
+  @Override
+  public void addListener(EntityListener listener) {
+    this.listeners.add(listener);
+  }
+
+  @Override
+  public void removeListener(EntityListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override
@@ -339,6 +352,20 @@ public abstract class Entity implements IEntity {
     sb.append(" #");
     sb.append(this.getMapId());
     return sb.toString();
+  }
+
+  @Override
+  public void loaded() {
+    for (EntityListener listener : this.listeners) {
+      listener.loaded(this);
+    }
+  }
+
+  @Override
+  public void removed() {
+    for (EntityListener listener : this.listeners) {
+      listener.removed(this);
+    }
   }
 
   protected EntityControllers getControllers() {

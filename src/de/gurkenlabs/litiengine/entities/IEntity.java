@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -18,6 +19,10 @@ public interface IEntity {
   public void addTransformListener(EntityTransformListener listener);
 
   public void removeTransformListener(EntityTransformListener listener);
+  
+  public void addListener(EntityListener listener);
+
+  public void removeListener(EntityListener listener);
 
   public float getAngle();
 
@@ -102,4 +107,19 @@ public interface IEntity {
   public void setX(double x);
 
   public void setY(double y);
+
+  /**
+   * This method provides the possibility to implement behavior whenever this entity was added to the environment.
+   * 
+   * @see IEnvironment#load(IEntity)
+   * @see IEntity#add
+   */
+  public void loaded();
+
+  /**
+   * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
+   * 
+   * @see IEnvironment#remove(IEntity)
+   */
+  public void removed();
 }

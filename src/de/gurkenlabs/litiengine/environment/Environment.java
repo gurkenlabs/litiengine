@@ -1146,6 +1146,8 @@ public class Environment implements IEnvironment {
     if (entity instanceof LightSource || entity instanceof StaticShadow) {
       this.updateColorLayers(entity);
     }
+    
+    entity.loaded();
   }
 
   private void loadPhysicsEntity(IEntity entity) {
@@ -1237,5 +1239,7 @@ public class Environment implements IEnvironment {
       Emitter em = (Emitter) entity;
       em.deactivate();
     }
+    
+    entity.removed();
   }
 }
