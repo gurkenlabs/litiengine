@@ -111,15 +111,14 @@ public interface IEntity {
   /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.
    * 
-   * @see IEnvironment#load(IEntity)
-   * @see IEntity#add
+   * @see IEntity#addListener(EntityListener)
    */
   public void loaded();
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
    * 
-   * @see IEnvironment#remove(IEntity)
+   * @see IEntity#addListener(EntityListener)
    */
   public void removed();
 }
