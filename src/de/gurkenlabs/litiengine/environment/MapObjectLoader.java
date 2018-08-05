@@ -44,7 +44,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
    * @param mapObject
    *          The mapObject that provides the static information for the new entity.
    * 
-   * @see CustomMapObjectProperty
+   * @see TmxProperty
    */
   public static void loadDefaultProperties(IEntity entity, IMapObject mapObject) {
     entity.setMapId(mapObject.getId());
