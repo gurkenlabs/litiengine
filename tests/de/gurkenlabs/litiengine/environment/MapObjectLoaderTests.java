@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.annotation.CustomMapObjectProperty;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
 import de.gurkenlabs.litiengine.entities.Entity;
@@ -36,6 +35,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 
 public class MapObjectLoaderTests {
@@ -51,17 +51,17 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
     when(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getCustomPropertyBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION)).thenReturn(true);
     when(mapObject.getCustomPropertyBool(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH)).thenReturn(100);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_HEALTH)).thenReturn(100);
 
     when(mapObject.getCustomPropertyFloat(eq(MapObjectProperty.COLLISIONBOX_WIDTH), any(float.class))).thenReturn(100.0f);
     when(mapObject.getCustomPropertyFloat(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
 
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
     when(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
-    when(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM)).thenReturn(1);
+    when(mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_TEAM)).thenReturn(1);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -254,9 +254,11 @@ public class MapObjectLoaderTests {
   }
 
   @EntityInfo(customMapObjectType = "customEntity")
-  @CustomMapObjectProperty(keys = { "foo", "bar" })
   public static class CustomEntity extends Entity {
+    @TmxProperty(name = "foo")
     private String foo;
+    
+    @TmxProperty(name = "bar")
     private int bar;
 
     public CustomEntity(IMapObject mo) {

@@ -12,6 +12,8 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -29,15 +31,26 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final Collection<TriggerActivatedListener> activatedListeners;
   private final Collection<TriggerDeactivatedListener> deactivatedListeners;
   private final Collection<TriggerActivatingCondition> activatingConditions;
-  private final TriggerActivation activationType;
-  private final List<Integer> activators;
-  private final List<Integer> targets;
   private final ICustomPropertyProvider customProperties;
 
+  @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATORS)
+  private final List<Integer> activators;
+
+  @TmxProperty(name = MapObjectProperty.TRIGGER_TARGETS)
+  private final List<Integer> targets;
+
+  @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATION)
+  private final TriggerActivation activationType;
+
+  @TmxProperty(name = MapObjectProperty.TRIGGER_ONETIME)
   private final boolean isOneTimeTrigger;
 
+  @TmxProperty(name = MapObjectProperty.TRIGGER_MESSAGE)
   private String message;
+
+  @TmxProperty(name = MapObjectProperty.TRIGGER_COOLDOWN)
   private int cooldown;
+
   private long lastActivation;
   private boolean isActivated;
 

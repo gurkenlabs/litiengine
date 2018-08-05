@@ -6,6 +6,8 @@ import java.awt.geom.Rectangle2D;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -13,17 +15,22 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
 
   private static final double WIDTH_FACTOR = 0.4;
 
+  @TmxProperty(name = MapObjectProperty.COLLISION_ALIGN)
   private Align align = Align.CENTER;
 
+  @TmxProperty(name = MapObjectProperty.COLLISION)
   private boolean collision;
 
-  private Rectangle2D collisionBox;
-
+  @TmxProperty(name = MapObjectProperty.COLLISIONBOX_HEIGHT)
   private float collisionBoxHeight;
 
+  @TmxProperty(name = MapObjectProperty.COLLISIONBOX_WIDTH)
   private float collisionBoxWidth;
 
+  @TmxProperty(name = MapObjectProperty.COLLISION_VALIGN)
   private Valign valign = Valign.DOWN;
+  
+  private Rectangle2D collisionBox;
 
   protected CollisionEntity() {
     super();
@@ -46,7 +53,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   public boolean canCollideWith(final ICollisionEntity otherEntity) {
     return true;
   }
-  
+
   @Override
   public Align getCollisionBoxAlign() {
     return this.align;
@@ -129,7 +136,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
     this.collisionBoxHeight = collisionBoxHeight;
     this.collisionBox = this.getCollisionBox(this.getLocation());
   }
-  
+
   @Override
   public void setCollisionBoxValign(final Valign valign) {
     this.valign = valign;
