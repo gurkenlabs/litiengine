@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 @XmlRootElement(name = "blueprint")
@@ -58,18 +59,18 @@ public class Blueprint extends MapObject {
    * should be kept. This is currently used when objects are cut and pasted
    * afterwards.
    * 
-   * @return True if the ids for all {@link MapObject}s of this {@link Blueprint} should be re-applied after building new instances.
+   * @return True if the ids for all {@link IMapObject}s of this {@link Blueprint} should be re-applied after building new instances.
    */
   public boolean keepIds() {
     return this.keepIds;
   }
 
-  public List<MapObject> build(Point2D location) {
+  public List<IMapObject> build(Point2D location) {
     return this.build(Math.round((float) location.getX()), Math.round((float) location.getY()));
   }
 
-  public List<MapObject> build(float x, float y) {
-    List<MapObject> builtObjects = new ArrayList<>();
+  public List<IMapObject> build(float x, float y) {
+    List<IMapObject> builtObjects = new ArrayList<>();
 
     for (MapObject item : this.getItems()) {
       MapObject newObject = new MapObject(item, this.keepIds());

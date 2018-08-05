@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpriteSheetInfo;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -341,8 +342,8 @@ public class AssetPanelItem extends JPanel {
 
       UndoManager.instance().beginOperation();
       try {
-        List<MapObject> newObjects = blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2);
-        for (MapObject newMapObject : newObjects) {
+        List<IMapObject> newObjects = blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2);
+        for (IMapObject newMapObject : newObjects) {
           EditorScreen.instance().getMapComponent().add(newMapObject);
         }
 
@@ -350,7 +351,7 @@ public class AssetPanelItem extends JPanel {
         // the
         // previous loop because it gets overwritten every time a map object
         // gets added
-        for (MapObject newMapObject : newObjects) {
+        for (IMapObject newMapObject : newObjects) {
           EditorScreen.instance().getMapComponent().setSelection(newMapObject, false);
         }
       } finally {

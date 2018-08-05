@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -52,6 +54,10 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void add(IRenderable renderable, RenderType renderType);
 
   public void clear();
+
+  public Collection<IEntity> build(Blueprint blueprint, double x, double y);
+
+  public Collection<IEntity> build(Blueprint blueprint, Point2D location);
 
   public List<ICombatEntity> findCombatEntities(Shape shape);
 

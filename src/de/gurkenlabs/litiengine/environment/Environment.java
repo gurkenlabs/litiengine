@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +44,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -275,6 +278,22 @@ public class Environment implements IEnvironment {
   @Override
   public void add(IRenderable renderable, RenderType renderType) {
     this.getRenderables(renderType).add(renderable);
+  }
+
+  @Override
+  public Collection<IEntity> build(Blueprint blueprint, double x, double y) {
+    return this.build(blueprint, new Point2D.Double(x, y));
+  }
+
+  @Override
+  public Collection<IEntity> build(Blueprint blueprint, Point2D location) {
+    Collection<IMapObject> mapObjects = blueprint.build(location);
+    Collection<IEntity> loadedEntities = new ArrayList<>();
+    for (IMapObject obj : mapObjects) {
+      loadedEntities.addAll(this.load(obj));
+    }
+
+    return loadedEntities;
   }
 
   @Override

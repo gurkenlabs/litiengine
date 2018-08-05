@@ -444,7 +444,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     UndoManager.instance().beginOperation();
     try {
       this.setFocus(null, true);
-      for (MapObject mapObject : this.copiedBlueprint.build(x, y)) {
+      for (IMapObject mapObject : this.copiedBlueprint.build(x, y)) {
         this.add(mapObject);
         this.setSelection(mapObject, false);
       }
