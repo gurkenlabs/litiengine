@@ -23,7 +23,7 @@ import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
-public class EmitterPanel extends PropertyPanel<IMapObject> {
+public class EmitterPanel extends PropertyPanel {
   private JToggleButton btnPause;
   private transient CustomEmitter emitter;
 

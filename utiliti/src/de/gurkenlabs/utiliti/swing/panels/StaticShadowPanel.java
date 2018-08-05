@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 @SuppressWarnings("serial")
-public class StaticShadowPanel extends PropertyPanel<IMapObject> {
+public class StaticShadowPanel extends PropertyPanel {
   private JComboBox<StaticShadowType> comboBoxShadowType;
   private JSpinner spinnerOffset;
 

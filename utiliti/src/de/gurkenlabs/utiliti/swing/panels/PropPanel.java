@@ -30,7 +30,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
-public class PropPanel extends PropertyPanel<IMapObject> {
+public class PropPanel extends PropertyPanel {
   private JComboBox<JLabel> comboBoxSpriteSheets;
   private JCheckBox chckbxIndestructible;
   private JSpinner spinnerHealth;

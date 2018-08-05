@@ -22,7 +22,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
 @SuppressWarnings("serial")
-public class CollisionPanel extends PropertyPanel<IMapObject> {
+public class CollisionPanel extends PropertyPanel {
   private JCheckBox chckbxHasCollision;
   private JSpinner spinnerWidth;
   private JSpinner spinnerHeight;

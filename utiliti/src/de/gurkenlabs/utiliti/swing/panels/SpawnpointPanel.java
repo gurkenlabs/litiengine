@@ -19,7 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
 @SuppressWarnings("serial")
-public class SpawnpointPanel extends PropertyPanel<IMapObject> {
+public class SpawnpointPanel extends PropertyPanel {
   private JTextField textFieldType;
   private JComboBox<Direction> comboBoxDirection;
 

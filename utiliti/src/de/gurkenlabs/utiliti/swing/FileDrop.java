@@ -23,6 +23,8 @@ import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.utiliti.swing.FileDrop.TransferableObject;
+
 /**
  * This class makes it easy to drag and drop files from the operating system to
  * a Java program. Any <tt>java.awt.Component</tt> can be dropped onto, but only

@@ -117,13 +117,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private final List<Consumer<Integer>> editModeChangedConsumer;
   private final List<Consumer<IMapObject>> focusChangedConsumer;
-  private final List<Consumer<List<MapObject>>> selectionChangedConsumer;
+  private final List<Consumer<List<IMapObject>>> selectionChangedConsumer;
   private final List<Consumer<Map>> mapLoadedConsumer;
 
   private final java.util.Map<String, Integer> selectedLayers;
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
-  private final java.util.Map<String, List<MapObject>> selectedObjects;
+  private final java.util.Map<String, List<IMapObject>> selectedObjects;
   private final java.util.Map<String, IEnvironment> environments;
   private final java.util.Map<IMapObject, Point2D> dragLocationMapObjects;
 
@@ -188,7 +188,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.focusChangedConsumer.add(cons);
   }
 
-  public void onSelectionChanged(Consumer<List<MapObject>> cons) {
+  public void onSelectionChanged(Consumer<List<IMapObject>> cons) {
     this.selectionChangedConsumer.add(cons);
   }
 
@@ -269,7 +269,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     return null;
   }
 
-  public List<MapObject> getSelectedMapObjects() {
+  public List<IMapObject> getSelectedMapObjects() {
     final String map = Game.getEnvironment().getMap().getName();
     if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null && this.selectedObjects.containsKey(map)) {
       return this.selectedObjects.get(map);
@@ -463,7 +463,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     UndoManager.instance().beginOperation();
     try {
-      for (MapObject mapObject : this.getSelectedMapObjects()) {
+      for (IMapObject mapObject : this.getSelectedMapObjects()) {
         this.delete(mapObject);
         UndoManager.instance().mapObjectDeleted(mapObject);
       }
@@ -609,7 +609,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void setSelection(IMapObject mapObject, boolean clearSelection) {
     if (mapObject == null) {
       this.getSelectedMapObjects().clear();
-      for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+      for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
         cons.accept(this.getSelectedMapObjects());
       }
       return;
@@ -628,7 +628,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.getSelectedMapObjects().add((MapObject) mapObject);
     }
 
-    for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+    for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
       cons.accept(this.getSelectedMapObjects());
     }
   }
@@ -636,7 +636,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void setSelection(List<IMapObject> mapObjects, boolean clearSelection) {
     if (mapObjects == null || mapObjects.isEmpty()) {
       this.getSelectedMapObjects().clear();
-      for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+      for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
         cons.accept(this.getSelectedMapObjects());
       }
       return;
@@ -657,7 +657,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
     }
 
-    for (Consumer<List<MapObject>> cons : this.selectionChangedConsumer) {
+    for (Consumer<List<IMapObject>> cons : this.selectionChangedConsumer) {
       cons.accept(this.getSelectedMapObjects());
     }
   }
@@ -1134,10 +1134,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
+    final Rectangle2D beforeBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
     this.handleEntityDrag(snappedDeltaX, snappedDeltaY);
 
     if (this.getSelectedMapObjects().stream().anyMatch(x -> MapObjectType.get(x.getType()) == MapObjectType.STATICSHADOW || MapObjectType.get(x.getType()) == MapObjectType.LIGHTSOURCE)) {
-      Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds2D(this.getSelectedMapObjects()));
+      final Rectangle2D afterBounds = MapObject.getBounds2D(this.getSelectedMapObjects());
+      double x = Math.min(beforeBounds.getX(), afterBounds.getX());
+      double y = Math.min(beforeBounds.getY(), afterBounds.getY());
+      double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
+      double height = Math.max(beforeBounds.getMaxY(), afterBounds.getMaxY()) - y;
+      Game.getEnvironment().getAmbientLight().updateSection(new Rectangle2D.Double(x, y, width, height));
     }
   }
 

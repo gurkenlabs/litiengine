@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 
 @SuppressWarnings("serial")
-public class CollisionBoxPanel extends PropertyPanel<IMapObject> {
+public class CollisionBoxPanel extends PropertyPanel {
   private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxIsObstructingLights;
 

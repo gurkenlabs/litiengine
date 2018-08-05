@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -24,10 +25,9 @@ import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import javax.swing.JSlider;
 
 @SuppressWarnings("serial")
-public class LightSourcePanel extends PropertyPanel<IMapObject> {
+public class LightSourcePanel extends PropertyPanel {
   private final JTextField textFieldColor;
   private final JSpinner spinnerBrightness;
   private final JComboBox<String> comboBoxLightShape;

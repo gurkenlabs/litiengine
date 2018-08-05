@@ -48,7 +48,7 @@ import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 
 @SuppressWarnings("serial")
-public class EmitterPropertyPanel extends PropertyPanel<IMapObject> {
+public class EmitterPropertyPanel extends PropertyPanel {
   // TODO: implement support to adjust rendertype (GROUND, NORMAL, OVERLAY)
   private static final double PARTICLESPINNER_MAX_VALUE = 100.0;
   private static final double PARTICLEDELTA_MAX_VALUE = 1.0;

@@ -29,7 +29,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 @SuppressWarnings("serial")
-public class TriggerPanel extends PropertyPanel<IMapObject> {
+public class TriggerPanel extends PropertyPanel {
   private JTextField textFieldMessage;
   private DefaultTableModel model;
   private DefaultTableModel targetsModel;

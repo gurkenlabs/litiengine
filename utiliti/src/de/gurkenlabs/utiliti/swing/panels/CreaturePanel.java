@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
-public class CreaturePanel extends PropertyPanel<IMapObject> {
+public class CreaturePanel extends PropertyPanel {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
   private final JComboBox<Direction> comboBoxDirection;
   private final JTextField textFieldType;

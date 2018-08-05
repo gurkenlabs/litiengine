@@ -94,24 +94,24 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     }   
   }
 
-  public static Rectangle2D getBounds2D(MapObject... objects) {
+  public static Rectangle2D getBounds2D(IMapObject... objects) {
     return getBounds(objects);
   }
 
-  public static Rectangle2D getBounds2D(Iterable<MapObject> objects) {
+  public static Rectangle2D getBounds2D(Iterable<IMapObject> objects) {
     return getBounds(objects);
   }
 
-  public static Rectangle2D getBounds(MapObject... objects) {
+  public static Rectangle2D getBounds(IMapObject... objects) {
     return getBounds(Arrays.asList(objects));
   }
 
-  public static Rectangle2D getBounds(Iterable<MapObject> objects) {
+  public static Rectangle2D getBounds(Iterable<IMapObject> objects) {
     float minX = -1;
     float minY = -1;
     float maxX = -1;
     float maxY = -1;
-    for (MapObject item : objects) {
+    for (IMapObject item : objects) {
       if (minX == -1 || item.getX() < minX) {
         minX = item.getX();
       }

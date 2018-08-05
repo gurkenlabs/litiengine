@@ -27,9 +27,9 @@ import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.TagPanel;
 
 @SuppressWarnings("serial")
-public class MapObjectPanel extends PropertyPanel<IMapObject> {
-  private final Map<MapObjectType, PropertyPanel<IMapObject>> panels;
-  private PropertyPanel<IMapObject> currentPanel;
+public class MapObjectPanel extends PropertyPanel {
+  private final Map<MapObjectType, PropertyPanel> panels;
+  private PropertyPanel currentPanel;
   private JPanel componentPanel;
   private JPanel collWrapper = new JPanel();
   private final CollisionPanel collisionPanel;
@@ -159,7 +159,7 @@ public class MapObjectPanel extends PropertyPanel<IMapObject> {
   }
 
   private void switchPanel(MapObjectType type) {
-    PropertyPanel<IMapObject> panel = this.panels.get(type);
+    PropertyPanel panel = this.panels.get(type);
     if (panel == null) {
       if (this.currentPanel != null) {
         this.componentPanel.remove(this.currentPanel);

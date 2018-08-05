@@ -23,7 +23,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
-public class CustomPanel extends PropertyPanel<IMapObject> {
+public class CustomPanel extends PropertyPanel {
   private JTable tableCustomProperties;
   private JScrollPane scrollPane;
   private DefaultTableModel model;

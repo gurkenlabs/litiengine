@@ -22,22 +22,23 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
-public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
+public abstract class PropertyPanel extends JPanel {
   protected boolean isFocussing;
-  private transient T dataSource;
+  private transient IMapObject dataSource;
 
   public PropertyPanel() {
   }
 
-  protected T getDataSource() {
+  protected IMapObject getDataSource() {
     return this.dataSource;
   }
 
-  public void bind(T mapObject) {
+  public void bind(IMapObject mapObject) {
     this.dataSource = mapObject;
 
     this.isFocussing = true;
@@ -80,15 +81,15 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
       }
     }
   }
-  
+
   protected abstract void clearControls();
 
-  protected abstract void setControlValues(T mapObject);
+  protected abstract void setControlValues(IMapObject mapObject);
 
   protected class MapObjectPropertyItemListener implements ItemListener {
-    private final Consumer<T> updateAction;
+    private final Consumer<IMapObject> updateAction;
 
-    MapObjectPropertyItemListener(Consumer<T> updateAction) {
+    MapObjectPropertyItemListener(Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
     }
 
@@ -98,18 +99,14 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
         return;
       }
 
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      this.updateAction.accept(getDataSource());
-      UndoManager.instance().mapObjectChanged(getDataSource());
-      updateEnvironment();
+      applyChanges(this.updateAction);
     }
-
   }
 
   protected class MapObjectPropertyActionListener implements ActionListener {
-    private final Consumer<T> updateAction;
+    private final Consumer<IMapObject> updateAction;
 
-    MapObjectPropertyActionListener(Consumer<T> updateAction) {
+    MapObjectPropertyActionListener(Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
     }
 
@@ -119,17 +116,14 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
         return;
       }
 
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      this.updateAction.accept(getDataSource());
-      UndoManager.instance().mapObjectChanged(getDataSource());
-      updateEnvironment();
+      applyChanges(this.updateAction);
     }
   }
 
   protected class MapObjectPropertyChangeListener implements ChangeListener {
-    private final Consumer<T> updateAction;
+    private final Consumer<IMapObject> updateAction;
 
-    MapObjectPropertyChangeListener(Consumer<T> updateAction) {
+    MapObjectPropertyChangeListener(Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
     }
 
@@ -139,10 +133,7 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
         return;
       }
 
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      this.updateAction.accept(getDataSource());
-      UndoManager.instance().mapObjectChanged(getDataSource());
-      updateEnvironment();
+      applyChanges(this.updateAction);
     }
   }
 
@@ -153,9 +144,9 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
   }
 
   protected class MapObjectPropteryFocusListener extends FocusAdapter {
-    private final Consumer<T> updateAction;
+    private final Consumer<IMapObject> updateAction;
 
-    MapObjectPropteryFocusListener(Consumer<T> updateAction) {
+    MapObjectPropteryFocusListener(Consumer<IMapObject> updateAction) {
       this.updateAction = updateAction;
     }
 
@@ -165,20 +156,25 @@ public abstract class PropertyPanel<T extends IMapObject> extends JPanel {
         return;
       }
 
-      UndoManager.instance().mapObjectChanging(getDataSource());
-      this.updateAction.accept(getDataSource());
-      UndoManager.instance().mapObjectChanged(getDataSource());
-      updateEnvironment();
+      applyChanges(this.updateAction);
     }
   }
 
-  protected void updateEnvironment() {
+  protected void updateEnvironment(final IMapObject before) {
     if (getDataSource() instanceof IMapObject) {
-      IMapObject obj = (IMapObject) getDataSource();
+      IMapObject obj = getDataSource();
       Game.getEnvironment().reloadFromMap(obj.getId());
       if (MapObjectType.get(obj.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+        Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds(before, obj));
       }
     }
+  }
+
+  private void applyChanges(Consumer<IMapObject> updateAction) {
+    final IMapObject before = new MapObject(getDataSource());
+    UndoManager.instance().mapObjectChanging(getDataSource());
+    updateAction.accept(getDataSource());
+    UndoManager.instance().mapObjectChanged(getDataSource());
+    updateEnvironment(before);
   }
 }
