@@ -196,6 +196,10 @@ public final class TextRenderer {
    * @see RenderingHints
    */
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final Object antiAliasing) {
+    if(text == null || text.isEmpty()) {
+      return;
+    }
+    
     Color fillColor = g.getColor();
     BasicStroke outlineStroke = new BasicStroke(g.getFont().getSize() * 1 / 10f);
 
