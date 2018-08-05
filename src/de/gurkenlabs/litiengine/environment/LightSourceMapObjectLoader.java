@@ -27,6 +27,8 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
     final Color color = mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
     final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
+    final double focusOffsetX = mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETX);
+    final double focusOffsetY = mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETY);
     Collection<IEntity> entities = new ArrayList<>();
     if (color == null || lightShape == null) {
       return entities;
@@ -45,6 +47,8 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
 
     final LightSource light = this.createLightSource(mapObject, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
     loadDefaultProperties(light, mapObject);
+    light.setFocusOffsetX(focusOffsetX);
+    light.setFocusOffsetY(focusOffsetY);
 
     entities.add(light);
     return entities;

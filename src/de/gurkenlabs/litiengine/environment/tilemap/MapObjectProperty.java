@@ -51,7 +51,9 @@ public final class MapObjectProperty {
   public static final String LIGHT_INTENSITY = "lightIntensity";
   public static final String LIGHT_SHAPE = "lightShape";
   public static final String LIGHT_ACTIVE = "lightActive";
-
+  public static final String LIGHT_FOCUSOFFSETX = "lightFocusOffsetX";
+  public static final String LIGHT_FOCUSOFFSETY = "lightFocusOffsetY";
+  
   // static shadow
   public static final String SHADOW_TYPE = "shadowType";
   public static final String SHADOW_OFFSET = "shadowOffset";
