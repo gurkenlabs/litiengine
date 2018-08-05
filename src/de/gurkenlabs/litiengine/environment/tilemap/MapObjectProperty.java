@@ -24,19 +24,17 @@ public final class MapObjectProperty {
   public static final String COLLISIONBOX_OBSTRUCTINGLIGHTS = "isObstructingLight";
 
   // general entity stuff
-  public static final String HEALTH = "health";
   public static final String SPRITESHEETNAME = "spritesheetName";
-  public static final String TEAM = "team";
-
-  // decor mob
-  public static final String DECORMOB_BEHAVIOUR = "decormob-behaviour";
-  public static final String DECORMOB_VELOCITY = "decormob-velocity";
-
+  
   // creature
   public static final String CREATURE_TYPE = "creature-type";
 
+  // combat entity
+  public static final String COMBAT_HEALTH = "health";
+  public static final String COMBAT_INDESTRUCTIBLE = "indestructible";
+  public static final String COMBAT_TEAM = "team";
+  
   // props
-  public static final String PROP_INDESTRUCTIBLE = "indestructible";
   public static final String PROP_MATERIAL = "material";
   public static final String PROP_OBSTACLE = "isObstacle";
   public static final String PROP_ADDSHADOW = "addShadow";

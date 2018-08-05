@@ -15,6 +15,8 @@ import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
@@ -40,14 +42,24 @@ public class LightSource extends Entity implements IRenderable {
    */
   private static final Color[] SHADOW_GRADIENT_COLORS = new Color[] { new Color(0, 0, 0, .3f), new Color(0f, 0f, 0f, 0f) };
 
+  @TmxProperty(name = MapObjectProperty.LIGHT_ACTIVE)
   private boolean activated;
-  private Color color;
+
+  @TmxProperty(name = MapObjectProperty.LIGHT_INTENSITY)
   private int intensity;
-  private Shape lightShape;
+
+  @TmxProperty(name = MapObjectProperty.LIGHT_SHAPE)
   private String lightShapeType;
-  private int radius;
+
+  @TmxProperty(name = MapObjectProperty.LIGHT_FOCUSOFFSETX)
   private double focusOffsetX;
+
+  @TmxProperty(name = MapObjectProperty.LIGHT_FOCUSOFFSETY)
   private double focusOffsetY;
+
+  private Color color;
+  private Shape lightShape;
+  private int radius;
 
   public LightSource(final int intensity, final Color lightColor, final String shapeType, boolean activated) {
     super();

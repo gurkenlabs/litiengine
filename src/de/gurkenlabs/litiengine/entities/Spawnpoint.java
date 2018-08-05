@@ -3,9 +3,14 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 public class Spawnpoint extends Entity {
+  @TmxProperty(name = MapObjectProperty.SPAWN_DIRECTION)
   private Direction direction;
+  
+  @TmxProperty(name = MapObjectProperty.SPAWN_TYPE)
   private String spawnType;
 
   public Spawnpoint() {

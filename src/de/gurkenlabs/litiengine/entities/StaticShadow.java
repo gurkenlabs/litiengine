@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
@@ -16,10 +18,13 @@ public class StaticShadow extends MapArea {
   public static final Color DEFAULT_COLOR = Color.BLACK;
   public static final int DEFAULT_OFFSET = 10;
 
-  private final CollisionBox origin;
-
+  @TmxProperty(name = MapObjectProperty.SHADOW_TYPE)
   private StaticShadowType shadowType;
+
+  @TmxProperty(name = MapObjectProperty.SHADOW_OFFSET)
   private int shadowOffset;
+
+  private final CollisionBox origin;
   private Area area;
 
   public StaticShadow(StaticShadowType shadowType, int offset) {

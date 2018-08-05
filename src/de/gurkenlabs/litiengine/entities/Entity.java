@@ -11,6 +11,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -19,6 +21,8 @@ public abstract class Entity implements IEntity {
   public static final String ANY_MESSAGE = "";
   private final List<EntityTransformListener> transformListeners;
   private final Map<String, List<MessageListener>> messageListeners;
+
+  @TmxProperty(name = MapObjectProperty.TAGS)
   private final List<String> tags;
 
   private final EntityControllers controllers;
@@ -138,7 +142,7 @@ public abstract class Entity implements IEntity {
   public void addController(IEntityController controller) {
     this.controllers.addController(controller);
   }
-  
+
   @Override
   public <T extends IEntityController> void setController(Class<T> clss, T controller) {
     this.controllers.setController(clss, controller);

@@ -11,6 +11,8 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 /**
  * The Class AttackableEntity.
@@ -24,9 +26,13 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<CombatEntityHitListener> hitListeners;
   private final CombatAttributes attributes;
 
+  @TmxProperty(name = MapObjectProperty.COMBAT_INDESTRUCTIBLE)
   private boolean isIndestructible;
-  private ICombatEntity target;
+
+  @TmxProperty(name = MapObjectProperty.COMBAT_TEAM)
   private int team;
+  
+  private ICombatEntity target;
   private long lastHit;
 
   public CombatEntity() {

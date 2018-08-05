@@ -4,12 +4,12 @@ import java.lang.reflect.Field;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.annotation.CustomMapObjectProperty;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 public abstract class MapObjectLoader implements IMapObjectLoader {
@@ -44,7 +44,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
    * @param mapObject
    *          The mapObject that provides the static information for the new entity.
    * 
-   * @see CustomMapObjectProperty
+   * @see TmxProperty
    */
   public static void loadDefaultProperties(IEntity entity, IMapObject mapObject) {
     entity.setMapId(mapObject.getId());
@@ -71,23 +71,18 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   private static void loadCustomMapObjectProperties(IEntity entity, IMapObject mapObject) {
-    CustomMapObjectProperty customProp = entity.getClass().getAnnotation(CustomMapObjectProperty.class);
-    if (customProp == null) {
-      return;
-    }
-
-    for (String key : customProp.keys()) {
-      Field field = ReflectionUtilities.getField(entity.getClass(), key);
-      if (field == null) {
+    for (final Field field : entity.getClass().getDeclaredFields()) {
+      TmxProperty property = field.getAnnotation(TmxProperty.class);
+      if (property == null) {
         return;
       }
-      
-      String value = mapObject.getCustomProperty(key);
+
+      String value = mapObject.getCustomProperty(property.name());
       if (value == null) {
         continue;
       }
 
-      ReflectionUtilities.setFieldValue(entity.getClass(), entity, key, value);
+      ReflectionUtilities.setFieldValue(entity.getClass(), entity, property.name(), value);
     }
   }
 

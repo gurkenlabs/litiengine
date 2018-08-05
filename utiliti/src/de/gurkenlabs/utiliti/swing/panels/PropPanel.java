@@ -206,8 +206,8 @@ public class PropPanel extends PropertyPanel<IMapObject> {
     final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
     this.comboBoxRotation.setSelectedItem(rotation);
 
-    this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
-    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
+    this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_HEALTH));
+    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
     this.chckbxShadow.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
     this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
     this.checkBoxHorizontalFlip.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
@@ -216,7 +216,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
+    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
     this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()))));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
@@ -234,7 +234,7 @@ public class PropPanel extends PropertyPanel<IMapObject> {
       m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
-    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
+    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.COMBAT_HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
     this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
 
     this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_FLIPHORIZONTALLY, Boolean.toString(checkBoxHorizontalFlip.isSelected()))));

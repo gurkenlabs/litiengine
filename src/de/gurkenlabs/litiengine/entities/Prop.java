@@ -4,18 +4,36 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
 @AnimationInfo(spritePrefix = "prop-")
 public class Prop extends CombatEntity {
+
+  @TmxProperty(name = MapObjectProperty.PROP_MATERIAL)
   private Material material;
-  private String spritesheetName;
+
+  @TmxProperty(name = MapObjectProperty.PROP_OBSTACLE)
   private boolean isObstacle;
+
+  @TmxProperty(name = MapObjectProperty.PROP_ADDSHADOW)
   private boolean addShadow;
+  
+  @TmxProperty(name = MapObjectProperty.PROP_FLIPHORIZONTALLY)
   private boolean flipHorizontally;
+  
+  @TmxProperty(name = MapObjectProperty.PROP_FLIPVERTICALLY)
   private boolean flipVertically;
+  
+  @TmxProperty(name = MapObjectProperty.PROP_SCALE)
   private boolean scaling;
+
+  @TmxProperty(name = MapObjectProperty.PROP_ROTATION)
   private Rotation rotation;
+
+  @TmxProperty(name = MapObjectProperty.SPRITESHEETNAME)
+  private String spritesheetName;
 
   public Prop(final String spritesheetName) {
     this(0, 0, spritesheetName);

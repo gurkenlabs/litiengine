@@ -911,7 +911,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4) + "");
       mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
-      mo.setCustomProperty(MapObjectProperty.PROP_INDESTRUCTIBLE, "false");
+      mo.setCustomProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, "false");
       mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
       break;
     case LIGHTSOURCE:

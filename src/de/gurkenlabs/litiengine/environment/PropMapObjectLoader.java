@@ -82,9 +82,9 @@ public class PropMapObjectLoader extends MapObjectLoader {
     final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
     prop.setSpriteRotation(rotation);
 
-    prop.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_INDESTRUCTIBLE));
+    prop.setIndestructible(mapObject.getCustomPropertyBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
 
-    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getCustomPropertyInt(MapObjectProperty.HEALTH));
+    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_HEALTH));
     prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
     prop.getAttributes().getHealth().modifyBaseValue(mod);
 
@@ -94,7 +94,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     prop.setFlipVertically(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
     prop.setScaling(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_SCALE));
 
-    prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.TEAM));
+    prop.setTeam(mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_TEAM));
 
     Collection<IEntity> entities = new ArrayList<>();
     entities.add(prop);
