@@ -52,7 +52,7 @@ dependencies {
   
   testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.+'
   testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.+'
-  testCompile 'org.mockito:mockito-core:2.18.+'
+  testCompile 'org.mockito:mockito-core:2.21.+'
   testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.+'
 }
 
