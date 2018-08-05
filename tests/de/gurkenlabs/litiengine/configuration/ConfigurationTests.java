@@ -82,8 +82,6 @@ public class ConfigurationTests {
       assertEquals(true, configGroup.isTestBoolean());
       assertEquals(TEST.TEST1, configGroup.getTestEnum());
       assertEquals("", configGroup.getTestWithNoSetter());
-      System.out.println(new String[] { "test", "testicle" });
-      System.out.println(configGroup.getTestStringArray());
       assertArrayEquals(new String[] { "test", "testicle" }, configGroup.getTestStringArray());
     } finally {
 

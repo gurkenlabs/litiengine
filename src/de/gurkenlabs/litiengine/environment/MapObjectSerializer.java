@@ -2,6 +2,8 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -11,6 +13,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public final class MapObjectSerializer {
+  private static final Logger log = Logger.getLogger(MapObjectSerializer.class.getName());
+  
   private MapObjectSerializer() {
   }
 
@@ -58,10 +62,8 @@ public final class MapObjectSerializer {
       }
 
       mapObject.setCustomProperty(property.name(), getPropertyValue(field, value));
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    } catch (IllegalArgumentException | IllegalAccessException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
 
@@ -70,7 +72,7 @@ public final class MapObjectSerializer {
       try {
         return new DecimalFloatAdapter().marshal((Float) value);
       } catch (Exception e) {
-        e.printStackTrace();
+        log.log(Level.SEVERE, e.getMessage(), e);
       }
     } else if (field.getType().equals(Integer.class)) {
       return Integer.toString((int) value);
