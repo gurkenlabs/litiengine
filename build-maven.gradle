@@ -30,10 +30,10 @@ dependencies {
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
   
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.+'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.+'
-  testCompile 'org.mockito:mockito-core:2.21.+'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.+'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
+  testCompile 'org.mockito:mockito-core:2.21.0'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
 }
 
 test {
