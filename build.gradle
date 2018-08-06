@@ -4,8 +4,7 @@ buildscript {
   }
 }
  
- 
-plugins {
+ plugins {
   id 'com.stehno.natives' version '0.3.1'
   id 'org.sonarqube' version '2.6.2'
 }
@@ -21,7 +20,7 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 
 archivesBaseName = "litiengine"
-version = "v0.4.12-alpha"
+version = "v0.4.13-alpha"
 
 sourceSets {
   main.java.srcDir "src"

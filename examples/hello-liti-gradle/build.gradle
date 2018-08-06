@@ -5,5 +5,5 @@ repositories {
 }
 
 dependencies {
-  compile 'de.gurkenlabs:litiengine:0.4.12'
+  compile 'de.gurkenlabs:litiengine:0.4.13'
 }

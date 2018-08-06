@@ -16,14 +16,11 @@ sourceSets {
 
 repositories {
    mavenCentral()
-   
-   flatDir {
-      dirs 'lib'
-   }
 }
 
 dependencies {
-  compile 'net.java.jinput:jinput:2.0.7'
+  compile 'net.java.jinput:jinput:2.0.9'
+  compile 'net.java.jinput:jinput:2.0.9:natives-all'
   compile 'com.googlecode.soundlibs:jorbis:0.0.17.4'
   compile 'com.googlecode.soundlibs:tritonus-share:0.3.7.4'
   compile 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
@@ -32,21 +29,29 @@ dependencies {
   }
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0'
-  testCompile 'org.mockito:mockito-core:2.10.0'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
-  testRuntime 'org.junit.platform:junit-platform-launcher:1.1.0'
+  
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.+'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.+'
+  testCompile 'org.mockito:mockito-core:2.21.+'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.+'
+}
+
+test {
+  useJUnitPlatform()
 }
 
 jar {
-  from configurations.compile.collect { zipTree it }
-  
+  from  {configurations.compile.collect { zipTree it }
+  } {
+     exclude 'META-INF/services/**'
+  }
+
   from('resources') { include '**/*' }
   
-  version = 'v0.4.12-alpha'
+  version = 'v0.4.13-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
+  exclude '**/*.dylib'
   exclude '**/*.so'
   exclude 'junit**/**'
 }
@@ -56,7 +61,7 @@ javadoc {
 }
 
 signing {
-    sign configurations.archives
+  sign configurations.archives
 }
 
 task copyNativeLibs(type: Copy) {
@@ -74,29 +79,29 @@ task createJavadocs(type: Javadoc) {
 }
 
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-    version = 'v0.4.12-alpha'
+  classifier = 'javadoc'
+  from javadoc
+  version = 'v0.4.13-alpha'
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-    version = 'v0.4.12-alpha'
+  classifier = 'sources'
+  from sourceSets.main.allSource
+  version = 'v0.4.13-alpha'
 }
 
 artifacts {
-    archives javadocJar, sourcesJar
+  archives javadocJar, sourcesJar
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    dependsOn copyNativeLibs
+  options.encoding = 'UTF-8'
+  dependsOn copyNativeLibs
 }
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.12"
+version = "0.4.13"
 
 uploadArchives {
   repositories {
