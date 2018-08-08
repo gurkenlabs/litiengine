@@ -4,18 +4,19 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 archivesBaseName = "utiliti"
 version = "v0.4.13-alpha"
-
+mainClassName = "de.gurkenlabs.utiliti.Program"
 
 sourceSets {
   main.java.srcDir "src"
-  main.java.srcDir "resources"
+  main.resources.srcDir "resources"
 }
 
 dependencies {
-  compile  project(':')
+  compile project(':')
 } 
 
 jar {
