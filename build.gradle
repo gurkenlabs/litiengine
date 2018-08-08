@@ -120,8 +120,7 @@ task copyLicense(type: Copy) {
 
 fullbuild.dependsOn jacocoTestReport
 fullbuild.dependsOn distZip
-fullbuild.dependsOn includeNatives
-build.dependsOn includeNatives
+compileJava.dependsOn includeNatives
 includeNatives.dependsOn copyLicense
 
 tasks.withType(JavaCompile) {
