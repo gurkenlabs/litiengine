@@ -103,6 +103,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<MapArea> getAreas();
 
+  public Point2D getCenter();
   public Collection<Emitter> getEmitters();
 
   public Emitter getEmitter(int mapId);

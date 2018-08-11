@@ -75,6 +75,10 @@ public interface IMap extends ICustomPropertyProvider {
    */
   public Dimension getSizeInPixels();
 
+  public int getWidth();
+
+  public int getHeight();
+
   /**
    * Gets the sizein tiles.
    *

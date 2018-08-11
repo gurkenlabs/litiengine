@@ -504,6 +504,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public Point2D getCenter() {
+    return new Point2D.Double(this.getMap().getSizeInPixels().getWidth() / 2.0, this.getMap().getSizeInPixels().getHeight() / 2.0);
+  }
+
+  @Override
   public Collection<Emitter> getEmitters() {
     return this.emitters;
   }
@@ -1146,7 +1151,7 @@ public class Environment implements IEnvironment {
     if (entity instanceof LightSource || entity instanceof StaticShadow) {
       this.updateColorLayers(entity);
     }
-    
+
     entity.loaded();
   }
 
@@ -1239,7 +1244,7 @@ public class Environment implements IEnvironment {
       Emitter em = (Emitter) entity;
       em.deactivate();
     }
-    
+
     entity.removed();
   }
 }

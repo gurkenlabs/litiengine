@@ -38,7 +38,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = {1, 1, 5}; // 1.1.5
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 1, 5 }; // 1.1.5
 
   @XmlAttribute
   private double version;
@@ -290,6 +290,16 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return null;
   }
 
+  @Override
+  public int getWidth() {
+    return this.width;
+  }
+
+  @Override
+  public int getHeight() {
+    return this.height;
+  }
+
   public void setPath(final String path) {
     this.path = path;
     if (this.rawImageLayers != null && !this.rawImageLayers.isEmpty()) {
@@ -326,7 +336,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.getRawMapObjectLayers().add((MapObjectLayer) layer);
     this.mapObjectLayers = null;
   }
-  
+
   @Override
   public void addMapObjectLayer(int index, IMapObjectLayer layer) {
     this.getRawMapObjectLayers().add(index, (MapObjectLayer) layer);
@@ -470,7 +480,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
         break;
       }
     }
-    
+
     ArrayList<ITileset> tmpSets = new ArrayList<>();
     if (this.rawTilesets != null) {
       tmpSets.addAll(this.rawTilesets);
@@ -487,7 +497,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     }
 
     ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
-    if (this.rawImageLayers != null) {      
+    if (this.rawImageLayers != null) {
       tmpImageLayers.addAll(this.rawImageLayers);
     }
 
