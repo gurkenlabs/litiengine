@@ -16,6 +16,8 @@ import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
+import de.gurkenlabs.litiengine.gui.GuiProperties;
+
 public final class TextRenderer {
   private TextRenderer() {
   }
@@ -34,7 +36,7 @@ public final class TextRenderer {
    *          the min y coordinate
    */
   public static void render(final Graphics2D g, final String text, final double x, final double y) {
-    render(g, text, x, y, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    render(g, text, x, y, GuiProperties.getDefaultAppearance().getTextAntialiasing());
   }
 
   public static void render(final Graphics2D g, final String text, Point2D location) {
@@ -113,7 +115,7 @@ public final class TextRenderer {
    *          the max line width
    */
   public static void renderWithLinebreaks(final Graphics2D g, final String text, final double x, final double y, final double lineWidth) {
-    renderWithLinebreaks(g, text, x, y, lineWidth, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    renderWithLinebreaks(g, text, x, y, lineWidth, GuiProperties.getDefaultAppearance().getTextAntialiasing());
   }
 
   public static void renderWithLinebreaks(final Graphics2D g, final String text, Point2D location, final double lineWidth) {

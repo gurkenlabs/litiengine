@@ -26,6 +26,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+import de.gurkenlabs.litiengine.gui.GuiProperties;
 
 public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
@@ -67,9 +68,10 @@ public final class RenderEngine {
       return;
     }
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
     final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, GuiProperties.getDefaultAppearance().getTextAntialiasing());
   }
 
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
