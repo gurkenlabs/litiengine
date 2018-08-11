@@ -38,6 +38,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private String[] customDeathAnimations;
   private String randomDeathSprite;
 
+  // TODO: overhaul and streamline the constructor overloads
   public CreatureAnimationController(T entity, boolean useFlippedSpritesAsFallback) {
     super(entity);
     this.init(useFlippedSpritesAsFallback);

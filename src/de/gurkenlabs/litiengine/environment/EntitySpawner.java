@@ -28,6 +28,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.spawnDelay = 1000;
     this.amount = amount;
     this.spawnpoints = spawnpoints;
+    this.spawnMode = SpawnMode.ALLSPAWNPOINTS;
     loop.attach(this);
   }
 
@@ -86,8 +87,6 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     this.lastSpawn = Game.getLoop().getTicks();
   }
 
-  protected abstract void addToEnvironment(final IEnvironment env, T newEntity);
-
   protected void spawnNewEntities() {
     if (this.getSpawnPoints().isEmpty()) {
       return;
@@ -134,7 +133,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
         final T newEntity = EntitySpawner.this.createNew();
         newEntity.setLocation(this.point.getLocation());
         newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());
-        EntitySpawner.this.addToEnvironment(EntitySpawner.this.environment, newEntity);
+        EntitySpawner.this.environment.add(newEntity);
 
         try {
           Thread.sleep(EntitySpawner.this.getSpawnDelay());
