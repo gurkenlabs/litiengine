@@ -308,6 +308,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadEnvironment(Map map) {
+    if(map == null) {
+      return;
+    }
     this.loading = true;
     try {
       if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
