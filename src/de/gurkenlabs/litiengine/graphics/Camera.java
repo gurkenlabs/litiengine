@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -42,10 +40,8 @@ public class Camera implements ICamera {
 
   private long zoomTick;
 
+  // TODO: implement possiblity to provide a padding
   private boolean clampToMap;
-
-  private Align horizontalAlign;
-  private Valign verticalAlign;
 
   /**
    * Instantiates a new camera.
@@ -54,8 +50,6 @@ public class Camera implements ICamera {
     this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
     this.focusChangedConsumer = new CopyOnWriteArrayList<>();
     this.focus = new Point2D.Double(0, 0);
-    this.setHorizontalAlign(Align.LEFT);
-    this.setVerticalAlign(Valign.TOP);
     this.viewPort = new Rectangle2D.Double(0, 0, 0, 0);
     this.zoom = 1;
   }
@@ -253,29 +247,23 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void setClampToMap(final boolean clampToMap, final Align horizontalClampFocus, final Valign verticalClampFocus) {
+  public void setClampToMap(final boolean clampToMap) {
     this.clampToMap = clampToMap;
-    this.setHorizontalAlign(horizontalClampFocus);
-    this.setVerticalAlign(verticalClampFocus);
   }
 
+  // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
       return focus;
     }
 
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
+
+    // TODO: Implement special handling for maps that are smaller than the camera area: use Align, Valign to determine where to render them
     final Dimension resolution = Game.getScreenManager().getResolution();
-
-    //    old code for reference
-    //    double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
-    //    double maxX = mapSize.getWidth() - minX;
-    //    double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
-    //    double maxY = mapSize.getHeight() - minY;
-
-    double minX = (resolution.getWidth() - this.getHorizontalAlign().getValue(resolution.getWidth())) / this.getRenderScale() / 2.0;
+    double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
     double maxX = mapSize.getWidth() - minX;
-    double minY = (resolution.getHeight() - this.getVerticalAlign().getValue(resolution.getHeight())) / this.getRenderScale() / 2.0;
+    double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
     double x = mapSize.getWidth() * this.getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
@@ -336,21 +324,5 @@ public class Camera implements ICamera {
 
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
-  }
-
-  public Align getHorizontalAlign() {
-    return horizontalAlign;
-  }
-
-  public void setHorizontalAlign(Align horizontalAlign) {
-    this.horizontalAlign = horizontalAlign;
-  }
-
-  public Valign getVerticalAlign() {
-    return verticalAlign;
-  }
-
-  public void setVerticalAlign(Valign verticalAlign) {
-    this.verticalAlign = verticalAlign;
   }
 }

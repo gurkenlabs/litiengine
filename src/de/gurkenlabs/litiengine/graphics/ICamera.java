@@ -4,9 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
@@ -99,8 +97,8 @@ public interface ICamera extends IUpdateable {
   public void setZoom(float zoom, int delay);
 
   public boolean isClampToMap();
-
-  public void setClampToMap(final boolean clampToMap, final Align horizontalClampFocus, final Valign verticalClampFocus);
+ 
+  public void setClampToMap(final boolean clampToMap);
 
   public void shake(double intensity, final int delay, int duration);
 
