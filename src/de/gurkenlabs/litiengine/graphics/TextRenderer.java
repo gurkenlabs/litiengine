@@ -72,6 +72,13 @@ public final class TextRenderer {
     render(g, text, location.getX(), location.getY(), antiAliasing);
   }
 
+  public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle, Object antiAliasing) {
+    RenderingHints originalHints = g.getRenderingHints();
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasing);
+    renderRotated(g, text, x, y, angle);
+    g.setRenderingHints(originalHints);
+  }
+
   public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle) {
     // TODO: does this actually work as expected if we're rendering on the copy?
     final Graphics2D g2 = (Graphics2D) g.create();
@@ -80,10 +87,15 @@ public final class TextRenderer {
     g2.dispose();
   }
 
+
   public static void renderRotated(final Graphics2D g, final String text, Point2D location, final double angle) {
     renderRotated(g, text, location.getX(), location.getY(), angle);
   }
 
+  public static void renderRotated(final Graphics2D g, final String text, Point2D location, final double angle, Object antiAliasing) {
+    renderRotated(g, text, location.getX(), location.getY(), angle, antiAliasing);
+  }
+  
   /**
    * Draw text at the given coordinates with a maximum line width for automatic line breaks. This variant of drawTextWithAutomaticLinebreaks() uses
    * RenderingHints.VALUE_TEXT_ANTIALIAS_OFF as Anti-Aliasing method by
@@ -173,7 +185,7 @@ public final class TextRenderer {
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor) {
     renderWithOutline(g, text, x, y, outlineColor, RenderingHints.VALUE_ANTIALIAS_OFF);
   }
-  
+
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor);
   }
@@ -196,10 +208,10 @@ public final class TextRenderer {
    * @see RenderingHints
    */
   public static void renderWithOutline(final Graphics2D g, final String text, final double x, final double y, final Color outlineColor, final Object antiAliasing) {
-    if(text == null || text.isEmpty()) {
+    if (text == null || text.isEmpty()) {
       return;
     }
-    
+
     Color fillColor = g.getColor();
     BasicStroke outlineStroke = new BasicStroke(g.getFont().getSize() * 1 / 10f);
 
@@ -232,7 +244,7 @@ public final class TextRenderer {
     g.setStroke(originalStroke);
     g.setRenderingHints(originalHints);
   }
-  
+
   public static void renderWithOutline(final Graphics2D g, final String text, Point2D location, final Color outlineColor, final Object antiAliasing) {
     renderWithOutline(g, text, location.getX(), location.getY(), outlineColor, antiAliasing);
   }

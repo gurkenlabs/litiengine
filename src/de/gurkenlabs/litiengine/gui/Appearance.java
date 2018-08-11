@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.gui;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,8 +18,11 @@ public class Appearance {
   private boolean horizontalBackgroundGradient;
   private boolean transparentBackground;
 
+  private Object textAntialiasing;
+
   public Appearance() {
     this.changedConsumer = new CopyOnWriteArrayList<>();
+    this.textAntialiasing = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
   }
 
   public Appearance(Color foreColor) {
@@ -76,6 +80,10 @@ public class Appearance {
     }
   }
 
+  public Object getTextAntialiasing() {
+    return this.textAntialiasing;
+  }
+
   public boolean isHorizontalBackgroundGradient() {
     return this.horizontalBackgroundGradient;
   }
@@ -109,6 +117,16 @@ public class Appearance {
     this.fireOnChangeEvent();
   }
 
+  /**
+   * Sets the {@link RenderingHints#KEY_TEXT_ANTIALIASING} settings for the rendered text.
+   * 
+   * @param antialiasing
+   *          Either {@link RenderingHints#VALUE_TEXT_ANTIALIAS_ON} or {@link RenderingHints#VALUE_TEXT_ANTIALIAS_OFF}
+   */
+  public void setTextAntialiasing(Object antialiasing) {
+    this.textAntialiasing = antialiasing;
+  }
+
   public void onChange(Consumer<Appearance> cons) {
     this.changedConsumer.add(cons);
   }
@@ -119,6 +137,7 @@ public class Appearance {
     this.setForeColor(updateAppearance.getForeColor());
     this.setHorizontalBackgroundGradient(updateAppearance.isHorizontalBackgroundGradient());
     this.setTransparentBackground(updateAppearance.isTransparentBackground());
+    this.setTextAntialiasing(updateAppearance.getTextAntialiasing());
   }
 
   protected void fireOnChangeEvent() {

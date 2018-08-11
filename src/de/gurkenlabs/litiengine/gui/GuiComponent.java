@@ -812,27 +812,25 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     if (this.getTextX() == 0) {
       this.setTextX(defaultTextX);
     }
-    if (this.getTextAngle() == 0) {
-      if (this.drawTextShadow()) {
-        TextRenderer.renderWithOutline(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor());
-      } else {
-        TextRenderer.render(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY());
-      }
-    } else if (this.getTextAngle() == 90) {
-      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle());
-    } else {
-      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle());
+
+    Object antialiasing = this.getAppearance().getTextAntialiasing();
+    if (this.isHovered()) {
+      antialiasing = this.getAppearanceHovered().getTextAntialiasing();
+    }
+    if (!this.isEnabled()) {
+      antialiasing = this.getAppearanceDisabled().getTextAntialiasing();
     }
 
-    /*
-     * Debugging functionality for rendering the text boundaries
-     * g.setColor(Color.RED);
-     * g.drawLine((int) (this.getX() + this.getTextX()), (int) this.getY(), (int) (this.getX() + this.getTextX()), (int) (this.getY() +
-     * this.getHeight()));
-     * g.drawLine((int) (this.getX() + this.getTextX() + fm.stringWidth(this.getText())), (int) this.getY(), (int) (this.getX() + this.getTextX() +
-     * fm.stringWidth(this.getText())), (int) (this.getY() + this.getHeight()));
-     * g.drawLine((int) this.getBoundingBox().getCenterX(), (int) this.getY(), (int) this.getBoundingBox().getCenterX(), (int) (this.getY() +
-     * this.getHeight()));
-     */
+    if (this.getTextAngle() == 0) {
+      if (this.drawTextShadow()) {
+        TextRenderer.renderWithOutline(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextShadowColor(), antialiasing);
+      } else {
+        TextRenderer.render(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), antialiasing);
+      }
+    } else if (this.getTextAngle() == 90) {
+      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY() - fm.stringWidth(this.getTextToRender(g)), this.getTextAngle(), antialiasing);
+    } else {
+      TextRenderer.renderRotated(g, this.getTextToRender(g), this.getX() + this.getTextX(), this.getY() + this.getTextY(), this.getTextAngle(), antialiasing);
+    }
   }
 }
