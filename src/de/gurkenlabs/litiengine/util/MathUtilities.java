@@ -153,10 +153,18 @@ public class MathUtilities {
   }
 
   public static int getFullPercent(double value, double fraction) {
+    if (value == 0) {
+      return 0;
+    }
+
     return (int) ((fraction * 100.0f) / value);
   }
 
   public static double getPercent(double value, double fraction) {
+    if (value == 0) {
+      return 0;
+    }
+
     return (float) fraction * 100 / value;
   }
 }
