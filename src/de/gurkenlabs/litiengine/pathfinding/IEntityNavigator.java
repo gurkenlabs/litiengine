@@ -24,6 +24,8 @@ public interface IEntityNavigator extends IUpdateable, IRenderable {
 
   public IPathFinder getPathFinder();
 
+  public float getAcceptableError();
+
   public boolean isNavigating();
 
   public boolean navigate(Path2D path);
@@ -31,6 +33,8 @@ public interface IEntityNavigator extends IUpdateable, IRenderable {
   public boolean navigate(Point2D target);
 
   public void rotateTowards(Point2D target);
+
+  public void setAcceptableError(float acceptableError);
 
   public void stop();
 }

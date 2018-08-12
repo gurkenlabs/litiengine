@@ -15,17 +15,17 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class EntityNavigator implements IEntityNavigator {
 
-  /** The Constant ACCEPTABLE_ERROR. */
-  private static final float ACCEPTABLE_ERROR = 0.3f;
+  private static final float DEFAULT_ACCEPTABLE_ERROR = 0.3f;
 
   private final List<Predicate<IMobileEntity>> cancelNavigationConditions;
   private final List<NavigationListener> listeners;
-  private int currentSegment;
+
   private final IMobileEntity entity;
-
-  private Path path;
-
   private final IPathFinder pathFinder;
+
+  private int currentSegment;
+  private Path path;
+  private float acceptableError;
 
   /**
    * Instantiates a new entity navigator.
@@ -40,6 +40,7 @@ public class EntityNavigator implements IEntityNavigator {
     this.listeners = new CopyOnWriteArrayList<>();
     this.entity = entity;
     this.pathFinder = pathFinder;
+    this.setAcceptableError(DEFAULT_ACCEPTABLE_ERROR);
     Game.getLoop().attach(this);
   }
 
@@ -76,6 +77,11 @@ public class EntityNavigator implements IEntityNavigator {
   }
 
   @Override
+  public float getAcceptableError() {
+    return this.acceptableError;
+  }
+
+  @Override
   public boolean isNavigating() {
     return this.path != null;
   }
@@ -109,6 +115,11 @@ public class EntityNavigator implements IEntityNavigator {
   public void rotateTowards(final Point2D target) {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
     this.entity.setAngle((float) angle);
+  }
+
+  @Override
+  public void setAcceptableError(float acceptableError) {
+    this.acceptableError = acceptableError;
   }
 
   @Override
@@ -167,7 +178,7 @@ public class EntityNavigator implements IEntityNavigator {
     pi.currentSegment(coordinates);
 
     final double distance = GeometricUtilities.distance(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
-    if (distance < ACCEPTABLE_ERROR) {
+    if (distance < this.getAcceptableError()) {
       ++this.currentSegment;
       return;
     }

@@ -5,6 +5,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
@@ -431,6 +432,21 @@ public class GeometricUtilities {
     return Math.abs(a.getCenterX() - b.getCenterX()) < a.getWidth() * 0.5 + b.getWidth() * 0.5 && Math.abs(a.getCenterY() - b.getCenterY()) < a.getHeight() * 0.5 + b.getHeight() * 0.5;
   }
 
+  public static boolean intersects(final Ellipse2D a, final Ellipse2D b) {
+    if (a.getWidth() != a.getHeight() || b.getWidth() != b.getHeight()) {
+      return shapeIntersects(a, b);
+    }
+
+    double distSq = Math.pow((a.getCenterX() - b.getCenterX()), 2) + Math.pow((a.getCenterY() - b.getCenterY()), 2);
+    double radSumSq = Math.pow((a.getWidth() / 2.0 + b.getWidth() / 2.0), 2);
+
+    if (distSq > radSumSq) {
+      return false;
+    }
+
+    return true;
+  }
+
   public static Point2D project(final Point2D start, final double angle, final double delta) {
     double x = start.getX();
     double y = start.getY();
@@ -462,7 +478,7 @@ public class GeometricUtilities {
 
     // euclidean length
     final double len = Math.hypot(dx, dy);
-    
+
     return new Point2D.Double(start.getX() + dx * scalar / len, start.getY() + dy * scalar / len);
   }
 
@@ -562,7 +578,6 @@ public class GeometricUtilities {
     t.translate(renderLocation.getX(), renderLocation.getY());
     return shape;
   }
-  
 
   private static double getXDelta(final double angle, final double delta) {
     return Trigonometry.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
