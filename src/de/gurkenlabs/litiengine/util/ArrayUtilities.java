@@ -113,6 +113,20 @@ public final class ArrayUtilities {
     return arr[randomIndex];
   }
 
+  public static <T> boolean contains(T[] arr, T value) {
+    if (value == null) {
+      return false;
+    }
+
+    for (T v : arr) {
+      if (v != null && v.equals(value)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static boolean containsArgument(String[] args, String argument) {
     if (args == null || args.length == 0) {
       return false;
