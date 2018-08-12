@@ -129,10 +129,10 @@ public class AStarGrid implements IRenderable {
 
     final AStarNode startNode = this.getNode(viewport.getX(), viewport.getY());
     final AStarNode endNode = this.getNode(viewport.getMaxX(), viewport.getMaxY());
-    final int startX = MathUtilities.clamp(startNode.getGridX(), 0, this.getGrid().length - 1);
-    final int endX = MathUtilities.clamp(endNode.getGridX(), 0, this.getGrid().length - 1);
-    final int startY = MathUtilities.clamp(startNode.getGridY(), 0, this.getGrid()[0].length - 1);
-    final int endY = MathUtilities.clamp(endNode.getGridY(), 0, this.getGrid()[0].length - 1);
+    final int startX = startNode == null ? 0 : clampX(startNode.getGridX());
+    final int endX = endNode == null ? this.getGrid().length - 1 : clampX(endNode.getGridX());
+    final int startY = startNode == null ? 0 : clampY(startNode.getGridY());
+    final int endY = endNode == null ? this.getGrid()[0].length - 1 : clampY(endNode.getGridY());
 
     g.setColor(new Color(255, 0, 255, 100));
     for (int x = startX; x <= endX; x++) {
@@ -145,6 +145,14 @@ public class AStarGrid implements IRenderable {
         }
       }
     }
+  }
+
+  private int clampX(int x) {
+    return MathUtilities.clamp(x, 0, this.getGrid().length - 1);
+  }
+
+  private int clampY(int y) {
+    return MathUtilities.clamp(y, 0, this.getGrid()[0].length - 1);
   }
 
   public void setAllowDiagonalMovement(final boolean allowDiagonalMovement) {

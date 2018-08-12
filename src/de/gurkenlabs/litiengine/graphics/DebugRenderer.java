@@ -25,11 +25,22 @@ import de.gurkenlabs.litiengine.input.Input;
 public class DebugRenderer {
   private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
 
+  private static List<EntityDebugRenderedListener> entityDebugListeners;
+
   static {
     mapDebugConsumer = new CopyOnWriteArrayList<>();
+    entityDebugListeners = new CopyOnWriteArrayList<>();
   }
 
   private DebugRenderer() {
+  }
+
+  public static void addEntityDebugListener(EntityDebugRenderedListener listener) {
+    entityDebugListeners.add(listener);
+  }
+
+  public static void removeEntityDebugListener(EntityDebugRenderedListener listener) {
+    entityDebugListeners.remove(listener);
   }
 
   public static void onMapDebugRendered(Consumer<MapDebugArgs> cons) {
@@ -59,6 +70,10 @@ public class DebugRenderer {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
       g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
       Game.getRenderEngine().renderOutline(g, collisionEntity.getCollisionBox());
+    }
+
+    for (EntityDebugRenderedListener listener : entityDebugListeners) {
+      listener.entityRendered(g, entity);
     }
   }
 

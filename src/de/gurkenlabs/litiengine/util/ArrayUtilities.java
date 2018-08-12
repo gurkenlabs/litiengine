@@ -1,6 +1,9 @@
 package de.gurkenlabs.litiengine.util;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -123,6 +126,30 @@ public final class ArrayUtilities {
     }
 
     return false;
+  }
+
+  /**
+   * Removes the specified deleteItem from the input array and returns a trimmed new array instance without null entries.
+   * The resulting array will have a length -1;
+   * 
+   * @param input
+   *          The original array
+   * @param deleteItem
+   *          The item to delete
+   * @return A new array with the length input.length - 1.
+   */
+  public static <T> T[] remove(T[] input, T deleteItem) {
+    List<T> result = new ArrayList<>();
+
+    for (T item : input) {
+      if (!deleteItem.equals(item)) {
+        result.add(item);
+      }
+    }
+
+    result.removeAll(Collections.singleton(null));
+    T[] newArr = (T[]) input.getClass().cast(Array.newInstance(input.getClass().getComponentType(), result.size()));
+    return result.toArray(newArr);
   }
 
   public static int[] toIntegerArray(List<Integer> intList) {
