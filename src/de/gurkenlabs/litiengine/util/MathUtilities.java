@@ -10,6 +10,10 @@ public class MathUtilities {
   private MathUtilities() {
   }
 
+  public static boolean equals(double d1, double d2, double epsilon) {
+    return Math.abs(d1 - d2) <= epsilon;
+  }
+
   public static float round(float value, int places) {
     return (float) round((double) value, places);
   }
