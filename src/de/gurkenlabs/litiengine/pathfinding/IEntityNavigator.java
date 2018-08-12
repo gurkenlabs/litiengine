@@ -12,6 +12,10 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
  * The Interface IEntityNavigator.
  */
 public interface IEntityNavigator extends IUpdateable, IRenderable {
+  public void addNavigationListener(NavigationListener listener);
+
+  public void removeNavigationListener(NavigationListener listener);
+
   public void cancelNavigation(Predicate<IMobileEntity> predicate);
 
   public IMobileEntity getEntity();

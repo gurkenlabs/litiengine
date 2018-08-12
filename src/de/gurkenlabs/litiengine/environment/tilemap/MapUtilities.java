@@ -73,6 +73,10 @@ public final class MapUtilities {
     return new Rectangle2D.Double(location.x * map.getTileSize().getWidth(), location.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
   }
 
+  public static Rectangle2D getTileBoundingBox(final int x, final int y) {
+    return getTileBoundingBox(new Point(x, y));
+  }
+
   public static Rectangle2D getTileBoundingBox(final Point tile) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return new Rectangle2D.Double();

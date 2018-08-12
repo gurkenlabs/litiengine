@@ -13,20 +13,16 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-/**
- * The Class EntityNavigator.
- */
 public class EntityNavigator implements IEntityNavigator {
 
   /** The Constant ACCEPTABLE_ERROR. */
   private static final float ACCEPTABLE_ERROR = 0.3f;
 
   private final List<Predicate<IMobileEntity>> cancelNavigationConditions;
-  /** The current segments. */
+  private final List<NavigationListener> listeners;
   private int currentSegment;
   private final IMobileEntity entity;
 
-  /** The navigations. */
   private Path path;
 
   private final IPathFinder pathFinder;
@@ -41,9 +37,20 @@ public class EntityNavigator implements IEntityNavigator {
    */
   public EntityNavigator(final IMobileEntity entity, final IPathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
     this.entity = entity;
     this.pathFinder = pathFinder;
     Game.getLoop().attach(this);
+  }
+
+  @Override
+  public void addNavigationListener(NavigationListener listener) {
+    this.listeners.add(listener);
+  }
+
+  @Override
+  public void removeNavigationListener(NavigationListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override
@@ -108,6 +115,10 @@ public class EntityNavigator implements IEntityNavigator {
   public void stop() {
     this.currentSegment = 0;
     this.path = null;
+
+    for (NavigationListener listener : this.listeners) {
+      listener.stopped();
+    }
   }
 
   @Override
