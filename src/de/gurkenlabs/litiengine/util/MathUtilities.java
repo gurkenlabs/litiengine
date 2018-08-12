@@ -89,6 +89,16 @@ public class MathUtilities {
     return sum / numbers.length;
   }
 
+  public static int getMax(final int... numbers) {
+    int max = Integer.MIN_VALUE;
+    for (int i = 0; i < numbers.length; i++) {
+      if (numbers[i] > max) {
+        max = numbers[i];
+      }
+    }
+    return max;
+  }
+
   /**
    * The index probabilities must sum up to 1;
    *
@@ -153,10 +163,18 @@ public class MathUtilities {
   }
 
   public static int getFullPercent(double value, double fraction) {
+    if (value == 0) {
+      return 0;
+    }
+
     return (int) ((fraction * 100.0f) / value);
   }
 
   public static double getPercent(double value, double fraction) {
+    if (value == 0) {
+      return 0;
+    }
+
     return (float) fraction * 100 / value;
   }
 }
