@@ -137,6 +137,8 @@ public class ImageComponent extends GuiComponent {
       return;
     }
 
+    super.render(g);
+
     final Image bg = this.getBackground();
     if (bg != null) {
       ImageRenderer.render(g, bg, this.getLocation());
@@ -146,8 +148,6 @@ public class ImageComponent extends GuiComponent {
     if (img != null) {
       ImageRenderer.render(g, img, this.getImageLocation(img));
     }
-
-    super.render(g);
   }
 
   public void setImage(final Image image) {
