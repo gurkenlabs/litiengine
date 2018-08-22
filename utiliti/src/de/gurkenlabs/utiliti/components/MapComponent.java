@@ -557,7 +557,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       break;
     case EDITMODE_MOVE:
-      EditorScreen.instance().getMapObjectPanel().bind(null);
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
     default:
@@ -1208,7 +1207,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
     });
 
-    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> this.setEditMode(EDITMODE_EDIT));
+    Input.keyboard().onKeyReleased(KeyEvent.VK_CONTROL, e -> {
+      if (this.currentEditMode == EDITMODE_MOVE) {
+        this.setEditMode(EDITMODE_EDIT);
+      }
+    });
 
     Input.keyboard().onKeyReleased(KeyEvent.VK_Z, e -> {
       if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
