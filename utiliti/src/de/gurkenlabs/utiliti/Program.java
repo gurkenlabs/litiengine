@@ -116,7 +116,7 @@ public class Program {
     }
 
     Game.getInfo().setName("utiLITI");
-    Game.getInfo().setSubTitle("litiengine creation kit");
+    Game.getInfo().setSubTitle("LITIengine Creation Kit");
     Game.getInfo().setVersion("v0.4.13-alpha");
 
     initSystemTray();
@@ -557,7 +557,18 @@ public class Program {
     saveMapSnapshot.addActionListener(a -> {
       EditorScreen.instance().saveMapSnapshot();
     });
-    
+
+    MenuItem reassignIDs = new MenuItem(Resources.get("menu_reassignMapIds"));
+    reassignIDs.addActionListener(a -> {
+      try {
+        int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.get("panel_reassignMapIds"), 1));
+        EditorScreen.instance().getMapComponent().reassignIds(Game.getEnvironment().getMap(), minID);
+      } catch (Exception e) {
+        log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
+      }
+
+    });
+
     MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
     del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
@@ -598,6 +609,7 @@ public class Program {
     mnMap.add(imp);
     mnMap.add(exp);
     mnMap.add(saveMapSnapshot);
+    mnMap.add(reassignIDs);
     mnMap.add(del2);
     mnMap.addSeparator();
     mnMap.add(mapProps);

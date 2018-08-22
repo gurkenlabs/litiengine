@@ -88,7 +88,6 @@ public class Environment implements IEnvironment {
   private IMap map;
 
   private int localIdSequence = 0;
-  private int mapIdSequence;
 
   static {
     mapObjectLoaders = new ConcurrentHashMap<>();
@@ -98,7 +97,6 @@ public class Environment implements IEnvironment {
   public Environment(final IMap map) {
     this();
     this.map = map;
-    this.mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
   }
 
@@ -110,8 +108,6 @@ public class Environment implements IEnvironment {
     } else {
       this.map = loadedMap;
     }
-
-    this.mapIdSequence = MapUtilities.getMaxMapId(this.getMap());
     Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
 
@@ -629,7 +625,8 @@ public class Environment implements IEnvironment {
 
   @Override
   public synchronized int getNextMapId() {
-    return ++this.mapIdSequence;
+    int maxMapID =  MapUtilities.getMaxMapId(this.getMap());
+    return ++maxMapID;
   }
 
   @Override

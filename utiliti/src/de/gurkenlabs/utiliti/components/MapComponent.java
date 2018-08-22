@@ -308,7 +308,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadEnvironment(Map map) {
-    if(map == null) {
+    if (map == null) {
       return;
     }
     this.loading = true;
@@ -332,8 +332,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       Game.getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
-
-      this.ensureUniqueIds(map);
 
       if (!this.environments.containsKey(map.getName())) {
         Environment env = new Environment(map);
@@ -869,20 +867,18 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.updateScrollSpeed();
   }
 
-  private void updateScrollSpeed() {
-    this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
-  }
-
-  private void ensureUniqueIds(IMap map) {
-    int maxMapId = MapUtilities.getMaxMapId(map);
+  public void reassignIds(IMap map, int startID) {
+    int maxMapId = startID;
     List<Integer> usedIds = new ArrayList<>();
     for (IMapObject obj : map.getMapObjects()) {
-      if (usedIds.contains(obj.getId())) {
-        obj.setId(++maxMapId);
-      }
-
+      obj.setId(maxMapId);
       usedIds.add(obj.getId());
+      maxMapId++;
     }
+  }
+
+  private void updateScrollSpeed() {
+    this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }
 
   private static IMapObjectLayer getCurrentLayer() {
