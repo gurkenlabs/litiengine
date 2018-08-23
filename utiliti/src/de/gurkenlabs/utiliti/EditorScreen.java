@@ -465,7 +465,7 @@ public class EditorScreen extends Screen {
 
   public void saveMapSnapshot() {
     IMap currentMap = Game.getEnvironment().getMap();
-    BufferedImage img = Game.getRenderEngine().getMapRenderer(MapOrientation.ORTHOGONAL).getImage(currentMap);
+    BufferedImage img = Game.getRenderEngine().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);
     
     try {
       final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());

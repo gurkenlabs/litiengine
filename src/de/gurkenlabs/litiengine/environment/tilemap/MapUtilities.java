@@ -114,6 +114,8 @@ public final class MapUtilities {
   }
 
   public static Point getTile(final IMap map, final double x, final double y) {
+    //TODO: implement different tile metrics for hex / iso maps
+
     return new Point((int) (x / map.getTileSize().getWidth()), (int) (y / map.getTileSize().getHeight()));
   }
 

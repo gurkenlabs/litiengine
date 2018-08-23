@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.tilemap.HexagonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
@@ -47,6 +48,7 @@ public final class RenderEngine {
     this.entityComparator = new EntityYComparator();
 
     this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
+    this.mapRenderer.put(MapOrientation.HEXAGONAL, new HexagonalMapRenderer());
 
     this.baseRenderScale = DEFAULT_RENDERSCALE;
   }

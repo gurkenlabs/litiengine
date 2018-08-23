@@ -30,6 +30,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
@@ -66,6 +68,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlAttribute
   private int tileheight;
+
+  @XmlAttribute
+  private int hexsidelength;
+
+  @XmlTransient
+  private StaggerAxis staggerAxis = StaggerAxis.UNDEFINED;
+
+  @XmlTransient
+  private StaggerIndex staggerIndex = StaggerIndex.UNDEFINED;
+
+  @XmlAttribute
+  private String staggeraxis;
+
+  @XmlAttribute
+  private String staggerindex;
 
   @XmlAttribute
   private String backgroundcolor;
@@ -119,7 +136,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     if (this.mapOrientation == MapOrientation.UNDEFINED) {
       this.mapOrientation = MapOrientation.valueOf(this.orientation.toUpperCase());
     }
-
     return this.mapOrientation;
   }
 
@@ -180,7 +196,27 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public Dimension getSizeInPixels() {
-    return new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
+    Dimension mapSizeInPixels = new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
+    switch (this.getOrientation()) {
+    case HEXAGONAL:
+      if (this.getStaggerAxis() == StaggerAxis.Y) {
+        mapSizeInPixels.setSize(mapSizeInPixels.width + this.getTileSize().width * 1 / 2, (this.getHeight() * this.getTileSize().height * 3 / 4) + this.getTileSize().height * 1 / 2);
+      } else if (this.getStaggerAxis() == StaggerAxis.X) {
+        mapSizeInPixels.setSize((this.getWidth() * this.getTileSize().width * 3 / 4) + this.getTileSize().width * 1 / 2 + 1, mapSizeInPixels.height + this.getTileSize().height * 1 / 2);
+      }
+      break;
+    case ISOMETRIC:
+      break;
+    case ORTHOGONAL:
+      break;
+    case SHIFTED:
+      break;
+    case STAGGERED:
+      break;
+    case UNDEFINED:
+      break;
+    }
+    return mapSizeInPixels;
   }
 
   @XmlTransient
@@ -300,6 +336,27 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.height;
   }
 
+  @Override
+  public int getHexSideLength() {
+    return this.hexsidelength;
+  }
+
+  @Override
+  public StaggerAxis getStaggerAxis() {
+    if (this.staggerAxis == StaggerAxis.UNDEFINED) {
+      this.staggerAxis = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
+    }
+    return this.staggerAxis;
+  }
+
+  @Override
+  public StaggerIndex getStaggerIndex() {
+    if (this.staggerIndex == StaggerIndex.UNDEFINED) {
+      this.staggerIndex = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
+    }
+    return this.staggerIndex;
+  }
+
   public void setPath(final String path) {
     this.path = path;
     if (this.rawImageLayers != null && !this.rawImageLayers.isEmpty()) {
@@ -386,6 +443,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
+  public void setHexSideLength(int hexSideLength) {
+    this.hexsidelength = hexSideLength;
+  }
+
+  @XmlTransient
+  public void setStaggerAxis(String staggerAxis) {
+    this.staggeraxis = staggerAxis;
+  }
+
+  @XmlTransient
+  public void setStaggerIndex(String staggerIndex) {
+    this.staggerindex = staggerIndex;
+  }
+
+  @XmlTransient
   public void setVersion(double version) {
     this.version = version;
   }
@@ -397,6 +469,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public int compareTo(Map o) {
+    if (this.name == null || o.name == null) {
+      System.err.println("A map file couldn't be processed due to the name attribute not being present!");
+    }
     return this.name.compareTo(o.name);
   }
 

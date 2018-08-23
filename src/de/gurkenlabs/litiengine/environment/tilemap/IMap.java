@@ -103,6 +103,27 @@ public interface IMap extends ICustomPropertyProvider {
   public Dimension getTileSize();
 
   /**
+   * Gets the straight edges' length for hexagonal maps.
+   *
+   * @return the hex side length
+   */
+  public int getHexSideLength();
+
+  /**
+   * Gets the staggering axis
+   *
+   * @return the tile size
+   */
+  public StaggerAxis getStaggerAxis();
+
+  /**
+   * Gets the tile size.
+   *
+   * @return the tile size
+   */
+  public StaggerIndex getStaggerIndex();
+
+  /**
    * Gets the version.
    *
    * @return the version
