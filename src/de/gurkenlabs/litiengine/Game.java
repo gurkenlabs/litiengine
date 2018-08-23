@@ -58,7 +58,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 public final class Game {
   public static final int EXIT_GAME_CLOSED = 0;
   public static final int EXIT_GAME_CRASHED = -1;
-  
+
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
@@ -76,7 +76,7 @@ public final class Game {
   private static final RenderEngine graphicsEngine;
   private static final SoundEngine soundEngine;
   private static final IPhysicsEngine physicsEngine;
-  
+
   private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
@@ -192,6 +192,16 @@ public final class Game {
     return gameLoop;
   }
 
+  /**
+   * Get a Map that was already loaded into memory by its name.
+   * It is important that maps always have a unique name because only the first match will be retrieved.
+   * 
+   * @param mapName
+   *          the name of the map you want to load
+   * 
+   * @return
+   *         null if no map with the provided name was found, otherwise the first found map.
+   */
   public static IMap getMap(final String mapName) {
     if (mapName == null || mapName.isEmpty() || maps.isEmpty()) {
       return null;
@@ -206,6 +216,12 @@ public final class Game {
     return null;
   }
 
+  /**
+   * Get a list of maps that are already loaded into memory.
+   * 
+   * @return
+   *         a list of all previously loaded maps
+   */
   public static List<IMap> getMaps() {
     return maps;
   }
@@ -251,30 +267,30 @@ public final class Game {
   }
 
   /***
-   * Initializes the infrastructure of the LITIengine game. 
+   * Initializes the infrastructure of the LITIengine game.
    * 
    * The following tasks are carried out by this method:
    * <ul>
-   *  <li>load the <code>GameConfiguration</code></li>
-   *  <li>handle the specified program parameters</li>
-   *  <li>configure the logging</li>
-   *  <li>set the programs <code>Locale</code> according to the configured values.</li>
-   *  <li>initialize and attach core components like the <code>PhysicsEngine</code></li>
-   *  <li>initialize the <code>ScreenManger</code></li>
-   *  <li>initialize the <code>Input</code></li>
-   *  <li>initialize the <code>GameLoop</code> and <code>RenderLoop</code></li>
-   *  <li>set a default camera</li>
-   * </ul> 
+   * <li>load the <code>GameConfiguration</code></li>
+   * <li>handle the specified program parameters</li>
+   * <li>configure the logging</li>
+   * <li>set the programs <code>Locale</code> according to the configured values.</li>
+   * <li>initialize and attach core components like the <code>PhysicsEngine</code></li>
+   * <li>initialize the <code>ScreenManger</code></li>
+   * <li>initialize the <code>Input</code></li>
+   * <li>initialize the <code>GameLoop</code> and <code>RenderLoop</code></li>
+   * <li>set a default camera</li>
+   * </ul>
    * 
    * @param args
    *          The arguments passed to the programs entry point.
    */
   public static void init(String... args) {
-    if(initialized) {
+    if (initialized) {
       log.log(Level.INFO, "The game has already been initialized.");
       return;
     }
-    
+
     handleCommandLineArguments(args);
 
     getConfiguration().load();
@@ -335,12 +351,18 @@ public final class Game {
 
       Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
     }
-    
+
     Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
-    
+
     initialized = true;
   }
 
+  /**
+   * Load Spritesheets, Tilesets and Maps from a game resource file created with the utiLITI editor.
+   * 
+   * @param gameResourceFile
+   *          the file name of the game resource file
+   */
   public static void load(final String gameResourceFile) {
     final GameData file = GameData.load(gameResourceFile);
     if (file == null) {
@@ -413,9 +435,9 @@ public final class Game {
 
   /***
    * <p>
-   * Starts the <code>GameLoops</code> and other components. 
-   * After this method is called, the engine will start to render contents of the current <code>Screen</code> of the <code>ScreenManager</code>, 
-   * the <code>SoundEngine</code> will start to playback <code>Sounds</code> 
+   * Starts the <code>GameLoops</code> and other components.
+   * After this method is called, the engine will start to render contents of the current <code>Screen</code> of the <code>ScreenManager</code>,
+   * the <code>SoundEngine</code> will start to playback <code>Sounds</code>
    * and the different input devices (e.g. <code>Mouse</code>, <code>Keyboard</code>) will start to process player input.
    * </p>
    * <p>
@@ -428,10 +450,10 @@ public final class Game {
    * @see GameListener#started()
    */
   public static void start() {
-    if(!initialized) {
+    if (!initialized) {
       throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
     }
-    
+
     gameLoop.start();
     Input.start();
 
@@ -467,7 +489,7 @@ public final class Game {
     for (final GameTerminatedListener listener : gameTerminatedListeners) {
       listener.terminated();
     }
-    
+
     hasStarted = false;
     initialized = false;
   }
