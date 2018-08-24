@@ -8,9 +8,7 @@
 
 ![LITIengine Logo](https://github.com/gurkenlabs/litiengine/blob/master/resources/LITIEngine_Logo_big.png "LITIengine Logo")
 
-LITIengine is the pure 2D free java game engine. Written in plain Java 8 it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
-
-> ## HEXAGONAL AND ISOMETRIC MAPS ARE CURRENTLY NOT SUPPORTED!
+LITIengine is the pure 2D free java game engine. Written in plain Java 8, it provides all the infrastructure to create a 2D tile based java game, be it a platformer or a top-down adventure.
 
 > ## Important Note
 
@@ -29,7 +27,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 1. [Setup the Game Project](https://litiengine.com/getting-started-setup-the-game-project/)
 2. [Learning the Basics](https://litiengine.com/getting-started-learning-the-basics)
 3. [Configuring the Game](https://litiengine.com/getting-started-configuring-the-game/)
-4. Loading a .tmx Map
+4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 5. Working with Entities
 
 ## Features
@@ -43,6 +41,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
   * ...
 * 2D Sound Engine (support for .wav, .mp3 and .ogg)
 * Support for Tile Maps in .tmx format (e.g. made with [Tiled Editor](http://www.mapeditor.org/))
+  * **Hexagonal and Isometric maps are not currently supported, but are in development**
 * Message Based Networking Framework
 * Player Input via Gamepad/Keyboard/Mouse
 * Entity Framework
@@ -78,6 +77,7 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 * Website [litiengine.com](https://litiengine.com)
 * Twitter [@gurkenlabs](https://twitter.com/gurkenlabs)
 * Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
+* YouTube [Gurkenlabs](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
 * Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
 * E-Mail info@gurkenlabs.de
 
