@@ -192,6 +192,16 @@ public class HexagonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
 
+    // read hex specific properties from the map. depending on the orientation of the hex grid, 
+    // we'll have to stagger along different axes. See the renderTileLayerImage() - method down below for more detailed comments.
+    // A good reading source on this task is http://www.quarkphysics.ca/scripsi/hexgrid/
+    final StaggerAxis staggerAxis = map.getStaggerAxis();
+    final StaggerIndex staggerIndex = map.getStaggerIndex();
+    final int s = map.getHexSideLength();
+    final double twoR = staggerAxis == StaggerAxis.X ? map.getTileSize().height : map.getTileSize().width;
+    final double r = twoR / 2d;
+    final double t = staggerAxis == StaggerAxis.X ? (map.getTileSize().width - s) / 2d : (map.getTileSize().height - s) / 2d;
+
     for (int x = 0; x <= layer.getSizeInTiles().width; x++) {
       for (int y = 0; y <= layer.getSizeInTiles().height; y++) {
         ITile tile = layer.getTile(x, y);
@@ -203,18 +213,16 @@ public class HexagonalMapRenderer implements IMapRenderer {
         // draw the tile on the layer image
         double widthStaggerFactor = 0;
         double heightStaggerFactor = 0;
-        if (map.getStaggerAxis() == StaggerAxis.X) {
-          widthStaggerFactor = 3 / 4d;
-          if (map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) {
-            heightStaggerFactor = 1 / 2d;
+        if (staggerAxis == StaggerAxis.X) {
+          if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
+            heightStaggerFactor = r;
           }
-          ImageRenderer.render(imageGraphics, tileTexture, x * map.getTileSize().width * widthStaggerFactor, map.getTileSize().height * heightStaggerFactor + y * map.getTileSize().height);
-        } else if (map.getStaggerAxis() == StaggerAxis.Y) {
-          heightStaggerFactor = 3 / 4d;
-          if (map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(y)) {
-            widthStaggerFactor = 1 / 2d;
+          ImageRenderer.render(imageGraphics, tileTexture, x * (t + s), heightStaggerFactor + y * twoR);
+        } else if (staggerAxis == StaggerAxis.Y) {
+          if (staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
+            widthStaggerFactor = r;
           }
-          ImageRenderer.render(imageGraphics, tileTexture, map.getTileSize().width * widthStaggerFactor + x * map.getTileSize().width, y * map.getTileSize().height * heightStaggerFactor);
+          ImageRenderer.render(imageGraphics, tileTexture, widthStaggerFactor + x * twoR, y * (t + s));
         }
       }
     }
@@ -252,6 +260,16 @@ public class HexagonalMapRenderer implements IMapRenderer {
     final double offsetX = viewportOffsetX + (startX - startTile.x) * map.getTileSize().width;
     final double offsetY = viewportOffsetY + (startY - startTile.y) * map.getTileSize().height;
 
+    // read hex specific properties from the map. depending on the orientation of the hex grid, 
+    // we'll have to stagger along different axes. A good reading source on this task is
+    // http://www.quarkphysics.ca/scripsi/hexgrid/
+    final StaggerAxis staggerAxis = map.getStaggerAxis();
+    final StaggerIndex staggerIndex = map.getStaggerIndex();
+    final int s = map.getHexSideLength();
+    final double twoR = staggerAxis == StaggerAxis.X ? map.getTileSize().height : map.getTileSize().width;
+    final double r = twoR / 2d;
+    final double t = staggerAxis == StaggerAxis.X ? (map.getTileSize().width - s) / 2d : (map.getTileSize().height - s) / 2d;
+
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
         ITile tile = layer.getTile(x, y);
@@ -261,19 +279,25 @@ public class HexagonalMapRenderer implements IMapRenderer {
 
         final Image tileTexture = getTileImage(map, tile);
         // draw the tile on the layer image
-        double widthStaggerFactor = 0, heightStaggerFactor = 0;
-        if (map.getStaggerAxis() == StaggerAxis.X) {
-          widthStaggerFactor = 3 / 4d;
-          if (map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) {
-            heightStaggerFactor = 1 / 2d;
+        double widthStaggerFactor = 0;
+        double heightStaggerFactor = 0;
+        //first we'll check if our hex grid is staggered horizontally
+        if (staggerAxis == StaggerAxis.X) {
+          //check if we need to stagger the current column
+          if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
+            //stagger the current column by a half tile height
+            heightStaggerFactor = r;
           }
-          ImageRenderer.render(g, tileTexture, offsetX + (x - startX) * map.getTileSize().width * widthStaggerFactor, offsetY + map.getTileSize().height * heightStaggerFactor + (y - startY) * map.getTileSize().height);
-        } else if (map.getStaggerAxis() == StaggerAxis.Y) {
-          heightStaggerFactor = 3 / 4d;
-          if (map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(y)) {
-            widthStaggerFactor = 1 / 2d;
+          ImageRenderer.render(g, tileTexture, offsetX + (x - startX) * (t + s), offsetY + heightStaggerFactor + (y - startY) * twoR);
+        }
+        //next case: our hex grid is staggered vertically
+        else if (staggerAxis == StaggerAxis.Y) {
+          //check if we need to stagger the current row
+          if (staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
+            //stagger the current row by a half tile width
+            widthStaggerFactor = r;
           }
-          ImageRenderer.render(g, tileTexture, offsetX + map.getTileSize().width * widthStaggerFactor + (x - startX) * map.getTileSize().width, offsetY + (y - startY) * map.getTileSize().height * heightStaggerFactor);
+          ImageRenderer.render(g, tileTexture, offsetX + widthStaggerFactor + (x - startX) * twoR, offsetY + (y - startY) * (t + s));
         }
 
       }
