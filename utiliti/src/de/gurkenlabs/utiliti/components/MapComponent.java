@@ -149,6 +149,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private Blueprint copiedBlueprint;
   private int gridWidth;
   private int gridHeight;
+  private Color gridColor;
+  private float gridStrokeFactor;
 
   private Color colorSelectionBorder;
   private float focusBorderBrightness = 0;
@@ -180,6 +182,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
     this.gridWidth = Program.getUserPreferences().getGridWidth();
     this.gridHeight = Program.getUserPreferences().getGridHeight();
+    this.gridStrokeFactor = Program.getUserPreferences().getGridLineWidth();
+    this.gridColor = ColorHelper.decode(Program.getUserPreferences().getGridColor());
   }
 
   public void onEditModeChanged(Consumer<Integer> cons) {
@@ -265,6 +269,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   public int getGridHeight() {
     return this.gridHeight;
+  }
+
+  public Color getGridColor() {
+    return this.gridColor;
+  }
+
+  public float getGridStrokeFactor() {
+    return this.gridStrokeFactor;
   }
 
   public IMapObject getFocusedMapObject() {
@@ -673,6 +685,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     Program.getUserPreferences().setGridHeight(gridHeight);
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
+  }
+
+  public void setGridStrokeFactor(float gridStrokeFactor) {
+    this.gridStrokeFactor = gridStrokeFactor;
+  }
+
+  public void setGridColor(Color gridColor) {
+    this.gridColor = gridColor;
   }
 
   public void updateTransformControls() {
@@ -1720,8 +1740,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     // render the grid
     if (Program.getUserPreferences().isShowGrid() && Game.getCamera().getRenderScale() >= 1) {
 
-      g.setColor(new Color(255, 255, 255, 100));
-      final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+      g.setColor(this.getGridColor());
+      final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.getCamera().getRenderScale());
 
       for (Shape[] tileColumn : Game.getEnvironment().getMap().getTileGrid()) {
         for (Shape tile : tileColumn) {

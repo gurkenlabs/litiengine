@@ -476,12 +476,14 @@ public class Program {
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
     renderCollision.addItemListener(e -> userPreferences.setRenderBoundingBoxes(renderCollision.getState()));
 
-    MenuItem setGrid = new MenuItem(Resources.get("menu_gridSize"));
+    MenuItem setGrid = new MenuItem(Resources.get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
-      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight());
+      GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight(), EditorScreen.instance().getMapComponent().getGridStrokeFactor(), EditorScreen.instance().getMapComponent().getGridColor());
       int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize().width, panel.getGridSize().height);
+        EditorScreen.instance().getMapComponent().setGridColor(panel.getGridColor());
+        EditorScreen.instance().getMapComponent().setGridStrokeFactor(panel.getStrokeWidth());
       }
     });
 
