@@ -25,14 +25,24 @@ public interface ILayer extends ICustomPropertyProvider {
   public float getOpacity();
 
   /**
-   * Gets the position.
+   * Gets both the X and the Y offset of the layer.
    *
-   * @return the position
+   * @return a {@link Point} representing the offset
    */
-  public Point getPosition();
+  public Point getOffset();
 
+  /**
+   * Gets the horizontal offset of the layer.
+   *
+   * @return the x offset
+   */
   public int getOffsetX();
 
+  /**
+   * Gets the vertical offset of the layer.
+   *
+   * @return the y offset
+   */
   public int getOffsetY();
 
   /**

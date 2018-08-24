@@ -82,6 +82,9 @@ public abstract class ColorLayer implements IRenderable {
     final IMap map = this.getEnvironment().getMap();
 
     final Rectangle2D tileSection = MapUtilities.getTileBoundingBox(map, section);
+    if (tileSection == null) {
+      return;
+    }
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
     final Graphics2D g = img.createGraphics();
 
@@ -99,7 +102,7 @@ public abstract class ColorLayer implements IRenderable {
     final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
 
-    final int endX = MathUtilities.clamp(endTile.x, 0,  Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
+    final int endX = MathUtilities.clamp(endTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
 
     for (int x = startX; x <= endX; x++) {
@@ -108,6 +111,9 @@ public abstract class ColorLayer implements IRenderable {
         final int subY = (y - startY) * map.getTileSize().height;
 
         final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileSize().width, map.getTileSize().height);
+        if (x < 0 || y < 0) {
+          continue;
+        }
         this.tiles[x][y] = smallImage;
       }
     }

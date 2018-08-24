@@ -1,52 +1,69 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
-import java.awt.Font;
-import java.text.NumberFormat;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.text.ParseException;
 
+import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
-import de.gurkenlabs.utiliti.Program;
+import de.gurkenlabs.litiengine.Resources;
 
 public class GridEditPanel extends JPanel {
-  private JFormattedTextField textField;
+  private JSpinner widthSpinner, heightSpinner;
 
-  public GridEditPanel(int rasterSize) {
+  public GridEditPanel(int gridWidth, int gridHeight) {
 
-    JLabel lblSize = new JLabel("size (px)");
-    lblSize.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(10f));
-
-    textField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-
-    textField.setText("16");
-    textField.setFont(Program.TEXT_FONT.deriveFont(10f));
-    textField.setColumns(10);
-    textField.setValue(rasterSize);
+    Box horizontalBox = Box.createHorizontalBox();
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblSize, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(textField, GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                .addGap(34)));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSize, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(46, Short.MAX_VALUE)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(horizontalBox, GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE).addContainerGap()));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(horizontalBox, GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE).addContainerGap()));
+
+    Component horizontalGlue0 = Box.createHorizontalGlue();
+    horizontalBox.add(horizontalGlue0);
+
+    JLabel lblWidth = new JLabel(Resources.get("menu_gridWidth"));
+    horizontalBox.add(lblWidth);
+
+    Component horizontalGlue1 = Box.createHorizontalGlue();
+    horizontalBox.add(horizontalGlue1);
+
+    this.widthSpinner = new JSpinner();
+    horizontalBox.add(this.widthSpinner);
+    this.widthSpinner.setModel(new SpinnerNumberModel(gridWidth, null, null, new Integer(1)));
+
+    Component horizontalGlue2 = Box.createHorizontalGlue();
+    horizontalBox.add(horizontalGlue2);
+
+    JLabel lblHeight = new JLabel(Resources.get("menu_gridHeight"));
+    horizontalBox.add(lblHeight);
+
+    Component horizontalGlue3 = Box.createHorizontalGlue();
+    horizontalBox.add(horizontalGlue3);
+
+    this.heightSpinner = new JSpinner();
+    horizontalBox.add(this.heightSpinner);
+    this.heightSpinner.setModel(new SpinnerNumberModel(gridHeight, null, null, new Integer(1)));
+
+    Component horizontalGlue4 = Box.createHorizontalGlue();
+    horizontalBox.add(horizontalGlue4);
+
     setLayout(groupLayout);
   }
 
-  public int getGridSize() {
-    return Integer.parseInt(this.textField.getText());
+  public Dimension getGridSize() {
+    try {
+      this.widthSpinner.commitEdit();
+      this.heightSpinner.commitEdit();
+    } catch (ParseException e) {
+      System.err.println("One of your edits in the grid size spinners could not be parsed as Integer.");
+      e.printStackTrace();
+    }
+    return new Dimension((Integer) this.widthSpinner.getValue(), (Integer) this.heightSpinner.getValue());
   }
 }

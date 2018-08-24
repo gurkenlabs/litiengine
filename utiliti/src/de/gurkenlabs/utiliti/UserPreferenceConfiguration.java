@@ -17,7 +17,8 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
-  private int gridSize;
+  private int gridWidth;
+  private int gridHeight;
   private int mainSplitter;
   private int selectionEditSplitter;
   private int mapPanelSplitter;
@@ -37,7 +38,8 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderBoundingBoxes = true;
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
-    this.gridSize = 16;
+    this.gridWidth = 16;
+    this.gridHeight = 16;
   }
 
   public void addOpenedFile(String str) {
@@ -129,12 +131,20 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.compressFile = compressFile;
   }
 
-  public int getGridSize() {
-    return gridSize;
+  public int getGridWidth() {
+    return this.gridWidth;
   }
 
-  public void setGridSize(int gridSize) {
-    this.gridSize = gridSize;
+  public int getGridHeight() {
+    return this.gridHeight;
+  }
+
+  public void setGridWidth(int gridwidth) {
+    this.gridWidth = gridwidth;
+  }
+
+  public void setGridHeight(int gridHeight) {
+    this.gridHeight = gridHeight;
   }
 
   public boolean isSyncMaps() {

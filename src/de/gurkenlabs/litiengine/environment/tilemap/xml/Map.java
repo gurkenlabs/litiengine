@@ -4,6 +4,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
@@ -73,10 +76,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int hexsidelength;
 
   @XmlTransient
-  private StaggerAxis staggerAxis = StaggerAxis.UNDEFINED;
+  private StaggerAxis staggerAxisEnum = StaggerAxis.UNDEFINED;
 
   @XmlTransient
-  private StaggerIndex staggerIndex = StaggerIndex.UNDEFINED;
+  private StaggerIndex staggerIndexEnum = StaggerIndex.UNDEFINED;
 
   @XmlAttribute
   private String staggeraxis;
@@ -246,6 +249,67 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
+  public int getTileWidth() {
+    return this.tilewidth;
+  }
+
+  @Override
+  public int getTileHeight() {
+    return this.tileheight;
+  }
+
+  @XmlTransient
+  public Shape[][] getTileGrid() {
+    Shape[][] grid = new Shape[this.getSizeInTiles().width][this.getSizeInTiles().height];
+    switch (this.getOrientation()) {
+    case HEXAGONAL:
+      for (int x = 0; x < this.getSizeInTiles().width; x++) {
+        for (int y = 0; y < this.getSizeInTiles().height; y++) {
+          final StaggerAxis staggerAxis = this.getStaggerAxis();
+          final StaggerIndex staggerIndex = this.getStaggerIndex();
+          final int s = this.getHexSideLength();
+          final int h = staggerAxis == StaggerAxis.X ? this.getTileHeight() : this.getTileWidth();
+          final int r = h / 2;
+          final int t = staggerAxis == StaggerAxis.X ? (this.getTileWidth() - s) / 2 : (this.getTileHeight() - s) / 2;
+          int widthStaggerFactor = 0;
+          int heightStaggerFactor = 0;
+          if (staggerAxis == StaggerAxis.X) {
+            if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
+              heightStaggerFactor = r;
+            }
+            grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * (t + s), heightStaggerFactor + y * h, staggerAxis, s, r, t);
+          }
+          if (staggerAxis == StaggerAxis.Y) {
+            if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
+              widthStaggerFactor = r;
+            }
+            grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * h, heightStaggerFactor + y * (t + s), staggerAxis, s, r, t);
+          }
+        }
+      }
+      break;
+    case ISOMETRIC:
+      break;
+    case ORTHOGONAL:
+      for (int x = 0; x < this.getSizeInTiles().width; x++) {
+        for (int y = 0; y < this.getSizeInTiles().height; y++) {
+          grid[x][y] = new Rectangle(x * this.getTileWidth(), y * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
+        }
+      }
+      break;
+    case SHIFTED:
+      break;
+    case STAGGERED:
+      break;
+    case UNDEFINED:
+      break;
+    default:
+      break;
+    }
+    return grid;
+  }
+
+  @Override
   public double getVersion() {
     return this.version;
   }
@@ -343,18 +407,18 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public StaggerAxis getStaggerAxis() {
-    if (this.staggerAxis == StaggerAxis.UNDEFINED) {
-      this.staggerAxis = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
+    if (this.staggerAxisEnum == StaggerAxis.UNDEFINED) {
+      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
     }
-    return this.staggerAxis;
+    return this.staggerAxisEnum;
   }
 
   @Override
   public StaggerIndex getStaggerIndex() {
-    if (this.staggerIndex == StaggerIndex.UNDEFINED) {
-      this.staggerIndex = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
+    if (this.staggerIndexEnum == StaggerIndex.UNDEFINED) {
+      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
     }
-    return this.staggerIndex;
+    return this.staggerIndexEnum;
   }
 
   public void setPath(final String path) {

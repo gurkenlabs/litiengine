@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
@@ -69,9 +70,9 @@ public interface IMap extends ICustomPropertyProvider {
   public void removeMapObject(int mapId);
 
   /**
-   * Gets the size in pixles.
+   * Gets the size in pixels.
    *
-   * @return the size in pixles
+   * @return the size in pixels
    */
   public Dimension getSizeInPixels();
 
@@ -96,11 +97,32 @@ public interface IMap extends ICustomPropertyProvider {
   public List<ITileLayer> getTileLayers();
 
   /**
+   * Gets the tile grid.
+   *
+   * @return a two-dimensional array of shapes that define the tile grid
+   */
+  public Shape[][] getTileGrid();
+
+  /**
    * Gets the tile size.
    *
    * @return the tile size
    */
   public Dimension getTileSize();
+
+  /**
+   * Gets the horizontal tile size.
+   *
+   * @return the horizontal tile size
+   */
+  public int getTileWidth();
+
+  /**
+   * Gets the vertical tile size.
+   *
+   * @return the vertical tile size
+   */
+  public int getTileHeight();
 
   /**
    * Gets the straight edges' length for hexagonal maps.
@@ -145,4 +167,5 @@ public interface IMap extends ICustomPropertyProvider {
   public int getNextObjectId();
 
   public Color getBackgroundColor();
+
 }

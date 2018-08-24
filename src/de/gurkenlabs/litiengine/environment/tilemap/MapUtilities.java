@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -81,7 +82,6 @@ public final class MapUtilities {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
       return new Rectangle2D.Double();
     }
-
     return getTileBoundingBox(Game.getEnvironment().getMap(), tile);
   }
 
@@ -89,23 +89,21 @@ public final class MapUtilities {
     if (map == null || tile == null) {
       return null;
     }
-    return new Rectangle2D.Double(tile.x * map.getTileSize().getWidth(), tile.y * map.getTileSize().getHeight(), map.getTileSize().getWidth(), map.getTileSize().getHeight());
+    return map.getTileGrid()[tile.x][tile.y].getBounds2D();
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
-    final Point start = getTile(map, box.getX(), box.getY());
-    final Point end = new Point((int) Math.ceil(box.getMaxX() / map.getTileSize().getWidth()), (int) Math.ceil(box.getMaxY() / map.getTileSize().getHeight()));
-    final double tileWidth = map.getTileSize().getWidth();
-    final double tileHeight = map.getTileSize().getHeight();
-
-    return new Rectangle2D.Double(start.x * tileWidth, start.y * map.getTileSize().getHeight(), end.x * tileWidth - start.x * tileWidth, end.y * tileHeight - start.y * tileHeight);
+    final Point tile = getTile(map, box.getX(), box.getY());
+    if (tile.x == -1 || tile.y == -1) {
+      return null;
+    }
+    return map.getTileGrid()[tile.x][tile.y].getBounds2D();
   }
 
   public static Point getTile(final Point2D mapLocation) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
-      return new Point();
+    if (Game.getEnvironment() == null) {
+      return new Point(-1, -1);
     }
-
     return getTile(Game.getEnvironment().getMap(), mapLocation);
   }
 
@@ -114,9 +112,23 @@ public final class MapUtilities {
   }
 
   public static Point getTile(final IMap map, final double x, final double y) {
+    if (map == null) {
+      return new Point(-1, -1);
+    }
     //TODO: implement different tile metrics for hex / iso maps
+    int colIndex = 0;
+    for (Shape[] tileCol : map.getTileGrid()) {
+      int tileIndex = 0;
+      for (Shape tile : tileCol) {
+        if (tile.contains(x, y)) {
+          return new Point(colIndex, tileIndex);
+        }
+        tileIndex++;
+      }
+      colIndex++;
+    }
 
-    return new Point((int) (x / map.getTileSize().getWidth()), (int) (y / map.getTileSize().getHeight()));
+    return new Point(-1, -1);
   }
 
   public static Point2D getMapLocation(final IMap map, final Point tileLocation) {

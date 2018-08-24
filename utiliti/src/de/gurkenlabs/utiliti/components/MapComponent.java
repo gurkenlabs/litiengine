@@ -5,12 +5,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -147,7 +147,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private float dragSizeWidth;
   private Rectangle2D newObjectArea;
   private Blueprint copiedBlueprint;
-  private int gridSize;
+  private int gridWidth;
+  private int gridHeight;
 
   private Color colorSelectionBorder;
   private float focusBorderBrightness = 0;
@@ -177,7 +178,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
-    this.gridSize = Program.getUserPreferences().getGridSize();
+    this.gridWidth = Program.getUserPreferences().getGridWidth();
+    this.gridHeight = Program.getUserPreferences().getGridHeight();
   }
 
   public void onEditModeChanged(Consumer<Integer> cons) {
@@ -257,8 +259,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     return this.maps;
   }
 
-  public int getGridSize() {
-    return this.gridSize;
+  public int getGridWidth() {
+    return this.gridWidth;
+  }
+
+  public int getGridHeight() {
+    return this.gridHeight;
   }
 
   public IMapObject getFocusedMapObject() {
@@ -662,9 +668,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
   }
 
-  public void setGridSize(int gridSize) {
-    Program.getUserPreferences().setGridSize(gridSize);
-    this.gridSize = gridSize;
+  public void setGridSize(int gridWidth, int gridHeight) {
+    Program.getUserPreferences().setGridWidth(gridWidth);
+    Program.getUserPreferences().setGridHeight(gridHeight);
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
   }
 
   public void updateTransformControls() {
@@ -1584,7 +1592,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private float snapX(double x) {
     if (Program.getUserPreferences().isSnapGrid()) {
-      double snapped = ((int) (x / this.gridSize) * this.gridSize);
+      double snapped = ((int) (x / this.getGridWidth()) * this.getGridWidth());
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
     }
 
@@ -1597,7 +1605,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private float snapY(double y) {
     if (Program.getUserPreferences().isSnapGrid()) {
-      int snapped = (int) (y / this.gridSize) * this.gridSize;
+      int snapped = (int) (y / this.getGridHeight()) * this.getGridHeight();
       return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
     }
 
@@ -1712,21 +1720,15 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     // render the grid
     if (Program.getUserPreferences().isShowGrid() && Game.getCamera().getRenderScale() >= 1) {
 
-      g.setColor(new Color(255, 255, 255, 70));
+      g.setColor(new Color(255, 255, 255, 100));
       final Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
-      final double viewPortX = Math.max(0, Game.getCamera().getViewPort().getX());
-      final double viewPortMaxX = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getWidth(), Game.getCamera().getViewPort().getMaxX());
 
-      final double viewPortY = Math.max(0, Game.getCamera().getViewPort().getY());
-      final double viewPortMaxY = Math.min(Game.getEnvironment().getMap().getSizeInPixels().getHeight(), Game.getCamera().getViewPort().getMaxY());
-      final int startX = Math.max(0, (int) (viewPortX / gridSize) * gridSize);
-      final int startY = Math.max(0, (int) (viewPortY / gridSize) * gridSize);
-      for (int x = startX; x <= viewPortMaxX; x += gridSize) {
-        Game.getRenderEngine().renderOutline(g, new Line2D.Double(x, viewPortY, x, viewPortMaxY), stroke);
-      }
-
-      for (int y = startY; y <= viewPortMaxY; y += gridSize) {
-        Game.getRenderEngine().renderOutline(g, new Line2D.Double(viewPortX, y, viewPortMaxX, y), stroke);
+      for (Shape[] tileColumn : Game.getEnvironment().getMap().getTileGrid()) {
+        for (Shape tile : tileColumn) {
+          if (Game.getCamera().getViewPort().intersects(tile.getBounds2D())) {
+            Game.getRenderEngine().renderOutline(g, tile, stroke);
+          }
+        }
       }
     }
   }

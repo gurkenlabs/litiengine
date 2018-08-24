@@ -4,8 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
-import java.awt.geom.Point2D;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -15,7 +14,6 @@ import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class HexagonalMapRenderer implements IMapRenderer {
   @Override
@@ -33,7 +31,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
         continue;
       }
 
-      ImageRenderer.render(g, this.getLayerImage(layer, map), layer.getPosition());
+      ImageRenderer.render(g, this.getLayerImage(layer, map, true), layer.getOffset());
     }
 
     g.dispose();
@@ -176,7 +174,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
    *          the map
    * @return the layer image
    */
-  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map) {
+  private synchronized BufferedImage getLayerImage(final ITileLayer layer, final IMap map, boolean includeAnimationTiles) {
     // if we have already retrived the image, use the one from the cache to
     // draw the layer
     final String cacheKey = getCacheKey(map) + "_" + layer.getName();
@@ -192,38 +190,16 @@ public class HexagonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
 
-    // read hex specific properties from the map. depending on the orientation of the hex grid, 
-    // we'll have to stagger along different axes. See the renderTileLayerImage() - method down below for more detailed comments.
-    // A good reading source on this task is http://www.quarkphysics.ca/scripsi/hexgrid/
-    final StaggerAxis staggerAxis = map.getStaggerAxis();
-    final StaggerIndex staggerIndex = map.getStaggerIndex();
-    final int s = map.getHexSideLength();
-    final double twoR = staggerAxis == StaggerAxis.X ? map.getTileSize().height : map.getTileSize().width;
-    final double r = twoR / 2d;
-    final double t = staggerAxis == StaggerAxis.X ? (map.getTileSize().width - s) / 2d : (map.getTileSize().height - s) / 2d;
-
-    for (int x = 0; x <= layer.getSizeInTiles().width; x++) {
-      for (int y = 0; y <= layer.getSizeInTiles().height; y++) {
+    for (int x = 0; x < layer.getSizeInTiles().width; x++) {
+      for (int y = 0; y < layer.getSizeInTiles().height; y++) {
         ITile tile = layer.getTile(x, y);
-        if (tile == null) {
+        Rectangle tileBounds = map.getTileGrid()[x][y].getBounds();
+        if (tile == null || (!includeAnimationTiles && MapUtilities.hasAnimation(map, tile))) {
           continue;
         }
 
         final Image tileTexture = getTileImage(map, tile);
-        // draw the tile on the layer image
-        double widthStaggerFactor = 0;
-        double heightStaggerFactor = 0;
-        if (staggerAxis == StaggerAxis.X) {
-          if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
-            heightStaggerFactor = r;
-          }
-          ImageRenderer.render(imageGraphics, tileTexture, x * (t + s), heightStaggerFactor + y * twoR);
-        } else if (staggerAxis == StaggerAxis.Y) {
-          if (staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
-            widthStaggerFactor = r;
-          }
-          ImageRenderer.render(imageGraphics, tileTexture, widthStaggerFactor + x * twoR, y * (t + s));
-        }
+        ImageRenderer.render(imageGraphics, tileTexture, tileBounds.x, tileBounds.getBounds().y);
       }
     }
 
@@ -243,63 +219,23 @@ public class HexagonalMapRenderer implements IMapRenderer {
    * @param viewport
    */
   private void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
-    final Point startTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getX(), viewport.getY()));
-    final Point endTile = MapUtilities.getTile(map, new Point2D.Double(viewport.getMaxX(), viewport.getMaxY()));
-    final double viewportOffsetX = -(viewport.getX() - startTile.x * map.getTileSize().width) + layer.getPosition().x;
-    final double viewportOffsetY = -(viewport.getY() - startTile.y * map.getTileSize().height) + layer.getPosition().y;
-
     // set alpha value of the tiles by the layers value
     final Composite oldComp = g.getComposite();
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
-    final int startX = MathUtilities.clamp(startTile.x, 0, layer.getSizeInTiles().width);
-    final int endX = MathUtilities.clamp(endTile.x, 0, layer.getSizeInTiles().width);
-    final int startY = MathUtilities.clamp(startTile.y, 0, layer.getSizeInTiles().height);
-    final int endY = MathUtilities.clamp(endTile.y, 0, layer.getSizeInTiles().height);
 
-    final double offsetX = viewportOffsetX + (startX - startTile.x) * map.getTileSize().width;
-    final double offsetY = viewportOffsetY + (startY - startTile.y) * map.getTileSize().height;
-
-    // read hex specific properties from the map. depending on the orientation of the hex grid, 
-    // we'll have to stagger along different axes. A good reading source on this task is
-    // http://www.quarkphysics.ca/scripsi/hexgrid/
-    final StaggerAxis staggerAxis = map.getStaggerAxis();
-    final StaggerIndex staggerIndex = map.getStaggerIndex();
-    final int s = map.getHexSideLength();
-    final double twoR = staggerAxis == StaggerAxis.X ? map.getTileSize().height : map.getTileSize().width;
-    final double r = twoR / 2d;
-    final double t = staggerAxis == StaggerAxis.X ? (map.getTileSize().width - s) / 2d : (map.getTileSize().height - s) / 2d;
-
-    for (int x = startX; x <= endX; x++) {
-      for (int y = startY; y <= endY; y++) {
+    for (int x = 0; x < map.getWidth(); x++) {
+      for (int y = 0; y < map.getHeight(); y++) {
         ITile tile = layer.getTile(x, y);
-        if (tile == null) {
+        Rectangle tileBounds = map.getTileGrid()[x][y].getBounds();
+        if (tile == null || !viewport.intersects(tileBounds)) {
           continue;
         }
-
         final Image tileTexture = getTileImage(map, tile);
-        // draw the tile on the layer image
-        double widthStaggerFactor = 0;
-        double heightStaggerFactor = 0;
-        //first we'll check if our hex grid is staggered horizontally
-        if (staggerAxis == StaggerAxis.X) {
-          //check if we need to stagger the current column
-          if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
-            //stagger the current column by a half tile height
-            heightStaggerFactor = r;
-          }
-          ImageRenderer.render(g, tileTexture, offsetX + (x - startX) * (t + s), offsetY + heightStaggerFactor + (y - startY) * twoR);
-        }
-        //next case: our hex grid is staggered vertically
-        else if (staggerAxis == StaggerAxis.Y) {
-          //check if we need to stagger the current row
-          if (staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
-            //stagger the current row by a half tile width
-            widthStaggerFactor = r;
-          }
-          ImageRenderer.render(g, tileTexture, offsetX + widthStaggerFactor + (x - startX) * twoR, offsetY + (y - startY) * (t + s));
-        }
+        final double offsetX = -(viewport.getX()) + layer.getOffset().x;
+        final double offsetY = -(viewport.getY()) + layer.getOffset().y;
 
+        ImageRenderer.render(g, tileTexture, offsetX + tileBounds.x, offsetY + tileBounds.y);
       }
     }
 
@@ -316,8 +252,8 @@ public class HexagonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     g.setComposite(ac);
 
-    final double viewportOffsetX = -viewport.getX() + layer.getPosition().x;
-    final double viewportOffsetY = -viewport.getY() + layer.getPosition().y;
+    final double viewportOffsetX = -viewport.getX() + layer.getOffset().x;
+    final double viewportOffsetY = -viewport.getY() + layer.getOffset().y;
 
     ImageRenderer.render(g, sprite.getImage(), viewportOffsetX, viewportOffsetY);
     g.setComposite(oldComp);
