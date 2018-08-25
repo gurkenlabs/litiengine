@@ -202,11 +202,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     Dimension mapSizeInPixels = new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
     switch (this.getOrientation()) {
     case HEXAGONAL:
-      if (this.getStaggerAxis() == StaggerAxis.Y) {
-        mapSizeInPixels.setSize(mapSizeInPixels.width + this.getTileSize().width * 1 / 2, (this.getHeight() * this.getTileSize().height * 3 / 4) + this.getTileSize().height * 1 / 2);
-      } else if (this.getStaggerAxis() == StaggerAxis.X) {
-        mapSizeInPixels.setSize((this.getWidth() * this.getTileSize().width * 3 / 4) + this.getTileSize().width * 1 / 2 + 1, mapSizeInPixels.height + this.getTileSize().height * 1 / 2);
-      }
+      int maxX = (int) Math.max(this.getTileGrid()[this.getWidth() - 1][0].getBounds2D().getMaxX(), this.getTileGrid()[this.getWidth() - 1][1].getBounds2D().getMaxX());
+      int maxY = (int) Math.max(this.getTileGrid()[0][this.getHeight() - 1].getBounds2D().getMaxY(), this.getTileGrid()[1][this.getHeight() - 1].getBounds2D().getMaxY());
+      mapSizeInPixels.setSize(maxX, maxY);
       break;
     case ISOMETRIC:
       break;
