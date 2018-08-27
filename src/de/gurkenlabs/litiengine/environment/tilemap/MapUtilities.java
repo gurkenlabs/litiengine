@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Point;
-import java.awt.Shape;
+import java.awt.Polygon;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public final class MapUtilities {
   private static final Map<String, ITileAnimation> animations;
@@ -93,11 +94,16 @@ public final class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
-    final Point tile = getTile(map, box.getX(), box.getY());
-    if (tile.x == -1 || tile.y == -1) {
-      return null;
-    }
-    return map.getTileGrid()[tile.x][tile.y].getBounds2D();
+    final int minX = (int) MathUtilities.clamp(box.getX(), 0, map.getSizeInPixels().width - 1);
+    final int minY = (int) MathUtilities.clamp(box.getY(), 0, map.getSizeInPixels().height - 1);
+    final int maxX = (int) MathUtilities.clamp(box.getMaxX(), 0, map.getSizeInPixels().width - 1);
+    final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().height - 1);
+    final Point minTilePoint = getTile(map, minX, minY);
+    final Point maxTilePoint = getTile(map, maxX, maxY);
+    final Rectangle2D minTileBounds = map.getTileGrid()[minTilePoint.x][minTilePoint.y].getBounds2D();
+    final Rectangle2D maxTileBounds = map.getTileGrid()[maxTilePoint.x][maxTilePoint.y].getBounds2D();
+
+    return new Rectangle2D.Double(minTileBounds.getX(), minTileBounds.getY(), maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
   }
 
   public static Point getTile(final Point2D mapLocation) {
@@ -112,23 +118,46 @@ public final class MapUtilities {
   }
 
   public static Point getTile(final IMap map, final double x, final double y) {
-    if (map == null) {
-      return new Point(-1, -1);
-    }
-    //TODO: implement different tile metrics for hex / iso maps
-    int colIndex = 0;
-    for (Shape[] tileCol : map.getTileGrid()) {
-      int tileIndex = 0;
-      for (Shape tile : tileCol) {
-        if (tile.contains(x, y)) {
-          return new Point(colIndex, tileIndex);
+    //standard behaviour for rectangular Tiles: search on a grid with the tile dimensions
+    int jumpWidth = map.getTileWidth();
+    int jumpHeight = map.getTileHeight();
+    //if we're less than 1 tile left or up the map, get -1 instead of 0 as tile coordinate.
+    int xCoord = x < 0 && -x < jumpWidth ? -1 : (int) (x / jumpWidth);
+    int yCoord = y < 0 && -y < jumpHeight ? -1 : (int) (y / jumpHeight);
+
+    //for staggered maps, we must adjust our jump size for cropping the subImages since tiles are not aligned orthogonally.
+    if (map.getOrientation() == MapOrientation.HEXAGONAL) {
+      //the t parameter describes the distance between one end of the flat hex side to the bounding box.
+      int s = map.getHexSideLength();
+      int t = map.getStaggerAxis() == StaggerAxis.X ? (map.getTileWidth() - s) / 2 : (map.getTileHeight() - s) / 2;
+      //STOP READING HERE, ARE YOU NUTS??
+      //Since we require to get Tiles outside of the map as well, we need to construct an infinite hex grid on which we can determine
+      //tile indices. This follows the hex grid click detection from http://www.quarkphysics.ca/scripsi/hexgrid/ 
+      //There's a lot of case discriminations, which makes the code very ugly. 
+      //Feel free to refactor this. 
+      if (map.getStaggerAxis() == StaggerAxis.X) {
+        jumpWidth = t + s;
+        jumpHeight = map.getTileHeight();
+        xCoord = x < 0 && -x < jumpWidth ? -1 : (int) (x / jumpWidth);
+        yCoord = y < 0 && -y < jumpHeight ? -1 : (int) (y / jumpHeight);
+        if ((map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(xCoord)) || (map.getStaggerIndex() == StaggerIndex.EVEN && !MathUtilities.isOddNumber(xCoord))) {
+          yCoord = (int) ((y - jumpHeight / 2) / jumpHeight);
+          yCoord = y < jumpHeight / 2 && -y < jumpHeight ? yCoord - 1 : yCoord;
         }
-        tileIndex++;
+
+      } else if (map.getStaggerAxis() == StaggerAxis.Y) {
+        jumpWidth = map.getTileWidth();
+        jumpHeight = t + s;
+        xCoord = x < 0 && -x < jumpWidth ? -1 : (int) (x / jumpWidth);
+        yCoord = y < 0 && -y < jumpHeight ? -1 : (int) (y / jumpHeight);
+        if ((map.getStaggerIndex() == StaggerIndex.ODD && MathUtilities.isOddNumber(yCoord)) || (map.getStaggerIndex() == StaggerIndex.EVEN && !MathUtilities.isOddNumber(yCoord))) {
+          xCoord = (int) ((x - jumpWidth / 2) / jumpWidth);
+          xCoord = x < jumpWidth / 2 && -x < jumpWidth ? xCoord - 1 : xCoord;
+        }
       }
-      colIndex++;
     }
 
-    return new Point(-1, -1);
+    return new Point(xCoord, yCoord);
   }
 
   public static Point2D getMapLocation(final IMap map, final Point tileLocation) {

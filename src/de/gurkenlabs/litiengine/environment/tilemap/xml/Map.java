@@ -81,6 +81,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlTransient
   private StaggerIndex staggerIndexEnum = StaggerIndex.UNDEFINED;
 
+
   @XmlAttribute
   private String staggeraxis;
 

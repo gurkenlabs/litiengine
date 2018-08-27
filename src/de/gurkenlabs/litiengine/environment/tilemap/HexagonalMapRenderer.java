@@ -199,7 +199,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
         }
 
         final Image tileTexture = getTileImage(map, tile);
-        ImageRenderer.render(imageGraphics, tileTexture, tileBounds.x, tileBounds.getBounds().y);
+        ImageRenderer.render(imageGraphics, tileTexture, tileBounds.x, tileBounds.y);
       }
     }
 

@@ -46,7 +46,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.gridWidth = 16;
     this.gridHeight = 16;
     this.gridLineWidth = 1.0f;
-    this.gridColor = ColorHelper.encode(Color.WHITE);
+    this.gridColor = ColorHelper.encode(new Color(255, 255, 255, 65));
   }
 
   public void addOpenedFile(String str) {

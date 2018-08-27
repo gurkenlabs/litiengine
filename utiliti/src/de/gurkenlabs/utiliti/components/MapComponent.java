@@ -688,10 +688,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void setGridStrokeFactor(float gridStrokeFactor) {
+    Program.getUserPreferences().setGridLineWidth(gridStrokeFactor);
     this.gridStrokeFactor = gridStrokeFactor;
   }
 
   public void setGridColor(Color gridColor) {
+    Program.getUserPreferences().setGridColor(ColorHelper.encode(gridColor));
     this.gridColor = gridColor;
   }
 
