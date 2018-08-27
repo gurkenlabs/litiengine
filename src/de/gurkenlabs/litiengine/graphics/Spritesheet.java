@@ -31,7 +31,7 @@ public final class Spritesheet {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
-  private final List<Integer> emptySprites;
+  private final List<Integer> emptySprites = new CopyOnWriteArrayList<>();
 
   private final int hashCode;
   private final BufferedImage image;
@@ -47,7 +47,10 @@ public final class Spritesheet {
   private boolean loaded;
 
   private Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
-    this.emptySprites = new CopyOnWriteArrayList<>();
+    checkImage(image, path);
+    checkDimension(spriteHeight, "height");
+    checkDimension(spriteWidth, "width");
+
     this.image = image;
 
     this.name = FileUtilities.getFileName(path);
@@ -365,11 +368,15 @@ public final class Spritesheet {
   }
 
   public void setSpriteHeight(final int spriteHeight) {
+    checkDimension(spriteHeight, "height");
+
     this.spriteHeight = spriteHeight;
     this.updateRowsAndCols();
   }
 
   public void setSpriteWidth(final int spriteWidth) {
+    checkDimension(spriteWidth, "width");
+
     this.spriteWidth = spriteWidth;
     this.updateRowsAndCols();
   }
@@ -400,6 +407,23 @@ public final class Spritesheet {
     }
   }
 
+  private static void checkDimension(int spriteHeight, String dimension) {
+    if (spriteHeight <= 0) {
+      throw new IllegalArgumentException("Invalid sprite dimensions! Sprite " + dimension + " must to be greater than 0.");
+    }
+  }
+
+  private static void checkImage(BufferedImage image, String name) {
+    if (image == null) {
+      throw new IllegalArgumentException("The image for the spritesheet '" + name + "' is null!");
+    }
+
+    if (image.getWidth() <= 0 || image.getHeight() <= 0) {
+      String error = String.format("Invalid image dimensions for spritesheet %s! Width and height must be greater than 0 (actual dimensions: %dx%d).", name, image.getWidth(), image.getHeight());
+      throw new IllegalArgumentException(error);
+    }
+  }
+
   private Point getLocation(final int index) {
     final int row = index / this.getColumns();
     final int column = index % this.getColumns();
@@ -409,21 +433,7 @@ public final class Spritesheet {
 
   private void updateRowsAndCols() {
     final BufferedImage sprite = this.getImage();
-    if (sprite != null && sprite.getWidth() != 0 && sprite.getHeight() != 0 && this.spriteWidth != 0 && this.spriteHeight != 0) {
-      this.columns = sprite.getWidth() / this.spriteWidth;
-      this.rows = sprite.getHeight() / this.spriteHeight;
-    } else {
-      this.columns = 0;
-      this.rows = 0;
-    }
-
-    if (this.columns == 0 || this.rows == 0) {
-      String error = String.format("The spritesheet %s doesn't provide the correct dimensions. Provided dimensions: (%dx%d).", this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
-      if (sprite != null) {
-        error += ", Spritesheet(" + sprite.getWidth() + "/" + sprite.getHeight() + ")";
-      }
-
-      throw new IllegalArgumentException(error);
-    }
+    this.columns = sprite.getWidth() / this.spriteWidth;
+    this.rows = sprite.getHeight() / this.spriteHeight;
   }
 }
