@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 @XmlRootElement(name = "sprite")
-public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo> {
+public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo> {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
@@ -32,29 +32,29 @@ public class SpriteSheetInfo implements Serializable, Comparable<SpriteSheetInfo
   @XmlElement(required = false)
   private String keyframes;
 
-  public SpriteSheetInfo() {
+  public SpritesheetInfo() {
     // keep empty constructor for serialization
   }
 
-  public SpriteSheetInfo(final Spritesheet sprite) {
+  public SpritesheetInfo(final Spritesheet sprite) {
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage(), sprite.getImageFormat()));
     this.setKeyframes(Spritesheet.getCustomKeyFrameDurations(sprite));
   }
 
-  public SpriteSheetInfo(final BufferedImage image, String name, final int width, final int height) {
+  public SpritesheetInfo(final BufferedImage image, String name, final int width, final int height) {
     this(width, height, name);
     this.setImage(ImageProcessing.encodeToString(image));
   }
 
-  private SpriteSheetInfo(int width, int height, String name) {
+  private SpritesheetInfo(int width, int height, String name) {
     this.setWidth(width);
     this.setHeight(height);
     this.setName(name);
   }
 
   @Override
-  public int compareTo(SpriteSheetInfo obj) {
+  public int compareTo(SpritesheetInfo obj) {
     if (obj == null) {
       return 1;
     }

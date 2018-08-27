@@ -25,7 +25,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -328,16 +328,16 @@ public class EditorScreen extends Screen {
   }
 
   public void importSpriteFile() {
-    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, "Import " + SPRITE_FILE_NAME, false, SpriteSheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, "Import " + SPRITE_FILE_NAME, false, SpritesheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
       }
 
       List<Spritesheet> loaded = Spritesheet.load(spriteFile.toString());
-      List<SpriteSheetInfo> infos = new ArrayList<>();
+      List<SpritesheetInfo> infos = new ArrayList<>();
       for (Spritesheet sprite : loaded) {
-        SpriteSheetInfo info = new SpriteSheetInfo(sprite);
+        SpritesheetInfo info = new SpritesheetInfo(sprite);
         infos.add(info);
         this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
         this.getGameFile().getSpriteSheets().add(info);
@@ -362,8 +362,8 @@ public class EditorScreen extends Screen {
 
     // TODO: somehow improve this to allow keeping the animation frames and only
     // update the image
-    Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
-    for (SpriteSheetInfo info : sprites) {
+    Collection<SpritesheetInfo> sprites = spritePanel.getSpriteSheets();
+    for (SpritesheetInfo info : sprites) {
       this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
       this.getGameFile().getSpriteSheets().add(info);
       log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
@@ -442,7 +442,7 @@ public class EditorScreen extends Screen {
     return this.loading;
   }
 
-  public void loadSpriteSheets(Collection<SpriteSheetInfo> infos, boolean forceAssetTreeUpdate) {
+  public void loadSpriteSheets(Collection<SpritesheetInfo> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
       if (Spritesheet.find(info.getName()) != null) {
         Spritesheet.update(info);
@@ -592,7 +592,7 @@ public class EditorScreen extends Screen {
   }
 
   private void loadSpriteSheets(Map map) {
-    List<SpriteSheetInfo> infos = new ArrayList<>();
+    List<SpritesheetInfo> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {
       if (tileSet.getImage() == null || Spritesheet.find(tileSet.getName()) != null) {
@@ -607,7 +607,7 @@ public class EditorScreen extends Screen {
         }
       }
 
-      infos.add(new SpriteSheetInfo(sprite));
+      infos.add(new SpritesheetInfo(sprite));
       cnt++;
     }
 
@@ -625,7 +625,7 @@ public class EditorScreen extends Screen {
         }
       }
 
-      SpriteSheetInfo info = new SpriteSheetInfo(sprite);
+      SpritesheetInfo info = new SpritesheetInfo(sprite);
       infos.add(info);
       this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
       this.getGameFile().getSpriteSheets().add(info);
@@ -633,7 +633,7 @@ public class EditorScreen extends Screen {
     }
 
     this.loadSpriteSheets(infos, false);
-    for (SpriteSheetInfo info : infos) {
+    for (SpritesheetInfo info : infos) {
       if (!this.getGameFile().getSpriteSheets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
         this.getGameFile().getSpriteSheets().add(info);
       }

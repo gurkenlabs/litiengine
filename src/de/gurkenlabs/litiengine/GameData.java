@@ -51,7 +51,7 @@ public class GameData implements Serializable {
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
-  private List<SpriteSheetInfo> spriteSheets;
+  private List<SpritesheetInfo> spriteSheets;
 
   @XmlElementWrapper(name = "tilesets")
   @XmlElement(name = "tileset")
@@ -102,7 +102,7 @@ public class GameData implements Serializable {
   }
 
   @XmlTransient
-  public List<SpriteSheetInfo> getSpriteSheets() {
+  public List<SpritesheetInfo> getSpriteSheets() {
     return this.spriteSheets;
   }
 
@@ -184,8 +184,8 @@ public class GameData implements Serializable {
   }
 
   void beforeMarshal(Marshaller m) {
-    List<SpriteSheetInfo> distinctList = new ArrayList<>();
-    for (SpriteSheetInfo sprite : this.getSpriteSheets()) {
+    List<SpritesheetInfo> distinctList = new ArrayList<>();
+    for (SpritesheetInfo sprite : this.getSpriteSheets()) {
       if (distinctList.stream().anyMatch(x -> x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
         continue;
       }

@@ -36,7 +36,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -101,7 +101,7 @@ public class AssetPanelItem extends JPanel {
         // TODO: We might need to provide multiple JPanels that contain the
         // buttons for
         // a certain usage and swap them out
-        if (getOrigin() instanceof SpriteSheetInfo || getOrigin() instanceof EmitterData) {
+        if (getOrigin() instanceof SpritesheetInfo || getOrigin() instanceof EmitterData) {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
@@ -197,19 +197,19 @@ public class AssetPanelItem extends JPanel {
     btnEdit = new JButton("");
     btnEdit.setToolTipText("Edit Asset");
     btnEdit.addActionListener(e -> {
-      if (!(this.getOrigin() instanceof SpriteSheetInfo)) {
+      if (!(this.getOrigin() instanceof SpritesheetInfo)) {
         return;
       }
-      SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpriteSheetInfo) this.getOrigin());
+      SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetInfo) this.getOrigin());
       int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
         return;
       }
 
-      final Collection<SpriteSheetInfo> sprites = spritePanel.getSpriteSheets();
-      for (SpriteSheetInfo spriteFile : sprites) {
+      final Collection<SpritesheetInfo> sprites = spritePanel.getSpriteSheets();
+      for (SpritesheetInfo spriteFile : sprites) {
         int index = -1;
-        Optional<SpriteSheetInfo> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
+        Optional<SpritesheetInfo> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
         if (old.isPresent()) {
           index = EditorScreen.instance().getGameFile().getSpriteSheets().indexOf(old.get());
           EditorScreen.instance().getGameFile().getSpriteSheets().remove(index);
@@ -273,8 +273,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void deleteAsset() {
-    if (getOrigin() instanceof SpriteSheetInfo) {
-      SpriteSheetInfo info = (SpriteSheetInfo) getOrigin();
+    if (getOrigin() instanceof SpritesheetInfo) {
+      SpritesheetInfo info = (SpritesheetInfo) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
@@ -307,8 +307,8 @@ public class AssetPanelItem extends JPanel {
 
   private boolean addEntity() {
     // TODO: experimental code... this needs to be refactored with issue #66
-    if (this.getOrigin() instanceof SpriteSheetInfo) {
-      SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
+    if (this.getOrigin() instanceof SpritesheetInfo) {
+      SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
       String propName = PropPanel.getNameBySpriteName(info.getName());
       if (propName == null) {
         return false;
@@ -366,7 +366,7 @@ public class AssetPanelItem extends JPanel {
     if (this.getOrigin() instanceof Tileset) {
       this.exportTileset();
       return;
-    } else if (this.getOrigin() instanceof SpriteSheetInfo) {
+    } else if (this.getOrigin() instanceof SpritesheetInfo) {
       this.exportSpritesheet();
       return;
     } else if (this.getOrigin() instanceof EmitterData) {
@@ -379,8 +379,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void exportSpritesheet() {
-    if (this.getOrigin() instanceof SpriteSheetInfo) {
-      SpriteSheetInfo spriteSheetInfo = (SpriteSheetInfo) this.getOrigin();
+    if (this.getOrigin() instanceof SpritesheetInfo) {
+      SpritesheetInfo spriteSheetInfo = (SpritesheetInfo) this.getOrigin();
 
       Spritesheet sprite = Spritesheet.find(spriteSheetInfo.getName());
       if (sprite == null) {
@@ -447,8 +447,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean canAdd() {
-    if (this.getOrigin() != null && this.getOrigin() instanceof SpriteSheetInfo) {
-      SpriteSheetInfo info = (SpriteSheetInfo) this.getOrigin();
+    if (this.getOrigin() != null && this.getOrigin() instanceof SpritesheetInfo) {
+      SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
       String propName = PropPanel.getNameBySpriteName(info.getName());
       return propName != null && !propName.isEmpty();
     }

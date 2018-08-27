@@ -33,7 +33,7 @@ import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -172,7 +172,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxSpriteType.addItem(Resources.get("panel_animation"));
     this.comboBoxSpriteType.addItem(Resources.get("panel_spritesheet"));
     this.comboBoxSpriteType.setSelectedIndex(0);
-    for (SpriteSheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
+    for (SpritesheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
       this.comboBoxSprite.addItem(s.getName());
     }
     

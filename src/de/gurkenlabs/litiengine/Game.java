@@ -394,7 +394,7 @@ public final class Game {
     log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (final SpriteSheetInfo tileset : file.getSpriteSheets()) {
+    for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
       final Spritesheet sprite = Spritesheet.load(tileset);
       loadedSprites.add(sprite);
     }

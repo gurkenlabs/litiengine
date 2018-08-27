@@ -40,7 +40,7 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -755,7 +755,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
-        this.screen.getGameFile().getSpriteSheets().add(new SpriteSheetInfo(sprite));
+        this.screen.getGameFile().getSpriteSheets().add(new SpritesheetInfo(sprite));
       }
 
       // remove old spritesheets
@@ -788,7 +788,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     Spritesheet newSprite = Spritesheet.load(tileset);
-    SpriteSheetInfo info = new SpriteSheetInfo(newSprite);
+    SpritesheetInfo info = new SpritesheetInfo(newSprite);
     EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
     EditorScreen.instance().getGameFile().getSpriteSheets().add(info);
     EditorScreen.instance().loadSpriteSheets(Arrays.asList(info), true);

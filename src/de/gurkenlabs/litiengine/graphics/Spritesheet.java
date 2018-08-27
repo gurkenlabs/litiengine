@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -138,7 +138,7 @@ public final class Spritesheet {
     return new Spritesheet(tileset);
   }
 
-  public static Spritesheet load(final SpriteSheetInfo info) {
+  public static Spritesheet load(final SpritesheetInfo info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
       log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
@@ -216,7 +216,7 @@ public final class Spritesheet {
     return spriteToRemove;
   }
 
-  public static void update(final SpriteSheetInfo info) {
+  public static void update(final SpritesheetInfo info) {
     if (info == null || info.getName() == null) {
       return;
     }

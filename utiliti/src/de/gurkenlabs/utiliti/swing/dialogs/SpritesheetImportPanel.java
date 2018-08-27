@@ -30,7 +30,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.SpriteSheetInfo;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -63,10 +63,10 @@ public class SpritesheetImportPanel extends JPanel {
     }
   }
 
-  public SpritesheetImportPanel(SpriteSheetInfo... infos) {
+  public SpritesheetImportPanel(SpritesheetInfo... infos) {
     this();
     fileListModel = new DefaultListModel<>();
-    for (SpriteSheetInfo info : infos) {
+    for (SpritesheetInfo info : infos) {
       fileListModel.addElement(new SpriteFileWrapper(info));
     }
 
@@ -241,8 +241,8 @@ public class SpritesheetImportPanel extends JPanel {
     panel.setLayout(glPanel);
   }
 
-  public Collection<SpriteSheetInfo> getSpriteSheets() {
-    ArrayList<SpriteSheetInfo> infos = new ArrayList<>();
+  public Collection<SpritesheetInfo> getSpriteSheets() {
+    ArrayList<SpritesheetInfo> infos = new ArrayList<>();
 
     for (int i = 0; i < this.fileList.getModel().getSize(); i++) {
       SpriteFileWrapper wrap = this.fileListModel.getElementAt(i);
@@ -289,7 +289,7 @@ public class SpritesheetImportPanel extends JPanel {
       this.updateSprite();
     }
 
-    public SpriteFileWrapper(SpriteSheetInfo info) {
+    public SpriteFileWrapper(SpritesheetInfo info) {
       this(ImageProcessing.decodeToImage(info.getImage()), info.getName());
       this.spriteWidth = info.getWidth();
       this.spriteHeight = info.getHeight();
@@ -387,8 +387,8 @@ public class SpritesheetImportPanel extends JPanel {
       this.icon = new ImageIcon(img);
     }
 
-    public SpriteSheetInfo createSpritesheetInfo() {
-      SpriteSheetInfo info = new SpriteSheetInfo(this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
+    public SpritesheetInfo createSpritesheetInfo() {
+      SpritesheetInfo info = new SpritesheetInfo(this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
 
       boolean nonDefaultFrames = false;
       for (int i = 0; i < this.getKeyFrames().length; i++) {
