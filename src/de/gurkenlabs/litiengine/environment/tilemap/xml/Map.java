@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
@@ -34,7 +35,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
@@ -202,8 +202,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     Dimension mapSizeInPixels = new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
     switch (this.getOrientation()) {
     case HEXAGONAL:
-      int maxX = (int) Math.max(this.getTileGrid()[this.getWidth() - 1][0].getBounds2D().getMaxX(), this.getTileGrid()[this.getWidth() - 1][1].getBounds2D().getMaxX());
-      int maxY = (int) Math.max(this.getTileGrid()[0][this.getHeight() - 1].getBounds2D().getMaxY(), this.getTileGrid()[1][this.getHeight() - 1].getBounds2D().getMaxY());
+      int maxX = (int) Math.max(this.getTileShape(this.getWidth() - 1, 0).getBounds2D().getMaxX(), this.getTileShape(this.getWidth() - 1, 1).getBounds2D().getMaxX());
+      int maxY = (int) Math.max(this.getTileShape(0, this.getHeight() - 1).getBounds2D().getMaxY(), this.getTileShape(1, this.getHeight() - 1).getBounds2D().getMaxY());
       mapSizeInPixels.setSize(maxX, maxY);
       break;
     case ISOMETRIC:
@@ -256,55 +256,33 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.tileheight;
   }
 
-  @XmlTransient
-  public Shape[][] getTileGrid() {
-    Shape[][] grid = new Shape[this.getSizeInTiles().width][this.getSizeInTiles().height];
+  public Shape getTileShape(int tileX, int tileY) {
     switch (this.getOrientation()) {
     case HEXAGONAL:
-      for (int x = 0; x < this.getSizeInTiles().width; x++) {
-        for (int y = 0; y < this.getSizeInTiles().height; y++) {
-          final StaggerAxis staggerAxis = this.getStaggerAxis();
-          final StaggerIndex staggerIndex = this.getStaggerIndex();
-          final int s = this.getHexSideLength();
-          final int h = staggerAxis == StaggerAxis.X ? this.getTileHeight() : this.getTileWidth();
-          final int r = h / 2;
-          final int t = staggerAxis == StaggerAxis.X ? (this.getTileWidth() - s) / 2 : (this.getTileHeight() - s) / 2;
-          int widthStaggerFactor = 0;
-          int heightStaggerFactor = 0;
-          if (staggerAxis == StaggerAxis.X) {
-            if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, x)) {
-              heightStaggerFactor = r;
-            }
-            grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * (t + s), heightStaggerFactor + y * h, staggerAxis, s, r, t);
-          }
-          if (staggerAxis == StaggerAxis.Y) {
-            if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, y)) {
-              widthStaggerFactor = r;
-            }
-            grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * h, heightStaggerFactor + y * (t + s), staggerAxis, s, r, t);
-          }
+      final StaggerAxis staggerAxis = this.getStaggerAxis();
+      final StaggerIndex staggerIndex = this.getStaggerIndex();
+      final int s = this.getHexSideLength();
+      final int h = staggerAxis == StaggerAxis.X ? this.getTileHeight() : this.getTileWidth();
+      final int r = h / 2;
+      final int t = staggerAxis == StaggerAxis.X ? (this.getTileWidth() - s) / 2 : (this.getTileHeight() - s) / 2;
+      Polygon hex = new Polygon();
+      int widthStaggerFactor = 0;
+      int heightStaggerFactor = 0;
+      if (staggerAxis == StaggerAxis.X) {
+        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileX)) {
+          heightStaggerFactor = r;
         }
-      }
-      break;
-    case ISOMETRIC:
-      break;
-    case ORTHOGONAL:
-      for (int x = 0; x < this.getSizeInTiles().width; x++) {
-        for (int y = 0; y < this.getSizeInTiles().height; y++) {
-          grid[x][y] = new Rectangle(x * this.getTileWidth(), y * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
+        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * (t + s), heightStaggerFactor + tileY * h, staggerAxis, s, r, t);
+      } else if (staggerAxis == StaggerAxis.Y) {
+        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileY)) {
+          widthStaggerFactor = r;
         }
+        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * h, heightStaggerFactor + tileY * (t + s), staggerAxis, s, r, t);
       }
-      break;
-    case SHIFTED:
-      break;
-    case STAGGERED:
-      break;
-    case UNDEFINED:
-      break;
+      return hex;
     default:
-      break;
+      return new Rectangle(tileX * this.getTileWidth(), tileY * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
     }
-    return grid;
   }
 
   @Override

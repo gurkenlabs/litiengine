@@ -1744,9 +1744,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       g.setColor(this.getGridColor());
       final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.getCamera().getRenderScale());
-
-      for (Shape[] tileColumn : Game.getEnvironment().getMap().getTileGrid()) {
-        for (Shape tile : tileColumn) {
+      for (int x = 0; x < Game.getEnvironment().getMap().getWidth(); x++) {
+        for (int y = 0; y < Game.getEnvironment().getMap().getHeight(); y++) {
+          Shape tile = Game.getEnvironment().getMap().getTileShape(x, y);
           if (Game.getCamera().getViewPort().intersects(tile.getBounds2D())) {
             Game.getRenderEngine().renderOutline(g, tile, stroke);
           }

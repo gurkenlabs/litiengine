@@ -193,7 +193,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
     for (int x = 0; x < layer.getSizeInTiles().width; x++) {
       for (int y = 0; y < layer.getSizeInTiles().height; y++) {
         ITile tile = layer.getTile(x, y);
-        Rectangle tileBounds = map.getTileGrid()[x][y].getBounds();
+        Rectangle tileBounds = map.getTileShape(x, y).getBounds();
         if (tile == null || (!includeAnimationTiles && MapUtilities.hasAnimation(map, tile))) {
           continue;
         }
@@ -227,7 +227,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
     for (int x = 0; x < map.getWidth(); x++) {
       for (int y = 0; y < map.getHeight(); y++) {
         ITile tile = layer.getTile(x, y);
-        Rectangle tileBounds = map.getTileGrid()[x][y].getBounds();
+        Rectangle tileBounds = map.getTileShape(x, y).getBounds();
         if (tile == null || !viewport.intersects(tileBounds)) {
           continue;
         }

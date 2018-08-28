@@ -97,11 +97,11 @@ public interface IMap extends ICustomPropertyProvider {
   public List<ITileLayer> getTileLayers();
 
   /**
-   * Gets the tile grid.
+   * Gets the shape of the tile [X|Y] at its absolute location.
    *
-   * @return a two-dimensional array of shapes that define the tile grid
+   * @return the tile shape
    */
-  public Shape[][] getTileGrid();
+  public Shape getTileShape(int tileX, int tileY);
 
   /**
    * Gets the tile size.

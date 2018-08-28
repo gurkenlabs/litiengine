@@ -91,7 +91,7 @@ public final class MapUtilities {
     if (map == null || tile == null) {
       return null;
     }
-    return map.getTileGrid()[tile.x][tile.y].getBounds2D();
+    return map.getTileShape(tile.x, tile.y).getBounds2D();
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Rectangle2D box) {
@@ -101,8 +101,8 @@ public final class MapUtilities {
     final int maxY = (int) MathUtilities.clamp(box.getMaxY(), 0, map.getSizeInPixels().height - 1);
     final Point minTilePoint = getTile(map, minX, minY);
     final Point maxTilePoint = getTile(map, maxX, maxY);
-    final Rectangle2D minTileBounds = map.getTileGrid()[MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1)][MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1)].getBounds2D();
-    final Rectangle2D maxTileBounds = map.getTileGrid()[MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1)][MathUtilities.clamp(maxTilePoint.y, 0, map.getHeight() - 1)].getBounds2D();
+    final Rectangle2D minTileBounds = map.getTileShape(MathUtilities.clamp(minTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(minTilePoint.y, 0, map.getHeight() - 1)).getBounds2D();
+    final Rectangle2D maxTileBounds = map.getTileShape(MathUtilities.clamp(maxTilePoint.x, 0, map.getWidth() - 1), MathUtilities.clamp(maxTilePoint.y, 0, map.getHeight() - 1)).getBounds2D();
 
     return new Rectangle2D.Double(minTileBounds.getX(), minTileBounds.getY(), maxTileBounds.getMaxX() - minTileBounds.getX(), maxTileBounds.getMaxY() - minTileBounds.getY());
   }

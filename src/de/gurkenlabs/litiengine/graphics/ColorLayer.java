@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -41,7 +42,7 @@ public abstract class ColorLayer implements IRenderable {
     // draw the tile on the layer image
     for (int x = 0; x < map.getWidth(); x++) {
       for (int y = 0; y < map.getHeight(); y++) {
-        Rectangle2D tileBounds = map.getTileGrid()[x][y].getBounds2D();
+        Rectangle2D tileBounds = map.getTileShape(x, y).getBounds2D();
         if (!viewport.intersects(tileBounds)) {
           continue;
         }
@@ -101,26 +102,19 @@ public abstract class ColorLayer implements IRenderable {
     final Point endTile = MapUtilities.getTile(map, new Point2D.Double(section.getMaxX(), section.getMaxY()));
     final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
-
     final int endX = MathUtilities.clamp(endTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
 
+    final Shape startTileShape = map.getTileShape(startX, startY);
+    final Shape endTileShape = map.getTileShape(endX, endY);
+
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
-
-        int jumpWidth = map.getTileWidth();
-        int jumpHeight = map.getTileHeight();
-
-        //for staggered maps, we must adjust our jump size for cropping the subImages since tiles are not aligned orthogonally.
-        if (map.getOrientation() == MapOrientation.HEXAGONAL) {
-          //the t parameter describes the distance between one end of the flat hex side to the bounding box.
-          int t = map.getStaggerAxis() == StaggerAxis.X ? (map.getTileWidth() - map.getHexSideLength()) / 2 : (map.getTileHeight() - map.getHexSideLength()) / 2;
-          jumpWidth = map.getStaggerAxis() == StaggerAxis.X ? t + map.getHexSideLength() : map.getTileWidth() / 2;
-          jumpHeight = map.getStaggerAxis() == StaggerAxis.Y ? t + map.getHexSideLength() : map.getTileHeight() / 2;
-        }
-        final int subX = (x - startX) * jumpWidth;
-        final int subY = (y - startY) * jumpHeight;
-        final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileSize().width, map.getTileSize().height);
+        Shape tile = map.getTileShape(x, y);
+        int subX = MathUtilities.clamp((int) (tile.getBounds().getX() - startTileShape.getBounds().getX()), 0, img.getWidth() - map.getTileWidth());
+        int subY = MathUtilities.clamp((int) (tile.getBounds().getY() - startTileShape.getBounds().getY()), 0, img.getHeight() - map.getTileHeight());
+        System.out.println(String.format("Tile [%d|%d] at %d-%d. Image size: %dx%d", x, y, subX, subY, img.getWidth(), img.getHeight()));
+        final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileWidth(), map.getTileHeight());
         this.tiles[x][y] = smallImage;
       }
     }
