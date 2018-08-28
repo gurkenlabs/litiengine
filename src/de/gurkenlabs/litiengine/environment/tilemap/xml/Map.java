@@ -81,7 +81,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlTransient
   private StaggerIndex staggerIndexEnum = StaggerIndex.UNDEFINED;
 
-
   @XmlAttribute
   private String staggeraxis;
 
@@ -273,13 +272,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
           int widthStaggerFactor = 0;
           int heightStaggerFactor = 0;
           if (staggerAxis == StaggerAxis.X) {
-            if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(x)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(x))) {
+            if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, x)) {
               heightStaggerFactor = r;
             }
             grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * (t + s), heightStaggerFactor + y * h, staggerAxis, s, r, t);
           }
           if (staggerAxis == StaggerAxis.Y) {
-            if ((staggerIndex == StaggerIndex.ODD && MathUtilities.isOddNumber(y)) || (staggerIndex == StaggerIndex.EVEN && !MathUtilities.isOddNumber(y))) {
+            if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, y)) {
               widthStaggerFactor = r;
             }
             grid[x][y] = GeometricUtilities.getHex(widthStaggerFactor + x * h, heightStaggerFactor + y * (t + s), staggerAxis, s, r, t);
