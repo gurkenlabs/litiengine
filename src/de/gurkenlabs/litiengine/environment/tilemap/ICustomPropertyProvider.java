@@ -23,6 +23,18 @@ public interface ICustomPropertyProvider {
 
   public int getCustomPropertyInt(String name, int defaultValue);
 
+  public long getCustomPropertyLong(String name);
+
+  public long getCustomPropertyLong(String name, long defaultValue);
+
+  public short getCustomPropertyShort(String name);
+
+  public short getCustomPropertyShort(String name, short defaultValue);
+
+  public byte getCustomPropertyByte(String name);
+
+  public byte getCustomPropertyByte(String name, byte defaultValue);
+
   public boolean getCustomPropertyBool(String name);
 
   public boolean getCustomPropertyBool(String name, boolean defaultValue);

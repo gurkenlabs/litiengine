@@ -125,6 +125,51 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
+  public short getCustomPropertyShort(String name) {
+    return this.getCustomPropertyShort(name, (short) 0);
+  }
+
+  @Override
+  public short getCustomPropertyShort(String name, short defaultValue) {
+    String value = this.getCustomProperty(name);
+    if (value == null || value.isEmpty()) {
+      return defaultValue;
+    }
+
+    return Short.parseShort(value);
+  }
+
+  @Override
+  public byte getCustomPropertyByte(String name) {
+    return this.getCustomPropertyByte(name, (byte) 0);
+  }
+
+  @Override
+  public byte getCustomPropertyByte(String name, byte defaultValue) {
+    String value = this.getCustomProperty(name);
+    if (value == null || value.isEmpty()) {
+      return defaultValue;
+    }
+
+    return Byte.parseByte(value);
+  }
+
+  @Override
+  public long getCustomPropertyLong(String name) {
+    return this.getCustomPropertyLong(name, 0L);
+  }
+
+  @Override
+  public long getCustomPropertyLong(String name, long defaultValue) {
+    String value = this.getCustomProperty(name);
+    if (value == null || value.isEmpty()) {
+      return defaultValue;
+    }
+
+    return Long.parseLong(value);
+  }
+
+  @Override
   public boolean getCustomPropertyBool(String name) {
     return this.getCustomPropertyBool(name, false);
   }

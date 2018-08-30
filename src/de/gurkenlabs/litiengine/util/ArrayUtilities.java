@@ -75,13 +75,50 @@ public final class ArrayUtilities {
 
     return doubles;
   }
-
+  
+  public static String getCommaSeparatedString(boolean[] arr) {
+    List<Boolean> list = new ArrayList<>();
+    for (int i = 0; i < arr.length; i++) {
+      list.add(arr[i]);
+    }
+    
+    return getCommaSeparatedString(list);
+  }
+  
   public static String getCommaSeparatedString(int[] arr) {
     return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Integer[]::new));
   }
 
   public static String getCommaSeparatedString(double[] arr) {
     return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Double[]::new));
+  }
+
+  public static String getCommaSeparatedString(float[] arr) {
+    List<Float> list = new ArrayList<>();
+    for (int i = 0; i < arr.length; i++) {
+      list.add(arr[i]);
+    }
+    return getCommaSeparatedString(list);
+  }
+
+  public static String getCommaSeparatedString(short[] arr) {
+    List<Short> list = new ArrayList<>();
+    for (int i = 0; i < arr.length; i++) {
+      list.add(arr[i]);
+    }
+    return getCommaSeparatedString(list);
+  }
+
+  public static String getCommaSeparatedString(long[] arr) {
+    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Long[]::new));
+  }
+
+  public static String getCommaSeparatedString(byte[] arr) {
+    List<Byte> list = new ArrayList<>();
+    for (int i = 0; i < arr.length; i++) {
+      list.add(arr[i]);
+    }
+    return getCommaSeparatedString(list);
   }
 
   public static <T> String getCommaSeparatedString(List<T> list) {

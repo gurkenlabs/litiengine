@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public final class MapObjectSerializer {
   private static final Logger log = Logger.getLogger(MapObjectSerializer.class.getName());
-  
+
   private MapObjectSerializer() {
   }
 
@@ -90,20 +90,22 @@ public final class MapObjectSerializer {
     }
 
     if (value.getClass().isArray()) {
-      if (field.getType().getComponentType() == int[].class || field.getType().getComponentType() == Integer[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Integer[]) value);
-      } else if (field.getType().getComponentType() == double[].class || field.getType().getComponentType() == Double[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Double[]) value);
-      } else if (field.getType().getComponentType() == float[].class || field.getType().getComponentType() == Float[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Float[]) value);
-      } else if (field.getType().getComponentType() == short[].class || field.getType().getComponentType() == Short[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Short[]) value);
-      } else if (field.getType().getComponentType() == byte[].class || field.getType().getComponentType() == Byte[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Byte[]) value);
-      } else if (field.getType().getComponentType() == long[].class || field.getType().getComponentType() == Long[].class) {
-        return ArrayUtilities.getCommaSeparatedString((Long[]) value);
-      } else if (field.getType().getComponentType() == String[].class) {
+      if (field.getType().getComponentType() == int.class) {
+        return ArrayUtilities.getCommaSeparatedString((int[]) value);
+      } else if (field.getType().getComponentType() == double.class) {
+        return ArrayUtilities.getCommaSeparatedString((double[]) value);
+      } else if (field.getType().getComponentType() == float.class) {
+        return ArrayUtilities.getCommaSeparatedString((float[]) value);
+      } else if (field.getType().getComponentType() == short.class) {
+        return ArrayUtilities.getCommaSeparatedString((short[]) value);
+      } else if (field.getType().getComponentType() == byte.class) {
+        return ArrayUtilities.getCommaSeparatedString((byte[]) value);
+      } else if (field.getType().getComponentType() == long.class) {
+        return ArrayUtilities.getCommaSeparatedString((long[]) value);
+      } else if (field.getType().getComponentType() == String.class) {
         return ArrayUtilities.getCommaSeparatedString((String[]) value);
+      } else if (field.getType().getComponentType() == boolean.class) {
+        return ArrayUtilities.getCommaSeparatedString((boolean[]) value);
       } else {
         return ArrayUtilities.getCommaSeparatedString((Object[]) value);
       }
