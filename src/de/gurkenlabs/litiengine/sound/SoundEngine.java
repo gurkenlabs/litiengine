@@ -33,6 +33,11 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
 
   @Override
   public ISoundPlayback playMusic(final Sound sound) {
+    return this.playMusic(sound, true);
+  }
+
+  @Override
+  public ISoundPlayback playMusic(final Sound sound, boolean loop) {
     if (sound == null || this.music != null && sound.equals(this.music.getSound())) {
       return null;
     }
@@ -42,42 +47,57 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     }
 
     this.music = new SoundPlayback(sound);
-    this.music.play(true, Game.getConfiguration().sound().getMusicVolume());
+    this.music.play(loop, Game.getConfiguration().sound().getMusicVolume());
     return this.music;
   }
 
   @Override
   public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
+    return playSound(entity, sound, false);
+  }
+
+  @Override
+  public ISoundPlayback playSound(final IEntity entity, final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
     }
 
     final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation, entity);
-    playback.play();
+    playback.play(loop);
     this.sounds.add(playback);
     return playback;
   }
 
   @Override
   public ISoundPlayback playSound(final Point2D location, final Sound sound) {
+    return this.playSound(location, sound, false);
+  }
+
+  @Override
+  public ISoundPlayback playSound(final Point2D location, final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
     }
 
     final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation);
-    playback.play();
+    playback.play(loop);
     this.sounds.add(playback);
     return playback;
   }
 
   @Override
   public ISoundPlayback playSound(final Sound sound) {
+    return playSound(sound, false);
+  }
+
+  @Override
+  public ISoundPlayback playSound(final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
     }
 
     final SoundPlayback playback = new SoundPlayback(sound);
-    playback.play();
+    playback.play(loop);
     this.sounds.add(playback);
 
     return playback;

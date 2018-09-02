@@ -36,6 +36,20 @@ public interface ISoundEngine {
   public ISoundPlayback playMusic(Sound sound);
 
   /**
+   * Plays the specified sound file as background music. If another music was
+   * specified beforehand, its play-back will get interrupted and the new one
+   * will be played.
+   * 
+   * @param sound
+   *          The sound from which to play the background music.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public ISoundPlayback playMusic(Sound sound, boolean loop);
+
+  /**
    * Plays the specified sound and updates its volume and pan by the current
    * entity location in relation to the listener location.
    * 
@@ -48,6 +62,21 @@ public interface ISoundEngine {
    *         and control the played sound.
    */
   public ISoundPlayback playSound(IEntity entity, Sound sound);
+
+  /**
+   * Plays the specified sound and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public ISoundPlayback playSound(IEntity entity, Sound sound, boolean loop);
 
   /**
    * Plays the specified sound at the specified location and updates the volume
@@ -64,6 +93,21 @@ public interface ISoundEngine {
   public ISoundPlayback playSound(Point2D location, Sound sound);
 
   /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public ISoundPlayback playSound(Point2D location, Sound sound, boolean loop);
+
+  /**
    * Plays the specified sound with the volume configured in the SOUND config
    * with a center pan.
    * 
@@ -74,6 +118,19 @@ public interface ISoundEngine {
    *         and control the played sound.
    */
   public ISoundPlayback playSound(Sound sound);
+
+  /**
+   * Plays the specified sound with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
+  public ISoundPlayback playSound(Sound sound, boolean loop);
 
   /**
    * Sets the maximum distance from the listener at which a sound source can

@@ -206,11 +206,23 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
    * Plays the sound without any volume or pan adjustments.
    */
   void play() {
-    this.play(false, null, -1);
+    this.play(false);
+  }
+
+  void play(final boolean loop) {
+    this.play(loop, Game.getConfiguration().sound().getSoundVolume());
   }
 
   void play(final boolean loop, final float volume) {
     this.play(loop, null, volume);
+  }
+
+  void play(final float volume) {
+    this.play(false, null, volume);
+  }
+
+  void play(final Point2D location) {
+    this.play(false, location, Game.getConfiguration().sound().getSoundVolume());
   }
 
   void play(final boolean loop, final Point2D location, final float gain) {
@@ -286,11 +298,6 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     return (float) -Math.sin(angle);
   }
 
-  private void initGain() {
-    final float initialGain = this.actualGain > 0 ? this.actualGain : Game.getConfiguration().sound().getSoundVolume();
-    this.setMasterGain(initialGain);
-  }
-
   private void loadDataLine() {
     final DataLine.Info dataInfo = new DataLine.Info(SourceDataLine.class, this.sound.getFormat());
     try {
@@ -302,13 +309,13 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
-  
+
   private void startDataLine() {
     this.initControls();
     this.updateControls(this.initialListenerLocation);
     this.dataLine.start();
   }
-  
+
   private void restartDataLine() {
     this.dataLine.drain();
     this.loadDataLine();
@@ -345,8 +352,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     } catch (final IllegalArgumentException iae) {
       this.gainControl = null;
     }
-    
-    this.initGain();
+
+    this.setMasterGain(this.actualGain);
   }
 
   private void setPan(final float p) {
