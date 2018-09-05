@@ -443,11 +443,7 @@ public class GeometricUtilities {
     double distSq = Math.pow((a.getCenterX() - b.getCenterX()), 2) + Math.pow((a.getCenterY() - b.getCenterY()), 2);
     double radSumSq = Math.pow((a.getWidth() / 2.0 + b.getWidth() / 2.0), 2);
 
-    if (distSq > radSumSq) {
-      return false;
-    }
-
-    return true;
+    return distSq <= radSumSq;
   }
 
   public static Point2D project(final Point2D start, final double angle, final double delta) {
@@ -620,8 +616,7 @@ public class GeometricUtilities {
     final AffineTransform t = new AffineTransform();
     t.translate(-shape.getBounds2D().getX(), -shape.getBounds2D().getY());
     t.translate(newLocation.getX(), newLocation.getY());
-    Shape translatedShape = t.createTransformedShape(shape);
-    return translatedShape;
+    return t.createTransformedShape(shape);
   }
 
   private static double getXDelta(final double angle, final double delta) {
