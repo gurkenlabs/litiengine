@@ -616,10 +616,12 @@ public class GeometricUtilities {
     return hex;
   }
 
-  public static Shape translateShape(final Shape shape, final Point2D renderLocation) {
+  public static Shape translateShape(final Shape shape, final Point2D newLocation) {
     final AffineTransform t = new AffineTransform();
-    t.translate(renderLocation.getX(), renderLocation.getY());
-    return shape;
+    t.translate(-shape.getBounds2D().getX(), -shape.getBounds2D().getY());
+    t.translate(newLocation.getX(), newLocation.getY());
+    Shape translatedShape = t.createTransformedShape(shape);
+    return translatedShape;
   }
 
   private static double getXDelta(final double angle, final double delta) {

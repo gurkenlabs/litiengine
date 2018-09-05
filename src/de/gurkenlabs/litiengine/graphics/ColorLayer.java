@@ -12,11 +12,10 @@ import java.awt.image.BufferedImage;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public abstract class ColorLayer implements IRenderable {
   private final IEnvironment environment;
@@ -106,16 +105,20 @@ public abstract class ColorLayer implements IRenderable {
     final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
 
     final Shape startTileShape = map.getTileShape(startX, startY);
-    final Shape endTileShape = map.getTileShape(endX, endY);
-
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
         Shape tile = map.getTileShape(x, y);
+        Shape translatedTile = GeometricUtilities.translateShape(tile, new Point2D.Double(0, 0));
         int subX = MathUtilities.clamp((int) (tile.getBounds().getX() - startTileShape.getBounds().getX()), 0, img.getWidth() - map.getTileWidth());
         int subY = MathUtilities.clamp((int) (tile.getBounds().getY() - startTileShape.getBounds().getY()), 0, img.getHeight() - map.getTileHeight());
-        System.out.println(String.format("Tile [%d|%d] at %d-%d. Image size: %dx%d", x, y, subX, subY, img.getWidth(), img.getHeight()));
         final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileWidth(), map.getTileHeight());
-        this.tiles[x][y] = smallImage;
+        final BufferedImage clippedImage = ImageProcessing.getCompatibleImage(smallImage.getWidth(), smallImage.getHeight());
+        Graphics2D g = clippedImage.createGraphics();
+        g.clip(translatedTile);
+        g.drawImage(smallImage, 0, 0, null);
+        g.clip(translatedTile);
+        g.dispose();
+        this.tiles[x][y] = clippedImage;
       }
     }
   }
