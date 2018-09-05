@@ -37,10 +37,8 @@ public class AmbientLight extends ColorLayer {
 
     final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
     final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
-    double longerDimension = mapWidth;
-    if (mapWidth < mapHeight) {
-      longerDimension = mapHeight;
-    }
+    double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
+
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, width, height));
 
     for (final LightSource light : this.getEnvironment().getLightSources()) {
