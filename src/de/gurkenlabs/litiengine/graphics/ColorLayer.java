@@ -116,7 +116,6 @@ public abstract class ColorLayer implements IRenderable {
         Graphics2D g = clippedImage.createGraphics();
         g.clip(translatedTile);
         g.drawImage(smallImage, 0, 0, null);
-        g.clip(translatedTile);
         g.dispose();
         this.tiles[x][y] = clippedImage;
       }
