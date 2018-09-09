@@ -98,7 +98,11 @@ public interface IMap extends ICustomPropertyProvider {
 
   /**
    * Gets the shape of the tile [X|Y] at its absolute location.
-   *
+   * 
+   * @param tileX
+   *          the horizontal grid index of the tile
+   * @param tileY
+   *          the vertical grid index of the tile
    * @return the tile shape
    */
   public Shape getTileShape(int tileX, int tileY);

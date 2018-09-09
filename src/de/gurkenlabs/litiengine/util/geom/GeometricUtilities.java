@@ -581,15 +581,14 @@ public class GeometricUtilities {
    *          the minimum y coordinate of the polygon
    * @param axis
    *          the orientation of the hexagon.<br>
-   *          &#8195;StaggerAxis.X -> flat edges on the top and bottom of the hex<br>
-   *          &#8195;StaggerAxis.Y -> flat edges on the left and right of the hex
+   *          &#8195;StaggerAxis.X : flat edges on the top and bottom of the hex<br>
+   *          &#8195;StaggerAxis.Y : flat edges on the left and right of the hex
    * @param sideLength
    *          the length of the flat edges in the polygon
    * @param r
    *          half the length of a pointy side of the polygon
    * @param t
-   *          the space from both ends of a flat edge to the respective border of the polygon.
-   * @see www.quarkphysics.ca/scripsi/hexgrid/
+   *          the space from both ends of a flat edge to the respective border of the polygon bounding box.<br>
    * @return a {@link Polygon}
    */
   public static Polygon getHex(final int x, final int y, final StaggerAxis axis, final int sideLength, final int r, final int t) {
