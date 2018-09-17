@@ -9,21 +9,21 @@ import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 
-public final class CustomMapObjectLoader extends MapObjectLoader {
+public class CustomMapObjectLoader extends MapObjectLoader {
   private final ConstructorInvocation invoke;
 
   @FunctionalInterface
-  private interface ConstructorInvocation {
+  protected interface ConstructorInvocation {
     IEntity invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
-  protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
+  public CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
     if (entityType.isInterface())
       throw new IllegalArgumentException("Cannot create loader for interface or abstract class");
     ConstructorInvocation invoke;
     try {
-      final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
+      final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class, IMapObject.class);
       invoke = (e, o) -> constructor.newInstance(e, o);
     } catch (NoSuchMethodException e1) {
       try {
