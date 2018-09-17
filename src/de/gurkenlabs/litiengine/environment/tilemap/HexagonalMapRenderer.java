@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.TooManyListenersException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -190,8 +191,8 @@ public class HexagonalMapRenderer implements IMapRenderer {
     final AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.getOpacity());
     imageGraphics.setComposite(ac);
 
-    for (int x = 0; x < layer.getSizeInTiles().width; x++) {
-      for (int y = 0; y < layer.getSizeInTiles().height; y++) {
+    for (int y = 0; y < layer.getSizeInTiles().height; y++) {
+      for (int x = 0; x < layer.getSizeInTiles().width; x++) {
         ITile tile = layer.getTile(x, y);
         Rectangle tileBounds = map.getTileShape(x, y).getBounds();
         if (tile == null || (!includeAnimationTiles && MapUtilities.hasAnimation(map, tile))) {
@@ -227,15 +228,25 @@ public class HexagonalMapRenderer implements IMapRenderer {
     for (int x = 0; x < map.getWidth(); x++) {
       for (int y = 0; y < map.getHeight(); y++) {
         ITile tile = layer.getTile(x, y);
-        Rectangle tileBounds = map.getTileShape(x, y).getBounds();
+        Rectangle2D tileBounds = map.getTileShape(x, y).getBounds2D();
         if (tile == null || !viewport.intersects(tileBounds)) {
           continue;
         }
         final Image tileTexture = getTileImage(map, tile);
+
+        //There are two offset properties: TileOffset from the TileSet and layer offset.
+        int tileOffsetX = 0;
+        int tileOffsetY = 0;
+        final ITileOffset tileOffset = MapUtilities.findTileSet(map, tile).getTileOffset();
+        if (tileOffset != null) {
+          tileOffsetX = tileOffset.getX();
+          tileOffsetY = tileOffset.getY();
+        }
+
         final double offsetX = -(viewport.getX()) + layer.getOffset().x;
         final double offsetY = -(viewport.getY()) + layer.getOffset().y;
 
-        ImageRenderer.render(g, tileTexture, offsetX + tileBounds.x, offsetY + tileBounds.y);
+        ImageRenderer.render(g, tileTexture, offsetX + tileBounds.getX() + tileOffsetX, offsetY + tileBounds.getY() + tileOffsetY);
       }
     }
 

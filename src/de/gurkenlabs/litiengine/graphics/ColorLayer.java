@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITile;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -42,12 +44,22 @@ public abstract class ColorLayer implements IRenderable {
     for (int x = 0; x < map.getWidth(); x++) {
       for (int y = 0; y < map.getHeight(); y++) {
         Rectangle2D tileBounds = map.getTileShape(x, y).getBounds2D();
+        ITile tile = map.getTileLayers().get(0).getTile(x, y);
         if (!viewport.intersects(tileBounds)) {
           continue;
         }
         final double offsetX = -(viewport.getX());
         final double offsetY = -(viewport.getY());
-        ImageRenderer.render(g, tiles[x][y], offsetX + tileBounds.getX(), offsetY + tileBounds.getY());
+
+        int tileOffsetX = 0;
+        int tileOffsetY = 0;
+        final ITileOffset tileOffset = MapUtilities.findTileSet(map, tile).getTileOffset();
+        if (tileOffset != null) {
+          tileOffsetX = tileOffset.getX();
+          tileOffsetY = tileOffset.getY();
+        }
+
+        ImageRenderer.render(g, tiles[x][y], offsetX + tileBounds.getX() + MapUtilities.findTileSet(map, tile).getTileWidth() - map.getTileWidth() + tileOffsetX, offsetY + tileBounds.getY() + MapUtilities.findTileSet(map, tile).getTileHeight() - map.getTileHeight() + tileOffsetY);
       }
     }
   }

@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -57,6 +58,10 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   /** The tileheight. */
   @XmlAttribute
   private Integer tileheight;
+
+  /** The tilewidth. */
+  @XmlElement(name = "tileoffset")
+  private TileOffset tileoffset;
 
   @XmlAttribute
   private Integer tilecount;
@@ -285,6 +290,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public int getColumns() {
     return this.sourceTileset != null ? this.sourceTileset.getColumns() : this.columns;
+  }
+
+  @Override
+  public ITileOffset getTileOffset() {
+    return this.sourceTileset != null ? this.sourceTileset.getTileOffset() : this.tileoffset;
   }
 
   @Override
