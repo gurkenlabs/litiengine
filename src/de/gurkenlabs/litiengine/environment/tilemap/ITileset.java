@@ -26,6 +26,10 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
 
   public Spritesheet getSpritesheet();
 
+  public int getMargin();
+
+  public int getSpacing();
+
   /**
    * Gets the name.
    *

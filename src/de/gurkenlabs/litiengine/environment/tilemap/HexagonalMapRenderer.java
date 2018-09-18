@@ -7,7 +7,6 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.TooManyListenersException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageCache;
@@ -147,7 +146,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
       }
     }
 
-    BufferedImage tileImage = sprite.getSprite(index);
+    BufferedImage tileImage = sprite.getSprite(index, tileset.getMargin(), tileset.getSpacing());
     if (tile.isFlipped()) {
       if (tile.isFlippedDiagonally()) {
         tileImage = ImageProcessing.rotate(tileImage, Math.toRadians(90));
@@ -200,7 +199,22 @@ public class HexagonalMapRenderer implements IMapRenderer {
         }
 
         final Image tileTexture = getTileImage(map, tile);
-        ImageRenderer.render(imageGraphics, tileTexture, tileBounds.x, tileBounds.y);
+        //There are two offset properties: TileOffset from the TileSet and layer offset.
+        int tileOffsetX = 0;
+        int tileOffsetY = 0;
+        final ITileOffset tileOffset = MapUtilities.findTileSet(map, tile).getTileOffset();
+        if (tileOffset != null) {
+          tileOffsetX = tileOffset.getX();
+          tileOffsetY = tileOffset.getY();
+        }
+
+        tileOffsetX -= MapUtilities.findTileSet(map, tile).getTileWidth() - map.getTileWidth();
+        tileOffsetY -= MapUtilities.findTileSet(map, tile).getTileHeight() - map.getTileHeight();
+
+        final double offsetX = layer.getOffset().x;
+        final double offsetY = layer.getOffset().y;
+
+        ImageRenderer.render(imageGraphics, tileTexture, offsetX + tileBounds.getX() + tileOffsetX, offsetY + tileBounds.getY() + tileOffsetY);
       }
     }
 
@@ -242,6 +256,9 @@ public class HexagonalMapRenderer implements IMapRenderer {
           tileOffsetX = tileOffset.getX();
           tileOffsetY = tileOffset.getY();
         }
+
+        tileOffsetX -= MapUtilities.findTileSet(map, tile).getTileWidth() - map.getTileWidth();
+        tileOffsetY -= MapUtilities.findTileSet(map, tile).getTileHeight() - map.getTileHeight();
 
         final double offsetX = -(viewport.getX()) + layer.getOffset().x;
         final double offsetY = -(viewport.getY()) + layer.getOffset().y;

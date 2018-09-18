@@ -290,6 +290,10 @@ public final class Spritesheet {
   }
 
   public BufferedImage getSprite(final int index) {
+    return this.getSprite(index, 0, 0);
+  }
+
+  public BufferedImage getSprite(final int index, final int margin, final int spacing) {
     if (this.emptySprites.contains(index)) {
       return null;
     }
@@ -303,7 +307,7 @@ public final class Spritesheet {
       return null;
     }
 
-    final Point position = this.getLocation(index);
+    final Point position = this.getLocation(index, margin, spacing);
     try {
       final BufferedImage sprite = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
       if (ImageProcessing.isEmpty(sprite)) {
@@ -401,10 +405,14 @@ public final class Spritesheet {
   }
 
   private Point getLocation(final int index) {
+    return this.getLocation(index, 0, 0);
+  }
+
+  private Point getLocation(final int index, final int margin, final int spacing) {
     final int row = index / this.getColumns();
     final int column = index % this.getColumns();
 
-    return new Point(column * this.getSpriteWidth(), row * this.getSpriteHeight());
+    return new Point(margin + column * (this.getSpriteWidth() + spacing), margin + row * (this.getSpriteHeight() + spacing));
   }
 
   private void updateRowsAndCols() {

@@ -59,7 +59,7 @@ public abstract class ColorLayer implements IRenderable {
           tileOffsetY = tileOffset.getY();
         }
 
-        ImageRenderer.render(g, tiles[x][y], offsetX + tileBounds.getX() + MapUtilities.findTileSet(map, tile).getTileWidth() - map.getTileWidth() + tileOffsetX, offsetY + tileBounds.getY() + MapUtilities.findTileSet(map, tile).getTileHeight() - map.getTileHeight() + tileOffsetY);
+        ImageRenderer.render(g, tiles[x][y], offsetX + tileBounds.getX() + tileOffsetX, offsetY + tileBounds.getY() + tileOffsetY);
       }
     }
   }
