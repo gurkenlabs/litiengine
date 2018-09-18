@@ -37,10 +37,8 @@ public class AmbientLight extends ColorLayer {
 
     final double mapWidth = this.getEnvironment().getMap().getSizeInPixels().width;
     final double mapHeight = this.getEnvironment().getMap().getSizeInPixels().height;
-    double longerDimension = mapWidth;
-    if (mapWidth < mapHeight) {
-      longerDimension = mapHeight;
-    }
+    double longerDimension = mapWidth < mapHeight ? mapHeight : mapWidth;
+
     final Area darkArea = new Area(new Rectangle2D.Double(0, 0, width, height));
 
     for (final LightSource light : this.getEnvironment().getLightSources()) {
@@ -71,7 +69,8 @@ public class AmbientLight extends ColorLayer {
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
     Shape fillShape;
-
+    g.setColor(Color.RED);
+    g.draw(light.getBoundingBox());
     Area lightArea = null;
     if (light.getLightShapeType().equals(LightSource.RECTANGLE)) {
       g.setColor(new Color(light.getColor().getRed(), light.getColor().getGreen(), light.getColor().getBlue(), light.getColor().getAlpha()));

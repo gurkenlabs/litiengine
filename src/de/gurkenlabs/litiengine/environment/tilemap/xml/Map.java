@@ -3,7 +3,9 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +32,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
@@ -38,7 +43,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 1, 5 }; // 1.1.5
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 1, 6 }; // 1.1.5
 
   @XmlAttribute
   private double version;
@@ -66,6 +71,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlAttribute
   private int tileheight;
+
+  @XmlAttribute
+  private int hexsidelength;
+
+  @XmlTransient
+  private StaggerAxis staggerAxisEnum = StaggerAxis.UNDEFINED;
+
+  @XmlTransient
+  private StaggerIndex staggerIndexEnum = StaggerIndex.UNDEFINED;
+
+  @XmlAttribute
+  private String staggeraxis;
+
+  @XmlAttribute
+  private String staggerindex;
 
   @XmlAttribute
   private String backgroundcolor;
@@ -119,7 +139,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     if (this.mapOrientation == MapOrientation.UNDEFINED) {
       this.mapOrientation = MapOrientation.valueOf(this.orientation.toUpperCase());
     }
-
     return this.mapOrientation;
   }
 
@@ -180,7 +199,25 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public Dimension getSizeInPixels() {
-    return new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
+    Dimension mapSizeInPixels = new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
+    switch (this.getOrientation()) {
+    case HEXAGONAL:
+      int maxX = (int) Math.max(this.getTileShape(this.getWidth() - 1, 0).getBounds2D().getMaxX(), this.getTileShape(this.getWidth() - 1, 1).getBounds2D().getMaxX());
+      int maxY = (int) Math.max(this.getTileShape(0, this.getHeight() - 1).getBounds2D().getMaxY(), this.getTileShape(1, this.getHeight() - 1).getBounds2D().getMaxY());
+      mapSizeInPixels.setSize(maxX, maxY);
+      break;
+    case ISOMETRIC:
+      break;
+    case ORTHOGONAL:
+      break;
+    case SHIFTED:
+      break;
+    case STAGGERED:
+      break;
+    case UNDEFINED:
+      break;
+    }
+    return mapSizeInPixels;
   }
 
   @XmlTransient
@@ -207,6 +244,45 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public Dimension getTileSize() {
     return new Dimension(this.tilewidth, this.tileheight);
+  }
+
+  @Override
+  public int getTileWidth() {
+    return this.tilewidth;
+  }
+
+  @Override
+  public int getTileHeight() {
+    return this.tileheight;
+  }
+
+  public Shape getTileShape(int tileX, int tileY) {
+    switch (this.getOrientation()) {
+    case HEXAGONAL:
+      final StaggerAxis staggerAxis = this.getStaggerAxis();
+      final StaggerIndex staggerIndex = this.getStaggerIndex();
+      final int s = this.getHexSideLength();
+      final int h = staggerAxis == StaggerAxis.X ? this.getTileHeight() : this.getTileWidth();
+      final int r = h / 2;
+      final int t = staggerAxis == StaggerAxis.X ? (this.getTileWidth() - s) / 2 : (this.getTileHeight() - s) / 2;
+      Polygon hex = new Polygon();
+      int widthStaggerFactor = 0;
+      int heightStaggerFactor = 0;
+      if (staggerAxis == StaggerAxis.X) {
+        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileX)) {
+          heightStaggerFactor = r;
+        }
+        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * (t + s), heightStaggerFactor + tileY * h, staggerAxis, s, r, t);
+      } else if (staggerAxis == StaggerAxis.Y) {
+        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileY)) {
+          widthStaggerFactor = r;
+        }
+        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * h, heightStaggerFactor + tileY * (t + s), staggerAxis, s, r, t);
+      }
+      return hex;
+    default:
+      return new Rectangle(tileX * this.getTileWidth(), tileY * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
+    }
   }
 
   @Override
@@ -300,6 +376,27 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.height;
   }
 
+  @Override
+  public int getHexSideLength() {
+    return this.hexsidelength;
+  }
+
+  @Override
+  public StaggerAxis getStaggerAxis() {
+    if (this.staggerAxisEnum == StaggerAxis.UNDEFINED) {
+      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
+    }
+    return this.staggerAxisEnum;
+  }
+
+  @Override
+  public StaggerIndex getStaggerIndex() {
+    if (this.staggerIndexEnum == StaggerIndex.UNDEFINED) {
+      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
+    }
+    return this.staggerIndexEnum;
+  }
+
   public void setPath(final String path) {
     this.path = path;
     if (this.rawImageLayers != null && !this.rawImageLayers.isEmpty()) {
@@ -386,6 +483,21 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
+  public void setHexSideLength(int hexSideLength) {
+    this.hexsidelength = hexSideLength;
+  }
+
+  @XmlTransient
+  public void setStaggerAxis(String staggerAxis) {
+    this.staggeraxis = staggerAxis;
+  }
+
+  @XmlTransient
+  public void setStaggerIndex(String staggerIndex) {
+    this.staggerindex = staggerIndex;
+  }
+
+  @XmlTransient
   public void setVersion(double version) {
     this.version = version;
   }
@@ -397,6 +509,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public int compareTo(Map o) {
+    if (this.name == null || o.name == null) {
+      System.err.println("A map file couldn't be processed due to the name attribute not being present!");
+    }
     return this.name.compareTo(o.name);
   }
 

@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.util.geom;
 
 import java.awt.Dimension;
+import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -14,6 +15,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 
 public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
@@ -440,11 +443,7 @@ public class GeometricUtilities {
     double distSq = Math.pow((a.getCenterX() - b.getCenterX()), 2) + Math.pow((a.getCenterY() - b.getCenterY()), 2);
     double radSumSq = Math.pow((a.getWidth() / 2.0 + b.getWidth() / 2.0), 2);
 
-    if (distSq > radSumSq) {
-      return false;
-    }
-
-    return true;
+    return distSq <= radSumSq;
   }
 
   public static Point2D project(final Point2D start, final double angle, final double delta) {
@@ -573,10 +572,50 @@ public class GeometricUtilities {
     return !areaA.isEmpty();
   }
 
-  public static Shape translateShape(final Shape shape, final Point2D renderLocation) {
+  /**
+   * Create a Hexagon from the provided parameters
+   * 
+   * @param x
+   *          the minimum x coordinate of the polygon
+   * @param y
+   *          the minimum y coordinate of the polygon
+   * @param axis
+   *          the orientation of the hexagon.<br>
+   *          &#8195;StaggerAxis.X : flat edges on the top and bottom of the hex<br>
+   *          &#8195;StaggerAxis.Y : flat edges on the left and right of the hex
+   * @param sideLength
+   *          the length of the flat edges in the polygon
+   * @param r
+   *          half the length of a pointy side of the polygon
+   * @param t
+   *          the space from both ends of a flat edge to the respective border of the polygon bounding box.<br>
+   * @return a {@link Polygon}
+   */
+  public static Polygon getHex(final int x, final int y, final StaggerAxis axis, final int sideLength, final int r, final int t) {
+    Polygon hex = new Polygon();
+    if (axis == StaggerAxis.X) {
+      hex.addPoint(x + t, y);
+      hex.addPoint(x + t + sideLength, y);
+      hex.addPoint(x + t + sideLength + t, y + r);
+      hex.addPoint(x + t + sideLength, y + 2 * r);
+      hex.addPoint(x + t, y + 2 * r);
+      hex.addPoint(x, y + r);
+    } else if (axis == StaggerAxis.Y) {
+      hex.addPoint(x + r, y);
+      hex.addPoint(x + r * 2, y + t);
+      hex.addPoint(x + r * 2, y + t + sideLength);
+      hex.addPoint(x + r, y + t + sideLength + t);
+      hex.addPoint(x, y + t + sideLength);
+      hex.addPoint(x, y + t);
+    }
+    return hex;
+  }
+
+  public static Shape translateShape(final Shape shape, final Point2D newLocation) {
     final AffineTransform t = new AffineTransform();
-    t.translate(renderLocation.getX(), renderLocation.getY());
-    return shape;
+    t.translate(-shape.getBounds2D().getX(), -shape.getBounds2D().getY());
+    t.translate(newLocation.getX(), newLocation.getY());
+    return t.createTransformedShape(shape);
   }
 
   private static double getXDelta(final double angle, final double delta) {

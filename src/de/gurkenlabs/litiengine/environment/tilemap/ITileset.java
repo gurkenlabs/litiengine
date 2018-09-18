@@ -23,8 +23,12 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
    * @return the image
    */
   public IMapImage getImage();
-  
+
   public Spritesheet getSpritesheet();
+
+  public int getMargin();
+
+  public int getSpacing();
 
   /**
    * Gets the name.
@@ -42,6 +46,8 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
 
   public int getColumns();
 
+  public ITileOffset getTileOffset();
+
   public int getTileHeight();
 
   /**
@@ -52,7 +58,7 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
   public int getTileWidth();
 
   public int getTileCount();
-  
+
   public ITile getTile(int id);
 
   public List<ITerrain> getTerrainTypes();

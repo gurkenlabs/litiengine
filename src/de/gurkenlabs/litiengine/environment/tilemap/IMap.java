@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
@@ -69,9 +70,9 @@ public interface IMap extends ICustomPropertyProvider {
   public void removeMapObject(int mapId);
 
   /**
-   * Gets the size in pixles.
+   * Gets the size in pixels.
    *
-   * @return the size in pixles
+   * @return the size in pixels
    */
   public Dimension getSizeInPixels();
 
@@ -96,11 +97,57 @@ public interface IMap extends ICustomPropertyProvider {
   public List<ITileLayer> getTileLayers();
 
   /**
+   * Gets the shape of the tile [X|Y] at its absolute location.
+   * 
+   * @param tileX
+   *          the horizontal grid index of the tile
+   * @param tileY
+   *          the vertical grid index of the tile
+   * @return the tile shape
+   */
+  public Shape getTileShape(int tileX, int tileY);
+
+  /**
    * Gets the tile size.
    *
    * @return the tile size
    */
   public Dimension getTileSize();
+
+  /**
+   * Gets the horizontal tile size.
+   *
+   * @return the horizontal tile size
+   */
+  public int getTileWidth();
+
+  /**
+   * Gets the vertical tile size.
+   *
+   * @return the vertical tile size
+   */
+  public int getTileHeight();
+
+  /**
+   * Gets the straight edges' length for hexagonal maps.
+   *
+   * @return the hex side length
+   */
+  public int getHexSideLength();
+
+  /**
+   * Gets the staggering axis
+   *
+   * @return the tile size
+   */
+  public StaggerAxis getStaggerAxis();
+
+  /**
+   * Gets the tile size.
+   *
+   * @return the tile size
+   */
+  public StaggerIndex getStaggerIndex();
 
   /**
    * Gets the version.
@@ -124,4 +171,5 @@ public interface IMap extends ICustomPropertyProvider {
   public int getNextObjectId();
 
   public Color getBackgroundColor();
+
 }

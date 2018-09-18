@@ -129,6 +129,10 @@ public class MathUtilities {
     return value == Math.floor(value) && !Double.isInfinite(value);
   }
 
+  public static boolean isOddNumber(int num) {
+    return (num & 1) != 0;
+  }
+
   public static boolean probabilityIsTrue(final double probability) {
     double rnd = random.nextDouble();
     return rnd < probability;

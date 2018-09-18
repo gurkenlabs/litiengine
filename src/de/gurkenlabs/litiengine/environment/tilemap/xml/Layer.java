@@ -104,7 +104,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   @Override
-  public Point getPosition() {
+  public Point getOffset() {
     return new Point(this.getOffsetX(), this.getOffsetY());
   }
 

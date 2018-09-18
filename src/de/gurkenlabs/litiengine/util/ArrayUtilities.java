@@ -75,6 +75,7 @@ public final class ArrayUtilities {
 
     return doubles;
   }
+
   
   public static String getCommaSeparatedString(boolean[] arr) {
     List<Boolean> list = new ArrayList<>();
@@ -183,6 +184,7 @@ public final class ArrayUtilities {
    * Removes the specified deleteItem from the input array and returns a trimmed new array instance without null entries.
    * The resulting array will have a length -1;
    * 
+   * @param <T> The element type of the array.
    * @param input
    *          The original array
    * @param deleteItem

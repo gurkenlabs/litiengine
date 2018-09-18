@@ -1,52 +1,97 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
-import java.awt.Font;
-import java.text.NumberFormat;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.text.ParseException;
 
+import javax.swing.Box;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
+import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.utiliti.EditorScreen;
+import de.gurkenlabs.utiliti.Icons;
+
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import de.gurkenlabs.utiliti.Program;
-
 public class GridEditPanel extends JPanel {
-  private JFormattedTextField textField;
+  private JSpinner widthSpinner, heightSpinner, strokeSpinner;
+  private JButton buttonSetColor;
+  private Color gridColor;
 
-  public GridEditPanel(int rasterSize) {
+  public GridEditPanel(int gridWidth, int gridHeight, float strokeWidth, Color strokeColor) {
 
-    JLabel lblSize = new JLabel("size (px)");
-    lblSize.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(10f));
+    JLabel lblStroke = new JLabel(Resources.get("menu_gridStroke"));
 
-    textField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+    JLabel lblWidth = new JLabel(Resources.get("menu_gridWidth"));
 
-    textField.setText("16");
-    textField.setFont(Program.TEXT_FONT.deriveFont(10f));
-    textField.setColumns(10);
-    textField.setValue(rasterSize);
+    this.widthSpinner = new JSpinner();
+    this.widthSpinner.setModel(new SpinnerNumberModel(gridWidth, null, null, new Integer(1)));
+
+    JLabel lblHeight = new JLabel(Resources.get("menu_gridHeight"));
+
+    this.heightSpinner = new JSpinner();
+    this.heightSpinner.setModel(new SpinnerNumberModel(gridHeight, null, null, new Integer(1)));
+
+    this.strokeSpinner = new JSpinner();
+    strokeSpinner.setModel(new SpinnerNumberModel((Float) strokeWidth, new Float(1), null, new Float(0.1)));
+
+    this.gridColor = strokeColor;
+    this.buttonSetColor = new JButton("");
+    this.buttonSetColor.setIcon(Icons.COLORX16);
+    this.buttonSetColor.addActionListener(a -> {
+      Color newColor = JColorChooser.showDialog(null, Resources.get("panel_selectLayerColor"), strokeColor);
+      this.gridColor = newColor == null ? strokeColor : newColor;
+    });
+
+    JLabel lblColor = new JLabel(Resources.get("menu_gridColor"));
+
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblSize, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(textField, GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                .addGap(34)));
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSize, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(46, Short.MAX_VALUE)));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblWidth).addComponent(lblStroke).addComponent(lblColor)).addGap(18)
+            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(strokeSpinner).addComponent(widthSpinner, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE).addComponent(buttonSetColor, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 52, Short.MAX_VALUE)).addGap(18)
+            .addComponent(lblHeight).addPreferredGap(ComponentPlacement.RELATED).addComponent(heightSpinner, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE).addGap(49)));
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+        .addGroup(groupLayout.createSequentialGroup().addGap(22)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblWidth).addComponent(widthSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight).addComponent(heightSpinner, GroupLayout.PREFERRED_SIZE,
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addGap(18).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblStroke).addComponent(strokeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addGap(18)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblColor).addComponent(this.buttonSetColor, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)).addGap(110)));
+
     setLayout(groupLayout);
   }
 
-  public int getGridSize() {
-    return Integer.parseInt(this.textField.getText());
+  public Color getGridColor() {
+    return this.gridColor;
+  }
+
+  public float getStrokeWidth() {
+    try {
+      this.strokeSpinner.commitEdit();
+    } catch (ParseException e) {
+      System.err.println("Your edits in the grid line thickness spinner could not be parsed as Float.");
+      e.printStackTrace();
+    }
+    return (Float) this.strokeSpinner.getValue();
+  }
+
+  public Dimension getGridSize() {
+    try {
+      this.widthSpinner.commitEdit();
+      this.heightSpinner.commitEdit();
+    } catch (ParseException e) {
+      System.err.println("One of your edits in the grid size spinners could not be parsed as Integer.");
+      e.printStackTrace();
+    }
+    return new Dimension((Integer) this.widthSpinner.getValue(), (Integer) this.heightSpinner.getValue());
   }
 }

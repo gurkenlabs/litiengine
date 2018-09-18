@@ -1,11 +1,13 @@
 package de.gurkenlabs.utiliti;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroup;
 import de.gurkenlabs.litiengine.configuration.ConfigurationGroupInfo;
+import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @ConfigurationGroupInfo(prefix = "user_")
 public class UserPreferenceConfiguration extends ConfigurationGroup {
@@ -17,7 +19,8 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
-  private int gridSize;
+  private int gridWidth;
+  private int gridHeight;
   private int mainSplitter;
   private int selectionEditSplitter;
   private int mapPanelSplitter;
@@ -26,8 +29,11 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private int width;
   private int height;
 
+  private float gridLineWidth;
+
   private String lastGameFile;
   private String[] lastOpenedFiles;
+  private String gridColor;
 
   public UserPreferenceConfiguration() {
     this.zoom = 1.0f;
@@ -37,7 +43,10 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.renderBoundingBoxes = true;
     this.lastOpenedFiles = new String[10];
     this.compressFile = false;
-    this.gridSize = 16;
+    this.gridWidth = 16;
+    this.gridHeight = 16;
+    this.gridLineWidth = 1.0f;
+    this.gridColor = ColorHelper.encode(new Color(255, 255, 255, 65));
   }
 
   public void addOpenedFile(String str) {
@@ -129,12 +138,36 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
     this.compressFile = compressFile;
   }
 
-  public int getGridSize() {
-    return gridSize;
+  public int getGridWidth() {
+    return this.gridWidth;
   }
 
-  public void setGridSize(int gridSize) {
-    this.gridSize = gridSize;
+  public int getGridHeight() {
+    return this.gridHeight;
+  }
+
+  public float getGridLineWidth() {
+    return this.gridLineWidth;
+  }
+
+  public String getGridColor() {
+    return this.gridColor;
+  }
+
+  public void setGridLineWidth(float gridLineWidth) {
+    this.gridLineWidth = gridLineWidth;
+  }
+
+  public void setGridColor(String gridColor) {
+    this.gridColor = gridColor;
+  }
+
+  public void setGridWidth(int gridwidth) {
+    this.gridWidth = gridwidth;
+  }
+
+  public void setGridHeight(int gridHeight) {
+    this.gridHeight = gridHeight;
   }
 
   public boolean isSyncMaps() {
