@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
  * @param <T>
  *          the generic type
  */
-public abstract class AttributeStateEffect<T extends Number> extends StateEffect {
+public abstract class AttributeEffect<T extends Number> extends Effect {
 
   /** The modifier. */
   private final AttributeModifier<T> modifier;
@@ -30,7 +30,7 @@ public abstract class AttributeStateEffect<T extends Number> extends StateEffect
    * @param targtes
    *          the targtes
    */
-  protected AttributeStateEffect(final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
+  protected AttributeEffect(final Ability ability, final Modification modification, final double delta, final EffectTarget... targtes) {
     super(ability, targtes);
     this.modifier = new AttributeModifier<>(modification, delta);
   }
