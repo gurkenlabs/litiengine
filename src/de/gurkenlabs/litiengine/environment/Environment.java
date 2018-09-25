@@ -625,7 +625,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public synchronized int getNextMapId() {
-    int maxMapID =  MapUtilities.getMaxMapId(this.getMap());
+    int maxMapID = MapUtilities.getMaxMapId(this.getMap());
     return ++maxMapID;
   }
 
@@ -1102,14 +1102,14 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final int ambientAlpha = this.getMap().getCustomPropertyInt(MapProperty.AMBIENTALPHA);
-    final Color ambientColor = this.getMap().getCustomPropertyColor(MapProperty.AMBIENTCOLOR, Color.WHITE);
+    final int ambientAlpha = this.getMap().getInt(MapProperty.AMBIENTALPHA);
+    final Color ambientColor = this.getMap().getColor(MapProperty.AMBIENTCOLOR, Color.WHITE);
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   private void addStaticShadows() {
-    final int alpha = this.getMap().getCustomPropertyInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
-    final Color color = this.getMap().getCustomPropertyColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
+    final int alpha = this.getMap().getInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
+    final Color color = this.getMap().getColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
     this.staticShadowLayer = new StaticShadowLayer(this, alpha, color);
   }
 

@@ -200,19 +200,19 @@ public class PropPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
 
-    final Material material = mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_MATERIAL));
+    final Material material = mapObject.getString(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getString(MapObjectProperty.PROP_MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
-    final Rotation rotation = mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getCustomProperty(MapObjectProperty.PROP_ROTATION));
+    final Rotation rotation = mapObject.getString(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getString(MapObjectProperty.PROP_ROTATION));
     this.comboBoxRotation.setSelectedItem(rotation);
 
-    this.spinnerHealth.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.COMBAT_HEALTH));
-    this.chckbxIndestructible.setSelected(!mapObject.getCustomPropertyBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    this.chckbxShadow.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_ADDSHADOW));
-    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
-    this.checkBoxHorizontalFlip.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
-    this.checkBoxVerticalFlip.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_FLIPVERTICALLY));
-    this.checkBoxScale.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_SCALE));
+    this.spinnerHealth.setValue(mapObject.getInt(MapObjectProperty.COMBAT_HEALTH));
+    this.chckbxIndestructible.setSelected(!mapObject.getBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+    this.chckbxShadow.setSelected(mapObject.getBool(MapObjectProperty.PROP_ADDSHADOW));
+    this.chckbxIsObstacle.setSelected(mapObject.getBool(MapObjectProperty.PROP_OBSTACLE));
+    this.checkBoxHorizontalFlip.setSelected(mapObject.getBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+    this.checkBoxVerticalFlip.setSelected(mapObject.getBool(MapObjectProperty.PROP_FLIPVERTICALLY));
+    this.checkBoxScale.setSelected(mapObject.getBool(MapObjectProperty.PROP_SCALE));
   }
 
   private void setupChangedListeners() {

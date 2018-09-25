@@ -16,13 +16,13 @@ public class CustomPropertyProviderTests {
     CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
     propProvider.setCustomProperty("test", "testvalue");
 
-    assertEquals("testvalue", propProvider.getCustomProperty("test"));
-    assertNull(propProvider.getCustomProperty("test2"));
+    assertEquals("testvalue", propProvider.getString("test"));
+    assertNull(propProvider.getString("test2"));
     assertEquals(1, propProvider.getCustomProperties().size());
 
     propProvider.setCustomProperty("test", "testvalue2");
 
-    assertEquals("testvalue2", propProvider.getCustomProperty("test"));
+    assertEquals("testvalue2", propProvider.getString("test"));
 
     ArrayList<Property> props = new ArrayList<>();
     props.add(new Property("test2", "testvalue3"));
@@ -31,8 +31,8 @@ public class CustomPropertyProviderTests {
     propProvider.setCustomProperties(props);
 
     assertEquals(2, propProvider.getCustomProperties().size());
-    assertEquals("testvalue3", propProvider.getCustomProperty("test2"));
-    assertEquals("testvalue4", propProvider.getCustomProperty("test3"));
+    assertEquals("testvalue3", propProvider.getString("test2"));
+    assertEquals("testvalue4", propProvider.getString("test3"));
 
     propProvider.setCustomProperties(null);
     assertNotNull(propProvider.getCustomProperties());

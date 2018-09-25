@@ -45,12 +45,12 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public String getCustomProperty(final String name) {
-    return this.getCustomProperty(name, null);
+  public String getString(final String name) {
+    return this.getString(name, null);
   }
 
   @Override
-  public String getCustomProperty(String name, String defaultValue) {
+  public String getString(String name, String defaultValue) {
     if (this.properties != null && this.properties.stream().anyMatch(x -> x.getName().equals(name))) {
       Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
       if (opt.isPresent()) {
@@ -110,13 +110,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public int getCustomPropertyInt(String name) {
-    return this.getCustomPropertyInt(name, 0);
+  public int getInt(String name) {
+    return this.getInt(name, 0);
   }
 
   @Override
-  public int getCustomPropertyInt(String name, int defaultValue) {
-    String value = this.getCustomProperty(name);
+  public int getInt(String name, int defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -125,13 +125,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public short getCustomPropertyShort(String name) {
-    return this.getCustomPropertyShort(name, (short) 0);
+  public short getShort(String name) {
+    return this.getShort(name, (short) 0);
   }
 
   @Override
-  public short getCustomPropertyShort(String name, short defaultValue) {
-    String value = this.getCustomProperty(name);
+  public short getShort(String name, short defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -140,13 +140,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public byte getCustomPropertyByte(String name) {
-    return this.getCustomPropertyByte(name, (byte) 0);
+  public byte getByte(String name) {
+    return this.getByte(name, (byte) 0);
   }
 
   @Override
-  public byte getCustomPropertyByte(String name, byte defaultValue) {
-    String value = this.getCustomProperty(name);
+  public byte getByte(String name, byte defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -155,13 +155,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public long getCustomPropertyLong(String name) {
-    return this.getCustomPropertyLong(name, 0L);
+  public long getLong(String name) {
+    return this.getLong(name, 0L);
   }
 
   @Override
-  public long getCustomPropertyLong(String name, long defaultValue) {
-    String value = this.getCustomProperty(name);
+  public long getLong(String name, long defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -170,13 +170,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public boolean getCustomPropertyBool(String name) {
-    return this.getCustomPropertyBool(name, false);
+  public boolean getBool(String name) {
+    return this.getBool(name, false);
   }
 
   @Override
-  public boolean getCustomPropertyBool(String name, boolean defaultValue) {
-    String value = this.getCustomProperty(name);
+  public boolean getBool(String name, boolean defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -185,13 +185,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public float getCustomPropertyFloat(String name) {
-    return this.getCustomPropertyFloat(name, 0);
+  public float getFloat(String name) {
+    return this.getFloat(name, 0);
   }
 
   @Override
-  public float getCustomPropertyFloat(String name, float defaultValue) {
-    String value = this.getCustomProperty(name);
+  public float getFloat(String name, float defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -200,13 +200,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public double getCustomPropertyDouble(String name) {
-    return this.getCustomPropertyDouble(name, 0);
+  public double getDouble(String name) {
+    return this.getDouble(name, 0);
   }
 
   @Override
-  public double getCustomPropertyDouble(String name, double defaultValue) {
-    String value = this.getCustomProperty(name);
+  public double getDouble(String name, double defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -215,13 +215,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public Color getCustomPropertyColor(String name) {
-    return getCustomPropertyColor(name, null);
+  public Color getColor(String name) {
+    return getColor(name, null);
   }
 
   @Override
-  public Color getCustomPropertyColor(String name, Color defaultValue) {
-    String value = this.getCustomProperty(name);
+  public Color getColor(String name, Color defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -230,13 +230,13 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType) {
-    return getCustomPropertyEnum(name, enumType, null);
+  public <T extends Enum<T>> T getEnum(String name, Class<T> enumType) {
+    return getEnum(name, enumType, null);
   }
 
   @Override
-  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType, T defaultValue) {
-    String value = this.getCustomProperty(name);
+  public <T extends Enum<T>> T getEnum(String name, Class<T> enumType, T defaultValue) {
+    String value = this.getString(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }

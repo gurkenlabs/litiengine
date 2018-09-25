@@ -64,11 +64,11 @@ public class StaticShadowPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    String shadowType = mapObject.getCustomProperty(MapObjectProperty.SHADOW_TYPE);
+    String shadowType = mapObject.getString(MapObjectProperty.SHADOW_TYPE);
     if (shadowType != null && !shadowType.isEmpty()) {
       this.comboBoxShadowType.setSelectedItem(StaticShadowType.valueOf(shadowType));
     }
 
-    this.spinnerOffset.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET));
+    this.spinnerOffset.setValue(mapObject.getInt(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET));
   }
 }

@@ -70,17 +70,17 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     }
 
     Collection<IEntity> entities = new ArrayList<>();
-    final String spriteSheet = mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME);
+    final String spriteSheet = mapObject.getString(MapObjectProperty.SPRITESHEETNAME);
     if (spriteSheet == null) {
       return entities;
     }
 
-    Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
+    Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getString(MapObjectProperty.SPAWN_TYPE));
     loadDefaultProperties(creature, mapObject);
     loadCollisionProperties(creature, mapObject);
 
     // TODO: load IMobileEntity and ICombatEntity properties
-    creature.setFacingDirection(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
+    creature.setFacingDirection(mapObject.getEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
 
     entities.add(creature);
     return entities;

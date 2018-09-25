@@ -62,9 +62,9 @@ public class SpawnpointPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
+    this.textFieldType.setText(mapObject.getString(MapObjectProperty.SPAWN_TYPE));
 
-    String direction = mapObject.getCustomProperty(MapObjectProperty.SPAWN_DIRECTION);
+    String direction = mapObject.getString(MapObjectProperty.SPAWN_DIRECTION);
     if (direction != null && !direction.isEmpty()) {
       this.comboBoxDirection.setSelectedItem(Direction.valueOf(direction));
     }

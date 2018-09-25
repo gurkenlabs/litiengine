@@ -160,18 +160,18 @@ public class LightSourcePanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String color = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
-    final String shape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
-    final String active = mapObject.getCustomProperty(MapObjectProperty.LIGHT_ACTIVE);
+    final String color = mapObject.getString(MapObjectProperty.LIGHT_COLOR);
+    final String shape = mapObject.getString(MapObjectProperty.LIGHT_SHAPE);
+    final String active = mapObject.getString(MapObjectProperty.LIGHT_ACTIVE);
 
     boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
-    this.spinnerBrightness.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA));
-    this.spinnerIntensity.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
+    this.spinnerBrightness.setValue(mapObject.getInt(MapObjectProperty.LIGHT_ALPHA));
+    this.spinnerIntensity.setValue(mapObject.getInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.sliderOffsetX.setValue((int) Math.max(Math.min(100 * mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
-    this.sliderOffsetY.setValue((int) Math.max(Math.min(100 * mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
+    this.sliderOffsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDouble(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
+    this.sliderOffsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDouble(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
   }
 
   private void setupChangedListeners() {

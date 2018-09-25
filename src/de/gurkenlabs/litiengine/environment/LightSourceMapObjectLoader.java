@@ -22,13 +22,13 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
 
-    final int alpha = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_ALPHA);
-    final int intensity = mapObject.getCustomPropertyInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
-    final Color color = mapObject.getCustomPropertyColor(MapObjectProperty.LIGHT_COLOR);
-    final boolean active = mapObject.getCustomPropertyBool(MapObjectProperty.LIGHT_ACTIVE, true);
-    final String lightShape = mapObject.getCustomProperty(MapObjectProperty.LIGHT_SHAPE);
-    final double focusOffsetX = mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETX);
-    final double focusOffsetY = mapObject.getCustomPropertyDouble(MapObjectProperty.LIGHT_FOCUSOFFSETY);
+    final int alpha = mapObject.getInt(MapObjectProperty.LIGHT_ALPHA);
+    final int intensity = mapObject.getInt(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
+    final Color color = mapObject.getColor(MapObjectProperty.LIGHT_COLOR);
+    final boolean active = mapObject.getBool(MapObjectProperty.LIGHT_ACTIVE, true);
+    final String lightShape = mapObject.getString(MapObjectProperty.LIGHT_SHAPE);
+    final double focusOffsetX = mapObject.getDouble(MapObjectProperty.LIGHT_FOCUSOFFSETX);
+    final double focusOffsetY = mapObject.getDouble(MapObjectProperty.LIGHT_FOCUSOFFSETY);
     Collection<IEntity> entities = new ArrayList<>();
     if (color == null || lightShape == null) {
       return entities;

@@ -236,7 +236,7 @@ public class MapObjectPanel extends PropertyPanel {
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.comboBoxType.setEnabled(false);
 
-    this.tagPanel.bind(mapObject.getCustomProperty(MapObjectProperty.TAGS));
+    this.tagPanel.bind(mapObject.getString(MapObjectProperty.TAGS));
   }
 
   private void setupChangedListeners() {

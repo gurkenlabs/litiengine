@@ -104,8 +104,8 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   }
 
   @Override
-  public String getCustomProperty(String name, String defaultValue) {
-    return customPropertySource == null ? super.getCustomProperty(name, defaultValue) : customPropertySource.getCustomProperty(name, defaultValue);
+  public String getString(String name, String defaultValue) {
+    return customPropertySource == null ? super.getString(name, defaultValue) : customPropertySource.getString(name, defaultValue);
   }
 
   @Override

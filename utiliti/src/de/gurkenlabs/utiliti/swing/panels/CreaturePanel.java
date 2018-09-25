@@ -139,8 +139,8 @@ public class CreaturePanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
-    this.textFieldType.setText(mapObject.getCustomProperty(MapObjectProperty.SPAWN_TYPE));
-    this.comboBoxDirection.setSelectedItem(mapObject.getCustomPropertyEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
+    this.textFieldType.setText(mapObject.getString(MapObjectProperty.SPAWN_TYPE));
+    this.comboBoxDirection.setSelectedItem(mapObject.getEnum(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
   }
 
   private void setupChangedListeners() {

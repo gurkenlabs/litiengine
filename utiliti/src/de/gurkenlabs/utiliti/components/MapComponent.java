@@ -1722,7 +1722,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     // render tags
-    String tags = mapObject.getCustomProperty(MapObjectProperty.TAGS);
+    String tags = mapObject.getString(MapObjectProperty.TAGS);
     if (tags == null || tags.isEmpty()) {
       return;
     }
@@ -1867,7 +1867,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (type == MapObjectType.TRIGGER) {
       borderColor = COLOR_TRIGGER_BORDER;
     } else if (type == MapObjectType.LIGHTSOURCE) {
-      final String mapObjectColor = mapObject.getCustomProperty(MapObjectProperty.LIGHT_COLOR);
+      final String mapObjectColor = mapObject.getString(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
         Color lightColor = ColorHelper.decode(mapObjectColor);
         borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
@@ -1887,11 +1887,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderCollisionBox(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
     // render collision boxes
-    boolean collision = mapObject.getCustomPropertyBool(MapObjectProperty.COLLISION, false);
-    float collisionBoxWidth = mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
-    float collisionBoxHeight = mapObject.getCustomPropertyFloat(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
-    final Align align = Align.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_ALIGN));
-    final Valign valign = Valign.get(mapObject.getCustomProperty(MapObjectProperty.COLLISION_VALIGN));
+    boolean collision = mapObject.getBool(MapObjectProperty.COLLISION, false);
+    float collisionBoxWidth = mapObject.getFloat(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
+    float collisionBoxHeight = mapObject.getFloat(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
+    final Align align = Align.get(mapObject.getString(MapObjectProperty.COLLISION_ALIGN));
+    final Valign valign = Valign.get(mapObject.getString(MapObjectProperty.COLLISION_VALIGN));
 
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
       collisionBoxWidth = mapObject.getWidth();

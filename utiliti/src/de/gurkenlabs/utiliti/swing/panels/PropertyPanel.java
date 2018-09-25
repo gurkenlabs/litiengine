@@ -71,10 +71,10 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected static void selectSpriteSheet(JComboBox<JLabel> comboBox, IMapObject mapObject) {
-    if (mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
+    if (mapObject.getString(MapObjectProperty.SPRITESHEETNAME) != null) {
       for (int i = 0; i < comboBox.getModel().getSize(); i++) {
         JLabel label = comboBox.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getCustomProperty(MapObjectProperty.SPRITESHEETNAME))) {
+        if (label != null && label.getText().equals(mapObject.getString(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }

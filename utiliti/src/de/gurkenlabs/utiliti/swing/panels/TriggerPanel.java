@@ -169,26 +169,26 @@ public class TriggerPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldMessage.setText(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_MESSAGE));
+    this.textFieldMessage.setText(mapObject.getString(MapObjectProperty.TRIGGER_MESSAGE));
 
-    String targets = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_TARGETS);
+    String targets = mapObject.getString(MapObjectProperty.TRIGGER_TARGETS);
     this.targetsModel.setRowCount(0);
     for (int target : ArrayUtilities.getIntegerArray(targets)) {
       this.targetsModel.addRow(new Object[] { target });
     }
 
-    this.chckbxOneTimeOnly.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.TRIGGER_ONETIME));
+    this.chckbxOneTimeOnly.setSelected(mapObject.getBool(MapObjectProperty.TRIGGER_ONETIME));
 
-    final TriggerActivation act = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATION));
+    final TriggerActivation act = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION));
     this.comboBoxActivationType.setSelectedItem(act);
 
-    String activators = mapObject.getCustomProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
+    String activators = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATORS);
     this.model.setRowCount(0);
     for (int activator : ArrayUtilities.getIntegerArray(activators)) {
       this.model.addRow(new Object[] { activator });
     }
 
-    this.spinnerCooldown.setValue(mapObject.getCustomPropertyInt(MapObjectProperty.TRIGGER_COOLDOWN));
+    this.spinnerCooldown.setValue(mapObject.getInt(MapObjectProperty.TRIGGER_COOLDOWN));
   }
 
   private void setupChangedListeners() {

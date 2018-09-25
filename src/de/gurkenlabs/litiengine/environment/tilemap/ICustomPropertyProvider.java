@@ -15,45 +15,45 @@ public interface ICustomPropertyProvider {
    *          the name
    * @return the custom property
    */
-  public String getCustomProperty(String name);
+  public String getString(String name);
 
-  public String getCustomProperty(String name, String defaultValue);
+  public String getString(String name, String defaultValue);
 
-  public int getCustomPropertyInt(String name);
+  public int getInt(String name);
 
-  public int getCustomPropertyInt(String name, int defaultValue);
+  public int getInt(String name, int defaultValue);
 
-  public long getCustomPropertyLong(String name);
+  public long getLong(String name);
 
-  public long getCustomPropertyLong(String name, long defaultValue);
+  public long getLong(String name, long defaultValue);
 
-  public short getCustomPropertyShort(String name);
+  public short getShort(String name);
 
-  public short getCustomPropertyShort(String name, short defaultValue);
+  public short getShort(String name, short defaultValue);
 
-  public byte getCustomPropertyByte(String name);
+  public byte getByte(String name);
 
-  public byte getCustomPropertyByte(String name, byte defaultValue);
+  public byte getByte(String name, byte defaultValue);
 
-  public boolean getCustomPropertyBool(String name);
+  public boolean getBool(String name);
 
-  public boolean getCustomPropertyBool(String name, boolean defaultValue);
+  public boolean getBool(String name, boolean defaultValue);
 
-  public float getCustomPropertyFloat(String name);
+  public float getFloat(String name);
 
-  public float getCustomPropertyFloat(String name, float defaultValue);
+  public float getFloat(String name, float defaultValue);
 
-  public double getCustomPropertyDouble(String name);
+  public double getDouble(String name);
 
-  public double getCustomPropertyDouble(String name, double defaultValue);
+  public double getDouble(String name, double defaultValue);
 
-  public Color getCustomPropertyColor(String name);
+  public Color getColor(String name);
 
-  public Color getCustomPropertyColor(String name, Color defaultValue);
+  public Color getColor(String name, Color defaultValue);
 
-  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType);
+  public <T extends Enum<T>> T getEnum(String name, Class<T> enumType);
 
-  public <T extends Enum<T>> T getCustomPropertyEnum(String name, Class<T> enumType, T defaultValue);
+  public <T extends Enum<T>> T getEnum(String name, Class<T> enumType, T defaultValue);
 
   public void setCustomProperty(String name, String value);
 

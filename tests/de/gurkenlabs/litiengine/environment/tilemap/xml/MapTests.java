@@ -54,8 +54,8 @@ public class MapTests {
   public void testTileCustomProperties() {
     IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
-    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getCustomProperty("foo"));
-    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getCustomProperty("baz"));
+    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getString("foo"));
+    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getString("baz"));
   }
 
   @Test
@@ -100,12 +100,12 @@ public class MapTests {
     assertEquals(1, map.getMapObjects("TEST_TYPE").size());
     assertEquals(1, map.getMapObjects().size());
     assertEquals("TEST_TYPE", object.getType());
-    assertEquals("bar", object.getCustomProperty("foo"));
+    assertEquals("bar", object.getString("foo"));
     assertEquals(0.1f, object.getX());
     assertEquals(0.1f, object.getY());
     assertEquals(10.1f, object.getWidth());
     assertEquals(10.1f, object.getHeight());
-    assertEquals("bar", object.getCustomProperty("foo"));
+    assertEquals("bar", object.getString("foo"));
 
     map.addMapObjectLayer(mock(MapObjectLayer.class));
     assertEquals(2, map.getMapObjectLayers().size());

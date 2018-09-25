@@ -588,10 +588,10 @@ public class Program {
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
-        final String colorProp = Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTCOLOR);
+        final String colorProp = Game.getEnvironment().getMap().getString(MapProperty.AMBIENTCOLOR);
         try {
-          if (Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA) != null) {
-            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getCustomProperty(MapProperty.AMBIENTALPHA));
+          if (Game.getEnvironment().getMap().getString(MapProperty.AMBIENTALPHA) != null) {
+            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getString(MapProperty.AMBIENTALPHA));
             Game.getEnvironment().getAmbientLight().setAlpha(alpha);
           }
 
@@ -903,9 +903,9 @@ public class Program {
       isChanging = true;
       colorButton.setEnabled(map != null);
       spinnerAmbientAlpha.setEnabled(map != null);
-      colorText.setText(map.getCustomProperty(MapProperty.AMBIENTCOLOR));
+      colorText.setText(map.getString(MapProperty.AMBIENTCOLOR));
 
-      String alpha = map.getCustomProperty(MapProperty.AMBIENTALPHA);
+      String alpha = map.getString(MapProperty.AMBIENTALPHA);
       if (alpha != null && !alpha.isEmpty()) {
         spinnerAmbientAlpha.setValue((int) Double.parseDouble(alpha));
       }

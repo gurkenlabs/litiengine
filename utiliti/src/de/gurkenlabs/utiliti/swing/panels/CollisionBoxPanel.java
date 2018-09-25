@@ -46,8 +46,8 @@ public class CollisionBoxPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxIsObstacle.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.PROP_OBSTACLE));
-    this.chckbxIsObstructingLights.setSelected(mapObject.getCustomPropertyBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
+    this.chckbxIsObstacle.setSelected(mapObject.getBool(MapObjectProperty.PROP_OBSTACLE));
+    this.chckbxIsObstructingLights.setSelected(mapObject.getBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
 
   private void setupChangedListeners() {
