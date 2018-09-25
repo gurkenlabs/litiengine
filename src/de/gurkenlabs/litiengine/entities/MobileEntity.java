@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -14,11 +15,11 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   private int deceleration;
   private Point2D moveDestination;
   private boolean turnOnMove;
-  private short velocity;
+  private Attribute<Float> velocity;
 
   public MobileEntity() {
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
-    this.velocity = info.velocity();
+    this.velocity = new Attribute<>(info.velocity());
     this.acceleration = info.acceleration();
     this.deceleration = info.deceleration();
     this.setTurnOnMove(info.turnOnMove());
@@ -45,7 +46,7 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   }
 
   @Override
-  public float getVelocity() {
+  public Attribute<Float> getVelocity() {
     return this.velocity;
   }
 
@@ -84,11 +85,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   }
 
   @Override
-  public void setVelocity(final short velocity) {
-    this.velocity = velocity;
-  }
-
-  @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
   }
@@ -96,6 +92,6 @@ public class MobileEntity extends CollisionEntity implements IMobileEntity {
   protected static float getTickVelocity(IMobileEntity entity) {
     // pixels per ms multiplied by the passed ms
     // ensure that entities don't travel too far in case of lag
-    return Math.min(Game.getLoop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity() * Game.getLoop().getTimeScale();
+    return Math.min(Game.getLoop().getDeltaTime(), GameLoop.TICK_DELTATIME_LAG) * 0.001F * entity.getVelocity().getCurrentValue() * Game.getLoop().getTimeScale();
   }
 }

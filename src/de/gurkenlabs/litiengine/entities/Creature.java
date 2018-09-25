@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
+import de.gurkenlabs.litiengine.attributes.Attribute;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
@@ -19,7 +20,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private long lastMoved;
   private Point2D moveDestination;
   private boolean turnOnMove;
-  private short velocity;
+  private Attribute<Float> velocity;
+
   private String spritePrefix;
 
   public Creature() {
@@ -30,7 +32,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     super();
     final MovementInfo movementInfo = this.getClass().getAnnotation(MovementInfo.class);
     if (movementInfo != null) {
-      this.velocity = movementInfo.velocity();
+      this.velocity = new Attribute<>(movementInfo.velocity());
       this.acceleration = movementInfo.acceleration();
       this.deceleration = movementInfo.deceleration();
       this.setTurnOnMove(movementInfo.turnOnMove());
@@ -91,8 +93,8 @@ public class Creature extends CombatEntity implements IMobileEntity {
   }
 
   @Override
-  public float getVelocity() {
-    return this.velocity * this.getAttributes().getVelocity().getCurrentValue();
+  public Attribute<Float> getVelocity() {
+    return this.velocity;
   }
 
   /**
@@ -140,11 +142,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   @Override
   public void setTurnOnMove(final boolean turn) {
     this.turnOnMove = turn;
-  }
-
-  @Override
-  public void setVelocity(final short velocity) {
-    this.velocity = velocity;
   }
 
   public void setSpritePrefix(String spritePrefix) {

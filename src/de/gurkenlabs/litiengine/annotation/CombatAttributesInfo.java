@@ -15,5 +15,4 @@ import java.lang.annotation.Target;
 public @interface CombatAttributesInfo {
   float damageMultiplier() default 1.0f;
   int health() default 100;
-  float velocityFactor() default 1.0f;
 }

@@ -11,7 +11,6 @@ import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 public class CombatAttributes {
   private final Attribute<Float> damageMultiplier;
   private final RangeAttribute<Integer> health;
-  private final Attribute<Float> velocity;
 
   /**
    * Instantiates a new attributes.
@@ -25,7 +24,6 @@ public class CombatAttributes {
     this.health = new RangeAttribute<>(info.health(), 0, info.health());
 
     // init single value attributes
-    this.velocity = new Attribute<>(info.velocityFactor());
     this.damageMultiplier = new Attribute<>(info.damageMultiplier());
   }
 
@@ -45,14 +43,5 @@ public class CombatAttributes {
    */
   public RangeAttribute<Integer> getHealth() {
     return this.health;
-  }
-
-  /**
-   * Gets the velocity.
-   *
-   * @return the velocity
-   */
-  public Attribute<Float> getVelocity() {
-    return this.velocity;
   }
 }
