@@ -8,23 +8,24 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
-import de.gurkenlabs.litiengine.annotation.CombatAttributesInfo;
+import de.gurkenlabs.litiengine.annotation.CombatInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
 import de.gurkenlabs.litiengine.attributes.Modification;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 /**
  * The Class AttackableEntity.
  */
-@CombatAttributesInfo
+@CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
   private final List<IEffect> appliedEffects;
   private final List<CombatEntityListener> listeners;
   private final List<CombatEntityDeathListener> deathListeners;
   private final List<CombatEntityHitListener> hitListeners;
-  private final CombatAttributes attributes;
+  private final RangeAttribute<Integer> hitPoints;
 
   @TmxProperty(name = MapObjectProperty.COMBAT_INDESTRUCTIBLE)
   private boolean isIndestructible;
@@ -42,11 +43,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.hitListeners = new CopyOnWriteArrayList<>();
     this.appliedEffects = new CopyOnWriteArrayList<>();
 
-    final CombatAttributesInfo info = this.getClass().getAnnotation(CombatAttributesInfo.class);
-
-    this.attributes = new CombatAttributes(info);
+    final CombatInfo info = this.getClass().getAnnotation(CombatInfo.class);
+    this.hitPoints = new RangeAttribute<>(info.hitpoints(), 0, info.hitpoints());
     this.setIndestructible(false);
-    this.setupAttributes(this.getAttributes());
   }
 
   @Override
@@ -89,7 +88,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
+    this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, 0));
     this.fireDeathEvent();
 
     this.setCollision(false);
@@ -106,8 +105,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * @return the attributes
    */
   @Override
-  public CombatAttributes getAttributes() {
-    return this.attributes;
+  public RangeAttribute<Integer> getHitPoints() {
+    return this.hitPoints;
   }
 
   /**
@@ -142,7 +141,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     }
 
     if (!this.isIndestructible()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, damage));
+      this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, damage));
     }
 
     if (this.isDead()) {
@@ -173,7 +172,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public boolean isDead() {
-    return this.getAttributes().getHealth().getCurrentValue() <= 0;
+    return this.getHitPoints().getCurrentValue() <= 0;
   }
 
   /**
@@ -212,7 +211,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return;
     }
 
-    this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getAttributes().getHealth().getMaxValue()));
+    this.getHitPoints().modifyBaseValue(new AttributeModifier<>(Modification.SET, this.getHitPoints().getMaxValue()));
 
     for (final CombatEntityListener listener : this.listeners) {
       listener.onResurrection(this);
@@ -241,17 +240,6 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   @Override
   public void setTeam(final int team) {
     this.team = team;
-  }
-
-  /**
-   * Sets the up attributes.
-   *
-   * @param attributes
-   *          the new up attributes
-   */
-  protected void setupAttributes(final CombatAttributes attributes) {
-    // do nothing because this method is designed to provide the child classes
-    // the possibility to implement additional functionality upon instantiation
   }
 
   @Override

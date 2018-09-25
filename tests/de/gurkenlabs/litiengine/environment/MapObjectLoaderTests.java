@@ -78,8 +78,8 @@ public class MapObjectLoaderTests {
     assertEquals(prop.getMaterial(), Material.PLASTIC);
     assertTrue(prop.isIndestructible());
     assertTrue(prop.hasCollision());
-    assertEquals(prop.getAttributes().getHealth().getMaxValue().intValue(), 100);
-    assertEquals(prop.getAttributes().getHealth().getCurrentValue().intValue(), 100);
+    assertEquals(prop.getHitPoints().getMaxValue().intValue(), 100);
+    assertEquals(prop.getHitPoints().getCurrentValue().intValue(), 100);
 
     assertEquals(prop.getCollisionBoxWidth(), 100.0, 0.0001);
     assertEquals(prop.getCollisionBoxHeight(), 100.0, 0.0001);

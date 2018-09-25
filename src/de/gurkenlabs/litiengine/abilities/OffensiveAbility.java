@@ -34,7 +34,7 @@ public abstract class OffensiveAbility extends Ability {
   }
 
   public int getAttackDamage() {
-    return Math.round(this.getAttributes().getValue().getCurrentValue() * this.getExecutor().getAttributes().getDamageMultiplier().getCurrentValue());
+    return Math.round(this.getAttributes().getValue().getCurrentValue());
   }
 
   public void onEntityHit(final Consumer<EntityHitArgument> consumer) {

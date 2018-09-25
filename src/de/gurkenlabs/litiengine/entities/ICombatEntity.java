@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.abilities.effects.IEffect;
+import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
 public interface ICombatEntity extends ICollisionEntity {
   public void addCombatEntityListener(CombatEntityListener listener);
@@ -23,7 +24,7 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public List<IEffect> getAppliedEffects();
 
-  public CombatAttributes getAttributes();
+  public RangeAttribute<Integer> getHitPoints();
 
   // TODO: This could be refactored to be a shape which would allow for the game
   // developer to decide what he wants to use.

@@ -85,8 +85,8 @@ public class PropMapObjectLoader extends MapObjectLoader {
     prop.setIndestructible(mapObject.getBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
 
     AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getInt(MapObjectProperty.COMBAT_HEALTH));
-    prop.getAttributes().getHealth().modifyMaxBaseValue(mod);
-    prop.getAttributes().getHealth().modifyBaseValue(mod);
+    prop.getHitPoints().modifyMaxBaseValue(mod);
+    prop.getHitPoints().modifyBaseValue(mod);
 
     prop.setAddShadow(mapObject.getBool(MapObjectProperty.PROP_ADDSHADOW));
 

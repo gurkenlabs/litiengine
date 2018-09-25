@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface CombatAttributesInfo {
-  float damageMultiplier() default 1.0f;
-  int health() default 100;
+public @interface CombatInfo {
+  int hitpoints() default 100;
 }
