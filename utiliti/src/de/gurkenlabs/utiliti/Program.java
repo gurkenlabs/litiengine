@@ -871,7 +871,7 @@ public class Program {
         return;
       }
 
-      Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
+      Game.getEnvironment().getMap().set(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
       Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
     });
 
@@ -895,7 +895,7 @@ public class Program {
 
       spinnerAmbientAlpha.setValue(result.getAlpha());
 
-      Game.getEnvironment().getMap().setCustomProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
+      Game.getEnvironment().getMap().set(MapProperty.AMBIENTCOLOR, colorText.getText());
       Game.getEnvironment().getAmbientLight().setColor(result);
     });
 

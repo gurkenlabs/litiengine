@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -18,7 +19,7 @@ public interface IEntity {
   public void addTransformListener(EntityTransformListener listener);
 
   public void removeTransformListener(EntityTransformListener listener);
-  
+
   public void addListener(EntityListener listener);
 
   public void removeListener(EntityListener listener);
@@ -106,6 +107,8 @@ public interface IEntity {
   public void setX(double x);
 
   public void setY(double y);
+
+  public ICustomPropertyProvider getProperties();
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.

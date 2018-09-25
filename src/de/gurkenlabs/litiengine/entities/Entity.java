@@ -11,8 +11,10 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
@@ -28,6 +30,8 @@ public abstract class Entity implements IEntity {
   private final List<String> tags;
 
   private final EntityControllers controllers;
+
+  private ICustomPropertyProvider properties;
 
   private float angle;
 
@@ -53,6 +57,7 @@ public abstract class Entity implements IEntity {
     this.listeners = new CopyOnWriteArrayList<>();
     this.messageListeners = new ConcurrentHashMap<>();
     this.tags = new CopyOnWriteArrayList<>();
+    this.properties = new CustomPropertyProvider();
 
     this.controllers = new EntityControllers();
 
@@ -134,6 +139,11 @@ public abstract class Entity implements IEntity {
 
       listeners.remove(listener);
     }
+  }
+
+  @Override
+  public ICustomPropertyProvider getProperties() {
+    return this.properties;
   }
 
   @Override
@@ -370,6 +380,10 @@ public abstract class Entity implements IEntity {
 
   protected EntityControllers getControllers() {
     return this.controllers;
+  }
+
+  protected final void setProperties(ICustomPropertyProvider attributes) {
+    this.properties = attributes;
   }
 
   private void fireSizeChangedEvent() {

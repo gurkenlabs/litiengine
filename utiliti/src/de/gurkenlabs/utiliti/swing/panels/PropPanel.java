@@ -216,30 +216,30 @@ public class PropPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, Boolean.toString(!chckbxIndestructible.isSelected()))));
-    this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, Boolean.toString(chckbxShadow.isSelected()))));
+    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.COMBAT_INDESTRUCTIBLE, !chckbxIndestructible.isSelected())));
+    this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_ADDSHADOW, chckbxShadow.isSelected())));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
-      m.setCustomProperty(MapObjectProperty.PROP_MATERIAL, material.toString());
+      m.set(MapObjectProperty.PROP_MATERIAL, material);
     }));
 
     this.comboBoxRotation.addActionListener(new MapObjectPropertyActionListener(m -> {
       Rotation rotation = (Rotation) this.comboBoxRotation.getSelectedItem();
-      m.setCustomProperty(MapObjectProperty.PROP_ROTATION, rotation.toString());
+      m.set(MapObjectProperty.PROP_ROTATION, rotation);
     }));
 
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
-      m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
+      m.set(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
-    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.COMBAT_HEALTH, Integer.toString((int) this.spinnerHealth.getValue()))));
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_OBSTACLE, Boolean.toString(chckbxIsObstacle.isSelected()))));
+    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.set(MapObjectProperty.COMBAT_HEALTH, (int) this.spinnerHealth.getValue())));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_OBSTACLE,chckbxIsObstacle.isSelected())));
 
-    this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_FLIPHORIZONTALLY, Boolean.toString(checkBoxHorizontalFlip.isSelected()))));
-    this.checkBoxVerticalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_FLIPVERTICALLY, Boolean.toString(checkBoxVerticalFlip.isSelected()))));
-    this.checkBoxScale.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.PROP_SCALE, Boolean.toString(checkBoxScale.isSelected()))));
+    this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_FLIPHORIZONTALLY, checkBoxHorizontalFlip.isSelected())));
+    this.checkBoxVerticalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_FLIPVERTICALLY, checkBoxVerticalFlip.isSelected())));
+    this.checkBoxScale.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_SCALE, checkBoxScale.isSelected())));
   }
 
   private void loadAvailableProps() {

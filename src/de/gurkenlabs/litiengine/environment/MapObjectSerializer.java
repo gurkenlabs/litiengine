@@ -61,7 +61,7 @@ public final class MapObjectSerializer {
         return;
       }
 
-      mapObject.setCustomProperty(property.name(), getPropertyValue(field, value));
+      mapObject.set(property.name(), getPropertyValue(field, value));
     } catch (IllegalArgumentException | IllegalAccessException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }

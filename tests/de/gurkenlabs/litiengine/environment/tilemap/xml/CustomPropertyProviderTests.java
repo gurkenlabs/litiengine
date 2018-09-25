@@ -14,13 +14,13 @@ public class CustomPropertyProviderTests {
   public void testSetCustomProperty() {
     @SuppressWarnings("serial")
     CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
-    propProvider.setCustomProperty("test", "testvalue");
+    propProvider.set("test", "testvalue");
 
     assertEquals("testvalue", propProvider.getString("test"));
     assertNull(propProvider.getString("test2"));
     assertEquals(1, propProvider.getCustomProperties().size());
 
-    propProvider.setCustomProperty("test", "testvalue2");
+    propProvider.set("test", "testvalue2");
 
     assertEquals("testvalue2", propProvider.getString("test"));
 

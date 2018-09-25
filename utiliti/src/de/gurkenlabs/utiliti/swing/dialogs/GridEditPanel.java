@@ -1,27 +1,21 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.text.ParseException;
 
-import javax.swing.Box;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
-
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class GridEditPanel extends JPanel {
   private JSpinner widthSpinner, heightSpinner, strokeSpinner;

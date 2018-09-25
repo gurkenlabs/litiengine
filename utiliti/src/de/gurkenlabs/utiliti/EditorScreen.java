@@ -29,7 +29,6 @@ import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;

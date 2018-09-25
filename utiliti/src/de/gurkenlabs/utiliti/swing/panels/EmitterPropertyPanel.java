@@ -955,7 +955,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
       model.setValueAt(c, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
         String commaSeperated = ArrayUtilities.getCommaSeparatedString(colors);
-        this.getDataSource().setCustomProperty(MapObjectProperty.Emitter.COLORS, commaSeperated);
+        this.getDataSource().set(MapObjectProperty.Emitter.COLORS, commaSeperated);
       }
     });
 
@@ -983,24 +983,24 @@ public class EmitterPropertyPanel extends PropertyPanel {
       this.updateTabbedGroup();
 
       this.txt.setEnabled(particleType == ParticleType.TEXT);
-      m.setCustomProperty(MapObjectProperty.Emitter.PARTICLETYPE, particleType.toString());
+      m.set(MapObjectProperty.Emitter.PARTICLETYPE, particleType);
     }));
     
     this.comboBoxCollisionType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString());
+      m.set(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString());
     }));
     
     this.comboBoxSprite.addActionListener(new MapObjectPropertyActionListener(m -> {
       String sprite = this.comboBoxSprite.getSelectedItem().toString();
-      m.setCustomProperty(MapObjectProperty.Particle.SPRITE, sprite);
+      m.set(MapObjectProperty.Particle.SPRITE, sprite);
     }));
     
     this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
+      m.set(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
     }));
     
     this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
+      m.set(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
     }));
     
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
@@ -1039,9 +1039,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.COLORDEVIATION, this.spinnerColorDeviation));
     this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHADEVIATION, this.spinnerAlphaDeviation));
 
-    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.TEXT, this.txt.getText())));
+    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.Particle.TEXT, this.txt.getText())));
     
-    this.checkBoxFade.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.Particle.FADE, Boolean.toString(this.checkBoxFade.isSelected()))));
+    this.checkBoxFade.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.Particle.FADE, this.checkBoxFade.isSelected())));
   }
   
   private void updateTabbedGroup() {
@@ -1228,7 +1228,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     private final JSpinner max;
 
     public ParticleRadioButtonListener(String mapObjectPropery, JRadioButton button, JSpinner max) {
-      super(m -> m.setCustomProperty(mapObjectPropery, Boolean.toString(button.isSelected())));
+      super(m -> m.set(mapObjectPropery, button.isSelected()));
       this.max = max;
     }
 

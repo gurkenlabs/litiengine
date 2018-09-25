@@ -936,17 +936,17 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (type) {
     case PROP:
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4) + "");
-      mo.setCustomProperty(MapObjectProperty.COLLISION, "true");
-      mo.setCustomProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, "false");
-      mo.setCustomProperty(MapObjectProperty.PROP_ADDSHADOW, "true");
+      mo.set(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4));
+      mo.set(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4));
+      mo.set(MapObjectProperty.COLLISION, true);
+      mo.set(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+      mo.set(MapObjectProperty.PROP_ADDSHADOW, true);
       break;
     case LIGHTSOURCE:
-      mo.setCustomProperty(MapObjectProperty.LIGHT_ALPHA, "180");
-      mo.setCustomProperty(MapObjectProperty.LIGHT_COLOR, "#ffffff");
-      mo.setCustomProperty(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
-      mo.setCustomProperty(MapObjectProperty.LIGHT_ACTIVE, "true");
+      mo.set(MapObjectProperty.LIGHT_ALPHA, 180);
+      mo.set(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
+      mo.set(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
+      mo.set(MapObjectProperty.LIGHT_ACTIVE, true);
       break;
     case SPAWNPOINT:
     default:

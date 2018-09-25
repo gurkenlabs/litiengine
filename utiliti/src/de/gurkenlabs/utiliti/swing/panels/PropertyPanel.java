@@ -139,7 +139,7 @@ public abstract class PropertyPanel extends JPanel {
 
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
-      super(m -> m.setCustomProperty(mapObjectProperty, spinner.getValue().toString()));
+      super(m -> m.set(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 

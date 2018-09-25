@@ -31,7 +31,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private final Collection<TriggerActivatedListener> activatedListeners;
   private final Collection<TriggerDeactivatedListener> deactivatedListeners;
   private final Collection<TriggerActivatingCondition> activatingConditions;
-  private final ICustomPropertyProvider customProperties;
 
   @TmxProperty(name = MapObjectProperty.TRIGGER_ACTIVATORS)
   private final List<Integer> activators;
@@ -67,13 +66,13 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.activatingConditions = new CopyOnWriteArrayList<>();
     this.activatedListeners = new CopyOnWriteArrayList<>();
     this.deactivatedListeners = new CopyOnWriteArrayList<>();
-    this.customProperties = customProperties;
     this.activators = new CopyOnWriteArrayList<>();
     this.targets = new CopyOnWriteArrayList<>();
     this.activated = new CopyOnWriteArrayList<>();
     this.message = message;
     this.isOneTimeTrigger = isOneTime;
     this.activationType = activation;
+    this.setProperties(customProperties);
   }
 
   public Trigger(final TriggerActivation activation, final String name, final String message, final boolean isOneTime, ICustomPropertyProvider customProperties) {
@@ -132,10 +131,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   public TriggerActivation getActivationType() {
     return this.activationType;
-  }
-
-  public ICustomPropertyProvider getCustomProperties() {
-    return this.customProperties;
   }
 
   public List<Integer> getActivators() {

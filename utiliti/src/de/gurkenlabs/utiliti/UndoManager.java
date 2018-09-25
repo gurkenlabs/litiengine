@@ -268,7 +268,7 @@ public class UndoManager {
     target.setHeight(restore.getHeight());
     target.getCustomProperties().clear();
     for (Property prop : restore.getCustomProperties()) {
-      target.setCustomProperty(prop.getName(), prop.getValue());
+      target.set(prop.getName(), prop.getValue());
     }
 
     Game.getEnvironment().reloadFromMap(target.getId());

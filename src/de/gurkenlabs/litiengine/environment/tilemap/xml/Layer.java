@@ -220,7 +220,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   private void setOrder(int order) {
-    this.setCustomProperty(LayerProperty.LAYER_ORDER, Integer.toString(order));
+    this.set(LayerProperty.LAYER_ORDER, order);
   }
 
   @SuppressWarnings("unused")

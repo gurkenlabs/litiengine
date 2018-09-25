@@ -277,7 +277,7 @@ public class MapObjectPanel extends PropertyPanel {
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
-    this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+    this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 
   private static float getSpinnerValue(JSpinner spinner) {

@@ -52,8 +52,8 @@ public class StaticShadowPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SHADOW_TYPE, ((StaticShadowType) this.comboBoxShadowType.getSelectedItem()).toString())));
-    this.spinnerOffset.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setCustomProperty(MapObjectProperty.SHADOW_OFFSET, Integer.toString((int) this.spinnerOffset.getValue()))));
+    this.comboBoxShadowType.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SHADOW_TYPE, (StaticShadowType) this.comboBoxShadowType.getSelectedItem())));
+    this.spinnerOffset.addChangeListener(new MapObjectPropertyChangeListener(m -> m.set(MapObjectProperty.SHADOW_OFFSET, (int) this.spinnerOffset.getValue())));
   }
 
   @Override

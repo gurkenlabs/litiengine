@@ -55,7 +55,25 @@ public interface ICustomPropertyProvider {
 
   public <T extends Enum<T>> T getEnum(String name, Class<T> enumType, T defaultValue);
 
-  public void setCustomProperty(String name, String value);
+  public void set(String name, String value);
+
+  public void set(String name, boolean value);
+
+  public void set(String name, byte value);
+
+  public void set(String name, short value);
+
+  public void set(String name, int value);
+
+  public void set(String name, long value);
+
+  public void set(String name, float value);
+
+  public void set(String name, double value);
+
+  public void set(String name, Color value);
+
+  public <T extends Enum<T>> void set(String name, T value);
 
   public List<Property> getCustomProperties();
 

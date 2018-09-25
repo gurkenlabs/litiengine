@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
-public abstract class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
+public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
   private static final long serialVersionUID = 7418225969292279565L;
 
   public CustomPropertyProvider() {
@@ -62,27 +62,6 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
   }
 
   @Override
-  public void setCustomProperty(String name, String value) {
-    if (this.properties == null || name == null) {
-      return;
-    }
-
-    Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
-    if (opt.isPresent()) {
-      // clear property if the value is null because there is no need to keep it
-      if (value == null || value.isEmpty()) {
-        this.properties.removeIf(x -> x.getName().equals(name));
-        return;
-      }
-
-      opt.get().setValue(value);
-      return;
-    }
-
-    this.properties.add(new Property(name, value));
-  }
-
-  @Override
   @XmlTransient
   public List<Property> getCustomProperties() {
     if (this.properties == null) {
@@ -105,7 +84,7 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
     }
 
     for (Property prop : props) {
-      this.setCustomProperty(prop.getName(), prop.getValue());
+      this.set(prop.getName(), prop.getValue());
     }
   }
 
@@ -246,6 +225,73 @@ public abstract class CustomPropertyProvider implements ICustomPropertyProvider,
     } catch (final IllegalArgumentException iae) {
       return defaultValue;
     }
+  }
+
+  @Override
+  public void set(String name, String value) {
+    if (this.properties == null || name == null) {
+      return;
+    }
+
+    Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
+    if (opt.isPresent()) {
+      // clear property if the value is null because there is no need to keep it
+      if (value == null || value.isEmpty()) {
+        this.properties.removeIf(x -> x.getName().equals(name));
+        return;
+      }
+
+      opt.get().setValue(value);
+      return;
+    }
+
+    this.properties.add(new Property(name, value));
+  }
+
+  @Override
+  public void set(String name, boolean value) {
+    this.set(name, Boolean.toString(value));
+  }
+
+  @Override
+  public void set(String name, byte value) {
+    this.set(name, Byte.toString(value));
+  }
+
+  @Override
+  public void set(String name, short value) {
+    this.set(name, Short.toString(value));
+  }
+
+  @Override
+  public void set(String name, int value) {
+    this.set(name, Integer.toString(value));
+  }
+
+  @Override
+  public void set(String name, long value) {
+    this.set(name, Long.toString(value));
+  }
+
+  @Override
+  public void set(String name, float value) {
+    this.set(name, Float.toString(value));
+  }
+
+  @Override
+  public void set(String name, double value) {
+    this.set(name, Double.toString(value));
+
+  }
+
+  @Override
+  public void set(String name, Color value) {
+    this.set(name, ColorHelper.encode(value));
+  }
+
+  @Override
+  public <T extends Enum<T>> void set(String name, T value) {
+    this.set(name, value.name());
   }
 
   private static int sortPropertiesByName(Property prop1, Property prop2) {

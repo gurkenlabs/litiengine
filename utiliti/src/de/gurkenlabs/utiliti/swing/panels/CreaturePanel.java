@@ -146,15 +146,15 @@ public class CreaturePanel extends PropertyPanel {
   private void setupChangedListeners() {
     this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
-      m.setCustomProperty(MapObjectProperty.SPRITESHEETNAME, selected.getText());
+      m.set(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
 
     this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setCustomProperty(MapObjectProperty.SPAWN_DIRECTION, this.comboBoxDirection.getSelectedItem().toString());
+      m.set(MapObjectProperty.SPAWN_DIRECTION, this.comboBoxDirection.getSelectedItem().toString());
     }));
 
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
   }
 
   private void loadAvailableCreatureSprites() {

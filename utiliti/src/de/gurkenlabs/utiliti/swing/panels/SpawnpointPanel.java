@@ -71,8 +71,8 @@ public class SpawnpointPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> m.setCustomProperty(MapObjectProperty.SPAWN_DIRECTION, ((Direction) this.comboBoxDirection.getSelectedItem()).toString())));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SPAWN_DIRECTION, (Direction) this.comboBoxDirection.getSelectedItem())));
   }
 }
