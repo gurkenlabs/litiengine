@@ -13,20 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface CombatAttributesInfo {
-
-  float attackSpeed() default 1.0f;
-
   float damageMultiplier() default 1.0f;
-
   int health() default 100;
-
-  byte healthRegenerationPerSecond() default 1;
-
-  short maxShield() default 0;
-
-  short shield() default 0;
-
   float velocityFactor() default 1.0f;
-
-  int vision() default 100;
 }

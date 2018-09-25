@@ -31,7 +31,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @TmxProperty(name = MapObjectProperty.COMBAT_TEAM)
   private int team;
-  
+
   private ICombatEntity target;
   private long lastHit;
 
@@ -141,19 +141,8 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       return false;
     }
 
-    int actualDamage = damage;
-    if (this.getAttributes().getShield().getCurrentValue() > 0) {
-      int shieldDmg = damage;
-      if (shieldDmg > this.getAttributes().getShield().getCurrentValue()) {
-        shieldDmg = this.getAttributes().getShield().getCurrentValue();
-      }
-
-      this.getAttributes().getShield().modifyBaseValue(new AttributeModifier<Short>(Modification.SUBSTRACT, shieldDmg));
-      actualDamage = damage - shieldDmg;
-    }
-
     if (!this.isIndestructible()) {
-      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, actualDamage));
+      this.getAttributes().getHealth().modifyBaseValue(new AttributeModifier<>(Modification.SUBSTRACT, damage));
     }
 
     if (this.isDead()) {
@@ -161,7 +150,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
       this.setCollision(false);
     }
 
-    final CombatEntityHitEvent event = new CombatEntityHitEvent(this, actualDamage, ability);
+    final CombatEntityHitEvent event = new CombatEntityHitEvent(this, damage, ability);
     for (final CombatEntityHitListener listener : this.hitListeners) {
       listener.onHit(event);
     }
