@@ -22,12 +22,6 @@ public @interface CombatAttributesInfo {
 
   byte healthRegenerationPerSecond() default 1;
 
-  byte level() default 1;
-
-  int maxExperience() default 100;
-
-  byte maxLevel() default 20;
-
   short maxShield() default 0;
 
   short shield() default 0;
