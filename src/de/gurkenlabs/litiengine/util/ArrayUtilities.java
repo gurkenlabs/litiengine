@@ -76,16 +76,15 @@ public final class ArrayUtilities {
     return doubles;
   }
 
-  
   public static String getCommaSeparatedString(boolean[] arr) {
     List<Boolean> list = new ArrayList<>();
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
-    
+
     return getCommaSeparatedString(list);
   }
-  
+
   public static String getCommaSeparatedString(int[] arr) {
     return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Integer[]::new));
   }
@@ -138,6 +137,15 @@ public final class ArrayUtilities {
     return sb.toString();
   }
 
+  public static <T> List<T> toList(T[][] arr) {
+    List<T> list = new ArrayList<>();
+    for (T[] rows : arr) {
+      list.addAll(Arrays.asList(rows));
+    }
+
+    return list;
+  }
+
   public static <T> String getCommaSeparatedString(T[] arr) {
     return getCommaSeparatedString(Arrays.asList(arr));
   }
@@ -184,7 +192,8 @@ public final class ArrayUtilities {
    * Removes the specified deleteItem from the input array and returns a trimmed new array instance without null entries.
    * The resulting array will have a length -1;
    * 
-   * @param <T> The element type of the array.
+   * @param <T>
+   *          The element type of the array.
    * @param input
    *          The original array
    * @param deleteItem

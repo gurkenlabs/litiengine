@@ -19,6 +19,8 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
+
 @XmlRootElement(name = "data")
 public class TileData {
   protected static final String ENCODING_BASE64 = "base64";
@@ -51,6 +53,12 @@ public class TileData {
 
   @XmlTransient
   private int height;
+
+  @XmlTransient
+  private int minChunkX;
+
+  @XmlTransient
+  private int minChunkY;
 
   @XmlTransient
   public String getEncoding() {
@@ -252,23 +260,54 @@ public class TileData {
 
     this.width = (maxX + maxChunkWidth) - minX;
     this.height = (maxY + maxChunkHeight) - minY;
+
+    this.minChunkX = minX;
+    this.minChunkY = minY;
   }
 
   private List<Tile> parseChunkData() {
-    List<Tile> tiles = new ArrayList<>();
+
+    // first fill a two-dimensional array with all the information of the chunks
+    Tile[][] tileArr = new Tile[this.height][this.width];
+
     if (this.getEncoding().equals(ENCODING_BASE64)) {
       for (TileChunk chunk : this.chunks) {
-        tiles.addAll(parseBase64Data(chunk.getValue(), this.compression));
+        List<Tile> chunkTiles = parseBase64Data(chunk.getValue(), this.compression);
+        this.addTiles(tileArr, chunk, chunkTiles);
       }
     } else if (this.getEncoding().equals(ENCODING_CSV)) {
       for (TileChunk chunk : this.chunks) {
-        tiles.addAll(parseCsvData(chunk.getValue()));
+        List<Tile> chunkTiles = parseCsvData(chunk.getValue());
+        this.addTiles(tileArr, chunk, chunkTiles);
       }
     } else {
       throw new IllegalArgumentException("Unsupported tile layer encoding " + this.getEncoding());
     }
 
-    return tiles;
+    // fill up the rest of the map with Tile.EMPTY
+    for (int y = 0; y < tileArr.length; y++) {
+      for (int x = 0; x < tileArr[y].length; x++) {
+        if (tileArr[y][x] == null) {
+          tileArr[y][x] = Tile.EMPTY;
+        }
+      }
+    }
+
+    return ArrayUtilities.toList(tileArr);
+  }
+
+  private void addTiles(Tile[][] tileArr, TileChunk chunk, List<Tile> chunkTiles) {
+    int startX = chunk.getX() - this.minChunkX;
+    int startY = chunk.getY() - this.minChunkY;
+
+    int index = 0;
+
+    for (int y = startY; y < startY + chunk.getHeight(); y++) {
+      for (int x = startX; x < startX + chunk.getWidth(); x++) {
+        tileArr[y][x] = chunkTiles.get(index);
+        index++;
+      }
+    }
   }
 
   private List<Tile> parseData() {

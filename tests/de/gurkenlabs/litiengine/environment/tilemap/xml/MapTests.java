@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 
@@ -136,13 +137,22 @@ public class MapTests {
 
   @Test
   public void testInfiniteMap() {
-    Map map = (Map)MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
-    
+    Map map = (Map) MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+
     assertTrue(map.isInfinite());
     assertEquals(48, map.getWidth());
     assertEquals(64, map.getHeight());
     assertEquals(2, map.getTileLayers().size());
     assertEquals(2, map.getTileLayers().size());
-    
+
+    ITileLayer layer = map.getTileLayers().get(0);
+    for (int y = 0; y < layer.getHeight(); y++) {
+      for (int x = 0; x < layer.getWidth(); x++) {
+        System.out.print(layer.getTile(x, y) + ",");
+      }
+
+      System.out.println();
+    }
+    assertEquals(49, map.getTileLayers().get(0).getTile(15, 8).getGridId());
   }
 }

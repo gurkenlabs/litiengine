@@ -17,9 +17,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
-/**
- * The Class Tile.
- */
 @XmlRootElement(name = "tile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile extends CustomPropertyProvider implements ITile, Serializable {
@@ -35,7 +32,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   private static final long serialVersionUID = -7597673646108642906L;
 
-  /** The gid. */
   @XmlAttribute
   private Integer gid;
 
@@ -48,7 +44,6 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   @XmlElement(required = false)
   private Animation animation;
 
-  /** The tile coordinate. */
   private transient Point tileCoordinate;
 
   private transient ITerrain[] terrains;
@@ -184,11 +179,17 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public String toString() {
-    return this.getGridId() + " (" + Arrays.toString(this.getTerrainIds()) + ")";
+    for (int i = 0; i < this.getTerrainIds().length; i++) {
+      if (this.getTerrainIds()[i] != Terrain.NONE) {
+        return this.getGridId() + " (" + Arrays.toString(this.getTerrainIds()) + ")";
+      }
+    }
+
+    return this.getGridId() + "";
   }
 
   protected int[] getTerrainIds() {
-    int[] terrainIds = new int[] { -1, -1, -1, -1 };
+    int[] terrainIds = new int[] { Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE };
     if (this.terrain == null || this.terrain.isEmpty()) {
       return terrainIds;
     }
