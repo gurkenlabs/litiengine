@@ -13,15 +13,11 @@ import java.util.zip.InflaterInputStream;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlValue;
 
 @XmlRootElement(name = "data")
 public class TileData {
@@ -44,7 +40,8 @@ public class TileData {
   @XmlTransient
   private String value;
 
-  private transient List<TileChunk> chunks;
+  @XmlTransient
+  private List<TileChunk> chunks;
 
   @XmlTransient
   private List<Tile> parsedTiles;
