@@ -23,7 +23,8 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 @XmlRootElement(name = "tile")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile extends CustomPropertyProvider implements ITile, Serializable {
-  public static final Tile EMPTY = new Tile(0);
+  public static final int NONE = 0;
+  public static final Tile EMPTY = new Tile(NONE);
   protected static final long FLIPPED_HORIZONTALLY_FLAG = 0xFFFFFFFF80000000L;
   protected static final long FLIPPED_VERTICALLY_FLAG = 0xFFFFFFFF40000000L;
   protected static final long FLIPPED_DIAGONALLY_FLAG = 0xFFFFFFFF20000000L;

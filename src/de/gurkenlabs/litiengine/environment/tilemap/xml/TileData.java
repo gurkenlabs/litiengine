@@ -146,7 +146,11 @@ public class TileData {
         flags |= read << Byte.SIZE * 3;
         tileId |= flags;
 
-        parsed.add(new Tile(tileId, false));
+        if (tileId == Tile.NONE) {
+          parsed.add(Tile.EMPTY);
+        } else {
+          parsed.add(new Tile(tileId, false));
+        }
       }
 
     } catch (IOException e) {
@@ -170,7 +174,11 @@ public class TileData {
       if (tileId > Integer.MAX_VALUE) {
         parsed.add(new Tile(tileId, true));
       } else {
-        parsed.add(new Tile((int) tileId));
+        if (tileId == Tile.NONE) {
+          parsed.add(Tile.EMPTY);
+        } else {
+          parsed.add(new Tile((int) tileId));
+        }
       }
     }
 
