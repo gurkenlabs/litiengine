@@ -13,14 +13,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
-/**
- * The Class TileLayer.
- */
 @XmlRootElement(name = "layer")
 public class TileLayer extends Layer implements ITileLayer {
   private static final long serialVersionUID = -6588787132358068892L;
 
-  /** The data. */
   @XmlElement
   private TileData data = null;
 
@@ -72,6 +68,24 @@ public class TileLayer extends Layer implements ITileLayer {
     }
 
     return this.tileList;
+  }
+
+  @Override
+  public int getWidth() {
+    if (this.data != null && this.data.isInfinite()) {
+      return this.data.getWidth();
+    }
+
+    return super.getWidth();
+  }
+
+  @Override
+  public int getHeight() {
+    if (this.data != null && this.data.isInfinite()) {
+      return this.data.getHeight();
+    }
+
+    return super.getHeight();
   }
 
   protected List<Tile> getData() {

@@ -73,6 +73,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int tileheight;
 
   @XmlAttribute
+  private int infinite;
+
+  @XmlAttribute
   private int hexsidelength;
 
   @XmlTransient
@@ -577,8 +580,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawMapObjectLayers;
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  protected boolean isInfinite() {
+    return this.infinite == 1;
+  }
+
+  void afterUnmarshal(Unmarshaller u, Object parent) {
     String[] ver = this.tiledversion.split("\\.");
     int[] vNumbers = new int[ver.length];
     try {
@@ -627,5 +633,29 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
     this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
 
+    if (this.isInfinite()) {
+      this.updateDimensionsByTileLayers();
+    }
+  }
+
+  /**
+   * Update width and height by the max width and height of the tile layers in the infinite map.
+   */
+  private void updateDimensionsByTileLayers() {
+    int w = 0;
+    int h = 0;
+
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getWidth() > w) {
+        w = tileLayer.getWidth();
+      }
+
+      if (tileLayer.getHeight() > h) {
+        h = tileLayer.getHeight();
+      }
+    }
+
+    this.width = w;
+    this.height = h;
   }
 }

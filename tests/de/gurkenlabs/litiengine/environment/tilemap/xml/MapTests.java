@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
@@ -49,7 +50,7 @@ public class MapTests {
     assertEquals(0, map.getCustomProperties().size());
     assertEquals(0, map.getMapObjects().size());
   }
-  
+
   @Test
   public void testTileCustomProperties() {
     IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
@@ -131,5 +132,17 @@ public class MapTests {
     assertEquals("1", adapter.marshal(1.00f));
     assertEquals("1.1", adapter.marshal(1.1f));
     assertEquals("1.00003", adapter.marshal(1.00003f));
+  }
+
+  @Test
+  public void testInfiniteMap() {
+    Map map = (Map)MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+    
+    assertTrue(map.isInfinite());
+    assertEquals(48, map.getWidth());
+    assertEquals(64, map.getHeight());
+    assertEquals(2, map.getTileLayers().size());
+    assertEquals(2, map.getTileLayers().size());
+    
   }
 }
