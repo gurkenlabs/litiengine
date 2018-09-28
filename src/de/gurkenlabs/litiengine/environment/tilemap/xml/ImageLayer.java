@@ -34,6 +34,26 @@ public class ImageLayer extends Layer implements IImageLayer {
     return null;
   }
 
+  @Override
+  public int getOffsetX() {
+    if (this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof Map) {
+      Map map = (Map) this.getMap();
+      return super.getOffsetX() - map.getChunkOffsetX();
+    }
+
+    return super.getOffsetX();
+  }
+
+  @Override
+  public int getOffsetY() {
+    if (this.getMap() != null && this.getMap().isInfinite() && this.getMap() instanceof Map) {
+      Map map = (Map) this.getMap();
+      return super.getOffsetX() - map.getChunkOffsetY();
+    }
+
+    return super.getOffsetY();
+  }
+
   public void setMapPath(final String path) {
     this.image.setAbsolutPath(path);
   }

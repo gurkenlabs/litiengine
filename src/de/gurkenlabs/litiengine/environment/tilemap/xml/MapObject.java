@@ -70,7 +70,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    * @param mapObjectToBeCopied
    *          the MapObject we want to copy
    */
-  public MapObject(IMapObject mapObjectToBeCopied) {
+  public MapObject(MapObject mapObjectToBeCopied) {
     super(mapObjectToBeCopied);
     this.setName(mapObjectToBeCopied.getName());
     this.setId(Game.getEnvironment().getNextMapId());
@@ -91,7 +91,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    * @param keepID
    *          decide if the new instance will adopt the old MapObject's ID or get a new, unique one.
    */
-  public MapObject(IMapObject mapObjectToBeCopied, boolean keepID) {
+  public MapObject(MapObject mapObjectToBeCopied, boolean keepID) {
     this(mapObjectToBeCopied);
     if (keepID) {
       this.setId(mapObjectToBeCopied.getId());

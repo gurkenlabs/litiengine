@@ -171,7 +171,7 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   private void applyChanges(Consumer<IMapObject> updateAction) {
-    final IMapObject before = new MapObject(getDataSource());
+    final IMapObject before = new MapObject((MapObject) getDataSource());
     UndoManager.instance().mapObjectChanging(getDataSource());
     updateAction.accept(getDataSource());
     UndoManager.instance().mapObjectChanged(getDataSource());

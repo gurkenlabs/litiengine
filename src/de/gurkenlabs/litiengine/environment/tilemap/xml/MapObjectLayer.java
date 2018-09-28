@@ -52,10 +52,10 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
    * @param layerToBeCopied
    *          the layer we want to copy
    */
-  public MapObjectLayer(IMapObjectLayer layerToBeCopied) {
+  public MapObjectLayer(MapObjectLayer layerToBeCopied) {
     super(layerToBeCopied);
     for (IMapObject obj : layerToBeCopied.getMapObjects()) {
-      this.addMapObject(new MapObject(obj));
+      this.addMapObject(new MapObject((MapObject)obj));
     }
     if (layerToBeCopied.getColor() != null) {
       this.setColor(layerToBeCopied.getColorHexString());

@@ -61,13 +61,13 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
    * @param layerToBeCopied
    *          the layer we want to copy
    */
-  public Layer(ILayer layerToBeCopied) {
+  public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
     this.setWidth(layerToBeCopied.getWidth());
     this.setHeight(layerToBeCopied.getHeight());
     this.setName(layerToBeCopied.getName());
-    this.setOffsetX(layerToBeCopied.getOffsetX());
-    this.setOffsetY(layerToBeCopied.getOffsetY());
+    this.offsetx = layerToBeCopied.offsetx;
+    this.offsety = layerToBeCopied.offsety;
     this.setOpacity(layerToBeCopied.getOpacity());
     this.setOrder(layerToBeCopied.getOrder());
     this.setVisible(layerToBeCopied.isVisible());
@@ -215,20 +215,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.visible = visible ? 1 : 0;
   }
 
-  @XmlTransient
-  public void setOffsetX(int offsetX) {
-    this.offsetx = offsetX;
-  }
-
-  @XmlTransient
-  public void setOffsetY(int offsetY) {
-    this.offsety = offsetY;
-  }
-
   protected void setMap(Map map) {
     this.parentMap = map;
   }
-  
+
   private void setOrder(int order) {
     this.set(LayerProperty.LAYER_ORDER, order);
   }
