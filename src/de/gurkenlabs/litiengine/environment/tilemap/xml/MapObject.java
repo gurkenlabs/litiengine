@@ -236,7 +236,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setX(float x) {
-    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+    if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
       this.x = x + map.getChunkOffsetX();
       return;
@@ -248,7 +248,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setY(float y) {
-    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+    if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
       this.y = y + map.getChunkOffsetY();
       return;
@@ -259,7 +259,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   public float getX() {
-    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+    if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
       return this.x - map.getChunkOffsetX();
     }
@@ -269,11 +269,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   public float getY() {
-    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+    if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
       return this.y - map.getChunkOffsetY();
     }
-    
+
     return this.y;
   }
 
@@ -305,5 +305,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   protected void setLayer(MapObjectLayer layer) {
     this.layer = layer;
+  }
+
+  private boolean isInfiniteMap() {
+    return this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map;
   }
 }
