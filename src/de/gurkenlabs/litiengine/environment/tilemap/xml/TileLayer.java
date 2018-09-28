@@ -92,6 +92,10 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.data.parseTiles();
   }
 
+  protected TileData getRawTileData() {
+    return this.data;
+  }
+
   public void setCustomPropertySources(Map map) {
     for (Tile tile : getData()) {
       for (ITileset tileset : map.getRawTilesets()) {

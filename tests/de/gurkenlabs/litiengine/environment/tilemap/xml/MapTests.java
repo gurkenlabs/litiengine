@@ -145,14 +145,6 @@ public class MapTests {
     assertEquals(2, map.getTileLayers().size());
     assertEquals(2, map.getTileLayers().size());
 
-    ITileLayer layer = map.getTileLayers().get(0);
-    for (int y = 0; y < layer.getHeight(); y++) {
-      for (int x = 0; x < layer.getWidth(); x++) {
-        System.out.print(layer.getTile(x, y) + ",");
-      }
-
-      System.out.println();
-    }
-    assertEquals(49, map.getTileLayers().get(0).getTile(15, 8).getGridId());
+    assertEquals(1, map.getTileLayers().get(0).getTile(15, 24).getGridId());
   }
 }

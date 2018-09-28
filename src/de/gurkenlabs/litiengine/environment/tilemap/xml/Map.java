@@ -642,9 +642,31 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
    * Update width and height by the max width and height of the tile layers in the infinite map.
    */
   private void updateDimensionsByTileLayers() {
+
+    int minChunkOffsetX = 0;
+    int minChunkOffsetY = 0;
+
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetX() < minChunkOffsetX) {
+        minChunkOffsetX = tileLayer.getRawTileData().getOffsetX();
+      }
+
+      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetY() < minChunkOffsetY) {
+        minChunkOffsetY = tileLayer.getRawTileData().getOffsetY();
+      }
+    }
+
+    // update all tile layer data with the information about the layer based on which they'll position themselves in the grid
+    // they need this information because they have to create an appropriately sized grid before locating their chunks in it
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getRawTileData() != null) {
+        tileLayer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
+      }
+    }
+    
     int w = 0;
     int h = 0;
-
+    
     for (TileLayer tileLayer : this.rawTileLayers) {
       if (tileLayer.getWidth() > w) {
         w = tileLayer.getWidth();

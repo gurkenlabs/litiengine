@@ -55,10 +55,16 @@ public class TileData {
   private int height;
 
   @XmlTransient
-  private int minChunkX;
+  private int offsetX;
 
   @XmlTransient
-  private int minChunkY;
+  private int offsetY;
+
+  @XmlTransient
+  private int minChunkOffsetXMap;
+
+  @XmlTransient
+  private int minChunkOffsetYMap;
 
   @XmlTransient
   public String getEncoding() {
@@ -87,16 +93,37 @@ public class TileData {
     this.value = value;
   }
 
+  protected void setMinChunkOffsets(int x, int y) {
+    this.minChunkOffsetXMap = x;
+    this.minChunkOffsetYMap = y;
+  }
+
   protected boolean isInfinite() {
     return this.chunks != null && !this.chunks.isEmpty();
   }
 
   protected int getWidth() {
+    if (this.isInfinite() && this.minChunkOffsetXMap != 0) {
+      return this.width + (this.offsetX - this.minChunkOffsetXMap);
+    }
+
     return this.width;
   }
 
   protected int getHeight() {
+    if (this.isInfinite() && this.minChunkOffsetYMap != 0) {
+      return this.height + (this.offsetY - this.minChunkOffsetYMap);
+    }
+    
     return this.height;
+  }
+
+  protected int getOffsetX() {
+    return this.offsetX;
+  }
+
+  protected int getOffsetY() {
+    return this.offsetY;
   }
 
   protected List<Tile> parseTiles() {
@@ -191,7 +218,7 @@ public class TileData {
   }
 
   void afterUnmarshal(Unmarshaller u, Object parent) {
-    this.processRawData();
+    this.processMixedData();
 
     if (this.isInfinite()) {
       // make sure that the chunks are organized top-left to bottom right
@@ -202,7 +229,11 @@ public class TileData {
     }
   }
 
-  private void processRawData() {
+  /**
+   * This method processes the {@link XmlMixed} contents that were unmarshalled and extract either the string value containing the information
+   * about the layer of a set of {@link TileChunk}s if the map is infinite.
+   */
+  private void processMixedData() {
     if (this.rawValue == null || this.rawValue.isEmpty()) {
       return;
     }
@@ -230,6 +261,9 @@ public class TileData {
     this.chunks = rawChunks;
   }
 
+  /**
+   * For infinite maps, the size of a tile layer depends on the <code>TileChunks</code> it contains.
+   */
   private void updateDimensionsByTileData() {
     int minX = 0;
     int maxX = 0;
@@ -261,14 +295,13 @@ public class TileData {
     this.width = (maxX + maxChunkWidth) - minX;
     this.height = (maxY + maxChunkHeight) - minY;
 
-    this.minChunkX = minX;
-    this.minChunkY = minY;
+    this.offsetX = minX;
+    this.offsetY = minY;
   }
 
   private List<Tile> parseChunkData() {
-
     // first fill a two-dimensional array with all the information of the chunks
-    Tile[][] tileArr = new Tile[this.height][this.width];
+    Tile[][] tileArr = new Tile[this.getHeight()][this.getWidth()];
 
     if (this.getEncoding().equals(ENCODING_BASE64)) {
       for (TileChunk chunk : this.chunks) {
@@ -297,8 +330,8 @@ public class TileData {
   }
 
   private void addTiles(Tile[][] tileArr, TileChunk chunk, List<Tile> chunkTiles) {
-    int startX = chunk.getX() - this.minChunkX;
-    int startY = chunk.getY() - this.minChunkY;
+    int startX = chunk.getX() - this.minChunkOffsetXMap;
+    int startY = chunk.getY() - this.minChunkOffsetYMap;
 
     int index = 0;
 
