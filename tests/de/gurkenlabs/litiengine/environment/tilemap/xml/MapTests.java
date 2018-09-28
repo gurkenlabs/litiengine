@@ -140,7 +140,7 @@ public class MapTests {
     Map map = (Map) MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
-    assertEquals(48, map.getWidth());
+    assertEquals(64, map.getWidth());
     assertEquals(64, map.getHeight());
     assertEquals(2, map.getTileLayers().size());
     assertEquals(2, map.getTileLayers().size());

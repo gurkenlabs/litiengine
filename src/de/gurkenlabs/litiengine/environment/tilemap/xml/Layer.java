@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
@@ -172,6 +173,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   @Override
+  public IMap getMap() {
+    return this.parentMap;
+  }
+
+  @Override
   public boolean isVisible() {
     if (this.visible == null) {
       return true;
@@ -219,6 +225,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.offsety = offsetY;
   }
 
+  protected void setMap(Map map) {
+    this.parentMap = map;
+  }
+  
   private void setOrder(int order) {
     this.set(LayerProperty.LAYER_ORDER, order);
   }

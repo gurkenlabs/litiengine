@@ -48,6 +48,8 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
   public String getType();
 
   public IPolyline getPolyline();
+  
+  public IMapObjectLayer getLayer();
 
   public void setGridId(int gid);
 

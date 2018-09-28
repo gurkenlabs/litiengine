@@ -53,6 +53,8 @@ public interface ILayer extends ICustomPropertyProvider {
   public Dimension getSizeInTiles();
 
   public int getOrder();
+  
+  public IMap getMap();
 
   /**
    * Checks if is visible.

@@ -172,4 +172,5 @@ public interface IMap extends ICustomPropertyProvider {
 
   public Color getBackgroundColor();
 
+  public boolean isInfinite();
 }

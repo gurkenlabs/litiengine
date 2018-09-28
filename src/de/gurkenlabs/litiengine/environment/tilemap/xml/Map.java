@@ -122,6 +122,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   private transient Color decodedBackgroundColor;
 
+  @XmlTransient
+  private int chunkOffsetX;
+
+  @XmlTransient
+  private int chunkOffsetY;
+
   @Override
   public List<IImageLayer> getImageLayers() {
     return this.imageLayers;
@@ -433,25 +439,35 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public void addMapObjectLayer(IMapObjectLayer layer) {
-    this.getRawMapObjectLayers().add((MapObjectLayer) layer);
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    this.getRawMapObjectLayers().add(rawLayer);
+    rawLayer.setMap(this);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void addMapObjectLayer(int index, IMapObjectLayer layer) {
-    this.getRawMapObjectLayers().add(index, (MapObjectLayer) layer);
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    this.getRawMapObjectLayers().add(index, rawLayer);
+    rawLayer.setMap(this);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(IMapObjectLayer layer) {
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    rawLayer.setMap(null);
     this.getRawMapObjectLayers().remove(layer);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(int index) {
-    this.getRawMapObjectLayers().remove(index);
+    MapObjectLayer removed = this.getRawMapObjectLayers().remove(index);
+    if (removed != null) {
+      removed.setMap(null);
+    }
+
     this.mapObjectLayers = null;
   }
 
@@ -564,6 +580,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawTileLayers;
   }
 
+  public boolean isInfinite() {
+    return this.infinite == 1;
+  }
+
   protected List<ImageLayer> getRawImageLayers() {
     if (this.rawImageLayers == null) {
       this.rawImageLayers = new ArrayList<>();
@@ -580,8 +600,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawMapObjectLayers;
   }
 
-  protected boolean isInfinite() {
-    return this.infinite == 1;
+  protected int getChunkOffsetX() {
+    return this.chunkOffsetX;
+  }
+
+  protected int getChunkOffsetY() {
+    return this.chunkOffsetY;
   }
 
   void afterUnmarshal(Unmarshaller u, Object parent) {
@@ -663,10 +687,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
         tileLayer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
       }
     }
-    
+
+    this.chunkOffsetX = minChunkOffsetX;
+    this.chunkOffsetY = minChunkOffsetY;
+
     int w = 0;
     int h = 0;
-    
+
     for (TileLayer tileLayer : this.rawTileLayers) {
       if (tileLayer.getWidth() > w) {
         w = tileLayer.getWidth();

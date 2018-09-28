@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 
 /**
  * The Class MapObject.
@@ -52,6 +53,8 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @XmlElement(name = "polyline")
   private Polyline polyline;
 
+  private transient MapObjectLayer layer;
+
   public MapObject() {
     super();
     this.setX(0f);
@@ -71,17 +74,18 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     super(mapObjectToBeCopied);
     this.setName(mapObjectToBeCopied.getName());
     this.setId(Game.getEnvironment().getNextMapId());
-    this.setPolyline(new Polyline (mapObjectToBeCopied.getPolyline()));
+    this.setPolyline(new Polyline(mapObjectToBeCopied.getPolyline()));
     this.setType(mapObjectToBeCopied.getType());
     this.setX(mapObjectToBeCopied.getX());
     this.setY(mapObjectToBeCopied.getY());
     this.setWidth(mapObjectToBeCopied.getWidth());
     this.setHeight(mapObjectToBeCopied.getHeight());
   }
-  
+
   /**
    * Copy Constructor for copying instances of MapObjects.
    * This variant of the constructor lets you decide if the copy instance will get the same ID as the old MapObject or get a new ID.
+   * 
    * @param mapObjectToBeCopied
    *          the MapObject we want to copy
    * @param keepID
@@ -89,9 +93,9 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
    */
   public MapObject(IMapObject mapObjectToBeCopied, boolean keepID) {
     this(mapObjectToBeCopied);
-    if(keepID) {
+    if (keepID) {
       this.setId(mapObjectToBeCopied.getId());
-    }   
+    }
   }
 
   public static Rectangle2D getBounds2D(IMapObject... objects) {
@@ -160,7 +164,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   public Rectangle2D getBoundingBox() {
-    return new Rectangle2D.Double(this.x, this.y, this.width, this.height);
+    return new Rectangle2D.Double(this.getX(), this.getY(), this.width, this.height);
   }
 
   @Override
@@ -170,7 +174,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @Override
   public Point2D getLocation() {
-    return new Point2D.Double(this.x, this.y);
+    return new Point2D.Double(this.getX(), this.getY());
   }
 
   @Override
@@ -232,22 +236,44 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setX(float x) {
+    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+      Map map = (Map) this.getLayer().getMap();
+      this.x = x + map.getChunkOffsetX();
+      return;
+    }
+
     this.x = x;
   }
 
   @Override
   @XmlTransient
   public void setY(float y) {
+    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+      Map map = (Map) this.getLayer().getMap();
+      this.y = y + map.getChunkOffsetY();
+      return;
+    }
+
     this.y = y;
   }
 
   @Override
   public float getX() {
+    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+      Map map = (Map) this.getLayer().getMap();
+      return this.x - map.getChunkOffsetX();
+    }
+
     return this.x;
   }
 
   @Override
   public float getY() {
+    if (this.getLayer() != null && this.getLayer().getMap() != null && this.getLayer().getMap().isInfinite() && this.getLayer().getMap() instanceof Map) {
+      Map map = (Map) this.getLayer().getMap();
+      return this.y - map.getChunkOffsetY();
+    }
+    
     return this.y;
   }
 
@@ -266,10 +292,18 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.height;
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.gid != null && this.gid == 0) {
       this.gid = null;
     }
+  }
+
+  @Override
+  public IMapObjectLayer getLayer() {
+    return this.layer;
+  }
+
+  protected void setLayer(MapObjectLayer layer) {
+    this.layer = layer;
   }
 }
