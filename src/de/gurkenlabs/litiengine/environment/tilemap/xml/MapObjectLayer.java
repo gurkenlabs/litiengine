@@ -52,10 +52,10 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
    * @param layerToBeCopied
    *          the layer we want to copy
    */
-  public MapObjectLayer(IMapObjectLayer layerToBeCopied) {
+  public MapObjectLayer(MapObjectLayer layerToBeCopied) {
     super(layerToBeCopied);
     for (IMapObject obj : layerToBeCopied.getMapObjects()) {
-      this.addMapObject(new MapObject(obj));
+      this.addMapObject(new MapObject((MapObject)obj));
     }
     if (layerToBeCopied.getColor() != null) {
       this.setColor(layerToBeCopied.getColorHexString());
@@ -82,6 +82,10 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public void removeMapObject(IMapObject mapObject) {
     this.mapObjects.remove(mapObject);
     this.objects.remove(mapObject);
+
+    if (mapObject instanceof MapObject) {
+      ((MapObject) mapObject).setLayer(null);
+    }
   }
 
   @Override
@@ -99,7 +103,9 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     loadMapObjects();
     this.mapObjects.add(mapObject);
     if (mapObject instanceof MapObject) {
-      this.objects.add((MapObject) mapObject);
+      MapObject obj = (MapObject) mapObject;
+      this.objects.add(obj);
+      obj.setLayer(this);
     }
   }
 
@@ -146,10 +152,13 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
     return objs;
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.objects == null) {
       this.objects = new ArrayList<>();
+    }
+
+    for (MapObject obj : this.objects) {
+      obj.setLayer(this);
     }
 
     Method m;

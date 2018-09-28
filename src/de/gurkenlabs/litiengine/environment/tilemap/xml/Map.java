@@ -73,6 +73,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int tileheight;
 
   @XmlAttribute
+  private int infinite;
+
+  @XmlAttribute
   private int hexsidelength;
 
   @XmlTransient
@@ -118,6 +121,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<ILayer> allRenderLayers;
 
   private transient Color decodedBackgroundColor;
+
+  @XmlTransient
+  private int chunkOffsetX;
+
+  @XmlTransient
+  private int chunkOffsetY;
 
   @Override
   public List<IImageLayer> getImageLayers() {
@@ -430,25 +439,35 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public void addMapObjectLayer(IMapObjectLayer layer) {
-    this.getRawMapObjectLayers().add((MapObjectLayer) layer);
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    this.getRawMapObjectLayers().add(rawLayer);
+    rawLayer.setMap(this);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void addMapObjectLayer(int index, IMapObjectLayer layer) {
-    this.getRawMapObjectLayers().add(index, (MapObjectLayer) layer);
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    this.getRawMapObjectLayers().add(index, rawLayer);
+    rawLayer.setMap(this);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(IMapObjectLayer layer) {
+    MapObjectLayer rawLayer = (MapObjectLayer) layer;
+    rawLayer.setMap(null);
     this.getRawMapObjectLayers().remove(layer);
     this.mapObjectLayers = null;
   }
 
   @Override
   public void removeMapObjectLayer(int index) {
-    this.getRawMapObjectLayers().remove(index);
+    MapObjectLayer removed = this.getRawMapObjectLayers().remove(index);
+    if (removed != null) {
+      removed.setMap(null);
+    }
+
     this.mapObjectLayers = null;
   }
 
@@ -561,6 +580,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawTileLayers;
   }
 
+  public boolean isInfinite() {
+    return this.infinite == 1;
+  }
+
   protected List<ImageLayer> getRawImageLayers() {
     if (this.rawImageLayers == null) {
       this.rawImageLayers = new ArrayList<>();
@@ -577,8 +600,15 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.rawMapObjectLayers;
   }
 
-  @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  protected int getChunkOffsetX() {
+    return this.chunkOffsetX;
+  }
+
+  protected int getChunkOffsetY() {
+    return this.chunkOffsetY;
+  }
+
+  void afterUnmarshal(Unmarshaller u, Object parent) {
     String[] ver = this.tiledversion.split("\\.");
     int[] vNumbers = new int[ver.length];
     try {
@@ -627,5 +657,54 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
     this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
 
+    if (this.isInfinite()) {
+      this.updateDimensionsByTileLayers();
+    }
+  }
+
+  /**
+   * Update width and height by the max width and height of the tile layers in the infinite map.
+   */
+  private void updateDimensionsByTileLayers() {
+
+    int minChunkOffsetX = 0;
+    int minChunkOffsetY = 0;
+
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetX() < minChunkOffsetX) {
+        minChunkOffsetX = tileLayer.getRawTileData().getOffsetX();
+      }
+
+      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetY() < minChunkOffsetY) {
+        minChunkOffsetY = tileLayer.getRawTileData().getOffsetY();
+      }
+    }
+
+    // update all tile layer data with the information about the layer based on which they'll position themselves in the grid
+    // they need this information because they have to create an appropriately sized grid before locating their chunks in it
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getRawTileData() != null) {
+        tileLayer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
+      }
+    }
+
+    this.chunkOffsetX = minChunkOffsetX;
+    this.chunkOffsetY = minChunkOffsetY;
+
+    int w = 0;
+    int h = 0;
+
+    for (TileLayer tileLayer : this.rawTileLayers) {
+      if (tileLayer.getWidth() > w) {
+        w = tileLayer.getWidth();
+      }
+
+      if (tileLayer.getHeight() > h) {
+        h = tileLayer.getHeight();
+      }
+    }
+
+    this.width = w;
+    this.height = h;
   }
 }

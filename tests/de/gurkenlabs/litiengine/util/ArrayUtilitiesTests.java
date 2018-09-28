@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,7 @@ public class ArrayUtilitiesTests {
   public void setup() {
     Logger.getLogger(ArrayUtilities.class.getName()).setUseParentHandlers(false);
   }
-  
+
   @Test
   public void testByteArrayConcat() {
     byte[] arr1 = new byte[] { 1, 2, 3, 4, 5 };
@@ -54,5 +55,28 @@ public class ArrayUtilitiesTests {
 
     assertEquals("100,200,300,1,2,3", testStringWithInts);
     assertNull(testEmpty);
+  }
+
+  @Test
+  public void testTwoDimensionalArrayToList() {
+    Integer[][] arr = new Integer[][] {
+      { 0, 0, 0, },  
+      { 1, 1, 1, },
+      { 2, 2, 2, },
+    };
+
+    List<Integer> list = ArrayUtilities.toList(arr);
+    
+    assertEquals(0, list.get(0).intValue());
+    assertEquals(0, list.get(1).intValue());
+    assertEquals(0, list.get(2).intValue());
+    
+    assertEquals(1, list.get(3).intValue());
+    assertEquals(1, list.get(4).intValue());
+    assertEquals(1, list.get(5).intValue());
+    
+    assertEquals(2, list.get(6).intValue());
+    assertEquals(2, list.get(7).intValue());
+    assertEquals(2, list.get(8).intValue());
   }
 }

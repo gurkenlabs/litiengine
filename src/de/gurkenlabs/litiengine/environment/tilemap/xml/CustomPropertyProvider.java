@@ -28,7 +28,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
    * @param propertyProviderToBeCopied
    *          the PropertyProvider we want to copy
    */
-  public CustomPropertyProvider(ICustomPropertyProvider propertyProviderToBeCopied) {
+  public CustomPropertyProvider(CustomPropertyProvider propertyProviderToBeCopied) {
     super();
     for (Property p : propertyProviderToBeCopied.getCustomProperties()) {
       this.getCustomProperties().add(new Property(p));

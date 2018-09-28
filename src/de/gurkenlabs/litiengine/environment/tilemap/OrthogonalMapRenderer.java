@@ -228,6 +228,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         ITile tile = layer.getTile(x, y);
         int tileX = x * map.getTileWidth();
         int tileY = y * map.getTileHeight();
+        
+        // TODO: incorporate layer offsets, right now this may cut off layers with an offset
         Rectangle tileBounds = new Rectangle(tileX, tileY, map.getTileWidth(), map.getTileHeight());
         if (tile == null || !viewport.intersects(tileBounds)) {
           continue;

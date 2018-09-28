@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
@@ -60,13 +61,13 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
    * @param layerToBeCopied
    *          the layer we want to copy
    */
-  public Layer(ILayer layerToBeCopied) {
+  public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
     this.setWidth(layerToBeCopied.getWidth());
     this.setHeight(layerToBeCopied.getHeight());
     this.setName(layerToBeCopied.getName());
-    this.setOffsetX(layerToBeCopied.getOffsetX());
-    this.setOffsetY(layerToBeCopied.getOffsetY());
+    this.offsetx = layerToBeCopied.offsetx;
+    this.offsety = layerToBeCopied.offsety;
     this.setOpacity(layerToBeCopied.getOpacity());
     this.setOrder(layerToBeCopied.getOrder());
     this.setVisible(layerToBeCopied.isVisible());
@@ -172,6 +173,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   @Override
+  public IMap getMap() {
+    return this.parentMap;
+  }
+
+  @Override
   public boolean isVisible() {
     if (this.visible == null) {
       return true;
@@ -209,14 +215,8 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.visible = visible ? 1 : 0;
   }
 
-  @XmlTransient
-  public void setOffsetX(int offsetX) {
-    this.offsetx = offsetX;
-  }
-
-  @XmlTransient
-  public void setOffsetY(int offsetY) {
-    this.offsety = offsetY;
+  protected void setMap(Map map) {
+    this.parentMap = map;
   }
 
   private void setOrder(int order) {

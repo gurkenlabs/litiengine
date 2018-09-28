@@ -170,7 +170,7 @@ public class UndoManager {
       return;
     }
 
-    this.changing.add(new MapObject(mapObject,true));
+    this.changing.add(new MapObject((MapObject)mapObject,true));
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
@@ -189,7 +189,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject(mapObject,true), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject((MapObject)mapObject,true), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
