@@ -38,7 +38,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   public int getOffsetX() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getMap();
-      return super.getOffsetX() - map.getChunkOffsetX();
+      return super.getOffsetX() - map.getChunkOffsetX() * map.getTileWidth();
     }
 
     return super.getOffsetX();
@@ -48,7 +48,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   public int getOffsetY() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getMap();
-      return super.getOffsetX() - map.getChunkOffsetY();
+      return super.getOffsetX() - map.getChunkOffsetY() * map.getTileHeight();
     }
 
     return super.getOffsetY();

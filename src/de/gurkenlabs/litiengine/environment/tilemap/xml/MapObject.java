@@ -238,7 +238,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public void setX(float x) {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
-      this.x = x + map.getChunkOffsetX();
+      this.x = x + map.getChunkOffsetX() * map.getTileWidth();
       return;
     }
 
@@ -250,7 +250,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public void setY(float y) {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
-      this.y = y + map.getChunkOffsetY();
+      this.y = y + map.getChunkOffsetY() * map.getTileHeight();
       return;
     }
 
@@ -261,7 +261,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public float getX() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
-      return this.x - map.getChunkOffsetX();
+      return this.x - map.getChunkOffsetX() * map.getTileWidth();
     }
 
     return this.x;
@@ -271,7 +271,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public float getY() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();
-      return this.y - map.getChunkOffsetY();
+      return this.y - map.getChunkOffsetY() * map.getTileHeight();
     }
 
     return this.y;
