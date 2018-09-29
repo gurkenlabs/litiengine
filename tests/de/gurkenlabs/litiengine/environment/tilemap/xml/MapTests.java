@@ -41,7 +41,7 @@ public class MapTests {
     assertEquals(new Rectangle2D.Double(0, 0, 256, 256), map.getBounds());
     assertEquals(2, map.getTilesets().size());
     assertEquals(1, ((Map) map).getExternalTilesets().size());
-    assertEquals("tiles-test", map.getTilesets().get(1).getName());
+    assertEquals("external-tileset", map.getTilesets().get(1).getName());
     assertEquals(1, map.getTileLayers().size());
     assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().width);
     assertEquals(16, map.getTileLayers().get(0).getSizeInTiles().height);
