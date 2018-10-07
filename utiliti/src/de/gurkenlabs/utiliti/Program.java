@@ -625,20 +625,38 @@ public class Program {
     return mnMap;
   }
 
-  private static Menu initHelpMenu(){
+  private static Menu initHelpMenu() {
     Menu helpMenu = new Menu("Help");
-    MenuItem gitHubMenuItem = new MenuItem("GitHub Wiki");
-    gitHubMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create("https://github.com/gurkenlabs/litiengine/wiki")));
 
-    MenuItem payPalMenuItem = new MenuItem("PayPal");
-    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create("https://www.paypal.me/gurkenlabsmatthias")));
+    MenuItem tutorialMenuItem = new MenuItem(Resources.get("menu_help_tutorial"));
+    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_tutorials"))));
 
-    MenuItem aboutMenuItem = new MenuItem("About");
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.getScreenManager()), "LITIengine is the pure 2D free java game engine.\n" +
-            "Written in plain Java 8, it provides all the infrastructure to create a 2D tile based java game,\n" +
-            "be it a platformer or a top-down adventure.", "About utiLITI " + Game.getInfo().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+    MenuItem wikiMenuItem = new MenuItem(Resources.get("menu_help_wiki"));
+    wikiMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_wiki"))));
 
-    helpMenu.add(gitHubMenuItem);
+    MenuItem javadocsMenuItem = new MenuItem(Resources.get("menu_help_javadocs"));
+    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_javadocs"))));
+
+    MenuItem forumMenuItem = new MenuItem(Resources.get("menu_help_forum"));
+    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_forum"))));
+
+    MenuItem patreonMenuItem = new MenuItem(Resources.get("menu_help_patreon"));
+    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_patreon"))));
+
+    MenuItem payPalMenuItem = new MenuItem(Resources.get("menu_help_paypal"));
+    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_wiki"))));
+
+    MenuItem aboutMenuItem = new MenuItem(Resources.get("menu_help_about"));
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.getScreenManager()),
+        Resources.get("menu_help_abouttext") + "\n" + Resources.get("menu_help_releases") + Resources.get("link_LITIengine_releases") + "\n\n" + Resources.get("copyright_gurkenlabs") + "\n" + Resources.get("copyright_LITIengine"), Resources.get("menu_help_about") + " " + Game.getInfo().getVersion(),
+        JOptionPane.INFORMATION_MESSAGE));
+
+    helpMenu.add(tutorialMenuItem);
+    helpMenu.add(wikiMenuItem);
+    helpMenu.add(javadocsMenuItem);
+    helpMenu.add(forumMenuItem);
+    helpMenu.addSeparator();
+    helpMenu.add(patreonMenuItem);
     helpMenu.add(payPalMenuItem);
     helpMenu.addSeparator();
     helpMenu.add(aboutMenuItem);
