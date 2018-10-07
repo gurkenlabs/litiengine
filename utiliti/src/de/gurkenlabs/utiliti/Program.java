@@ -25,6 +25,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URI;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.ColorHelper;
+import de.gurkenlabs.litiengine.util.UriUtilities;
 import de.gurkenlabs.utiliti.components.MapComponent;
 import de.gurkenlabs.utiliti.swing.AssetPanel;
 import de.gurkenlabs.utiliti.swing.AssetTree;
@@ -332,6 +334,10 @@ public class Program {
 
     Menu mnMap = initMapMenu();
     menuBar.add(mnMap);
+
+    Menu mnHelp = initHelpMenu();
+    menuBar.add(mnHelp);
+
     return menuBar;
   }
 
@@ -617,6 +623,27 @@ public class Program {
     mnMap.add(mapProps);
 
     return mnMap;
+  }
+
+  private static Menu initHelpMenu(){
+    Menu helpMenu = new Menu("Help");
+    MenuItem gitHubMenuItem = new MenuItem("GitHub Wiki");
+    gitHubMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create("https://github.com/gurkenlabs/litiengine/wiki")));
+
+    MenuItem payPalMenuItem = new MenuItem("PayPal");
+    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create("https://www.paypal.me/gurkenlabsmatthias")));
+
+    MenuItem aboutMenuItem = new MenuItem("About");
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.getScreenManager()), "LITIengine is the pure 2D free java game engine.\n" +
+            "Written in plain Java 8, it provides all the infrastructure to create a 2D tile based java game,\n" +
+            "be it a platformer or a top-down adventure.", "About utiLITI " + Game.getInfo().getVersion(), JOptionPane.INFORMATION_MESSAGE));
+
+    helpMenu.add(gitHubMenuItem);
+    helpMenu.add(payPalMenuItem);
+    helpMenu.addSeparator();
+    helpMenu.add(aboutMenuItem);
+
+    return helpMenu;
   }
 
   private static Component initAssetsComponent() {
