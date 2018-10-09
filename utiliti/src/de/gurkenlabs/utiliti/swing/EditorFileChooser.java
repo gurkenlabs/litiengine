@@ -2,7 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.io.File;
 
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -26,7 +26,7 @@ public final class EditorFileChooser extends JFileChooser {
     instance().setFileSelectionMode(JFileChooser.FILES_ONLY);
     instance().setMultiSelectionEnabled(multiselect);
     instance().setDialogTitle(title);
-    return instance().showOpenDialog(Game.getScreenManager().getRenderComponent());
+    return instance().showOpenDialog((JFrame) Game.getScreenManager());
   }
 
   public static int showFileDialog(String description, boolean multiselect, String... extensions) {
