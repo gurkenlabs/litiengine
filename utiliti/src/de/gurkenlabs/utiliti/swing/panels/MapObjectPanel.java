@@ -236,7 +236,7 @@ public class MapObjectPanel extends PropertyPanel {
     this.labelEntityID.setText(Integer.toString(mapObject.getId()));
     this.comboBoxType.setEnabled(false);
 
-    this.tagPanel.bind(mapObject.getString(MapObjectProperty.TAGS));
+    this.tagPanel.bind(mapObject.getStringProperty(MapObjectProperty.TAGS));
   }
 
   private void setupChangedListeners() {
@@ -277,7 +277,7 @@ public class MapObjectPanel extends PropertyPanel {
       EditorScreen.instance().getMapComponent().updateTransformControls();
     }));
 
-    this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
+    this.tagPanel.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.TAGS, this.tagPanel.getTagsString())));
   }
 
   private static float getSpinnerValue(JSpinner spinner) {

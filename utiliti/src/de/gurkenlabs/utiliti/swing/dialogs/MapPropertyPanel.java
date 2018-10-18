@@ -177,16 +177,16 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private void setControlValues(IMap map) {
-    this.textFieldDescription.setText(map.getString(MapProperty.MAP_DESCRIPTION));
-    this.textFieldTitle.setText(map.getString(MapProperty.MAP_TITLE));
+    this.textFieldDescription.setText(map.getStringProperty(MapProperty.MAP_DESCRIPTION));
+    this.textFieldTitle.setText(map.getStringProperty(MapProperty.MAP_TITLE));
     this.textFieldName.setText(map.getName());
-    this.spinnerAmbientAlpha.setValue(map.getInt(MapProperty.AMBIENTALPHA));
-    if (map.getString(MapProperty.AMBIENTCOLOR) != null) {
-      this.textFieldAmbientColor.setText(map.getString(MapProperty.AMBIENTCOLOR));
+    this.spinnerAmbientAlpha.setValue(map.getIntProperty(MapProperty.AMBIENTALPHA));
+    if (map.getStringProperty(MapProperty.AMBIENTCOLOR) != null) {
+      this.textFieldAmbientColor.setText(map.getStringProperty(MapProperty.AMBIENTCOLOR));
     }
 
-    this.spinnerShadow.setValue(map.getInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA));
-    this.textFieldShadowColor.setText(map.getString(MapProperty.SHADOWCOLOR, "#" + Integer.toHexString(StaticShadow.DEFAULT_COLOR.getRGB()).substring(2)));
+    this.spinnerShadow.setValue(map.getIntProperty(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA));
+    this.textFieldShadowColor.setText(map.getStringProperty(MapProperty.SHADOWCOLOR, "#" + Integer.toHexString(StaticShadow.DEFAULT_COLOR.getRGB()).substring(2)));
   }
 
   public void saveChanges() {
@@ -194,12 +194,12 @@ public class MapPropertyPanel extends JPanel {
       return;
     }
 
-    this.dataSource.set(MapProperty.MAP_DESCRIPTION, this.textFieldDescription.getText());
-    this.dataSource.set(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
-    this.dataSource.set(MapProperty.AMBIENTALPHA, this.spinnerAmbientAlpha.getValue().toString());
-    this.dataSource.set(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
-    this.dataSource.set(MapProperty.SHADOWALPHA, this.spinnerShadow.getValue().toString());
-    this.dataSource.set(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
+    this.dataSource.setProperty(MapProperty.MAP_DESCRIPTION, this.textFieldDescription.getText());
+    this.dataSource.setProperty(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
+    this.dataSource.setProperty(MapProperty.AMBIENTALPHA, this.spinnerAmbientAlpha.getValue().toString());
+    this.dataSource.setProperty(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
+    this.dataSource.setProperty(MapProperty.SHADOWALPHA, this.spinnerShadow.getValue().toString());
+    this.dataSource.setProperty(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
     this.dataSource.setName(this.textFieldName.getText());
   }
 }

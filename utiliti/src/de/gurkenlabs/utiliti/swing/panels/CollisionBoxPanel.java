@@ -46,12 +46,12 @@ public class CollisionBoxPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxIsObstacle.setSelected(mapObject.getBool(MapObjectProperty.PROP_OBSTACLE));
-    this.chckbxIsObstructingLights.setSelected(mapObject.getBool(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
+    this.chckbxIsObstacle.setSelected(mapObject.getBoolProperty(MapObjectProperty.PROP_OBSTACLE));
+    this.chckbxIsObstructingLights.setSelected(mapObject.getBoolProperty(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
 
   private void setupChangedListeners() {
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.PROP_OBSTACLE, chckbxIsObstacle.isSelected())));
-    this.chckbxIsObstructingLights.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS, chckbxIsObstructingLights.isSelected())));
+    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.PROP_OBSTACLE, chckbxIsObstacle.isSelected())));
+    this.chckbxIsObstructingLights.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS, chckbxIsObstructingLights.isSelected())));
   }
 }

@@ -169,36 +169,36 @@ public class TriggerPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldMessage.setText(mapObject.getString(MapObjectProperty.TRIGGER_MESSAGE));
+    this.textFieldMessage.setText(mapObject.getStringProperty(MapObjectProperty.TRIGGER_MESSAGE));
 
-    String targets = mapObject.getString(MapObjectProperty.TRIGGER_TARGETS);
+    String targets = mapObject.getStringProperty(MapObjectProperty.TRIGGER_TARGETS);
     this.targetsModel.setRowCount(0);
     for (int target : ArrayUtilities.getIntegerArray(targets)) {
       this.targetsModel.addRow(new Object[] { target });
     }
 
-    this.chckbxOneTimeOnly.setSelected(mapObject.getBool(MapObjectProperty.TRIGGER_ONETIME));
+    this.chckbxOneTimeOnly.setSelected(mapObject.getBoolProperty(MapObjectProperty.TRIGGER_ONETIME));
 
-    final TriggerActivation act = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION));
+    final TriggerActivation act = mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATION) == null ? TriggerActivation.COLLISION : TriggerActivation.valueOf(mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATION));
     this.comboBoxActivationType.setSelectedItem(act);
 
-    String activators = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATORS);
+    String activators = mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
     this.model.setRowCount(0);
     for (int activator : ArrayUtilities.getIntegerArray(activators)) {
       this.model.addRow(new Object[] { activator });
     }
 
-    this.spinnerCooldown.setValue(mapObject.getInt(MapObjectProperty.TRIGGER_COOLDOWN));
+    this.spinnerCooldown.setValue(mapObject.getIntProperty(MapObjectProperty.TRIGGER_COOLDOWN));
   }
 
   private void setupChangedListeners() {
-    this.chckbxOneTimeOnly.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.TRIGGER_ONETIME, this.chckbxOneTimeOnly.isSelected())));
-    this.textFieldMessage.addFocusListener(new MapObjectPropteryFocusListener(m -> m.set(MapObjectProperty.TRIGGER_MESSAGE, textFieldMessage.getText())));
-    this.textFieldMessage.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.TRIGGER_MESSAGE, textFieldMessage.getText())));
+    this.chckbxOneTimeOnly.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.TRIGGER_ONETIME, this.chckbxOneTimeOnly.isSelected())));
+    this.textFieldMessage.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setProperty(MapObjectProperty.TRIGGER_MESSAGE, textFieldMessage.getText())));
+    this.textFieldMessage.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.TRIGGER_MESSAGE, textFieldMessage.getText())));
 
     this.comboBoxActivationType.addActionListener(new MapObjectPropertyActionListener(m -> {
       TriggerActivation act = (TriggerActivation) this.comboBoxActivationType.getSelectedItem();
-      m.set(MapObjectProperty.TRIGGER_ACTIVATION, act);
+      m.setProperty(MapObjectProperty.TRIGGER_ACTIVATION, act);
     }));
 
     this.model.addTableModelListener(t -> {
@@ -214,7 +214,7 @@ public class TriggerPanel extends PropertyPanel {
         }
       }
 
-      getDataSource().set(MapObjectProperty.TRIGGER_ACTIVATORS, String.join(",", activators));
+      getDataSource().setProperty(MapObjectProperty.TRIGGER_ACTIVATORS, String.join(",", activators));
     });
 
     this.targetsModel.addTableModelListener(t -> {
@@ -230,9 +230,9 @@ public class TriggerPanel extends PropertyPanel {
         }
       }
 
-      getDataSource().set(MapObjectProperty.TRIGGER_TARGETS, String.join(",", targets));
+      getDataSource().setProperty(MapObjectProperty.TRIGGER_TARGETS, String.join(",", targets));
     });
 
-    this.spinnerCooldown.addChangeListener(new MapObjectPropertyChangeListener(m -> m.set(MapObjectProperty.TRIGGER_COOLDOWN, (int) this.spinnerCooldown.getValue())));
+    this.spinnerCooldown.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setProperty(MapObjectProperty.TRIGGER_COOLDOWN, (int) this.spinnerCooldown.getValue())));
   }
 }

@@ -955,7 +955,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
       model.setValueAt(c, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
         String commaSeperated = ArrayUtilities.getCommaSeparatedString(colors);
-        this.getDataSource().set(MapObjectProperty.Emitter.COLORS, commaSeperated);
+        this.getDataSource().setProperty(MapObjectProperty.Emitter.COLORS, commaSeperated);
       }
     });
 
@@ -983,24 +983,24 @@ public class EmitterPropertyPanel extends PropertyPanel {
       this.updateTabbedGroup();
 
       this.txt.setEnabled(particleType == ParticleType.TEXT);
-      m.set(MapObjectProperty.Emitter.PARTICLETYPE, particleType);
+      m.setProperty(MapObjectProperty.Emitter.PARTICLETYPE, particleType);
     }));
     
     this.comboBoxCollisionType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.set(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString());
+      m.setProperty(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString());
     }));
     
     this.comboBoxSprite.addActionListener(new MapObjectPropertyActionListener(m -> {
       String sprite = this.comboBoxSprite.getSelectedItem().toString();
-      m.set(MapObjectProperty.Particle.SPRITE, sprite);
+      m.setProperty(MapObjectProperty.Particle.SPRITE, sprite);
     }));
     
     this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.set(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
+      m.setProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
     }));
     
     this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.set(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
+      m.setProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
     }));
     
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
@@ -1039,9 +1039,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.spinnerColorDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.COLORDEVIATION, this.spinnerColorDeviation));
     this.spinnerAlphaDeviation.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.ALPHADEVIATION, this.spinnerAlphaDeviation));
 
-    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.Particle.TEXT, this.txt.getText())));
+    this.txt.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.Particle.TEXT, this.txt.getText())));
     
-    this.checkBoxFade.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.Particle.FADE, this.checkBoxFade.isSelected())));
+    this.checkBoxFade.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.Particle.FADE, this.checkBoxFade.isSelected())));
   }
   
   private void updateTabbedGroup() {
@@ -1125,71 +1125,71 @@ public class EmitterPropertyPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    ParticleType type = mapObject.getEnum(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE);
+    ParticleType type = mapObject.getEnumProperty(MapObjectProperty.Emitter.PARTICLETYPE, ParticleType.class, ParticleType.RECTANGLE);
     this.comboBoxParticleType.setSelectedItem(type);
     this.updateTabbedGroup();
-    this.comboBoxSprite.setSelectedItem(mapObject.getString(MapObjectProperty.Particle.SPRITE));
-    this.comboBoxCollisionType.setSelectedItem(mapObject.getEnum(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
-    this.comboBoxAlign.setSelectedItem(mapObject.getEnum(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.CENTER));
-    this.comboBoxValign.setSelectedItem(mapObject.getEnum(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.MIDDLE));
+    this.comboBoxSprite.setSelectedItem(mapObject.getStringProperty(MapObjectProperty.Particle.SPRITE));
+    this.comboBoxCollisionType.setSelectedItem(mapObject.getEnumProperty(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
+    this.comboBoxAlign.setSelectedItem(mapObject.getEnumProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.CENTER));
+    this.comboBoxValign.setSelectedItem(mapObject.getEnumProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.MIDDLE));
     
     // TODO: implement this
     this.comboBoxSpriteType.setSelectedIndex(0);
 
-    this.spinnerSpawnRate.setValue(mapObject.getInt(MapObjectProperty.Emitter.SPAWNRATE));
-    this.spinnerSpawnAmount.setValue(mapObject.getInt(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
-    this.spinnerUpdateRate.setValue(mapObject.getInt(MapObjectProperty.Emitter.UPDATERATE));
-    this.spinnerTTL.setValue(mapObject.getInt(MapObjectProperty.Emitter.TIMETOLIVE));
-    this.spinnerMaxParticles.setValue(mapObject.getInt(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
+    this.spinnerSpawnRate.setValue(mapObject.getIntProperty(MapObjectProperty.Emitter.SPAWNRATE));
+    this.spinnerSpawnAmount.setValue(mapObject.getIntProperty(MapObjectProperty.Emitter.SPAWNAMOUNT, Emitter.DEFAULT_SPAWNAMOUNT));
+    this.spinnerUpdateRate.setValue(mapObject.getIntProperty(MapObjectProperty.Emitter.UPDATERATE));
+    this.spinnerTTL.setValue(mapObject.getIntProperty(MapObjectProperty.Emitter.TIMETOLIVE));
+    this.spinnerMaxParticles.setValue(mapObject.getIntProperty(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
 
     // TODO: implement this
-    this.spinnerColorDeviation.setValue(mapObject.getDouble(MapObjectProperty.Emitter.COLORDEVIATION));
-    this.spinnerAlphaDeviation.setValue(mapObject.getDouble(MapObjectProperty.Emitter.ALPHADEVIATION));
+    this.spinnerColorDeviation.setValue(mapObject.getDoubleProperty(MapObjectProperty.Emitter.COLORDEVIATION));
+    this.spinnerAlphaDeviation.setValue(mapObject.getDoubleProperty(MapObjectProperty.Emitter.ALPHADEVIATION));
 
-    this.spinnerMinDeltaX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINDELTAX, -PARTICLEDELTA_DEFAULT_VALUE));
-    this.spinnerMaxDeltaX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXDELTAX, PARTICLEDELTA_DEFAULT_VALUE));
-    this.spinnerMinDeltaY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINDELTAY, -PARTICLEDELTA_DEFAULT_VALUE));
-    this.spinnerMaxDeltaY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXDELTAY, PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMinDeltaX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINDELTAX, -PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMaxDeltaX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXDELTAX, PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMinDeltaY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINDELTAY, -PARTICLEDELTA_DEFAULT_VALUE));
+    this.spinnerMaxDeltaY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXDELTAY, PARTICLEDELTA_DEFAULT_VALUE));
 
-    this.spinnerMinGravityX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINGRAVITYX));
-    this.spinnerMaxGravityX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXGRAVITYX));
-    this.spinnerMinGravityY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINGRAVITYY));
-    this.spinnerMaxGravityY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXGRAVITYY));
+    this.spinnerMinGravityX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINGRAVITYX));
+    this.spinnerMaxGravityX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXGRAVITYX));
+    this.spinnerMinGravityY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINGRAVITYY));
+    this.spinnerMaxGravityY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXGRAVITYY));
 
-    this.spinnerMinStartWidth.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINSTARTWIDTH, 1));
-    this.spinnerMaxStartWidth.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXSTARTWIDTH, 1));
-    this.spinnerMinStartHeight.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINSTARTHEIGHT, 1));
-    this.spinnerMaxStartHeight.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXSTARTHEIGHT, 1));
+    this.spinnerMinStartWidth.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINSTARTWIDTH, 1));
+    this.spinnerMaxStartWidth.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXSTARTWIDTH, 1));
+    this.spinnerMinStartHeight.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINSTARTHEIGHT, 1));
+    this.spinnerMaxStartHeight.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXSTARTHEIGHT, 1));
 
-    this.spinnerMinDeltaWidth.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINDELTAWIDTH));
-    this.spinnerMaxDeltaWidth.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXDELTAWIDTH));
-    this.spinnerMinDeltaHeight.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINDELTAHEIGHT));
-    this.spinnerMaxDeltaHeight.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXDELTAHEIGHT));
+    this.spinnerMinDeltaWidth.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINDELTAWIDTH));
+    this.spinnerMaxDeltaWidth.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXDELTAWIDTH));
+    this.spinnerMinDeltaHeight.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINDELTAHEIGHT));
+    this.spinnerMaxDeltaHeight.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXDELTAHEIGHT));
 
-    this.spinnerMinParticleTTL.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINTTL, PARTICLEMINTTL_DEFAULT_VALUE));
-    this.spinnerMaxParticleTTL.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXTTL));
+    this.spinnerMinParticleTTL.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINTTL, PARTICLEMINTTL_DEFAULT_VALUE));
+    this.spinnerMaxParticleTTL.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXTTL));
 
-    this.spinnerMinStartX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINX));
-    this.spinnerMaxStartX.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXX));
+    this.spinnerMinStartX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINX));
+    this.spinnerMaxStartX.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXX));
     
-    this.spinnerMinStartY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MINY));
-    this.spinnerMaxStartY.setValue(mapObject.getDouble(MapObjectProperty.Particle.MAXY));
+    this.spinnerMinStartY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MINY));
+    this.spinnerMaxStartY.setValue(mapObject.getDoubleProperty(MapObjectProperty.Particle.MAXY));
     
-    this.txt.setText(mapObject.getString(MapObjectProperty.Particle.TEXT));
+    this.txt.setText(mapObject.getStringProperty(MapObjectProperty.Particle.TEXT));
 
-    this.rdbtnRandomDeltaX.setSelected(mapObject.getBool(MapObjectProperty.Particle.DELTAX_RANDOM, true));
-    this.rdbtnRandomDeltaY.setSelected(mapObject.getBool(MapObjectProperty.Particle.DELTAY_RANDOM, true));
+    this.rdbtnRandomDeltaX.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.DELTAX_RANDOM, true));
+    this.rdbtnRandomDeltaY.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.DELTAY_RANDOM, true));
 
-    this.rdbtnRandomGravityX.setSelected(mapObject.getBool(MapObjectProperty.Particle.GRAVITYX_RANDOM));
-    this.rdbtnRandomGravityY.setSelected(mapObject.getBool(MapObjectProperty.Particle.GRAVITYY_RANDOM));
-    this.rdbtnRandomStartWidth.setSelected(mapObject.getBool(MapObjectProperty.Particle.STARTWIDTH_RANDOM));
-    this.rdbtnRandomStartHeight.setSelected(mapObject.getBool(MapObjectProperty.Particle.STARTHEIGHT_RANDOM));
-    this.rdbtnRandomDeltaWidth.setSelected(mapObject.getBool(MapObjectProperty.Particle.DELTAWIDTH_RANDOM));
-    this.rdbtnRandomDeltaHeight.setSelected(mapObject.getBool(MapObjectProperty.Particle.DELTAHEIGHT_RANDOM));
-    this.rdbtnRandomParticleTTL.setSelected(mapObject.getBool(MapObjectProperty.Particle.TTL_RANDOM));
+    this.rdbtnRandomGravityX.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.GRAVITYX_RANDOM));
+    this.rdbtnRandomGravityY.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.GRAVITYY_RANDOM));
+    this.rdbtnRandomStartWidth.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.STARTWIDTH_RANDOM));
+    this.rdbtnRandomStartHeight.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.STARTHEIGHT_RANDOM));
+    this.rdbtnRandomDeltaWidth.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.DELTAWIDTH_RANDOM));
+    this.rdbtnRandomDeltaHeight.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.DELTAHEIGHT_RANDOM));
+    this.rdbtnRandomParticleTTL.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.TTL_RANDOM));
     
-    this.rdbtnRandomStartX.setSelected(mapObject.getBool(MapObjectProperty.Particle.X_RANDOM));
-    this.rdbtnRandomStartY.setSelected(mapObject.getBool(MapObjectProperty.Particle.Y_RANDOM));
+    this.rdbtnRandomStartX.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.X_RANDOM));
+    this.rdbtnRandomStartY.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.Y_RANDOM));
 
     this.model.setRowCount(0);
     for (ParticleColor color : EmitterMapObjectLoader.getColors(mapObject)) {
@@ -1197,7 +1197,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
       this.model.addRow(new Object[] { null, color.toString() });
     }
     
-    this.checkBoxFade.setSelected(mapObject.getBool(MapObjectProperty.Particle.FADE, true));
+    this.checkBoxFade.setSelected(mapObject.getBoolProperty(MapObjectProperty.Particle.FADE, true));
   }
 
   private static SpinnerNumberModel getParticleMinModel() {
@@ -1228,7 +1228,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     private final JSpinner max;
 
     public ParticleRadioButtonListener(String mapObjectPropery, JRadioButton button, JSpinner max) {
-      super(m -> m.set(mapObjectPropery, button.isSelected()));
+      super(m -> m.setProperty(mapObjectPropery, button.isSelected()));
       this.max = max;
     }
 

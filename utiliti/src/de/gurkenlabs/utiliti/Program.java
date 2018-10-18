@@ -595,10 +595,10 @@ public class Program {
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
-        final String colorProp = Game.getEnvironment().getMap().getString(MapProperty.AMBIENTCOLOR);
+        final String colorProp = Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTCOLOR);
         try {
-          if (Game.getEnvironment().getMap().getString(MapProperty.AMBIENTALPHA) != null) {
-            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getString(MapProperty.AMBIENTALPHA));
+          if (Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTALPHA) != null) {
+            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTALPHA));
             Game.getEnvironment().getAmbientLight().setAlpha(alpha);
           }
 
@@ -917,7 +917,7 @@ public class Program {
         return;
       }
 
-      Game.getEnvironment().getMap().set(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
+      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
       Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
     });
 
@@ -941,7 +941,7 @@ public class Program {
 
       spinnerAmbientAlpha.setValue(result.getAlpha());
 
-      Game.getEnvironment().getMap().set(MapProperty.AMBIENTCOLOR, colorText.getText());
+      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
       Game.getEnvironment().getAmbientLight().setColor(result);
     });
 
@@ -949,9 +949,9 @@ public class Program {
       isChanging = true;
       colorButton.setEnabled(map != null);
       spinnerAmbientAlpha.setEnabled(map != null);
-      colorText.setText(map.getString(MapProperty.AMBIENTCOLOR));
+      colorText.setText(map.getStringProperty(MapProperty.AMBIENTCOLOR));
 
-      String alpha = map.getString(MapProperty.AMBIENTALPHA);
+      String alpha = map.getStringProperty(MapProperty.AMBIENTALPHA);
       if (alpha != null && !alpha.isEmpty()) {
         spinnerAmbientAlpha.setValue((int) Double.parseDouble(alpha));
       }

@@ -113,7 +113,7 @@ public class CustomPanel extends PropertyPanel {
         String value = (String) model.getValueAt(row, 1);
         if (name != null && value != null && !name.isEmpty() && !value.isEmpty()) {
           setProperties.add(name);
-          getDataSource().set(name, value);
+          getDataSource().setProperty(name, value);
         }
       }
 

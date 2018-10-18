@@ -62,17 +62,17 @@ public class SpawnpointPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.textFieldType.setText(mapObject.getString(MapObjectProperty.SPAWN_TYPE));
+    this.textFieldType.setText(mapObject.getStringProperty(MapObjectProperty.SPAWN_TYPE));
 
-    String direction = mapObject.getString(MapObjectProperty.SPAWN_DIRECTION);
+    String direction = mapObject.getStringProperty(MapObjectProperty.SPAWN_DIRECTION);
     if (direction != null && !direction.isEmpty()) {
       this.comboBoxDirection.setSelectedItem(Direction.valueOf(direction));
     }
   }
 
   private void setupChangedListeners() {
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> m.set(MapObjectProperty.SPAWN_DIRECTION, (Direction) this.comboBoxDirection.getSelectedItem())));
+    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
+    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.SPAWN_DIRECTION, (Direction) this.comboBoxDirection.getSelectedItem())));
   }
 }

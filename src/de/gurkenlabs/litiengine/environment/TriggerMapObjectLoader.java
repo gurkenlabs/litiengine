@@ -23,10 +23,10 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + TriggerMapObjectLoader.class);
     }
 
-    final String message = mapObject.getString(MapObjectProperty.TRIGGER_MESSAGE);
-    final TriggerActivation act = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
-    final boolean oneTime = mapObject.getBool(MapObjectProperty.TRIGGER_ONETIME);
-    final int coolDown = mapObject.getInt(MapObjectProperty.TRIGGER_COOLDOWN);
+    final String message = mapObject.getStringProperty(MapObjectProperty.TRIGGER_MESSAGE);
+    final TriggerActivation act = mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATION) != null ? TriggerActivation.valueOf(mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATION)) : TriggerActivation.COLLISION;
+    final boolean oneTime = mapObject.getBoolProperty(MapObjectProperty.TRIGGER_ONETIME);
+    final int coolDown = mapObject.getIntProperty(MapObjectProperty.TRIGGER_COOLDOWN);
 
     final Trigger trigger = this.createTrigger(mapObject, act, message, oneTime, coolDown, mapObject);
     loadDefaultProperties(trigger, mapObject);
@@ -43,7 +43,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   protected void loadTargets(IMapObject mapObject, Trigger trigger) {
-    final String targets = mapObject.getString(MapObjectProperty.TRIGGER_TARGETS);
+    final String targets = mapObject.getStringProperty(MapObjectProperty.TRIGGER_TARGETS);
 
     for (final int target : ArrayUtilities.getIntegerArray(targets)) {
       if (target != 0) {
@@ -53,7 +53,7 @@ public class TriggerMapObjectLoader extends MapObjectLoader {
   }
 
   protected void loadActivators(IMapObject mapObject, Trigger trigger) {
-    final String activators = mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATORS);
+    final String activators = mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATORS);
 
     for (final int activator : ArrayUtilities.getIntegerArray(activators)) {
       if (activator != 0) {

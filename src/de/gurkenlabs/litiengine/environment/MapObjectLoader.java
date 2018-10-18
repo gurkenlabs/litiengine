@@ -53,7 +53,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     entity.setName(mapObject.getName());
     entity.setLocation(mapObject.getLocation());
 
-    String tagsString = mapObject.getString(MapObjectProperty.TAGS);
+    String tagsString = mapObject.getStringProperty(MapObjectProperty.TAGS);
     if (tagsString != null && tagsString.trim().length() > 0) {
       String[] tags = tagsString.split(",");
 
@@ -77,7 +77,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
         return;
       }
 
-      String value = mapObject.getString(property.name());
+      String value = mapObject.getStringProperty(property.name());
       if (value == null) {
         continue;
       }
@@ -87,10 +87,10 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
   }
 
   public static void loadCollisionProperties(ICollisionEntity entity, IMapObject mapObject) {
-    entity.setCollision(mapObject.getBool(MapObjectProperty.COLLISION, true));
-    entity.setCollisionBoxWidth(mapObject.getFloat(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
-    entity.setCollisionBoxHeight(mapObject.getFloat(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
-    entity.setCollisionBoxAlign(Align.get(mapObject.getString(MapObjectProperty.COLLISION_ALIGN)));
-    entity.setCollisionBoxValign(Valign.get(mapObject.getString(MapObjectProperty.COLLISION_VALIGN)));
+    entity.setCollision(mapObject.getBoolProperty(MapObjectProperty.COLLISION, true));
+    entity.setCollisionBoxWidth(mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
+    entity.setCollisionBoxHeight(mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
+    entity.setCollisionBoxAlign(Align.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_ALIGN)));
+    entity.setCollisionBoxValign(Valign.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_VALIGN)));
   }
 }

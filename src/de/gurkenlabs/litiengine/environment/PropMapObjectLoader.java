@@ -72,29 +72,29 @@ public class PropMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + PropMapObjectLoader.class);
     }
 
-    final Prop prop = this.createNewProp(mapObject, mapObject.getString(MapObjectProperty.SPRITESHEETNAME));
+    final Prop prop = this.createNewProp(mapObject, mapObject.getStringProperty(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
     loadCollisionProperties(prop, mapObject);
-    final Material material = mapObject.getString(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getString(MapObjectProperty.PROP_MATERIAL));
+    final Material material = mapObject.getStringProperty(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getStringProperty(MapObjectProperty.PROP_MATERIAL));
     prop.setMaterial(material);
-    prop.setObstacle(mapObject.getBool(MapObjectProperty.PROP_OBSTACLE));
+    prop.setObstacle(mapObject.getBoolProperty(MapObjectProperty.PROP_OBSTACLE));
 
-    final Rotation rotation = mapObject.getString(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getString(MapObjectProperty.PROP_ROTATION));
+    final Rotation rotation = mapObject.getStringProperty(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getStringProperty(MapObjectProperty.PROP_ROTATION));
     prop.setSpriteRotation(rotation);
 
-    prop.setIndestructible(mapObject.getBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+    prop.setIndestructible(mapObject.getBoolProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
 
-    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getInt(MapObjectProperty.COMBAT_HEALTH));
+    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getIntProperty(MapObjectProperty.COMBAT_HEALTH));
     prop.getHitPoints().modifyMaxBaseValue(mod);
     prop.getHitPoints().modifyBaseValue(mod);
 
-    prop.setAddShadow(mapObject.getBool(MapObjectProperty.PROP_ADDSHADOW));
+    prop.setAddShadow(mapObject.getBoolProperty(MapObjectProperty.PROP_ADDSHADOW));
 
-    prop.setFlipHorizontally(mapObject.getBool(MapObjectProperty.PROP_FLIPHORIZONTALLY));
-    prop.setFlipVertically(mapObject.getBool(MapObjectProperty.PROP_FLIPVERTICALLY));
-    prop.setScaling(mapObject.getBool(MapObjectProperty.PROP_SCALE));
+    prop.setFlipHorizontally(mapObject.getBoolProperty(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+    prop.setFlipVertically(mapObject.getBoolProperty(MapObjectProperty.PROP_FLIPVERTICALLY));
+    prop.setScaling(mapObject.getBoolProperty(MapObjectProperty.PROP_SCALE));
 
-    prop.setTeam(mapObject.getInt(MapObjectProperty.COMBAT_TEAM));
+    prop.setTeam(mapObject.getIntProperty(MapObjectProperty.COMBAT_TEAM));
 
     Collection<IEntity> entities = new ArrayList<>();
     entities.add(prop);

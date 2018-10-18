@@ -50,18 +50,18 @@ public class MapObjectLoaderTests {
     when(mapObject.getName()).thenReturn("testProp");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
-    when(mapObject.getString(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getBool(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
-    when(mapObject.getBool(MapObjectProperty.COLLISION)).thenReturn(true);
-    when(mapObject.getBool(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
-    when(mapObject.getInt(MapObjectProperty.COMBAT_HEALTH)).thenReturn(100);
+    when(mapObject.getStringProperty(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
+    when(mapObject.getBoolProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
+    when(mapObject.getBoolProperty(MapObjectProperty.COLLISION)).thenReturn(true);
+    when(mapObject.getBoolProperty(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
+    when(mapObject.getIntProperty(MapObjectProperty.COMBAT_HEALTH)).thenReturn(100);
 
-    when(mapObject.getFloat(eq(MapObjectProperty.COLLISIONBOX_WIDTH), any(float.class))).thenReturn(100.0f);
-    when(mapObject.getFloat(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
+    when(mapObject.getFloatProperty(eq(MapObjectProperty.COLLISIONBOX_WIDTH), any(float.class))).thenReturn(100.0f);
+    when(mapObject.getFloatProperty(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
 
-    when(mapObject.getString(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
-    when(mapObject.getString(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
-    when(mapObject.getInt(MapObjectProperty.COMBAT_TEAM)).thenReturn(1);
+    when(mapObject.getStringProperty(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
+    when(mapObject.getStringProperty(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
+    when(mapObject.getIntProperty(MapObjectProperty.COMBAT_TEAM)).thenReturn(1);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -130,11 +130,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(200f);
     when(mapObject.getHeight()).thenReturn(200f);
 
-    when(mapObject.getString(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
-    when(mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
-    when(mapObject.getString(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
-    when(mapObject.getString(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
-    when(mapObject.getString(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
+    when(mapObject.getStringProperty(MapObjectProperty.TRIGGER_MESSAGE)).thenReturn("message");
+    when(mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATION)).thenReturn(TriggerActivation.INTERACT.name());
+    when(mapObject.getStringProperty(MapObjectProperty.TRIGGER_TARGETS)).thenReturn("1,2,3");
+    when(mapObject.getStringProperty(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
+    when(mapObject.getStringProperty(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -191,11 +191,11 @@ public class MapObjectLoaderTests {
     when(mapObject.getName()).thenReturn("testLight");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
-    when(mapObject.getInt(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
-    when(mapObject.getInt(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
-    when(mapObject.getColor(MapObjectProperty.LIGHT_COLOR)).thenReturn(Color.WHITE);
-    when(mapObject.getBool(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
-    when(mapObject.getString(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
+    when(mapObject.getIntProperty(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
+    when(mapObject.getIntProperty(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
+    when(mapObject.getColorProperty(MapObjectProperty.LIGHT_COLOR)).thenReturn(Color.WHITE);
+    when(mapObject.getBoolProperty(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
+    when(mapObject.getStringProperty(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -233,8 +233,8 @@ public class MapObjectLoaderTests {
 
     List<Property> customProps = Arrays.asList(new Property("foo", "foovalue"), new Property("bar", "111"));
     when(mapObject.getCustomProperties()).thenReturn(customProps);
-    when(mapObject.getString("foo")).thenReturn("foovalue");
-    when(mapObject.getString("bar")).thenReturn("111");
+    when(mapObject.getStringProperty("foo")).thenReturn("foovalue");
+    when(mapObject.getStringProperty("bar")).thenReturn("111");
 
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));

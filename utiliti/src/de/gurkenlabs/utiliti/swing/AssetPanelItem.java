@@ -322,12 +322,12 @@ public class AssetPanelItem extends JPanel {
       mo.setHeight((int) info.getHeight());
       mo.setId(Game.getEnvironment().getNextMapId());
       mo.setName("");
-      mo.set(MapObjectProperty.COLLISIONBOX_WIDTH, info.getWidth() * 0.4);
-      mo.set(MapObjectProperty.COLLISIONBOX_HEIGHT, info.getHeight() * 0.4);
-      mo.set(MapObjectProperty.COLLISION, true);
-      mo.set(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-      mo.set(MapObjectProperty.PROP_ADDSHADOW, true);
-      mo.set(MapObjectProperty.SPRITESHEETNAME, propName);
+      mo.setProperty(MapObjectProperty.COLLISIONBOX_WIDTH, info.getWidth() * 0.4);
+      mo.setProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, info.getHeight() * 0.4);
+      mo.setProperty(MapObjectProperty.COLLISION, true);
+      mo.setProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+      mo.setProperty(MapObjectProperty.PROP_ADDSHADOW, true);
+      mo.setProperty(MapObjectProperty.SPRITESHEETNAME, propName);
 
       EditorScreen.instance().getMapComponent().add(mo);
       return true;

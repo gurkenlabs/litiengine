@@ -1102,14 +1102,14 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final int ambientAlpha = this.getMap().getInt(MapProperty.AMBIENTALPHA);
-    final Color ambientColor = this.getMap().getColor(MapProperty.AMBIENTCOLOR, Color.WHITE);
+    final int ambientAlpha = this.getMap().getIntProperty(MapProperty.AMBIENTALPHA);
+    final Color ambientColor = this.getMap().getColorProperty(MapProperty.AMBIENTCOLOR, Color.WHITE);
     this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
   }
 
   private void addStaticShadows() {
-    final int alpha = this.getMap().getInt(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
-    final Color color = this.getMap().getColor(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
+    final int alpha = this.getMap().getIntProperty(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
+    final Color color = this.getMap().getColorProperty(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
     this.staticShadowLayer = new StaticShadowLayer(this, alpha, color);
   }
 
