@@ -318,6 +318,7 @@ public class Program {
       window.setExtendedState(userPreferences.getFrameState());
     }
 
+    window.setLocationRelativeTo(null);
     return window;
   }
 
