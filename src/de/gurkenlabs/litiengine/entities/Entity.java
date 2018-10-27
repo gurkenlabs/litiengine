@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
@@ -321,7 +322,10 @@ public abstract class Entity implements IEntity {
       return;
     }
     Game.getEnvironment().getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
-    Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
+    IEnvironment env = Game.getEnvironment();
+    Map<String, List<IEntity>> byTag = env.getEntitiesByTag();
+    List<IEntity> forTag = byTag.get(tag);
+    forTag.add(this);
   }
 
   @Override
