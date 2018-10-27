@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 

@@ -200,6 +200,7 @@ public final class ArrayUtilities {
    *          The item to delete
    * @return A new array with the length input.length - 1.
    */
+  @SuppressWarnings("unchecked")
   public static <T> T[] remove(T[] input, T deleteItem) {
     List<T> result = new ArrayList<>();
 
@@ -210,8 +211,7 @@ public final class ArrayUtilities {
     }
 
     result.removeAll(Collections.singleton(null));
-    T[] newArr = (T[]) input.getClass().cast(Array.newInstance(input.getClass().getComponentType(), result.size()));
-    return result.toArray(newArr);
+    return result.toArray((T[]) Array.newInstance(input.getClass().getComponentType(), result.size()));
   }
 
   public static int[] toIntegerArray(List<Integer> intList) {

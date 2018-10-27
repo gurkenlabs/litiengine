@@ -428,10 +428,6 @@ public final class Spritesheet {
     }
   }
 
-  private Point getLocation(final int index) {
-    return this.getLocation(index, 0, 0);
-  }
-
   private Point getLocation(final int index, final int margin, final int spacing) {
     final int row = index / this.getColumns();
     final int column = index % this.getColumns();
