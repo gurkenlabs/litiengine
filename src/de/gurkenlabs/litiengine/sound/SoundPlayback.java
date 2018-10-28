@@ -2,11 +2,12 @@ package de.gurkenlabs.litiengine.sound;
 
 import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +29,15 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
  */
 final class SoundPlayback implements Runnable, ISoundPlayback {
   private static final Logger log = Logger.getLogger(SoundPlayback.class.getName());
-  private static final ExecutorService executorServie;
-  private static final SourceCloseQueue closeQueue;
+  private static final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+    private int id = 0;
+    
+    @Override
+    public Thread newThread(Runnable r) {
+      return new Thread(r, "Sound Playback Thread " + ++id);
+    }
+  });
+  private static final ExecutorService closeQueue = Executors.newSingleThreadExecutor(r -> new Thread(r, "Data Line Close Thread"));
 
   private final List<SoundPlaybackListener> playbackListeners;
 
@@ -50,12 +58,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   private boolean loop;
   private boolean cancelled;
   private boolean paused;
-
-  static {
-    closeQueue = new SourceCloseQueue();
-    executorServie = Executors.newCachedThreadPool();
-    executorServie.execute(closeQueue);
-  }
+  
+  private volatile Thread playingIn;
 
   SoundPlayback(final Sound sound) {
     this(sound, null);
@@ -80,6 +84,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
   @Override
   public void run() {
+    this.playingIn = Thread.currentThread();
     this.playing = true;
     this.loadDataLine();
 
@@ -92,32 +97,37 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     final byte[] buffer = new byte[64];
     ByteArrayInputStream str = new ByteArrayInputStream(this.sound.getStreamData());
     while (!this.cancelled) {
-      while (this.isPaused() && this.isPlaying() && !this.cancelled) {
+      if (this.isPaused()) {
         try {
-          Thread.sleep(1000 / Game.getConfiguration().client().getUpdaterate());
+          synchronized (this) {
+            this.wait();
+          }
         } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
+          continue;
         }
       }
 
       int readCount;
-      try {
-        readCount = str.read(buffer);
+      readCount = str.read(buffer, 0, buffer.length);
 
-        if (readCount < 0) {
-          if (!this.loop || this.dataLine == null) {
-            break;
+      if (readCount < 0) {
+        if (!this.loop || this.dataLine == null) {
+          final SoundEvent event = new SoundEvent(this, this.sound);
+          for (SoundPlaybackListener listener : this.playbackListeners) {
+            listener.finished(event);
           }
-
-          this.restartDataLine();
-          str = new ByteArrayInputStream(this.sound.getStreamData());
-
-        } else if (this.dataLine != null) {
-          this.dataLine.write(buffer, 0, readCount);
+          break;
         }
-      } catch (final IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
+
+        this.restartDataLine();
+        str = new ByteArrayInputStream(this.sound.getStreamData());
+
+      } else if (this.dataLine != null) {
+        this.dataLine.write(buffer, 0, readCount);
       }
+      Thread.interrupted(); // clears the interrupted flag for waiting; the interrupted flag is inconsistent when used with the sound system
+      // it can, however, establish a happens-before relationship
+      // see https://community.oracle.com/thread/2381571
     }
 
     if (this.dataLine != null) {
@@ -125,15 +135,12 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     }
 
     this.playing = false;
-    final SoundEvent event = new SoundEvent(this, this.sound);
-    for (SoundPlaybackListener listener : this.playbackListeners) {
-      listener.finished(event);
-    }
   }
 
   @Override
   public void cancel() {
     this.cancelled = true;
+    this.playingIn.interrupt();
 
     final SoundEvent event = new SoundEvent(this, this.sound);
     for (SoundPlaybackListener listener : this.playbackListeners) {
@@ -159,11 +166,15 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   @Override
   public void pausePlayback() {
     this.paused = true;
+    this.playingIn.interrupt();
   }
 
   @Override
   public void resumePlayback() {
     this.paused = false;
+    synchronized (this) {
+      this.notify();
+    }
   }
 
   @Override
@@ -182,7 +193,11 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   protected static void terminate() {
-    closeQueue.terminate();
+    executorService.shutdownNow();
+    try {
+      executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+    } catch (InterruptedException e) {}
+    closeQueue.shutdown();
   }
 
   void dispose() {
@@ -191,7 +206,11 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     }
 
     if (this.dataLine != null) {
-      closeQueue.enqueue(this.dataLine);
+      closeQueue.execute(() -> {
+        this.dataLine.stop();
+        this.dataLine.flush();
+        this.dataLine.close();
+      });
       this.dataLine = null;
       this.gainControl = null;
       this.panControl = null;
@@ -234,7 +253,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     this.actualGain = gain;
     this.location = location;
     this.loop = loop;
-    executorServie.execute(this);
+    executorService.execute(this);
   }
 
   void setMasterGain(final float g) {
@@ -329,29 +348,13 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     }
 
     // Check if panning is supported:
-    try {
-      if (!this.dataLine.isControlSupported(FloatControl.Type.PAN)) {
-        this.panControl = null;
-      } else {
-        // Create a new pan Control:
-        this.panControl = (FloatControl) this.dataLine.getControl(FloatControl.Type.PAN);
-      }
-    } catch (final IllegalArgumentException iae) {
-      this.panControl = null;
-    }
+    // Create a new pan Control:
+    this.panControl = this.dataLine.isControlSupported(FloatControl.Type.PAN) ? (FloatControl) this.dataLine.getControl(FloatControl.Type.PAN) : null;
 
     // Check if changing the volume is supported:
-    try {
-      if (!this.dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-        this.gainControl = null;
-      } else {
-        // Create a new gain control:
-        this.gainControl = (FloatControl) this.dataLine.getControl(FloatControl.Type.MASTER_GAIN);
-        // Store it's initial gain to use as "maximum volume" later:
-      }
-    } catch (final IllegalArgumentException iae) {
-      this.gainControl = null;
-    }
+    // Create a new gain control:
+    this.gainControl = this.dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN) ? (FloatControl) this.dataLine.getControl(FloatControl.Type.MASTER_GAIN) : null;
+    // Store it's initial gain to use as "maximum volume" later:
 
     this.setMasterGain(this.actualGain);
   }
