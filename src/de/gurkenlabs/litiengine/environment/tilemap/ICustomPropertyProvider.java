@@ -320,22 +320,19 @@ public interface ICustomPropertyProvider {
   public <T extends Enum<T>> void setProperty(String name, T value);
 
   /**
-   * Sets the value for the custom property with the given name to the given string value.
+   * Enumerates the custom properties for this object.
    *
-   * @param name
-   *          the name of the custom property
-   * @param value
-   *          the new value
+   * @return a complete list of custom properties for this {@code ICustomPropertyProvider}
    */
   public List<Property> getCustomProperties();
 
   /**
-   * Sets the value for the custom property with the given name to the given string value.
+   * Sets all of the custom properties on this object to the provided values. Properties are added
+   * when they only exist in the provided properties, and deleted when they only exist in the current
+   * properties.
    *
-   * @param name
-   *          the name of the custom property
-   * @param value
-   *          the new value
+   * @param props
+   *          the new list of properties
    */
   public void setCustomProperties(List<Property> props);
 }

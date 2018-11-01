@@ -323,15 +323,17 @@ public abstract class Entity implements IEntity {
     if (!this.getTags().contains(tag)) {
       this.getTags().add(tag);
     }
-    if (Game.getEnvironment() == null) {
-      return;
+    if (Game.getEnvironment() != null) {
+      Game.getEnvironment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
     }
+    /*
     if (Game.getEnvironment().getEntitiesByTag().containsKey(tag)) {
       Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
       return;
     }
     Game.getEnvironment().getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
     Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
+    */
   }
 
   @Override
