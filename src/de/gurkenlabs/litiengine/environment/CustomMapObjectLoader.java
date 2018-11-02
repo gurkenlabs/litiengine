@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -19,7 +20,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
 
   protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
-    if (entityType.isInterface()) {
+    if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
       throw new IllegalArgumentException("cannot create loader for interface or abstract class");
     }
     ConstructorInvocation invoke = null;
