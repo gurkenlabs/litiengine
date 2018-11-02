@@ -70,22 +70,15 @@ public final class Sound {
    * @return The loaded Sound from the specified path.
    */
   public static Sound get(final String path) {
-    String fileName = FileUtilities.getFileName(path);
-    Sound sound = sounds.get(fileName);
-    if (sound != null) {
-      return sound;
-    }
+    return sounds.computeIfAbsent(FileUtilities.getFileName(path), n -> {
+      final InputStream is = FileUtilities.getGameResource(path);
+      if (is == null) {
 
-    final InputStream is = FileUtilities.getGameResource(path);
-    if (is == null) {
-
-      log.log(Level.SEVERE, "Could not load sound {0} because the game resource was not found.", new Object[] { path });
-      return null;
-    }
-
-    sound = new Sound(is, fileName);
-    sounds.put(fileName, sound);
-    return sound;
+        log.log(Level.SEVERE, "Could not load sound {0} because the game resource was not found.", new Object[] { path });
+        return null;
+      }
+      return new Sound(is, n);
+    });
   }
 
   public AudioFormat getFormat() {

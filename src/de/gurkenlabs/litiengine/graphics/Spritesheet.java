@@ -98,10 +98,6 @@ public final class Spritesheet {
 
     final String name = FileUtilities.getFileName(path).toLowerCase();
 
-    if (!spritesheets.containsKey(name)) {
-      return null;
-    }
-
     return spritesheets.get(name);
   }
 
@@ -114,11 +110,7 @@ public final class Spritesheet {
   }
 
   public static int[] getCustomKeyFrameDurations(final String name) {
-    if (customKeyFrameDurations.containsKey(FileUtilities.getFileName(name).toLowerCase())) {
-      return customKeyFrameDurations.get(FileUtilities.getFileName(name).toLowerCase());
-    }
-
-    return new int[0];
+    return customKeyFrameDurations.getOrDefault(FileUtilities.getFileName(name).toLowerCase(), new int[0]);
   }
 
   public static int[] getCustomKeyFrameDurations(final Spritesheet sprite) {
@@ -207,13 +199,10 @@ public final class Spritesheet {
   }
 
   public static Spritesheet remove(final String path) {
-    if (!spritesheets.containsKey(path.toLowerCase())) {
-      return null;
+    Spritesheet spriteToRemove = spritesheets.remove(path.toLowerCase());
+    if (spriteToRemove != null) {
+      spriteToRemove.loaded = false;
     }
-
-    Spritesheet spriteToRemove = spritesheets.get(path.toLowerCase());
-    spritesheets.remove(path.toLowerCase());
-    spriteToRemove.loaded = false;
 
     customKeyFrameDurations.remove(path);
     return spriteToRemove;
@@ -225,21 +214,19 @@ public final class Spritesheet {
     }
 
     final String spriteName = info.getName().toLowerCase();
-    if (!spritesheets.containsKey(spriteName)) {
-      return;
-    }
 
-    Spritesheet spriteToRemove = spritesheets.get(spriteName);
-    spritesheets.remove(spriteName);
-    customKeyFrameDurations.remove(spriteName);
+    Spritesheet spriteToRemove = spritesheets.remove(spriteName);
 
-    if (info.getHeight() == 0 && info.getWidth() == 0) {
+    if (spriteToRemove != null) {
+      customKeyFrameDurations.remove(spriteName);
+      if (info.getHeight() == 0 && info.getWidth() == 0) {
+        spriteToRemove.loaded = false;
+        return;
+      }
+
+      load(info);
       spriteToRemove.loaded = false;
-      return;
     }
-
-    load(info);
-    spriteToRemove.loaded = false;
   }
 
   /**
@@ -426,10 +413,6 @@ public final class Spritesheet {
       String error = String.format("Invalid image dimensions for spritesheet %s! Width and height must be greater than 0 (actual dimensions: %dx%d).", name, image.getWidth(), image.getHeight());
       throw new IllegalArgumentException(error);
     }
-  }
-
-  private Point getLocation(final int index) {
-    return this.getLocation(index, 0, 0);
   }
 
   private Point getLocation(final int index, final int margin, final int spacing) {

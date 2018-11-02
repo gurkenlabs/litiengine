@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -19,34 +20,40 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
 
   protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
     super(mapObjectType);
-    if (entityType.isInterface())
-      throw new IllegalArgumentException("Cannot create loader for interface or abstract class");
-    ConstructorInvocation invoke;
-    try {
-      final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class, IEnvironment.class);
-      invoke = (e, o) -> constructor.newInstance(e, o);
-    } catch (NoSuchMethodException e1) {
-      try {
-        final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class, IEnvironment.class);
-        invoke = (e, o) -> constructor.newInstance(o, e);
-      } catch (NoSuchMethodException e2) {
-        try {
-          final Constructor<? extends IEntity> constructor = entityType.getConstructor(IMapObject.class);
-          invoke = (e, o) -> constructor.newInstance(o);
-        } catch (NoSuchMethodException e3) {
-          try {
-            final Constructor<? extends IEntity> constructor = entityType.getConstructor(IEnvironment.class);
-            invoke = (e, o) -> constructor.newInstance(e);
-          } catch (NoSuchMethodException e4) {
-            try {
-              final Constructor<? extends IEntity> constructor = entityType.getConstructor();
-              invoke = (e, o) -> constructor.newInstance();
-            } catch (NoSuchMethodException e5) {
-              throw new IllegalArgumentException("Entity class is missing a usable constructor");
-            }
+    if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
+      throw new IllegalArgumentException("cannot create loader for interface or abstract class");
+    }
+    ConstructorInvocation invoke = null;
+    Constructor<?>[] constructors = entityType.getConstructors();
+    int priority = 0; // env+mo, mo+env, mo, env, nullary
+    for (int i = 0; i < constructors.length; i++) {
+      final Constructor<?> constructor = constructors[i];
+      Class<?>[] classes = constructor.getParameterTypes();
+      if (classes.length == 2) {
+        if (classes[0] == IEnvironment.class && classes[1] == IMapObject.class) {
+          invoke = (e, o) -> (IEntity) constructor.newInstance(e, o);
+          break; // exit early because we've already found the highest priority constructor
+        } else if (classes[0] == IMapObject.class && classes[1] == IEnvironment.class) {
+          invoke = (e, o) -> (IEntity) constructor.newInstance(o, e);
+          priority = 3;
+        }
+      } else if (classes.length == 1) {
+        if (priority < 3) {
+          if (classes[0] == IMapObject.class) {
+            invoke = (e, o) -> (IEntity) constructor.newInstance(o);
+            priority = 2;
+          } else if (priority < 2 && classes[0] == IEnvironment.class) {
+            invoke = (e, o) -> (IEntity) constructor.newInstance(e);
+            priority = 1;
           }
         }
+      } else if (classes.length == 0 && priority < 1) {
+        invoke = (e, o) -> (IEntity) constructor.newInstance();
+        // priority is already 0
       }
+    }
+    if (invoke == null) {
+      throw new IllegalArgumentException("could not find suitable constructor");
     }
     this.invoke = invoke;
   }
@@ -57,7 +64,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     try {
       entity = invoke.invoke(environment, mapObject);
     } catch (InvocationTargetException e) {
-      // propagate the exception
+      // propagate the exception if unchecked
       Throwable cause = e.getCause();
       if (cause instanceof RuntimeException)
         throw (RuntimeException)cause;

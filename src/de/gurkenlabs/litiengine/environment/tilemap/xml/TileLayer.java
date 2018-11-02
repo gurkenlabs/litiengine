@@ -100,7 +100,7 @@ public class TileLayer extends Layer implements ITileLayer {
     for (Tile tile : getData()) {
       for (ITileset tileset : map.getRawTilesets()) {
         if (tileset.containsTile(tile)) {
-          tile.setCustomPropertySource(tileset.getTile(tile.getId()));
+          tile.setCustomPropertySource(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
           break;
         }
       }
