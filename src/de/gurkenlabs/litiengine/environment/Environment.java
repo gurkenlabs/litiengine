@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -59,7 +60,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
-  private static final Map<String, IMapObjectLoader> mapObjectLoaders;
+  private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
 
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
@@ -90,7 +91,6 @@ public class Environment implements IEnvironment {
   private int localIdSequence = 0;
 
   static {
-    mapObjectLoaders = new ConcurrentHashMap<>();
     registerDefaultMapObjectLoaders();
   }
 
@@ -214,14 +214,8 @@ public class Environment implements IEnvironment {
       if (tag.isEmpty()) {
         continue;
       }
-
-      if (this.getEntitiesByTag().containsKey(tag)) {
-        this.getEntitiesByTag().get(tag).add(entity);
-        continue;
-      }
-
-      this.getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
-      this.getEntitiesByTag().get(tag).add(entity);
+      
+      this.getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(entity);
     }
 
     // if the environment has already been loaded,
@@ -378,8 +372,8 @@ public class Environment implements IEnvironment {
 
   @Override
   public IEntity get(final int mapId) {
-    for (RenderType type : RenderType.values()) {
-      IEntity entity = this.entities.get(type).get(mapId);
+    for (Map<Integer, IEntity> type : this.entities.values()) {
+      IEntity entity = type.get(mapId);
       if (entity != null) {
         return entity;
       }
@@ -395,9 +389,9 @@ public class Environment implements IEnvironment {
       return foundEntities;
     }
 
-    for (RenderType type : RenderType.values()) {
+    for (Map<Integer, IEntity> type : this.entities.values()) {
       for (int id : mapIds) {
-        IEntity entity = this.entities.get(type).get(id);
+        IEntity entity = type.get(id);
         if (entity != null) {
           foundEntities.add(entity);
         }
@@ -423,8 +417,8 @@ public class Environment implements IEnvironment {
       return null;
     }
 
-    for (RenderType type : RenderType.values()) {
-      for (final IEntity entity : this.entities.get(type).values()) {
+    for (Map<Integer, IEntity> type : this.entities.values()) {
+      for (final IEntity entity : type.values()) {
         if (entity.getName() != null && entity.getName().equals(name)) {
           return entity;
         }
@@ -449,11 +443,7 @@ public class Environment implements IEnvironment {
     List<IEntity> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
-      if (!this.getEntitiesByTag().containsKey(tag)) {
-        continue;
-      }
-
-      foundEntities.addAll(this.getEntitiesByTag().get(tag));
+      foundEntities.addAll(this.getEntitiesByTag().getOrDefault(tag, Arrays.asList()));
     }
 
     return foundEntities;
@@ -464,11 +454,8 @@ public class Environment implements IEnvironment {
     List<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
-      if (!this.getEntitiesByTag().containsKey(tag)) {
-        continue;
-      }
 
-      for (IEntity ent : this.getEntitiesByTag().get(tag)) {
+      for (IEntity ent : this.getEntitiesByTag().getOrDefault(tag, Arrays.asList())) {
         if (!foundEntities.contains(ent) && clss.isInstance(ent)) {
           foundEntities.add(clss.cast(ent));
         }
@@ -1036,8 +1023,9 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<IEntity> load(final IMapObject mapObject) {
-    if (mapObjectLoaders.containsKey(mapObject.getType())) {
-      Collection<IEntity> loadedEntities = mapObjectLoaders.get(mapObject.getType()).load(this, mapObject);
+    IMapObjectLoader loader = mapObjectLoaders.get(mapObject.getType());
+    if (loader != null) {
+      Collection<IEntity> loadedEntities = loader.load(this, mapObject);
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
           this.add(entity);
