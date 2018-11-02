@@ -290,7 +290,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public <T extends Enum<T>> void setProperty(String name, T value) {
+  public void setProperty(String name, Enum<?> value) {
     this.setProperty(name, value.name());
   }
 

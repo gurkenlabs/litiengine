@@ -204,6 +204,10 @@ public interface ICustomPropertyProvider {
    *
    * @param name
    *          the name of the custom property
+   * @param enumType
+   *          a {@code Class} object for {@code <T>}
+   * @param <T>
+   *          the enum type to use
    * @return the enum value of the custom property
    */
   public <T extends Enum<T>> T getEnumProperty(String name, Class<T> enumType);
@@ -215,6 +219,10 @@ public interface ICustomPropertyProvider {
    *          the name of the custom property
    * @param defaultValue
    *          the fallback value in case the property value is null.
+   * @param enumType
+   *          a {@code Class} object for {@code <T>}
+   * @param <T>
+   *          the enum type to use
    * @return the enum value of the custom property, if present. Otherwise, the provided default value is returned.
    */
   public <T extends Enum<T>> T getEnumProperty(String name, Class<T> enumType, T defaultValue);
@@ -317,7 +325,7 @@ public interface ICustomPropertyProvider {
    * @param value
    *          the new value
    */
-  public <T extends Enum<T>> void setProperty(String name, T value);
+  public void setProperty(String name, Enum<?> value);
 
   /**
    * Enumerates the custom properties for this object.
