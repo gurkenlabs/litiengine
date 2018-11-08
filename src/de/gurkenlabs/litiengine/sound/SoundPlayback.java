@@ -31,7 +31,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   private static final Logger log = Logger.getLogger(SoundPlayback.class.getName());
   private static final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
     private int id = 0;
-    
+
     @Override
     public Thread newThread(Runnable r) {
       return new Thread(r, "Sound Playback Thread " + ++id);
@@ -58,7 +58,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   private boolean loop;
   private boolean cancelled;
   private boolean paused;
-  
+
   private volatile Thread playingIn;
 
   SoundPlayback(final Sound sound) {
@@ -196,7 +196,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     executorService.shutdownNow();
     try {
       executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-    } catch (InterruptedException e) {}
+    } catch (InterruptedException e) {
+    }
     closeQueue.shutdown();
   }
 
@@ -207,9 +208,11 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
     if (this.dataLine != null) {
       closeQueue.execute(() -> {
-        this.dataLine.stop();
-        this.dataLine.flush();
-        this.dataLine.close();
+        if (this.dataLine != null) {
+          this.dataLine.stop();
+          this.dataLine.flush();
+          this.dataLine.close();
+        }
       });
       this.dataLine = null;
       this.gainControl = null;
