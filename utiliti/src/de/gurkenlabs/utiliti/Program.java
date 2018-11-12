@@ -79,6 +79,7 @@ import de.gurkenlabs.utiliti.swing.FileDrop;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
+import javax.swing.SwingConstants;
 
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
@@ -105,6 +106,9 @@ public class Program {
   private static JPopupMenu canvasPopup;
   private static JPopupMenu addPopupMenu;
   private static JLabel statusBar;
+  private static JSpinner spinnerAmbientAlpha;
+  private static JButton colorButton;
+  private static JTextField colorText;
   private static boolean isChanging;
 
   public static void main(String[] args) {
@@ -597,11 +601,6 @@ public class Program {
 
         final String colorProp = Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTCOLOR);
         try {
-          if (Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTALPHA) != null) {
-            int alpha = Integer.parseInt(Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTALPHA));
-            Game.getEnvironment().getAmbientLight().setAlpha(alpha);
-          }
-
           if (colorProp != null && !colorProp.isEmpty()) {
             Color ambientColor = ColorHelper.decode(colorProp);
             Game.getEnvironment().getAmbientLight().setColor(ambientColor);
@@ -899,27 +898,33 @@ public class Program {
 
     basicMenu.addSeparator();
 
-    JButton colorButton = new JButton();
+    colorButton = new JButton();
     colorButton.setIcon(Icons.COLOR);
     colorButton.setEnabled(false);
 
-    JTextField colorText = new JTextField();
-    colorText.setEnabled(false);
-    colorText.setMaximumSize(new Dimension(50, 50));
-
-    JSpinner spinnerAmbientAlpha = new JSpinner();
+    spinnerAmbientAlpha = new JSpinner();
+    spinnerAmbientAlpha.setToolTipText("Adjust ambient alpha.");
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
     spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
     spinnerAmbientAlpha.setMaximumSize(new Dimension(50, 50));
-    spinnerAmbientAlpha.setEnabled(false);
+    spinnerAmbientAlpha.setEnabled(true);
     spinnerAmbientAlpha.addChangeListener(e -> {
       if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
         return;
       }
 
-      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTALPHA, spinnerAmbientAlpha.getValue().toString());
       Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
+      String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
+      colorText.setText(hex);
+      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTCOLOR, hex);
+
     });
+
+    colorText = new JTextField();
+    colorText.setHorizontalAlignment(SwingConstants.CENTER);
+    colorText.setMinimumSize(new Dimension(70, 20));
+    colorText.setMaximumSize(new Dimension(70, 50));
+    colorText.setEnabled(false);
 
     colorButton.addActionListener(a -> {
       if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
@@ -936,13 +941,12 @@ public class Program {
         return;
       }
 
-      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
-      colorText.setText(h);
-
       spinnerAmbientAlpha.setValue(result.getAlpha());
 
       Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
       Game.getEnvironment().getAmbientLight().setColor(result);
+      String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
+      colorText.setText(hex);
     });
 
     EditorScreen.instance().getMapComponent().onMapLoaded(map -> {
@@ -950,11 +954,8 @@ public class Program {
       colorButton.setEnabled(map != null);
       spinnerAmbientAlpha.setEnabled(map != null);
       colorText.setText(map.getStringProperty(MapProperty.AMBIENTCOLOR));
+      spinnerAmbientAlpha.setValue(ColorHelper.decode(colorText.getText()).getAlpha());
 
-      String alpha = map.getStringProperty(MapProperty.AMBIENTALPHA);
-      if (alpha != null && !alpha.isEmpty()) {
-        spinnerAmbientAlpha.setValue((int) Double.parseDouble(alpha));
-      }
       isChanging = false;
     });
 

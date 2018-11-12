@@ -23,13 +23,11 @@ public abstract class ColorLayer implements IRenderable {
   private final IEnvironment environment;
   private final Image[][] tiles;
 
-  private int alpha;
   private Color color;
 
-  protected ColorLayer(IEnvironment env, final Color color, final int alpha) {
+  protected ColorLayer(IEnvironment env, final Color color) {
     this.environment = env;
     this.color = color;
-    this.alpha = alpha;
     this.tiles = new Image[env.getMap().getWidth()][env.getMap().getHeight()];
     this.updateSection(this.environment.getMap().getBounds());
   }
@@ -64,20 +62,12 @@ public abstract class ColorLayer implements IRenderable {
     }
   }
 
-  public int getAlpha() {
-    return this.alpha;
-  }
-
   public Color getColor() {
     return this.color;
   }
 
-  public Color getColorWithAlpha() {
-    return new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), this.getAlpha());
-  }
-
   public void setAlpha(int ambientAlpha) {
-    this.alpha = MathUtilities.clamp(ambientAlpha, 0, 255);
+    this.setColor(new Color(this.getColor().getRed(), this.getColor().getGreen(), this.getColor().getBlue(), MathUtilities.clamp(ambientAlpha, 0, 255)));
     this.updateSection(this.environment.getMap().getBounds());
   }
 

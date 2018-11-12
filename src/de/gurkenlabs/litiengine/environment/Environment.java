@@ -968,7 +968,7 @@ public class Environment implements IEnvironment {
     renderDetails.append(this.render(g, RenderType.OVERLAY));
 
     long ambientStart = System.nanoTime();
-    if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getAlpha() != 0) {
+    if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
       this.getAmbientLight().render(g);
     }
 
@@ -1090,15 +1090,13 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final int ambientAlpha = this.getMap().getIntProperty(MapProperty.AMBIENTALPHA);
     final Color ambientColor = this.getMap().getColorProperty(MapProperty.AMBIENTCOLOR, Color.WHITE);
-    this.ambientLight = new AmbientLight(this, ambientColor, ambientAlpha);
+    this.ambientLight = new AmbientLight(this, ambientColor);
   }
 
   private void addStaticShadows() {
-    final int alpha = this.getMap().getIntProperty(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA);
     final Color color = this.getMap().getColorProperty(MapProperty.SHADOWCOLOR, StaticShadow.DEFAULT_COLOR);
-    this.staticShadowLayer = new StaticShadowLayer(this, alpha, color);
+    this.staticShadowLayer = new StaticShadowLayer(this, color);
   }
 
   private void dispose(final Collection<? extends IEntity> entities) {

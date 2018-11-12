@@ -23,13 +23,12 @@ import de.gurkenlabs.litiengine.util.geom.Vector2D;
 
 public class AmbientLight extends ColorLayer {
 
-  public AmbientLight(final IEnvironment env, final Color ambientColor, final int ambientAlpha) {
-    super(env, ambientColor, ambientAlpha);
+  public AmbientLight(final IEnvironment env, final Color ambientColor) {
+    super(env, ambientColor);
   }
 
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
-    final Color colorWithAlpha = this.getColorWithAlpha();
 
     // create large rectangle and crop lights from it
     final double width = section.getWidth();
@@ -49,7 +48,7 @@ public class AmbientLight extends ColorLayer {
       this.renderLightSource(g, light, longerDimension, section);
     }
 
-    g.setColor(colorWithAlpha);
+    g.setColor(this.getColor());
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OUT, 1.0f));
     g.fill(darkArea);
 
