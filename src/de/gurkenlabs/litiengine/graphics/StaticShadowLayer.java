@@ -10,14 +10,14 @@ import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public class StaticShadowLayer extends ColorLayer {
-  public StaticShadowLayer(IEnvironment env, int alpha, Color color) {
-    super(env, color, alpha);
+  public StaticShadowLayer(IEnvironment env, Color color) {
+    super(env, color);
   }
 
   @Override
   protected void renderSection(Graphics2D g, Rectangle2D section) {
-    final Color colorWithAlpha = this.getColorWithAlpha();
-    g.setColor(colorWithAlpha);
+    final Color color = this.getColor();
+    g.setColor(color);
 
     // check if the collision boxes have shadows. if so, determine which
     // shadow is needed, create the shape and add it to the

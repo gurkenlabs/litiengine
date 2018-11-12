@@ -16,7 +16,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import de.gurkenlabs.litiengine.Resources;
-import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -29,7 +28,7 @@ public class MapPropertyPanel extends JPanel {
   private final JTextField textFieldTitle;
   private JTextField textFieldAmbientColor;
   private JSpinner spinnerAmbientAlpha;
-  private JSpinner spinnerShadow;
+  private JSpinner spinnerShadowAlpha;
   private JTextField textFieldName;
   private transient IMap dataSource;
   private JTextField textFieldShadowColor;
@@ -57,17 +56,18 @@ public class MapPropertyPanel extends JPanel {
     JLabel label = new JLabel("color");
     label.setFont(Program.TEXT_FONT);
 
-    JButton button = new JButton("...");
-    button.addActionListener(a -> {
+    JButton buttonAmbientColor = new JButton("...");
+    buttonAmbientColor.addActionListener(a -> {
       Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), ColorHelper.decode(textFieldAmbientColor.getText()));
       if (result == null) {
         return;
       }
 
-      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
+      String h = ColorHelper.encode(result);
       textFieldAmbientColor.setText(h);
+      spinnerAmbientAlpha.setValue(result.getAlpha());
     });
-    button.setFont(Program.TEXT_FONT.deriveFont(10f));
+    buttonAmbientColor.setFont(Program.TEXT_FONT.deriveFont(10f));
 
     textFieldAmbientColor = new JTextField();
     textFieldAmbientColor.setText("#ffffff");
@@ -81,6 +81,13 @@ public class MapPropertyPanel extends JPanel {
     spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
     spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
+    spinnerAmbientAlpha.addChangeListener(e -> {
+      Color oldColor = ColorHelper.decode(textFieldAmbientColor.getText());
+      Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) spinnerAmbientAlpha.getValue());
+      String hex = ColorHelper.encode(newColor);
+      textFieldAmbientColor.setText(hex);
+
+    });
 
     JLabel lblNewLabel = new JLabel("General");
     lblNewLabel.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(12f));
@@ -101,9 +108,15 @@ public class MapPropertyPanel extends JPanel {
     JLabel labelAlpha = new JLabel("alpha");
     labelAlpha.setFont(new Font("Tahoma", Font.PLAIN, 10));
 
-    spinnerShadow = new JSpinner();
-    spinnerShadow.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-    spinnerShadow.setFont(null);
+    spinnerShadowAlpha = new JSpinner();
+    spinnerShadowAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
+    spinnerShadowAlpha.setFont(null);
+    spinnerShadowAlpha.addChangeListener(e -> {
+      Color oldColor = ColorHelper.decode(textFieldShadowColor.getText());
+      Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) spinnerShadowAlpha.getValue());
+      String hex = ColorHelper.encode(newColor);
+      textFieldShadowColor.setText(hex);
+    });
 
     JLabel labelColor = new JLabel("color");
     labelColor.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -115,8 +128,9 @@ public class MapPropertyPanel extends JPanel {
         return;
       }
 
-      String h = "#" + Integer.toHexString(result.getRGB()).substring(2);
+      String h = ColorHelper.encode(result);
       textFieldShadowColor.setText(h);
+      spinnerShadowAlpha.setValue(result.getAlpha());
     });
     buttonColorShadow.setFont(null);
 
@@ -126,31 +140,29 @@ public class MapPropertyPanel extends JPanel {
     textFieldShadowColor.setEditable(false);
     textFieldShadowColor.setColumns(10);
     GroupLayout glContentPanel = new GroupLayout(this);
-    glContentPanel
-        .setHorizontalGroup(
-            glContentPanel.createParallelGroup(Alignment.LEADING)
-                .addGroup(
-                    glContentPanel.createSequentialGroup().addContainerGap()
-                        .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblNewLabel)
-                            .addGroup(glContentPanel.createSequentialGroup()
-                                .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblMapName).addComponent(lblMapTitle, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE).addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(ComponentPlacement.RELATED)
-                                .addGroup(glContentPanel
-                                    .createParallelGroup(Alignment.LEADING).addComponent(textFieldDescription, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE).addComponent(textFieldTitle, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
-                                    .addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)))
-                            .addGroup(glContentPanel.createSequentialGroup().addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblAmbientLight, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-                                .addGroup(glContentPanel.createSequentialGroup().addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addGap(10).addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-                                .addGroup(
-                                    glContentPanel.createSequentialGroup().addComponent(lblAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(spinnerAmbientAlpha, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addGroup(glContentPanel.createSequentialGroup().addGap(18).addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
-                                    .addGroup(glContentPanel.createSequentialGroup().addComponent(labelColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
-                                        .addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldShadowColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(
-                                        glContentPanel.createSequentialGroup().addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))))
-                                    .addGroup(glContentPanel.createSequentialGroup().addGap(16).addComponent(lblStaticShadows, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)))
-                                .addGap(52)))
-                        .addGap(0)));
+    glContentPanel.setHorizontalGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+        .addGroup(glContentPanel.createSequentialGroup().addContainerGap()
+            .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblNewLabel)
+                .addGroup(glContentPanel.createSequentialGroup()
+                    .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblMapName).addComponent(lblMapTitle, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE).addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(
+                        glContentPanel
+                            .createParallelGroup(Alignment.LEADING).addComponent(textFieldDescription, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE).addComponent(textFieldTitle, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+                            .addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)))
+                .addGroup(glContentPanel.createSequentialGroup().addGroup(glContentPanel.createParallelGroup(Alignment.LEADING).addComponent(lblAmbientLight, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glContentPanel.createSequentialGroup().addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addGap(10).addComponent(buttonAmbientColor, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(glContentPanel.createSequentialGroup().addComponent(lblAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(spinnerAmbientAlpha, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glContentPanel.createSequentialGroup().addGap(18).addGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
+                            .addGroup(glContentPanel.createSequentialGroup().addComponent(labelColor, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(ComponentPlacement.RELATED).addComponent(textFieldShadowColor, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(
+                                glContentPanel.createSequentialGroup().addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(spinnerShadowAlpha, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(glContentPanel.createSequentialGroup().addGap(16).addComponent(lblStaticShadows, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)))
+                    .addGap(52)))
+            .addGap(0)));
     glContentPanel.setVerticalGroup(glContentPanel.createParallelGroup(Alignment.LEADING)
         .addGroup(glContentPanel.createSequentialGroup().addComponent(lblNewLabel).addPreferredGap(ComponentPlacement.RELATED)
             .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblMapName).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)).addPreferredGap(ComponentPlacement.RELATED)
@@ -158,9 +170,9 @@ public class MapPropertyPanel extends JPanel {
             .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(textFieldDescription, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblDesc, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)).addGap(63)
             .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblAmbientLight).addComponent(lblStaticShadows)).addGap(9)
             .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblAlpha, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerAmbientAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerShadow, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(labelAlpha, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerShadowAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(button, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+            .addGroup(glContentPanel.createParallelGroup(Alignment.BASELINE).addComponent(buttonAmbientColor, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(textFieldAmbientColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
                 .addComponent(label, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(labelColor, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(buttonColorShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
                 .addComponent(textFieldShadowColor, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
             .addContainerGap(60, Short.MAX_VALUE)));
@@ -180,13 +192,16 @@ public class MapPropertyPanel extends JPanel {
     this.textFieldDescription.setText(map.getStringProperty(MapProperty.MAP_DESCRIPTION));
     this.textFieldTitle.setText(map.getStringProperty(MapProperty.MAP_TITLE));
     this.textFieldName.setText(map.getName());
-    this.spinnerAmbientAlpha.setValue(map.getIntProperty(MapProperty.AMBIENTALPHA));
     if (map.getStringProperty(MapProperty.AMBIENTCOLOR) != null) {
-      this.textFieldAmbientColor.setText(map.getStringProperty(MapProperty.AMBIENTCOLOR));
+      final String hexColor = map.getStringProperty(MapProperty.AMBIENTCOLOR);
+      this.textFieldAmbientColor.setText(hexColor);
+      this.spinnerAmbientAlpha.setValue(ColorHelper.decode(hexColor).getAlpha());
     }
-
-    this.spinnerShadow.setValue(map.getIntProperty(MapProperty.SHADOWALPHA, StaticShadow.DEFAULT_ALPHA));
-    this.textFieldShadowColor.setText(map.getStringProperty(MapProperty.SHADOWCOLOR, "#" + Integer.toHexString(StaticShadow.DEFAULT_COLOR.getRGB()).substring(2)));
+    if (map.getStringProperty(MapProperty.SHADOWCOLOR) != null) {
+      final String hexColor = map.getStringProperty(MapProperty.SHADOWCOLOR);
+      this.textFieldShadowColor.setText(hexColor);
+      this.spinnerShadowAlpha.setValue(ColorHelper.decode(hexColor).getAlpha());
+    }
   }
 
   public void saveChanges() {
@@ -196,9 +211,7 @@ public class MapPropertyPanel extends JPanel {
 
     this.dataSource.setProperty(MapProperty.MAP_DESCRIPTION, this.textFieldDescription.getText());
     this.dataSource.setProperty(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
-    this.dataSource.setProperty(MapProperty.AMBIENTALPHA, this.spinnerAmbientAlpha.getValue().toString());
     this.dataSource.setProperty(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
-    this.dataSource.setProperty(MapProperty.SHADOWALPHA, this.spinnerShadow.getValue().toString());
     this.dataSource.setProperty(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
     this.dataSource.setName(this.textFieldName.getText());
   }
