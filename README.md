@@ -16,12 +16,10 @@ Nonetheless, the LITIengine can of course already be used to make fully function
 
 > We are aware that there is currently a **lack of documentation**, but for the mentioned reasons, we're planning to document the most important parts of the library and use-cases with the first beta release to ensure that features don't get deprecated before they're even used.
 
-> If any **questions occur**, please don't hesitate to contact us, preferably by consulting the official [LITIengine forum](https://forum.litiengine.com/) opening an issue at our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
-
 > We're looking forward for your feedback on the engine!
 
 ## Questions?
-Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community.
+Visit the official [LITIengine forum](https://forum.litiengine.com/) for troubleshooting or to learn about the LITIengine community. If you encounter bugs or want to request fancy new features, you can also open an issue in our [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues).
 
 ## Getting Started
 
