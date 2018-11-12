@@ -125,6 +125,7 @@ public class Program {
 
     Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
+    Game.setUncaughtExceptionHandler(new EditorUncaughtExceptionHandler());
 
     forceBasicEditorConfiguration();
 

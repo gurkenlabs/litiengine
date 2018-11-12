@@ -331,7 +331,11 @@ public class MapSelectionPanel extends JSplitPane {
     buttonAddLayer.setIcon(Icons.ADD);
 
     buttonAddLayer.addActionListener(a -> {
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
+      final IMap currentMap = this.getCurrentMap();
+      if (currentMap == null) {
+        return;
+      }
+
       MapObjectLayer layer = new MapObjectLayer();
       layer.setName("new layer");
       int selIndex = this.getSelectedLayerIndex();
@@ -355,6 +359,11 @@ public class MapSelectionPanel extends JSplitPane {
 
     buttonRemoveLayer.setIcon(Icons.DELETE);
     buttonRemoveLayer.addActionListener(a -> {
+      final IMap currentMap = this.getCurrentMap();
+      if (currentMap == null) {
+        return;
+      }
+      
       if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
         return;
       }
@@ -362,7 +371,6 @@ public class MapSelectionPanel extends JSplitPane {
         return;
       }
 
-      IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
       EditorScreen.instance().getMapComponent().delete(currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
       currentMap.removeMapObjectLayer(this.getSelectedLayerIndex());
       layerModel.remove(this.getSelectedLayerIndex());
@@ -400,7 +408,7 @@ public class MapSelectionPanel extends JSplitPane {
         return;
       }
       IMap currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-      IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer)currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
+      IMapObjectLayer copiedLayer = new MapObjectLayer((MapObjectLayer) currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()));
       currentMap.addMapObjectLayer(this.getSelectedLayerIndex(), copiedLayer);
       this.updateMapLayerControl();
       EditorScreen.instance().getMapComponent().add(copiedLayer);
@@ -633,6 +641,13 @@ public class MapSelectionPanel extends JSplitPane {
 
   public int getSelectedLayerIndex() {
     return listObjectLayers.getSelectedIndex();
+  }
+
+  public IMap getCurrentMap() {
+    if (this.mapList.getSelectedIndex() == -1) {
+      return null;
+    }
+    return EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
   }
 
   public void selectLayer(int index) {

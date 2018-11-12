@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -86,7 +87,7 @@ public final class Game {
   private static GameInfo gameInfo;
   private static IEnvironment environment;
   private static ICamera camera;
-  private static IGameLoop gameLoop;
+  private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
   private static IScreenManager screenManager;
 
@@ -296,18 +297,15 @@ public final class Game {
     getConfiguration().load();
     Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
 
-    final GameLoop updateLoop = new GameLoop("Main Update Loop", getConfiguration().client().getUpdaterate());
-    updateLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-    gameLoop = updateLoop;
-    getLoop().attach(getPhysicsEngine());
+    gameLoop = new GameLoop("Main Update Loop", getConfiguration().client().getUpdaterate());
+    gameLoop.attach(getPhysicsEngine());
 
     final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
-    renderLoop.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
-    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
     screenManager = scrMgr;
 
@@ -355,6 +353,12 @@ public final class Game {
     Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
 
     initialized = true;
+  }
+
+  public static void setUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
+    gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+    renderLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+    Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
   }
 
   /**

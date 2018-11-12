@@ -911,6 +911,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.scrollSpeed = BASE_SCROLL_SPEED / zooms[this.currentZoomIndex];
   }
 
+  private static boolean mapIsNull() {
+    return Game.getEnvironment() == null || Game.getEnvironment().getMap() == null;
+  }
+
   private static IMapObjectLayer getCurrentLayer() {
     int layerIndex = EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex();
     if (layerIndex < 0 || layerIndex >= Game.getEnvironment().getMap().getMapObjectLayers().size()) {
@@ -1346,7 +1350,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMouseWheelScrolled(ComponentMouseWheelEvent e) {
-    if (!this.hasFocus()) {
+    if (!this.hasFocus() || mapIsNull()) {
       return;
     }
 
@@ -1438,7 +1442,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMousePressed(ComponentMouseEvent e) {
-    if (!this.hasFocus()) {
+    if (!this.hasFocus() || mapIsNull()) {
       return;
     }
 
@@ -1464,7 +1468,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMouseDragged(ComponentMouseEvent e) {
-    if (!this.hasFocus()) {
+    if (!this.hasFocus() || mapIsNull()) {
       return;
     }
 
@@ -1503,7 +1507,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void handleMouseReleased(ComponentMouseEvent e) {
-    if (!this.hasFocus()) {
+    if (!this.hasFocus() || mapIsNull()) {
       return;
     }
 

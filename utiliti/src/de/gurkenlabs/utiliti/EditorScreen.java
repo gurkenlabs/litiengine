@@ -17,7 +17,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -462,9 +464,13 @@ public class EditorScreen extends Screen {
   }
 
   public void saveMapSnapshot() {
+    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      return;
+    }
+
     IMap currentMap = Game.getEnvironment().getMap();
     BufferedImage img = Game.getRenderEngine().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);
-    
+
     try {
       final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
       final File folder = new File("./screenshots/");
