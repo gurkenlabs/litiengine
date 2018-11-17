@@ -2,8 +2,8 @@
 
 ## Getting Started
 * [Creating a project](creating-a-project/README.md)
-    1. Build Systems
-    2. Obtaining LITIengine
+    * Build Systems
+    * Obtaining LITIengine
 
 * [Setting up the basics](basic-setup/README.md)
     1. The Game class
