@@ -123,7 +123,7 @@ public class Program {
 
     Game.getInfo().setName("utiLITI");
     Game.getInfo().setSubTitle("LITIengine Creation Kit");
-    Game.getInfo().setVersion("v0.4.13-alpha");
+    Game.getInfo().setVersion("v0.4.14-alpha");
 
     initSystemTray();
 

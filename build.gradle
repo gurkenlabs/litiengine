@@ -20,7 +20,7 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 
 archivesBaseName = "litiengine"
-version = "v0.4.13-alpha"
+version = "v0.4.14-alpha"
 
 sourceSets {
   main.java.srcDir "src"
