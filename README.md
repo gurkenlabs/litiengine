@@ -29,6 +29,9 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 5. Working with Entities
 
+## Further Documentation
+The [LITIengine documentation pages](https://docs.litiengine.com/) containing in-depth guides for LITIengine are currently in deployment. We're looking forward to your contributions!
+
 ## Becoming a contributor
 * Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/docs/CODE_OF_CONDUCT.md)
 * View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
