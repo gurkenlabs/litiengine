@@ -14,8 +14,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
 public class StaticShadow extends MapArea {
-  public static final int DEFAULT_ALPHA = 75;
-  public static final Color DEFAULT_COLOR = Color.BLACK;
+  public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 75);
   public static final int DEFAULT_OFFSET = 10;
 
   @TmxProperty(name = MapObjectProperty.SHADOW_TYPE)

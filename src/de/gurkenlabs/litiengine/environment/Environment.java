@@ -214,7 +214,7 @@ public class Environment implements IEnvironment {
       if (tag.isEmpty()) {
         continue;
       }
-      
+
       this.getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(entity);
     }
 
@@ -1090,7 +1090,7 @@ public class Environment implements IEnvironment {
   }
 
   private void addAmbientLight() {
-    final Color ambientColor = this.getMap().getColorValue(MapProperty.AMBIENTCOLOR, Color.WHITE);
+    final Color ambientColor = this.getMap().getColorValue(MapProperty.AMBIENTCOLOR, AmbientLight.DEFAULT_COLOR);
     this.ambientLight = new AmbientLight(this, ambientColor);
   }
 

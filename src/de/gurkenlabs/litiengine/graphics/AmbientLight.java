@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.geom.Vector2D;
 
 public class AmbientLight extends ColorLayer {
+  public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
   public AmbientLight(final IEnvironment env, final Color ambientColor) {
     super(env, ambientColor);
@@ -68,7 +69,7 @@ public class AmbientLight extends ColorLayer {
     final Point2D lightCenter = light.getCenter();
     final Point2D lightFocus = new Point2D.Double(lightCenter.getX() + light.getBoundingBox().getWidth() * light.getFocusOffsetX(), lightCenter.getY() + light.getBoundingBox().getHeight() * light.getFocusOffsetY());
     Shape fillShape;
-    
+
     // g.setColor(Color.RED);
     // g.draw(light.getBoundingBox());
     Area lightArea = null;
