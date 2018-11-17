@@ -35,12 +35,12 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 /***
  * <p>
- * The <code>Game</code> class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
- * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the <code>GameInfo</code>,
+ * The <code>Game</code> class is without any doubt one of the classes that you will call a lot when creating a game with the LITIengine.
+ * It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the <code>GameInfo</code>,
  * the <code>RenderEngine</code>, the <code>SoundEngine</code> and many other major components.
  * </p>
  * <p>
- * We designed the API such that all important parts that make up the game are directly accessible via the <code>Game</code> class in a static manner.
+ * We designed the API such that all important parts that make up the game are directly accessible via the <code>Game</code> class in a static manner.
  * To be a little bit more technical, it is essentially a collection of core Singleton instances.
  * </p>
  * <p>
@@ -48,7 +48,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  * you need to at least call {@link Game#init(String...)} and {@link Game#start()} from your programs <code>main(String[])</code> method.
  * </p>
  * <p>
- * Additionally, it provides an interface to hook up event listeners (e.g. <code>GameListener</code> or <code>EnvironmentLoadedListener</code>) for
+ * Additionally, it provides an interface to hook up event listeners (e.g. <code>GameListener</code> or <code>EnvironmentLoadedListener</code>) for
  * the most basic operations of a Game life cycle. 
  * </p>
  * 
