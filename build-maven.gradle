@@ -30,6 +30,12 @@ dependencies {
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
   
+  // JAXB modules for JDK 9 or higher
+  compile 'javax.xml.bind:jaxb-api:2.3.0'
+  compile 'com.sun.xml.bind:jaxb-core:2.3.0'
+  compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
+  compile 'javax.activation:activation:1.1.1'
+  
   testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
   testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
   testCompile 'org.mockito:mockito-core:2.21.0'
