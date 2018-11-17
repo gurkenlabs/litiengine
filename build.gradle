@@ -50,10 +50,10 @@ dependencies {
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
   
   // JAXB modules for JDK 9 or higher
-  compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-  compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-  compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
-  compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+  compile 'javax.xml.bind:jaxb-api:2.3.0'
+  compile 'com.sun.xml.bind:jaxb-core:2.3.0'
+  compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
+  compile 'javax.activation:activation:1.1.1'
   
   testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.+'
   testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.+'
