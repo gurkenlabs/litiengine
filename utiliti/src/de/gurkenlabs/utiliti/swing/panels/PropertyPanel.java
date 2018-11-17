@@ -71,10 +71,10 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected static void selectSpriteSheet(JComboBox<JLabel> comboBox, IMapObject mapObject) {
-    if (mapObject.getStringProperty(MapObjectProperty.SPRITESHEETNAME) != null) {
+    if (mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME) != null) {
       for (int i = 0; i < comboBox.getModel().getSize(); i++) {
         JLabel label = comboBox.getModel().getElementAt(i);
-        if (label != null && label.getText().equals(mapObject.getStringProperty(MapObjectProperty.SPRITESHEETNAME))) {
+        if (label != null && label.getText().equals(mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME))) {
           comboBox.setSelectedItem(label);
           break;
         }
@@ -139,7 +139,7 @@ public abstract class PropertyPanel extends JPanel {
 
   protected class SpinnerListener extends MapObjectPropertyChangeListener {
     SpinnerListener(String mapObjectProperty, JSpinner spinner) {
-      super(m -> m.setProperty(mapObjectProperty, spinner.getValue().toString()));
+      super(m -> m.setValue(mapObjectProperty, spinner.getValue().toString()));
     }
   }
 

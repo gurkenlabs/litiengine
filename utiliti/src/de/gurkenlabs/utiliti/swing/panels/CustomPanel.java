@@ -90,10 +90,10 @@ public class CustomPanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     this.clearControls();
-    if (mapObject == null || mapObject.getCustomProperties() == null) {
+    if (mapObject == null || mapObject.getProperties() == null) {
       return;
     }
-    for (Property prop : mapObject.getCustomProperties()) {
+    for (Property prop : mapObject.getProperties()) {
       if (MapObjectProperty.isCustom(prop.getName())) {
         this.model.addRow(new Object[] { prop.getName(), prop.getValue() });
       }
@@ -113,11 +113,11 @@ public class CustomPanel extends PropertyPanel {
         String value = (String) model.getValueAt(row, 1);
         if (name != null && value != null && !name.isEmpty() && !value.isEmpty()) {
           setProperties.add(name);
-          getDataSource().setProperty(name, value);
+          getDataSource().setValue(name, value);
         }
       }
 
-      getDataSource().getCustomProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
+      getDataSource().getProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
       UndoManager.instance().mapObjectChanged(getDataSource());
     });
   }

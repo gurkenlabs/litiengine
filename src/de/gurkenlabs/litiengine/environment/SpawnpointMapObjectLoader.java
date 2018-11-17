@@ -22,8 +22,8 @@ public class SpawnpointMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + SpawnpointMapObjectLoader.class);
     }
 
-    final Direction direction = mapObject.getStringProperty(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getStringProperty(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
-    final String spawnType = mapObject.getStringProperty(MapObjectProperty.SPAWN_TYPE);
+    final Direction direction = mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION) != null ? Direction.valueOf(mapObject.getStringValue(MapObjectProperty.SPAWN_DIRECTION)) : Direction.DOWN;
+    final String spawnType = mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE);
 
     final Spawnpoint spawn = this.createSpawnpoint(mapObject, direction, spawnType);
     loadDefaultProperties(spawn, mapObject);

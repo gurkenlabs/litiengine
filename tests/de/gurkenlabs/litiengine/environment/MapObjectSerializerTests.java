@@ -53,48 +53,48 @@ public class MapObjectSerializerTests {
     assertEquals(10, mapObject.getX());
     assertEquals(10.5, mapObject.getY());
     assertEquals(123, mapObject.getId());
-    assertEquals("test,test2", mapObject.getStringProperty(MapObjectProperty.TAGS));
+    assertEquals("test,test2", mapObject.getStringValue(MapObjectProperty.TAGS));
 
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    assertEquals(2, mapObject.getIntProperty(MapObjectProperty.COMBAT_TEAM));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+    assertEquals(2, mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
 
-    assertEquals(Align.CENTER_LEFT, mapObject.getEnumProperty(MapObjectProperty.COLLISION_ALIGN, Align.class));
-    assertEquals(Valign.MIDDLE_DOWN, mapObject.getEnumProperty(MapObjectProperty.COLLISION_VALIGN, Valign.class));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.COLLISION));
-    assertEquals(5, mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_WIDTH));
-    assertEquals(5, mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_HEIGHT));
+    assertEquals(Align.CENTER_LEFT, mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class));
+    assertEquals(Valign.MIDDLE_DOWN, mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.COLLISION));
+    assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH));
+    assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
-    assertEquals(Material.CERAMIC, mapObject.getEnumProperty(MapObjectProperty.PROP_MATERIAL, Material.class));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.PROP_OBSTACLE));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.PROP_ADDSHADOW));
-    assertEquals(Rotation.ROTATE_270, mapObject.getEnumProperty(MapObjectProperty.PROP_ROTATION, Rotation.class));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.PROP_FLIPHORIZONTALLY));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.PROP_FLIPVERTICALLY));
-    assertEquals(true, mapObject.getBoolProperty(MapObjectProperty.PROP_SCALE));
+    assertEquals(Material.CERAMIC, mapObject.getEnumValue(MapObjectProperty.PROP_MATERIAL, Material.class));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
+    assertEquals(Rotation.ROTATE_270, mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_SCALE));
   }
 
   @Test
   public void testTmxPropertyAnnotation() {
     IMapObject mapObject = MapObjectSerializer.serialize(new TestProp());
 
-    assertEquals(true, mapObject.getBoolProperty("testBool"));
-    assertEquals(1, mapObject.getIntProperty("testInt"));
-    assertEquals(2, mapObject.getShortProperty("testShort"));
-    assertEquals(3, mapObject.getLongProperty("testLong"));
-    assertEquals(4, mapObject.getByteProperty("testByte"));
-    assertEquals(5.5, mapObject.getDoubleProperty("testDouble"));
-    assertEquals(6.6f, mapObject.getFloatProperty("testFloat"));
-    assertEquals("test", mapObject.getStringProperty("testString"));
+    assertEquals(true, mapObject.getBoolValue("testBool"));
+    assertEquals(1, mapObject.getIntValue("testInt"));
+    assertEquals(2, mapObject.getShortValue("testShort"));
+    assertEquals(3, mapObject.getLongValue("testLong"));
+    assertEquals(4, mapObject.getByteValue("testByte"));
+    assertEquals(5.5, mapObject.getDoubleValue("testDouble"));
+    assertEquals(6.6f, mapObject.getFloatValue("testFloat"));
+    assertEquals("test", mapObject.getStringValue("testString"));
     
-    assertEquals("false,false", mapObject.getStringProperty("testBoolArr"));
-    assertEquals("0", mapObject.getStringProperty("testIntArr"));
-    assertEquals("0,0", mapObject.getStringProperty("testShortArr"));
-    assertEquals("0,0,0", mapObject.getStringProperty("testLongArr"));
-    assertEquals("0,0,0,0", mapObject.getStringProperty("testByteArr"));
-    assertEquals("0.0,0.0", mapObject.getStringProperty("testDoubleArr"));
-    assertEquals("0,0,0,0", mapObject.getStringProperty("testByteArr"));
-    assertEquals("0.0,0.0", mapObject.getStringProperty("testFloatArr"));
-    assertEquals("null,null", mapObject.getStringProperty("testStringArr"));
+    assertEquals("false,false", mapObject.getStringValue("testBoolArr"));
+    assertEquals("0", mapObject.getStringValue("testIntArr"));
+    assertEquals("0,0", mapObject.getStringValue("testShortArr"));
+    assertEquals("0,0,0", mapObject.getStringValue("testLongArr"));
+    assertEquals("0,0,0,0", mapObject.getStringValue("testByteArr"));
+    assertEquals("0.0,0.0", mapObject.getStringValue("testDoubleArr"));
+    assertEquals("0,0,0,0", mapObject.getStringValue("testByteArr"));
+    assertEquals("0.0,0.0", mapObject.getStringValue("testFloatArr"));
+    assertEquals("null,null", mapObject.getStringValue("testStringArr"));
   }
 
   private class TestProp extends Prop {

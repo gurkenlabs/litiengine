@@ -160,18 +160,18 @@ public class LightSourcePanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    final String color = mapObject.getStringProperty(MapObjectProperty.LIGHT_COLOR);
-    final String shape = mapObject.getStringProperty(MapObjectProperty.LIGHT_SHAPE);
-    final String active = mapObject.getStringProperty(MapObjectProperty.LIGHT_ACTIVE);
+    final String color = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
+    final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
+    final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
 
     boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
-    this.spinnerBrightness.setValue(mapObject.getIntProperty(MapObjectProperty.LIGHT_ALPHA));
-    this.spinnerIntensity.setValue(mapObject.getIntProperty(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
+    this.spinnerBrightness.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_ALPHA));
+    this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.textFieldColor.setText(color);
     this.comboBoxLightShape.setSelectedItem(shape);
     this.checkBoxIsActive.setSelected(isActive);
-    this.sliderOffsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleProperty(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
-    this.sliderOffsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleProperty(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
+    this.sliderOffsetX.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETX), 100), -100));
+    this.sliderOffsetY.setValue((int) Math.max(Math.min(100 * mapObject.getDoubleValue(MapObjectProperty.LIGHT_FOCUSOFFSETY), 100), -100));
   }
 
   private void setupChangedListeners() {
@@ -187,39 +187,39 @@ public class LightSourcePanel extends PropertyPanel {
       textFieldColor.setText(h);
       this.spinnerBrightness.setValue(result.getAlpha());
       if (getDataSource() != null) {
-        getDataSource().setProperty(MapObjectProperty.LIGHT_COLOR, h);
+        getDataSource().setValue(MapObjectProperty.LIGHT_COLOR, h);
         Game.getEnvironment().reloadFromMap(getDataSource().getId());
         Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
       }
     });
 
     this.spinnerBrightness.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_ALPHA, spinnerBrightness.getValue().toString());
+      m.setValue(MapObjectProperty.LIGHT_ALPHA, spinnerBrightness.getValue().toString());
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
+      m.setValue(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
+      m.setValue(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_ACTIVE, checkBoxIsActive.isSelected());
+      m.setValue(MapObjectProperty.LIGHT_ACTIVE, checkBoxIsActive.isSelected());
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_FOCUSOFFSETX, this.sliderOffsetX.getValue() / 100.0);
+      m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, this.sliderOffsetX.getValue() / 100.0);
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
-      m.setProperty(MapObjectProperty.LIGHT_FOCUSOFFSETY, this.sliderOffsetY.getValue() / 100.0);
+      m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, this.sliderOffsetY.getValue() / 100.0);
       Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
   }

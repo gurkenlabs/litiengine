@@ -30,8 +30,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
    */
   public CustomPropertyProvider(CustomPropertyProvider propertyProviderToBeCopied) {
     super();
-    for (Property p : propertyProviderToBeCopied.getCustomProperties()) {
-      this.getCustomProperties().add(new Property(p));
+    for (Property p : propertyProviderToBeCopied.getProperties()) {
+      this.getProperties().add(new Property(p));
     }
   }
 
@@ -45,12 +45,12 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public String getStringProperty(final String name) {
-    return this.getStringProperty(name, null);
+  public String getStringValue(final String name) {
+    return this.getStringValue(name, null);
   }
 
   @Override
-  public String getStringProperty(String name, String defaultValue) {
+  public String getStringValue(String name, String defaultValue) {
     if (this.properties != null && this.properties.stream().anyMatch(x -> x.getName().equals(name))) {
       Optional<Property> opt = this.properties.stream().filter(x -> x.getName().equals(name)).findFirst();
       if (opt.isPresent()) {
@@ -63,7 +63,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   @XmlTransient
-  public List<Property> getCustomProperties() {
+  public List<Property> getProperties() {
     if (this.properties == null) {
       return new CopyOnWriteArrayList<>();
     }
@@ -72,7 +72,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public void setCustomProperties(List<Property> props) {
+  public void setProperties(List<Property> props) {
     if (props == null) {
       this.properties = null;
       return;
@@ -84,18 +84,18 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
 
     for (Property prop : props) {
-      this.setProperty(prop.getName(), prop.getValue());
+      this.setValue(prop.getName(), prop.getValue());
     }
   }
 
   @Override
-  public int getIntProperty(String name) {
-    return this.getIntProperty(name, 0);
+  public int getIntValue(String name) {
+    return this.getIntValue(name, 0);
   }
 
   @Override
-  public int getIntProperty(String name, int defaultValue) {
-    String value = this.getStringProperty(name);
+  public int getIntValue(String name, int defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -104,13 +104,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public short getShortProperty(String name) {
-    return this.getShortProperty(name, (short) 0);
+  public short getShortValue(String name) {
+    return this.getShortValue(name, (short) 0);
   }
 
   @Override
-  public short getShortProperty(String name, short defaultValue) {
-    String value = this.getStringProperty(name);
+  public short getShortValue(String name, short defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -119,13 +119,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public byte getByteProperty(String name) {
-    return this.getByteProperty(name, (byte) 0);
+  public byte getByteValue(String name) {
+    return this.getByteValue(name, (byte) 0);
   }
 
   @Override
-  public byte getByteProperty(String name, byte defaultValue) {
-    String value = this.getStringProperty(name);
+  public byte getByteValue(String name, byte defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -134,13 +134,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public long getLongProperty(String name) {
-    return this.getLongProperty(name, 0L);
+  public long getLongValue(String name) {
+    return this.getLongValue(name, 0L);
   }
 
   @Override
-  public long getLongProperty(String name, long defaultValue) {
-    String value = this.getStringProperty(name);
+  public long getLongValue(String name, long defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -149,13 +149,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public boolean getBoolProperty(String name) {
-    return this.getBoolProperty(name, false);
+  public boolean getBoolValue(String name) {
+    return this.getBoolValue(name, false);
   }
 
   @Override
-  public boolean getBoolProperty(String name, boolean defaultValue) {
-    String value = this.getStringProperty(name);
+  public boolean getBoolValue(String name, boolean defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -164,13 +164,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public float getFloatProperty(String name) {
-    return this.getFloatProperty(name, 0);
+  public float getFloatValue(String name) {
+    return this.getFloatValue(name, 0);
   }
 
   @Override
-  public float getFloatProperty(String name, float defaultValue) {
-    String value = this.getStringProperty(name);
+  public float getFloatValue(String name, float defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -179,13 +179,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public double getDoubleProperty(String name) {
-    return this.getDoubleProperty(name, 0);
+  public double getDoubleValue(String name) {
+    return this.getDoubleValue(name, 0);
   }
 
   @Override
-  public double getDoubleProperty(String name, double defaultValue) {
-    String value = this.getStringProperty(name);
+  public double getDoubleValue(String name, double defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -194,13 +194,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public Color getColorProperty(String name) {
-    return getColorProperty(name, null);
+  public Color getColorValue(String name) {
+    return getColorValue(name, null);
   }
 
   @Override
-  public Color getColorProperty(String name, Color defaultValue) {
-    String value = this.getStringProperty(name);
+  public Color getColorValue(String name, Color defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -209,13 +209,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public <T extends Enum<T>> T getEnumProperty(String name, Class<T> enumType) {
-    return getEnumProperty(name, enumType, null);
+  public <T extends Enum<T>> T getEnumValue(String name, Class<T> enumType) {
+    return getEnumValue(name, enumType, null);
   }
 
   @Override
-  public <T extends Enum<T>> T getEnumProperty(String name, Class<T> enumType, T defaultValue) {
-    String value = this.getStringProperty(name);
+  public <T extends Enum<T>> T getEnumValue(String name, Class<T> enumType, T defaultValue) {
+    String value = this.getStringValue(name);
     if (value == null || value.isEmpty()) {
       return defaultValue;
     }
@@ -228,7 +228,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public void setProperty(String name, String value) {
+  public void setValue(String name, String value) {
     if (this.properties == null || name == null) {
       return;
     }
@@ -249,49 +249,49 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   }
 
   @Override
-  public void setProperty(String name, boolean value) {
-    this.setProperty(name, Boolean.toString(value));
+  public void setValue(String name, boolean value) {
+    this.setValue(name, Boolean.toString(value));
   }
 
   @Override
-  public void setProperty(String name, byte value) {
-    this.setProperty(name, Byte.toString(value));
+  public void setValue(String name, byte value) {
+    this.setValue(name, Byte.toString(value));
   }
 
   @Override
-  public void setProperty(String name, short value) {
-    this.setProperty(name, Short.toString(value));
+  public void setValue(String name, short value) {
+    this.setValue(name, Short.toString(value));
   }
 
   @Override
-  public void setProperty(String name, int value) {
-    this.setProperty(name, Integer.toString(value));
+  public void setValue(String name, int value) {
+    this.setValue(name, Integer.toString(value));
   }
 
   @Override
-  public void setProperty(String name, long value) {
-    this.setProperty(name, Long.toString(value));
+  public void setValue(String name, long value) {
+    this.setValue(name, Long.toString(value));
   }
 
   @Override
-  public void setProperty(String name, float value) {
-    this.setProperty(name, Float.toString(value));
+  public void setValue(String name, float value) {
+    this.setValue(name, Float.toString(value));
   }
 
   @Override
-  public void setProperty(String name, double value) {
-    this.setProperty(name, Double.toString(value));
+  public void setValue(String name, double value) {
+    this.setValue(name, Double.toString(value));
 
   }
 
   @Override
-  public void setProperty(String name, Color value) {
-    this.setProperty(name, ColorHelper.encode(value));
+  public void setValue(String name, Color value) {
+    this.setValue(name, ColorHelper.encode(value));
   }
 
   @Override
-  public void setProperty(String name, Enum<?> value) {
-    this.setProperty(name, value.name());
+  public void setValue(String name, Enum<?> value) {
+    this.setValue(name, value.name());
   }
 
   private static int sortPropertiesByName(Property prop1, Property prop2) {

@@ -383,8 +383,8 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     }
 
-    if (this.getCustomProperties() != null && this.getCustomProperties().isEmpty()) {
-      this.setCustomProperties(null);
+    if (this.getProperties() != null && this.getProperties().isEmpty()) {
+      this.setProperties(null);
     }
   }
 

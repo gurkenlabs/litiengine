@@ -22,8 +22,8 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
     }
 
-    boolean isObstacle = mapObject.getBoolProperty(MapObjectProperty.PROP_OBSTACLE, true);
-    boolean isObstructingLight = mapObject.getBoolProperty(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
+    boolean isObstacle = mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE, true);
+    boolean isObstructingLight = mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
 
     final CollisionBox col = this.createCollisionBox(mapObject, isObstacle, isObstructingLight);
     loadDefaultProperties(col, mapObject);

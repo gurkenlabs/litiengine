@@ -133,7 +133,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
       return this.renderType;
     }
 
-    final String renderTypeProp = this.getStringProperty(LayerProperty.LAYER_RENDER_TYPE);
+    final String renderTypeProp = this.getStringValue(LayerProperty.LAYER_RENDER_TYPE);
     if (renderTypeProp != null && !renderTypeProp.isEmpty()) {
       this.renderType = RenderType.valueOf(renderTypeProp);
     } else {
@@ -169,7 +169,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @Override
   public int getOrder() {
-    return this.getIntProperty(LayerProperty.LAYER_ORDER, -1);
+    return this.getIntValue(LayerProperty.LAYER_ORDER, -1);
   }
 
   @Override
@@ -220,7 +220,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   private void setOrder(int order) {
-    this.setProperty(LayerProperty.LAYER_ORDER, order);
+    this.setValue(LayerProperty.LAYER_ORDER, order);
   }
 
   @SuppressWarnings("unused")
@@ -229,7 +229,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
       this.parentMap = (Map) parent;
     }
 
-    int order = this.getIntProperty(LayerProperty.LAYER_ORDER, -1);
+    int order = this.getIntValue(LayerProperty.LAYER_ORDER, -1);
     if (order == -1 && parentMap != null) {
       int layerCnt = this.parentMap.getRawImageLayers().size();
       layerCnt += this.parentMap.getRawMapObjectLayers().size();

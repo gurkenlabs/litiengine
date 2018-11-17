@@ -47,7 +47,7 @@ public class MapTests {
     assertEquals(0, map.getImageLayers().size());
     assertEquals(1, map.getRenderLayers().size());
     assertEquals(0, map.getMapObjectLayers().size());
-    assertEquals(0, map.getCustomProperties().size());
+    assertEquals(0, map.getProperties().size());
     assertEquals(0, map.getMapObjects().size());
   }
 
@@ -55,8 +55,8 @@ public class MapTests {
   public void testTileCustomProperties() {
     IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
-    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getStringProperty("foo"));
-    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getStringProperty("baz"));
+    assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getStringValue("foo"));
+    assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getStringValue("baz"));
   }
 
   @Test
@@ -101,12 +101,12 @@ public class MapTests {
     assertEquals(1, map.getMapObjects("TEST_TYPE").size());
     assertEquals(1, map.getMapObjects().size());
     assertEquals("TEST_TYPE", object.getType());
-    assertEquals("bar", object.getStringProperty("foo"));
+    assertEquals("bar", object.getStringValue("foo"));
     assertEquals(0.1f, object.getX());
     assertEquals(0.1f, object.getY());
     assertEquals(10.1f, object.getWidth());
     assertEquals(10.1f, object.getHeight());
-    assertEquals("bar", object.getStringProperty("foo"));
+    assertEquals("bar", object.getStringValue("foo"));
 
     map.addMapObjectLayer(mock(MapObjectLayer.class));
     assertEquals(2, map.getMapObjectLayers().size());

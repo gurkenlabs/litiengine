@@ -940,17 +940,17 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     switch (type) {
     case PROP:
-      mo.setProperty(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4));
-      mo.setProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4));
-      mo.setProperty(MapObjectProperty.COLLISION, true);
-      mo.setProperty(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
-      mo.setProperty(MapObjectProperty.PROP_ADDSHADOW, true);
+      mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, (this.newObjectArea.getWidth() * 0.4));
+      mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, (this.newObjectArea.getHeight() * 0.4));
+      mo.setValue(MapObjectProperty.COLLISION, true);
+      mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
+      mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
       break;
     case LIGHTSOURCE:
-      mo.setProperty(MapObjectProperty.LIGHT_ALPHA, 180);
-      mo.setProperty(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
-      mo.setProperty(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
-      mo.setProperty(MapObjectProperty.LIGHT_ACTIVE, true);
+      mo.setValue(MapObjectProperty.LIGHT_ALPHA, 180);
+      mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
+      mo.setValue(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
+      mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);
       break;
     case SPAWNPOINT:
     default:
@@ -1726,7 +1726,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     // render tags
-    String tags = mapObject.getStringProperty(MapObjectProperty.TAGS);
+    String tags = mapObject.getStringValue(MapObjectProperty.TAGS);
     if (tags == null || tags.isEmpty()) {
       return;
     }
@@ -1871,7 +1871,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (type == MapObjectType.TRIGGER) {
       borderColor = COLOR_TRIGGER_BORDER;
     } else if (type == MapObjectType.LIGHTSOURCE) {
-      final String mapObjectColor = mapObject.getStringProperty(MapObjectProperty.LIGHT_COLOR);
+      final String mapObjectColor = mapObject.getStringValue(MapObjectProperty.LIGHT_COLOR);
       if (mapObjectColor != null && !mapObjectColor.isEmpty()) {
         Color lightColor = ColorHelper.decode(mapObjectColor);
         borderColor = new Color(lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue(), 180);
@@ -1891,11 +1891,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderCollisionBox(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
     // render collision boxes
-    boolean collision = mapObject.getBoolProperty(MapObjectProperty.COLLISION, false);
-    float collisionBoxWidth = mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
-    float collisionBoxHeight = mapObject.getFloatProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
-    final Align align = Align.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_ALIGN));
-    final Valign valign = Valign.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_VALIGN));
+    boolean collision = mapObject.getBoolValue(MapObjectProperty.COLLISION, false);
+    float collisionBoxWidth = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, -1);
+    float collisionBoxHeight = mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, -1);
+    final Align align = Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN));
+    final Valign valign = Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN));
 
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.COLLISIONBOX) {
       collisionBoxWidth = mapObject.getWidth();

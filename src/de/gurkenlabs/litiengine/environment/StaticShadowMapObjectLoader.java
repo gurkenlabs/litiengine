@@ -23,8 +23,8 @@ public class StaticShadowMapObjectLoader extends MapObjectLoader {
     }
 
     Collection<IEntity> entities = new ArrayList<>();
-    StaticShadowType type = mapObject.getEnumProperty(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.DOWN);
-    int offset = mapObject.getIntProperty(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET);
+    StaticShadowType type = mapObject.getEnumValue(MapObjectProperty.SHADOW_TYPE, StaticShadowType.class, StaticShadowType.DOWN);
+    int offset = mapObject.getIntValue(MapObjectProperty.SHADOW_OFFSET, StaticShadow.DEFAULT_OFFSET);
 
     StaticShadow shadow = this.createStaticShadow(mapObject, type, offset);
     loadDefaultProperties(shadow, mapObject);

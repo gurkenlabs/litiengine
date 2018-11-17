@@ -14,28 +14,28 @@ public class CustomPropertyProviderTests {
   public void testSetCustomProperty() {
     @SuppressWarnings("serial")
     CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
-    propProvider.setProperty("test", "testvalue");
+    propProvider.setValue("test", "testvalue");
 
-    assertEquals("testvalue", propProvider.getStringProperty("test"));
-    assertNull(propProvider.getStringProperty("test2"));
-    assertEquals(1, propProvider.getCustomProperties().size());
+    assertEquals("testvalue", propProvider.getStringValue("test"));
+    assertNull(propProvider.getStringValue("test2"));
+    assertEquals(1, propProvider.getProperties().size());
 
-    propProvider.setProperty("test", "testvalue2");
+    propProvider.setValue("test", "testvalue2");
 
-    assertEquals("testvalue2", propProvider.getStringProperty("test"));
+    assertEquals("testvalue2", propProvider.getStringValue("test"));
 
     ArrayList<Property> props = new ArrayList<>();
     props.add(new Property("test2", "testvalue3"));
     props.add(new Property("test3", "testvalue4"));
 
-    propProvider.setCustomProperties(props);
+    propProvider.setProperties(props);
 
-    assertEquals(2, propProvider.getCustomProperties().size());
-    assertEquals("testvalue3", propProvider.getStringProperty("test2"));
-    assertEquals("testvalue4", propProvider.getStringProperty("test3"));
+    assertEquals(2, propProvider.getProperties().size());
+    assertEquals("testvalue3", propProvider.getStringValue("test2"));
+    assertEquals("testvalue4", propProvider.getStringValue("test3"));
 
-    propProvider.setCustomProperties(null);
-    assertNotNull(propProvider.getCustomProperties());
-    assertEquals(0, propProvider.getCustomProperties().size());
+    propProvider.setProperties(null);
+    assertNotNull(propProvider.getProperties());
+    assertEquals(0, propProvider.getProperties().size());
   }
 }

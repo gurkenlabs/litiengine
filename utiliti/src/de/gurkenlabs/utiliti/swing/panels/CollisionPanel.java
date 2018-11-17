@@ -74,20 +74,20 @@ public class CollisionPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.chckbxHasCollision.addActionListener(new MapObjectPropertyActionListener(m -> m.setProperty(MapObjectProperty.COLLISION, chckbxHasCollision.isSelected())));
+    this.chckbxHasCollision.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.COLLISION, chckbxHasCollision.isSelected())));
 
-    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setProperty(MapObjectProperty.COLLISIONBOX_WIDTH, this.spinnerWidth.getValue().toString())));
+    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, this.spinnerWidth.getValue().toString())));
 
-    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setProperty(MapObjectProperty.COLLISIONBOX_HEIGHT, this.spinnerHeight.getValue().toString())));
+    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, this.spinnerHeight.getValue().toString())));
 
     this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
       Align align = (Align) this.comboBoxAlign.getSelectedItem();
-      m.setProperty(MapObjectProperty.COLLISION_ALIGN, align);
+      m.setValue(MapObjectProperty.COLLISION_ALIGN, align);
     }));
 
     this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
       Valign valign = (Valign) this.comboBoxValign.getSelectedItem();
-      m.setProperty(MapObjectProperty.COLLISION_VALIGN, valign);
+      m.setValue(MapObjectProperty.COLLISION_VALIGN, valign);
     }));
   }
 
@@ -102,11 +102,11 @@ public class CollisionPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.chckbxHasCollision.setSelected(mapObject.getBoolProperty(MapObjectProperty.COLLISION));
-    this.spinnerWidth.setValue(mapObject.getDoubleProperty(MapObjectProperty.COLLISIONBOX_WIDTH));
-    this.spinnerHeight.setValue(mapObject.getDoubleProperty(MapObjectProperty.COLLISIONBOX_HEIGHT));
+    this.chckbxHasCollision.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISION));
+    this.spinnerWidth.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_WIDTH));
+    this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
-    this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_ALIGN)));
-    this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getStringProperty(MapObjectProperty.COLLISION_VALIGN)));
+    this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)));
+    this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)));
   }
 }

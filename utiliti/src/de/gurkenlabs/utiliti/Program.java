@@ -600,7 +600,7 @@ public class Program {
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
-        final String colorProp = Game.getEnvironment().getMap().getStringProperty(MapProperty.AMBIENTCOLOR);
+        final String colorProp = Game.getEnvironment().getMap().getStringValue(MapProperty.AMBIENTCOLOR);
         try {
           if (colorProp != null && !colorProp.isEmpty()) {
             Color ambientColor = ColorHelper.decode(colorProp);
@@ -917,7 +917,7 @@ public class Program {
       Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
       String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
       colorText.setText(hex);
-      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTCOLOR, hex);
+      Game.getEnvironment().getMap().setValue(MapProperty.AMBIENTCOLOR, hex);
 
     });
 
@@ -944,7 +944,7 @@ public class Program {
 
       spinnerAmbientAlpha.setValue(result.getAlpha());
 
-      Game.getEnvironment().getMap().setProperty(MapProperty.AMBIENTCOLOR, colorText.getText());
+      Game.getEnvironment().getMap().setValue(MapProperty.AMBIENTCOLOR, colorText.getText());
       Game.getEnvironment().getAmbientLight().setColor(result);
       String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
       colorText.setText(hex);
@@ -954,7 +954,7 @@ public class Program {
       isChanging = true;
       colorButton.setEnabled(map != null);
       spinnerAmbientAlpha.setEnabled(map != null);
-      colorText.setText(map.getStringProperty(MapProperty.AMBIENTCOLOR));
+      colorText.setText(map.getStringValue(MapProperty.AMBIENTCOLOR));
       spinnerAmbientAlpha.setValue(ColorHelper.decode(colorText.getText()).getAlpha());
 
       isChanging = false;

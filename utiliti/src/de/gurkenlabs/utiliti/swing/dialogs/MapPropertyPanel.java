@@ -189,16 +189,16 @@ public class MapPropertyPanel extends JPanel {
   }
 
   private void setControlValues(IMap map) {
-    this.textFieldDescription.setText(map.getStringProperty(MapProperty.MAP_DESCRIPTION));
-    this.textFieldTitle.setText(map.getStringProperty(MapProperty.MAP_TITLE));
+    this.textFieldDescription.setText(map.getStringValue(MapProperty.MAP_DESCRIPTION));
+    this.textFieldTitle.setText(map.getStringValue(MapProperty.MAP_TITLE));
     this.textFieldName.setText(map.getName());
-    if (map.getStringProperty(MapProperty.AMBIENTCOLOR) != null) {
-      final String hexColor = map.getStringProperty(MapProperty.AMBIENTCOLOR);
+    if (map.getStringValue(MapProperty.AMBIENTCOLOR) != null) {
+      final String hexColor = map.getStringValue(MapProperty.AMBIENTCOLOR);
       this.textFieldAmbientColor.setText(hexColor);
       this.spinnerAmbientAlpha.setValue(ColorHelper.decode(hexColor).getAlpha());
     }
-    if (map.getStringProperty(MapProperty.SHADOWCOLOR) != null) {
-      final String hexColor = map.getStringProperty(MapProperty.SHADOWCOLOR);
+    if (map.getStringValue(MapProperty.SHADOWCOLOR) != null) {
+      final String hexColor = map.getStringValue(MapProperty.SHADOWCOLOR);
       this.textFieldShadowColor.setText(hexColor);
       this.spinnerShadowAlpha.setValue(ColorHelper.decode(hexColor).getAlpha());
     }
@@ -209,10 +209,10 @@ public class MapPropertyPanel extends JPanel {
       return;
     }
 
-    this.dataSource.setProperty(MapProperty.MAP_DESCRIPTION, this.textFieldDescription.getText());
-    this.dataSource.setProperty(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
-    this.dataSource.setProperty(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
-    this.dataSource.setProperty(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
+    this.dataSource.setValue(MapProperty.MAP_DESCRIPTION, this.textFieldDescription.getText());
+    this.dataSource.setValue(MapProperty.MAP_TITLE, this.textFieldTitle.getText());
+    this.dataSource.setValue(MapProperty.AMBIENTCOLOR, this.textFieldAmbientColor.getText());
+    this.dataSource.setValue(MapProperty.SHADOWCOLOR, this.textFieldShadowColor.getText());
     this.dataSource.setName(this.textFieldName.getText());
   }
 }
