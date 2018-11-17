@@ -85,29 +85,29 @@ public final class MapObjectSerializer {
     }
 
     if (value instanceof List<?>) {
-      return ArrayUtilities.getCommaSeparatedString((List<?>) value);
+      return ArrayUtilities.join((List<?>) value);
       // special handling
     }
 
     if (value.getClass().isArray()) {
       if (field.getType().getComponentType() == int.class) {
-        return ArrayUtilities.getCommaSeparatedString((int[]) value);
+        return ArrayUtilities.join((int[]) value);
       } else if (field.getType().getComponentType() == double.class) {
-        return ArrayUtilities.getCommaSeparatedString((double[]) value);
+        return ArrayUtilities.join((double[]) value);
       } else if (field.getType().getComponentType() == float.class) {
-        return ArrayUtilities.getCommaSeparatedString((float[]) value);
+        return ArrayUtilities.join((float[]) value);
       } else if (field.getType().getComponentType() == short.class) {
-        return ArrayUtilities.getCommaSeparatedString((short[]) value);
+        return ArrayUtilities.join((short[]) value);
       } else if (field.getType().getComponentType() == byte.class) {
-        return ArrayUtilities.getCommaSeparatedString((byte[]) value);
+        return ArrayUtilities.join((byte[]) value);
       } else if (field.getType().getComponentType() == long.class) {
-        return ArrayUtilities.getCommaSeparatedString((long[]) value);
+        return ArrayUtilities.join((long[]) value);
       } else if (field.getType().getComponentType() == String.class) {
-        return ArrayUtilities.getCommaSeparatedString((String[]) value);
+        return ArrayUtilities.join((String[]) value);
       } else if (field.getType().getComponentType() == boolean.class) {
-        return ArrayUtilities.getCommaSeparatedString((boolean[]) value);
+        return ArrayUtilities.join((boolean[]) value);
       } else {
-        return ArrayUtilities.getCommaSeparatedString((Object[]) value);
+        return ArrayUtilities.join((Object[]) value);
       }
     }
 

@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,8 +44,10 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class Map extends CustomPropertyProvider implements IMap, Serializable, Comparable<Map> {
   public static final String FILE_EXTENSION = "tmx";
+
+  private static final Logger log = Logger.getLogger(Map.class.getName());
   private static final long serialVersionUID = 402776584608365440L;
-  private static final int[] MAX_SUPPORTED_VERSION = { 1, 1, 6 }; // 1.1.5
+  private static final int[] MAX_SUPPORTED_VERSION = { 1, 1, 6 };
 
   @XmlAttribute
   private double version;
@@ -266,8 +270,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   public Shape getTileShape(int tileX, int tileY) {
-    switch (this.getOrientation()) {
-    case HEXAGONAL:
+    if (this.getOrientation() == MapOrientation.HEXAGONAL) {
       final StaggerAxis staggerAxis = this.getStaggerAxis();
       final StaggerIndex staggerIndex = this.getStaggerIndex();
       final int s = this.getHexSideLength();
@@ -289,7 +292,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
         hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * h, heightStaggerFactor + tileY * (t + s), staggerAxis, s, r, t);
       }
       return hex;
-    default:
+    } else {
       return new Rectangle(tileX * this.getTileWidth(), tileY * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
     }
   }
@@ -528,9 +531,14 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public int compareTo(Map o) {
-    if (this.name == null || o.name == null) {
-      System.err.println("A map file couldn't be processed due to the name attribute not being present!");
+    if (this.name == null) {
+      return -1;
     }
+
+    if (o.name == null) {
+      return 1;
+    }
+
     return this.name.compareTo(o.name);
   }
 
@@ -609,22 +617,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   void afterUnmarshal(Unmarshaller u, Object parent) {
-    String[] ver = this.tiledversion.split("\\.");
-    int[] vNumbers = new int[ver.length];
-    try {
-      for (int i = 0; i < ver.length; i++) {
-        vNumbers[i] = Integer.parseInt(ver[i]);
-      }
-    } catch (NumberFormatException e) {
-      throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion, e);
-    }
-    for (int i = 0; i < Math.min(vNumbers.length, MAX_SUPPORTED_VERSION.length); i++) {
-      if (vNumbers[i] > MAX_SUPPORTED_VERSION[i]) {
-        throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion);
-      } else if (vNumbers[i] < MAX_SUPPORTED_VERSION[i]) {
-        break;
-      }
-    }
+    this.checkVersion();
 
     ArrayList<ITileset> tmpSets = new ArrayList<>();
     if (this.rawTilesets != null) {
@@ -659,6 +652,25 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     if (this.isInfinite()) {
       this.updateDimensionsByTileLayers();
+    }
+  }
+
+  private void checkVersion() {
+    String[] ver = this.tiledversion.split("\\.");
+    int[] vNumbers = new int[ver.length];
+    try {
+      for (int i = 0; i < ver.length; i++) {
+        vNumbers[i] = Integer.parseInt(ver[i]);
+      }
+    } catch (NumberFormatException e) {
+      log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is ", this.tiledversion);
+    }
+    for (int i = 0; i < Math.min(vNumbers.length, MAX_SUPPORTED_VERSION.length); i++) {
+      if (vNumbers[i] > MAX_SUPPORTED_VERSION[i]) {
+        throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion);
+      } else if (vNumbers[i] < MAX_SUPPORTED_VERSION[i]) {
+        break;
+      }
     }
   }
 

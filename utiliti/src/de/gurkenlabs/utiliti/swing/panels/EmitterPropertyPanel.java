@@ -954,7 +954,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
       colors.set(table.getSelectedRow(), c);
       model.setValueAt(c, table.getSelectedRow(), 1);
       if (getDataSource() != null) {
-        String commaSeperated = ArrayUtilities.getCommaSeparatedString(colors);
+        String commaSeperated = ArrayUtilities.join(colors);
         this.getDataSource().setProperty(MapObjectProperty.Emitter.COLORS, commaSeperated);
       }
     });

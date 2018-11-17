@@ -124,10 +124,10 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     newMapObject.setProperty(MapObjectProperty.Emitter.ORIGIN_ALIGN, emitterData.getOriginAlign());
     newMapObject.setProperty(MapObjectProperty.Emitter.ORIGIN_VALIGN, emitterData.getOriginValign());
 
-    String commaSeperatedColors = ArrayUtilities.getCommaSeparatedString(emitterData.getColors());
+    String commaSeperatedColors = ArrayUtilities.join(emitterData.getColors());
     newMapObject.setProperty(MapObjectProperty.Emitter.COLORS, commaSeperatedColors);
 
-    newMapObject.setProperty(MapObjectProperty.Emitter.PARTICLETYPE, ArrayUtilities.getCommaSeparatedString(emitterData.getColorProbabilities()));
+    newMapObject.setProperty(MapObjectProperty.Emitter.PARTICLETYPE, ArrayUtilities.join(emitterData.getColorProbabilities()));
 
     newMapObject.setProperty(MapObjectProperty.Particle.MINX, emitterData.getParticleX().getMinValue());
     newMapObject.setProperty(MapObjectProperty.Particle.MINY, emitterData.getParticleY().getMinValue());

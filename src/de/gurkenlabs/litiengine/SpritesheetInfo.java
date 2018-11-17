@@ -116,7 +116,7 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
   }
 
   public void setKeyframes(int[] keyframes) {
-    this.keyframes = ArrayUtilities.getCommaSeparatedString(keyframes);
+    this.keyframes = ArrayUtilities.join(keyframes);
   }
 
   @SuppressWarnings("unused")

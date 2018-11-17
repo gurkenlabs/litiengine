@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class ArrayUtilities {
+  public static final String DEFALUT_SEPARATOR = ",";
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
 
   private ArrayUtilities() {
@@ -76,52 +77,84 @@ public final class ArrayUtilities {
     return doubles;
   }
 
-  public static String getCommaSeparatedString(boolean[] arr) {
+  public static String join(boolean[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
+  }
+
+  public static String join(boolean[] arr, String separator) {
     List<Boolean> list = new ArrayList<>();
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
 
-    return getCommaSeparatedString(list);
+    return join(list, separator);
   }
 
-  public static String getCommaSeparatedString(int[] arr) {
-    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Integer[]::new));
+  public static String join(int[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
   }
 
-  public static String getCommaSeparatedString(double[] arr) {
-    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Double[]::new));
+  public static String join(int[] arr, String separator) {
+    return join(Arrays.stream(arr).boxed().toArray(Integer[]::new), separator);
   }
 
-  public static String getCommaSeparatedString(float[] arr) {
+  public static String join(double[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
+  }
+
+  public static String join(double[] arr, String separator) {
+    return join(Arrays.stream(arr).boxed().toArray(Double[]::new), separator);
+  }
+
+  public static String join(float[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
+  }
+
+  public static String join(float[] arr, String separator) {
     List<Float> list = new ArrayList<>();
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
-    return getCommaSeparatedString(list);
+    return join(list, separator);
   }
 
-  public static String getCommaSeparatedString(short[] arr) {
+  public static String join(short[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
+  }
+
+  public static String join(short[] arr, String separator) {
     List<Short> list = new ArrayList<>();
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
-    return getCommaSeparatedString(list);
+    return join(list, separator);
   }
 
-  public static String getCommaSeparatedString(long[] arr) {
-    return getCommaSeparatedString(Arrays.stream(arr).boxed().toArray(Long[]::new));
+  public static String join(long[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
   }
 
-  public static String getCommaSeparatedString(byte[] arr) {
+  public static String join(long[] arr, String separator) {
+    return join(Arrays.stream(arr).boxed().toArray(Long[]::new), separator);
+  }
+
+  public static String join(byte[] arr) {
+    return join(arr, DEFALUT_SEPARATOR);
+  }
+
+  public static String join(byte[] arr, String separator) {
     List<Byte> list = new ArrayList<>();
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
-    return getCommaSeparatedString(list);
+    return join(list, separator);
   }
 
-  public static <T> String getCommaSeparatedString(List<T> list) {
+  public static <T> String join(List<T> list) {
+    return join(list, ",");
+  }
+
+  public static <T> String join(List<T> list, String separator) {
     if (list == null || list.isEmpty()) {
       return null;
     }
@@ -130,11 +163,19 @@ public final class ArrayUtilities {
     for (int i = 0; i < list.size(); i++) {
       sb.append(list.get(i));
       if (i < list.size() - 1) {
-        sb.append(',');
+        sb.append(separator);
       }
     }
 
     return sb.toString();
+  }
+
+  public static <T> String join(T[] arr) {
+    return join(Arrays.asList(arr), DEFALUT_SEPARATOR);
+  }
+
+  public static <T> String join(T[] arr, String separator) {
+    return join(Arrays.asList(arr), separator);
   }
 
   public static <T> List<T> toList(T[][] arr) {
@@ -144,10 +185,6 @@ public final class ArrayUtilities {
     }
 
     return list;
-  }
-
-  public static <T> String getCommaSeparatedString(T[] arr) {
-    return getCommaSeparatedString(Arrays.asList(arr));
   }
 
   public static <T> T getRandom(T[] arr) {

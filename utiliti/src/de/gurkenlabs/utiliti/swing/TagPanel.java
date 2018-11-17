@@ -129,7 +129,7 @@ public class TagPanel extends JPanel {
   }
 
   public String getTagsString() {
-    return ArrayUtilities.getCommaSeparatedString(this.getTags());
+    return ArrayUtilities.join(this.getTags());
   }
 
   public void clear() {

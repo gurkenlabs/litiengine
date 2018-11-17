@@ -362,7 +362,7 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
   }
 
   public void setColorProbabilities(double[] colorProbabilities) {
-    this.colorProbabilities = ArrayUtilities.getCommaSeparatedString(colorProbabilities);
+    this.colorProbabilities = ArrayUtilities.join(colorProbabilities);
   }
 
   public void setColorProbabilities(String colorProbabilities) {
