@@ -29,6 +29,10 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 4. [Loading a .tmx Map](https://youtu.be/RR3QxOhV8hM)
 5. Working with Entities
 
+## Becoming a contributor
+* Agree to our [Code of Conduct](https://github.com/gurkenlabs/litiengine/blob/master/docs/CODE_OF_CONDUCT.md)
+* View our [Contribution guidelines](https://github.com/gurkenlabs/litiengine/blob/master/CONTRIBUTING.md)
+
 ## Features
 
 * Basic Game Infrastructure (GameLoop, Configuration, Resource Management, Logging, ...)
@@ -78,7 +82,8 @@ Visit the official [LITIengine forum](https://forum.litiengine.com/) for trouble
 * Facebook [gurkenlabsofficial](https://www.facebook.com/gurkenlabsofficial/)
 * YouTube [Gurkenlabs](https://www.youtube.com/channel/UCN7-9zYTxip_Hl1LvCQ8RBA)
 * Bug Reports [Issue Tracker](https://github.com/gurkenlabs/litiengine/issues)
-* E-Mail info@gurkenlabs.de
+* E-Mail info@litiengine.com, info@gurkenlabs.de
+* Forum [forum.litiengine.com](https://forum.litiengine.com/)
 
 ## Authors
 ![Gurkenlabs](https://gurkenlabs.de/wp-content/uploads/2017/01/logo_banner_4-1.png "Gurkenlabs")
