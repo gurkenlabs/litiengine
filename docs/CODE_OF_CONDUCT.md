@@ -73,7 +73,7 @@ further defined and clarified by project maintainers.
 Unacceptable behavior from any community member, including sponsors, project maintainers, moderators, and those with decision-making authority, will not be tolerated.
 Anyone asked to stop unacceptable behavior is expected to comply immediately.
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [info@gurkenlabs.de]. 
+reported by contacting the project team at info@gurkenlabs.de. 
 All complaints will be reviewed and investigated by project maintainers and moderators and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
@@ -100,10 +100,10 @@ http://safetyfirstpdx.org/training/code_of_conduct/TemplateReportingForm.pdf
 
 ## Contact
 ### Project maintainers:
-*Steffen Wilke - steffen@gurkenlabs.de
-*Matthias Wilke - matthias@gurkenlabs.de
+* Steffen Wilke - steffen@gurkenlabs.de
+* Matthias Wilke - matthias@gurkenlabs.de
 ### Moderators
-*currently none appointed
+* currently none appointed
 
 ## About this Code of Conduct
 The rules and expectations stated in this code of conduct have last been changed on 11-17-2018.
@@ -112,8 +112,8 @@ Modifications to this code of conduct immediately have to be communicated with t
 
 ## Attribution
 
-This Code of Conduct adapts parts from the [Contributor Covenant][homepage], version 1.4,
-and the [Citizen Code of Conduct].
+This Code of Conduct adapts parts from the Contributor Covenant, version 1.4,
+and the Citizen Code of Conduct.
 Contributor Covenant: https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 Citizen Code of Conduct: http://citizencodeofconduct.org/
 
