@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -656,6 +657,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   private void checkVersion() {
+    String supportedVersionString = ArrayUtilities.join(MAX_SUPPORTED_VERSION, ".");
     String[] ver = this.tiledversion.split("\\.");
     int[] vNumbers = new int[ver.length];
     try {
@@ -663,11 +665,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
         vNumbers[i] = Integer.parseInt(ver[i]);
       }
     } catch (NumberFormatException e) {
-      log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is ", this.tiledversion);
+      log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is {1})", new Object[] { this.tiledversion, supportedVersionString });
     }
+
     for (int i = 0; i < Math.min(vNumbers.length, MAX_SUPPORTED_VERSION.length); i++) {
       if (vNumbers[i] > MAX_SUPPORTED_VERSION[i]) {
-        throw new UnsupportedOperationException("unsupported Tiled version: " + tiledversion);
+        log.log(Level.WARNING, "Unsupported Tiled version: {0} (Max. supported version is {1})", new Object[] { this.tiledversion, supportedVersionString });
+        break;
       } else if (vNumbers[i] < MAX_SUPPORTED_VERSION[i]) {
         break;
       }

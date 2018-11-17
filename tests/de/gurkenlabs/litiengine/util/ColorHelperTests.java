@@ -89,10 +89,12 @@ public class ColorHelperTests {
     String redEncoded = ColorHelper.encode(Color.RED);
     String greenEncoded = ColorHelper.encode(Color.GREEN);
     String blueEncoded = ColorHelper.encode(Color.BLUE);
+    String invisibleBlack = ColorHelper.encode(new Color(0, 0, 0, 0));
 
     assertEquals("#ff0000", redEncoded);
     assertEquals("#00ff00", greenEncoded);
     assertEquals("#0000ff", blueEncoded);
+    assertEquals("#00000000", invisibleBlack);
   }
 
   @Test

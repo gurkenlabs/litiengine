@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -51,12 +52,14 @@ public abstract class ColorLayer implements IRenderable {
 
         int tileOffsetX = 0;
         int tileOffsetY = 0;
-        final ITileOffset tileOffset = MapUtilities.findTileSet(map, tile).getTileOffset();
-        if (tileOffset != null) {
-          tileOffsetX = tileOffset.getX();
-          tileOffsetY = tileOffset.getY();
+        ITileset tileset = MapUtilities.findTileSet(map, tile);
+        if (tileset != null) {
+          final ITileOffset tileOffset = tileset.getTileOffset();
+          if (tileOffset != null) {
+            tileOffsetX = tileOffset.getX();
+            tileOffsetY = tileOffset.getY();
+          }
         }
-
         ImageRenderer.render(g, tiles[x][y], offsetX + tileBounds.getX() + tileOffsetX, offsetY + tileBounds.getY() + tileOffsetY);
       }
     }

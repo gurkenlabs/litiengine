@@ -38,10 +38,11 @@ public final class ColorHelper {
       return null;
     }
 
+    String colorString = String.format("%08x", color.getRGB());
     if (color.getAlpha() == MAX_RGB_VALUE) {
-      return "#" + Integer.toHexString(color.getRGB()).substring(2);
+      return "#" + colorString.substring(2);
     } else {
-      return "#" + Integer.toHexString(color.getRGB());
+      return "#" + colorString;
     }
   }
 

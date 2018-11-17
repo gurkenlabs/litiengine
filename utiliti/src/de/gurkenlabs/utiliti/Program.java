@@ -954,8 +954,13 @@ public class Program {
       isChanging = true;
       colorButton.setEnabled(map != null);
       spinnerAmbientAlpha.setEnabled(map != null);
-      colorText.setText(map.getStringValue(MapProperty.AMBIENTCOLOR));
-      spinnerAmbientAlpha.setValue(ColorHelper.decode(colorText.getText()).getAlpha());
+
+      String colorValue = map.getStringValue(MapProperty.AMBIENTCOLOR, "#00000000");
+      colorText.setText(colorValue);
+      Color color = ColorHelper.decode(colorText.getText());
+      if (color != null) {
+        spinnerAmbientAlpha.setValue(color.getAlpha());
+      }
 
       isChanging = false;
     });
