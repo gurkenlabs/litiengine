@@ -86,14 +86,14 @@ members of the project's leadership.
 ## Reporting violations
 Reports for violations against this code of conduct should be directed at the project maintainers 
 or responsible community managers and include at least the following information:
-*Date of the incident
-*Name(s) of reporter(s)
-*Contact details for follow-up
-*Contact details of additional witnesses
-*A concise description of the incident
-*Time and location of the incident
-*Additional context
-*Is the situation persisting at the time of the report?
+ * Date of the incident
+ * Name(s) of reporter(s)
+ * Contact details for follow-up
+ * Contact details of additional witnesses
+ * A concise description of the incident
+ * Time and location of the incident
+ * Additional context
+ * Is the situation persisting at the time of the report?
 
 An example form for written incident reports can be found at:
 http://safetyfirstpdx.org/training/code_of_conduct/TemplateReportingForm.pdf
