@@ -6,38 +6,38 @@
     * Obtaining LITIengine
 
 * [Setting up the basics](basic-setup/README.md)
-    1. The Game class
-    2. The Game Loop
-    3. Creating screens
+    * The Game class
+    * The Game Loop
+    * Creating screens
 
 * [Configuring the game](game-configuration/README.md)
-    1. Setting Metadata
-    2. Configuration Files
-    3. Default behaviour
+    * Setting Metadata
+    * Configuration Files
+    * Default behaviour
 
 * [Creating a map](map-creation/README.md)
-    1. Map creation with Tiled
-    2. Importing maps into utiLITI
-    3. The Environment
-    4. MapObjects and Entities
-    5. Lighting
-    6. Triggers
-    7. Emitters
+    * Map creation with Tiled
+    * Importing maps into utiLITI
+    * The Environment
+    * MapObjects and Entities
+    * Lighting
+    * Triggers
+    * Emitters
 
 * [Importing Maps](importing-maps/README.md)
-    1. PropertyProviders
-    2. Loading maps from the .litidata file
-    3. Loading external maps
+    * PropertyProviders
+    * Loading maps from the .litidata file
+    * Loading external maps
 
 * [Controlling entities](controlling-entities/README.md)
-    1. Player Input
-    2. Animation
-    3. Movement and behaviours
-    4. The messaging system
+    * Player Input
+    * Animation
+    * Movement and behaviours
+    * The messaging system
 
 * [Graphical User Interface](graphical-user-interface/README.md)
-    1. GuiComponents: An Overview
-    2. Creating Menus
+    * GuiComponents: An Overview
+    * Creating Menus
 
 ## Deployment
 
