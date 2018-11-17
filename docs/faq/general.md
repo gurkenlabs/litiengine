@@ -1,4 +1,4 @@
-## Q: How to use steamworks4j SteamAPI from Eclipse?
+### Q: How to use steamworks4j SteamAPI from Eclipse?
 LITIengine uses the **steamworks4j** wrapper for the SteamAPI to grant access to Steam features from java.
 When developing a game that uses these features, you need to execute a few extra steps in order to support the functionality from the IDE.
 
