@@ -11,34 +11,24 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-/**
- * The listener interface for receiving userKey events. The class that is
- * interested in processing a userKey event implements this interface, and the
- * object created with that class is registered with a component using the
- * component's <code>addUserKeyListener</code> method. When the userKey event
- * occurs, that object's appropriate method is invoked.
- */
 public class KeyBoard implements KeyEventDispatcher, IKeyboard {
   private final List<KeyListener> keyListeners = new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer= new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer= new CopyOnWriteArrayList<>();
-  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer= new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyPressedConsumer= new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyReleasedConsumer= new CopyOnWriteArrayList<>();
-  private final List<Consumer<KeyEvent>> keyTypedConsumer= new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificTypedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyPressedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyReleasedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<KeyEvent>> keyTypedConsumer = new CopyOnWriteArrayList<>();
 
-  private final List<KeyEvent> pressedKeys= new CopyOnWriteArrayList<>();
-  private final List<KeyEvent> releasedKeys= new CopyOnWriteArrayList<>();
-  private final List<KeyEvent> typedKeys= new CopyOnWriteArrayList<>();
+  private final List<KeyEvent> pressedKeys = new CopyOnWriteArrayList<>();
+  private final List<KeyEvent> releasedKeys = new CopyOnWriteArrayList<>();
+  private final List<KeyEvent> typedKeys = new CopyOnWriteArrayList<>();
 
   private boolean consumeAlt;
-  
-  /**
-   * Instantiates a new key board.
-   */
-  public KeyBoard() {
+
+  protected KeyBoard() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
-    
+
     Input.getLoop().attach(this);
     this.consumeAlt = true;
   }

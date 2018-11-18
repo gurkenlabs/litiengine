@@ -20,4 +20,8 @@ public abstract class GameAdapter implements GameListener {
   @Override
   public void terminated() {
   }
+
+  @Override
+  public void initialized(String... args) {
+  }
 }

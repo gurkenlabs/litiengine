@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,6 +26,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
@@ -112,6 +112,8 @@ public final class Game {
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
+    
+    addGameListener(new InputGameAdapter());
   }
 
   private Game() {
@@ -188,8 +190,10 @@ public final class Game {
 
   /**
    * Gets the basic meta information about this game.<br>
-   * This instance can be used to define meta information about your game, like it's name, version or web site.<br><br>
-   * <i>It's also possible to provide additional custom information using the method group of <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
+   * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
+   * <br>
+   * <i>It's also possible to provide additional custom information using the method group of
+   * <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
    * 
    * @return The game's basic meta information.
    * 
@@ -337,10 +341,8 @@ public final class Game {
       }
     }
 
-    try {
-      Input.init();
-    } catch (AWTException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+    for (GameListener listener : gameListeners) {
+      listener.initialized(args);
     }
 
     if (!isInNoGUIMode()) {
@@ -472,7 +474,6 @@ public final class Game {
     }
 
     gameLoop.start();
-    Input.start();
 
     soundEngine.start();
 
@@ -495,7 +496,6 @@ public final class Game {
     }
 
     getConfiguration().save();
-    Input.terminate();
     gameLoop.terminate();
 
     soundEngine.terminate();

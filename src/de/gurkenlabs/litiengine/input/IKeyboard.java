@@ -6,9 +6,6 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 
-/**
- * The Interface IKeyboard.
- */
 public interface IKeyboard extends IUpdateable {
 
   public void consumeAlt(boolean consume);

@@ -22,8 +22,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 /**
- * This implementation provides information about the mouse input in the
- * litiengine.
+ * This implementation provides information about the mouse input in the LITIengine.
  */
 public class Mouse implements IMouse {
   private static final Logger log = Logger.getLogger(Mouse.class.getName());
@@ -56,7 +55,7 @@ public class Mouse implements IMouse {
    * @throws AWTException
    *           In case the {@link Robot} class could not be initialized.
    */
-  public Mouse() throws AWTException {
+  protected Mouse() throws AWTException {
     try {
       this.robot = new Robot();
       this.robot.setAutoDelay(0);

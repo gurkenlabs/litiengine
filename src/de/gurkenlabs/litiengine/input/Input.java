@@ -3,14 +3,25 @@ package de.gurkenlabs.litiengine.input;
 import java.awt.AWTException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameAdapter;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.IGameLoop;
 
+/**
+ * The static <code>Input</code> class is the LITIengine's access point to devices that capture physical player input.
+ * It manages input from different devices, i.e. keyboard, mouse or game pad, and provides a unified API to access this information.
+ * 
+ * @see #mouse()
+ * @see #keyboard()
+ * @see #gamepadManager()
+ */
 public final class Input {
-  // we need an own update loop because otherwise input won't work if the game has
-  // been paused
+  private static final Logger log = Logger.getLogger(Input.class.getName());
+
   private static final IGameLoop InputLoop;
   private static IGamepadManager gamePadManager;
   private static List<IGamepad> gamePads;
@@ -18,33 +29,11 @@ public final class Input {
   private static IMouse mouse;
 
   static {
+    // we need an own update loop because otherwise input won't work if the game has been paused
     InputLoop = new GameLoop("Input Loop", Game.getLoop().getUpdateRate());
   }
 
   private Input() {
-  }
-
-  public static void init() throws AWTException {
-    keyboard = new KeyBoard();
-    mouse = new Mouse();
-    if (Game.getConfiguration().input().isGamepadSupport()) {
-      gamePads = new CopyOnWriteArrayList<>();
-      gamePadManager = new GamepadManager();
-    }
-  }
-
-  public static void start() {
-    InputLoop.start();
-    if (gamePadManager != null) {
-      gamePadManager.start();
-    }
-  }
-
-  public static void terminate() {
-    InputLoop.terminate();
-    if (gamePadManager != null) {
-      gamePadManager.terminate();
-    }
   }
 
   public static IGameLoop getLoop() {
@@ -100,5 +89,41 @@ public final class Input {
     }
 
     return null;
+  }
+
+  private static final void init() {
+    try {
+      Input.keyboard = new KeyBoard();
+      mouse = new Mouse();
+      if (Game.getConfiguration().input().isGamepadSupport()) {
+        gamePads = new CopyOnWriteArrayList<>();
+        gamePadManager = new GamepadManager();
+      }
+    } catch (AWTException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+  }
+
+  public static final class InputGameAdapter extends GameAdapter {
+    @Override
+    public void terminated() {
+      InputLoop.terminate();
+      if (gamePadManager != null) {
+        gamePadManager.terminate();
+      }
+    }
+
+    @Override
+    public void initialized(String... args) {
+      Input.init();
+    }
+
+    @Override
+    public void started() {
+      InputLoop.start();
+      if (gamePadManager != null) {
+        gamePadManager.start();
+      }
+    }
   }
 }
