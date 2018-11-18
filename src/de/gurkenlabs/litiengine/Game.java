@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
@@ -185,6 +186,18 @@ public final class Game {
     return environment;
   }
 
+  /**
+   * Gets the basic meta information about this game.<br>
+   * This instance can be used to define meta information about your game, like it's name, version or web site.<br><br>
+   * <i>It's also possible to provide additional custom information using the method group of <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
+   * 
+   * @return The game's basic meta information.
+   * 
+   * @see GameInfo
+   * @see ICustomPropertyProvider
+   * @see GameInfo#setName(String)
+   * @see GameInfo#setValue(String, String)
+   */
   public static GameInfo getInfo() {
     return gameInfo;
   }
@@ -511,10 +524,35 @@ public final class Game {
     }
   }
 
+  /**
+   * Sets the <code>Game's</code> basic information by the specified <code>GameInfo</code> instance.
+   * <p>
+   * <i>Typically, this should not be called manually because the <code>Game</code> already provides a <code>GameInfo</code> object which can be
+   * adjusted.<br>
+   * If you just want to edit some of it's information, use the provided instance of {@link Game#getInfo()}.
+   * </i>
+   * </p>
+   * 
+   * @param info
+   *          The <code>GameInfo</code> that contains the basic information for the game.
+   * 
+   * @see Game#getInfo()
+   * @see GameInfo
+   */
   public static void setInfo(final GameInfo info) {
     gameInfo = info;
   }
 
+  /**
+   * Sets the <code>Game's</code> basic information by loading the <code>GameInfo</code> from the specified path to an XML file.
+   * 
+   * @param gameInfoFile
+   *          The path to the XML file that contains the serialized <code>GameInfo</code>.
+   * 
+   * @see Game#setInfo(GameInfo)
+   * @see Game#getInfo()
+   * @see GameInfo
+   */
   public static void setInfo(final String gameInfoFile) {
     GameInfo info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
     if (info == null) {
