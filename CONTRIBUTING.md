@@ -60,6 +60,7 @@ You can do so by [becoming our Patron](https://www.patreon.com/gurkenlabs) or [d
 * Create a thematically labelled branch
 * Commit & Push your changes to the branch
   * Commits should be logical and atomic units. Commit often!
+  * We expect any new methods that you write to be fully documented
   * Make sure to also include unit tests for new features
   * Clean up your code following our style and formatting guide (Which we don't have ready yet. Heh.)
 * File a Pull Request
