@@ -152,14 +152,14 @@ public class ScreenManager extends JFrame implements IScreenManager {
   }
 
   @Override
-  public void init(final int width, final int height, final boolean fullscreen) {
+  public void init() {
     if (Game.isInNoGUIMode()) {
       this.resolution = new Dimension(0, 0);
       this.setVisible(false);
       return;
     }
 
-    if (fullscreen) {
+    if (Game.getConfiguration().graphics().isFullscreen()) {
       this.setUndecorated(true);
       GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 

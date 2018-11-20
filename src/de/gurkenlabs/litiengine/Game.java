@@ -327,7 +327,7 @@ public final class Game {
     screenManager = scrMgr;
 
     // init screens
-    getScreenManager().init(getConfiguration().graphics().getResolutionWidth(), getConfiguration().graphics().getResolutionHeight(), getConfiguration().graphics().isFullscreen());
+    getScreenManager().init();
     setCamera(new Camera());
 
     // init logging
