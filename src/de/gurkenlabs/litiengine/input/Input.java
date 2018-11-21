@@ -93,7 +93,7 @@ public final class Input {
 
   private static final void init() {
     try {
-      Input.keyboard = new KeyBoard();
+      Input.keyboard = new Keyboard();
       mouse = new Mouse();
       if (Game.getConfiguration().input().isGamepadSupport()) {
         gamePads = new CopyOnWriteArrayList<>();
