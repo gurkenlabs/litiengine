@@ -159,17 +159,17 @@ public class TileData {
       } else if (compression.equals(COMPRESSION_ZLIB)) {
         is = new InflaterInputStream(bais);
       } else {
-        throw new IllegalArgumentException("Unsupported tile layer compression method" + compression);
+        throw new IllegalArgumentException("Unsupported tile layer compression method " + compression);
       }
 
       int read;
 
       while ((read = is.read()) != -1) {
-        long tileId = 0;
+        int tileId = 0;
         tileId |= read;
 
         read = is.read();
-        long flags = read << Byte.SIZE;
+        int flags = read << Byte.SIZE;
 
         read = is.read();
         flags |= read << Byte.SIZE * 2;
@@ -181,7 +181,7 @@ public class TileData {
         if (tileId == Tile.NONE) {
           parsed.add(Tile.EMPTY);
         } else {
-          parsed.add(new Tile(tileId, false));
+          parsed.add(new Tile(tileId));
         }
       }
 
@@ -201,10 +201,10 @@ public class TileData {
     String[] csvTileIds = value.trim().split("[\\s]*,[\\s]*");
 
     for (String gid : csvTileIds) {
-      long tileId = Long.parseLong(gid);
+      int tileId = Integer.parseInt(gid);
 
       if (tileId > Integer.MAX_VALUE) {
-        parsed.add(new Tile(tileId, true));
+        parsed.add(new Tile(tileId));
       } else {
         if (tileId == Tile.NONE) {
           parsed.add(Tile.EMPTY);
