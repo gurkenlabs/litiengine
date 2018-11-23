@@ -2,9 +2,11 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,8 +21,30 @@ import java.util.stream.Collectors;
  */
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
-  private final Map<String, T> resources = new ConcurrentHashMap<>();
 
+  private final Map<String, T> resources;
+  private final List<ResourcesContainerListener<T>> listeners;
+
+  protected ResourcesContainer() {
+    this.resources = new ConcurrentHashMap<>();
+    this.listeners = new CopyOnWriteArrayList<>();
+  }
+
+  /**
+   * Add the specified resource to this container.<br>
+   * The added element can later be retrieved by this container by calling <code>get(resourceName)</code>.
+   * 
+   * @param resourceName
+   *          The name that the resource is managed by.
+   * @param resource
+   *          The resource instance.
+   * 
+   * @see #get(Predicate)
+   * @see #get(String)
+   * @see #get(String, boolean)
+   * @see #remove(String)
+   * @see #tryGet(String)
+   */
   public void add(String resourceName, T resource) {
     String identifier = resourceName.toLowerCase();
     if (this.resources.containsKey(identifier)) {
@@ -28,13 +52,21 @@ public abstract class ResourcesContainer<T> {
     }
 
     this.resources.put(identifier, resource);
+
+    for (ResourcesContainerListener<T> listener : this.listeners) {
+      listener.added(resourceName, resource);
+    }
   }
 
   /**
-   * Clears this resources container. This method removes all previously loaded resources.
+   * Clears the resources container by removing all previously loaded resources.
    */
   public void clear() {
     this.resources.clear();
+
+    for (ResourcesContainerListener<T> listener : this.listeners) {
+      listener.cleared();
+    }
   }
 
   public boolean contains(String resourceName) {
@@ -101,7 +133,15 @@ public abstract class ResourcesContainer<T> {
   }
 
   public T remove(String resourceName) {
-    return this.resources.remove(resourceName.toLowerCase());
+    T removedResource = this.resources.remove(resourceName.toLowerCase());
+
+    if (removedResource != null) {
+      for (ResourcesContainerListener<T> listener : this.listeners) {
+        listener.removed(resourceName, removedResource);
+      }
+    }
+
+    return removedResource;
   }
 
   public Optional<T> tryGet(String resourceName) {
