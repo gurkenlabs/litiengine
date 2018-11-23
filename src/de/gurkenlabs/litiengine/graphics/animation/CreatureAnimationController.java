@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -114,29 +115,29 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private void initializeAvailableAnimations() {
     for (Direction dir : Direction.values()) {
       // initialize walking animations
-      Spritesheet walkSprite = Spritesheet.find(this.getSpriteName(WALK) + "-" + dir.toString().toLowerCase());
+      Spritesheet walkSprite = Resources.spritesheets().get(this.getSpriteName(WALK) + "-" + dir.toString().toLowerCase());
       if (walkSprite != null) {
         this.add(new Animation(walkSprite, true));
       }
 
       // initialize idle animations
-      Spritesheet idleSprite = Spritesheet.find(this.getSpriteName(IDLE) + "-" + dir.toString().toLowerCase());
+      Spritesheet idleSprite = Resources.spritesheets().get(this.getSpriteName(IDLE) + "-" + dir.toString().toLowerCase());
       if (idleSprite != null) {
         this.add(new Animation(idleSprite, true));
       }
     }
 
-    Spritesheet deadSprite = Spritesheet.find(this.getSpritePrefix() + DEAD);
+    Spritesheet deadSprite = Resources.spritesheets().get(this.getSpritePrefix() + DEAD);
     if (deadSprite != null) {
       this.add(new Animation(deadSprite, true));
     }
 
-    Spritesheet baseIdle = Spritesheet.find(this.getSpriteName(IDLE));
+    Spritesheet baseIdle = Resources.spritesheets().get(this.getSpriteName(IDLE));
     if (baseIdle != null) {
       this.add(new Animation(baseIdle, true));
     }
 
-    Spritesheet baseWalk = Spritesheet.find(this.getSpriteName(WALK));
+    Spritesheet baseWalk = Resources.spritesheets().get(this.getSpriteName(WALK));
     if (baseWalk != null) {
       this.add(new Animation(baseWalk, true));
     }
@@ -172,7 +173,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
   public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
     final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
-    Spritesheet leftIdleSpritesheet = Spritesheet.load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
+    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
   }
 

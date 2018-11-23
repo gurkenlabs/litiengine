@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.resources;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

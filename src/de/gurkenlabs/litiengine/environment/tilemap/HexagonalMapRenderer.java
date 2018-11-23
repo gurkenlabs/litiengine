@@ -9,10 +9,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.ImageCache;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class HexagonalMapRenderer implements IMapRenderer {
@@ -271,7 +272,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
   }
 
   private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
-    Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
+    Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     if (sprite == null) {
       return;
     }

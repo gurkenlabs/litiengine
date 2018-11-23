@@ -35,7 +35,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -44,10 +43,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.ImageCache;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -201,7 +201,7 @@ public class AssetPanelItem extends JPanel {
         return;
       }
       SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetInfo) this.getOrigin());
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
         return;
       }
@@ -280,7 +280,7 @@ public class AssetPanelItem extends JPanel {
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
         ImageCache.clearAll();
-        Spritesheet.remove(info.getName());
+        Resources.spritesheets().remove(info.getName());
         EditorScreen.instance().getMapComponent().reloadEnvironment();
 
         Program.getAssetTree().forceUpdate();
@@ -382,10 +382,12 @@ public class AssetPanelItem extends JPanel {
     if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo spriteSheetInfo = (SpritesheetInfo) this.getOrigin();
 
-      Spritesheet sprite = Spritesheet.find(spriteSheetInfo.getName());
-      if (sprite == null) {
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(spriteSheetInfo.getName());
+      if (!opt.isPresent()) {
         return;
       }
+
+      Spritesheet sprite = opt.get();
 
       ImageFormat format = sprite.getImageFormat() != ImageFormat.UNDEFINED ? sprite.getImageFormat() : ImageFormat.PNG;
 

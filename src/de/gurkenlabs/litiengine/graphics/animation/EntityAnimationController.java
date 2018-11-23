@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController {
@@ -44,7 +45,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   }
 
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
-    this(entity, new Animation(sprite, loop, Spritesheet.getCustomKeyFrameDurations(sprite)));
+    this(entity, new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
   public static <T> String[] getDefaultSpritePrefixes(Class<T> cls) {

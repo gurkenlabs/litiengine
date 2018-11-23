@@ -57,19 +57,20 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.configuration.Quality;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.UriUtilities;
 import de.gurkenlabs.utiliti.components.MapComponent;
@@ -79,19 +80,18 @@ import de.gurkenlabs.utiliti.swing.FileDrop;
 import de.gurkenlabs.utiliti.swing.dialogs.GridEditPanel;
 import de.gurkenlabs.utiliti.swing.dialogs.MapPropertyPanel;
 import de.gurkenlabs.utiliti.swing.panels.MapObjectPanel;
-import javax.swing.SwingConstants;
 
 public class Program {
   public static final Font TEXT_FONT = new JLabel().getFont().deriveFont(10f);
-  public static final BufferedImage CURSOR = Resources.getImage("cursor.png");
-  public static final BufferedImage CURSOR_ADD = Resources.getImage("cursor-add.png");
-  public static final BufferedImage CURSOR_MOVE = Resources.getImage("cursor-move.png");
-  public static final BufferedImage CURSOR_SELECT = Resources.getImage("cursor-select.png");
-  public static final BufferedImage CURSOR_LOAD = Resources.getImage("cursor-load.png");
-  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Resources.getImage("cursor-trans-horizontal.png");
-  public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.getImage("cursor-trans-vertical.png");
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.getImage("cursor-trans-315.png");
-  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.getImage("cursor-trans-45.png");
+  public static final BufferedImage CURSOR = Resources.images().get("cursor.png");
+  public static final BufferedImage CURSOR_ADD = Resources.images().get("cursor-add.png");
+  public static final BufferedImage CURSOR_MOVE = Resources.images().get("cursor-move.png");
+  public static final BufferedImage CURSOR_SELECT = Resources.images().get("cursor-select.png");
+  public static final BufferedImage CURSOR_LOAD = Resources.images().get("cursor-load.png");
+  public static final BufferedImage CURSOR_TRANS_HORIZONTAL = Resources.images().get("cursor-trans-horizontal.png");
+  public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.images().get("cursor-trans-vertical.png");
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.images().get("cursor-trans-315.png");
+  public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
   public static final String PROP_SPRITE_PREFIX = "prop-";
 
   private static UserPreferenceConfiguration userPreferences;
@@ -221,7 +221,7 @@ public class Program {
       return true;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
       EditorScreen.instance().save(false);
@@ -382,7 +382,7 @@ public class Program {
     JPanel bottomPanel = new JPanel(new BorderLayout());
     JTabbedPane bottomTab = new JTabbedPane();
 
-    bottomTab.addTab(Resources.get("assettree_assets"), initAssetsComponent());
+    bottomTab.addTab(Resources.strings().get("assettree_assets"), initAssetsComponent());
     bottomTab.addTab("Console", initConsole());
     bottomTab.setIconAt(0, Icons.ASSET);
     bottomTab.setIconAt(1, Icons.CONSOLE);
@@ -429,24 +429,24 @@ public class Program {
   }
 
   private static Menu initFileMenu() {
-    Menu mnFile = new Menu(Resources.get("menu_file"));
+    Menu mnFile = new Menu(Resources.strings().get("menu_file"));
 
-    MenuItem create = new MenuItem(Resources.get("menu_createProject"));
+    MenuItem create = new MenuItem(Resources.strings().get("menu_createProject"));
     create.setShortcut(new MenuShortcut(KeyEvent.VK_N));
     create.addActionListener(a -> EditorScreen.instance().create());
 
-    MenuItem load = new MenuItem(Resources.get("menu_loadProject"));
+    MenuItem load = new MenuItem(Resources.strings().get("menu_loadProject"));
     load.setShortcut(new MenuShortcut(KeyEvent.VK_O));
     load.addActionListener(a -> EditorScreen.instance().load());
 
-    MenuItem save = new MenuItem(Resources.get("menu_save"));
+    MenuItem save = new MenuItem(Resources.strings().get("menu_save"));
     save.setShortcut(new MenuShortcut(KeyEvent.VK_S));
     save.addActionListener(a -> EditorScreen.instance().save(false));
 
-    MenuItem saveAs = new MenuItem(Resources.get("menu_saveAs"));
+    MenuItem saveAs = new MenuItem(Resources.strings().get("menu_saveAs"));
     saveAs.addActionListener(a -> EditorScreen.instance().save(true));
 
-    MenuItem exit = new MenuItem(Resources.get("menu_exit"));
+    MenuItem exit = new MenuItem(Resources.strings().get("menu_exit"));
     exit.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
     exit.addActionListener(a -> System.exit(0));
 
@@ -455,7 +455,7 @@ public class Program {
     mnFile.add(save);
     mnFile.add(saveAs);
     mnFile.addSeparator();
-    recentFiles = new Menu(Resources.get("menu_recentFiles"));
+    recentFiles = new Menu(Resources.strings().get("menu_recentFiles"));
     loadRecentFiles();
     mnFile.add(recentFiles);
     mnFile.addSeparator();
@@ -464,9 +464,9 @@ public class Program {
   }
 
   private static Menu initViewMenu() {
-    Menu mnView = new Menu(Resources.get("menu_view"));
+    Menu mnView = new Menu(Resources.strings().get("menu_view"));
 
-    CheckboxMenuItem snapToPixels = new CheckboxMenuItem(Resources.get("menu_snapPixels"));
+    CheckboxMenuItem snapToPixels = new CheckboxMenuItem(Resources.strings().get("menu_snapPixels"));
     snapToPixels.setState(userPreferences.isSnapPixels());
     snapToPixels.addItemListener(e -> {
       userPreferences.setSnapPixels(snapToPixels.getState());
@@ -474,24 +474,24 @@ public class Program {
       EditorScreen.instance().getMapObjectPanel().bind(EditorScreen.instance().getMapComponent().getFocusedMapObject());
     });
 
-    CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.get("menu_snapGrid"));
+    CheckboxMenuItem snapToGrid = new CheckboxMenuItem(Resources.strings().get("menu_snapGrid"));
     snapToGrid.setState(userPreferences.isSnapGrid());
     snapToGrid.addItemListener(e -> userPreferences.setSnapGrid(snapToGrid.getState()));
 
-    CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.get("menu_renderGrid"));
+    CheckboxMenuItem renderGrid = new CheckboxMenuItem(Resources.strings().get("menu_renderGrid"));
     renderGrid.setState(userPreferences.isShowGrid());
     renderGrid.setShortcut(new MenuShortcut(KeyEvent.VK_G));
     renderGrid.addItemListener(e -> userPreferences.setShowGrid(renderGrid.getState()));
 
-    CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.get("menu_renderCollisionBoxes"));
+    CheckboxMenuItem renderCollision = new CheckboxMenuItem(Resources.strings().get("menu_renderCollisionBoxes"));
     renderCollision.setState(userPreferences.isRenderBoundingBoxes());
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
     renderCollision.addItemListener(e -> userPreferences.setRenderBoundingBoxes(renderCollision.getState()));
 
-    MenuItem setGrid = new MenuItem(Resources.get("menu_gridSettings"));
+    MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight(), EditorScreen.instance().getMapComponent().getGridStrokeFactor(), EditorScreen.instance().getMapComponent().getGridColor());
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize().width, panel.getGridSize().height);
         EditorScreen.instance().getMapComponent().setGridColor(panel.getGridColor());
@@ -499,11 +499,11 @@ public class Program {
       }
     });
 
-    MenuItem zoomIn = new MenuItem(Resources.get("menu_zoomIn"));
+    MenuItem zoomIn = new MenuItem(Resources.strings().get("menu_zoomIn"));
     zoomIn.setShortcut(new MenuShortcut(KeyEvent.VK_PLUS));
     zoomIn.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomIn());
 
-    MenuItem zoomOut = new MenuItem(Resources.get("menu_zoomOut"));
+    MenuItem zoomOut = new MenuItem(Resources.strings().get("menu_zoomOut"));
     zoomOut.setShortcut(new MenuShortcut(KeyEvent.VK_MINUS));
     zoomOut.addActionListener(a -> EditorScreen.instance().getMapComponent().zoomOut());
 
@@ -520,29 +520,29 @@ public class Program {
   }
 
   private static Menu initProjectMenu() {
-    Menu mnProject = new Menu(Resources.get("menu_project"));
+    Menu mnProject = new Menu(Resources.strings().get("menu_project"));
 
-    CheckboxMenuItem compress = new CheckboxMenuItem(Resources.get("menu_compressProjectFile"));
+    CheckboxMenuItem compress = new CheckboxMenuItem(Resources.strings().get("menu_compressProjectFile"));
     compress.setState(userPreferences.isCompressFile());
     compress.addItemListener(e -> userPreferences.setCompressFile(compress.getState()));
 
-    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.get("menu_syncMaps"));
+    CheckboxMenuItem sync = new CheckboxMenuItem(Resources.strings().get("menu_syncMaps"));
     sync.setState(userPreferences.isSyncMaps());
     sync.addItemListener(e -> userPreferences.setSyncMaps(sync.getState()));
 
-    MenuItem importSpriteFile = new MenuItem(Resources.get("menu_assets_importSpriteFile"));
+    MenuItem importSpriteFile = new MenuItem(Resources.strings().get("menu_assets_importSpriteFile"));
     importSpriteFile.addActionListener(a -> EditorScreen.instance().importSpriteFile());
 
-    MenuItem importSprite = new MenuItem(Resources.get("menu_assets_importSprite"));
+    MenuItem importSprite = new MenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> EditorScreen.instance().importSpriteSheets());
 
-    MenuItem importEmitters = new MenuItem(Resources.get("menu_assets_importEmitters"));
+    MenuItem importEmitters = new MenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
-    MenuItem importBlueprints = new MenuItem(Resources.get("menu_assets_importBlueprints"));
+    MenuItem importBlueprints = new MenuItem(Resources.strings().get("menu_assets_importBlueprints"));
     importBlueprints.addActionListener(a -> EditorScreen.instance().importBlueprints());
 
-    MenuItem importTilesets = new MenuItem(Resources.get("menu_assets_importTilesets"));
+    MenuItem importTilesets = new MenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
 
     mnProject.add(importSprite);
@@ -558,24 +558,24 @@ public class Program {
   }
 
   private static Menu initMapMenu() {
-    Menu mnMap = new Menu(Resources.get("menu_map"));
+    Menu mnMap = new Menu(Resources.strings().get("menu_map"));
 
-    MenuItem imp = new MenuItem(Resources.get("menu_import"));
+    MenuItem imp = new MenuItem(Resources.strings().get("menu_import"));
     imp.addActionListener(a -> EditorScreen.instance().getMapComponent().importMap());
 
-    MenuItem exp = new MenuItem(Resources.get("menu_export"));
+    MenuItem exp = new MenuItem(Resources.strings().get("menu_export"));
     exp.addActionListener(a -> EditorScreen.instance().getMapComponent().exportMap());
 
-    MenuItem saveMapSnapshot = new MenuItem(Resources.get("menu_exportMapSnapshot"));
+    MenuItem saveMapSnapshot = new MenuItem(Resources.strings().get("menu_exportMapSnapshot"));
     saveMapSnapshot.setShortcut(new MenuShortcut(KeyEvent.VK_ENTER));
     saveMapSnapshot.addActionListener(a -> {
       EditorScreen.instance().saveMapSnapshot();
     });
 
-    MenuItem reassignIDs = new MenuItem(Resources.get("menu_reassignMapIds"));
+    MenuItem reassignIDs = new MenuItem(Resources.strings().get("menu_reassignMapIds"));
     reassignIDs.addActionListener(a -> {
       try {
-        int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.get("panel_reassignMapIds"), 1));
+        int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
         EditorScreen.instance().getMapComponent().reassignIds(Game.getEnvironment().getMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
@@ -583,10 +583,10 @@ public class Program {
 
     });
 
-    MenuItem del2 = new MenuItem(Resources.get("menu_removeMap"));
+    MenuItem del2 = new MenuItem(Resources.strings().get("menu_removeMap"));
     del2.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
 
-    MenuItem mapProps = new MenuItem(Resources.get("menu_properties"));
+    MenuItem mapProps = new MenuItem(Resources.strings().get("menu_properties"));
     mapProps.setShortcut(new MenuShortcut(KeyEvent.VK_M));
     mapProps.addActionListener(a -> {
       if (EditorScreen.instance().getMapComponent().getMaps() == null || EditorScreen.instance().getMapComponent().getMaps().isEmpty()) {
@@ -596,7 +596,7 @@ public class Program {
       MapPropertyPanel panel = new MapPropertyPanel();
       panel.bind(Game.getEnvironment().getMap());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
@@ -629,27 +629,27 @@ public class Program {
   private static Menu initHelpMenu() {
     Menu helpMenu = new Menu("Help");
 
-    MenuItem tutorialMenuItem = new MenuItem(Resources.get("menu_help_tutorial"));
-    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_tutorials"))));
+    MenuItem tutorialMenuItem = new MenuItem(Resources.strings().get("menu_help_tutorial"));
+    tutorialMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_tutorials"))));
 
-    MenuItem wikiMenuItem = new MenuItem(Resources.get("menu_help_wiki"));
-    wikiMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_wiki"))));
+    MenuItem wikiMenuItem = new MenuItem(Resources.strings().get("menu_help_wiki"));
+    wikiMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_wiki"))));
 
-    MenuItem javadocsMenuItem = new MenuItem(Resources.get("menu_help_javadocs"));
-    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_javadocs"))));
+    MenuItem javadocsMenuItem = new MenuItem(Resources.strings().get("menu_help_javadocs"));
+    javadocsMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_javadocs"))));
 
-    MenuItem forumMenuItem = new MenuItem(Resources.get("menu_help_forum"));
-    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_forum"))));
+    MenuItem forumMenuItem = new MenuItem(Resources.strings().get("menu_help_forum"));
+    forumMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_forum"))));
 
-    MenuItem patreonMenuItem = new MenuItem(Resources.get("menu_help_patreon"));
-    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_patreon"))));
+    MenuItem patreonMenuItem = new MenuItem(Resources.strings().get("menu_help_patreon"));
+    patreonMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_patreon"))));
 
-    MenuItem payPalMenuItem = new MenuItem(Resources.get("menu_help_paypal"));
-    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.get("link_LITIengine_wiki"))));
+    MenuItem payPalMenuItem = new MenuItem(Resources.strings().get("menu_help_paypal"));
+    payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_wiki"))));
 
-    MenuItem aboutMenuItem = new MenuItem(Resources.get("menu_help_about"));
+    MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.getScreenManager()),
-        Resources.get("menu_help_abouttext") + "\n" + Resources.get("menu_help_releases") + Resources.get("link_LITIengine_releases") + "\n\n" + Resources.get("copyright_gurkenlabs") + "\n" + Resources.get("copyright_LITIengine"), Resources.get("menu_help_about") + " " + Game.getInfo().getVersion(),
+        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.getInfo().getVersion(),
         JOptionPane.INFORMATION_MESSAGE));
 
     helpMenu.add(tutorialMenuItem);
@@ -937,7 +937,7 @@ public class Program {
         Color solid = ColorHelper.decode(colorText.getText());
         color = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) spinnerAmbientAlpha.getValue());
       }
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), color);
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectAmbientColor"), color);
       if (result == null) {
         return;
       }
@@ -988,31 +988,31 @@ public class Program {
   }
 
   private static void initAddMenu(JComponent addMenu) {
-    JMenuItem addProp = new JMenuItem(Resources.get("add_prop"), Icons.PROP);
+    JMenuItem addProp = new JMenuItem(Resources.strings().get("add_prop"), Icons.PROP);
     addProp.addActionListener(a -> setCreateMode(MapObjectType.PROP));
 
-    JMenuItem addCreature = new JMenuItem(Resources.get("add_creature"), Icons.CREATURE);
+    JMenuItem addCreature = new JMenuItem(Resources.strings().get("add_creature"), Icons.CREATURE);
     addCreature.addActionListener(a -> setCreateMode(MapObjectType.CREATURE));
 
-    JMenuItem addLight = new JMenuItem(Resources.get("add_light"), Icons.LIGHT);
+    JMenuItem addLight = new JMenuItem(Resources.strings().get("add_light"), Icons.LIGHT);
     addLight.addActionListener(a -> setCreateMode(MapObjectType.LIGHTSOURCE));
 
-    JMenuItem addTrigger = new JMenuItem(Resources.get("add_trigger"), Icons.TRIGGER);
+    JMenuItem addTrigger = new JMenuItem(Resources.strings().get("add_trigger"), Icons.TRIGGER);
     addTrigger.addActionListener(a -> setCreateMode(MapObjectType.TRIGGER));
 
-    JMenuItem addSpawnpoint = new JMenuItem(Resources.get("add_spawnpoint"), Icons.SPAWNPOINT);
+    JMenuItem addSpawnpoint = new JMenuItem(Resources.strings().get("add_spawnpoint"), Icons.SPAWNPOINT);
     addSpawnpoint.addActionListener(a -> setCreateMode(MapObjectType.SPAWNPOINT));
 
-    JMenuItem addCollisionBox = new JMenuItem(Resources.get("add_collisionbox"), Icons.COLLISIONBOX);
+    JMenuItem addCollisionBox = new JMenuItem(Resources.strings().get("add_collisionbox"), Icons.COLLISIONBOX);
     addCollisionBox.addActionListener(a -> setCreateMode(MapObjectType.COLLISIONBOX));
 
-    JMenuItem addMapArea = new JMenuItem(Resources.get("add_area"), Icons.MAPAREA);
+    JMenuItem addMapArea = new JMenuItem(Resources.strings().get("add_area"), Icons.MAPAREA);
     addMapArea.addActionListener(a -> setCreateMode(MapObjectType.AREA));
 
-    JMenuItem addShadow = new JMenuItem(Resources.get("add_shadow"), Icons.SHADOWBOX);
+    JMenuItem addShadow = new JMenuItem(Resources.strings().get("add_shadow"), Icons.SHADOWBOX);
     addShadow.addActionListener(a -> setCreateMode(MapObjectType.STATICSHADOW));
 
-    JMenuItem addEmitter = new JMenuItem(Resources.get("add_emitter"), Icons.EMITTER);
+    JMenuItem addEmitter = new JMenuItem(Resources.strings().get("add_emitter"), Icons.EMITTER);
     addEmitter.addActionListener(a -> setCreateMode(MapObjectType.EMITTER));
 
     addMenu.add(addProp);
@@ -1097,11 +1097,11 @@ public class Program {
     if (SystemTray.isSupported()) {
       SystemTray tray = SystemTray.getSystemTray();
       PopupMenu menu = new PopupMenu();
-      MenuItem exitItem = new MenuItem(Resources.get("menu_exit"));
+      MenuItem exitItem = new MenuItem(Resources.strings().get("menu_exit"));
       exitItem.addActionListener(a -> System.exit(0));
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(Resources.getImage("litiengine-icon.png"), Game.getInfo().toString(), menu);
+      trayIcon = new TrayIcon(Resources.images().get("litiengine-icon.png"), Game.getInfo().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);

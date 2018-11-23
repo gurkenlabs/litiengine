@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.SpriteParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
@@ -150,7 +151,7 @@ public class CustomEmitter extends Emitter {
       particle = new TextParticle(this.getEmitterData().getParticleText(), this.getRandomParticleColor(), this.getRandomParticleTTL()).setX(x).setY(y).setDeltaIncX(gravityX).setDeltaIncY(gravityY).setDeltaX(deltaX).setDeltaY(deltaY).setDeltaWidth(deltaWidth).setDeltaHeight(deltaHeight);
       break;
     case SPRITE:
-      Spritesheet sprite = Spritesheet.find(this.getEmitterData().getSpritesheet());
+      Spritesheet sprite = Resources.spritesheets().get(this.getEmitterData().getSpritesheet());
       if (sprite == null) {
         return null;
       }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -25,7 +26,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameData;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -33,7 +33,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
@@ -41,6 +40,8 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.ImageCache;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
@@ -206,7 +207,7 @@ public class EditorScreen extends Screen {
     JFileChooser chooser;
     try {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
-      chooser.setDialogTitle(Resources.get("input_select_project_folder"));
+      chooser.setDialogTitle(Resources.strings().get("input_select_project_folder"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       if (chooser.showOpenDialog((JFrame) Game.getScreenManager()) != JFileChooser.APPROVE_OPTION) {
         return;
@@ -293,7 +294,7 @@ public class EditorScreen extends Screen {
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
 
       ImageCache.clearAll();
-      Spritesheet.getSpritesheets().clear();
+      Resources.spritesheets().clear();
 
       // load sprite sheets from different sources:
       // 1. add sprite sheets from game file
@@ -319,7 +320,7 @@ public class EditorScreen extends Screen {
       }
 
       this.changeComponent(ComponentType.MAP);
-      this.setCurrentStatus(Resources.get("status_gamefile_loaded"));
+      this.setCurrentStatus(Resources.strings().get("status_gamefile_loaded"));
     } finally {
       Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       log.log(Level.INFO, "Loading gamefile {0} took: {1} ms", new Object[] { gameFile, (System.nanoTime() - currentTime) / 1000000.0 });
@@ -334,7 +335,7 @@ public class EditorScreen extends Screen {
         return;
       }
 
-      List<Spritesheet> loaded = Spritesheet.load(spriteFile.toString());
+      List<Spritesheet> loaded = Resources.spritesheets().loadFrom(spriteFile.toString());
       List<SpritesheetInfo> infos = new ArrayList<>();
       for (Spritesheet sprite : loaded) {
         SpritesheetInfo info = new SpritesheetInfo(sprite);
@@ -355,7 +356,7 @@ public class EditorScreen extends Screen {
 
   public void importSpriteSheets(File... files) {
     SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(files);
-    int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (option != JOptionPane.OK_OPTION) {
       return;
     }
@@ -380,7 +381,7 @@ public class EditorScreen extends Screen {
       }
 
       if (this.gameFile.getEmitters().stream().anyMatch(x -> x.getName().equals(emitter.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_emitter_question", emitter.getName()), Resources.get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("import_emitter_question", emitter.getName()), Resources.strings().get("import_emitter_title"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.NO_OPTION) {
           return;
         }
@@ -401,7 +402,7 @@ public class EditorScreen extends Screen {
       }
 
       if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_blueprint_question", blueprint.getName()), Resources.get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("import_blueprint_question", blueprint.getName()), Resources.strings().get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.NO_OPTION) {
           return;
         }
@@ -426,7 +427,7 @@ public class EditorScreen extends Screen {
       tileset.setMapPath(path);
 
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("import_tileset_title", tileset.getName()), Resources.get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
+        int result = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("import_tileset_title", tileset.getName()), Resources.strings().get("import_tileset_title"), JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.NO_OPTION) {
           return;
         }
@@ -444,10 +445,11 @@ public class EditorScreen extends Screen {
 
   public void loadSpriteSheets(Collection<SpritesheetInfo> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
-      if (Spritesheet.find(info.getName()) != null) {
-        Spritesheet.update(info);
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
+      if (opt.isPresent()) {
+        Resources.spritesheets().update(info);
       } else {
-        Spritesheet.load(info);
+        Resources.spritesheets().load(info);
       }
     });
 
@@ -569,7 +571,7 @@ public class EditorScreen extends Screen {
     Program.loadRecentFiles();
     log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints to {5}",
         new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.currentResourceFile });
-    this.setCurrentStatus(Resources.get("status_gamefile_saved"));
+    this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
     if (Program.getUserPreferences().isSyncMaps()) {
       this.saveMaps();
@@ -599,16 +601,19 @@ public class EditorScreen extends Screen {
     List<SpritesheetInfo> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {
-      if (tileSet.getImage() == null || Spritesheet.find(tileSet.getName()) != null) {
+      if (tileSet.getImage() == null) {
         continue;
       }
 
-      Spritesheet sprite = Spritesheet.find(tileSet.getImage().getSource());
-      if (sprite == null) {
-        sprite = Spritesheet.load(tileSet);
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileSet.getImage().getSource());
+      Spritesheet sprite = null;
+      if (!opt.isPresent()) {
+        sprite = Resources.spritesheets().load(tileSet);
         if (sprite == null) {
           continue;
         }
+      } else {
+        sprite = opt.get();
       }
 
       infos.add(new SpritesheetInfo(sprite));
@@ -616,17 +621,20 @@ public class EditorScreen extends Screen {
     }
 
     for (IImageLayer imageLayer : map.getImageLayers()) {
-      Spritesheet sprite = Spritesheet.find(imageLayer.getImage().getSource());
-      if (sprite == null) {
-        BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(imageLayer.getImage().getSource());
+      Spritesheet sprite = null;
+      if (!opt.isPresent()) {
+        BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
         if (img == null) {
           continue;
         }
 
-        sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
+        sprite = Resources.spritesheets().load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
         if (sprite == null) {
           continue;
         }
+      } else {
+        sprite = opt.get();
       }
 
       SpritesheetInfo info = new SpritesheetInfo(sprite);

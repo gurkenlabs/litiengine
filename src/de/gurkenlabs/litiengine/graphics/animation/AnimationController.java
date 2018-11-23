@@ -11,8 +11,9 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.ImageCache;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
@@ -43,7 +44,7 @@ public class AnimationController implements IAnimationController {
   }
 
   public AnimationController(final Spritesheet sprite, boolean loop) {
-    this(new Animation(sprite, loop, Spritesheet.getCustomKeyFrameDurations(sprite)));
+    this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }
 
   public AnimationController(final Animation defaultAnimation, final Animation... animations) {

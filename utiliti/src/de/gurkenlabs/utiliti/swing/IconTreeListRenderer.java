@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -19,9 +20,10 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.resources.ImageCache;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
@@ -70,10 +72,10 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Prop prop) {
-    if(prop == null || prop.getSpritesheetName() == null) {
+    if (prop == null || prop.getSpritesheetName() == null) {
       return null;
     }
-    
+
     String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
     BufferedImage propImag;
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
@@ -82,9 +84,13 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
       final String name = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
       final String fallbackName = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase();
-      Spritesheet sprite = Spritesheet.find(name);
-      if (sprite == null) {
-        sprite = Spritesheet.find(fallbackName);
+
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(name);
+      Spritesheet sprite = null;
+      if (opt.isPresent()) {
+        sprite = opt.get();
+      } else if (Resources.spritesheets().contains(fallbackName)) {
+        sprite = Resources.spritesheets().get(fallbackName);
       }
 
       if (sprite == null || sprite.getSprite(0) == null) {
@@ -104,7 +110,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     if (ImageCache.IMAGES.containsKey(cacheKey)) {
       propImag = ImageCache.IMAGES.get(cacheKey);
     } else {
-      Collection<Spritesheet> sprites = Spritesheet.find(s -> s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.IDLE) || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.WALK)
+      Collection<Spritesheet> sprites = Resources.spritesheets().get(s -> s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.IDLE) || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.WALK)
           || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.DEAD) || s.getName().startsWith(creature.getSpritePrefix() + "-"));
       if (sprites.isEmpty()) {
         return null;

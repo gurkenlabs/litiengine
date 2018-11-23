@@ -10,9 +10,9 @@ import javax.swing.JLabel;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {

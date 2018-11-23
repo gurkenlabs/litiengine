@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.swing.ImageIcon;
@@ -24,6 +25,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
@@ -58,9 +60,9 @@ public abstract class PropertyPanel extends JPanel {
     for (Map.Entry<String, String> entry : m.entrySet()) {
       JLabel label = new JLabel();
       label.setText(entry.getKey());
-      Spritesheet sprite = Spritesheet.find(entry.getValue());
-      if (sprite != null && sprite.getTotalNumberOfSprites() > 0) {
-        BufferedImage scaled = sprite.getPreview(24);
+      Optional<Spritesheet> opt = Resources.spritesheets().tryGet(entry.getValue());
+      if (opt.isPresent() && opt.get().getTotalNumberOfSprites() > 0) {
+        BufferedImage scaled = opt.get().getPreview(24);
         if (scaled != null) {
           label.setIcon(new ImageIcon(scaled));
         }

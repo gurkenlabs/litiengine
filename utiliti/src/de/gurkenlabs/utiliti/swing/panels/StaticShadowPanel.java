@@ -13,11 +13,11 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class StaticShadowPanel extends PropertyPanel {
@@ -25,11 +25,11 @@ public class StaticShadowPanel extends PropertyPanel {
   private JSpinner spinnerOffset;
 
   public StaticShadowPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_staticShadow"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_staticShadow"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    JLabel lblShadowType = new JLabel(Resources.get("panel_shadowType"));
+    JLabel lblShadowType = new JLabel(Resources.strings().get("panel_shadowType"));
 
     this.comboBoxShadowType = new JComboBox<>();
     this.comboBoxShadowType.setModel(new DefaultComboBoxModel<StaticShadowType>(StaticShadowType.values()));
