@@ -18,16 +18,6 @@ public final class Images extends ResourcesContainer<BufferedImage> {
   protected Images() {
   }
 
-  @Override
-  public BufferedImage get(String resourceName) {
-    if (!ImageFormat.isSupported(resourceName)) {
-      log.log(Level.SEVERE, "The image file {0} could not be loaded because the image format is not supported.", new Object[] { resourceName });
-      return null;
-    }
-
-    return super.get(resourceName, false);
-  }
-
   /**
    * Loads the image by the specified resourceName. This method supports both,
    * loading images from a folder and loading them from the resources.
@@ -41,6 +31,11 @@ public final class Images extends ResourcesContainer<BufferedImage> {
   @Override
   protected BufferedImage load(String resourceName) {
     if (resourceName == null || resourceName.isEmpty()) {
+      return null;
+    }
+    
+    if (!ImageFormat.isSupported(resourceName)) {
+      log.log(Level.SEVERE, "The image file {0} could not be loaded because the image format is not supported.", new Object[] { resourceName });
       return null;
     }
 
