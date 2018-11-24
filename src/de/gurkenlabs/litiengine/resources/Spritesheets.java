@@ -192,4 +192,9 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
+
+  @Override
+  protected Spritesheet load(String resourceName) {
+    return null;
+  }
 }

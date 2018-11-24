@@ -47,9 +47,6 @@ public abstract class ResourcesContainer<T> {
    */
   public void add(String resourceName, T resource) {
     String identifier = resourceName.toLowerCase();
-    if (this.resources.containsKey(identifier)) {
-      this.resources.remove(identifier);
-    }
 
     this.resources.put(identifier, resource);
 
@@ -74,7 +71,7 @@ public abstract class ResourcesContainer<T> {
   }
 
   public boolean contains(T resource) {
-    return this.resources.values().contains(resource);
+    return this.resources.containsValue(resource);
   }
 
   public int count() {
@@ -111,9 +108,18 @@ public abstract class ResourcesContainer<T> {
     // the case is ignored when retrieving resources
     String identifier = resourceName.toLowerCase();
 
-    if (!forceLoad && this.resources.containsKey(identifier)) {
-      return this.resources.get(identifier);
+    if (forceLoad) {
+      T resource = this.loadResource(resourceName);
+      this.resources.put(identifier, resource);
+      return resource;
+    } else {
+      return this.resources.computeIfAbsent(identifier, this::loadResource);
     }
+  }
+  
+  private T loadResource(String resourceName) {
+    // the case is ignored when retrieving resources
+    String identifier = resourceName.toLowerCase();
 
     T newResource = this.load(identifier);
 
@@ -123,7 +129,9 @@ public abstract class ResourcesContainer<T> {
       return null;
     }
 
-    this.add(resourceName, newResource);
+    for (ResourcesContainerListener<T> listener : this.listeners) {
+      listener.added(resourceName, newResource);
+    }
 
     return newResource;
   }
@@ -148,9 +156,7 @@ public abstract class ResourcesContainer<T> {
     return Optional.ofNullable(this.get(resourceName));
   }
 
-  protected T load(String resourceName) {
-    return null;
-  }
+  protected abstract T load(String resourceName);
 
   protected Map<String, T> getResources() {
     return this.resources;
