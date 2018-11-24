@@ -31,6 +31,7 @@ public final class XmlUtilities {
   private static final Map<Class<?>, JAXBContext> jaxbContexts;
 
   private XmlUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   static {

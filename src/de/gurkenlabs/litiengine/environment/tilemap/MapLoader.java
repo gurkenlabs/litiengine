@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
  */
 public final class MapLoader {
   private MapLoader() {
+    throw new UnsupportedOperationException();
   }
 
   public static IMap load(final String path) {

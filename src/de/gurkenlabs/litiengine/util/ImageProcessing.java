@@ -48,6 +48,7 @@ public class ImageProcessing {
   private static GraphicsConfiguration graphicsConfig;
 
   private ImageProcessing() {
+    throw new UnsupportedOperationException();
   }
 
   /**

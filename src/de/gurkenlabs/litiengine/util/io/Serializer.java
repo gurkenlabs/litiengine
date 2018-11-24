@@ -15,6 +15,7 @@ public final class Serializer {
   private static final Logger log = Logger.getLogger(Serializer.class.getName());
 
   private Serializer() {
+    throw new UnsupportedOperationException();
   }
 
   /**

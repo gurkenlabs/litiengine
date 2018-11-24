@@ -16,5 +16,6 @@ public final class CollectionUtilities {
   }
 
   private CollectionUtilities() {
+    throw new UnsupportedOperationException();
   }
 }

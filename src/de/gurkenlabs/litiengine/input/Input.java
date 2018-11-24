@@ -34,6 +34,7 @@ public final class Input {
   }
 
   private Input() {
+    throw new UnsupportedOperationException();
   }
 
   public static IGameLoop getLoop() {

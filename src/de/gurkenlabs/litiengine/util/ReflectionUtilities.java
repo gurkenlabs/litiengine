@@ -10,6 +10,7 @@ public final class ReflectionUtilities {
   private static final Logger log = Logger.getLogger(ReflectionUtilities.class.getName());
 
   private ReflectionUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static <T> Field getField(Class<T> cls, final String fieldName) {

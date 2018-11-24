@@ -5,6 +5,7 @@ import java.util.List;
 
 public class ListUtilities {
   private ListUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static <E> boolean containsInstance(final List<E> list, final Class<? extends E> clazz) {

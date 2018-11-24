@@ -41,6 +41,7 @@ public final class Resources {
   }
 
   private Resources() {
+    throw new UnsupportedOperationException();
   }
 
   public static void setEncoding(String newEncoding) {
