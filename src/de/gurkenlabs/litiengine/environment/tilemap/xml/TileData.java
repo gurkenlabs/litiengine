@@ -201,7 +201,7 @@ public class TileData {
     String[] csvTileIds = value.trim().split("[\\s]*,[\\s]*");
 
     for (String gid : csvTileIds) {
-      int tileId = (int)Long.parseLong(gid);
+      int tileId = Integer.parseUnsignedInt(gid);
 
       if (tileId > Integer.MAX_VALUE) {
         parsed.add(new Tile(tileId));
