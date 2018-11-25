@@ -6,7 +6,7 @@ package de.gurkenlabs.litiengine.resources;
  * 
  * @see ResourcesContainerListener
  */
-public abstract class ResourceContainerAdapter<T> implements ResourcesContainerListener<T> {
+public abstract class ResourcesContainerAdapter<T> implements ResourcesContainerListener<T> {
   @Override
   public void added(String resourceName, T resource) {
   }
