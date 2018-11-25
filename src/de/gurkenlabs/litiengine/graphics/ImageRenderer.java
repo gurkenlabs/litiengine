@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 public final class ImageRenderer {
 
   private ImageRenderer() {
+    throw new UnsupportedOperationException();
   }
 
   public static void render(final Graphics2D g, final Image image, final double x, final double y) {

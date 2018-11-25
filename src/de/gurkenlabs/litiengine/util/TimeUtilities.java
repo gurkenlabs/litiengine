@@ -23,6 +23,7 @@ public final class TimeUtilities {
   }
 
   private TimeUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static double nanoToMs(final long nano) {

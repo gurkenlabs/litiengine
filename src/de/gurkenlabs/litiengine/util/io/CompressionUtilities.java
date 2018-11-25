@@ -22,6 +22,7 @@ public final class CompressionUtilities {
   private static final Logger log = Logger.getLogger(CompressionUtilities.class.getName());
 
   private CompressionUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static byte[] compress(final byte[] data) {

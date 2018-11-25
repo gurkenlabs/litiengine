@@ -117,6 +117,7 @@ public final class Game {
   }
 
   private Game() {
+    throw new UnsupportedOperationException();
   }
 
   public static void addGameListener(GameListener listener) {

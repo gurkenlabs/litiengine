@@ -20,6 +20,7 @@ public final class ImageSerializer {
   private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());
 
   private ImageSerializer() {
+    throw new UnsupportedOperationException();
   }
 
   public static BufferedImage loadImage(final String fileName) {

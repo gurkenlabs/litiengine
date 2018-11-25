@@ -37,19 +37,17 @@ public class Configuration {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public <T extends ConfigurationGroup> T getConfigurationGroup(final Class<T> groupClass) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
       if (group.getClass().equals(groupClass)) {
-        return (T) group;
+        return groupClass.cast(group);
       }
     }
 
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends ConfigurationGroup> T getConfigurationGroup(final String prefix) {
+  public ConfigurationGroup getConfigurationGroup(final String prefix) {
     for (final ConfigurationGroup group : this.getConfigurationGroups()) {
 
       final ConfigurationGroupInfo info = group.getClass().getAnnotation(ConfigurationGroupInfo.class);
@@ -58,11 +56,15 @@ public class Configuration {
       }
 
       if (info.prefix().equals(prefix)) {
-        return (T) group;
+        return group;
       }
     }
 
     return null;
+  }
+  
+  public <T extends ConfigurationGroup> T getConfigurationGroup(String prefix, Class<T> groupClass) {
+    return groupClass.cast(getConfigurationGroup(prefix));
   }
 
   public List<ConfigurationGroup> getConfigurationGroups() {

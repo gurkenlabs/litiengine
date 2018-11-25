@@ -24,6 +24,7 @@ public final class MapUtilities {
   }
 
   private MapUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static int getMaxMapId(final IMap map) {

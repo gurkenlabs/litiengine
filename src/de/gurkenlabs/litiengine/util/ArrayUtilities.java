@@ -14,6 +14,7 @@ public final class ArrayUtilities {
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
 
   private ArrayUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static byte[] arrayConcat(final byte[] firstArray, final byte[] secondArray) {

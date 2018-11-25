@@ -5,7 +5,7 @@ import java.awt.Font;
 public class FontUtilities {
 
   private FontUtilities() {
-    throw new IllegalStateException("Utility class");
+    throw new UnsupportedOperationException();
   }
   
   public static Font getFallbackFontIfNecessary(final String stringToWrite, final float textSize, final Font primaryFont, final Font fallbackFont) {

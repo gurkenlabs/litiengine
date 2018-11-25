@@ -8,6 +8,7 @@ public class MathUtilities {
   private static Random random = new Random();
 
   private MathUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static boolean equals(double d1, double d2, double epsilon) {

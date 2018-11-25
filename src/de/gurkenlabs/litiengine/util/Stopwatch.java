@@ -8,6 +8,7 @@ public final class Stopwatch {
   private static final Logger log = Logger.getLogger(Stopwatch.class.getName());
 
   private Stopwatch() {
+    throw new UnsupportedOperationException();
   }
 
   public static void trackInConsole(final String name, final Consumer<Long> consumer) {

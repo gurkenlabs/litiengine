@@ -86,7 +86,7 @@ public abstract class ConfigurationGroup {
           properties.setProperty(propertyKey, field.get(this) != null ? (String) field.get(this) : "");
         } else if (field.getType().equals(String[].class)) {
           properties.setProperty(propertyKey, field.get(this) != null ? String.join(",", (String[]) field.get(this)) : "");
-        } else if (field.getType() instanceof Class && field.getType().isEnum()) {
+        } else if (field.getType().isEnum()) {
           Object val = field.get(this);
           final String value = val == null && field.getType().getEnumConstants().length > 0 ? field.getType().getEnumConstants()[0].toString() : "";
           properties.setProperty(propertyKey, val != null ? val.toString() : value);

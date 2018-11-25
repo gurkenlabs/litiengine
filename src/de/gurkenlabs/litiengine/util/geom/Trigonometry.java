@@ -41,6 +41,7 @@ public class Trigonometry {
   }
 
   private Trigonometry() {
+    throw new UnsupportedOperationException();
   }
 
   public static final float atan2(float y, float x) {
