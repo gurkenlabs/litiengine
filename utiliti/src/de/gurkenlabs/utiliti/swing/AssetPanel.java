@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -16,6 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
 
@@ -42,12 +44,12 @@ public class AssetPanel extends JPanel {
       Collections.sort(infos);
       for (SpritesheetInfo info : infos) {
         Icon icon;
-        Spritesheet sprite = Spritesheet.find(info.getName());
+        Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
 
-        if (sprite == null || sprite.getSprite(0) == null) {
-          icon = null;
+        if (opt.isPresent() && opt.get().getSprite(0) != null) {
+          icon = new ImageIcon(ImageProcessing.scaleImage(opt.get().getSprite(0), 64, 64, true));
         } else {
-          icon = new ImageIcon(ImageProcessing.scaleImage(sprite.getSprite(0), 64, 64, true));
+          icon = null;
         }
 
         AssetPanelItem panelItem = new AssetPanelItem(icon, info.getName(), info);

@@ -43,7 +43,6 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -55,6 +54,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -99,18 +99,13 @@ public class Environment implements IEnvironment {
     this();
     this.map = map;
     if (this.getMap() != null) {
-      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
-    }
+    Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+  }
   }
 
   public Environment(final String mapPath) {
     this();
-    final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
-    if (loadedMap == null) {
-      this.map = MapLoader.load(mapPath);
-    } else {
-      this.map = loadedMap;
-    }
+    this.map = Resources.maps().get(FileUtilities.getFileName(mapPath));
     if (this.getMap() != null) {
       Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
     }
@@ -720,9 +715,9 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-      this.loadMapObjects();
-      this.addStaticShadows();
-      this.addAmbientLight();
+    this.loadMapObjects();
+    this.addStaticShadows();
+    this.addAmbientLight();
     }
 
     this.fireEvent(l -> l.environmentInitialized(this));
@@ -742,13 +737,13 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-      Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+    Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
     }
 
     if (this.getMap() != null) {
-      if (this.getMap().getBackgroundColor() != null) {
-        Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
-      }
+    if (this.getMap().getBackgroundColor() != null) {
+      Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+    }
     } else {
       Game.getScreenManager().getRenderComponent().setBackground(Color.BLACK);
     }

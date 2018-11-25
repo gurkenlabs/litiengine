@@ -32,7 +32,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
@@ -42,6 +41,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
 import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -169,8 +169,8 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
     this.comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
     
-    this.comboBoxSpriteType.addItem(Resources.get("panel_animation"));
-    this.comboBoxSpriteType.addItem(Resources.get("panel_spritesheet"));
+    this.comboBoxSpriteType.addItem(Resources.strings().get("panel_animation"));
+    this.comboBoxSpriteType.addItem(Resources.strings().get("panel_spritesheet"));
     this.comboBoxSpriteType.setSelectedIndex(0);
     for (SpritesheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
       this.comboBoxSprite.addItem(s.getName());
@@ -185,7 +185,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.tabbedPanel.setBorder(null);
 
     this.colorPanel = new JPanel();
-    this.tabbedPanel.addTab(Resources.get("panel_color"), null, colorPanel, null);
+    this.tabbedPanel.addTab(Resources.strings().get("panel_color"), null, colorPanel, null);
     this.tabbedPanel.setEnabledAt(0, true);
 
     JScrollPane scrollPane = new JScrollPane();
@@ -198,25 +198,25 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.table.getColumnModel().getColumn(1).setCellRenderer(new ParticleColorCellRenderer());
     scrollPane.setViewportView(this.table);
     this.spritePanel = new JPanel();
-    this.tabbedPanel.addTab(Resources.get("panel_sprite"), null, spritePanel, null);
+    this.tabbedPanel.addTab(Resources.strings().get("panel_sprite"), null, spritePanel, null);
     this.tabbedPanel.setEnabledAt(1, false);
     
-    final String min = Resources.get("panel_min");
-    final String max = Resources.get("panel_max");
+    final String min = Resources.strings().get("panel_min");
+    final String max = Resources.strings().get("panel_max");
  
     
     // init all labels
-    JLabel labelEmitterData = new JLabel(Resources.get("panel_emitterData"));
+    JLabel labelEmitterData = new JLabel(Resources.strings().get("panel_emitterData"));
     labelEmitterData.setFont(new Font(TAHOMA, Font.BOLD, 12));
 
-    JLabel lblSpawnRate = new JLabel(Resources.get("panel_emitterSpawnRate"));
-    JLabel lblSpawnAmount = new JLabel(Resources.get("panel_emitterSpawnAmount"));
-    JLabel lblParticleData = new JLabel(Resources.get("panel_particleData"));
+    JLabel lblSpawnRate = new JLabel(Resources.strings().get("panel_emitterSpawnRate"));
+    JLabel lblSpawnAmount = new JLabel(Resources.strings().get("panel_emitterSpawnAmount"));
+    JLabel lblParticleData = new JLabel(Resources.strings().get("panel_particleData"));
     lblParticleData.setFont(new Font(TAHOMA, Font.BOLD, 12));
 
-    JLabel lblDeltax = new JLabel(Resources.get("panel_particleDeltaX"));
+    JLabel lblDeltax = new JLabel(Resources.strings().get("panel_particleDeltaX"));
 
-    JLabel lblDeltaY = new JLabel(Resources.get("panel_particleDeltaY"));
+    JLabel lblDeltaY = new JLabel(Resources.strings().get("panel_particleDeltaY"));
 
     JLabel lblMin1 = new JLabel(min);
     lblMin1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -226,9 +226,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMin2.setHorizontalAlignment(SwingConstants.CENTER);
     lblMin2.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblLock = new JLabel(Resources.get("panel_lock"));
+    JLabel lblLock = new JLabel(Resources.strings().get("panel_lock"));
 
-    JLabel lblRandom = new JLabel(Resources.get("panel_random"));
+    JLabel lblRandom = new JLabel(Resources.strings().get("panel_random"));
 
     JLabel lblMax = new JLabel(max);
     lblMax.setHorizontalAlignment(SwingConstants.CENTER);
@@ -238,9 +238,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax1.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax1.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblUpdateDelay = new JLabel(Resources.get("panel_emitterUpdateDelay"));
+    JLabel lblUpdateDelay = new JLabel(Resources.strings().get("panel_emitterUpdateDelay"));
 
-    JLabel lblGravityX = new JLabel(Resources.get("panel_particleGravityX"));
+    JLabel lblGravityX = new JLabel(Resources.strings().get("panel_particleGravityX"));
 
     JLabel lblMin3 = new JLabel(min);
     lblMin3.setHorizontalAlignment(SwingConstants.CENTER);
@@ -250,9 +250,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax2.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax2.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel labelTtl = new JLabel(Resources.get("panel_emitterTTL"));
+    JLabel labelTtl = new JLabel(Resources.strings().get("panel_emitterTTL"));
 
-    JLabel lblGravityY = new JLabel(Resources.get("panel_particleGravityY"));
+    JLabel lblGravityY = new JLabel(Resources.strings().get("panel_particleGravityY"));
 
     JLabel lblMin4 = new JLabel(min);
     lblMin4.setHorizontalAlignment(SwingConstants.CENTER);
@@ -262,9 +262,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax3.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax3.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblMaxParticles = new JLabel(Resources.get("panel_emitterMaxParticles"));
+    JLabel lblMaxParticles = new JLabel(Resources.strings().get("panel_emitterMaxParticles"));
 
-    JLabel lblStartWidth = new JLabel(Resources.get("panel_particleStartWidth"));
+    JLabel lblStartWidth = new JLabel(Resources.strings().get("panel_particleStartWidth"));
 
     JLabel lblMin5 = new JLabel(min);
     lblMin5.setHorizontalAlignment(SwingConstants.CENTER);
@@ -274,9 +274,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax4.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax4.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblParticleType = new JLabel(Resources.get("panel_particleType"));
+    JLabel lblParticleType = new JLabel(Resources.strings().get("panel_particleType"));
 
-    JLabel lblStartHeight = new JLabel(Resources.get("panel_particleStartHeight"));
+    JLabel lblStartHeight = new JLabel(Resources.strings().get("panel_particleStartHeight"));
 
     JLabel lblMin6 = new JLabel(min);
     lblMin6.setHorizontalAlignment(SwingConstants.CENTER);
@@ -286,15 +286,15 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax5.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax5.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblColorDeviation = new JLabel(Resources.get("panel_colorDeviation"));
+    JLabel lblColorDeviation = new JLabel(Resources.strings().get("panel_colorDeviation"));
 
-    JLabel lblAlphaDeviation = new JLabel(Resources.get("panel_alphaDeviation"));
+    JLabel lblAlphaDeviation = new JLabel(Resources.strings().get("panel_alphaDeviation"));
 
-    JLabel lblEmittertype = new JLabel(Resources.get("panel_spriteType"));
+    JLabel lblEmittertype = new JLabel(Resources.strings().get("panel_spriteType"));
 
-    JLabel lblSpritesheet = new JLabel(Resources.get("panel_sprite"));
+    JLabel lblSpritesheet = new JLabel(Resources.strings().get("panel_sprite"));
 
-    JLabel lblDeltaWidth = new JLabel(Resources.get("panel_particleDeltaWidth"));
+    JLabel lblDeltaWidth = new JLabel(Resources.strings().get("panel_particleDeltaWidth"));
 
     JLabel lblMin7 = new JLabel(min);
     lblMin7.setHorizontalAlignment(SwingConstants.CENTER);
@@ -304,7 +304,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblMax6.setHorizontalAlignment(SwingConstants.CENTER);
     lblMax6.setFont(new Font(TAHOMA, Font.ITALIC, 11));
 
-    JLabel lblDeltaHeight = new JLabel(Resources.get("panel_particleDeltaHeight"));
+    JLabel lblDeltaHeight = new JLabel(Resources.strings().get("panel_particleDeltaHeight"));
 
     JLabel lblMin = new JLabel(min);
     lblMin.setHorizontalAlignment(SwingConstants.CENTER);
@@ -318,7 +318,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     lblStaticPhysics.setHorizontalAlignment(SwingConstants.LEFT);
     lblStaticPhysics.setFont(new Font(TAHOMA, Font.PLAIN, 11));
 
-    JLabel lblText = new JLabel(Resources.get("panel_particleText"));
+    JLabel lblText = new JLabel(Resources.strings().get("panel_particleText"));
 
     JLabel lblParticleTtl = new JLabel("particle ttl");
 
@@ -945,7 +945,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
       }
 
       ParticleColor color = colors.get(table.getSelectedRow());
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectEmitterColor"), color.toColor());
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectEmitterColor"), color.toColor());
       if (result == null) {
         return;
       }

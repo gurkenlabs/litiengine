@@ -16,10 +16,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
@@ -33,15 +33,15 @@ public class CollisionPanel extends PropertyPanel {
    * Create the panel.
    */
   public CollisionPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_collisionEntity"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_collisionEntity"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    JLabel lblMaterial = new JLabel(Resources.get("panel_width"));
+    JLabel lblMaterial = new JLabel(Resources.strings().get("panel_width"));
 
     this.chckbxHasCollision = new JCheckBox("collision");
 
-    JLabel lblHeightFactor = new JLabel(Resources.get("panel_height"));
+    JLabel lblHeightFactor = new JLabel(Resources.strings().get("panel_height"));
 
     this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
 

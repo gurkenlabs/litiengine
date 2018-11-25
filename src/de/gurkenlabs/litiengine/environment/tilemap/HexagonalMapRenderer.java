@@ -7,20 +7,22 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class HexagonalMapRenderer implements IMapRenderer {
   @Override
   public BufferedImage getImage(IMap map, RenderType... renderTypes) {
     final String cacheKey = getCacheKey(map) + "_" + renderTypes;
-    if (ImageCache.MAPS.containsKey(cacheKey)) {
-      return ImageCache.MAPS.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
@@ -36,7 +38,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
 
     g.dispose();
 
-    ImageCache.MAPS.put(cacheKey, img);
+    Resources.images().add(cacheKey, img);
     return img;
   }
 
@@ -178,9 +180,11 @@ public class HexagonalMapRenderer implements IMapRenderer {
     // if we have already retrived the image, use the one from the cache to
     // draw the layer
     final String cacheKey = getCacheKey(map) + "_" + layer.getName();
-    if (ImageCache.MAPS.containsKey(cacheKey)) {
-      return ImageCache.MAPS.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
+
     final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(map.getSizeInPixels().width, map.getSizeInPixels().height);
 
     // we need a graphics 2D object to work with transparency
@@ -218,7 +222,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
       }
     }
 
-    ImageCache.MAPS.put(cacheKey, bufferedImage);
+    Resources.images().add(cacheKey, bufferedImage);
     return bufferedImage;
   }
 
@@ -271,7 +275,7 @@ public class HexagonalMapRenderer implements IMapRenderer {
   }
 
   private void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
-    Spritesheet sprite = Spritesheet.find(layer.getImage().getSource());
+    Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     if (sprite == null) {
       return;
     }

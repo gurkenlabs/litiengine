@@ -18,10 +18,10 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.swing.TagPanel;
@@ -59,16 +59,16 @@ public class MapObjectPanel extends PropertyPanel {
 
     setMinimumSize(new Dimension(250, 500));
 
-    JLabel lblX = new JLabel(Resources.get("panel_x"));
-    JLabel lblYcoordinate = new JLabel(Resources.get("panel_y"));
-    JLabel lblWidth = new JLabel(Resources.get("panel_width"));
-    JLabel lblHeight = new JLabel(Resources.get("panel_height"));
-    JLabel lblName = new JLabel(Resources.get("panel_name"));
+    JLabel lblX = new JLabel(Resources.strings().get("panel_x"));
+    JLabel lblYcoordinate = new JLabel(Resources.strings().get("panel_y"));
+    JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
+    JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
+    JLabel lblName = new JLabel(Resources.strings().get("panel_name"));
 
     this.textFieldName = new JTextField();
     this.textFieldName.setColumns(10);
 
-    JLabel lblType = new JLabel(Resources.get("panel_type"));
+    JLabel lblType = new JLabel(Resources.strings().get("panel_type"));
     this.comboBoxType = new JComboBox<>();
     this.comboBoxType.setModel(new DefaultComboBoxModel<MapObjectType>(MapObjectType.values()));
 

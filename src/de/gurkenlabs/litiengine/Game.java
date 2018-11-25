@@ -29,6 +29,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -79,7 +80,6 @@ public final class Game {
   private static final SoundEngine soundEngine;
   private static final IPhysicsEngine physicsEngine;
 
-  private static final List<IMap> maps;
   private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
 
@@ -105,14 +105,14 @@ public final class Game {
     soundEngine = new SoundEngine();
     metrics = new GameMetrics();
     gameInfo = new GameInfo();
-    maps = new CopyOnWriteArrayList<>();
+
     tilesets = new CopyOnWriteArrayList<>();
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
-    
+
     addGameListener(new InputGameAdapter());
   }
 
@@ -209,40 +209,6 @@ public final class Game {
 
   public static IGameLoop getLoop() {
     return gameLoop;
-  }
-
-  /**
-   * Get a Map that was already loaded into memory by its name.
-   * It is important that maps always have a unique name because only the first match will be retrieved.
-   * 
-   * @param mapName
-   *          the name of the map you want to load
-   * 
-   * @return
-   *         null if no map with the provided name was found, otherwise the first found map.
-   */
-  public static IMap getMap(final String mapName) {
-    if (mapName == null || mapName.isEmpty() || maps.isEmpty()) {
-      return null;
-    }
-
-    for (final IMap map : maps) {
-      if (map.getName().equals(mapName)) {
-        return map;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Get a list of maps that are already loaded into memory.
-   * 
-   * @return
-   *         a list of all previously loaded maps
-   */
-  public static List<IMap> getMaps() {
-    return maps;
   }
 
   public static List<ITileset> getTilesets() {
@@ -356,7 +322,7 @@ public final class Game {
       }
 
       getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
-      getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
+      getScreenManager().setIconImage(Resources.images().get("litiengine-icon.png"));
 
       // init mouse inputs
       getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
@@ -391,11 +357,7 @@ public final class Game {
 
     int mapCnt = 0;
     for (final IMap m : file.getMaps()) {
-      if (getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
-        continue;
-      }
-
-      getMaps().add(m);
+      Resources.maps().add(m.getName(), m);
       mapCnt++;
     }
 
@@ -415,7 +377,7 @@ public final class Game {
 
     final List<Spritesheet> loadedSprites = new ArrayList<>();
     for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
-      final Spritesheet sprite = Spritesheet.load(tileset);
+      final Spritesheet sprite = Resources.spritesheets().load(tileset);
       loadedSprites.add(sprite);
     }
 
