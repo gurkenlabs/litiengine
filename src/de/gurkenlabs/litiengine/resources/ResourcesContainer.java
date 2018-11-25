@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  *
  * @param <T>
  *          The type of the resource that is contained by this instance.
+ * 
+ * @see ResourcesContainerListener
  */
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
@@ -31,9 +33,37 @@ public abstract class ResourcesContainer<T> {
   }
 
   /**
-   * Add the specified resource to this container.<br>
-   * The added element can later be retrieved by this container by calling <code>get(resourceName)</code>.
+   * Add a new container listener to this instance in order to observe resource life cycles.
+   * The listener will get notified whenever a resource was added to or removed from this container.
    * 
+   * @param listener
+   *          The container listener instance that will receive call backs from this container.
+   * 
+   * @see #removeContainerListener(ResourcesContainerListener)
+   */
+  public void addContainerListener(ResourcesContainerListener<T> listener) {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove the specified listener from this container.
+   * 
+   * @param listener
+   *          The listener instance that was previously added to this container.
+   * 
+   * @see #addContainerListener(ResourcesContainerListener)
+   */
+  public void removeContainerListener(ResourcesContainerListener<T> listener) {
+    this.listeners.remove(listener);
+  }
+
+  /**
+   * Add the specified resource to this container.<br>
+   * The added element can later be retrieved from this container by calling <code>get(resourceName)</code>.
+   * <p>
+   * Use this method to make a resource accessible over this container during runtime.
+   * </p>
+   *
    * @param resourceName
    *          The name that the resource is managed by.
    * @param resource
@@ -66,18 +96,49 @@ public abstract class ResourcesContainer<T> {
     }
   }
 
+  /**
+   * Checks if this instance contains a resource with the specified name.
+   * <p>
+   * Note that the name is <b>not case-sensitive</b>.
+   * </p>
+   * 
+   * @param resourceName
+   *          The resource's name.
+   * @return True if this container contains a resource with the specified name; otherwise false.
+   * 
+   * @see ResourcesContainer#contains(Object)
+   */
   public boolean contains(String resourceName) {
     return this.resources.containsKey(resourceName.toLowerCase());
   }
 
+  /**
+   * Checks if the specified resource is contained by this instance.
+   * 
+   * @param resource
+   *          The resource.
+   * @return True if this instance contains the specified resource instance; otherwise false.
+   */
   public boolean contains(T resource) {
     return this.resources.containsValue(resource);
   }
 
+  /**
+   * Gets the amount of resources that this container holds.
+   * 
+   * @return The amount of resources in this container.
+   */
   public int count() {
     return this.resources.size();
   }
 
+  /**
+   * Gets all resources that match the specified condition.
+   * 
+   * @param pred
+   *          The condition that a resource must fulfill in order to be returned.
+   * @return All resources that match the specified condition.
+   */
   public Collection<T> get(Predicate<T> pred) {
     if (pred == null) {
       return new ArrayList<>();
@@ -86,13 +147,27 @@ public abstract class ResourcesContainer<T> {
     return this.resources.values().stream().filter(pred).collect(Collectors.toList());
   }
 
+  /**
+   * Gets the resource with the specified name.<br>
+   * <p>
+   * This is the most common (and preferred) way to fetch resources from a container.
+   * </p>
+   * <p>
+   * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
+   * </p>
+   * 
+   * @param resourceName
+   * @return The resource with the specified name or null if not found.
+   */
   public T get(String resourceName) {
     return this.get(resourceName, false);
   }
 
   /**
-   * Gets the game resource with the specified name.<br>
+   * Gets the resource with the specified name.
+   * <p>
    * If not previously loaded, this method attempts to load the resource on the fly otherwise it will be retrieved from the cache.
+   * </p>
    * 
    * @param resourceName
    *          The name of the game resource.
@@ -116,7 +191,73 @@ public abstract class ResourcesContainer<T> {
       return this.resources.computeIfAbsent(identifier, this::loadResource);
     }
   }
-  
+
+  /**
+   * Gets all loaded resources from this container.
+   * 
+   * @return All loaded resources.
+   */
+  public Collection<T> getAll() {
+    return this.resources.values();
+  }
+
+  /**
+   * Removes the resource with the specified name from this container.
+   * 
+   * @param resourceName
+   *          The name of the resource that should be removed.
+   * @return The removed resource.
+   */
+  public T remove(String resourceName) {
+    T removedResource = this.resources.remove(resourceName.toLowerCase());
+
+    if (removedResource != null) {
+      for (ResourcesContainerListener<T> listener : this.listeners) {
+        listener.removed(resourceName, removedResource);
+      }
+    }
+
+    return removedResource;
+  }
+
+  /**
+   * Tries to get a resource with the specified name from this container.
+   * <p>
+   * This method should be used, if it's not clear whether the resource is present on this container.<br>
+   * It is basically a combination of <code>get(String)</code> and <code>contains(String)</code> and allows
+   * to check whether a resource is present while also fetching it from the container.
+   * </p>
+   * <p>
+   * <b>Example usage:</b>
+   * 
+   * <pre>
+   * {@code
+   * Optional<Spritesheet> opt = Resources.sprites().tryGet("my-sprite");
+   * if(opt.isPresent()){
+   *   Spritesheet sprite = opt.get();
+   *   ...
+   * }
+   * </pre>
+   * </p>
+   * 
+   * @param resourceName The name of the resource.
+   * 
+   * @return An Optional instance that holds the resource instance, if present on this container.
+   * 
+   * @see Optional
+   * @see #contains(String)
+   * @see #get(String)
+   */
+  public Optional<T> tryGet(String resourceName) {
+    return Optional.ofNullable(this.get(resourceName));
+  }
+
+  protected abstract T load(String resourceName);
+
+  protected Map<String, T> getResources() {
+    return this.resources;
+  }
+
   private T loadResource(String resourceName) {
     // the case is ignored when retrieving resources
     String identifier = resourceName.toLowerCase();
@@ -134,31 +275,5 @@ public abstract class ResourcesContainer<T> {
     }
 
     return newResource;
-  }
-
-  public Collection<T> getAll() {
-    return this.resources.values();
-  }
-
-  public T remove(String resourceName) {
-    T removedResource = this.resources.remove(resourceName.toLowerCase());
-
-    if (removedResource != null) {
-      for (ResourcesContainerListener<T> listener : this.listeners) {
-        listener.removed(resourceName, removedResource);
-      }
-    }
-
-    return removedResource;
-  }
-
-  public Optional<T> tryGet(String resourceName) {
-    return Optional.ofNullable(this.get(resourceName));
-  }
-
-  protected abstract T load(String resourceName);
-
-  protected Map<String, T> getResources() {
-    return this.resources;
   }
 }
