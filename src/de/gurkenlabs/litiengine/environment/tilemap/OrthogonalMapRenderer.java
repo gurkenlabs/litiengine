@@ -7,12 +7,12 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -21,8 +21,9 @@ public class OrthogonalMapRenderer implements IMapRenderer {
   @Override
   public BufferedImage getImage(IMap map, RenderType... renderTypes) {
     final String cacheKey = getCacheKey(map) + "_" + renderTypes;
-    if (ImageCache.MAPS.containsKey(cacheKey)) {
-      return ImageCache.MAPS.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
@@ -38,7 +39,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
 
     g.dispose();
 
-    ImageCache.MAPS.put(cacheKey, img);
+    Resources.images().add(cacheKey, img);
     return img;
   }
 
@@ -180,9 +181,11 @@ public class OrthogonalMapRenderer implements IMapRenderer {
     // if we have already retrieved the image, use the one from the cache to
     // draw the layer
     final String cacheKey = getCacheKey(map) + "_" + layer.getName();
-    if (ImageCache.MAPS.containsKey(cacheKey)) {
-      return ImageCache.MAPS.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
+
     final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(layer.getSizeInTiles().width * map.getTileSize().width, layer.getSizeInTiles().height * map.getTileSize().height);
 
     // we need a graphics 2D object to work with transparency
@@ -203,7 +206,8 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         ImageRenderer.render(imageGraphics, tileTexture, x * map.getTileWidth(), y * map.getTileHeight());
       }
     }
-    ImageCache.MAPS.put(cacheKey, bufferedImage);
+
+    Resources.images().add(cacheKey, bufferedImage);
     return bufferedImage;
   }
 
@@ -229,7 +233,7 @@ public class OrthogonalMapRenderer implements IMapRenderer {
         ITile tile = layer.getTile(x, y);
         int tileX = x * map.getTileWidth();
         int tileY = y * map.getTileHeight();
-        
+
         // TODO: incorporate layer offsets, right now this may cut off layers with an offset
         Rectangle tileBounds = new Rectangle(tileX, tileY, map.getTileWidth(), map.getTileHeight());
         if (tile == null || !viewport.intersects(tileBounds)) {

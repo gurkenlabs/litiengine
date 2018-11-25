@@ -11,8 +11,6 @@ public final class ImageCache {
 
   public static final ImageCache IMAGES = new ImageCache();
 
-  public static final ImageCache MAPS = new ImageCache();
-
   public static final ImageCache SPRITES = new ImageCache();
 
   private final ConcurrentHashMap<String, BufferedImage> cache;
@@ -27,7 +25,6 @@ public final class ImageCache {
   public static void clearAll() {
     IMAGES.clear();
     SPRITES.clear();
-    MAPS.clear();
   }
 
   public void clear() {
