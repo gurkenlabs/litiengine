@@ -29,7 +29,7 @@ public final class Strings {
 
   private String encoding = ENCODING_ISO_8859_1;
 
-  protected Strings() {
+  Strings() {
     Locale.setDefault(new Locale("en", "US"));
   }
 

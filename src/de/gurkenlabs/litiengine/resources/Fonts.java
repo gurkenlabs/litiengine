@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Fonts extends ResourcesContainer<Font> {
   private static final Logger log = Logger.getLogger(Fonts.class.getName());
 
-  protected Fonts() {
+  Fonts() {
   }
 
   /***

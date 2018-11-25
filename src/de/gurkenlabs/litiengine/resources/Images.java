@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Images extends ResourcesContainer<BufferedImage> {
   private static final Logger log = Logger.getLogger(Images.class.getName());
 
-  protected Images() {
+  Images() {
   }
 
   /**

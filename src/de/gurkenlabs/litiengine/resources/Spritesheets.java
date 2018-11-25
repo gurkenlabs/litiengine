@@ -24,7 +24,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());
   private static final String SPRITE_INFO_COMMENT_CHAR = "#";
 
-  protected Spritesheets() {
+  Spritesheets() {
   }
 
   /**

@@ -51,7 +51,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
@@ -237,7 +236,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
-      Map map = (Map) MapLoader.load(mapFile);
+      Map map = (Map) Resources.maps().get(mapFile);
       loadedMaps.add(map);
       log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
     }
@@ -748,7 +747,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
       String mapPath = file.toString();
-      Map map = (Map) MapLoader.load(mapPath);
+      Map map = (Map) Resources.maps().get(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
         return;

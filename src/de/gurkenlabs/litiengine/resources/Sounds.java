@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 public final class Sounds extends ResourcesContainer<Sound> {
   private static final Logger log = Logger.getLogger(Sounds.class.getName());
 
-  protected Sounds() {
+  Sounds() {
   }
 
   /**
