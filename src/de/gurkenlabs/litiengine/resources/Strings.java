@@ -20,7 +20,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Strings {
-  public static final String LOCALIZATION_RESOURCE_FOLDER = "localization/";
   public static final String DEFAULT_BUNDLE = "strings";
   public static final String ENCODING_ISO_8859_1 = "ISO-8859-1";
   public static final String ENCODING_UTF_8 = "UTF-8";
@@ -63,7 +62,7 @@ public final class Strings {
     }
 
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().client().getLocale());
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.getConfiguration().client().getLocale());
 
       String value = defaultBundle.getString(key);
 
@@ -125,7 +124,7 @@ public final class Strings {
 
   public boolean contains(final String bundleName, final String key) {
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(LOCALIZATION_RESOURCE_FOLDER + bundleName, Game.getConfiguration().client().getLocale());
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.getConfiguration().client().getLocale());
       return defaultBundle.containsKey(key);
     } catch (final MissingResourceException me) {
       final StringWriter sw = new StringWriter();

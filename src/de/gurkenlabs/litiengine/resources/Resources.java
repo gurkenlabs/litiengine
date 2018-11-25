@@ -79,7 +79,7 @@ public final class Resources {
   }
 
   /**
-   * Gets a container that manages <code>String</code> resources.
+   * Gets a container that manages <code>String</code> resources.<br>
    * This instance can be used to access localizable string from a ".properties" file.
    * 
    * @return The String resource container.
