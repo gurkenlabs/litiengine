@@ -66,7 +66,6 @@ import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -798,7 +797,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       EditorScreen.instance().updateGameFileMaps();
-      ImageCache.clearAll();
+      Resources.images().clear();
       if (this.environments.containsKey(map.getName())) {
         this.environments.remove(map.getName());
       }

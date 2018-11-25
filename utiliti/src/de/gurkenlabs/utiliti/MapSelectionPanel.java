@@ -62,7 +62,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
@@ -363,7 +362,7 @@ public class MapSelectionPanel extends JSplitPane {
       if (currentMap == null) {
         return;
       }
-      
+
       if (this.getSelectedLayerIndex() < 0 || this.getSelectedLayerIndex() >= this.layerModel.size()) {
         return;
       }
@@ -610,7 +609,8 @@ public class MapSelectionPanel extends JSplitPane {
       Color layerColor = layer.getColor();
       if (layerColor != null) {
         final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
-        if (!ImageCache.IMAGES.containsKey(cacheKey)) {
+
+        BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
           BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();
           g.setColor(layer.getColor());
@@ -618,9 +618,10 @@ public class MapSelectionPanel extends JSplitPane {
           g.setColor(Color.BLACK);
           g.drawRect(0, 0, 9, 9);
           g.dispose();
-          ImageCache.IMAGES.put(cacheKey, img);
-        }
-        newBox.setIcon(new ImageIcon(ImageCache.IMAGES.get(cacheKey)));
+          return img;
+        });
+        
+        newBox.setIcon(new ImageIcon(newIconImage));
       }
       newBox.setSelected(layer.isVisible());
       newBox.addItemListener(sel -> {

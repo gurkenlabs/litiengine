@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -183,10 +184,37 @@ public abstract class ResourcesContainer<T> {
    * </p>
    * 
    * @param resourceName
+   *          The resource's name.
    * @return The resource with the specified name or null if not found.
    */
   public T get(String resourceName) {
     return this.get(resourceName, false);
+  }
+
+  /**
+   * Gets the resource with the specified name.<br>
+   * <p>
+   * If no such resource is currently present on the container, it will be loaded with the specified <code>loadCallback</code> and added to this
+   * container.
+   * </p>
+   * 
+   * @param resourceName
+   *          The resource's name.
+   * @param loadCallback
+   *          The callback that is used to load the resource on-demand if it's not present on this container.
+   * @return T The resource with the specified name.
+   */
+  public T get(String resourceName, Supplier<T> loadCallback) {
+    String identifier = resourceName.toLowerCase();
+    Optional<T> opt = this.tryGet(identifier);
+    if (opt.isPresent()) {
+      return opt.get();
+    }
+
+    T resource = loadCallback.get();
+    this.add(identifier, resource);
+
+    return resource;
   }
 
   /**

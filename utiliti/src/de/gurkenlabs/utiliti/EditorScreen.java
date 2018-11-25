@@ -40,7 +40,6 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -122,8 +121,8 @@ public class EditorScreen extends Screen {
       Game.getEnvironment().render(g);
     }
 
-    if (ImageCache.IMAGES.size() > 200) {
-      ImageCache.IMAGES.clear();
+    if (Resources.images().count() > 200) {
+      Resources.images().clear();
       log.log(Level.INFO, "cache cleared!");
     }
 
@@ -293,7 +292,7 @@ public class EditorScreen extends Screen {
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
 
-      ImageCache.clearAll();
+      Resources.images().clear();
       Resources.spritesheets().clear();
 
       // load sprite sheets from different sources:
@@ -457,7 +456,7 @@ public class EditorScreen extends Screen {
       return;
     }
 
-    ImageCache.clearAll();
+    Resources.images().clear();
     this.getMapComponent().reloadEnvironment();
 
     if (forceAssetTreeUpdate) {

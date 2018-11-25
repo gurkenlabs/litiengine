@@ -46,7 +46,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
@@ -279,7 +278,7 @@ public class AssetPanelItem extends JPanel {
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
-        ImageCache.clearAll();
+        Resources.images().clear();
         Resources.spritesheets().remove(info.getName());
         EditorScreen.instance().getMapComponent().reloadEnvironment();
 
