@@ -22,10 +22,9 @@ public final class Images extends ResourcesContainer<BufferedImage> {
    * Loads the image by the specified resourceName. This method supports both,
    * loading images from a folder and loading them from the resources.
    *
-   * @param absolutPath
+   * @param resourceName
    *          The path to the image.
-   * @param forceLoad
-   *          Forces the image to be reloaded. Cached values will be ignored.
+   * 
    * @return the image
    */
   @Override
@@ -33,7 +32,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     if (resourceName == null || resourceName.isEmpty()) {
       return null;
     }
-    
+
     if (!ImageFormat.isSupported(resourceName)) {
       log.log(Level.SEVERE, "The image file {0} could not be loaded because the image format is not supported.", new Object[] { resourceName });
       return null;

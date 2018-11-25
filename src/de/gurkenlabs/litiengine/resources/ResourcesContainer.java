@@ -285,7 +285,6 @@ public abstract class ResourcesContainer<T> {
    * <b>Example usage:</b>
    * 
    * <pre>
-   * {@code
    * Optional<Spritesheet> opt = Resources.sprites().tryGet("my-sprite");
    * if(opt.isPresent()){
    *   Spritesheet sprite = opt.get();

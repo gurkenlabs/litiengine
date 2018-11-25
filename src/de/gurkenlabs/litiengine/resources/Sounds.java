@@ -16,7 +16,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
   /**
    * Loads the sound from the specified path and returns it.
    * 
-   * @param path
+   * @param resourceName
    *          The path of the file to be loaded.(Can be relative or absolute)
    * @return The loaded Sound from the specified path.
    */

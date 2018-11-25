@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * resources available during runtime.
  * <p>
  * The LITIengine supports a variety of different resource types, including:
+ * </p>
+ * 
  * <ul>
  * <li>images</li>
  * <li>fonts</li>
@@ -21,7 +23,6 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * <li>spritesheets</li>
  * <li>sounds</li>
  * </ul>
- * </p>
  * 
  * @see ResourcesContainer
  */

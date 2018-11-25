@@ -20,7 +20,7 @@ public final class Fonts extends ResourcesContainer<Font> {
    * Loads a custom font with the specified name from game's resources and registers it on the <code>GraphicsEnvironment</code>.
    * As a fallback, when no font could be found by the specified <code>fontName</code>, it tries to get the font from the environment by calling.
    *
-   * @param fontName
+   * @param resourceName
    *          The name of the font
    * @return The loaded font.
    * 
