@@ -26,10 +26,12 @@ public abstract class ResourcesContainer<T> {
 
   private final Map<String, T> resources;
   private final List<ResourcesContainerListener<T>> listeners;
+  private final List<ResourcesContainerClearedListener> clearedListeners;
 
   protected ResourcesContainer() {
     this.resources = new ConcurrentHashMap<>();
     this.listeners = new CopyOnWriteArrayList<>();
+    this.clearedListeners = new CopyOnWriteArrayList<>();
   }
 
   /**
@@ -55,6 +57,30 @@ public abstract class ResourcesContainer<T> {
    */
   public void removeContainerListener(ResourcesContainerListener<T> listener) {
     this.listeners.remove(listener);
+  }
+
+  /**
+   * Add a new container listener to this instance that observes whenever this instance is cleared.
+   * 
+   * @param listener
+   *          The container listener instance.
+   * 
+   * @see #removeClearedListener(ResourcesContainerClearedListener)
+   */
+  public void addClearedListener(ResourcesContainerClearedListener listener) {
+    this.clearedListeners.add(listener);
+  }
+
+  /**
+   * Remove the specified listener from this container.
+   * 
+   * @param listener
+   *          The listener instance that was previously added to this container.
+   * 
+   * @see #addClearedListener(ResourcesContainerClearedListener)
+   */
+  public void removeClearedListener(ResourcesContainerClearedListener listener) {
+    this.clearedListeners.remove(listener);
   }
 
   /**

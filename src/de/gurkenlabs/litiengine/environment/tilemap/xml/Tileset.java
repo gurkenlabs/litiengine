@@ -22,45 +22,34 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
-/**
- * The Class Tileset.
- */
 @XmlRootElement(name = "tileset")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
   public static final String FILE_EXTENSION = "tsx";
   private static final long serialVersionUID = 1711536300667154031L;
 
-  /** The firstgid. */
   @XmlAttribute
   private int firstgid;
 
-  /** The image. */
   @XmlElement
   private MapImage image;
 
-  /** The margin. */
   @XmlAttribute
   private Integer margin;
 
-  /** The name. */
   @XmlAttribute
   private String name;
 
-  /** The tilewidth. */
   @XmlAttribute
   private Integer tilewidth;
 
-  /** The tileheight. */
   @XmlAttribute
   private Integer tileheight;
 
-  /** The tilewidth. */
   @XmlElement(name = "tileoffset")
   private TileOffset tileoffset;
 
@@ -70,7 +59,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @XmlAttribute
   private Integer columns;
 
-  /** The spacing. */
   @XmlAttribute
   private Integer spacing;
 
@@ -90,7 +78,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private transient Spritesheet spriteSheet;
 
   public Tileset() {
-    ImageCache.SPRITES.onCleared(cache -> this.spriteSheet = null);
+    Resources.images().addClearedListener(() -> this.spriteSheet = null);
   }
 
   @Override

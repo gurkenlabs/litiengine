@@ -14,7 +14,7 @@ package de.gurkenlabs.litiengine.resources;
  * @see Spritesheets
  * 
  */
-public interface ResourcesContainerListener<T> {
+public interface ResourcesContainerListener<T> extends ResourcesContainerClearedListener {
 
   /**
    * This method gets called after the <code>ResourcesContainer.add</code> method was executed.
@@ -37,11 +37,4 @@ public interface ResourcesContainerListener<T> {
    * @see ResourcesContainer#remove(String)
    */
   public void removed(String resourceName, T resource);
-
-  /**
-   * This method gets called after the <code>ResourcesContainer.clear</code> method was executed.
-   * 
-   * @see ResourcesContainer#clear()
-   */
-  public void cleared();
 }

@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -43,7 +43,7 @@ public final class Spritesheet {
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
 
     Resources.spritesheets().add(this.name.toLowerCase(), this);
-    ImageCache.SPRITES.onCleared(cache -> {
+    Resources.images().addClearedListener(() -> {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
     });
@@ -62,8 +62,10 @@ public final class Spritesheet {
     final BufferedImage img = this.getSprite(0);
     BufferedImage scaled = null;
     String cacheKey = "iconx" + dimension + this.getName();
-    if (ImageCache.SPRITES.containsKey(cacheKey)) {
-      scaled = ImageCache.SPRITES.get(cacheKey);
+
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      scaled = opt.get();
     } else {
       if (img != null) {
         scaled = ImageProcessing.scaleImage(img, dimension, dimension, true);
@@ -71,7 +73,7 @@ public final class Spritesheet {
         scaled = ImageProcessing.getCompatibleImage(dimension, dimension);
       }
 
-      ImageCache.SPRITES.put(cacheKey, scaled);
+      Resources.images().add(cacheKey, scaled);
     }
 
     return scaled;

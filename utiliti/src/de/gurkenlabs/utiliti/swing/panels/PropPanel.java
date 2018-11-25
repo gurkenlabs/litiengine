@@ -25,7 +25,6 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.ImageCache;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
@@ -48,7 +47,7 @@ public class PropPanel extends PropertyPanel {
    * Create the panel.
    */
   public PropPanel() {
-    ImageCache.SPRITES.onCleared(e -> this.propsLoaded = false);
+    Resources.images().addClearedListener(() -> this.propsLoaded = false);
 
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_prop"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
