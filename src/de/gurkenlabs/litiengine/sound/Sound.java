@@ -33,7 +33,7 @@ public final class Sound {
    * the sound file.
    * 
    * Note that the constructor is private. In order to load files use the static
-   * <code>Resources.sounds()get(String) method.
+   * <code>Resources.sounds()get(String)</code> method.
    * 
    * @param is
    *          The input stream to load the sound from.

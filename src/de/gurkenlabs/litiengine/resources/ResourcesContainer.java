@@ -281,17 +281,6 @@ public abstract class ResourcesContainer<T> {
    * It is basically a combination of <code>get(String)</code> and <code>contains(String)</code> and allows
    * to check whether a resource is present while also fetching it from the container.
    * </p>
-   * <p>
-   * <b>Example usage:</b>
-   * 
-   * <pre>
-   * Optional<Spritesheet> opt = Resources.sprites().tryGet("my-sprite");
-   * if(opt.isPresent()){
-   *   Spritesheet sprite = opt.get();
-   *   ...
-   * }
-   * </pre>
-   * </p>
    * 
    * @param resourceName The name of the resource.
    * 
