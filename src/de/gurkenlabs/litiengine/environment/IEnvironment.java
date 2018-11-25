@@ -59,7 +59,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IEntity> build(Blueprint blueprint, Point2D location);
 
-  public List<ICombatEntity> findCombatEntities(Shape shape);
+  public Collection<ICombatEntity> findCombatEntities(Shape shape);
 
   /**
    * Searches for all combat entities whose hitBox intersect the specified
@@ -73,12 +73,18 @@ public interface IEnvironment extends IInitializable, IRenderable {
    * @return A list of all combat entities that intersect the specified
    *         {@link Shape}.
    */
-  public List<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
+  public Collection<ICombatEntity> findCombatEntities(Shape shape, Predicate<ICombatEntity> condition);
 
-  public List<IEntity> findEntities(Shape shape);
+  public Collection<IEntity> findEntities(Shape shape);
 
   public IEntity get(final int mapId);
 
+  /**
+   * Finds the entities in the environment with the specified map IDs.
+   * 
+   * @param mapIds The map IDs to search for.
+   * @return A {@code List} of entities found, in the order given by the parameters.
+   */
   public List<IEntity> get(final int... mapIds);
 
   public <T extends IEntity> T get(Class<T> clss, final int mapId);
@@ -89,9 +95,9 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IEntity> getByTag(final String... tag);
 
-  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, final String... tag);
+  public <T> Collection<T> getByTag(Class<? extends T> clss, final String... tag);
 
-  public Map<String, List<IEntity>> getEntitiesByTag();
+  public Map<String, Collection<IEntity>> getEntitiesByTag();
 
   public AmbientLight getAmbientLight();
 
@@ -138,7 +144,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IEntity> getEntities(RenderType renderType);
 
-  public <T extends IEntity> Collection<T> getByType(Class<T> clss);
+  public <T> Collection<T> getByType(Class<? extends T> clss);
 
   public LightSource getLightSource(int mapId);
 
@@ -180,7 +186,7 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<Creature> getCreatures();
 
-  public List<String> getUsedTags();
+  public Collection<String> getUsedTags();
 
   public Trigger getTrigger(int mapId);
 
