@@ -203,7 +203,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    this.image.setAbsolutPath(completePath);
+    this.image.setAbsolutePath(completePath);
   }
 
   @Override
