@@ -39,11 +39,11 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   private int height;
 
   @XmlTransient
-  private String absolutPath;
+  private String absolutePath;
 
   @Override
   public String getAbsoluteSourcePath() {
-    return this.absolutPath;
+    return this.absolutePath;
   }
 
   @Override
@@ -89,6 +89,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   }
 
   public void setAbsolutePath(final String mapPath) {
-    this.absolutPath = FileUtilities.combine(mapPath, this.getSource());
+    this.absolutePath = FileUtilities.combine(mapPath, this.getSource());
   }
 }
