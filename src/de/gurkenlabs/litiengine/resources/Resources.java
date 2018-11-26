@@ -28,23 +28,13 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * @see ResourcesContainer
  */
 public final class Resources {
-  private static Fonts fonts;
-  private static Sounds sounds;
-  private static Maps maps;
-  private static Tilesets tilesets;
-  private static Strings strings;
-  private static Images images;
-  private static Spritesheets spritesheets;
-
-  static {
-    fonts = new Fonts();
-    sounds = new Sounds();
-    maps = new Maps();
-    tilesets = new Tilesets();
-    strings = new Strings();
-    images = new Images();
-    spritesheets = new Spritesheets();
-  }
+  private static Fonts fonts = new Fonts();
+  private static Sounds sounds = new Sounds();
+  private static Maps maps = new Maps();
+  private static Tilesets tilesets = new Tilesets();
+  private static Strings strings = new Strings();
+  private static Images images = new Images();
+  private static Spritesheets spritesheets = new Spritesheets();
 
   private Resources() {
     throw new UnsupportedOperationException();
