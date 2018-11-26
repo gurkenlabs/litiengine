@@ -334,7 +334,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return;
     }
 
-    this.sourceTileset = XmlUtilities.readFromFile(Tileset.class, FileUtilities.combine(basePath, this.source));
+    this.sourceTileset = Resources.tilesets().get(FileUtilities.combine(basePath, this.source));
   }
 
   public void saveSource(String basePath) {
