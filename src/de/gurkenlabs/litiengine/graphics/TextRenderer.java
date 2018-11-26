@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.gui.GuiProperties;
 
 public final class TextRenderer {
   private TextRenderer() {
+    throw new UnsupportedOperationException();
   }
 
   /**

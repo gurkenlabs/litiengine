@@ -15,6 +15,7 @@ public final class StreamUtilities {
   private static final Logger log = Logger.getLogger(StreamUtilities.class.getName());
 
   private StreamUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static void copy(final File file, final OutputStream out) throws IOException {

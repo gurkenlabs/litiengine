@@ -14,9 +14,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Direction;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class SpawnpointPanel extends PropertyPanel {
@@ -24,16 +24,16 @@ public class SpawnpointPanel extends PropertyPanel {
   private JComboBox<Direction> comboBoxDirection;
 
   public SpawnpointPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_spawnPoint"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_spawnPoint"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    JLabel lblShadowType = new JLabel(Resources.get("panel_entity"));
+    JLabel lblShadowType = new JLabel(Resources.strings().get("panel_entity"));
 
     this.textFieldType = new JTextField();
     this.textFieldType.setColumns(10);
 
-    JLabel lblDirection = new JLabel(Resources.get("panel_direction"));
+    JLabel lblDirection = new JLabel(Resources.strings().get("panel_direction"));
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<Direction>(Direction.values()));

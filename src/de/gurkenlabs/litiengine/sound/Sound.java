@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.sound;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,7 +10,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.StreamUtilities;
 
 /**
@@ -20,7 +17,6 @@ import de.gurkenlabs.litiengine.util.io.StreamUtilities;
  * system and provide a stream that can later on be used for the sound playback.
  */
 public final class Sound {
-  private static final Map<String, Sound> sounds = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Sound.class.getName());
 
   private AudioFormat format;
@@ -37,12 +33,14 @@ public final class Sound {
    * the sound file.
    * 
    * Note that the constructor is private. In order to load files use the static
-   * {@link #get(String)} method.
+   * <code>Resources.sounds()get(String)</code> method.
    * 
    * @param is
    *          The input stream to load the sound from.
+   * @param name
+   *          The name of this sound file.
    */
-  private Sound(InputStream is, String name) {
+  public Sound(InputStream is, String name) {
     this.name = name;
 
     try {
@@ -60,25 +58,6 @@ public final class Sound {
 
       log.log(Level.SEVERE, e.getMessage(), e);
     }
-  }
-
-  /**
-   * Loads the sound from the specified path and returns it.
-   * 
-   * @param path
-   *          The path of the file to be loaded.(Can be relative or absolute)
-   * @return The loaded Sound from the specified path.
-   */
-  public static Sound get(final String path) {
-    return sounds.computeIfAbsent(FileUtilities.getFileName(path), n -> {
-      final InputStream is = FileUtilities.getGameResource(path);
-      if (is == null) {
-
-        log.log(Level.SEVERE, "Could not load sound {0} because the game resource was not found.", new Object[] { path });
-        return null;
-      }
-      return new Sound(is, n);
-    });
   }
 
   public AudioFormat getFormat() {

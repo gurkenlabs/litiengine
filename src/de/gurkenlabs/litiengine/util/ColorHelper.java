@@ -11,6 +11,7 @@ public final class ColorHelper {
   private static final int MAX_RGB_VALUE = 255;
 
   private ColorHelper() {
+    throw new UnsupportedOperationException();
   }
 
   /**

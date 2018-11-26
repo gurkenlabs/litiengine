@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-public class KeyBoard implements KeyEventDispatcher, IKeyboard {
+public class Keyboard implements KeyEventDispatcher, IKeyboard {
   private final List<KeyListener> keyListeners = new CopyOnWriteArrayList<>();
   private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificPressedConsumer = new CopyOnWriteArrayList<>();
   private final List<Map.Entry<Integer, Consumer<KeyEvent>>> keySpecificReleasedConsumer = new CopyOnWriteArrayList<>();
@@ -26,7 +26,7 @@ public class KeyBoard implements KeyEventDispatcher, IKeyboard {
 
   private boolean consumeAlt;
 
-  protected KeyBoard() {
+  protected Keyboard() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
     Input.getLoop().attach(this);

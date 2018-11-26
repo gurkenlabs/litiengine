@@ -29,9 +29,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
@@ -283,7 +283,7 @@ public class SpritesheetImportPanel extends JPanel {
     private String name;
 
     public SpriteFileWrapper(File file) {
-      this(Resources.getImage(file.getAbsolutePath()), FileUtilities.getFileName(file.getName()));
+      this(Resources.images().get(file.getAbsolutePath()), FileUtilities.getFileName(file.getName()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
       this.updateSprite();

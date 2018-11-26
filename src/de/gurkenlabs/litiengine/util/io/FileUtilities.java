@@ -19,6 +19,7 @@ public final class FileUtilities {
   private static final String FILE_SEPARATOR_LINUX = "/";
 
   private FileUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static boolean deleteDir(final File dir) {

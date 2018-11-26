@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.util.io;
 public class SerializationHelper {
 
   private SerializationHelper() {
+    throw new UnsupportedOperationException();
   }
 
   /**

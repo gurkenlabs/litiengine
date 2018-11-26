@@ -5,14 +5,15 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 import javax.swing.JLabel;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class ImageComponent extends GuiComponent {
@@ -66,8 +67,9 @@ public class ImageComponent extends GuiComponent {
     }
 
     final String cacheKey = this.getSpritesheet().getName().hashCode() + "_" + this.isHovered() + "_" + this.isPressed() + "_" + this.isEnabled() + "_" + this.getWidth() + "x" + this.getHeight();
-    if (ImageCache.SPRITES.containsKey(cacheKey)) {
-      return ImageCache.SPRITES.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     int spriteIndex = BACKGROUND_INDEX;
@@ -81,7 +83,7 @@ public class ImageComponent extends GuiComponent {
 
     BufferedImage img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(spriteIndex), (int) this.getWidth(), (int) this.getHeight());
     if (img != null) {
-      ImageCache.SPRITES.put(cacheKey, img);
+      Resources.images().add(cacheKey, img);
     }
 
     return img;
@@ -101,8 +103,9 @@ public class ImageComponent extends GuiComponent {
     }
 
     final String cacheKey = this.image.hashCode() + "_" + imageWidth + "+" + imageHeight;
-    if (ImageCache.SPRITES.containsKey(cacheKey)) {
-      return ImageCache.SPRITES.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     BufferedImage bufferedImage = ImageProcessing.toBufferedImage(this.image);
@@ -111,7 +114,7 @@ public class ImageComponent extends GuiComponent {
     }
 
     BufferedImage img = ImageProcessing.scaleImage(bufferedImage, imageWidth, imageHeight);
-    ImageCache.SPRITES.put(cacheKey, img);
+    Resources.images().add(cacheKey, img);
     return img;
   }
 
@@ -137,12 +140,12 @@ public class ImageComponent extends GuiComponent {
       return;
     }
 
-    super.render(g);
-
     final Image bg = this.getBackground();
     if (bg != null) {
       ImageRenderer.render(g, bg, this.getLocation());
     }
+
+    super.render(g);
 
     final Image img = this.getImage();
     if (img != null) {

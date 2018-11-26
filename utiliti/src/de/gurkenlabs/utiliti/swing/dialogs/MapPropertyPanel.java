@@ -15,9 +15,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.Program;
 
@@ -58,7 +58,7 @@ public class MapPropertyPanel extends JPanel {
 
     JButton buttonAmbientColor = new JButton("...");
     buttonAmbientColor.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectAmbientColor"), ColorHelper.decode(textFieldAmbientColor.getText()));
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectAmbientColor"), ColorHelper.decode(textFieldAmbientColor.getText()));
       if (result == null) {
         return;
       }
@@ -123,7 +123,7 @@ public class MapPropertyPanel extends JPanel {
 
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectShadowColor"), ColorHelper.decode(textFieldShadowColor.getText()));
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectShadowColor"), ColorHelper.decode(textFieldShadowColor.getText()));
       if (result == null) {
         return;
       }

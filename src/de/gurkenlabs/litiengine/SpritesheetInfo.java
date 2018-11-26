@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
@@ -39,7 +40,7 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
   public SpritesheetInfo(final Spritesheet sprite) {
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(ImageProcessing.encodeToString(sprite.getImage(), sprite.getImageFormat()));
-    this.setKeyframes(Spritesheet.getCustomKeyFrameDurations(sprite));
+    this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
   public SpritesheetInfo(final BufferedImage image, String name, final int width, final int height) {

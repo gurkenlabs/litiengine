@@ -22,10 +22,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 @SuppressWarnings("serial")
@@ -41,11 +41,11 @@ public class TriggerPanel extends PropertyPanel {
   private JTable tableTargets;
 
   public TriggerPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_trigger"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_trigger"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    JLabel lblShadowType = new JLabel(Resources.get("panel_message"));
+    JLabel lblShadowType = new JLabel(Resources.strings().get("panel_message"));
 
     this.textFieldMessage = new JTextField();
     this.textFieldMessage.setColumns(10);
@@ -53,7 +53,7 @@ public class TriggerPanel extends PropertyPanel {
     this.comboBoxActivationType = new JComboBox<>();
     this.comboBoxActivationType.setModel(new DefaultComboBoxModel<TriggerActivation>(TriggerActivation.values()));
 
-    JLabel lblActivation = new JLabel(Resources.get("panel_activation"));
+    JLabel lblActivation = new JLabel(Resources.strings().get("panel_activation"));
 
     JScrollPane scrollPane = new JScrollPane();
 
@@ -69,7 +69,7 @@ public class TriggerPanel extends PropertyPanel {
       }
     });
 
-    this.chckbxOneTimeOnly = new JCheckBox(Resources.get("panel_oneTimeOnly"));
+    this.chckbxOneTimeOnly = new JCheckBox(Resources.strings().get("panel_oneTimeOnly"));
 
     JScrollPane scrollPane1 = new JScrollPane();
 
@@ -126,7 +126,7 @@ public class TriggerPanel extends PropertyPanel {
 
     this.tableTargets = new JTable();
     this.tableTargets.getTableHeader().setReorderingAllowed(false);
-    this.tableTargets.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_targets") }) {
+    this.tableTargets.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_targets") }) {
       Class[] columnTypes = new Class[] { Integer.class };
 
       @Override
@@ -139,7 +139,7 @@ public class TriggerPanel extends PropertyPanel {
 
     this.table = new JTable();
     this.table.getTableHeader().setReorderingAllowed(false);
-    this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_activators") }) {
+    this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_activators") }) {
       Class[] columnTypes = new Class[] { Integer.class };
 
       @Override

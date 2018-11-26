@@ -10,6 +10,13 @@
     * The Game Loop
     * Creating screens
 
+* [Managing resources](managing-resources/README.md)
+    * The Resources API
+    * Sounds
+    * Images
+    * Fonts
+    * Text
+
 * [Configuring the game](game-configuration/README.md)
     * Setting Metadata
     * Configuration Files

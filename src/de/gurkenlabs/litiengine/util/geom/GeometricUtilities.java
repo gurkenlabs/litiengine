@@ -22,6 +22,7 @@ public class GeometricUtilities {
   private static final double RAYCAST_EPSILON = 0.01;
 
   private GeometricUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static float calcRotationAngleInDegrees(final double centerX, final double centerY, final double targetX, final double targetY) {

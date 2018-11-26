@@ -112,10 +112,6 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
       if (readCount < 0) {
         if (!this.loop || this.dataLine == null) {
-          final SoundEvent event = new SoundEvent(this, this.sound);
-          for (SoundPlaybackListener listener : this.playbackListeners) {
-            listener.finished(event);
-          }
           break;
         }
 
@@ -132,6 +128,13 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
     if (this.dataLine != null) {
       this.dataLine.drain();
+    }
+    
+    if (!this.cancelled) {
+      final SoundEvent event = new SoundEvent(this, this.sound);
+      for (SoundPlaybackListener listener : this.playbackListeners) {
+        listener.finished(event);
+      }
     }
 
     this.playing = false;

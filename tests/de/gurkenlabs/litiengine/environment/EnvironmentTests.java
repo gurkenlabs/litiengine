@@ -449,8 +449,8 @@ public class EnvironmentTests {
     this.testEnvironment.add(entity);
     this.testEnvironment.add(entity2);
 
-    List<IEntity> found = this.testEnvironment.findEntities(new Rectangle2D.Double(0, 0, 10, 10));
-    List<IEntity> found2 = this.testEnvironment.findEntities(new Ellipse2D.Double(0, 0, 10, 10));
+    Collection<IEntity> found = this.testEnvironment.findEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    Collection<IEntity> found2 = this.testEnvironment.findEntities(new Ellipse2D.Double(0, 0, 10, 10));
     assertTrue(found.contains(entity));
     assertFalse(found.contains(entity2));
     assertTrue(found2.contains(entity));
@@ -472,8 +472,8 @@ public class EnvironmentTests {
     this.testEnvironment.add(combatEntity);
     this.testEnvironment.add(combatEntity2);
 
-    List<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
-    List<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
+    Collection<ICombatEntity> found = this.testEnvironment.findCombatEntities(new Rectangle2D.Double(0, 0, 10, 10));
+    Collection<ICombatEntity> found2 = this.testEnvironment.findCombatEntities(new Ellipse2D.Double(0, 0, 10, 10));
 
     assertTrue(found.contains(combatEntity));
     assertFalse(found.contains(combatEntity2));
