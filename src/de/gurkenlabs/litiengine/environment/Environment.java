@@ -99,8 +99,8 @@ public class Environment implements IEnvironment {
     this();
     this.map = map;
     if (this.getMap() != null) {
-    Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
-  }
+      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+    }
   }
 
   public Environment(final String mapPath) {
@@ -113,9 +113,9 @@ public class Environment implements IEnvironment {
 
   private Environment() {
     for (RenderType renderType : RenderType.values()) {
-      this.entities.put(renderType, new HashMap<>());
-      this.renderListeners.put(renderType, new HashSet<>());
-      this.renderables.put(renderType, new HashSet<>());
+      this.entities.put(renderType, Collections.synchronizedMap(new HashMap<>()));
+      this.renderListeners.put(renderType, ConcurrentHashMap.newKeySet());
+      this.renderables.put(renderType, ConcurrentHashMap.newKeySet());
     }
   }
 
@@ -715,9 +715,9 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-    this.loadMapObjects();
-    this.addStaticShadows();
-    this.addAmbientLight();
+      this.loadMapObjects();
+      this.addStaticShadows();
+      this.addAmbientLight();
     }
 
     this.fireEvent(l -> l.environmentInitialized(this));
@@ -737,13 +737,13 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-    Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+      Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
     }
 
     if (this.getMap() != null) {
-    if (this.getMap().getBackgroundColor() != null) {
-      Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
-    }
+      if (this.getMap().getBackgroundColor() != null) {
+        Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+      }
     } else {
       Game.getScreenManager().getRenderComponent().setBackground(Color.BLACK);
     }
