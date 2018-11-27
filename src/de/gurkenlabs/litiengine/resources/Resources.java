@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.sound.Sound;
 
@@ -27,23 +28,16 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * @see ResourcesContainer
  */
 public final class Resources {
-  private static Fonts fonts;
-  private static Sounds sounds;
-  private static Maps maps;
-  private static Strings strings;
-  private static Images images;
-  private static Spritesheets spritesheets;
-
-  static {
-    fonts = new Fonts();
-    sounds = new Sounds();
-    maps = new Maps();
-    strings = new Strings();
-    images = new Images();
-    spritesheets = new Spritesheets();
-  }
+  private static Fonts fonts = new Fonts();
+  private static Sounds sounds = new Sounds();
+  private static Maps maps = new Maps();
+  private static Tilesets tilesets = new Tilesets();
+  private static Strings strings = new Strings();
+  private static Images images = new Images();
+  private static Spritesheets spritesheets = new Spritesheets();
 
   private Resources() {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -77,6 +71,19 @@ public final class Resources {
    */
   public static Maps maps() {
     return maps;
+  }
+
+  /**
+   * Gets the container that manages <code>Tileset</code> resources.<br>
+   * This implementation uses raw {@code Tileset}s, to avoid problems with
+   * {@code Tileset} methods that aren't in the {@code ITileset} interface.
+   * 
+   * @return The Tileset resource container.
+   * 
+   * @see Tileset
+   */
+  public static Tilesets tilesets() {
+    return tilesets;
   }
 
   /**

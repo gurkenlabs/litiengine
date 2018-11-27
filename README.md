@@ -62,6 +62,8 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
 * [Steamworks4j](https://github.com/code-disaster/steamworks4j) for supporting the steamworks SDK
 
 ## Games made with LITIengine
+### [GoIn - Behave or GET LOST!](https://gurkenlabs.de/ldjam-42-goin-behave-or-get-lost/)
+![GoIn - Behave or GET LOST!](https://gurkenlabs.de/wp-content/uploads/2018/11/banner1.png "GoIn")
 
 ### [DR.LEPUS](https://drlepus.com)
 ![DR.LEPUS - The Last Rabbit on Earth](https://gurkenlabs.de/wp-content/uploads/2017/04/page-title.png "DR.LEPUS")

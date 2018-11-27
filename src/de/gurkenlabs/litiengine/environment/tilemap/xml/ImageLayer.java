@@ -55,7 +55,7 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   public void setMapPath(final String path) {
-    this.image.setAbsolutPath(path);
+    this.image.setAbsolutePath(path);
   }
 
   private boolean isInfiniteMap() {
