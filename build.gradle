@@ -86,8 +86,8 @@ javadoc {
 
 jacocoTestReport {
   sourceSets(sourceSets.main)
-  sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-  classDirectories = files(sourceSets.main.output)
+  getSourceDirectories().setFrom(sourceSets.main.allSource.srcDirs)
+  getClassDirectories().setFrom(sourceSets.main.output)
 
   reports {
     xml.enabled true
