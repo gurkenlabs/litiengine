@@ -23,15 +23,18 @@ public final class Sound {
 
   private final String name;
 
+  private AudioInputStream stream;
+
   private byte[] streamData;
 
   /**
    * Creates a new Sound instance by the specified file path. Loads the sound
    * data into a byte array and also retrieves information about the format of
    * the sound file.
-   * <p>
-   * Note that sounds should be loaded with the static <code>Resources.sounds()get(String)</code> method.
-   * </p>
+   * 
+   * Note that the constructor is private. In order to load files use the static
+   * <code>Resources.sounds()get(String)</code> method.
+   * 
    * @param is
    *          The input stream to load the sound from.
    * @param name
@@ -47,8 +50,9 @@ public final class Sound {
         final AudioFormat decodedFormat = this.getOutFormat(baseFormat);
         // Get AudioInputStream that will be decoded by underlying VorbisSPI
         in = AudioSystem.getAudioInputStream(decodedFormat, in);
-        this.streamData = StreamUtilities.getBytes(in);
-        this.format = in.getFormat();
+        this.stream = in;
+        this.streamData = StreamUtilities.getBytes(this.stream);
+        this.format = this.stream.getFormat();
       }
     } catch (final UnsupportedAudioFileException | IOException e) {
 
