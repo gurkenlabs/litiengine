@@ -1,5 +1,6 @@
-# General Java Game Development FAQ
-This page contains answers to frequently asked questions that are broadly related to Java Game Development.
+---
+description: This page contains answers to frequently asked questions that are broadly related to Java Game Development.
+---
 
 ## Libraries 
 This section contains useful information for external libraries related to Java Game Development.
