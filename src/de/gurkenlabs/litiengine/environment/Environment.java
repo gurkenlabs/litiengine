@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -113,7 +111,7 @@ public class Environment implements IEnvironment {
 
   private Environment() {
     for (RenderType renderType : RenderType.values()) {
-      this.entities.put(renderType, Collections.synchronizedMap(new HashMap<>()));
+      this.entities.put(renderType, new ConcurrentHashMap<>());
       this.renderListeners.put(renderType, ConcurrentHashMap.newKeySet());
       this.renderables.put(renderType, ConcurrentHashMap.newKeySet());
     }
