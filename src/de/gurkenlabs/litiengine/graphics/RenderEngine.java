@@ -85,11 +85,7 @@ public final class RenderEngine {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    ShapeRenderer.renderTransformed(g, shape, t);
+    ShapeRenderer.renderTransformed(g, shape, AffineTransform.getTranslateInstance(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY()));
   }
 
   public void renderOutline(final Graphics2D g, final Shape shape) {
@@ -101,11 +97,7 @@ public final class RenderEngine {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
+    ShapeRenderer.renderOutlineTransformed(g, shape, AffineTransform.getTranslateInstance(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY()), stroke);
   }
 
   public boolean canRender(final IEntity entity) {
