@@ -90,7 +90,15 @@ public class Environment implements IEnvironment {
   private int localIdSequence = 0;
 
   static {
-    registerDefaultMapObjectLoaders();
+    registerMapObjectLoader(new PropMapObjectLoader());
+    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
+    registerMapObjectLoader(new TriggerMapObjectLoader());
+    registerMapObjectLoader(new EmitterMapObjectLoader());
+    registerMapObjectLoader(new LightSourceMapObjectLoader());
+    registerMapObjectLoader(new SpawnpointMapObjectLoader());
+    registerMapObjectLoader(new MapAreaMapObjectLoader());
+    registerMapObjectLoader(new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   public Environment(final IMap map) {
@@ -1180,18 +1188,6 @@ public class Environment implements IEnvironment {
         this.load(mapObject);
       }
     }
-  }
-
-  private static void registerDefaultMapObjectLoaders() {
-    registerMapObjectLoader(new PropMapObjectLoader());
-    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
-    registerMapObjectLoader(new TriggerMapObjectLoader());
-    registerMapObjectLoader(new EmitterMapObjectLoader());
-    registerMapObjectLoader(new LightSourceMapObjectLoader());
-    registerMapObjectLoader(new SpawnpointMapObjectLoader());
-    registerMapObjectLoader(new MapAreaMapObjectLoader());
-    registerMapObjectLoader(new StaticShadowMapObjectLoader());
-    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   /**
