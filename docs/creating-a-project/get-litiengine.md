@@ -21,15 +21,15 @@ compile 'de.gurkenlabs:litiengine:0.4.14'
 
 ### Manual Download
 [litiengine-0.4.14.jar](https://search.maven.org/remotecontent?filepath=de/gurkenlabs/litiengine/0.4.14/litiengine-0.4.14.jar)
-> Note that this download will not provide you with any referenced native assemblies (e.g. for Gamepad integration).
+> **Note:** This download will not provide you with any referenced native assemblies (e.g. for Gamepad integration).
 
 [litiengine-v0.4.14-alpha.zip](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/litiengine-v0.4.14-alpha.zip)
-> This `.zip` archive contains all the required libraries and native assemblies
+> **Note:** This `.zip` archive contains all the required libraries and native assemblies
 
 ## Get the utiLITI editor
 The LITIengine comes with an editor that supports you with creating game environments and managing your resources. It is a stand alone product which produces a `.litidata` game project files that can than be loaded to your game. 
 
-> The editor is not an IDE for Java development.
+> **Note:** The editor is not an IDE for Java development.
 
 [utiLITI for Windows](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-win.zip)
 
