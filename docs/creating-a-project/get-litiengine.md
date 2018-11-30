@@ -30,5 +30,7 @@ compile 'de.gurkenlabs:litiengine:0.4.14'
 The LITIengine comes with an editor that supports you with creating game environments and managing your resources. It is a stand alone product which produces a `.litidata` game project files that can than be loaded to your game. 
 
 > The editor is not an IDE for Java development.
+
 [utiLITI for Windows](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-win.zip)
+
 [utiLITI for Linux / iOS](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-linux-mac.zip)
