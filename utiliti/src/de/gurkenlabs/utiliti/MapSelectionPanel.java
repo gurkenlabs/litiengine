@@ -69,6 +69,7 @@ import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
 
+@SuppressWarnings("serial")
 public class MapSelectionPanel extends JSplitPane {
   private final JList<String> mapList;
   private final java.util.Map<String, java.util.Map<String, Boolean>> layerVisibility;

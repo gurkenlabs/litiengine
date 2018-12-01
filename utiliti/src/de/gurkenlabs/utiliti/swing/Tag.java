@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import de.gurkenlabs.utiliti.Icons;
 
+@SuppressWarnings("serial")
 public class Tag extends JPanel {
 
   public static final Color DEFAULT_TAG_COLOR = new Color(99, 113, 118);

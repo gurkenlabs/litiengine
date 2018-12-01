@@ -251,6 +251,7 @@ public class FileDrop {
           LOG.log(Level.FINE, "FileDrop: file list accepted.");
 
           // Get a useful list
+          @SuppressWarnings("unchecked")
           List<File> fileList = (List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 
           // Convert list to array
