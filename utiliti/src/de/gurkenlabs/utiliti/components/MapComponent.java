@@ -1827,7 +1827,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();

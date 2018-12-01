@@ -71,7 +71,7 @@ public final class RenderEngine {
     }
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-    final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
+    final Point2D viewPortLocation = Game.getCamera().getViewportLocation(x, y);
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, GuiProperties.getDefaultAppearance().getTextAntialiasing());
   }
@@ -242,12 +242,12 @@ public final class RenderEngine {
       if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
-        ImageRenderer.renderScaled(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);
+        ImageRenderer.renderScaled(g, img, Game.getCamera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
       } else {
         float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
         float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
 
-        ImageRenderer.renderTransformed(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+        ImageRenderer.renderTransformed(g, img, Game.getCamera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
       }
     }
 

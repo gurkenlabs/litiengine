@@ -115,7 +115,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   @Override
   public void scaleSprite(float scaleX, float scaleY) {
-    final Point2D point = Game.getCamera().getViewPortLocation(this.getEntity());
+    final Point2D point = Game.getCamera().getViewportLocation(this.getEntity());
     double deltaX = (point.getX() - (point.getX() * scaleX));
     double deltaY = (point.getY() - (point.getY() * scaleY));
 
