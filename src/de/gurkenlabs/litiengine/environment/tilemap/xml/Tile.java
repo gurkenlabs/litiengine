@@ -2,20 +2,16 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ITerrain;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
-import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
 @XmlRootElement(name = "tile")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -31,20 +27,9 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   @XmlAttribute
   private Integer gid;
 
-  @XmlAttribute
-  private Integer id;
-
-  @XmlAttribute
-  private String terrain;
-
-  @XmlElement(required = false)
-  private Animation animation;
-
   private transient Point tileCoordinate;
 
-  private transient ITerrain[] terrains;
-
-  private transient ITile customPropertySource;
+  private transient ITilesetEntry tilesetEntry;
 
   private transient boolean flippedDiagonally;
   private transient boolean flippedHorizontally;
@@ -66,34 +51,34 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public boolean hasCustomProperty(String name) {
-    return customPropertySource == null ? super.hasCustomProperty(name) : customPropertySource.hasCustomProperty(name);
+    return tilesetEntry == null ? super.hasCustomProperty(name) : tilesetEntry.hasCustomProperty(name);
   }
 
   @Override
   public List<Property> getProperties() {
-    return customPropertySource == null ? super.getProperties() : customPropertySource.getProperties();
+    return tilesetEntry == null ? super.getProperties() : tilesetEntry.getProperties();
   }
 
   @Override
   public void setProperties(List<Property> props) {
-    if (customPropertySource == null) {
+    if (tilesetEntry == null) {
       super.setProperties(props);
     } else {
-      customPropertySource.setProperties(props);
+      tilesetEntry.setProperties(props);
     }
   }
 
   @Override
   public String getStringValue(String name, String defaultValue) {
-    return customPropertySource == null ? super.getStringValue(name, defaultValue) : customPropertySource.getStringValue(name, defaultValue);
+    return tilesetEntry == null ? super.getStringValue(name, defaultValue) : tilesetEntry.getStringValue(name, defaultValue);
   }
 
   @Override
   public void setValue(String name, String value) {
-    if (customPropertySource == null) {
+    if (tilesetEntry == null) {
       super.setValue(name, value);
     } else {
-      customPropertySource.setValue(name, value);
+      tilesetEntry.setValue(name, value);
     }
   }
 
@@ -142,67 +127,23 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   }
 
   @Override
-  public int getId() {
-    if (this.id == null) {
-      return 0;
-    }
-
-    return this.id;
-  }
-
-  @Override
-  public ITerrain[] getTerrain() {
-    return customPropertySource == null ? this.terrains : customPropertySource.getTerrain();
-  }
-
-  @Override
-  public ITileAnimation getAnimation() {
-    return customPropertySource == null ? this.animation : customPropertySource.getAnimation();
-  }
-
-  @Override
   public String toString() {
-    for (int i = 0; i < this.getTerrainIds().length; i++) {
-      if (this.getTerrainIds()[i] != Terrain.NONE) {
-        return this.getGridId() + " (" + Arrays.toString(this.getTerrainIds()) + ")";
-      }
-    }
-
-    return this.getGridId() + "";
+    return this.getGridId() + String.valueOf(this.getTilesetEntry());
   }
 
-  protected int[] getTerrainIds() {
-    int[] terrainIds = new int[] { Terrain.NONE, Terrain.NONE, Terrain.NONE, Terrain.NONE };
-    if (this.terrain == null || this.terrain.isEmpty()) {
-      return terrainIds;
-    }
-
-    int[] ids = ArrayUtilities.getIntegerArray(this.terrain);
-    if (ids.length != 4) {
-      return terrainIds;
-    } else {
-      terrainIds = ids;
-    }
-
-    return terrainIds;
+  protected void setTilesetEntry(ITilesetEntry entry) {
+    this.tilesetEntry = entry;
   }
 
-  protected void setTerrains(ITerrain[] terrains) {
-    this.terrains = terrains;
-  }
-
-  protected void setCustomPropertySource(ITile source) {
-    customPropertySource = source;
+  @Override
+  public ITilesetEntry getTilesetEntry() {
+    return this.tilesetEntry;
   }
 
   @SuppressWarnings("unused")
-  private void afterUnmarshal(Unmarshaller u, Object parent) {
+  private void beforeMarshal(Marshaller m) {
     if (this.gid != null && this.gid == 0) {
       this.gid = null;
-    }
-
-    if (this.id != null && this.id == 0) {
-      this.id = null;
     }
   }
 }

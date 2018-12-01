@@ -25,7 +25,7 @@ public final class Maps extends ResourcesContainer<IMap> {
     }
 
     for (TileLayer layer : map.getRawTileLayers()) {
-      layer.setCustomPropertySources(map);
+      layer.setTilesetEntries(map);
     }
 
     // by default the map is named by the source file

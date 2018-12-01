@@ -434,10 +434,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   public void updateTileTerrain() {
-    for (TileLayer layer : this.rawTileLayers) {
-      for (Tile tile : layer.getData()) {
-        tile.setTerrains(MapUtilities.getTerrain(this, tile.getGridId()));
-      }
+    for (Tileset tileset : this.rawTilesets) {
+      tileset.updateTileTerrain();
     }
   }
 

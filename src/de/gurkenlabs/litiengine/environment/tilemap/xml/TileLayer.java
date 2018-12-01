@@ -96,11 +96,11 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.data;
   }
 
-  public void setCustomPropertySources(Map map) {
+  public void setTilesetEntries(Map map) {
     for (Tile tile : getData()) {
       for (ITileset tileset : map.getRawTilesets()) {
-        if (tileset.containsTile(tile)) {
-          tile.setCustomPropertySource(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
+        if (tileset.containsTile(tile.getGridId())) {
+          tile.setTilesetEntry(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
           break;
         }
       }

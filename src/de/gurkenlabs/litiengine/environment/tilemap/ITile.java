@@ -7,10 +7,6 @@ import java.awt.Point;
  */
 public interface ITile extends ICustomPropertyProvider {
 
-  public int getId();
-
-  public ITerrain[] getTerrain();
-
   /**
    * Gets the grid id.
    *
@@ -25,7 +21,7 @@ public interface ITile extends ICustomPropertyProvider {
    */
   public Point getTileCoordinate();
 
-  public ITileAnimation getAnimation();
+  public ITilesetEntry getTilesetEntry();
 
   public boolean isFlippedHorizontally();
 

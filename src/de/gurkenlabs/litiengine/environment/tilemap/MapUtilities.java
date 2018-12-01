@@ -259,16 +259,6 @@ public final class MapUtilities {
     return tile;
   }
 
-  public static ITerrain[] getTerrain(final IMap map, final int gId) {
-    for (final ITileset tileset : map.getTilesets()) {
-      if (tileset.containsTile(gId)) {
-        return tileset.getTerrain(gId);
-      }
-    }
-
-    return new ITerrain[4];
-  }
-
   public static boolean hasAnimation(final IMap map, final ITile tile) {
 
     final ITileset tileset = MapUtilities.findTileSet(map, tile);

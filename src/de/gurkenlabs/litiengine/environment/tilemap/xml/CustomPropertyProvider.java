@@ -314,7 +314,8 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     return prop1.getName().compareTo(prop2.getName());
   }
 
-  void beforeMarshal(Marshaller m) {
+  @SuppressWarnings("unused")
+  private void beforeMarshal(Marshaller m) {
     if (this.properties != null && this.properties.isEmpty()) {
       this.properties = null;
       return;
