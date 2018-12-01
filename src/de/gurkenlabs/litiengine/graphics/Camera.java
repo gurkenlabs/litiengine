@@ -77,7 +77,7 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public Rectangle2D getViewPort() {
+  public Rectangle2D getViewport() {
     return this.viewPort;
   }
 

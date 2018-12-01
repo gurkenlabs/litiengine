@@ -178,7 +178,7 @@ public final class RenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getCamera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
@@ -268,7 +268,7 @@ public final class RenderEngine {
     }
 
     // draw layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort(), renderTypes);
+    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewport(), renderTypes);
   }
 
   /**

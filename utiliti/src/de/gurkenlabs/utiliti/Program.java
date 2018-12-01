@@ -211,8 +211,8 @@ public class Program {
     horizontalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().width);
     verticalScroll.setMinimum(0);
     verticalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().height);
-    horizontalScroll.setValue((int) Game.getCamera().getViewPort().getCenterX());
-    verticalScroll.setValue((int) Game.getCamera().getViewPort().getCenterY());
+    horizontalScroll.setValue((int) Game.getCamera().getViewport().getCenterX());
+    verticalScroll.setValue((int) Game.getCamera().getViewport().getCenterY());
   }
 
   public static boolean notifyPendingChanges() {

@@ -47,7 +47,7 @@ public interface ICamera extends IUpdateable {
    *
    * @return the camera region
    */
-  public Rectangle2D getViewPort();
+  public Rectangle2D getViewport();
 
   public Point2D getViewPortDimensionCenter(IEntity entity);
 
