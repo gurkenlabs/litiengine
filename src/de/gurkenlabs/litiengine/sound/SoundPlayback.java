@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +36,6 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       return new Thread(r, "Sound Playback Thread " + ++id);
     }
   });
-  private static final ExecutorService closeQueue = Executors.newSingleThreadExecutor(r -> new Thread(r, "Data Line Close Thread"));
 
   private final List<SoundPlaybackListener> playbackListeners;
 
@@ -197,11 +195,6 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
 
   protected static void terminate() {
     executorService.shutdownNow();
-    try {
-      executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-    } catch (InterruptedException e) {
-    }
-    closeQueue.shutdown();
   }
 
   void dispose() {
@@ -210,13 +203,9 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     }
 
     if (this.dataLine != null) {
-      closeQueue.execute(() -> {
-        if (this.dataLine != null) {
-          this.dataLine.stop();
-          this.dataLine.flush();
-          this.dataLine.close();
-        }
-      });
+      this.dataLine.stop();
+      this.dataLine.flush();
+      this.dataLine.close();
       this.dataLine = null;
       this.gainControl = null;
       this.panControl = null;
