@@ -123,12 +123,10 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       // it can, however, establish a happens-before relationship
       // see https://community.oracle.com/thread/2381571
     }
-
-    if (this.dataLine != null) {
-      this.dataLine.drain();
-    }
     
     if (!this.cancelled) {
+      this.dataLine.drain();
+      this.dataLine.close();
       final SoundEvent event = new SoundEvent(this, this.sound);
       for (SoundPlaybackListener listener : this.playbackListeners) {
         listener.finished(event);
@@ -141,6 +139,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   @Override
   public void cancel() {
     this.cancelled = true;
+    this.dispose();
     this.playingIn.interrupt();
 
     final SoundEvent event = new SoundEvent(this, this.sound);
@@ -197,19 +196,15 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     executorService.shutdownNow();
   }
 
-  void dispose() {
-    if (this.isPlaying()) {
-      this.cancel();
-    }
-
+  private void dispose() {
     if (this.dataLine != null) {
       this.dataLine.stop();
       this.dataLine.flush();
       this.dataLine.close();
-      this.dataLine = null;
-      this.gainControl = null;
-      this.panControl = null;
     }
+    this.dataLine = null;
+    this.gainControl = null;
+    this.panControl = null;
   }
 
   Sound getSound() {
