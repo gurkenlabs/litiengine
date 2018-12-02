@@ -330,6 +330,11 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
     }
   }
 
+  @Override
+  public void removeProperty(String propertyName) {
+    this.getProperties().remove(propertyName);
+  }
+
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.properties == null) {

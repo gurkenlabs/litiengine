@@ -25,6 +25,8 @@ public interface ICustomPropertyProvider {
 
   public void setValue(String propertyName, ICustomProperty value);
 
+  public void removeProperty(String propertyName);
+
   /**
    * Gets the string value of the custom property with the provided name.
    *
