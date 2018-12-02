@@ -7,7 +7,6 @@ import java.util.Arrays;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -18,7 +17,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 /**
  * The Class MapObject.
  */
-@XmlRootElement(name = "object")
 public class MapObject extends CustomPropertyProvider implements IMapObject {
   private static final long serialVersionUID = -6001981756772928868L;
 

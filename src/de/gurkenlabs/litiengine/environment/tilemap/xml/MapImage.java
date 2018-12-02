@@ -7,7 +7,6 @@ import java.io.File;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
@@ -17,7 +16,6 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 /**
  * The Class MapImage.
  */
-@XmlRootElement(name = "image")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MapImage extends CustomPropertyProvider implements IMapImage {
   private static final long serialVersionUID = -3571362172734426098L;

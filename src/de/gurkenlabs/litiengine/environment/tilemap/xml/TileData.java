@@ -14,12 +14,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlMixed;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
-@XmlRootElement(name = "data")
 public class TileData {
   protected static final String ENCODING_BASE64 = "base64";
   protected static final String ENCODING_CSV = "csv";

@@ -9,14 +9,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
-  @XmlRootElement(name = "property")
   @XmlAccessorType(XmlAccessType.FIELD)
   static class Property {
     @XmlAttribute
@@ -37,7 +35,6 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     }
   }
 
-  @XmlRootElement(name = "properties")
   @XmlAccessorType(XmlAccessType.FIELD)
   static class PropertyList {
     @XmlElement(name = "property")

@@ -8,11 +8,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IPolyline;
 
-@XmlRootElement(name = "polyline")
 public class Polyline implements IPolyline, Serializable {
   private static final Logger log = Logger.getLogger(Polyline.class.getName());
   private static final long serialVersionUID = -9046398175130339L;

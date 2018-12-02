@@ -7,13 +7,11 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
-@XmlRootElement(name = "layer")
 public class TileLayer extends Layer implements ITileLayer {
   private static final long serialVersionUID = -6588787132358068892L;
 
