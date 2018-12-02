@@ -250,9 +250,13 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public void setValue(String propertyName, String value) {
-    ICustomProperty property = createPropertyIfAbsent(propertyName);
-    property.setType("string");
-    property.setValue(value);
+    if (value != null) {
+      ICustomProperty property = createPropertyIfAbsent(propertyName);
+      property.setType("string");
+      property.setValue(value);
+    } else {
+      this.getProperties().remove(propertyName);
+    }
   }
 
   @Override
