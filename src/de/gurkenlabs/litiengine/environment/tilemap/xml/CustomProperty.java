@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
+import java.util.Objects;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.util.ColorHelper;
@@ -11,51 +12,53 @@ public class CustomProperty implements ICustomProperty {
   private String value;
 
   public CustomProperty() {
-    this("string", "");
+    this.type = "string";
+    this.value = "";
   }
 
   public CustomProperty(String value) {
-    this("string", value);
+    this.type = "string";
+    this.value = Objects.requireNonNull(value);
   }
 
   public CustomProperty(String type, String value) {
-    this.type = type;
-    this.value = value;
+    this.type = Objects.requireNonNull(type);
+    this.value = Objects.requireNonNull(value);
   }
 
   @Override
   public void setValue(String value) {
-    this.value = value;
+    this.value = Objects.requireNonNull(value);
   }
 
   @Override
   public void setValue(char value) {
-    this.setValue(Character.toString(value));
+    this.value = Character.toString(value);
   }
 
   @Override
   public void setValue(Enum<?> value) {
-    this.setValue(value.name());
+    this.value = value.name();
   }
 
   @Override
   public void setValue(long value) {
-    this.setValue(Long.toString(value));
+    this.value = Long.toString(value);
   }
 
   @Override
   public void setValue(double value) {
-    this.setValue(Double.toString(value));
+    this.value = Double.toString(value);
   }
 
   @Override
   public void setValue(boolean value) {
-    this.setValue(Boolean.toString(value));
+    this.value = Boolean.toString(value);
   }
 
   @Override
   public void setValue(Color value) {
-    this.setValue(ColorHelper.encode(value));
+    this.value = ColorHelper.encode(value);
   }
 
   @Override
@@ -124,6 +127,6 @@ public class CustomProperty implements ICustomProperty {
 
   @Override
   public void setType(String type) {
-    this.type = type;
+    this.type = Objects.requireNonNull(type);
   }
 }

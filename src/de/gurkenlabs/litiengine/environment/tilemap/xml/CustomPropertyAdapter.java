@@ -5,6 +5,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,7 +33,21 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
     Property(String name, String type) {
       this.name = name;
-      this.type = type;
+      this.type = type == null ? "string" : type;
+    }
+
+    @SuppressWarnings("unused")
+    private void afterUnmarshal(Unmarshaller u, Object parent) {
+      if (this.type == null) {
+        this.type = "string";
+      }
+    }
+
+    @SuppressWarnings("unused")
+    private void beforeMarshal(Marshaller m) {
+      if (this.type.equals("string")) {
+        this.type = null;
+      }
     }
   }
 
