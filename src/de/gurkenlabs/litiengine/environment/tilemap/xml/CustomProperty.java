@@ -129,4 +129,26 @@ public class CustomProperty implements ICustomProperty {
   public void setType(String type) {
     this.type = Objects.requireNonNull(type);
   }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (this == anObject) {
+      return true;
+    }
+    if (!(anObject instanceof ICustomProperty) || anObject == null) {
+      return false;
+    }
+    ICustomProperty other = (ICustomProperty) anObject;
+    return this.getType().equals(other.getType()) && this.getAsString().equals(other.getAsString());
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getType().hashCode() * 31 + this.getAsString().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return this.getAsString() + " (" + this.getType() + ')';
+  }
 }

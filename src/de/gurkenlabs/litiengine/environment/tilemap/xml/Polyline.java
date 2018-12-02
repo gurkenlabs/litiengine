@@ -67,4 +67,21 @@ public class Polyline implements IPolyline, Serializable {
     }
 
   }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (this == anObject) {
+      return true;
+    }
+    if (!(anObject instanceof IPolyline) || anObject == null) {
+      return false;
+    }
+    IPolyline other = (IPolyline) anObject;
+    return this.getPoints().equals(other.getPoints());
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getPoints().hashCode();
+  }
 }

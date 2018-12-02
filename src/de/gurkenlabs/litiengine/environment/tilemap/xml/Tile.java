@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -49,20 +50,20 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
 
   @Override
   public boolean hasCustomProperty(String name) {
-    return tilesetEntry == null ? super.hasCustomProperty(name) : tilesetEntry.hasCustomProperty(name);
+    return this.getTilesetEntry() == null ? super.hasCustomProperty(name) : this.getTilesetEntry().hasCustomProperty(name);
   }
 
   @Override
   public java.util.Map<String, ICustomProperty> getProperties() {
-    return this.tilesetEntry == null ? super.getProperties() : this.tilesetEntry.getProperties();
+    return this.getTilesetEntry() == null ? super.getProperties() : this.getTilesetEntry().getProperties();
   }
 
   @Override
   public void setProperties(java.util.Map<String, ICustomProperty> props) {
-    if (this.tilesetEntry == null) {
+    if (this.getTilesetEntry() == null) {
       super.setProperties(props);
     } else {
-      this.tilesetEntry.setProperties(props);
+      this.getTilesetEntry().setProperties(props);
     }
   }
 
@@ -108,6 +109,36 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
    */
   public void setTileCoordinate(final Point tileCoordinate) {
     this.tileCoordinate = tileCoordinate;
+  }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (this == anObject) {
+      return true;
+    }
+    if (!(anObject instanceof ITile) || anObject == null) {
+      return false;
+    }
+    ITile other = (ITile) anObject;
+    return this.getGridId() == other.getGridId() && this.isFlippedDiagonally() == other.isFlippedDiagonally()
+        && this.isFlippedHorizontally() == other.isFlippedHorizontally() && this.isFlippedVertically() == other.isFlippedVertically();
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = this.getGridId();
+    if (this.isFlipped()) {
+      if (this.isFlippedDiagonally()) {
+        hash |= FLIPPED_DIAGONALLY_FLAG;
+      }
+      if (this.isFlippedHorizontally()) {
+        hash |= FLIPPED_HORIZONTALLY_FLAG;
+      }
+      if (this.isFlippedVertically()) {
+        hash |= FLIPPED_VERTICALLY_FLAG;
+      }
+    }
+    return hash ^ Objects.hashCode(this.getTilesetEntry());
   }
 
   @Override

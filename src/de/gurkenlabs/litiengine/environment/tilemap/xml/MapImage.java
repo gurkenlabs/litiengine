@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
-import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
@@ -26,7 +26,8 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   /** The transparentcolor. */
   @XmlAttribute(name = "trans")
-  private String transparentcolor;
+  @XmlJavaTypeAdapter(ColorAdapter.class)
+  private Color transparentcolor;
 
   /** The width. */
   @XmlAttribute
@@ -70,11 +71,7 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   @Override
   public Color getTransparentColor() {
-    if (this.transparentcolor != null && !this.transparentcolor.isEmpty()) {
-      return ColorHelper.decode(this.transparentcolor);
-    }
-
-    return null;
+    return this.transparentcolor;
   }
 
   /**
@@ -88,5 +85,27 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   public void setAbsolutePath(final String mapPath) {
     this.absolutePath = FileUtilities.combine(mapPath, this.getSource());
+  }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (this == anObject) {
+      return true;
+    }
+    if (!(anObject instanceof IMapImage) || anObject == null) {
+      return false;
+    }
+    IMapImage other = (IMapImage) anObject;
+    return this.getTransparentColor().equals(other.getTransparentColor()) && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getAbsoluteSourcePath().hashCode() ^ this.getTransparentColor().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return this.getAbsoluteSourcePath();
   }
 }
