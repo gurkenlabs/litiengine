@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -31,12 +31,13 @@ import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 
 public class MapObjectLoaderTests {
 
@@ -231,7 +232,9 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(50f);
     when(mapObject.getHeight()).thenReturn(150f);
 
-    List<Property> customProps = Arrays.asList(new Property("foo", "foovalue"), new Property("bar", "111"));
+    Map<String, ICustomProperty> customProps = new Hashtable<>(2);
+    customProps.put("foo", new CustomProperty("foovalue"));
+    customProps.put("bar", new CustomProperty("111"));
     when(mapObject.getProperties()).thenReturn(customProps);
     when(mapObject.getStringValue("foo")).thenReturn("foovalue");
     when(mapObject.getStringValue("bar")).thenReturn("111");

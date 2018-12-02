@@ -1,10 +1,12 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.ArrayList;
+import java.util.Hashtable;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,16 +19,16 @@ public class CustomPropertyProviderTests {
     propProvider.setValue("test", "testvalue");
 
     assertEquals("testvalue", propProvider.getStringValue("test"));
-    assertNull(propProvider.getStringValue("test2"));
+    assertFalse(propProvider.hasCustomProperty("test2"));
     assertEquals(1, propProvider.getProperties().size());
 
     propProvider.setValue("test", "testvalue2");
 
     assertEquals("testvalue2", propProvider.getStringValue("test"));
 
-    ArrayList<Property> props = new ArrayList<>();
-    props.add(new Property("test2", "testvalue3"));
-    props.add(new Property("test3", "testvalue4"));
+    java.util.Map<String, ICustomProperty> props = new Hashtable<>(2);
+    props.put("test2", new CustomProperty("testvalue3"));
+    props.put("test3", new CustomProperty("testvalue4"));
 
     propProvider.setProperties(props);
 

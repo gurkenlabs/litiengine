@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Point;
 import java.io.Serializable;
-import java.util.List;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 
@@ -55,30 +55,16 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   }
 
   @Override
-  public List<Property> getProperties() {
-    return tilesetEntry == null ? super.getProperties() : tilesetEntry.getProperties();
+  public java.util.Map<String, ICustomProperty> getProperties() {
+    return this.tilesetEntry == null ? super.getProperties() : this.tilesetEntry.getProperties();
   }
 
   @Override
-  public void setProperties(List<Property> props) {
-    if (tilesetEntry == null) {
+  public void setProperties(java.util.Map<String, ICustomProperty> props) {
+    if (this.tilesetEntry == null) {
       super.setProperties(props);
     } else {
-      tilesetEntry.setProperties(props);
-    }
-  }
-
-  @Override
-  public String getStringValue(String name, String defaultValue) {
-    return tilesetEntry == null ? super.getStringValue(name, defaultValue) : tilesetEntry.getStringValue(name, defaultValue);
-  }
-
-  @Override
-  public void setValue(String name, String value) {
-    if (tilesetEntry == null) {
-      super.setValue(name, value);
-    } else {
-      tilesetEntry.setValue(name, value);
+      this.tilesetEntry.setProperties(props);
     }
   }
 
