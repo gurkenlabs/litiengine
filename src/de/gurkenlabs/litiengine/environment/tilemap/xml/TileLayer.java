@@ -51,23 +51,27 @@ public class TileLayer extends Layer implements ITileLayer {
       return this.tileList;
     }
 
-    this.tileList = new CopyOnWriteArrayList<>();
-    if (this.data == null) {
+    try {
+      this.tileList = new CopyOnWriteArrayList<>(this.getData());
+      if (this.data == null) {
+        return this.tileList;
+      }
+
+      this.tiles = new Tile[this.getWidth()][this.getHeight()];
+      for (int i = 0; i < this.getData().size(); i++) {
+        final int x = i % this.getWidth();
+        final int y = i / this.getWidth();
+  
+        final Tile tile = this.getData().get(i);
+        tile.setTileCoordinate(new Point(x, y));
+        this.tileList.add(tile);
+        this.tiles[x][y] = tile;
+      }
+
       return this.tileList;
+    } catch (InvalidTileLayerException e) {
+      throw new TmxError(e);
     }
-
-    this.tiles = new Tile[this.getWidth()][this.getHeight()];
-    for (int i = 0; i < this.getData().size(); i++) {
-      final int x = i % this.getWidth();
-      final int y = i / this.getWidth();
-
-      final Tile tile = this.getData().get(i);
-      tile.setTileCoordinate(new Point(x, y));
-      this.tileList.add(tile);
-      this.tiles[x][y] = tile;
-    }
-
-    return this.tileList;
   }
 
   @Override
@@ -88,7 +92,7 @@ public class TileLayer extends Layer implements ITileLayer {
     return super.getHeight();
   }
 
-  protected List<Tile> getData() {
+  protected List<Tile> getData() throws InvalidTileLayerException {
     return this.data.parseTiles();
   }
 
@@ -96,7 +100,7 @@ public class TileLayer extends Layer implements ITileLayer {
     return this.data;
   }
 
-  public void setTilesetEntries(Map map) {
+  public void setTilesetEntries(Map map) throws TmxException {
     for (Tile tile : getData()) {
       for (ITileset tileset : map.getRawTilesets()) {
         if (tileset.containsTile(tile.getGridId())) {

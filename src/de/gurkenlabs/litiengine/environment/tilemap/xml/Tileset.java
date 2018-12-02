@@ -330,12 +330,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return lastGridId >= tileId || this.sourceTileset != null && this.sourceTileset.containsTile(tileId);
   }
 
-  public void loadFromSource(String basePath) {
+  public void loadFromSource(String basePath) throws MissingExternalTilesetException {
     if (this.source == null || this.source.isEmpty()) {
       return;
     }
 
-    this.sourceTileset = Resources.tilesets().get(FileUtilities.combine(basePath, this.source));
+    String location = FileUtilities.combine(basePath, this.source);
+    this.sourceTileset = Resources.tilesets().get(location);
+    if (this.sourceTileset == null) {
+      throw new MissingExternalTilesetException(location);
+    }
   }
 
   public void saveSource(String basePath) {

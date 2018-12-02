@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBException;
+
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
@@ -517,9 +519,13 @@ public final class Game {
    * @see GameInfo
    */
   public static void setInfo(final String gameInfoFile) {
-    GameInfo info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
-    if (info == null) {
+    GameInfo info;
+    try {
+      info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
+    } catch (JAXBException e) {
       log.log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
+      setInfo((GameInfo)null);
+      return;
     }
 
     setInfo(info);

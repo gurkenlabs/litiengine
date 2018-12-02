@@ -30,16 +30,11 @@ public class Animation implements ITileAnimation, Serializable {
       return this.tileAnimationFrames;
     }
 
-    List<ITileAnimationFrame> fr = new ArrayList<>();
     if (this.frames == null) {
-      return fr;
+      return new ArrayList<>();
     }
 
-    for (ITileAnimationFrame frame : this.frames) {
-      fr.add(frame);
-    }
-
-    this.tileAnimationFrames = fr;
+    this.tileAnimationFrames = new ArrayList<>(this.frames);
     return this.tileAnimationFrames;
   }
 

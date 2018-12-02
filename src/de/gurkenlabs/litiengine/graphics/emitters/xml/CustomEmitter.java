@@ -4,6 +4,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -25,6 +29,8 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)
 public class CustomEmitter extends Emitter {
   private static final Map<String, EmitterData> loadedCustomEmitters;
+  
+  private static final Logger log = Logger.getLogger(CustomEmitter.class.getName());
 
   static {
     loadedCustomEmitters = new ConcurrentHashMap<>();
@@ -82,8 +88,11 @@ public class CustomEmitter extends Emitter {
       return loadedCustomEmitters.get(name);
     }
 
-    final EmitterData loaded = XmlUtilities.readFromFile(EmitterData.class, emitterXml);
-    if (loaded == null) {
+    EmitterData loaded;
+    try {
+      loaded = XmlUtilities.readFromFile(EmitterData.class, emitterXml);
+    } catch (JAXBException e) {
+      log.log(Level.SEVERE, "failed to load emmiter data for " + emitterXml, e);
       return null;
     }
 

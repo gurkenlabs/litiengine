@@ -28,7 +28,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
    * @return the image
    */
   @Override
-  protected BufferedImage load(String resourceName) {
+  protected BufferedImage load(String resourceName) throws IOException {
     if (resourceName == null || resourceName.isEmpty()) {
       return null;
     }
@@ -43,12 +43,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     BufferedImage img = null;
     final InputStream imageFile = FileUtilities.getGameResource(resourceName);
     if (imageFile != null) {
-      try {
-        img = ImageIO.read(imageFile);
-      } catch (final IOException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        return null;
-      }
+      img = ImageIO.read(imageFile);
     }
 
     if (img == null) {

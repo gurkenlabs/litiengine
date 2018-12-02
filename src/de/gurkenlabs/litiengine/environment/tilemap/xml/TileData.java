@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -27,7 +25,6 @@ public class TileData {
   protected static final String ENCODING_CSV = "csv";
   protected static final String COMPRESSION_GZIP = "gzip";
   protected static final String COMPRESSION_ZLIB = "zlib";
-  private static final Logger log = Logger.getLogger(TileData.class.getName());
 
   @XmlAttribute
   private String encoding;
@@ -126,7 +123,7 @@ public class TileData {
     return this.offsetY;
   }
 
-  protected List<Tile> parseTiles() {
+  protected List<Tile> parseTiles() throws InvalidTileLayerException {
     if (this.parsedTiles != null) {
       return this.parsedTiles;
     }
@@ -144,11 +141,16 @@ public class TileData {
     return this.parsedTiles;
   }
 
-  protected static List<Tile> parseBase64Data(String value, String compression) {
+  protected static List<Tile> parseBase64Data(String value, String compression) throws InvalidTileLayerException {
     List<Tile> parsed = new ArrayList<>();
 
     String enc = value.trim();
-    byte[] dec = DatatypeConverter.parseBase64Binary(enc);
+    byte[] dec;
+    try {
+      dec = DatatypeConverter.parseBase64Binary(enc);
+    } catch (IllegalArgumentException e) {
+      throw new InvalidTileLayerException("invalid base64 string", e);
+    }
     try (ByteArrayInputStream bais = new ByteArrayInputStream(dec)) {
       InputStream is;
 
@@ -186,13 +188,13 @@ public class TileData {
       }
 
     } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+      throw new InvalidTileLayerException(e);
     }
 
     return parsed;
   }
 
-  protected static List<Tile> parseCsvData(String value) {
+  protected static List<Tile> parseCsvData(String value) throws InvalidTileLayerException {
 
     List<Tile> parsed = new ArrayList<>();
 
@@ -201,7 +203,12 @@ public class TileData {
     String[] csvTileIds = value.trim().split("[\\s]*,[\\s]*");
 
     for (String gid : csvTileIds) {
-      int tileId = Integer.parseUnsignedInt(gid);
+      int tileId;
+      try {
+        tileId = Integer.parseUnsignedInt(gid);
+      } catch (NumberFormatException e) {
+        throw new InvalidTileLayerException(e);
+      }
 
       if (tileId > Integer.MAX_VALUE) {
         parsed.add(new Tile(tileId));
@@ -299,7 +306,7 @@ public class TileData {
     this.offsetY = minY;
   }
 
-  private List<Tile> parseChunkData() {
+  private List<Tile> parseChunkData() throws InvalidTileLayerException {
     // first fill a two-dimensional array with all the information of the chunks
     Tile[][] tileArr = new Tile[this.getHeight()][this.getWidth()];
 
@@ -343,7 +350,7 @@ public class TileData {
     }
   }
 
-  private List<Tile> parseData() {
+  private List<Tile> parseData() throws InvalidTileLayerException {
     List<Tile> tiles;
     if (this.getEncoding().equals(ENCODING_BASE64)) {
       tiles = parseBase64Data(this.value, this.compression);

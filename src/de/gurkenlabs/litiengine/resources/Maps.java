@@ -1,9 +1,12 @@
 package de.gurkenlabs.litiengine.resources;
 
+import javax.xml.bind.JAXBException;
+
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.TmxException;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -13,8 +16,13 @@ public final class Maps extends ResourcesContainer<IMap> {
   }
 
   @Override
-  protected IMap load(String resourceName) {
-    final Map map = XmlUtilities.readFromFile(Map.class, resourceName);
+  protected IMap load(String resourceName) throws TmxException {
+    Map map;
+    try {
+      map = XmlUtilities.readFromFile(Map.class, resourceName);
+    } catch (JAXBException e) {
+      throw new TmxException("could not parse xml data", e);
+    }
     if (map == null) {
       return null;
     }
