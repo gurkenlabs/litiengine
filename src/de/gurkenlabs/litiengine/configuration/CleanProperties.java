@@ -38,7 +38,7 @@ public class CleanProperties extends Properties {
     }
 
     @Override
-    public void write(byte[] b, int off, int len) {
+    public void write(byte[] b, int off, int len) throws IOException {
       while (!firstlineseen) {
         if (b[off++] == '\n') {
           firstlineseen = true;
