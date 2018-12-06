@@ -28,9 +28,6 @@ public abstract class SpritesheetEmitter extends Emitter {
   
   @Override
   protected Particle createNewParticle() {
-    final int life = this.getRandomParticleTTL();
-
-    final SpriteParticle p = new SpriteParticle(this.getRandomSprite(), life);
-    return p;
+    return new SpriteParticle(this.getRandomSprite(), this.getRandomParticleTTL());
   }
 }
