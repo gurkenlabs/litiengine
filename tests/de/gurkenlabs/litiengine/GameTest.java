@@ -32,36 +32,40 @@ public class GameTest {
     assertNotNull(Game.getRenderEngine());
   }
 
+  private class Status {
+    boolean wasCalled = false;
+  }
+
   @Test
   public void testInitializedListeners() {
-    final boolean wasCalled = false;
+    final Status status = new Status();
 
     Game.addGameListener(new GameAdapter() {
       @Override
       public void initialized(String... args) {
-        wasCalled = true;
+        status.wasCalled = true;
       }
     });
 
     Game.init(Game.COMMADLINE_ARG_NOGUI);
 
-    assertTrue(wasCalled);
+    assertTrue(status.wasCalled);
   }
 
   @Test
   public void testStartedListeners() {
-    final boolean wasCalled = false;
+    final Status status = new Status();
 
     Game.addGameListener(new GameAdapter() {
       @Override
       public void started() {
-        wasCalled = true;
+        status.wasCalled = true;
       }
     });
 
     Game.init(Game.COMMADLINE_ARG_NOGUI);
-    assertFalse(wasCalled);
+    assertFalse(status.wasCalled);
     Game.start();
-    assertTrue(wasCalled);
+    assertTrue(status.wasCalled);
   }
 }
