@@ -7,7 +7,7 @@ There are multiple ways to achieve this. The library is distributed over the [Ma
 
 ### Gradle (Groovy)
 ```groovy
-compile 'de.gurkenlabs:litiengine:{{ book.litiengine-version }}'
+compile 'de.gurkenlabs:litiengine:0.4.14'
 ```
 
 ### Apache Maven
@@ -15,7 +15,7 @@ compile 'de.gurkenlabs:litiengine:{{ book.litiengine-version }}'
 <dependency>
   <groupId>de.gurkenlabs</groupId>
   <artifactId>litiengine</artifactId>
-  <version>{{ book.litiengine-version }}</version>
+  <version>0.4.14</version>
 </dependency>
 ```
 
