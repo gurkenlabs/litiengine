@@ -20,52 +20,40 @@ public class GameTest {
     }
   }
 
+  private class Status {
+    boolean wasCalled = false;
+  }
+
   @Test
-  public void testGameInitialization() {
+  public void testStartup() {
+    final Status initialized = new Status();
+    final Status started = new Status();
+
+    Game.addGameListener(new GameAdapter() {
+      @Override
+      public void initialized(String... args) {
+        initialized.wasCalled = true;
+      }
+      @Override
+      public void started() {
+        started.wasCalled = true;
+      }
+    });
+
+    assertFalse(initialized.wasCalled);
+
     Game.init(Game.COMMADLINE_ARG_NOGUI);
 
+    assertTrue(initialized.wasCalled);
+    assertFalse(started.wasCalled);
     assertNotNull(Game.getRenderLoop());
     assertNotNull(Game.getLoop());
     assertNotNull(Game.getCamera());
     assertNotNull(Game.getScreenManager());
     assertNotNull(Game.getPhysicsEngine());
     assertNotNull(Game.getRenderEngine());
-  }
 
-  private class Status {
-    boolean wasCalled = false;
-  }
-
-  @Test
-  public void testInitializedListeners() {
-    final Status status = new Status();
-
-    Game.addGameListener(new GameAdapter() {
-      @Override
-      public void initialized(String... args) {
-        status.wasCalled = true;
-      }
-    });
-
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
-
-    assertTrue(status.wasCalled);
-  }
-
-  @Test
-  public void testStartedListeners() {
-    final Status status = new Status();
-
-    Game.addGameListener(new GameAdapter() {
-      @Override
-      public void started() {
-        status.wasCalled = true;
-      }
-    });
-
-    Game.init(Game.COMMADLINE_ARG_NOGUI);
-    assertFalse(status.wasCalled);
     Game.start();
-    assertTrue(status.wasCalled);
+    assertTrue(started.wasCalled);
   }
 }
