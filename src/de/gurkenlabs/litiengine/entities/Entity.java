@@ -132,12 +132,12 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removeMessageListener(MessageListener listener) {
-    for (List<MessageListener> listeners : this.messageListeners.values()) {
-      if (listeners == null || listeners.isEmpty()) {
+    for (List<MessageListener> listenerType : this.messageListeners.values()) {
+      if (listenerType == null || listenerType.isEmpty()) {
         continue;
       }
 
-      listeners.remove(listener);
+      listenerType.remove(listener);
     }
   }
 
@@ -326,14 +326,6 @@ public abstract class Entity implements IEntity {
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
     }
-    /*
-    if (Game.getEnvironment().getEntitiesByTag().containsKey(tag)) {
-      Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
-      return;
-    }
-    Game.getEnvironment().getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
-    Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
-    */
   }
 
   @Override
