@@ -31,10 +31,23 @@ public class CleanProperties extends Properties {
     @Override
     public void write(final int b) throws IOException {
       if (firstlineseen) {
-        super.write(b);
+        out.write(b);
       } else if (b == '\n') {
         firstlineseen = true;
       }
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) {
+      while (!firstlineseen) {
+        if (b[off++] == '\n') {
+          firstlineseen = true;
+        }
+        if (--len == 0) {
+          return;
+        }
+      }
+      out.write(b, off, len);
     }
   }
 }
