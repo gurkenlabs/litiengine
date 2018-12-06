@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,12 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class GameTest {
-  private static boolean wasCalled;
-
-  @BeforeEach
-  public void prepare() {
-    wasCalled = false;
-  }
 
   @AfterEach
   public void cleanup() {
@@ -39,6 +34,8 @@ public class GameTest {
 
   @Test
   public void testInitializedListeners() {
+    final boolean wasCalled = false;
+
     Game.addGameListener(new GameAdapter() {
       @Override
       public void initialized(String... args) {
@@ -53,6 +50,8 @@ public class GameTest {
 
   @Test
   public void testStartedListeners() {
+    final boolean wasCalled = false;
+
     Game.addGameListener(new GameAdapter() {
       @Override
       public void started() {
@@ -61,6 +60,7 @@ public class GameTest {
     });
 
     Game.init(Game.COMMADLINE_ARG_NOGUI);
+    assertFalse(wasCalled);
     Game.start();
     assertTrue(wasCalled);
   }
