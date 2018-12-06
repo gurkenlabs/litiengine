@@ -202,13 +202,13 @@ public class LightSource extends Entity implements IRenderable {
     return null;
   }
 
-  private static Ellipse2D getShadowEllipse(final IEntity mob) {
-    final int shadowHeight = (int) (mob.getHeight() / 4);
-    final int shadowWidth = (int) (mob.getWidth() / 3);
+  private static Ellipse2D getShadowEllipse(final IEntity entity) {
+    final int shadowHeight = (int) (entity.getHeight() / 4);
+    final int shadowWidth = (int) (entity.getWidth() / 3);
 
-    final int yOffset = (int) mob.getHeight();
-    final double x = mob.getLocation().getX() + (mob.getWidth() - shadowWidth) / 2;
-    final double y = mob.getLocation().getY() + yOffset - shadowHeight / 2.0;
+    final int yOffset = (int) entity.getHeight();
+    final double x = entity.getX() + (entity.getWidth() - shadowWidth) / 2;
+    final double y = entity.getY() + yOffset - shadowHeight / 2.0;
     return new Ellipse2D.Double(x, y, shadowWidth, shadowHeight);
   }
 

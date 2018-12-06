@@ -54,7 +54,7 @@ public class StaticShadow extends MapArea {
   }
 
   public StaticShadow(CollisionBox box) {
-    super(0, null, box.getLocation().getX(), box.getLocation().getY(), box.getWidth(), box.getHeight());
+    super(0, null, box.getX(), box.getY(), box.getWidth(), box.getHeight());
     this.setShadowType(StaticShadowType.NONE);
     this.origin = box;
     this.shadowOffset = DEFAULT_OFFSET;

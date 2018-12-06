@@ -112,7 +112,7 @@ public class DebugRenderer {
     final int x = (int) Game.getCamera().getViewportDimensionCenter(entity).getX() + 10;
     final int y = (int) Game.getCamera().getViewportDimensionCenter(entity).getY();
     TextRenderer.render(g, Integer.toString(entity.getMapId()), x, y);
-    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
+    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getY()) + "]";
     TextRenderer.render(g, locationString, x, y + 5.0);
   }
 
