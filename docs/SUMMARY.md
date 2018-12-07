@@ -10,7 +10,7 @@
     * Creating screens
 
 * [Managing resources](managing-resources/README.md)
-    * The Resources API
+    * [The Resources API](managing-resources/resources-api.md)
     * Sounds
     * Images
     * Fonts
