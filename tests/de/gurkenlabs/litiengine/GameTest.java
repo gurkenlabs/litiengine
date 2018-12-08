@@ -20,7 +20,7 @@ public class GameTest {
   }
 
   private class Status {
-    volatile boolean wasCalled = false;
+    boolean wasCalled = false;
   }
 
   @Test
