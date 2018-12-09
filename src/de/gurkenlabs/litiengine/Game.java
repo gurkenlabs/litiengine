@@ -201,8 +201,8 @@ public final class Game {
    * Gets the basic meta information about this game.<br>
    * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
    * <br>
-   * <i>It's also possible to provide additional custom information using the method group of
-   * <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
+   * <i>It's also possible to provide additional custom information using the method group of<br>
+   * <code>Game.getInfo().setValue("CUSTOM_STRING", "my-value")</code>.</i>
    * 
    * @return The game's basic meta information.
    * 

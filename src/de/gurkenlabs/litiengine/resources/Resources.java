@@ -126,10 +126,11 @@ public final class Resources {
   }
   
   /**
-   * Load Spritesheets, Tilesets and Maps from a game resource file created with the utiLITI editor.
+   * Load <code>Spritesheets</code>, <code>Tilesets</code> and <code>Maps</code> from a game resource file created with the utiLITI editor.
+   * After loading, these resources can be accessed via this API (e.g. <code>Resources.maps().get("mapname")</code>.
    * 
    * @param gameResourceFile
-   *          the file name of the game resource file
+   *          The file name of the game resource file
    */
   public static void load(final String gameResourceFile) {
     final GameData file = GameData.load(gameResourceFile);
