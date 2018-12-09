@@ -2,7 +2,13 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.GameData;
+import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -28,6 +34,7 @@ import de.gurkenlabs.litiengine.sound.Sound;
  * @see ResourcesContainer
  */
 public final class Resources {
+  private static final Logger log = Logger.getLogger(Resources.class.getName());
   private static Fonts fonts = new Fonts();
   private static Sounds sounds = new Sounds();
   private static Maps maps = new Maps();
@@ -116,5 +123,58 @@ public final class Resources {
    */
   public static Spritesheets spritesheets() {
     return spritesheets;
+  }
+  
+  /**
+   * Load Spritesheets, Tilesets and Maps from a game resource file created with the utiLITI editor.
+   * 
+   * @param gameResourceFile
+   *          the file name of the game resource file
+   */
+  public static void load(final String gameResourceFile) {
+    final GameData file = GameData.load(gameResourceFile);
+    if (file == null) {
+      return;
+    }
+
+    int mapCnt = 0;
+    for (final IMap m : file.getMaps()) {
+      Resources.maps().add(m.getName(), m);
+      mapCnt++;
+    }
+
+    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
+
+    int tileCnt = 0;
+    for (final Tileset tileset : file.getTilesets()) {
+      if (Resources.tilesets().contains(tileset.getName())) {
+        continue;
+      }
+
+      Resources.tilesets().add(tileset.getName(), tileset);
+      tileCnt++;
+    }
+
+    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
+
+    final List<Spritesheet> loadedSprites = new ArrayList<>();
+    for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
+      final Spritesheet sprite = Resources.spritesheets().load(tileset);
+      loadedSprites.add(sprite);
+    }
+
+    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
+
+    int spriteload = 0;
+    for (final Spritesheet s : loadedSprites) {
+      for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
+        BufferedImage sprite = s.getSprite(i);
+        if (sprite != null) {
+          spriteload++;
+        }
+      }
+    }
+
+    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 }
