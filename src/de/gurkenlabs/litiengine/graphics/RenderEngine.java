@@ -71,7 +71,7 @@ public final class RenderEngine {
     }
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-    final Point2D viewPortLocation = Game.getCamera().getViewPortLocation(x, y);
+    final Point2D viewPortLocation = Game.getCamera().getViewportLocation(x, y);
     g.drawString(text, (float) viewPortLocation.getX() * Game.getCamera().getRenderScale(), (float) viewPortLocation.getY() * Game.getCamera().getRenderScale());
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, GuiProperties.getDefaultAppearance().getTextAntialiasing());
   }
@@ -85,11 +85,7 @@ public final class RenderEngine {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    ShapeRenderer.renderTransformed(g, shape, t);
+    ShapeRenderer.renderTransformed(g, shape, AffineTransform.getTranslateInstance(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY()));
   }
 
   public void renderOutline(final Graphics2D g, final Shape shape) {
@@ -101,11 +97,7 @@ public final class RenderEngine {
       return;
     }
 
-    final AffineTransform t = new AffineTransform();
-    t.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
-    t.translate(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY());
-
-    ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
+    ShapeRenderer.renderOutlineTransformed(g, shape, AffineTransform.getTranslateInstance(Game.getCamera().getPixelOffsetX(), Game.getCamera().getPixelOffsetY()), stroke);
   }
 
   public boolean canRender(final IEntity entity) {
@@ -186,7 +178,7 @@ public final class RenderEngine {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
 
-    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getCamera().getViewPort().intersects(x.getBoundingBox())).collect(Collectors.toList());
+    final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.getCamera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
       // THIS COSTS THE MOST TIME OF THE RENDERING LOOP... MAYBE USE A
@@ -250,12 +242,12 @@ public final class RenderEngine {
       if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
-        ImageRenderer.renderScaled(g, img, Game.getCamera().getViewPortLocation(entity.getLocation()), ratioX, ratioY);
+        ImageRenderer.renderScaled(g, img, Game.getCamera().getViewportLocation(entity.getLocation()), ratioX, ratioY);
       } else {
         float deltaX = (entity.getWidth() - img.getWidth()) / 2.0f;
         float deltaY = (entity.getHeight() - img.getHeight()) / 2.0f;
 
-        ImageRenderer.renderTransformed(g, img, Game.getCamera().getViewPortLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
+        ImageRenderer.renderTransformed(g, img, Game.getCamera().getViewportLocation(entity.getX() + deltaX, entity.getY() + deltaY), animationController.getAffineTransform());
       }
     }
 
@@ -276,7 +268,7 @@ public final class RenderEngine {
     }
 
     // draw layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewPort(), renderTypes);
+    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.getCamera().getViewport(), renderTypes);
   }
 
   /**

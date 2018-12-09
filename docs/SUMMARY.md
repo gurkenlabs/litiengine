@@ -2,16 +2,15 @@
 
 ## Getting Started
 * [Creating a project](creating-a-project/README.md)
-    * Build Systems
-    * Obtaining LITIengine
+    * [Get LITIengine](creating-a-project/get-litiengine.md)
 
 * [Setting up the basics](basic-setup/README.md)
-    * The Game class
+    * [The Game class](basic-setup/game-class.md)
     * The Game Loop
     * Creating screens
 
 * [Managing resources](managing-resources/README.md)
-    * The Resources API
+    * [The Resources API](managing-resources/resources-api.md)
     * Sounds
     * Images
     * Fonts

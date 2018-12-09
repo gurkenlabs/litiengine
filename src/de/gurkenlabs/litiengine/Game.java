@@ -161,18 +161,33 @@ public final class Game {
   }
 
   /**
-   * This flag indicates whether the game should display the {@link ScreenManager} or not.
-   * This can only be set before the game has been initialized with the {@link #init(String...)} method. Afterwards it doesn't have an effect anymore.
-   * If set to true, the {@link ScreenManager#setVisible(boolean)} method won't be set to true and the {@link RenderLoop} won't be started.
-   * Also the {@link Camera} won't be updated.
+   * This flag indicates whether the game should display the <code>ScreenManager</code> or not.
+   * This can only be set before the game has been initialized with the <code>Game.init(String...)</code> method. Afterwards it doesn't have an effect
+   * anymore.
+   * If enabled, the <code>ScreenManager#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
+   * Also the <code>Camera</code> won't be updated.
    * 
    * @param noGui
    *          If set to true, the GUI will be hidden.
+   * @see ScreenManager
+   * @see Game#init(String...)
+   * @see ScreenManager#setVisible(boolean)
+   * @see RenderLoop
+   * @see Camera
    */
   public static void hideGUI(boolean noGui) {
     noGUIMode = noGui;
   }
 
+  /**
+   * This flag globally controls the game's debugging state. If enabled, debugging functionality (e.g. rendering collision boxes)
+   * can potentially be enabled in the configuration.
+   * 
+   * @return True if debugging functionality is enabled; otherwise false.
+   * 
+   * @see Game#allowDebug(boolean)
+   * @see GameConfiguration#debug()
+   */
   public static boolean isDebug() {
     return debug;
   }

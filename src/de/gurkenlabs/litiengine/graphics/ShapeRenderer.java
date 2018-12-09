@@ -11,6 +11,7 @@ public final class ShapeRenderer {
   public static final Stroke DEFAULT_STROKE = new BasicStroke(1);
 
   private ShapeRenderer() {
+    throw new UnsupportedOperationException();
   }
 
   public static void render(final Graphics2D g, final Shape shape) {
@@ -18,7 +19,7 @@ public final class ShapeRenderer {
   }
 
   public static void render(final Graphics2D g, final Shape shape, double x, double y) {
-    AffineTransform oldTransform = g.getTransform();
+    final AffineTransform oldTransform = g.getTransform();
     g.translate(x, y);
     render(g, shape);
     g.setTransform(oldTransform);
@@ -44,10 +45,10 @@ public final class ShapeRenderer {
   }
 
   public static void renderTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
-    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform oldTransform = g.getTransform();
     g.transform(transform);
     render(g, shape);
-    g.setTransform(oldTransForm);
+    g.setTransform(oldTransform);
   }
 
   public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform) {
@@ -55,9 +56,9 @@ public final class ShapeRenderer {
   }
 
   public static void renderOutlineTransformed(final Graphics2D g, final Shape shape, AffineTransform transform, final Stroke stroke) {
-    final AffineTransform oldTransForm = g.getTransform();
+    final AffineTransform oldTransform = g.getTransform();
     g.transform(transform);
     renderOutline(g, shape, stroke);
-    g.setTransform(oldTransForm);
+    g.setTransform(oldTransform);
   }
 }

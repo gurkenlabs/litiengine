@@ -116,7 +116,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    */
   @Override
   public Ellipse2D getHitBox() {
-    return new Ellipse2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    return new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
   }
 
   @Override

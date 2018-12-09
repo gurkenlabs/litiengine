@@ -109,10 +109,10 @@ public class DebugRenderer {
   private static void drawMapId(final Graphics2D g, final IEntity entity) {
     g.setColor(Color.RED);
     g.setFont(g.getFont().deriveFont(Font.PLAIN, 4f));
-    final int x = (int) Game.getCamera().getViewPortDimensionCenter(entity).getX() + 10;
-    final int y = (int) Game.getCamera().getViewPortDimensionCenter(entity).getY();
+    final int x = (int) Game.getCamera().getViewportDimensionCenter(entity).getX() + 10;
+    final int y = (int) Game.getCamera().getViewportDimensionCenter(entity).getY();
     TextRenderer.render(g, Integer.toString(entity.getMapId()), x, y);
-    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getLocation().getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getLocation().getY()) + "]";
+    final String locationString = "[x:" + new DecimalFormat("##.##").format(entity.getX()) + ";y:" + new DecimalFormat("##.##").format(entity.getY()) + "]";
     TextRenderer.render(g, locationString, x, y + 5.0);
   }
 
@@ -128,7 +128,7 @@ public class DebugRenderer {
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
     final FontMetrics fm = g.getFontMetrics();
-    final Point2D relative = Game.getCamera().getViewPortLocation(playerTile.getX(), playerTile.getY());
+    final Point2D relative = Game.getCamera().getViewportLocation(playerTile.getX(), playerTile.getY());
     TextRenderer.render(g, locationText, (float) (relative.getX() + playerTile.getWidth() + 3), (float) (relative.getY() + fm.getHeight()));
 
     final List<ITile> tiles = MapUtilities.getTilesByPixelLocation(map, location);

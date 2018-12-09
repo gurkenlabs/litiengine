@@ -17,6 +17,7 @@ import javax.swing.SpinnerNumberModel;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Icons;
 
+@SuppressWarnings("serial")
 public class GridEditPanel extends JPanel {
   private JSpinner widthSpinner, heightSpinner, strokeSpinner;
   private JButton buttonSetColor;

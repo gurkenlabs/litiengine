@@ -497,7 +497,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewPort().intersects(this.getBoundingBox())) {
+    if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewport().intersects(this.getBoundingBox())) {
       return;
     }
 

@@ -214,10 +214,10 @@ public class SpritesheetImportPanel extends JPanel {
     tableKeyFrames = new JTable();
     scrollPane1.setViewportView(tableKeyFrames);
     treeModel = new DefaultTableModel(new Object[][] {}, new String[] { "sprite", "duration" }) {
-      Class[] columnTypes = new Class[] { Integer.class, Integer.class };
+      Class<?>[] columnTypes = new Class<?>[] { Integer.class, Integer.class };
 
       @Override
-      public Class getColumnClass(int columnIndex) {
+      public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
 

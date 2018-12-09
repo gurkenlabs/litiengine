@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,15 +90,23 @@ public class Environment implements IEnvironment {
   private int localIdSequence = 0;
 
   static {
-    registerDefaultMapObjectLoaders();
+    registerMapObjectLoader(new PropMapObjectLoader());
+    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
+    registerMapObjectLoader(new TriggerMapObjectLoader());
+    registerMapObjectLoader(new EmitterMapObjectLoader());
+    registerMapObjectLoader(new LightSourceMapObjectLoader());
+    registerMapObjectLoader(new SpawnpointMapObjectLoader());
+    registerMapObjectLoader(new MapAreaMapObjectLoader());
+    registerMapObjectLoader(new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   public Environment(final IMap map) {
     this();
     this.map = map;
     if (this.getMap() != null) {
-    Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
-  }
+      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+    }
   }
 
   public Environment(final String mapPath) {
@@ -113,9 +119,9 @@ public class Environment implements IEnvironment {
 
   private Environment() {
     for (RenderType renderType : RenderType.values()) {
-      this.entities.put(renderType, new HashMap<>());
-      this.renderListeners.put(renderType, new HashSet<>());
-      this.renderables.put(renderType, new HashSet<>());
+      this.entities.put(renderType, new ConcurrentHashMap<>());
+      this.renderListeners.put(renderType, ConcurrentHashMap.newKeySet());
+      this.renderables.put(renderType, ConcurrentHashMap.newKeySet());
     }
   }
 
@@ -715,9 +721,9 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-    this.loadMapObjects();
-    this.addStaticShadows();
-    this.addAmbientLight();
+      this.loadMapObjects();
+      this.addStaticShadows();
+      this.addAmbientLight();
     }
 
     this.fireEvent(l -> l.environmentInitialized(this));
@@ -737,13 +743,13 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-    Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+      Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
     }
 
     if (this.getMap() != null) {
-    if (this.getMap().getBackgroundColor() != null) {
-      Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
-    }
+      if (this.getMap().getBackgroundColor() != null) {
+        Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+      }
     } else {
       Game.getScreenManager().getRenderComponent().setBackground(Color.BLACK);
     }
@@ -1182,18 +1188,6 @@ public class Environment implements IEnvironment {
         this.load(mapObject);
       }
     }
-  }
-
-  private static void registerDefaultMapObjectLoaders() {
-    registerMapObjectLoader(new PropMapObjectLoader());
-    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
-    registerMapObjectLoader(new TriggerMapObjectLoader());
-    registerMapObjectLoader(new EmitterMapObjectLoader());
-    registerMapObjectLoader(new LightSourceMapObjectLoader());
-    registerMapObjectLoader(new SpawnpointMapObjectLoader());
-    registerMapObjectLoader(new MapAreaMapObjectLoader());
-    registerMapObjectLoader(new StaticShadowMapObjectLoader());
-    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   /**

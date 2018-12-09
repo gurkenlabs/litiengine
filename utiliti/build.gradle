@@ -13,6 +13,7 @@ mainClassName = "de.gurkenlabs.utiliti.Program"
 sourceSets {
   main.java.srcDir "src"
   main.resources.srcDir "resources"
+  main.resources.srcDir "localization"
 }
 
 dependencies {

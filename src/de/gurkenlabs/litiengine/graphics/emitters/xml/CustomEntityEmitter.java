@@ -14,7 +14,7 @@ public class CustomEntityEmitter extends CustomEmitter implements IEntityProvide
   private final IEntity entity;
 
   public CustomEntityEmitter(final IEntity entity, final String emitterXml) {
-    super(entity.getLocation().getX(), entity.getLocation().getY(), emitterXml);
+    super(entity.getX(), entity.getY(), emitterXml);
     this.entity = entity;
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
     this.getEmitterData().getParticleX().setMinValue(0);
@@ -34,6 +34,6 @@ public class CustomEntityEmitter extends CustomEmitter implements IEntityProvide
       return null;
     }
 
-    return new Point2D.Double(this.getEntity().getLocation().getX(), this.getEntity().getLocation().getY());
+    return new Point2D.Double(this.getEntity().getX(), this.getEntity().getY());
   }
 }

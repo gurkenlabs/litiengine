@@ -47,9 +47,9 @@ public interface ICamera extends IUpdateable {
    *
    * @return the camera region
    */
-  public Rectangle2D getViewPort();
+  public Rectangle2D getViewport();
 
-  public Point2D getViewPortDimensionCenter(IEntity entity);
+  public Point2D getViewportDimensionCenter(IEntity entity);
 
   /**
    * Gets the render location.
@@ -60,7 +60,7 @@ public interface ICamera extends IUpdateable {
    *          the y
    * @return the render location
    */
-  public Point2D getViewPortLocation(double x, double y);
+  public Point2D getViewportLocation(double x, double y);
 
   /**
    * This method calculates to location for the specified entity in relation to
@@ -70,7 +70,7 @@ public interface ICamera extends IUpdateable {
    *          the entity
    * @return the render location
    */
-  public Point2D getViewPortLocation(IEntity entity);
+  public Point2D getViewportLocation(IEntity entity);
 
   /**
    * This method calculates to location for the specified point in relation to
@@ -80,7 +80,7 @@ public interface ICamera extends IUpdateable {
    *          the point
    * @return the render location
    */
-  public Point2D getViewPortLocation(Point2D point);
+  public Point2D getViewportLocation(Point2D point);
 
   public float getRenderScale();
 

@@ -127,10 +127,10 @@ public class TriggerPanel extends PropertyPanel {
     this.tableTargets = new JTable();
     this.tableTargets.getTableHeader().setReorderingAllowed(false);
     this.tableTargets.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_targets") }) {
-      Class[] columnTypes = new Class[] { Integer.class };
+      Class<?>[] columnTypes = new Class<?>[] { Integer.class };
 
       @Override
-      public Class getColumnClass(int columnIndex) {
+      public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
     });
@@ -140,10 +140,10 @@ public class TriggerPanel extends PropertyPanel {
     this.table = new JTable();
     this.table.getTableHeader().setReorderingAllowed(false);
     this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_activators") }) {
-      Class[] columnTypes = new Class[] { Integer.class };
+      Class<?>[] columnTypes = new Class<?>[] { Integer.class };
 
       @Override
-      public Class getColumnClass(int columnIndex) {
+      public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
     });

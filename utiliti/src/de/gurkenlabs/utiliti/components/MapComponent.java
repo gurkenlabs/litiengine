@@ -1365,7 +1365,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         Game.getCamera().setFocus(newFocus);
       }
 
-      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewPort().getCenterX());
+      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewport().getCenterX());
       return;
     }
 
@@ -1388,7 +1388,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.getCamera().setFocus(newFocus);
     }
 
-    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewPort().getCenterY());
+    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewport().getCenterY());
   }
 
   /***
@@ -1750,7 +1750,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       for (int x = 0; x < Game.getEnvironment().getMap().getWidth(); x++) {
         for (int y = 0; y < Game.getEnvironment().getMap().getHeight(); y++) {
           Shape tile = Game.getEnvironment().getMap().getTileShape(x, y);
-          if (Game.getCamera().getViewPort().intersects(tile.getBounds2D())) {
+          if (Game.getCamera().getViewport().intersects(tile.getBounds2D())) {
             Game.getRenderEngine().renderOutline(g, tile, stroke);
           }
         }
@@ -1827,7 +1827,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();

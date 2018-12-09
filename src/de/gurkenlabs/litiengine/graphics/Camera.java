@@ -77,13 +77,13 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public Rectangle2D getViewPort() {
+  public Rectangle2D getViewport() {
     return this.viewPort;
   }
 
   @Override
-  public Point2D getViewPortDimensionCenter(final IEntity entity) {
-    final Point2D viewPortLocation = this.getViewPortLocation(entity);
+  public Point2D getViewportDimensionCenter(final IEntity entity) {
+    final Point2D viewPortLocation = this.getViewportLocation(entity);
 
     final IAnimationController animationController = entity.getAnimationController();
     if (animationController == null || animationController.getCurrentAnimation() == null) {
@@ -99,18 +99,18 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public Point2D getViewPortLocation(final double x, final double y) {
+  public Point2D getViewportLocation(final double x, final double y) {
     return new Point2D.Double(x + this.getPixelOffsetX(), y + this.getPixelOffsetY());
   }
 
   @Override
-  public Point2D getViewPortLocation(final IEntity entity) {
-    return this.getViewPortLocation(entity.getLocation());
+  public Point2D getViewportLocation(final IEntity entity) {
+    return this.getViewportLocation(entity.getLocation());
   }
 
   @Override
-  public Point2D getViewPortLocation(final Point2D mapLocation) {
-    return this.getViewPortLocation(mapLocation.getX(), mapLocation.getY());
+  public Point2D getViewportLocation(final Point2D mapLocation) {
+    return this.getViewportLocation(mapLocation.getX(), mapLocation.getY());
   }
 
   @Override

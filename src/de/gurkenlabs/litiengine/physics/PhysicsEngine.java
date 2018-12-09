@@ -508,7 +508,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
    */
   private Point2D resolveCollision(final IMobileEntity entity, final Point2D newPosition) {
     // first resolve x-axis movement
-    Point2D resolvedPosition = new Point2D.Double(newPosition.getX(), entity.getLocation().getY());
+    Point2D resolvedPosition = new Point2D.Double(newPosition.getX(), entity.getY());
 
     // resolve static collision boxes first
     final Rectangle2D intersectionX = this.collidesWithAnything(entity, entity.getCollisionBox(resolvedPosition));
@@ -517,10 +517,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
         resolvedPosition = this.findLocationWithoutCollision(entity, resolvedPosition);
       } else if (entity.getCollisionBox().getX() < intersectionX.getMaxX()) {
         // new position is closer to the left side, so push out to the left
-        resolvedPosition.setLocation(Math.max(entity.getLocation().getX(), resolvedPosition.getX() - intersectionX.getWidth()), resolvedPosition.getY());
+        resolvedPosition.setLocation(Math.max(entity.getX(), resolvedPosition.getX() - intersectionX.getWidth()), resolvedPosition.getY());
       } else {
         // push it out to the right
-        resolvedPosition.setLocation(Math.min(entity.getLocation().getX(), resolvedPosition.getX() + intersectionX.getWidth()), resolvedPosition.getY());
+        resolvedPosition.setLocation(Math.min(entity.getX(), resolvedPosition.getX() + intersectionX.getWidth()), resolvedPosition.getY());
       }
     }
 
@@ -533,9 +533,9 @@ public final class PhysicsEngine implements IPhysicsEngine {
         resolvedPosition = this.findLocationWithoutCollision(entity, resolvedPosition);
       } else if (entity.getCollisionBox().getCenterY() - intersectionY.getCenterY() < 0) {
         // new position is closer to the top
-        resolvedPosition.setLocation(resolvedPosition.getX(), Math.max(entity.getLocation().getY(), resolvedPosition.getY() - intersectionY.getHeight()));
+        resolvedPosition.setLocation(resolvedPosition.getX(), Math.max(entity.getY(), resolvedPosition.getY() - intersectionY.getHeight()));
       } else {
-        resolvedPosition.setLocation(resolvedPosition.getX(), Math.min(entity.getLocation().getY(), resolvedPosition.getY() + intersectionY.getHeight()));
+        resolvedPosition.setLocation(resolvedPosition.getX(), Math.min(entity.getY(), resolvedPosition.getY() + intersectionY.getHeight()));
       }
     }
 

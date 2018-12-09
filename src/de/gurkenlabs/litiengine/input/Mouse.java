@@ -64,7 +64,7 @@ public class Mouse implements IMouse {
       throw e;
     }
 
-    this.location = new Point2D.Double(Game.getCamera().getViewPort().getCenterX(), Game.getCamera().getViewPort().getCenterY());
+    this.location = new Point2D.Double(Game.getCamera().getViewport().getCenterX(), Game.getCamera().getViewport().getCenterY());
     this.lastLocation = this.location;
     this.sensitivity = Game.getConfiguration().input().getMouseSensitivity();
     this.grabMouse = true;
