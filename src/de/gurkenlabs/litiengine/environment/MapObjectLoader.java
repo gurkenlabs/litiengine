@@ -77,7 +77,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
         return;
       }
 
-      String value = mapObject.getStringValue(property.name());
+      String value = mapObject.getStringValue(property.name(), null);
       if (value == null) {
         continue;
       }
@@ -90,7 +90,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     entity.setCollision(mapObject.getBoolValue(MapObjectProperty.COLLISION, true));
     entity.setCollisionBoxWidth(mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH, mapObject.getWidth()));
     entity.setCollisionBoxHeight(mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
-    entity.setCollisionBoxAlign(Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)));
-    entity.setCollisionBoxValign(Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)));
+    entity.setCollisionBoxAlign(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER));
+    entity.setCollisionBoxValign(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN));
   }
 }

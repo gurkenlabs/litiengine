@@ -75,12 +75,10 @@ public class PropMapObjectLoader extends MapObjectLoader {
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
     loadCollisionProperties(prop, mapObject);
-    final Material material = mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL));
-    prop.setMaterial(material);
+    prop.setMaterial(mapObject.getEnumValue(MapObjectProperty.PROP_MATERIAL, Material.class, Material.UNDEFINED));
     prop.setObstacle(mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
 
-    final Rotation rotation = mapObject.getStringValue(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getStringValue(MapObjectProperty.PROP_ROTATION));
-    prop.setSpriteRotation(rotation);
+    prop.setSpriteRotation(mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE));
 
     prop.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
 

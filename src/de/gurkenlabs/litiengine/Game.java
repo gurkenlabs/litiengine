@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,13 +14,10 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -80,7 +75,6 @@ public final class Game {
   private static final SoundEngine soundEngine;
   private static final IPhysicsEngine physicsEngine;
 
-  private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
 
   private static final GameTime gameTime;
@@ -106,7 +100,6 @@ public final class Game {
     metrics = new GameMetrics();
     gameInfo = new GameInfo();
 
-    tilesets = new CopyOnWriteArrayList<>();
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
@@ -208,8 +201,8 @@ public final class Game {
    * Gets the basic meta information about this game.<br>
    * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
    * <br>
-   * <i>It's also possible to provide additional custom information using the method group of
-   * <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
+   * <i>It's also possible to provide additional custom information using the method group of<br>
+   * <code>Game.getInfo().setValue("CUSTOM_STRING", "my-value")</code>.</i>
    * 
    * @return The game's basic meta information.
    * 
@@ -224,10 +217,6 @@ public final class Game {
 
   public static IGameLoop getLoop() {
     return gameLoop;
-  }
-
-  public static List<ITileset> getTilesets() {
-    return tilesets;
   }
 
   public static GameMetrics getMetrics() {
@@ -356,59 +345,6 @@ public final class Game {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     renderLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
-  }
-
-  /**
-   * Load Spritesheets, Tilesets and Maps from a game resource file created with the utiLITI editor.
-   * 
-   * @param gameResourceFile
-   *          the file name of the game resource file
-   */
-  public static void load(final String gameResourceFile) {
-    final GameData file = GameData.load(gameResourceFile);
-    if (file == null) {
-      return;
-    }
-
-    int mapCnt = 0;
-    for (final IMap m : file.getMaps()) {
-      Resources.maps().add(m.getName(), m);
-      mapCnt++;
-    }
-
-    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
-
-    int tileCnt = 0;
-    for (final ITileset tileset : file.getTilesets()) {
-      if (getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-        continue;
-      }
-
-      getTilesets().add(tileset);
-      tileCnt++;
-    }
-
-    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
-
-    final List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
-      final Spritesheet sprite = Resources.spritesheets().load(tileset);
-      loadedSprites.add(sprite);
-    }
-
-    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
-
-    int spriteload = 0;
-    for (final Spritesheet s : loadedSprites) {
-      for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
-        BufferedImage sprite = s.getSprite(i);
-        if (sprite != null) {
-          spriteload++;
-        }
-      }
-    }
-
-    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
   public static void loadEnvironment(final IEnvironment env) {
