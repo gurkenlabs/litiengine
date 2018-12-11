@@ -17,13 +17,16 @@ public final class GameMetrics implements IUpdateable, IRenderable {
   private final List<Long> bytesSent;
 
   private long downStreamInBytes;
-  private long framesPerSecond;
   private long lastNetworkTickTime;
   private int packagesReceived;
   private int packagesSent;
   private long ping;
-  private long updatesPerSecond;
   private long upStreamInBytes;
+  
+  private long framesPerSecond;
+  private long updatesPerSecond;
+  
+  private float usedMemory;
 
   GameMetrics() {
     this.bytesSent = new CopyOnWriteArrayList<>();
@@ -57,6 +60,10 @@ public final class GameMetrics implements IUpdateable, IRenderable {
   public float getUpStreamInBytes() {
     return this.upStreamInBytes;
   }
+  
+  public float getUsedMemory() {
+    return this.usedMemory;
+  }
 
   public void packageReceived(final long size) {
     this.bytesReceived.add(size);
@@ -77,9 +84,8 @@ public final class GameMetrics implements IUpdateable, IRenderable {
 
     g.setColor(Color.RED);
     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-    final Runtime runtime = Runtime.getRuntime();
-    final float usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
-    final String memory = "memory: " + usedMemory + "MB";
+
+    final String memory = "memory: " + this.usedMemory + "MB";
     g.drawString(memory, OFFSET_X, currentOffsetY);
     currentOffsetY += OFFSET_Y;
 
@@ -119,6 +125,9 @@ public final class GameMetrics implements IUpdateable, IRenderable {
 
   @Override
   public void update() {
+    final Runtime runtime = Runtime.getRuntime();
+    this.usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
+    
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;

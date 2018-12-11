@@ -11,17 +11,21 @@ import de.gurkenlabs.litiengine.gui.screens.Resolution;
 
 public interface GameWindow {
 
-  public Rectangle getBounds();
-
   public RenderComponent getRenderComponent();
 
+  public Point getWindowLocation();
+  
   public Dimension getResolution();
+
+  public int getWidth();
+
+  public int getHeight();
+  
+  public Rectangle getBounds();
 
   public Point2D getCenter();
 
   public float getResolutionScale();
-
-  public Point getScreenLocation();
 
   public String getTitle();
 

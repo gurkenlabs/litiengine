@@ -10,7 +10,12 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
+import de.gurkenlabs.litiengine.configuration.DebugConfiguration;
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
+import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
+import de.gurkenlabs.litiengine.configuration.InputConfiguration;
+import de.gurkenlabs.litiengine.configuration.SoundConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
@@ -200,10 +205,46 @@ public final class Game {
     return gameInfo;
   }
 
+  /**
+   * Gets the game's runtime configuration.<br>
+   * It contains default engine settings for the game client, graphics, audio, input and debugging.<br>
+   * Additionally, it can be used to register and manage custom settings that are specific to your game.
+   * <p>
+   * <i>
+   * Elements of this configuration are also presented in a config.properties file in the game's root directory. <br>
+   * This way its possible to adjust elements without having to recompile the game.
+   * </i>
+   * </p>
+   * 
+   * @return The game's runtime configuration.
+   * 
+   * @see SoundConfiguration
+   * @see GraphicConfiguration
+   * @see ClientConfiguration
+   * @see DebugConfiguration
+   * @see InputConfiguration
+   */
   public static GameConfiguration config() {
     return configuration;
   }
 
+  /**
+   * Gets basic client metrics about the game's runtime.
+   * This includes information about network, the frames-per-second or the updates-per-second and the used memory.
+   * 
+   * <p>
+   * <i>
+   * This information can be rendered by setting <br>
+   * <code>Game.config().client().setShowGameMetrics(boolean)</code> to true or <br>
+   * <code>cl_showGameMetrics=true</code> in the config.settings.
+   * </i>
+   * </p>
+   * 
+   * @return Metrics about the game's runtime.
+   * 
+   * @see GameMetrics#getFramesPerSecond()
+   * @see ClientConfiguration#setShowGameMetrics(boolean)
+   */
   public static GameMetrics metrics() {
     return metrics;
   }
@@ -212,6 +253,10 @@ public final class Game {
     return gameTime;
   }
 
+  /**
+   * 
+   * @return
+   */
   public static GameWindow window() {
     return screenManager;
   }
@@ -311,6 +356,7 @@ public final class Game {
 
     gameLoop = new GameLoop("Main Update Loop", config().client().getUpdaterate());
     gameLoop.attach(physics());
+    gameLoop.attach(metrics());
 
     final ScreenManager scrMgr = new ScreenManager(info().getTitle());
 

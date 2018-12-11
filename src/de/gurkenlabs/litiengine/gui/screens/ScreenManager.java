@@ -124,7 +124,7 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
 
   @Override
   public Point2D getCenter() {
-    return new Point2D.Double(this.getResolution().width / 2.0, this.getResolution().height / 2.0);
+    return new Point2D.Double(this.getWidth() / 2.0, this.getHeight() / 2.0);
   }
 
   @Override
@@ -143,7 +143,17 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   }
 
   @Override
-  public Point getScreenLocation() {
+  public int getWidth() {
+    return this.getResolution() != null ? this.getResolution().width : 0;
+  }
+
+  @Override
+  public int getHeight() {
+    return this.getResolution() != null ? this.getResolution().height : 0;
+  }
+
+  @Override
+  public Point getWindowLocation() {
     if (this.screenLocation != null) {
       return this.screenLocation;
     }

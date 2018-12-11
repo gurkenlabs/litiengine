@@ -238,7 +238,7 @@ public class Camera implements ICamera {
 
     final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getResolution().getWidth() / this.getRenderScale(), Game.window().getResolution().getHeight() / this.getRenderScale());
+    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getWidth() / this.getRenderScale(), Game.window().getHeight() / this.getRenderScale());
   }
 
   @Override
@@ -315,11 +315,11 @@ public class Camera implements ICamera {
   }
 
   private double getViewPortCenterX() {
-    return Game.window().getResolution().getWidth() * 0.5 / this.getRenderScale();
+    return Game.window().getWidth() * 0.5 / this.getRenderScale();
   }
 
   private double getViewPortCenterY() {
-    return Game.window().getResolution().getHeight() * 0.5 / this.getRenderScale();
+    return Game.window().getHeight() * 0.5 / this.getRenderScale();
   }
 
   private boolean isShakeEffectActive() {
