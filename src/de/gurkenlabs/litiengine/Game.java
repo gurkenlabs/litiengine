@@ -23,6 +23,7 @@ import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
@@ -33,6 +34,8 @@ import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
+import de.gurkenlabs.litiengine.sound.ISoundPlayback;
+import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
@@ -254,13 +257,39 @@ public final class Game {
   }
 
   /**
+   * Gets the game's window in which the <code>RenderComponent</code> lives.<br>
+   * This class e.g. provides the possibility to set a title, provide an icon or get information about the resolution.
    * 
-   * @return
+   * @return The window that hosts the game's <code>RenderComponent</code>.
+   * 
+   * @see RenderComponent
+   * @see GameWindow#getResolution()
+   * @see GameWindow#setTitle(String)
+   * @see GameWindow#setIconImage(java.awt.Image)
    */
   public static GameWindow window() {
     return screenManager;
   }
 
+  /**
+   * Gets the engine's <code>SoundEngine</code> that can be used to play sounds and music.<br>
+   * Sound can be loaded and accessed using the <code>Resources</code> API and are managed by the<br>
+   * <code>Resources.sounds()</code> resource container.
+   * 
+   * <p>
+   * <i>
+   * Upon playing a sound, the engine returns an <code>ISoundPlayback</code> instance that can then be used to further control the audio line.
+   * </i>
+   * </p>
+   * 
+   * @return The engine's <code>SoundEngine</code>.
+   * 
+   * @see Sound
+   * @see Resources#sounds()
+   * @see ISoundPlayback
+   * @see ISoundEngine#playSound(de.gurkenlabs.litiengine.sound.Sound)
+   * @see ISoundEngine#playMusic(de.gurkenlabs.litiengine.sound.Sound)
+   */
   public static ISoundEngine audio() {
     return soundEngine;
   }
