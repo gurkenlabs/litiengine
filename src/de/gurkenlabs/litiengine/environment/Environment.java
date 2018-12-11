@@ -105,7 +105,7 @@ public class Environment implements IEnvironment {
     this();
     this.map = map;
     if (this.getMap() != null) {
-      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+      Game.physics().setBounds(this.getMap().getBounds());
     }
   }
 
@@ -113,7 +113,7 @@ public class Environment implements IEnvironment {
     this();
     this.map = Resources.maps().get(FileUtilities.getFileName(mapPath));
     if (this.getMap() != null) {
-      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+      Game.physics().setBounds(this.getMap().getBounds());
     }
   }
 
@@ -293,7 +293,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void clear() {
-    Game.getPhysicsEngine().clear();
+    Game.physics().clear();
     this.dispose(this.getEntities());
     this.dispose(this.getTriggers());
     this.getCombatEntities().clear();
@@ -743,15 +743,15 @@ public class Environment implements IEnvironment {
     }
 
     if (this.getMap() != null) {
-      Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+      Game.physics().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
     }
 
     if (this.getMap() != null) {
       if (this.getMap().getBackgroundColor() != null) {
-        Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+        Game.window().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
       }
     } else {
-      Game.getScreenManager().getRenderComponent().setBackground(Color.BLACK);
+      Game.window().getRenderComponent().setBackground(Color.BLACK);
     }
 
     for (final IEntity entity : this.getEntities()) {
@@ -963,7 +963,7 @@ public class Environment implements IEnvironment {
     renderDetails.append(this.render(g, RenderType.BACKGROUND));
 
     renderDetails.append(this.render(g, RenderType.GROUND));
-    if (Game.getConfiguration().debug().isDebug()) {
+    if (Game.config().debug().isDebug()) {
       DebugRenderer.renderMapDebugInfo(g, this.getMap());
     }
 
@@ -981,7 +981,7 @@ public class Environment implements IEnvironment {
     renderDetails.append(this.render(g, RenderType.OVERLAY));
 
     long ambientStart = System.nanoTime();
-    if (Game.getConfiguration().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
+    if (Game.config().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
       this.getAmbientLight().render(g);
     }
 
@@ -989,7 +989,7 @@ public class Environment implements IEnvironment {
 
     renderDetails.append(this.render(g, RenderType.UI));
 
-    if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
+    if (Game.config().debug().isLogDetailedRenderTimes()) {
       final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
       log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails, shadowTime, ambientTime });
     }
@@ -1026,8 +1026,8 @@ public class Environment implements IEnvironment {
       this.unload(entity);
     }
 
-    if (Game.getScreenManager() != null && Game.getScreenManager().getRenderComponent() != null) {
-      Game.getScreenManager().getRenderComponent().setBackground(RenderComponent.DEFAULT_BACKGROUND_COLOR);
+    if (Game.screens() != null && Game.window().getRenderComponent() != null) {
+      Game.window().getRenderComponent().setBackground(RenderComponent.DEFAULT_BACKGROUND_COLOR);
     }
 
     this.loaded = false;
@@ -1078,7 +1078,7 @@ public class Environment implements IEnvironment {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    Game.getRenderEngine().render(g, this.getMap(), renderType);
+    Game.graphics().render(g, this.getMap(), renderType);
 
     // 2. Render renderables
     for (final IRenderable rend : this.getRenderables(renderType)) {
@@ -1086,12 +1086,12 @@ public class Environment implements IEnvironment {
     }
 
     // 3. Render entities
-    Game.getRenderEngine().renderEntities(g, this.entities.get(renderType).values(), renderType == RenderType.NORMAL);
+    Game.graphics().renderEntities(g, this.entities.get(renderType).values(), renderType == RenderType.NORMAL);
 
     // 4. fire event
     this.fireRenderEvent(g, renderType);
 
-    if (Game.getConfiguration().debug().isLogDetailedRenderTimes()) {
+    if (Game.config().debug().isLogDetailedRenderTimes()) {
       final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
       return "\t" + renderType + ": " + renderTime + "ms ("
           + this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count() + " layers, "
@@ -1115,7 +1115,7 @@ public class Environment implements IEnvironment {
   private void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
-        Game.getLoop().detach((IUpdateable) entity);
+        Game.loop().detach((IUpdateable) entity);
       }
 
       entity.detachControllers();
@@ -1155,14 +1155,14 @@ public class Environment implements IEnvironment {
     if (entity instanceof CollisionBox) {
       final CollisionBox coll = (CollisionBox) entity;
       if (coll.isObstacle()) {
-        Game.getPhysicsEngine().add(coll.getBoundingBox());
+        Game.physics().add(coll.getBoundingBox());
       } else {
-        Game.getPhysicsEngine().add(coll);
+        Game.physics().add(coll);
       }
     } else if (entity instanceof ICollisionEntity) {
       final ICollisionEntity coll = (ICollisionEntity) entity;
       if (coll.hasCollision()) {
-        Game.getPhysicsEngine().add(coll);
+        Game.physics().add(coll);
       }
     }
   }
@@ -1174,7 +1174,7 @@ public class Environment implements IEnvironment {
         emitter.activate();
       }
     } else if (entity instanceof IUpdateable) {
-      Game.getLoop().attach((IUpdateable) entity);
+      Game.loop().attach((IUpdateable) entity);
     }
   }
 
@@ -1207,18 +1207,18 @@ public class Environment implements IEnvironment {
     if (entity instanceof CollisionBox) {
       final CollisionBox coll = (CollisionBox) entity;
       if (coll.isObstacle()) {
-        Game.getPhysicsEngine().remove(coll.getBoundingBox());
+        Game.physics().remove(coll.getBoundingBox());
       } else {
-        Game.getPhysicsEngine().remove(coll);
+        Game.physics().remove(coll);
       }
     } else if (entity instanceof ICollisionEntity) {
       final ICollisionEntity coll = (ICollisionEntity) entity;
-      Game.getPhysicsEngine().remove(coll);
+      Game.physics().remove(coll);
     }
 
     // 2. unregister from update
     if (entity instanceof IUpdateable) {
-      Game.getLoop().detach((IUpdateable) entity);
+      Game.loop().detach((IUpdateable) entity);
     }
 
     // 3. detach all controllers

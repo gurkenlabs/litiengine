@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
  * Note that it's possible to keep this information in an XML file and load it up by calling <code>Game.setInfo(String)</code>.
  * </p>
  * 
- * @see Game#getInfo()
+ * @see Game#info()
  * @see Game#setInfo(String)
  */
 @XmlRootElement(name = "gameinfo")

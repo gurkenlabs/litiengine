@@ -103,7 +103,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
    * @return true, if is idle
    */
   public boolean isIdle() {
-    return Game.getLoop().getDeltaTime(this.lastMoved) > IDLE_DELAY;
+    return Game.loop().getDeltaTime(this.lastMoved) > IDLE_DELAY;
   }
 
   @Override
@@ -129,7 +129,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
     super.setLocation(position);
 
     if (Game.hasStarted()) {
-      this.lastMoved = Game.getLoop().getTicks();
+      this.lastMoved = Game.loop().getTicks();
     }
   }
 

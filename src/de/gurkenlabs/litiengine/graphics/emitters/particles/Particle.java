@@ -140,7 +140,7 @@ public abstract class Particle implements ITimeToLive {
   public Point2D getRenderLocation(Point2D effectLocation) {
     // if we have a camera, we need to render the particle relative to the
     // viewport
-    Point2D newEffectLocation = Game.getScreenManager() != null ? Game.getCamera().getViewportLocation(effectLocation) : effectLocation;
+    Point2D newEffectLocation = Game.screens() != null ? Game.getCamera().getViewportLocation(effectLocation) : effectLocation;
     return this.getAbsoluteLocation(newEffectLocation);
   }
 
@@ -301,10 +301,10 @@ public abstract class Particle implements ITimeToLive {
    */
   public void update(final Point2D emitterOrigin, final float updateRatio) {
     if (this.aliveTick == 0) {
-      this.aliveTick = Game.getLoop().getTicks();
+      this.aliveTick = Game.loop().getTicks();
     }
 
-    this.aliveTime = Game.getLoop().getDeltaTime(this.aliveTick);
+    this.aliveTime = Game.loop().getDeltaTime(this.aliveTick);
     if (this.timeToLiveReached() || this.colliding) {
       return;
     }
@@ -356,7 +356,7 @@ public abstract class Particle implements ITimeToLive {
       double endY = emitterOrigin.getY() + targetY - this.getHeight() / 2.0;
 
       Line2D ray = new Line2D.Double(start.getX(), start.getY(), endX, endY);
-      if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(ray, this.getCollisionType()) != null) {
+      if (this.getCollisionType() != CollisionType.NONE && Game.physics() != null && Game.physics().collides(ray, this.getCollisionType()) != null) {
         if (this.isFadingOnCollision()) {
           this.opacity = 0;
         }
@@ -364,7 +364,7 @@ public abstract class Particle implements ITimeToLive {
         this.colliding = true;
         return true;
       }
-    } else if (this.getCollisionType() != CollisionType.NONE && Game.getPhysicsEngine() != null && Game.getPhysicsEngine().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
+    } else if (this.getCollisionType() != CollisionType.NONE && Game.physics() != null && Game.physics().collides(this.getBoundingBox(emitterOrigin), this.getCollisionType())) {
       if (this.isFadingOnCollision()) {
         this.opacity = 0;
       }

@@ -219,7 +219,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   void play(final boolean loop) {
-    this.play(loop, Game.getConfiguration().sound().getSoundVolume());
+    this.play(loop, Game.config().sound().getSoundVolume());
   }
 
   void play(final boolean loop, final float volume) {
@@ -231,7 +231,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   void play(final Point2D location) {
-    this.play(false, location, Game.getConfiguration().sound().getSoundVolume());
+    this.play(false, location, Game.config().sound().getSoundVolume());
   }
 
   void play(final boolean loop, final Point2D location, final float gain) {
@@ -291,14 +291,14 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     final float distanceFromListener = (float) currentLocation.distance(listenerLocation);
     if (distanceFromListener <= 0) {
       gain = 1.0f;
-    } else if (distanceFromListener >= Game.getSoundEngine().getMaxDistance()) {
+    } else if (distanceFromListener >= Game.audio().getMaxDistance()) {
       gain = 0.0f;
     } else {
-      gain = 1.0f - distanceFromListener / Game.getSoundEngine().getMaxDistance();
+      gain = 1.0f - distanceFromListener / Game.audio().getMaxDistance();
     }
 
     gain = MathUtilities.clamp(gain, 0, 1);
-    gain *= Game.getConfiguration().sound().getSoundVolume();
+    gain *= Game.config().sound().getSoundVolume();
     return gain;
   }
 

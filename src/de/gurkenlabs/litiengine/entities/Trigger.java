@@ -259,7 +259,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return false;
     }
 
-    if (this.cooldown > 0 && Game.getLoop().getDeltaTime(this.lastActivation) < this.cooldown) {
+    if (this.cooldown > 0 && Game.loop().getDeltaTime(this.lastActivation) < this.cooldown) {
       return false;
     }
 
@@ -296,7 +296,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       Game.getEnvironment().remove(this);
     }
 
-    this.lastActivation = Game.getLoop().getTicks();
+    this.lastActivation = Game.loop().getTicks();
     return true;
   }
 
@@ -315,7 +315,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
 
   private List<IEntity> getEntitiesInCollisionBox() {
     final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
-    for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
+    for (final ICollisionEntity coll : Game.physics().getCollisionEntities()) {
       if (coll == this || !this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
         continue;
       }

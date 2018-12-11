@@ -306,7 +306,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   public void prepare() {
     Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
     if (!this.initialized) {
-      Game.getScreenManager().getRenderComponent().addFocusListener(new FocusAdapter() {
+      Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
         @Override
         public void focusLost(FocusEvent e) {
           startPoint = null;
@@ -317,7 +317,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       this.setupMouseControls();
       this.initialized = true;
 
-      Game.getLoop().attach(this);
+      Game.loop().attach(this);
     }
 
     super.prepare();
@@ -433,7 +433,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
     }
 
-    Game.getScreenManager().getRenderComponent().requestFocus();
+    Game.window().getRenderComponent().requestFocus();
     this.setFocus(mapObject, false);
     this.setEditMode(EDITMODE_EDIT);
   }
@@ -534,7 +534,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
+    Object name = JOptionPane.showInputDialog(Game.window().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
     if (name == null) {
       return;
     }
@@ -565,13 +565,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     case EDITMODE_CREATE:
       this.setFocus(null, true);
       EditorScreen.instance().getMapObjectPanel().bind(null);
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
+      Game.window().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
       break;
     case EDITMODE_EDIT:
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       break;
     case EDITMODE_MOVE:
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
+      Game.window().getRenderComponent().setCursor(Program.CURSOR_MOVE, 0, 0);
       break;
     default:
       break;
@@ -720,7 +720,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
     if (n != JOptionPane.YES_OPTION) {
       return;
     }
@@ -763,7 +763,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Optional<Map> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
       if (current.isPresent()) {
-        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_replace_map", map.getName()), Resources.strings().get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
+        int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("input_replace_map", map.getName()), Resources.strings().get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
 
         if (n == JOptionPane.YES_OPTION) {
           this.getMaps().remove(current.get());
@@ -854,7 +854,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       chooser.addChoosableFileFilter(filter);
       chooser.setSelectedFile(new File(map.getName() + "." + Map.FILE_EXTENSION));
 
-      int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
         String newFile = XmlUtilities.save(map, chooser.getSelectedFile().toString(), Map.FILE_EXTENSION);
 
@@ -1259,7 +1259,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      if (Game.getScreenManager().getRenderComponent().hasFocus() && this.currentEditMode == EDITMODE_EDIT) {
+      if (Game.window().getRenderComponent().hasFocus() && this.currentEditMode == EDITMODE_EDIT) {
         this.delete();
       }
     });
@@ -1285,7 +1285,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_RIGHT, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+      if (!Game.window().getRenderComponent().hasFocus()) {
         return;
       }
 
@@ -1295,7 +1295,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_LEFT, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+      if (!Game.window().getRenderComponent().hasFocus()) {
         return;
       }
 
@@ -1305,7 +1305,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_UP, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+      if (!Game.window().getRenderComponent().hasFocus()) {
         return;
       }
 
@@ -1315,7 +1315,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     });
 
     Input.keyboard().onKeyPressed(KeyEvent.VK_DOWN, e -> {
-      if (!Game.getScreenManager().getRenderComponent().hasFocus()) {
+      if (!Game.window().getRenderComponent().hasFocus()) {
         return;
       }
 
@@ -1404,7 +1404,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private void handleMouseMoved(ComponentMouseEvent e) {
     if (this.getFocus() == null) {
       if (this.currentEditMode != EDITMODE_CREATE) {
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+        Game.window().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       }
       this.currentTransform = TransformType.NONE;
       return;
@@ -1420,13 +1420,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       if (hoverrect.contains(Input.mouse().getMapLocation())) {
         hovered = true;
         if (entry.getKey() == TransformType.DOWN || entry.getKey() == TransformType.UP) {
-          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
+          Game.window().getRenderComponent().setCursor(Program.CURSOR_TRANS_VERTICAL, 0, 0);
         } else if (entry.getKey() == TransformType.UPLEFT || entry.getKey() == TransformType.DOWNRIGHT) {
-          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
+          Game.window().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_LEFT, 0, 0);
         } else if (entry.getKey() == TransformType.UPRIGHT || entry.getKey() == TransformType.DOWNLEFT) {
-          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
+          Game.window().getRenderComponent().setCursor(Program.CURSOR_TRANS_DIAGONAL_RIGHT, 0, 0);
         } else {
-          Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
+          Game.window().getRenderComponent().setCursor(Program.CURSOR_TRANS_HORIZONTAL, 0, 0);
         }
 
         this.currentTransform = entry.getKey();
@@ -1435,7 +1435,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (!hovered) {
-      Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(Program.CURSOR, 0, 0);
       this.currentTransform = TransformType.NONE;
     }
   }
@@ -1683,7 +1683,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(COLOR_SPAWNPOINT);
-          Game.getRenderEngine().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
+          Game.graphics().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
         } else if (type == MapObjectType.PATH) {
           // render lane
 
@@ -1698,10 +1698,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           }
 
           g.setColor(COLOR_LANE);
-          Game.getRenderEngine().renderOutline(g, path, shapeStroke);
+          Game.graphics().renderOutline(g, path, shapeStroke);
           Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-          Game.getRenderEngine().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
-          Game.getRenderEngine().renderText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
+          Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
+          Game.graphics().renderText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
@@ -1721,7 +1721,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     String objectName = mapObject.getName();
     if (objectName != null && !objectName.isEmpty()) {
-      Game.getRenderEngine().renderText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
+      Game.graphics().renderText(g, mapObject.getName(), mapObject.getX() + 1, mapObject.getBoundingBox().getMaxY() - 1);
     }
 
     // render tags
@@ -1738,7 +1738,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       tags += "...";
     }
 
-    Game.getRenderEngine().renderText(g, "[" + tags + "]", mapObject.getX() + 1, y);
+    Game.graphics().renderText(g, "[" + tags + "]", mapObject.getX() + 1, y);
   }
 
   private void renderGrid(Graphics2D g) {
@@ -1751,7 +1751,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         for (int y = 0; y < Game.getEnvironment().getMap().getHeight(); y++) {
           Shape tile = Game.getEnvironment().getMap().getTileShape(x, y);
           if (Game.getCamera().getViewport().intersects(tile.getBounds2D())) {
-            Game.getRenderEngine().renderOutline(g, tile, stroke);
+            Game.graphics().renderOutline(g, tile, stroke);
           }
         }
       }
@@ -1764,12 +1764,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     g.setColor(COLOR_NEWOBJECT_FILL);
-    Game.getRenderEngine().renderShape(g, newObjectArea);
+    Game.graphics().renderShape(g, newObjectArea);
     g.setColor(COLOR_NEWOBJECT_BORDER);
-    Game.getRenderEngine().renderOutline(g, newObjectArea, shapeStroke);
+    Game.graphics().renderOutline(g, newObjectArea, shapeStroke);
     g.setFont(g.getFont().deriveFont(Font.BOLD));
-    Game.getRenderEngine().renderText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
-    Game.getRenderEngine().renderText(g, newObjectArea.getHeight() + "", newObjectArea.getX() - 10, newObjectArea.getY() + newObjectArea.getHeight() / 2);
+    Game.graphics().renderText(g, newObjectArea.getWidth() + "", newObjectArea.getX() + newObjectArea.getWidth() / 2 - 3, newObjectArea.getY() - 5);
+    Game.graphics().renderText(g, newObjectArea.getHeight() + "", newObjectArea.getX() - 10, newObjectArea.getY() + newObjectArea.getHeight() / 2);
   }
 
   private void renderMouseSelectionArea(Graphics2D g, Stroke shapeStroke) {
@@ -1782,9 +1782,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       g.setColor(COLOR_MOUSE_SELECTION_AREA_FILL);
-      Game.getRenderEngine().renderShape(g, rect);
+      Game.graphics().renderShape(g, rect);
       g.setColor(COLOR_MOUSE_SELECTION_AREA_BORDER);
-      Game.getRenderEngine().renderOutline(g, rect, shapeStroke);
+      Game.graphics().renderOutline(g, rect, shapeStroke);
     }
   }
 
@@ -1793,24 +1793,24 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15);
+      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15);
 
       g.setColor(Color.BLACK);
 
-      Game.getRenderEngine().renderOutline(g, focus, stroke);
+      Game.graphics().renderOutline(g, focus, stroke);
 
-      Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.getLoop().getTicks() / 15 - 1f);
+      Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15 - 1f);
       g.setColor(Color.WHITE);
-      Game.getRenderEngine().renderOutline(g, focus, whiteStroke);
+      Game.graphics().renderOutline(g, focus, whiteStroke);
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
         Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
-          Game.getRenderEngine().renderShape(g, trans);
+          Game.graphics().renderShape(g, trans);
           g.setColor(Color.BLACK);
-          Game.getRenderEngine().renderOutline(g, trans, transStroke);
+          Game.graphics().renderOutline(g, trans, transStroke);
         }
       }
 
@@ -1819,9 +1819,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
-          Game.getRenderEngine().renderShape(g, trans);
+          Game.graphics().renderShape(g, trans);
           g.setColor(Color.BLACK);
-          Game.getRenderEngine().renderOutline(g, trans, transStroke);
+          Game.graphics().renderOutline(g, trans, transStroke);
         }
       }
     }
@@ -1844,7 +1844,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
 
       g.setColor(colorSelectionBorder);
-      Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), stroke);
+      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
     }
   }
 
@@ -1863,7 +1863,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     // don't fill rect for lightsource because it is important to judge
     // the color
     if (type != MapObjectType.LIGHTSOURCE) {
-      Game.getRenderEngine().renderShape(g, mapObject.getBoundingBox());
+      Game.graphics().renderShape(g, mapObject.getBoundingBox());
     }
 
     Color borderColor = colorBoundingBoxFill;
@@ -1883,7 +1883,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     g.setColor(borderColor);
 
-    Game.getRenderEngine().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+    Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
 
     this.renderName(g, borderColor, mapObject);
   }
@@ -1907,11 +1907,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       g.setColor(COLOR_COLLISION_FILL);
       Rectangle2D collisionBox = CollisionEntity.getCollisionBox(mapObject.getLocation(), mapObject.getWidth(), mapObject.getHeight(), collisionBoxWidth, collisionBoxHeight, align, valign);
 
-      Game.getRenderEngine().renderShape(g, collisionBox);
+      Game.graphics().renderShape(g, collisionBox);
       g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);
 
       Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
-      Game.getRenderEngine().renderOutline(g, collisionBox, collisionStroke);
+      Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }
 

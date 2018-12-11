@@ -62,7 +62,7 @@ public final class Strings {
     }
 
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.getConfiguration().client().getLocale());
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
 
       String value = defaultBundle.getString(key);
 
@@ -124,7 +124,7 @@ public final class Strings {
 
   public boolean contains(final String bundleName, final String key) {
     try {
-      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.getConfiguration().client().getLocale());
+      final ResourceBundle defaultBundle = ResourceBundle.getBundle(bundleName, Game.config().client().getLocale());
       return defaultBundle.containsKey(key);
     } catch (final MissingResourceException me) {
       final StringWriter sw = new StringWriter();

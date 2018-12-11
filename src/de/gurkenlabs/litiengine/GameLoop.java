@@ -153,7 +153,7 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
   private void trackUpdateRate(long currentMillis) {
     if (currentMillis - this.lastUpsTime >= 1000) {
       this.lastUpsTime = currentMillis;
-      Game.getMetrics().setUpdatesPerSecond(this.updateCount);
+      Game.metrics().setUpdatesPerSecond(this.updateCount);
       this.updateCount = 0;
     }
   }

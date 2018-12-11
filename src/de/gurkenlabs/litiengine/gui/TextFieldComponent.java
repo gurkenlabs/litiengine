@@ -100,9 +100,9 @@ public class TextFieldComponent extends ImageComponent {
     g.setFont(this.getFont());
     final FontMetrics fm = g.getFontMetrics();
 
-    if (this.isSelected() && Game.getLoop().getDeltaTime(this.lastToggled) > this.flickerDelay) {
+    if (this.isSelected() && Game.loop().getDeltaTime(this.lastToggled) > this.flickerDelay) {
       this.cursorVisible = !this.cursorVisible;
-      this.lastToggled = Game.getLoop().getTicks();
+      this.lastToggled = Game.loop().getTicks();
     }
     if (this.isSelected() && this.cursorVisible) {
       final Rectangle2D cursor = new Rectangle2D.Double(this.getX() + this.getTextX() + fm.stringWidth(this.getTextToRender(g)), this.getY() + this.getTextY(), this.getFont().getSize2D() * 3 / 5, this.getFont().getSize2D() * 1 / 5);

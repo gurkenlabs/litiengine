@@ -81,10 +81,10 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
       this.currentTextQueue.add(this.currentText.charAt(i));
     }
 
-    this.lastTextDispay = Game.getLoop().getTicks();
+    this.lastTextDispay = Game.loop().getTicks();
     this.createBubbleImage();
     Game.getEnvironment().add(this, RenderType.UI);
-    Game.getRenderLoop().attach(this);
+    Game.renderLoop().attach(this);
     activeSpeechBubbles.put(entity, this);
   }
 
@@ -130,7 +130,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
 
   @Override
   public void render(final Graphics2D g) {
-    if (this.displayedText == null || this.displayedText.isEmpty() || !Game.getRenderEngine().canRender(this.entity)) {
+    if (this.displayedText == null || this.displayedText.isEmpty() || !Game.graphics().canRender(this.entity)) {
       return;
     }
 
@@ -162,9 +162,9 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
       y += layout.getDescent() + layout.getLeading();
     }
 
-    if (Game.getConfiguration().debug().renderGuiComponentBoundingBoxes()) {
+    if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
-      Game.getRenderEngine().renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
+      Game.graphics().renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
     }
   }
 
@@ -176,7 +176,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
   public void update() {
     if (this.currentText == null) {
       Game.getEnvironment().removeRenderable(this);
-      Game.getRenderLoop().detach(this);
+      Game.renderLoop().detach(this);
 
       if (activeSpeechBubbles.containsKey(this.getEntity()) && activeSpeechBubbles.get(this.getEntity()).equals(this)) {
         activeSpeechBubbles.remove(this.getEntity());
@@ -188,7 +188,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     this.entityCenter = Game.getCamera().getViewportLocation(this.getEntity().getCenter());
 
     // old text was displayed long enough
-    if (this.lastTextDispay != 0 && Game.getLoop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
+    if (this.lastTextDispay != 0 && Game.loop().getDeltaTime(this.lastTextDispay) > this.currentTextDisplayTime) {
       this.currentText = null;
       this.displayedText = null;
       this.lastTextDispay = 0;
@@ -196,11 +196,11 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     }
 
     // display new text
-    if (!this.currentTextQueue.isEmpty() && Game.getLoop().getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
+    if (!this.currentTextQueue.isEmpty() && Game.loop().getDeltaTime(this.lastCharPoll) > LETTER_WRITE_DELAY) {
       this.displayedText += this.currentTextQueue.poll();
-      this.lastCharPoll = Game.getLoop().getTicks();
+      this.lastCharPoll = Game.loop().getTicks();
       if (this.typeSound != null) {
-        Game.getSoundEngine().playSound(this.getEntity(), this.typeSound);
+        Game.audio().playSound(this.getEntity(), this.typeSound);
       }
     }
 
@@ -209,7 +209,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
 
   private void cancel() {
     Game.getEnvironment().removeRenderable(this);
-    Game.getRenderLoop().detach(this);
+    Game.renderLoop().detach(this);
     if (activeSpeechBubbles.get(this.getEntity()) != null && activeSpeechBubbles.remove(this.getEntity()).equals(this)) {
       activeSpeechBubbles.remove(this.getEntity());
     }

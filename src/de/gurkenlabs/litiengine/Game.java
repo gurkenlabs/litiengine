@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
+import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
@@ -84,7 +85,7 @@ public final class Game {
   private static ICamera camera;
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
-  private static IScreenManager screenManager;
+  private static ScreenManager screenManager;
 
   private static boolean hasStarted;
   private static boolean initialized;
@@ -131,14 +132,6 @@ public final class Game {
     gameTerminatedListeners.remove(listener);
   }
 
-  public static void addEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
-    environmentLoadedListeners.add(listener);
-  }
-
-  public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
-    environmentLoadedListeners.remove(listener);
-  }
-
   /**
    * This flag indicates if the game currently supports debugging. This should
    * be set to false for release builds.
@@ -154,17 +147,17 @@ public final class Game {
   }
 
   /**
-   * This flag indicates whether the game should display the <code>ScreenManager</code> or not.
+   * This flag indicates whether the game should display the <code>GameWindow</code> or not.
    * This can only be set before the game has been initialized with the <code>Game.init(String...)</code> method. Afterwards it doesn't have an effect
    * anymore.
-   * If enabled, the <code>ScreenManager#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
+   * If enabled, the <code>GameWindow#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
    * Also the <code>Camera</code> won't be updated.
    * 
    * @param noGui
    *          If set to true, the GUI will be hidden.
-   * @see ScreenManager
+   * @see GameWindow
    * @see Game#init(String...)
-   * @see ScreenManager#setVisible(boolean)
+   * @see GameWindow#setVisible(boolean)
    * @see RenderLoop
    * @see Camera
    */
@@ -189,14 +182,6 @@ public final class Game {
     return noGUIMode;
   }
 
-  public static GameConfiguration getConfiguration() {
-    return configuration;
-  }
-
-  public static IEnvironment getEnvironment() {
-    return environment;
-  }
-
   /**
    * Gets the basic meta information about this game.<br>
    * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
@@ -211,44 +196,83 @@ public final class Game {
    * @see GameInfo#setName(String)
    * @see GameInfo#setValue(String, String)
    */
-  public static GameInfo getInfo() {
+  public static GameInfo info() {
     return gameInfo;
   }
 
-  public static IGameLoop getLoop() {
-    return gameLoop;
+  public static GameConfiguration config() {
+    return configuration;
   }
 
-  public static GameMetrics getMetrics() {
+  public static GameMetrics metrics() {
     return metrics;
   }
 
-  public static IPhysicsEngine getPhysicsEngine() {
-    return physicsEngine;
+  public static GameTime time() {
+    return gameTime;
   }
 
-  public static RenderEngine getRenderEngine() {
-    return graphicsEngine;
-  }
-
-  public static RenderLoop getRenderLoop() {
-    return renderLoop;
-  }
-
-  public static IScreenManager getScreenManager() {
+  public static GameWindow window() {
     return screenManager;
   }
 
-  public static ISoundEngine getSoundEngine() {
+  public static ISoundEngine audio() {
     return soundEngine;
+  }
+
+  public static IPhysicsEngine physics() {
+    return physicsEngine;
+  }
+
+  public static RenderEngine graphics() {
+    return graphicsEngine;
+  }
+
+  public static IGameLoop loop() {
+    return gameLoop;
+  }
+
+  public static RenderLoop renderLoop() {
+    return renderLoop;
+  }
+
+  public static IScreenManager screens() {
+    return screenManager;
   }
 
   public static ICamera getCamera() {
     return camera;
   }
 
-  public static GameTime getTime() {
-    return gameTime;
+  public static IEnvironment getEnvironment() {
+    return environment;
+  }
+
+  public static void loadEnvironment(final IEnvironment env) {
+    if (getEnvironment() != null) {
+      getEnvironment().unload();
+    }
+
+    environment = env;
+    if (getEnvironment() != null) {
+      getEnvironment().load();
+    }
+
+    for (final EnvironmentLoadedListener listener : environmentLoadedListeners) {
+      listener.environmentLoaded(getEnvironment());
+    }
+
+    if (loop() != null) {
+      environmentLoadTick = loop().getTicks();
+    }
+  }
+
+  public static void addEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
+    environmentLoadedListeners.add(listener);
+  }
+
+  public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
+    environmentLoadedListeners.remove(listener);
   }
 
   public static boolean hasStarted() {
@@ -282,13 +306,13 @@ public final class Game {
 
     handleCommandLineArguments(args);
 
-    getConfiguration().load();
-    Locale.setDefault(new Locale(getConfiguration().client().getCountry(), getConfiguration().client().getLanguage()));
+    config().load();
+    Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
 
-    gameLoop = new GameLoop("Main Update Loop", getConfiguration().client().getUpdaterate());
-    gameLoop.attach(getPhysicsEngine());
+    gameLoop = new GameLoop("Main Update Loop", config().client().getUpdaterate());
+    gameLoop.attach(physics());
 
-    final ScreenManager scrMgr = new ScreenManager(getInfo().getTitle());
+    final ScreenManager scrMgr = new ScreenManager(info().getTitle());
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
@@ -297,8 +321,8 @@ public final class Game {
 
     screenManager = scrMgr;
 
-    // init screens
-    getScreenManager().init();
+    // initialize  the game window
+    window().init();
     setCamera(new Camera());
 
     // init logging
@@ -317,23 +341,23 @@ public final class Game {
     }
 
     if (!isInNoGUIMode()) {
-      if (getConfiguration().client().showGameMetrics()) {
-        getScreenManager().getRenderComponent().onRendered(g -> getMetrics().render(g));
+      if (config().client().showGameMetrics()) {
+        window().getRenderComponent().onRendered(g -> metrics().render(g));
       }
 
-      if (getConfiguration().debug().isDebugEnabled()) {
-        getRenderEngine().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
+      if (config().debug().isDebugEnabled()) {
+        graphics().onEntityRendered(e -> DebugRenderer.renderEntityDebugInfo(e.getGraphics(), e.getRenderedObject()));
       }
 
-      getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
-      getScreenManager().setIconImage(Resources.images().get("litiengine-icon.png"));
+      window().getRenderComponent().onFpsChanged(fps -> metrics().setFramesPerSecond(fps));
+      window().setIconImage(Resources.images().get("litiengine-icon.png"));
 
       // init mouse inputs
-      getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
-      getScreenManager().getRenderComponent().addMouseMotionListener(Input.mouse());
-      getScreenManager().getRenderComponent().addMouseWheelListener(Input.mouse());
+      window().getRenderComponent().addMouseListener(Input.mouse());
+      window().getRenderComponent().addMouseMotionListener(Input.mouse());
+      window().getRenderComponent().addMouseWheelListener(Input.mouse());
 
-      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> getScreenManager().getRenderComponent().takeScreenshot());
+      Input.keyboard().onKeyTyped(KeyEvent.VK_PRINTSCREEN, key -> window().getRenderComponent().takeScreenshot());
     }
 
     Runtime.getRuntime().addShutdownHook(new Thread(Game::terminate, "Shutdown"));
@@ -345,25 +369,6 @@ public final class Game {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     renderLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
-  }
-
-  public static void loadEnvironment(final IEnvironment env) {
-    if (getEnvironment() != null) {
-      getEnvironment().unload();
-    }
-
-    environment = env;
-    if (getEnvironment() != null) {
-      getEnvironment().load();
-    }
-
-    for (final EnvironmentLoadedListener listener : environmentLoadedListeners) {
-      listener.environmentLoaded(getEnvironment());
-    }
-
-    if (getLoop() != null) {
-      environmentLoadTick = getLoop().getTicks();
-    }
   }
 
   /***
@@ -409,7 +414,7 @@ public final class Game {
       }
     }
 
-    getConfiguration().save();
+    config().save();
     gameLoop.terminate();
 
     soundEngine.terminate();
@@ -427,13 +432,13 @@ public final class Game {
 
   public static void setCamera(final ICamera cam) {
     if (getCamera() != null) {
-      Game.getLoop().detach(camera);
+      Game.loop().detach(camera);
     }
 
     camera = cam;
 
     if (!isInNoGUIMode()) {
-      Game.getLoop().attach(cam);
+      Game.loop().attach(cam);
       getCamera().updateFocus();
     }
   }
@@ -443,14 +448,14 @@ public final class Game {
    * <p>
    * <i>Typically, this should not be called manually because the <code>Game</code> already provides a <code>GameInfo</code> object which can be
    * adjusted.<br>
-   * If you just want to edit some of it's information, use the provided instance of {@link Game#getInfo()}.
+   * If you just want to edit some of it's information, use the provided instance of {@link Game#info()}.
    * </i>
    * </p>
    * 
    * @param info
    *          The <code>GameInfo</code> that contains the basic information for the game.
    * 
-   * @see Game#getInfo()
+   * @see Game#info()
    * @see GameInfo
    */
   public static void setInfo(final GameInfo info) {
@@ -464,7 +469,7 @@ public final class Game {
    *          The path to the XML file that contains the serialized <code>GameInfo</code>.
    * 
    * @see Game#setInfo(GameInfo)
-   * @see Game#getInfo()
+   * @see Game#info()
    * @see GameInfo
    */
   public static void setInfo(final String gameInfoFile) {

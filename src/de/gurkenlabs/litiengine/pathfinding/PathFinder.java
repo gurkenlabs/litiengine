@@ -36,7 +36,7 @@ public abstract class PathFinder implements IPathFinder {
   }
 
   protected boolean intersectsWithAnyCollisionBox(final ICollisionEntity entity, final Point2D start, final Point2D target) {
-    final List<Rectangle2D> allCollisionBoxes = Game.getPhysicsEngine().getAllCollisionBoxes();
+    final List<Rectangle2D> allCollisionBoxes = Game.physics().getAllCollisionBoxes();
 
     final Line2D line = new Line2D.Double(start, target);
     for (final Rectangle2D collisionBox : allCollisionBoxes) {

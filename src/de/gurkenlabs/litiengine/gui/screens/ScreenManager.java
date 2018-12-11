@@ -21,9 +21,10 @@ import java.util.function.Consumer;
 import javax.swing.JFrame;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
-public class ScreenManager extends JFrame implements IScreenManager {
+public class ScreenManager extends JFrame implements IScreenManager, GameWindow {
 
   private static final int SCREENCHANGETIMEOUT = 200;
   private static final int ICONIFIED_MAX_FPS = 1;
@@ -54,7 +55,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
     this.screenChangedConsumer = new CopyOnWriteArrayList<>();
     this.screens = new CopyOnWriteArrayList<>();
 
-    this.renderCanvas = new RenderComponent(Game.getConfiguration().graphics().getResolution());
+    this.renderCanvas = new RenderComponent(Game.config().graphics().getResolution());
     if (!Game.isInNoGUIMode()) {
       // set default jframe stuff
       this.setResizable(false);
@@ -159,7 +160,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       return;
     }
 
-    if (Game.getConfiguration().graphics().isFullscreen()) {
+    if (Game.config().graphics().isFullscreen()) {
       this.setUndecorated(true);
       GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
@@ -172,7 +173,7 @@ public class ScreenManager extends JFrame implements IScreenManager {
       }
       this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
     } else {
-      this.setResolution(Game.getConfiguration().graphics().getResolution());
+      this.setResolution(Game.config().graphics().getResolution());
       this.setVisible(true);
     }
 
@@ -219,9 +220,9 @@ public class ScreenManager extends JFrame implements IScreenManager {
   private void setResolution(Dimension dim) {
     Dimension insetAwareDimension = new Dimension(dim.width + this.getInsets().left + this.getInsets().right, dim.height + this.getInsets().top + this.getInsets().bottom);
 
-    if (Game.getConfiguration().graphics().enableResolutionScaling()) {
+    if (Game.config().graphics().enableResolutionScaling()) {
       this.resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
-      Game.getRenderEngine().setBaseRenderScale(Game.getRenderEngine().getBaseRenderScale() * this.resolutionScale);
+      Game.graphics().setBaseRenderScale(Game.graphics().getBaseRenderScale() * this.resolutionScale);
     }
 
     this.setSize(insetAwareDimension);
@@ -245,23 +246,23 @@ public class ScreenManager extends JFrame implements IScreenManager {
 
     this.addWindowStateListener(e -> {
       if (e.getNewState() == Frame.ICONIFIED) {
-        Game.getRenderLoop().setMaxFps(ICONIFIED_MAX_FPS);
+        Game.renderLoop().setMaxFps(ICONIFIED_MAX_FPS);
       } else {
-        Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
+        Game.renderLoop().setMaxFps(Game.config().client().getMaxFps());
       }
     });
 
     this.addWindowFocusListener(new WindowFocusListener() {
       @Override
       public void windowLostFocus(WindowEvent e) {
-        if (Game.getConfiguration().graphics().reduceFramesWhenNotFocused()) {
-          Game.getRenderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+        if (Game.config().graphics().reduceFramesWhenNotFocused()) {
+          Game.renderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
         }
       }
 
       @Override
       public void windowGainedFocus(WindowEvent e) {
-        Game.getRenderLoop().setMaxFps(Game.getConfiguration().client().getMaxFps());
+        Game.renderLoop().setMaxFps(Game.config().client().getMaxFps());
       }
     });
 

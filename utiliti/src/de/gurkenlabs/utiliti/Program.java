@@ -121,13 +121,13 @@ public class Program {
       log.log(Level.SEVERE, e.getLocalizedMessage(), e);
     }
 
-    Game.getInfo().setName("utiLITI");
-    Game.getInfo().setSubTitle("LITIengine Creation Kit");
-    Game.getInfo().setVersion("v0.4.14-alpha");
+    Game.info().setName("utiLITI");
+    Game.info().setSubTitle("LITIengine Creation Kit");
+    Game.info().setVersion("v0.4.14-alpha");
 
     initSystemTray();
 
-    Game.getConfiguration().getConfigurationGroups().add(new UserPreferenceConfiguration());
+    Game.config().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
     Game.setUncaughtExceptionHandler(new EditorUncaughtExceptionHandler());
 
@@ -135,15 +135,15 @@ public class Program {
 
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
-    userPreferences = Game.getConfiguration().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
+    userPreferences = Game.config().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
     Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
-    Game.getScreenManager().addScreen(EditorScreen.instance());
-    Game.getScreenManager().displayScreen("EDITOR");
+    Game.screens().addScreen(EditorScreen.instance());
+    Game.screens().displayScreen("EDITOR");
 
-    Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
-    Game.getScreenManager().getRenderComponent().setCursorOffsetX(0);
-    Game.getScreenManager().getRenderComponent().setCursorOffsetY(0);
+    Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
+    Game.window().getRenderComponent().setCursorOffsetX(0);
+    Game.window().getRenderComponent().setCursorOffsetY(0);
     setupInterface();
     Game.start();
     Input.mouse().setGrabMouse(false);
@@ -157,10 +157,10 @@ public class Program {
 
   private static void forceBasicEditorConfiguration() {
     // force configuration elements that are crucial for the editor
-    Game.getRenderEngine().setBaseRenderScale(1.0f);
-    Game.getConfiguration().debug().setDebugEnabled(true);
-    Game.getConfiguration().graphics().setGraphicQuality(Quality.VERYHIGH);
-    Game.getConfiguration().graphics().setReduceFramesWhenNotFocused(false);
+    Game.graphics().setBaseRenderScale(1.0f);
+    Game.config().debug().setDebugEnabled(true);
+    Game.config().graphics().setGraphicQuality(Quality.VERYHIGH);
+    Game.config().graphics().setReduceFramesWhenNotFocused(false);
   }
 
   public static void loadRecentFiles() {
@@ -221,7 +221,7 @@ public class Program {
       return true;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_saveProjectMessage") + "\n" + resourceFile, Resources.strings().get("hud_saveProject"), JOptionPane.YES_NO_CANCEL_OPTION);
 
     if (n == JOptionPane.YES_OPTION) {
       EditorScreen.instance().save(false);
@@ -261,7 +261,7 @@ public class Program {
   private static void setupInterface() {
     JFrame window = initWindow();
 
-    Canvas canvas = Game.getScreenManager().getRenderComponent();
+    Canvas canvas = Game.window().getRenderComponent();
     canvas.setFocusable(true);
     canvas.setSize((int) (window.getSize().width * 0.75), window.getSize().height);
 
@@ -300,7 +300,7 @@ public class Program {
   }
 
   private static JFrame initWindow() {
-    JFrame window = ((JFrame) Game.getScreenManager());
+    JFrame window = ((JFrame) Game.screens());
     window.setResizable(true);
 
     Game.addGameListener(new GameAdapter() {
@@ -491,7 +491,7 @@ public class Program {
     MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight(), EditorScreen.instance().getMapComponent().getGridStrokeFactor(), EditorScreen.instance().getMapComponent().getGridColor());
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_gridSettings"), JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getMapComponent().setGridSize(panel.getGridSize().width, panel.getGridSize().height);
         EditorScreen.instance().getMapComponent().setGridColor(panel.getGridColor());
@@ -596,7 +596,7 @@ public class Program {
       MapPropertyPanel panel = new MapPropertyPanel();
       panel.bind(Game.getEnvironment().getMap());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
@@ -648,8 +648,8 @@ public class Program {
     payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_wiki"))));
 
     MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.getScreenManager()),
-        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.getInfo().getVersion(),
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.screens()),
+        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(),
         JOptionPane.INFORMATION_MESSAGE));
 
     helpMenu.add(tutorialMenuItem);
@@ -776,7 +776,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_EDIT);
       isChanging = false;
 
-      Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
+      Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
     });
     basicMenu.add(ed);
     basicMenu.add(mv);
@@ -799,7 +799,7 @@ public class Program {
       EditorScreen.instance().getMapComponent().setEditMode(MapComponent.EDITMODE_MOVE);
       isChanging = false;
 
-      Game.getScreenManager().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
+      Game.window().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
     });
 
     EditorScreen.instance().getMapComponent().onEditModeChanged(i -> {
@@ -812,7 +812,7 @@ public class Program {
         mv.setSelected(false);
         place.setSelected(true);
         place.requestFocus();
-        Game.getScreenManager().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
+        Game.window().getRenderComponent().setCursor(Program.CURSOR_ADD, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_EDIT) {
@@ -820,7 +820,7 @@ public class Program {
         mv.setSelected(false);
         ed.setSelected(true);
         ed.requestFocus();
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR, 0, 0);
+        Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
       }
 
       if (i == MapComponent.EDITMODE_MOVE) {
@@ -832,7 +832,7 @@ public class Program {
         place.setSelected(false);
         mv.setSelected(true);
         mv.requestFocus();
-        Game.getScreenManager().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
+        Game.window().getRenderComponent().setCursor(CURSOR_MOVE, 0, 0);
       }
     });
 
@@ -1101,7 +1101,7 @@ public class Program {
       exitItem.addActionListener(a -> System.exit(0));
       menu.add(exitItem);
 
-      trayIcon = new TrayIcon(Resources.images().get("litiengine-icon.png"), Game.getInfo().toString(), menu);
+      trayIcon = new TrayIcon(Resources.images().get("litiengine-icon.png"), Game.info().toString(), menu);
       trayIcon.setImageAutoSize(true);
       try {
         tray.add(trayIcon);

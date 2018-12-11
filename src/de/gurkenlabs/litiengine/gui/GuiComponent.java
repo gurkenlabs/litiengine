@@ -390,7 +390,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
     final ComponentMouseEvent event = new ComponentMouseEvent(e, this);
     this.getHoverConsumer().forEach(consumer -> consumer.accept(event));
     if (this.getHoverSound() != null) {
-      Game.getSoundEngine().playSound(this.getHoverSound());
+      Game.audio().playSound(this.getHoverSound());
     }
 
     this.getMouseEnterConsumer().forEach(consumer -> consumer.accept(event));
@@ -564,7 +564,7 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
       component.render(g);
     }
 
-    if (Game.getConfiguration().debug().renderGuiComponentBoundingBoxes()) {
+    if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
       ShapeRenderer.renderOutline(g, this.getBoundingBox());
     }

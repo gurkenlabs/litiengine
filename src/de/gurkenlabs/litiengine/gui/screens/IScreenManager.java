@@ -2,14 +2,12 @@ package de.gurkenlabs.litiengine.gui.screens;
 
 import java.util.function.Consumer;
 
-import de.gurkenlabs.litiengine.graphics.GameWindow;
-
 /**
  * The screen manager manages all screens of a game. The method
  * renderCurrentScreen is called from the render loop of the game and renders
  * the current screen to the getRenderComponent() of this manager.
  */
-public interface IScreenManager extends GameWindow{
+public interface IScreenManager{
   public void addScreen(final Screen screen);
 
   public void displayScreen(Screen screen);

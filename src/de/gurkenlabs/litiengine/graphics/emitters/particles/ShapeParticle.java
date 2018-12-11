@@ -19,6 +19,6 @@ public abstract class ShapeParticle extends Particle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(this.getColor());
 
-    Game.getRenderEngine().renderShape(g, this.getShape(emitterOrigin));
+    Game.graphics().renderShape(g, this.getShape(emitterOrigin));
   }
 }

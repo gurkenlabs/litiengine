@@ -19,11 +19,11 @@ public class StateController<T extends IEntity> extends StateMachine implements 
 
   @Override
   public void detach() {
-    Game.getLoop().detach(this);
+    Game.loop().detach(this);
   }
 
   @Override
   public void attach() {
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 }

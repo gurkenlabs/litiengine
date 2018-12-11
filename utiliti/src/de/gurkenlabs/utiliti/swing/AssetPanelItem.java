@@ -200,7 +200,7 @@ public class AssetPanelItem extends JPanel {
         return;
       }
       SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetInfo) this.getOrigin());
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
         return;
       }
@@ -274,7 +274,7 @@ public class AssetPanelItem extends JPanel {
   private void deleteAsset() {
     if (getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) getOrigin();
-      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
+      int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getSpriteSheets().remove(getOrigin());
@@ -286,7 +286,7 @@ public class AssetPanelItem extends JPanel {
       }
     } else if (getOrigin() instanceof EmitterData) {
       EmitterData emitter = (EmitterData) getOrigin();
-      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
+      int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the emitter [" + emitter.getName() + "]", "Delete Emitter?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getEmitters().remove(getOrigin());
@@ -296,7 +296,7 @@ public class AssetPanelItem extends JPanel {
       }
     } else if (getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) getOrigin();
-      int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
+      int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the blueprint [" + blueprint.getName() + "]?", "Delete Blueprint?", JOptionPane.YES_NO_OPTION);
       if (n == JOptionPane.OK_OPTION) {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
         Program.getAssetTree().forceUpdate();
@@ -391,7 +391,7 @@ public class AssetPanelItem extends JPanel {
       ImageFormat format = sprite.getImageFormat() != ImageFormat.UNDEFINED ? sprite.getImageFormat() : ImageFormat.PNG;
 
       Object[] options = { ".xml", format.toExtension() };
-      int answer = JOptionPane.showOptionDialog(Game.getScreenManager().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+      int answer = JOptionPane.showOptionDialog(Game.window().getRenderComponent(), "Select an export format:", "Export Spritesheet", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       try {
         JFileChooser chooser;
@@ -408,7 +408,7 @@ public class AssetPanelItem extends JPanel {
           chooser.addChoosableFileFilter(filter);
           chooser.setSelectedFile(new File(spriteSheetInfo.getName() + format.toExtension()));
 
-          int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+          int result = chooser.showSaveDialog(Game.window().getRenderComponent());
           if (result == JFileChooser.APPROVE_OPTION) {
             ImageSerializer.saveImage(chooser.getSelectedFile().toString(), sprite.getImage(), format);
             log.log(Level.INFO, "exported spritesheet {0} to {1}", new Object[] { spriteSheetInfo.getName(), chooser.getSelectedFile() });

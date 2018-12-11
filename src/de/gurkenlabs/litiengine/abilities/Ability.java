@@ -73,7 +73,7 @@ public abstract class Ability implements IRenderable {
   }
 
   public boolean canCast() {
-    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.getLoop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
+    return !this.getExecutor().isDead() && (this.getCurrentExecution() == null || this.getCurrentExecution().getExecutionTicks() == 0 || Game.loop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) >= this.getAttributes().getCooldown().getCurrentValue());
   }
 
   /**
@@ -184,11 +184,11 @@ public abstract class Ability implements IRenderable {
   @Override
   public void render(final Graphics2D g) {
     g.setColor(new Color(255, 255, 0, 100));
-    Game.getRenderEngine().renderShape(g, this.calculateImpactArea());
+    Game.graphics().renderShape(g, this.calculateImpactArea());
     final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke(2f));
     g.setColor(new Color(255, 255, 0, 200));
-    Game.getRenderEngine().renderOutline(g, this.calculateImpactArea());
+    Game.graphics().renderOutline(g, this.calculateImpactArea());
     g.setStroke(oldStroke);
   }
 

@@ -152,7 +152,7 @@ public class Animation implements IUpdateable, ILaunchable {
 
     this.currentFrame = this.firstFrame;
 
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   public void restart() {
@@ -178,7 +178,7 @@ public class Animation implements IUpdateable, ILaunchable {
   public void update() {
     // do nothing if the animation is not playing of the current keyframe is not
     // finished
-    if (!this.isPlaying() || Game.getLoop().convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
+    if (!this.isPlaying() || Game.loop().convertToMs(++this.elapsedTicks) < this.currentFrame.getDuration()) {
       return;
     }
 

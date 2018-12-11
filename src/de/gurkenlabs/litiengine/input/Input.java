@@ -30,7 +30,7 @@ public final class Input {
 
   static {
     // we need an own update loop because otherwise input won't work if the game has been paused
-    InputLoop = new GameLoop("Input Loop", Game.getLoop().getUpdateRate());
+    InputLoop = new GameLoop("Input Loop", Game.loop().getUpdateRate());
   }
 
   private Input() {
@@ -96,7 +96,7 @@ public final class Input {
     try {
       Input.keyboard = new Keyboard();
       mouse = new Mouse();
-      if (Game.getConfiguration().input().isGamepadSupport()) {
+      if (Game.config().input().isGamepadSupport()) {
         gamePads = new CopyOnWriteArrayList<>();
         gamePadManager = new GamepadManager();
       }

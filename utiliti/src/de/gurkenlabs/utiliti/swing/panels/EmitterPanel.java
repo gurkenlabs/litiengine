@@ -40,7 +40,7 @@ public class EmitterPanel extends PropertyPanel {
       EmitterPropertyPanel panel = new EmitterPropertyPanel();
       panel.bind(this.getDataSource());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.CANCEL_OPTION) {
         panel.discardChanges();
       }
@@ -52,7 +52,7 @@ public class EmitterPanel extends PropertyPanel {
         return;
       }
 
-      Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, emitter.getName());
+      Object name = JOptionPane.showInputDialog(Game.window().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, emitter.getName());
       if (name == null) {
         return;
       }

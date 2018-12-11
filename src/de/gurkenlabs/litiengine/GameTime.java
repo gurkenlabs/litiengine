@@ -6,10 +6,10 @@ public class GameTime {
   }
 
   public long sinceGameStart() {
-    return Game.getLoop().convertToMs(Game.getLoop().getTicks());
+    return Game.loop().convertToMs(Game.loop().getTicks());
   }
 
   public long sinceEnvironmentLoad() {
-    return Game.getLoop().convertToMs(Game.getLoop().getTicks() - Game.environmentLoadTick);
+    return Game.loop().convertToMs(Game.loop().getTicks() - Game.environmentLoadTick);
   }
 }

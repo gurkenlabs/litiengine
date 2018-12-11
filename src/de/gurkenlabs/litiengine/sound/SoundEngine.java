@@ -48,7 +48,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     }
 
     this.music = new SoundPlayback(sound);
-    this.music.play(loop, Game.getConfiguration().sound().getMusicVolume());
+    this.music.play(loop, Game.config().sound().getMusicVolume());
     return this.music;
   }
 
@@ -160,7 +160,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     }
 
     if (this.music != null) {
-      this.music.setMasterGain(Game.getConfiguration().sound().getMusicVolume());
+      this.music.setMasterGain(Game.config().sound().getMusicVolume());
     }
 
     // music is looped by default
