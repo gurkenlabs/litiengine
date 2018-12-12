@@ -6,13 +6,6 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Interface IEntitySpawner.
- *
- * @param <T>
- *          the generic type
- */
 public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
 
   /**

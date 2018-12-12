@@ -10,37 +10,14 @@ import de.gurkenlabs.litiengine.IGameLoop;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Spawnpoint;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class EntitySpawner.
- *
- * @param <T>
- *          the generic type
- */
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
-
-  /** The Constant log. */
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
-
-  /** The amount. */
   private int amount;
-
-  /** The environment. */
   private IEnvironment environment;
-
-  /** The interval between spawn waves. */
   private int interval;
-
-  /** The time of the last spawn wave. */
   private long lastSpawnWave;
-
-  /** The spawn delay between individual entity spawns of a spawn wave. */
   private int spawnDelay;
-
-  /** The spawn mode. */
   private SpawnMode spawnMode;
-
-  /** The spawnpoints. */
   private List<Spawnpoint> spawnpoints;
 
   /**
@@ -77,101 +54,51 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     loop.attach(this);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#getSpawnAmount()
-   */
   @Override
   public int getSpawnAmount() {
     return this.amount;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#getSpawnInterval()
-   */
   @Override
   public int getSpawnInterval() {
     return this.interval;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#getSpawnDelay()
-   */
   @Override
   public int getSpawnDelay() {
     return this.spawnDelay;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#getSpawnMode()
-   */
   @Override
   public SpawnMode getSpawnMode() {
     return this.spawnMode;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#getSpawnPoints()
-   */
   @Override
   public List<Spawnpoint> getSpawnPoints() {
     return this.spawnpoints;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#setSpawnAmount(int)
-   */
   @Override
   public void setSpawnAmount(final int amount) {
     this.amount = amount;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#setSpawnInterval(int)
-   */
   @Override
   public void setSpawnInterval(final int interval) {
     this.interval = interval;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#setSpawnDelay(int)
-   */
   @Override
   public void setSpawnDelay(final int delay) {
     this.spawnDelay = delay;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.environment.IEntitySpawner#setSpawnMode(de.gurkenlabs.litiengine.environment.IEntitySpawner.SpawnMode)
-   */
   @Override
   public void setSpawnMode(final SpawnMode mode) {
     this.spawnMode = mode;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.gurkenlabs.litiengine.IUpdateable#update()
-   */
   @Override
   public void update() {
     if (Game.getLoop().getDeltaTime(this.lastSpawnWave) < this.getSpawnInterval()) {
@@ -214,21 +141,10 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     }
   }
 
-  /**
-   * Spawn.
-   *
-   * @param spawnpoint
-   *          the spawnpoint
-   * @param amount
-   *          the amount
-   */
   private void spawn(final Spawnpoint spawnpoint, final int amount) {
     new SpawnThread(spawnpoint, amount).start();
   }
 
-  /**
-   * The Class SpawnThread.
-   */
   private class SpawnThread extends Thread {
 
     /** The amount of entities to spawn. */
@@ -250,11 +166,6 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       this.amount = amount;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Thread#run()
-     */
     @Override
     public void run() {
       for (int i = 0; i < this.amount; i++) {
@@ -272,5 +183,4 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
     }
   }
-
 }
