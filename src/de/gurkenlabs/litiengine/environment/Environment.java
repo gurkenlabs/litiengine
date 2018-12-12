@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -42,7 +41,6 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -54,6 +52,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -65,22 +64,22 @@ public class Environment implements IEnvironment {
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
   private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
-  private final Map<String, List<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
+  private final Map<String, Collection<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
 
   private final Map<RenderType, Collection<EnvironmentRenderListener>> renderListeners = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
   private final List<EnvironmentListener> listeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentEntityListener> entityListeners = new CopyOnWriteArrayList<>();
 
   private final Map<RenderType, Collection<IRenderable>> renderables = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
-  private final Collection<CollisionBox> colliders = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<LightSource> lightSources = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<StaticShadow> staticShadows = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<Trigger> triggers = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<Prop> props = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<Emitter> emitters = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<Creature> creatures = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<Spawnpoint> spawnPoints = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final Collection<MapArea> mapAreas = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final Collection<CollisionBox> colliders = ConcurrentHashMap.newKeySet();
+  private final Collection<LightSource> lightSources = ConcurrentHashMap.newKeySet();
+  private final Collection<StaticShadow> staticShadows = ConcurrentHashMap.newKeySet();
+  private final Collection<Trigger> triggers = ConcurrentHashMap.newKeySet();
+  private final Collection<Prop> props = ConcurrentHashMap.newKeySet();
+  private final Collection<Emitter> emitters = ConcurrentHashMap.newKeySet();
+  private final Collection<Creature> creatures = ConcurrentHashMap.newKeySet();
+  private final Collection<Spawnpoint> spawnPoints = ConcurrentHashMap.newKeySet();
+  private final Collection<MapArea> mapAreas = ConcurrentHashMap.newKeySet();
 
   private AmbientLight ambientLight;
   private StaticShadowLayer staticShadowLayer;
@@ -91,31 +90,38 @@ public class Environment implements IEnvironment {
   private int localIdSequence = 0;
 
   static {
-    registerDefaultMapObjectLoaders();
+    registerMapObjectLoader(new PropMapObjectLoader());
+    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
+    registerMapObjectLoader(new TriggerMapObjectLoader());
+    registerMapObjectLoader(new EmitterMapObjectLoader());
+    registerMapObjectLoader(new LightSourceMapObjectLoader());
+    registerMapObjectLoader(new SpawnpointMapObjectLoader());
+    registerMapObjectLoader(new MapAreaMapObjectLoader());
+    registerMapObjectLoader(new StaticShadowMapObjectLoader());
+    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   public Environment(final IMap map) {
     this();
     this.map = map;
-    Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+    if (this.getMap() != null) {
+      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
+    }
   }
 
   public Environment(final String mapPath) {
     this();
-    final IMap loadedMap = Game.getMap(FileUtilities.getFileName(mapPath));
-    if (loadedMap == null) {
-      this.map = MapLoader.load(mapPath);
-    } else {
-      this.map = loadedMap;
+    this.map = Resources.maps().get(FileUtilities.getFileName(mapPath));
+    if (this.getMap() != null) {
+      Game.getPhysicsEngine().setBounds(this.getMap().getBounds());
     }
-    Game.getPhysicsEngine().setBounds(new Rectangle(this.getMap().getSizeInPixels()));
   }
 
   private Environment() {
     for (RenderType renderType : RenderType.values()) {
       this.entities.put(renderType, new ConcurrentHashMap<>());
-      this.renderListeners.put(renderType, Collections.newSetFromMap(new ConcurrentHashMap<EnvironmentRenderListener, Boolean>()));
-      this.renderables.put(renderType, Collections.newSetFromMap(new ConcurrentHashMap<IRenderable, Boolean>()));
+      this.renderListeners.put(renderType, ConcurrentHashMap.newKeySet());
+      this.renderables.put(renderType, ConcurrentHashMap.newKeySet());
     }
   }
 
@@ -309,13 +315,13 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape) {
+  public Collection<ICombatEntity> findCombatEntities(final Shape shape) {
     return this.findCombatEntities(shape, entity -> true);
   }
 
   @Override
-  public List<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
-    final ArrayList<ICombatEntity> foundCombatEntities = new ArrayList<>();
+  public Collection<ICombatEntity> findCombatEntities(final Shape shape, final Predicate<ICombatEntity> condition) {
+    final Collection<ICombatEntity> foundCombatEntities = new ArrayList<>();
     if (shape == null) {
       return foundCombatEntities;
     }
@@ -344,8 +350,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<IEntity> findEntities(final Shape shape) {
-    final ArrayList<IEntity> foundEntities = new ArrayList<>();
+  public Collection<IEntity> findEntities(final Shape shape) {
+    final Collection<IEntity> foundEntities = new ArrayList<>();
     if (shape == null) {
       return foundEntities;
     }
@@ -384,7 +390,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public List<IEntity> get(final int... mapIds) {
-    final ArrayList<IEntity> foundEntities = new ArrayList<>();
+    final List<IEntity> foundEntities = new ArrayList<>();
     if (mapIds == null) {
       return foundEntities;
     }
@@ -440,7 +446,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<IEntity> getByTag(String... tags) {
-    List<IEntity> foundEntities = new ArrayList<>();
+    Collection<IEntity> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
       foundEntities.addAll(this.getEntitiesByTag().getOrDefault(tag, Arrays.asList()));
@@ -450,8 +456,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public <T extends IEntity> Collection<T> getByTag(Class<T> clss, String... tags) {
-    List<T> foundEntities = new ArrayList<>();
+  public <T> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
+    Collection<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();
 
@@ -551,13 +557,13 @@ public class Environment implements IEnvironment {
     return this.entities.get(renderType).values();
   }
 
-  public Map<String, List<IEntity>> getEntitiesByTag() {
+  public Map<String, Collection<IEntity>> getEntitiesByTag() {
     return this.entitiesByTag;
   }
 
   @Override
-  public <T extends IEntity> Collection<T> getByType(Class<T> cls) {
-    List<T> foundEntities = new ArrayList<>();
+  public <T> Collection<T> getByType(Class<? extends T> cls) {
+    Collection<T> foundEntities = new ArrayList<>();
     for (IEntity ent : this.getEntities()) {
       if (cls.isInstance(ent)) {
         foundEntities.add(cls.cast(ent));
@@ -702,9 +708,8 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public List<String> getUsedTags() {
-    final List<String> tags = this.getEntitiesByTag().keySet().stream().collect(Collectors.toList());
-    Collections.sort(tags);
+  public Collection<String> getUsedTags() {
+    final Collection<String> tags = new ArrayList<>(this.getEntitiesByTag().keySet());
 
     return tags;
   }
@@ -715,9 +720,11 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    this.loadMapObjects();
-    this.addStaticShadows();
-    this.addAmbientLight();
+    if (this.getMap() != null) {
+      this.loadMapObjects();
+      this.addStaticShadows();
+      this.addAmbientLight();
+    }
 
     this.fireEvent(l -> l.environmentInitialized(this));
     this.initialized = true;
@@ -735,10 +742,16 @@ public class Environment implements IEnvironment {
       return;
     }
 
-    Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+    if (this.getMap() != null) {
+      Game.getPhysicsEngine().setBounds(new Rectangle2D.Double(0, 0, this.getMap().getSizeInPixels().getWidth(), this.getMap().getSizeInPixels().getHeight()));
+    }
 
-    if (this.getMap().getBackgroundColor() != null) {
-      Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+    if (this.getMap() != null) {
+      if (this.getMap().getBackgroundColor() != null) {
+        Game.getScreenManager().getRenderComponent().setBackground(this.getMap().getBackgroundColor());
+      }
+    } else {
+      Game.getScreenManager().getRenderComponent().setBackground(Color.BLACK);
     }
 
     for (final IEntity entity : this.getEntities()) {
@@ -819,7 +832,7 @@ public class Environment implements IEnvironment {
     EntityInfo info = entityType.getAnnotation(EntityInfo.class);
     if (info == null || info.customMapObjectType().isEmpty()) {
       throw new IllegalArgumentException(
-          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\n Add an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
+          "Cannot register a custom entity type without the related EntityInfo.customMapObjectType being specified.\nAdd an EntityInfo annotation to the " + entityType + " class and provide the required information or use the registerCustomEntityType overload and provide the type explicitly.");
     }
 
     registerCustomEntityType(info.customMapObjectType(), entityType);
@@ -1175,18 +1188,6 @@ public class Environment implements IEnvironment {
         this.load(mapObject);
       }
     }
-  }
-
-  private static void registerDefaultMapObjectLoaders() {
-    registerMapObjectLoader(new PropMapObjectLoader());
-    registerMapObjectLoader(new CollisionBoxMapObjectLoader());
-    registerMapObjectLoader(new TriggerMapObjectLoader());
-    registerMapObjectLoader(new EmitterMapObjectLoader());
-    registerMapObjectLoader(new LightSourceMapObjectLoader());
-    registerMapObjectLoader(new SpawnpointMapObjectLoader());
-    registerMapObjectLoader(new MapAreaMapObjectLoader());
-    registerMapObjectLoader(new StaticShadowMapObjectLoader());
-    registerMapObjectLoader(new CreatureMapObjectLoader());
   }
 
   /**

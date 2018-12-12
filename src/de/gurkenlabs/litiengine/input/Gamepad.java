@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier;
@@ -15,10 +16,6 @@ import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
 public class Gamepad implements IGamepad, IUpdateable {
-  public static final float AXIS_DEAD_ZONE = 0.3f;
-  public static final float TRIGGER_DEAD_ZONE = 0.1f;
-  public static final float STICK_DEADZONE = 0.15f;
-
   private static final Map<String, Identifier> components = new HashMap<>();
 
   private final Controller controller;
@@ -34,6 +31,9 @@ public class Gamepad implements IGamepad, IUpdateable {
   private final List<BiConsumer<String, Float>> releasedConsumer;
 
   private final List<String> pressedComponents;
+  
+  private float axisDeadzone = Game.getConfiguration().input().getGamepadAxisDeadzone();
+  private float triggerDeadzone = Game.getConfiguration().input().getGamepadTriggerDeadzone();
 
   protected Gamepad(final int index, final Controller controller) {
     this.componentPollConsumer = new ConcurrentHashMap<>();
@@ -70,6 +70,14 @@ public class Gamepad implements IGamepad, IUpdateable {
     return comp.getPollData();
   }
 
+  public float getAxisDeadzone() {
+    return this.axisDeadzone;
+  }
+  
+  public float getTriggerDeadzone() {
+    return this.triggerDeadzone;
+  }
+  
   @Override
   public void onPoll(final String identifier, final Consumer<Float> consumer) {
     GamepadManager.addComponentConsumer(this.componentPollConsumer, identifier, consumer);
@@ -111,6 +119,14 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     this.releasedConsumer.add(consumer);
   }
+  
+  public void setAxisDeadzone(float gamepadAxisDeadzone) {
+    this.axisDeadzone = gamepadAxisDeadzone;
+  }
+
+  public void setTriggerDeadzone(float gamepadTriggerDeadzone) {
+    this.triggerDeadzone = gamepadTriggerDeadzone;
+  }
 
   @Override
   public void update() {
@@ -126,7 +142,7 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     for (Component comp : this.controller.getComponents()) {
 
-      if (Math.abs(comp.getPollData()) > getDeadZone(comp.getIdentifier())) {
+      if (Math.abs(comp.getPollData()) > this.getDeadZone(comp.getIdentifier())) {
         this.handlePressed(comp);
       } else {
         this.handleRelease(comp);
@@ -151,14 +167,14 @@ public class Gamepad implements IGamepad, IUpdateable {
     }
   }
 
-  private static float getDeadZone(final Identifier ident) {
+  private float getDeadZone(final Identifier ident) {
     if (ident.getName().equals(Axis.X)
         || ident.getName().equals(Axis.Y)) {
-      return AXIS_DEAD_ZONE;
+      return this.getAxisDeadzone();
     }
 
     if (ident.getName().equals(Axis.Z)) {
-      return TRIGGER_DEAD_ZONE;
+      return this.getTriggerDeadzone();
     }
 
     return 0;

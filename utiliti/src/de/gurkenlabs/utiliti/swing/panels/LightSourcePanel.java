@@ -20,10 +20,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
 @SuppressWarnings("serial")
@@ -39,7 +39,7 @@ public class LightSourcePanel extends PropertyPanel {
   private JLabel lblOffsety;
 
   public LightSourcePanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_lightSource"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_lightSource"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
@@ -48,9 +48,9 @@ public class LightSourcePanel extends PropertyPanel {
     this.spinnerBrightness = new JSpinner();
     this.spinnerBrightness.setModel(new SpinnerNumberModel(0, 0, 255, 1));
 
-    JLabel lblColor = new JLabel(Resources.get("panel_color"));
+    JLabel lblColor = new JLabel(Resources.strings().get("panel_color"));
 
-    JLabel lblShape = new JLabel(Resources.get("panel_shape"));
+    JLabel lblShape = new JLabel(Resources.strings().get("panel_shape"));
 
     this.textFieldColor = new JTextField();
     this.textFieldColor.setText("#ffffff");
@@ -64,7 +64,7 @@ public class LightSourcePanel extends PropertyPanel {
 
     this.spinnerIntensity = new JSpinner(new SpinnerNumberModel(0, 0, 255, 1));
 
-    JLabel lblIntensity = new JLabel(Resources.get("panel_intensity"));
+    JLabel lblIntensity = new JLabel(Resources.strings().get("panel_intensity"));
 
     this.checkBoxIsActive = new JCheckBox("is active");
     this.checkBoxIsActive.setSelected(true);
@@ -178,7 +178,7 @@ public class LightSourcePanel extends PropertyPanel {
     this.btnSelectColor.addActionListener(a -> {
       Color solid = ColorHelper.decode(textFieldColor.getText());
       Color current = new Color(solid.getRed(), solid.getGreen(), solid.getBlue(), (int) this.spinnerBrightness.getValue());
-      Color result = JColorChooser.showDialog(null, Resources.get("panel_selectLightColor"), current);
+      Color result = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLightColor"), current);
       if (result == null) {
         return;
       }

@@ -263,7 +263,6 @@ public class Trigger extends CollisionEntity implements IUpdateable {
       return false;
     }
 
-    this.isActivated = true;
     List<Integer> triggerTargets = this.getTargets(tar);
 
     final TriggerEvent te = new TriggerEvent(this, activator, triggerTargets);
@@ -271,6 +270,8 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     if (!this.checkActivationPredicates(te)) {
       return false;
     }
+
+    this.isActivated = true;
 
     // if we actually have a trigger target, we send the message to the target
     if (!triggerTargets.isEmpty()) {
@@ -315,7 +316,7 @@ public class Trigger extends CollisionEntity implements IUpdateable {
   private List<IEntity> getEntitiesInCollisionBox() {
     final List<IEntity> collEntities = new CopyOnWriteArrayList<>();
     for (final ICollisionEntity coll : Game.getPhysicsEngine().getCollisionEntities()) {
-      if (!this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
+      if (coll == this || !this.activators.isEmpty() && !this.activators.contains(coll.getMapId())) {
         continue;
       }
 

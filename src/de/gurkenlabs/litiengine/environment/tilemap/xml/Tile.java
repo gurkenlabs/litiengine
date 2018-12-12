@@ -22,13 +22,9 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 public class Tile extends CustomPropertyProvider implements ITile, Serializable {
   public static final int NONE = 0;
   public static final Tile EMPTY = new Tile(NONE);
-  protected static final long FLIPPED_HORIZONTALLY_FLAG = 0xFFFFFFFF80000000L;
-  protected static final long FLIPPED_VERTICALLY_FLAG = 0xFFFFFFFF40000000L;
-  protected static final long FLIPPED_DIAGONALLY_FLAG = 0xFFFFFFFF20000000L;
-
-  protected static final long FLIPPED_HORIZONTALLY_FLAG_CSV = 0x80000000L;
-  protected static final long FLIPPED_VERTICALLY_FLAG_CSV = 0x40000000L;
-  protected static final long FLIPPED_DIAGONALLY_FLAG_CSV = 0x20000000L;
+  protected static final int FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+  protected static final int FLIPPED_VERTICALLY_FLAG = 0x40000000;
+  protected static final int FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
   private static final long serialVersionUID = -7597673646108642906L;
 
@@ -58,27 +54,14 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
   public Tile() {
   }
 
-  public Tile(int gid) {
-    this.gid = gid;
-  }
-
-  public Tile(long gidBitmask, boolean csv) {
+  public Tile(int gidBitmask) {
     // Clear the flags
-    long tileId = gidBitmask;
-    if (csv) {
-      tileId &= ~(FLIPPED_HORIZONTALLY_FLAG_CSV | FLIPPED_VERTICALLY_FLAG_CSV | FLIPPED_DIAGONALLY_FLAG_CSV);
-      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG_CSV) == FLIPPED_DIAGONALLY_FLAG_CSV;
-      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG_CSV) == FLIPPED_HORIZONTALLY_FLAG_CSV;
-      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG_CSV) == FLIPPED_VERTICALLY_FLAG_CSV;
-    } else {
-      tileId &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
-      this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) == FLIPPED_DIAGONALLY_FLAG;
-      this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG) == FLIPPED_HORIZONTALLY_FLAG;
-      this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG) == FLIPPED_VERTICALLY_FLAG;
-    }
+    this.flippedDiagonally = (gidBitmask & FLIPPED_DIAGONALLY_FLAG) != 0;
+    this.flippedHorizontally = (gidBitmask & FLIPPED_HORIZONTALLY_FLAG) != 0;
+    this.flippedVertically = (gidBitmask & FLIPPED_VERTICALLY_FLAG) != 0;
 
     this.flipped = this.isFlippedDiagonally() || this.isFlippedHorizontally() || this.isFlippedVertically();
-    this.gid = (int) tileId;
+    this.gid = gidBitmask & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
   }
 
   @Override

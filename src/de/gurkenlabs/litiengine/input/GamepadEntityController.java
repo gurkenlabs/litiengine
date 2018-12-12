@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.input;
 
 import java.awt.geom.Point2D;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -9,8 +10,8 @@ import net.java.games.input.Component.Identifier;
 
 public class GamepadEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
   private int gamePadIndex = -1;
-  private double gamePadDeadzone = Gamepad.STICK_DEADZONE;
-  private double gamePadRightStick = Gamepad.STICK_DEADZONE;
+  private double gamepadDeadzone = Game.getConfiguration().input().getGamepadStickDeadzone();
+  private double gamepadRightStick = Game.getConfiguration().input().getGamepadStickDeadzone();
   private boolean rotateWithRightStick = false;
 
   public GamepadEntityController(final T entity, boolean rotateWithRightStick) {
@@ -44,12 +45,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
     super.update();
   }
 
-  public double getGamePadDeadzone() {
-    return this.gamePadDeadzone;
+  public double getGamepadDeadzone() {
+    return this.gamepadDeadzone;
   }
 
-  public double getGamePadRightStick() {
-    return gamePadRightStick;
+  public double getGamepadRightStick() {
+    return gamepadRightStick;
   }
 
   public boolean isRotateWithRightStick() {
@@ -57,11 +58,11 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
   }
 
   public void setRightStickDeadzone(double gamePadRightStick) {
-    this.gamePadRightStick = gamePadRightStick;
+    this.gamepadRightStick = gamePadRightStick;
   }
 
   public void setLeftStickDeadzone(double gamePadDeadzone) {
-    this.gamePadDeadzone = gamePadDeadzone;
+    this.gamepadDeadzone = gamePadDeadzone;
   }
 
   public void setRotateWithRightStick(boolean rotateWithRightStick) {
@@ -76,12 +77,12 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
     final float x = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.X);
     final float y = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.Y);
 
-    if (Math.abs(x) > this.gamePadDeadzone) {
+    if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
       this.setMovedX(true);
     }
 
-    if (Math.abs(y) > this.gamePadDeadzone) {
+    if (Math.abs(y) > this.gamepadDeadzone) {
       this.setDy(y);
       this.setMovedY(true);
     }
@@ -91,10 +92,10 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
       final float rightY = Input.getGamepad(this.gamePadIndex).getPollData(Identifier.Axis.RY);
       float targetX = 0;
       float targetY = 0;
-      if (Math.abs(rightX) > this.gamePadRightStick) {
+      if (Math.abs(rightX) > this.gamepadRightStick) {
         targetX = rightX;
       }
-      if (Math.abs(rightY) > this.gamePadRightStick) {
+      if (Math.abs(rightY) > this.gamepadRightStick) {
         targetY = rightY;
       }
 

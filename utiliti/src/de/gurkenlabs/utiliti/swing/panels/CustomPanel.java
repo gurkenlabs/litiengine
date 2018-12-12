@@ -16,10 +16,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
@@ -29,7 +29,7 @@ public class CustomPanel extends PropertyPanel {
   private DefaultTableModel model;
 
   public CustomPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_customProperties"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_customProperties"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
@@ -60,12 +60,12 @@ public class CustomPanel extends PropertyPanel {
     this.tableCustomProperties.getTableHeader().setReorderingAllowed(false);
     this.tableCustomProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.scrollPane.setViewportView(tableCustomProperties);
-    this.tableCustomProperties.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.get("panel_name"), Resources.get("panel_value") }) {
-      Class[] columnTypes = new Class[] { String.class, String.class };
+    this.tableCustomProperties.setModel(new DefaultTableModel(new Object[][] {}, new String[] { Resources.strings().get("panel_name"), Resources.strings().get("panel_value") }) {
+      Class<?>[] columnTypes = new Class<?>[] { String.class, String.class };
       boolean[] columnEditables = new boolean[] { true, true };
 
       @Override
-      public Class getColumnClass(int columnIndex) {
+      public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnIndex];
       }
 

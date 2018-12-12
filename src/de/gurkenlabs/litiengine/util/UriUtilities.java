@@ -11,6 +11,7 @@ public final class UriUtilities {
   private static final Logger log = Logger.getLogger(UriUtilities.class.getName());
 
   private UriUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static boolean openWebpage(URI uri) {

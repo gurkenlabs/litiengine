@@ -15,10 +15,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
 
@@ -28,7 +28,7 @@ public class EmitterPanel extends PropertyPanel {
   private transient CustomEmitter emitter;
 
   public EmitterPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_emitter"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_emitter"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
@@ -40,7 +40,7 @@ public class EmitterPanel extends PropertyPanel {
       EmitterPropertyPanel panel = new EmitterPropertyPanel();
       panel.bind(this.getDataSource());
 
-      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+      int option = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), panel, Resources.strings().get("panel_emitterProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.CANCEL_OPTION) {
         panel.discardChanges();
       }
@@ -52,7 +52,7 @@ public class EmitterPanel extends PropertyPanel {
         return;
       }
 
-      Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_prompt_name"), Resources.get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, emitter.getName());
+      Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, emitter.getName());
       if (name == null) {
         return;
       }

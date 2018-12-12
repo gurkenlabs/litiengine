@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 public class Animation implements IUpdateable, ILaunchable {
   public static final int DEFAULT_FRAME_DURATION = 120;
@@ -27,7 +28,7 @@ public class Animation implements IUpdateable, ILaunchable {
   private Spritesheet spritesheet;
 
   public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
-    this(Spritesheet.find(spriteSheetName), loop, randomizeStart, keyFrameDurations);
+    this(Resources.spritesheets().get(spriteSheetName), loop, randomizeStart, keyFrameDurations);
   }
 
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
@@ -93,7 +94,7 @@ public class Animation implements IUpdateable, ILaunchable {
     // in case the previously sprite sheet was unloaded (removed from the loaded sprite sheets),
     // try to find an updated one by the name of the previously used sprite
     if (this.spritesheet != null && !this.spritesheet.isLoaded()) {
-      this.spritesheet = Spritesheet.find(this.spritesheet.getName());
+      this.spritesheet = Resources.spritesheets().get(this.spritesheet.getName());
       this.initKeyFrames();
     }
 
@@ -204,7 +205,7 @@ public class Animation implements IUpdateable, ILaunchable {
     if (keyFrameDurations.length == 0) {
       // fallback to use custom keyframe durations if no specific durations are
       // defined
-      keyFrameDurations = Spritesheet.getCustomKeyFrameDurations(name);
+      keyFrameDurations = Resources.spritesheets().getCustomKeyFrameDurations(name);
     }
 
     // if no keyframes are specified, the animation takes in the whole

@@ -10,9 +10,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
@@ -20,13 +20,13 @@ public class CollisionBoxPanel extends PropertyPanel {
   private JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.get("panel_collisionBox"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_collisionBox"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
     setBorder(border);
 
-    this.chckbxIsObstacle = new JCheckBox(Resources.get("panel_isObstacle"));
+    this.chckbxIsObstacle = new JCheckBox(Resources.strings().get("panel_isObstacle"));
 
-    this.chckbxIsObstructingLights = new JCheckBox(Resources.get("panel_isObstructingLights"));
+    this.chckbxIsObstructingLights = new JCheckBox(Resources.strings().get("panel_isObstructingLights"));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(

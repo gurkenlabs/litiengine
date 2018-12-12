@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -28,7 +27,7 @@ dependencies {
     exclude group:'junit'
   }
 
-  compile 'com.code-disaster.steamworks4j:steamworks4j:1.7.0'
+  compile 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
   
   // JAXB modules for JDK 9 or higher
   compile 'javax.xml.bind:jaxb-api:2.3.0'
@@ -36,10 +35,10 @@ dependencies {
   compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
   compile 'javax.activation:activation:1.1.1'
   
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-  testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
-  testCompile 'org.mockito:mockito-core:2.21.0'
-  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
+  testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.2'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
+  testCompile 'org.mockito:mockito-core:2.23.4'
 }
 
 test {

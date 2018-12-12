@@ -1,12 +1,13 @@
 package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
@@ -16,7 +17,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
 
   public PropAnimationController(final T prop) {
     super(prop);
-    
+
     this.setDefaultAnimation(this.createAnimation(this.getEntity(), PropState.INTACT));
     this.add(createAnimation(this.getEntity(), PropState.DAMAGED));
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
@@ -38,8 +39,9 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     cacheKey += "_" + this.getEntity().getSpriteRotation();
     cacheKey += "_" + this.getEntity().flipHorizontally();
     cacheKey += "_" + this.getEntity().flipVertically();
-    if (ImageCache.SPRITES.containsKey(cacheKey)) {
-      return ImageCache.SPRITES.get(cacheKey);
+    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     BufferedImage currentImage = super.getCurrentSprite();
@@ -66,7 +68,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     // add a shadow at the lower end of the current sprite.
     final int ShadowYOffset = currentImage.getHeight();
     final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
-    ImageCache.SPRITES.put(cacheKey, shadow);
+    Resources.images().add(cacheKey, shadow);
 
     return shadow;
   }
@@ -99,7 +101,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return null;
     }
 
-    return new Animation(state.name(), spritesheet, true, true, Spritesheet.getCustomKeyFrameDurations(spritesheet.getName()));
+    return new Animation(state.name(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
   }
 
   private Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
@@ -109,13 +111,13 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
 
     final String propState = state.name().toLowerCase();
     final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState;
-    Spritesheet sprite = Spritesheet.find(name);
+    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(name);
 
-    if (sprite != null) {
-      return sprite;
+    if (opt.isPresent()) {
+      return opt.get();
     }
 
     final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
-    return Spritesheet.find(fallbackName);
+    return Resources.spritesheets().get(fallbackName);
   }
 }

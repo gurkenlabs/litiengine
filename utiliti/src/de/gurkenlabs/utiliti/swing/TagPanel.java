@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
+@SuppressWarnings("serial")
 public class TagPanel extends JPanel {
   private static final int MAX_TAG_LENGTH = 15;
   private JTextField textFieldInput;

@@ -71,8 +71,8 @@ public class MapObjectLoaderTests {
     assertNotNull(entity);
     assertEquals(entity.getMapId(), 111);
     assertEquals(entity.getName(), "testProp");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertEquals(entity.getX(), 100, 0.0001);
+    assertEquals(entity.getY(), 100, 0.0001);
 
     Prop prop = (Prop) entity;
     assertEquals(prop.getMaterial(), Material.PLASTIC);
@@ -109,8 +109,8 @@ public class MapObjectLoaderTests {
     assertNotNull(entity);
     assertEquals(entity.getMapId(), 111);
     assertEquals(entity.getName(), "testCollider");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertEquals(entity.getX(), 100, 0.0001);
+    assertEquals(entity.getY(), 100, 0.0001);
 
     CollisionBox collider = (CollisionBox) entity;
 
@@ -145,8 +145,8 @@ public class MapObjectLoaderTests {
     assertNotNull(entity);
     assertEquals(entity.getMapId(), 111);
     assertEquals(entity.getName(), "testTrigger");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertEquals(entity.getX(), 100, 0.0001);
+    assertEquals(entity.getY(), 100, 0.0001);
 
     Trigger trigger = (Trigger) entity;
 
@@ -177,8 +177,8 @@ public class MapObjectLoaderTests {
     assertNotNull(entity);
     assertEquals(entity.getMapId(), 111);
     assertEquals(entity.getName(), "testEmitter");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertEquals(entity.getX(), 100, 0.0001);
+    assertEquals(entity.getY(), 100, 0.0001);
   }
 
   @Test
@@ -206,8 +206,8 @@ public class MapObjectLoaderTests {
     assertNotNull(entity);
     assertEquals(entity.getMapId(), 111);
     assertEquals(entity.getName(), "testLight");
-    assertEquals(entity.getLocation().getX(), 100, 0.0001);
-    assertEquals(entity.getLocation().getY(), 100, 0.0001);
+    assertEquals(entity.getX(), 100, 0.0001);
+    assertEquals(entity.getY(), 100, 0.0001);
 
     LightSource light = (LightSource) entity;
     assertTrue(light.isActive());

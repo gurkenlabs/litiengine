@@ -2,8 +2,9 @@ package de.gurkenlabs.litiengine.sound;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.Game;
@@ -21,7 +22,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   private final List<SoundPlayback> sounds;
 
   public SoundEngine() {
-    this.sounds = new CopyOnWriteArrayList<>();
+    this.sounds = Collections.synchronizedList(new ArrayList<>());
     this.maxDist = DEFAULT_MAX_DISTANCE;
     this.setListenerLocationCallback(old -> Game.getCamera().getFocus());
   }
@@ -43,7 +44,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     }
 
     if (this.music != null) {
-      this.music.dispose();
+      this.music.cancel();
     }
 
     this.music = new SoundPlayback(sound);
@@ -120,7 +121,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
       return;
     }
 
-    this.music.dispose();
+    this.music.cancel();
     this.music = null;
   }
 
@@ -128,15 +129,17 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   public void terminate() {
     Input.getLoop().detach(this);
     if (this.music != null && this.music.isPlaying()) {
-      this.music.dispose();
+      this.music.cancel();
       this.music = null;
     }
 
-    for (SoundPlayback playback : this.sounds) {
-      playback.dispose();
+    synchronized (this.sounds) {
+      for (SoundPlayback playback : this.sounds) {
+        playback.cancel();
+      }
+  
+      this.sounds.clear();
     }
-
-    this.sounds.clear();
     SoundPlayback.terminate();
   }
 
@@ -144,17 +147,16 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   public void update() {
     this.listenerLocation = this.listenerLocationCallback.apply(this.listenerLocation);
 
-    final List<SoundPlayback> remove = new ArrayList<>();
-    for (final SoundPlayback s : this.sounds) {
-      if (s != null && !s.isPlaying()) {
-        s.dispose();
-        remove.add(s);
+    synchronized (this.sounds) {
+      Iterator<SoundPlayback> iter = this.sounds.iterator();
+      while (iter.hasNext()) {
+        SoundPlayback s = iter.next();
+        if (s != null && !s.isPlaying()) {
+          iter.remove();
+        } else {
+          s.updateControls(this.listenerLocation);
+        }
       }
-    }
-
-    this.sounds.removeAll(remove);
-    for (final SoundPlayback s : this.sounds) {
-      s.updateControls(this.listenerLocation);
     }
 
     if (this.music != null) {

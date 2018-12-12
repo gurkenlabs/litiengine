@@ -6,12 +6,12 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IEntityProvider;
 
 /**
- * An abstract implementation for emitters that are bound to
- * {@link de.gurkenlabs.litiengine.entities.IEntity#getLocation()}.
+ * An abstract implementation for emitters that are bound to <code>IEntity.getLocation()</code>.
+ * 
+ * @see IEntity#getLocation()
  */
 public abstract class EntityEmitter extends Emitter implements IEntityProvider {
 
-  /** The entity. */
   private final IEntity entity;
 
   /**

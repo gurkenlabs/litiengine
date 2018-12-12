@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.Resources;
-
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
   private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
@@ -21,6 +19,7 @@ public final class FileUtilities {
   private static final String FILE_SEPARATOR_LINUX = "/";
 
   private FileUtilities() {
+    throw new UnsupportedOperationException();
   }
 
   public static boolean deleteDir(final File dir) {

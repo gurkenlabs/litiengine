@@ -14,9 +14,10 @@ import javax.swing.JSpinner;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
-import de.gurkenlabs.litiengine.Resources;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Icons;
 
+@SuppressWarnings("serial")
 public class GridEditPanel extends JPanel {
   private JSpinner widthSpinner, heightSpinner, strokeSpinner;
   private JButton buttonSetColor;
@@ -24,14 +25,14 @@ public class GridEditPanel extends JPanel {
 
   public GridEditPanel(int gridWidth, int gridHeight, float strokeWidth, Color strokeColor) {
 
-    JLabel lblStroke = new JLabel(Resources.get("menu_gridStroke"));
+    JLabel lblStroke = new JLabel(Resources.strings().get("menu_gridStroke"));
 
-    JLabel lblWidth = new JLabel(Resources.get("menu_gridWidth"));
+    JLabel lblWidth = new JLabel(Resources.strings().get("menu_gridWidth"));
 
     this.widthSpinner = new JSpinner();
     this.widthSpinner.setModel(new SpinnerNumberModel(gridWidth, null, null, new Integer(1)));
 
-    JLabel lblHeight = new JLabel(Resources.get("menu_gridHeight"));
+    JLabel lblHeight = new JLabel(Resources.strings().get("menu_gridHeight"));
 
     this.heightSpinner = new JSpinner();
     this.heightSpinner.setModel(new SpinnerNumberModel(gridHeight, null, null, new Integer(1)));
@@ -43,11 +44,11 @@ public class GridEditPanel extends JPanel {
     this.buttonSetColor = new JButton("");
     this.buttonSetColor.setIcon(Icons.COLORX16);
     this.buttonSetColor.addActionListener(a -> {
-      Color newColor = JColorChooser.showDialog(null, Resources.get("panel_selectLayerColor"), strokeColor);
+      Color newColor = JColorChooser.showDialog(null, Resources.strings().get("panel_selectLayerColor"), strokeColor);
       this.gridColor = newColor == null ? strokeColor : newColor;
     });
 
-    JLabel lblColor = new JLabel(Resources.get("menu_gridColor"));
+    JLabel lblColor = new JLabel(Resources.strings().get("menu_gridColor"));
 
     GroupLayout groupLayout = new GroupLayout(this);
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)

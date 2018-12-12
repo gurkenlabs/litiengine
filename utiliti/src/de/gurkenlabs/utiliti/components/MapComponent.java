@@ -39,7 +39,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.Resources;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.CollisionEntity;
@@ -52,7 +51,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
@@ -61,7 +59,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
-import de.gurkenlabs.litiengine.graphics.ImageCache;
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
@@ -69,6 +66,7 @@ import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.ComponentMouseWheelEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -237,7 +235,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     log.log(Level.INFO, "{0} maps found in folder {1}", new Object[] { files.size(), projectPath });
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
-      Map map = (Map) MapLoader.load(mapFile);
+      Map map = (Map) Resources.maps().get(mapFile);
       loadedMaps.add(map);
       log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
     }
@@ -536,7 +534,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_prompt_name"), Resources.get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
+    Object name = JOptionPane.showInputDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_prompt_name"), Resources.strings().get("input_prompt_name_title"), JOptionPane.PLAIN_MESSAGE, null, null, this.getFocusedMapObject().getName());
     if (name == null) {
       return;
     }
@@ -722,7 +720,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
     if (n != JOptionPane.YES_OPTION) {
       return;
     }
@@ -748,7 +746,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
       String mapPath = file.toString();
-      Map map = (Map) MapLoader.load(mapPath);
+      Map map = (Map) Resources.maps().get(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
         return;
@@ -765,7 +763,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       Optional<Map> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();
       if (current.isPresent()) {
-        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.get("input_replace_map", map.getName()), Resources.get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
+        int n = JOptionPane.showConfirmDialog(Game.getScreenManager().getRenderComponent(), Resources.strings().get("input_replace_map", map.getName()), Resources.strings().get("input_replace_map_title"), JOptionPane.YES_NO_OPTION);
 
         if (n == JOptionPane.YES_OPTION) {
           this.getMaps().remove(current.get());
@@ -779,12 +777,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Collections.sort(this.getMaps());
 
       for (IImageLayer imageLayer : map.getImageLayers()) {
-        BufferedImage img = Resources.getImage(imageLayer.getImage().getAbsoluteSourcePath(), true);
+        BufferedImage img = Resources.images().get(imageLayer.getImage().getAbsoluteSourcePath(), true);
         if (img == null) {
           continue;
         }
 
-        Spritesheet sprite = Spritesheet.load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
+        Spritesheet sprite = Resources.spritesheets().load(img, imageLayer.getImage().getSource(), img.getWidth(), img.getHeight());
         this.screen.getGameFile().getSpriteSheets().add(new SpritesheetInfo(sprite));
       }
 
@@ -799,7 +797,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       }
 
       EditorScreen.instance().updateGameFileMaps();
-      ImageCache.clearAll();
+      Resources.images().clear();
       if (this.environments.containsKey(map.getName())) {
         this.environments.remove(map.getName());
       }
@@ -811,13 +809,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
-    Spritesheet sprite = Spritesheet.find(tileset.getImage().getSource());
-    if (sprite != null) {
-      Spritesheet.remove(sprite.getName());
+    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(tileset.getImage().getSource());
+    if (opt.isPresent()) {
+      Spritesheet sprite = opt.get();
+      Resources.spritesheets().remove(sprite.getName());
       this.screen.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(sprite.getName()));
     }
 
-    Spritesheet newSprite = Spritesheet.load(tileset);
+    Spritesheet newSprite = Resources.spritesheets().load(tileset);
     SpritesheetInfo info = new SpritesheetInfo(newSprite);
     EditorScreen.instance().getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
     EditorScreen.instance().getGameFile().getSpriteSheets().add(info);
@@ -864,7 +863,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         String dir = FileUtilities.getParentDirPath(newFile);
         for (ITileset tileSet : map.getTilesets()) {
           ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
-          ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Spritesheet.find(tileSet.getImage().getSource()).getImage(), format);
+          ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);
 
           Tileset tile = (Tileset) tileSet;
           if (tile.isExternal()) {
@@ -1366,7 +1365,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         Game.getCamera().setFocus(newFocus);
       }
 
-      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewPort().getCenterX());
+      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewport().getCenterX());
       return;
     }
 
@@ -1389,7 +1388,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.getCamera().setFocus(newFocus);
     }
 
-    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewPort().getCenterY());
+    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewport().getCenterY());
   }
 
   /***
@@ -1751,7 +1750,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       for (int x = 0; x < Game.getEnvironment().getMap().getWidth(); x++) {
         for (int y = 0; y < Game.getEnvironment().getMap().getHeight(); y++) {
           Shape tile = Game.getEnvironment().getMap().getTileShape(x, y);
-          if (Game.getCamera().getViewPort().intersects(tile.getBounds2D())) {
+          if (Game.getCamera().getViewport().intersects(tile.getBounds2D())) {
             Game.getRenderEngine().renderOutline(g, tile, stroke);
           }
         }
@@ -1828,7 +1827,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewPortLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.getCamera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();

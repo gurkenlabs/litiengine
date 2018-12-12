@@ -132,12 +132,12 @@ public abstract class Entity implements IEntity {
 
   @Override
   public void removeMessageListener(MessageListener listener) {
-    for (List<MessageListener> listeners : this.messageListeners.values()) {
-      if (listeners == null || listeners.isEmpty()) {
+    for (List<MessageListener> listenerType : this.messageListeners.values()) {
+      if (listenerType == null || listenerType.isEmpty()) {
         continue;
       }
 
-      listeners.remove(listener);
+      listenerType.remove(listener);
     }
   }
 
@@ -182,13 +182,13 @@ public abstract class Entity implements IEntity {
       return this.boundingBox;
     }
 
-    this.boundingBox = new Rectangle2D.Double(this.getLocation().getX(), this.getLocation().getY(), this.getWidth(), this.getHeight());
+    this.boundingBox = new Rectangle2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     return this.boundingBox;
   }
 
   @Override
   public Point2D getCenter() {
-    return new Point2D.Double(this.getLocation().getX() + this.getWidth() * 0.5, this.getLocation().getY() + this.getHeight() * 0.5);
+    return new Point2D.Double(this.getX() + this.getWidth() * 0.5, this.getY() + this.getHeight() * 0.5);
   }
 
   @Override
@@ -326,14 +326,6 @@ public abstract class Entity implements IEntity {
     if (Game.getEnvironment() != null) {
       Game.getEnvironment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
     }
-    /*
-    if (Game.getEnvironment().getEntitiesByTag().containsKey(tag)) {
-      Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
-      return;
-    }
-    Game.getEnvironment().getEntitiesByTag().put(tag, new CopyOnWriteArrayList<>());
-    Game.getEnvironment().getEntitiesByTag().get(tag).add(this);
-    */
   }
 
   @Override

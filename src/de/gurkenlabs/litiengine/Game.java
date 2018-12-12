@@ -1,10 +1,8 @@
 package de.gurkenlabs.litiengine;
 
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,19 +15,17 @@ import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
-import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
 import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -81,8 +77,6 @@ public final class Game {
   private static final SoundEngine soundEngine;
   private static final IPhysicsEngine physicsEngine;
 
-  private static final List<IMap> maps;
-  private static final List<ITileset> tilesets;
   private static final GameMetrics metrics;
 
   private static final GameTime gameTime;
@@ -108,8 +102,7 @@ public final class Game {
     soundEngine = new SoundEngine();
     metrics = new GameMetrics();
     gameInfo = new GameInfo();
-    maps = new CopyOnWriteArrayList<>();
-    tilesets = new CopyOnWriteArrayList<>();
+
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
@@ -120,6 +113,7 @@ public final class Game {
   }
 
   private Game() {
+    throw new UnsupportedOperationException();
   }
 
   public static void addGameListener(GameListener listener) {
@@ -171,18 +165,34 @@ public final class Game {
   }
 
   /**
-   * This flag indicates whether the game should display the {@link ScreenManager} or not.
-   * This can only be set before the game has been initialized with the {@link #init(String...)} method. Afterwards it doesn't have an effect anymore.
-   * If set to true, the {@link ScreenManager#setVisible(boolean)} method won't be set to true and the {@link RenderLoop} won't be started.
-   * Also the {@link Camera} won't be updated.
+
+   * This flag indicates whether the game should display the <code>ScreenManager</code> or not.
+   * This can only be set before the game has been initialized with the <code>Game.init(String...)</code> method. Afterwards it doesn't have an effect
+   * anymore.
+   * If enabled, the <code>ScreenManager#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
+   * Also the <code>Camera</code> won't be updated.
    * 
    * @param noGui
    *          If set to true, the GUI will be hidden.
+   * @see ScreenManager
+   * @see Game#init(String...)
+   * @see ScreenManager#setVisible(boolean)
+   * @see RenderLoop
+   * @see Camera
    */
   public static void hideGUI(boolean noGui) {
     noGUIMode = noGui;
   }
 
+  /**
+   * This flag globally controls the game's debugging state. If enabled, debugging functionality (e.g. rendering collision boxes)
+   * can potentially be enabled in the configuration.
+   * 
+   * @return True if debugging functionality is enabled; otherwise false.
+   * 
+   * @see Game#allowDebug(boolean)
+   * @see GameConfiguration#debug()
+   */
   public static boolean isDebug() {
     return debug;
   }
@@ -203,8 +213,9 @@ public final class Game {
    * Gets the basic meta information about this game.<br>
    * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
    * <br>
-   * <i>It's also possible to provide additional custom information using the method group of
-   * <code>GameInfo.setValue("CUSTOM_STRING", "my-value")</code>.</i>
+
+   * <i>It's also possible to provide additional custom information using the method group of<br>
+   * <code>Game.getInfo().setValue("CUSTOM_STRING", "my-value")</code>.</i>
    * 
    * @return The game's basic meta information.
    * 
@@ -219,44 +230,6 @@ public final class Game {
 
   public static IGameLoop getLoop() {
     return gameLoop;
-  }
-
-  /**
-   * Get a Map that was already loaded into memory by its name.
-   * It is important that maps always have a unique name because only the first match will be retrieved.
-   * 
-   * @param mapName
-   *          the name of the map you want to load
-   * 
-   * @return
-   *         null if no map with the provided name was found, otherwise the first found map.
-   */
-  public static IMap getMap(final String mapName) {
-    if (mapName == null || mapName.isEmpty() || maps.isEmpty()) {
-      return null;
-    }
-
-    for (final IMap map : maps) {
-      if (map.getName().equals(mapName)) {
-        return map;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Get a list of maps that are already loaded into memory.
-   * 
-   * @return
-   *         a list of all previously loaded maps
-   */
-  public static List<IMap> getMaps() {
-    return maps;
-  }
-
-  public static List<ITileset> getTilesets() {
-    return tilesets;
   }
 
   public static GameMetrics getMetrics() {
@@ -366,7 +339,7 @@ public final class Game {
       }
 
       getScreenManager().getRenderComponent().onFpsChanged(fps -> getMetrics().setFramesPerSecond(fps));
-      getScreenManager().setIconImage(Resources.getImage("litiengine-icon.png"));
+      getScreenManager().setIconImage(Resources.images().get("litiengine-icon.png"));
 
       // init mouse inputs
       getScreenManager().getRenderComponent().addMouseListener(Input.mouse());
@@ -385,63 +358,6 @@ public final class Game {
     gameLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     renderLoop.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
-  }
-
-  /**
-   * Load Spritesheets, Tilesets and Maps from a game resource file created with the utiLITI editor.
-   * 
-   * @param gameResourceFile
-   *          the file name of the game resource file
-   */
-  public static void load(final String gameResourceFile) {
-    final GameData file = GameData.load(gameResourceFile);
-    if (file == null) {
-      return;
-    }
-
-    int mapCnt = 0;
-    for (final IMap m : file.getMaps()) {
-      if (getMaps().stream().anyMatch(x -> x.getName().equals(m.getName()))) {
-        continue;
-      }
-
-      getMaps().add(m);
-      mapCnt++;
-    }
-
-    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
-
-    int tileCnt = 0;
-    for (final ITileset tileset : file.getTilesets()) {
-      if (getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
-        continue;
-      }
-
-      getTilesets().add(tileset);
-      tileCnt++;
-    }
-
-    log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
-
-    final List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
-      final Spritesheet sprite = Spritesheet.load(tileset);
-      loadedSprites.add(sprite);
-    }
-
-    log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
-
-    int spriteload = 0;
-    for (final Spritesheet s : loadedSprites) {
-      for (int i = 0; i < s.getRows() * s.getColumns(); i++) {
-        BufferedImage sprite = s.getSprite(i);
-        if (sprite != null) {
-          spriteload++;
-        }
-      }
-    }
-
-    log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
   public static void unloadEnvironment() {

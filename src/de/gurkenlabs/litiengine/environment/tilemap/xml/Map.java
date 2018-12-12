@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -533,7 +534,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public int compareTo(Map o) {
     if (this.name == null) {
-      return -1;
+      return o.name == null ? 0 : -1;
     }
 
     if (o.name == null) {
@@ -541,6 +542,22 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     }
 
     return this.name.compareTo(o.name);
+  }
+
+  @Override
+  public boolean equals(Object anObject) {
+    if (this == anObject) {
+      return true;
+    }
+    if (!(anObject instanceof Map) || anObject == null) {
+      return false;
+    }
+    return Objects.equals(this.name, ((Map)anObject).name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(this.name);
   }
 
   @Override

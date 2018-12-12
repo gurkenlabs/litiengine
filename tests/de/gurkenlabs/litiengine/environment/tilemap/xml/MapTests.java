@@ -8,19 +8,24 @@ import static org.mockito.Mockito.mock;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapTests {
+  @BeforeEach
+  public void clearResources() {
+    Resources.maps().clear();
+  }
 
   @Test
   public void testBasicProperties() {
-    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals(1.0, map.getVersion());
     assertEquals("1.1.4", map.getTiledVersion());
@@ -53,7 +58,7 @@ public class MapTests {
 
   @Test
   public void testTileCustomProperties() {
-    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
     assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getStringValue("foo"));
     assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getStringValue("baz"));
@@ -61,7 +66,7 @@ public class MapTests {
 
   @Test
   public void testSettingProperties() {
-    Map map = (Map) MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
     map.setOrientation(MapOrientation.SHIFTED.name());
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
@@ -86,7 +91,7 @@ public class MapTests {
 
   @Test
   public void testMapObjectLayers() {
-    IMap map = MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-mapobject.tmx");
     assertEquals(1, map.getMapObjectLayers().size());
 
     IMapObjectLayer layer = map.getMapObjectLayers().get(0);
@@ -136,7 +141,7 @@ public class MapTests {
 
   @Test
   public void testInfiniteMap() {
-    Map map = (Map) MapLoader.load("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
+    Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-infinite-map.tmx");
 
     assertTrue(map.isInfinite());
     assertEquals(64, map.getWidth());

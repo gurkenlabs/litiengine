@@ -125,7 +125,7 @@ public class AStarGrid implements IRenderable {
 
   @Override
   public void render(Graphics2D g) {
-    final Rectangle2D viewport = Game.getCamera().getViewPort();
+    final Rectangle2D viewport = Game.getCamera().getViewport();
 
     final AStarNode startNode = this.getNode(viewport.getX(), viewport.getY());
     final AStarNode endNode = this.getNode(viewport.getMaxX(), viewport.getMaxY());

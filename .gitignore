@@ -4,3 +4,6 @@
 /config.properties
 /.DS_Store
 crash.txt
+/.idea
+/out/production/classes/de/gurkenlabs/litiengine
+/out/test/classes/de/gurkenlabs/litiengine
