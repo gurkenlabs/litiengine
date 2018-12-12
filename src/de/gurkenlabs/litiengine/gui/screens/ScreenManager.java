@@ -24,6 +24,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
+//TODO: Separate ScreenManager from GameWindow implementation
 public class ScreenManager extends JFrame implements IScreenManager, GameWindow {
 
   private static final int SCREENCHANGETIMEOUT = 200;

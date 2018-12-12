@@ -16,6 +16,8 @@ import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
 import de.gurkenlabs.litiengine.configuration.InputConfiguration;
 import de.gurkenlabs.litiengine.configuration.SoundConfiguration;
+import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
 import de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
@@ -24,8 +26,12 @@ import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.GameWindow;
 import de.gurkenlabs.litiengine.graphics.ICamera;
+import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
+import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -109,9 +115,9 @@ public final class Game {
     graphicsEngine = new RenderEngine();
     physicsEngine = new PhysicsEngine();
     soundEngine = new SoundEngine();
+
     metrics = new GameMetrics();
     gameInfo = new GameInfo();
-
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
@@ -194,10 +200,10 @@ public final class Game {
   }
 
   /**
-   * Gets the basic meta information about this game.<br>
-   * This instance can be used to define meta information about your game, like it's name, version or web site.<br>
+   * Gets the static meta information about this game.<br>
+   * This can be used to define meta information about your game, like it's name, version or web site.<br>
    * <br>
-   * <i>It's also possible to provide additional custom information using the method group of<br>
+   * <i>It's also possible to provide additional custom information using the method group <br>
    * <code>Game.getInfo().setValue("CUSTOM_STRING", "my-value")</code>.</i>
    * 
    * @return The game's basic meta information.
@@ -275,7 +281,7 @@ public final class Game {
   }
 
   /**
-   * Gets the engine's <code>SoundEngine</code> that can be used to play sounds and music.<br>
+   * Gets the engine's <code>SoundEngine</code> component that can be used to play sounds and music.<br>
    * Sound can be loaded and accessed using the <code>Resources</code> API and are managed by the<br>
    * <code>Resources.sounds()</code> resource container.
    * 
@@ -285,7 +291,7 @@ public final class Game {
    * </i>
    * </p>
    * 
-   * @return The engine's <code>SoundEngine</code>.
+   * @return The engine's <code>SoundEngine</code> component.
    * 
    * @see Sound
    * @see Resources#sounds()
@@ -297,18 +303,87 @@ public final class Game {
     return soundEngine;
   }
 
+  /**
+   * Gets the engine's <code>PhysicsEngine</code> component that can be used to detect and resolve collision and move entities with respect to all
+   * collision
+   * entities on the environment.<br>
+   * The boundaries of the loaded environment also pose a "non-walkable" area that will be taken into account when moving entities with this engine.
+   * 
+   * <p>
+   * <i>It is also possible to manually register static collision <code>Rectangles</code> that can further restrict the game world.</i>
+   * </p>
+   * 
+   * @return The engine's <code>PhysicsEngine</code> component.
+   * 
+   * @see PhysicsEngine
+   * @see PhysicsEngine#move(IMobileEntity, float)
+   * @see ICollisionEntity
+   */
   public static IPhysicsEngine physics() {
     return physicsEngine;
   }
 
+  /**
+   * Gets the engine's <code>RenderEngine</code> component that is used to render <code>Images, Shapes or Text</code> with respect to the environment
+   * and the render scale and the <code>Camera</code>.
+   * 
+   * <p>
+   * <i>In case you want to render something in a static manner that is unrelated to the environment, you can use the engine's different static
+   * <code>Renderer</code> implementations.</i>
+   * </p>
+   * 
+   * @return The engine's <code>RenderEngine</code> component.
+   * 
+   * @see RenderEngine#getBaseRenderScale()
+   * @see TextRenderer
+   * @see ShapeRenderer
+   * @see ImageRenderer
+   */
   public static RenderEngine graphics() {
     return graphicsEngine;
   }
 
+  /**
+   * Gets the game's main loop that is used to execute and manage all game logic apart from rendering and input processing.<br>
+   * You can attach any <code>Updatable</code> instance to this loop if you want to execute custom game logic that is executed at the configured
+   * updaterate.
+   * 
+   * <p>
+   * <i>The LITIengine has separate loops for game logic, rendering and input processing. <br>
+   * This prevents them from interfering with each other and also properly separates tasks by their category.</i>
+   * </p>
+   * 
+   * 
+   * @return The game's main loop.
+   *
+   * @see ClientConfiguration#getUpdaterate()
+   * @see IUpdateable
+   * @see ILoop#attach(IUpdateable)
+   * @see ILoop#detach(IUpdateable)
+   * @see Input#getLoop()
+   * @see Game#renderLoop()
+   */
   public static IGameLoop loop() {
     return gameLoop;
   }
 
+  /**
+   * Gets the game's loop that executes the rendering process on the GameFrame's <code>RenderComponent</code>.<br>
+   * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
+   * Environment for rendering. This loop will try to execute at the configured frames-per-second and limit the frames to this value.
+   * 
+   * <p>
+   * <i>It's also possible to register <code>Updatable</code> instances to this loop which is useful if you want to execute something that is directly related to
+   * the rendering process and needs to be executed right before the game's rendering starts.</i>
+   * </p>
+   * 
+   * @return The game's render loop.
+   * 
+   * @see ClientConfiguration#getMaxFps()
+   * @see RenderComponent#render()
+   * @see GuiComponent#render(java.awt.Graphics2D)
+   * @see Environment#render(java.awt.Graphics2D)
+   */
   public static RenderLoop renderLoop() {
     return renderLoop;
   }
@@ -336,7 +411,7 @@ public final class Game {
 
   public static void loadEnvironment(final IEnvironment env) {
     unloadEnvironment();
-    
+
     environment = env;
     if (getEnvironment() != null) {
       getEnvironment().load();
@@ -358,7 +433,7 @@ public final class Game {
   public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
     environmentLoadedListeners.remove(listener);
   }
-  
+
   public static void addEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
     environmentUnloadedListeners.add(listener);
   }
@@ -366,7 +441,6 @@ public final class Game {
   public static void removeEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
     environmentUnloadedListeners.remove(listener);
   }
-
 
   public static boolean hasStarted() {
     return hasStarted;
