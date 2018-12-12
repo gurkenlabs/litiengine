@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.configuration.GraphicConfiguration;
 import de.gurkenlabs.litiengine.configuration.InputConfiguration;
 import de.gurkenlabs.litiengine.configuration.SoundConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
+import de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.Camera;
@@ -76,6 +77,7 @@ public final class Game {
   private static boolean debug = true;
   private static boolean noGUIMode = false;
   private static final List<EnvironmentLoadedListener> environmentLoadedListeners;
+  private static final List<EnvironmentUnloadedListener> environmentUnloadedListeners;
   private static final List<GameListener> gameListeners;
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
@@ -100,6 +102,7 @@ public final class Game {
 
   static {
     environmentLoadedListeners = new CopyOnWriteArrayList<>();
+    environmentUnloadedListeners = new CopyOnWriteArrayList<>();
     gameListeners = new CopyOnWriteArrayList<>();
     gameTerminatedListeners = new CopyOnWriteArrayList<>();
 
@@ -322,11 +325,18 @@ public final class Game {
     return environment;
   }
 
-  public static void loadEnvironment(final IEnvironment env) {
+  public static void unloadEnvironment() {
     if (getEnvironment() != null) {
       getEnvironment().unload();
+      for (final EnvironmentUnloadedListener listener : environmentUnloadedListeners) {
+        listener.environmentUnloaded(getEnvironment());
+      }
     }
+  }
 
+  public static void loadEnvironment(final IEnvironment env) {
+    unloadEnvironment();
+    
     environment = env;
     if (getEnvironment() != null) {
       getEnvironment().load();
@@ -348,6 +358,15 @@ public final class Game {
   public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
     environmentLoadedListeners.remove(listener);
   }
+  
+  public static void addEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
+    environmentUnloadedListeners.add(listener);
+  }
+
+  public static void removeEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
+    environmentUnloadedListeners.remove(listener);
+  }
+
 
   public static boolean hasStarted() {
     return hasStarted;

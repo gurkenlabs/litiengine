@@ -15,15 +15,37 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private int amount;
   private IEnvironment environment;
   private int interval;
-  private long lastSpawn;
+  private long lastSpawnWave;
   private int spawnDelay;
-
   private SpawnMode spawnMode;
-
   private List<Spawnpoint> spawnpoints;
 
+  /**
+   * Instantiates a new entity spawner.
+   *
+   * @param environment
+   *          the environment
+   * @param loop
+   *          the loop
+   * @param spawnpoints
+   *          the spawnpoints
+   * @param interval
+   *          the interval
+   * @param amount
+   *          the amount
+   */
   public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.environment = environment;
+    Game.addEnvironmentUnloadedListener(e -> {
+      if (e == this.environment) {
+        loop.detach(this);
+      }
+    });
+    Game.addEnvironmentLoadedListener(e -> {
+      if (e == this.environment) {
+        loop.attach(this);
+      }
+    });
     this.interval = interval;
     this.spawnDelay = 1000;
     this.amount = amount;
@@ -33,12 +55,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public int getAmount() {
+  public int getSpawnAmount() {
     return this.amount;
   }
 
   @Override
-  public int getInterval() {
+  public int getSpawnInterval() {
     return this.interval;
   }
 
@@ -48,7 +70,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public IEntitySpawner.SpawnMode getSpawnMode() {
+  public SpawnMode getSpawnMode() {
     return this.spawnMode;
   }
 
@@ -58,12 +80,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public void setAmount(final int amount) {
+  public void setSpawnAmount(final int amount) {
     this.amount = amount;
   }
 
   @Override
-  public void setInterval(final int interval) {
+  public void setSpawnInterval(final int interval) {
     this.interval = interval;
   }
 
@@ -73,20 +95,25 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   @Override
-  public void setSpawnMode(final IEntitySpawner.SpawnMode mode) {
+  public void setSpawnMode(final SpawnMode mode) {
     this.spawnMode = mode;
   }
 
   @Override
   public void update() {
-    if (Game.loop().getDeltaTime(this.lastSpawn) < this.getInterval()) {
+    if (Game.loop().getDeltaTime(this.lastSpawnWave) < this.getSpawnInterval()) {
       return;
     }
 
     this.spawnNewEntities();
-    this.lastSpawn = Game.loop().getTicks();
+    this.lastSpawnWave = Game.loop().getTicks();
   }
 
+  /**
+   * Spawn new entities, depending on the <code>SpawnMode</code>, spawnAmount, spawnDelay, and spawnInterval of an <code>EntitySpawner</code>.
+   * 
+   * @see SpawnMode
+   */
   protected void spawnNewEntities() {
     if (this.getSpawnPoints().isEmpty()) {
       return;
@@ -95,15 +122,15 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
     switch (this.getSpawnMode()) {
     case ALLSPAWNPOINTS:
       for (final Spawnpoint spawn : this.getSpawnPoints()) {
-        this.spawn(spawn, this.getAmount());
+        this.spawn(spawn, this.getSpawnAmount());
       }
       break;
     case ONERANDOMSPAWNPOINT:
       final int rnd = new Random().nextInt(this.getSpawnPoints().size());
-      this.spawn(this.getSpawnPoints().get(rnd), this.getAmount());
+      this.spawn(this.getSpawnPoints().get(rnd), this.getSpawnAmount());
       break;
     case RANDOMSPAWNPOINTS:
-      for (int i = 0; i < this.getAmount(); i++) {
+      for (int i = 0; i < this.getSpawnAmount(); i++) {
         final int rnd2 = new Random().nextInt(this.getSpawnPoints().size());
         this.spawn(this.getSpawnPoints().get(rnd2), 1);
       }
@@ -119,9 +146,21 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   }
 
   private class SpawnThread extends Thread {
+
+    /** The amount of entities to spawn. */
     private final int amount;
+
+    /** The <code>Spawnpoint</code> where entities will be spawned. */
     private final Spawnpoint point;
 
+    /**
+     * Instantiates a new spawn thread.
+     *
+     * @param point
+     *          the <code>Spawnpoint</code> where entities will be spawned.
+     * @param amount
+     *          the amount of entities to spawn.
+     */
     public SpawnThread(final Spawnpoint point, final int amount) {
       this.point = point;
       this.amount = amount;
@@ -144,5 +183,4 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
       }
     }
   }
-
 }
