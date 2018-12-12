@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.configuration.GameConfiguration;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
+import de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener;
 import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -71,6 +72,7 @@ public final class Game {
   private static boolean debug = true;
   private static boolean noGUIMode = false;
   private static final List<EnvironmentLoadedListener> environmentLoadedListeners;
+  private static final List<EnvironmentUnloadedListener> environmentUnloadedListeners;
   private static final List<GameListener> gameListeners;
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
@@ -97,6 +99,7 @@ public final class Game {
 
   static {
     environmentLoadedListeners = new CopyOnWriteArrayList<>();
+    environmentUnloadedListeners = new CopyOnWriteArrayList<>();
     gameListeners = new CopyOnWriteArrayList<>();
     gameTerminatedListeners = new CopyOnWriteArrayList<>();
 
@@ -112,7 +115,7 @@ public final class Game {
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
-    
+
     addGameListener(new InputGameAdapter());
   }
 
@@ -143,6 +146,14 @@ public final class Game {
 
   public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
     environmentLoadedListeners.remove(listener);
+  }
+
+  public static void addEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
+    environmentUnloadedListeners.add(listener);
+  }
+
+  public static void removeEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
+    environmentUnloadedListeners.remove(listener);
   }
 
   /**
@@ -433,10 +444,17 @@ public final class Game {
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
   }
 
-  public static void loadEnvironment(final IEnvironment env) {
+  public static void unloadEnvironment() {
     if (getEnvironment() != null) {
       getEnvironment().unload();
+      for (final EnvironmentUnloadedListener listener : environmentUnloadedListeners) {
+        listener.environmentUnloaded(getEnvironment());
+      }
     }
+  }
+
+  public static void loadEnvironment(final IEnvironment env) {
+    unloadEnvironment();
 
     environment = env;
     if (getEnvironment() != null) {

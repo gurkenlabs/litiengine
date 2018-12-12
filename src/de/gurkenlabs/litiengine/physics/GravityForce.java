@@ -7,15 +7,19 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class GravityForce extends Force {
-  private final Direction direction;
+  private final float directionAngle;
 
-  /** The force entiy. */
+  /** The force entity. */
   private final IEntity forceEntity;
 
-  public GravityForce(final IEntity forceEntity, final float strength, final Direction dir) {
+  public GravityForce(final IEntity forceEntity, final float strength, final Direction direction) {
+    this(forceEntity, strength, Direction.toAngle(direction));
+  }
+
+  public GravityForce(final IEntity forceEntity, final float strength, final float angle) {
     super(forceEntity.getCenter(), strength, 0);
     this.forceEntity = forceEntity;
-    this.direction = dir;
+    this.directionAngle = angle;
     this.setCancelOnCollision(false);
     this.setCancelOnReached(false);
   }
@@ -31,6 +35,7 @@ public class GravityForce extends Force {
 
   @Override
   public Point2D getLocation() {
-    return GeometricUtilities.project(this.getForceEntity().getCenter(), Direction.toAngle(this.direction), Math.max(this.forceEntity.getHeight(), this.forceEntity.getWidth() * 2 + this.getStrength()));
+    return GeometricUtilities.project(this.getForceEntity().getCenter(), this.directionAngle, Math.max(this.forceEntity.getHeight(), this.forceEntity.getWidth() * 2 + this.getStrength()));
   }
+
 }
