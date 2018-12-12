@@ -33,6 +33,7 @@ import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
+import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
@@ -373,7 +374,8 @@ public final class Game {
    * Environment for rendering. This loop will try to execute at the configured frames-per-second and limit the frames to this value.
    * 
    * <p>
-   * <i>It's also possible to register <code>Updatable</code> instances to this loop which is useful if you want to execute something that is directly related to
+   * <i>It's also possible to register <code>Updatable</code> instances to this loop which is useful if you want to execute something that is directly
+   * related to
    * the rendering process and needs to be executed right before the game's rendering starts.</i>
    * </p>
    * 
@@ -381,6 +383,7 @@ public final class Game {
    * 
    * @see ClientConfiguration#getMaxFps()
    * @see RenderComponent#render()
+   * @see Screen#render(java.awt.Graphics2D)
    * @see GuiComponent#render(java.awt.Graphics2D)
    * @see Environment#render(java.awt.Graphics2D)
    */
@@ -388,12 +391,39 @@ public final class Game {
     return renderLoop;
   }
 
+  /**
+   * Gets the game's <code>ScreenManager</code> that is responsible for organizing all <code>Screens</code> of your game and providing the currently
+   * active <code>Screen</code> that is used to render the current <code>Environment</code>.<br>
+   * Screens are the containers that allow you to organize the visible contents of your game and are identified and addressed by a unique name.
+   * 
+   * <p>
+   * <i>Examples: Menu Screen, Credits Screen, Game Screen, Inventory Screen</i>
+   * </p>
+   * 
+   * @return
+   * 
+   * @see Screen
+   * @see Game#getEnvironment()
+   */
   public static IScreenManager screens() {
     return screenManager;
   }
 
   public static ICamera getCamera() {
     return camera;
+  }
+
+  public static void setCamera(final ICamera cam) {
+    if (getCamera() != null) {
+      Game.loop().detach(camera);
+    }
+
+    camera = cam;
+
+    if (!isInNoGUIMode()) {
+      Game.loop().attach(cam);
+      getCamera().updateFocus();
+    }
   }
 
   public static IEnvironment getEnvironment() {
@@ -596,19 +626,6 @@ public final class Game {
 
     hasStarted = false;
     initialized = false;
-  }
-
-  public static void setCamera(final ICamera cam) {
-    if (getCamera() != null) {
-      Game.loop().detach(camera);
-    }
-
-    camera = cam;
-
-    if (!isInNoGUIMode()) {
-      Game.loop().attach(cam);
-      getCamera().updateFocus();
-    }
   }
 
   /**
