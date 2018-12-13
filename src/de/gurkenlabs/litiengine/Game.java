@@ -580,7 +580,7 @@ public final class Game {
    * When the <code>Game</code> has started up successfully, it'll callback to the registered <code>GameListeners</code>.
    * </p>
    * 
-   * @see ScreenManager#getCurrentScreen()
+   * @see ScreenManager#current()
    * @see SoundEngine
    * @see Input
    * @see GameListener#started()

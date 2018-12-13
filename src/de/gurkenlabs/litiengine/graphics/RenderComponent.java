@@ -144,7 +144,7 @@ public class RenderComponent extends Canvas implements IInitializable {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        final Screen currentScreen = Game.screens().getCurrentScreen();
+        final Screen currentScreen = Game.screens().current();
         if (currentScreen != null) {
           currentScreen.render(g);
         }

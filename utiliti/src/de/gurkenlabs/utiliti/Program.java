@@ -138,8 +138,7 @@ public class Program {
     userPreferences = Game.config().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
     Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
-    Game.screens().addScreen(EditorScreen.instance());
-    Game.screens().displayScreen("EDITOR");
+    Game.screens().display(EditorScreen.instance());
 
     Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
     Game.window().getRenderComponent().setCursorOffsetX(0);

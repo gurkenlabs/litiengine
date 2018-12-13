@@ -21,13 +21,17 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
  * @see Game#renderLoop()
  */
 public interface IScreenManager {
-  public void addScreen(final Screen screen);
+  public void add(Screen screen);
 
-  public void displayScreen(Screen screen);
+  public void remove(Screen screen);
 
-  public void displayScreen(String screenName);
+  public void display(Screen screen);
 
-  public Screen getCurrentScreen();
+  public void display(String screenName);
+
+  public Screen get(String screenName);
+
+  public Screen current();
 
   public void onScreenChanged(Consumer<Screen> screenConsumer);
 }

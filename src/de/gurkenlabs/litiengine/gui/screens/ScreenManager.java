@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
@@ -26,7 +28,7 @@ import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 //TODO: Separate ScreenManager from GameWindow implementation
 public class ScreenManager extends JFrame implements IScreenManager, GameWindow {
-
+  private static final Logger log = Logger.getLogger(ScreenManager.class.getName());
   private static final int SCREENCHANGETIMEOUT = 200;
   private static final int ICONIFIED_MAX_FPS = 1;
   private static final int NONE_FOCUS_MAX_FPS = 10;
@@ -71,56 +73,57 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   }
 
   @Override
-  public void addScreen(final Screen screen) {
+  public void add(final Screen screen) {
     screen.setWidth(this.getWidth());
     screen.setHeight(this.getHeight());
     this.screens.add(screen);
 
-    if (this.getCurrentScreen() == null) {
-      this.displayScreen(screen);
+    if (this.current() == null) {
+      this.display(screen);
     }
   }
 
   @Override
-  public void displayScreen(final Screen screen) {
+  public void display(final Screen screen) {
     if (Game.hasStarted() && System.currentTimeMillis() - this.lastScreenChange < SCREENCHANGETIMEOUT) {
       return;
     }
 
-    if (this.getCurrentScreen() != null) {
-      this.getCurrentScreen().suspend();
+    if (this.current() != null) {
+      this.current().suspend();
     }
 
-    if (!screens.contains(screen))
-      screens.add(screen);
+    if (screen != null && !this.screens.contains(screen)) {
+      this.screens.add(screen);
+    }
 
     this.currentScreen = screen;
-    if (!Game.isInNoGUIMode()) {
-      this.getCurrentScreen().prepare();
+    if (!Game.isInNoGUIMode() && this.current() != null) {
+      this.current().prepare();
       this.setVisible(true);
     }
 
     this.lastScreenChange = System.currentTimeMillis();
     for (final Consumer<Screen> consumer : this.screenChangedConsumer) {
-      consumer.accept(this.getCurrentScreen());
+      consumer.accept(this.current());
     }
   }
 
   @Override
-  public void displayScreen(final String screen) {
+  public void display(final String screenName) {
     // if the screen is already displayed or there is no screen with the
     // specified name
-    if (this.getCurrentScreen() != null && this.getCurrentScreen().getName().equalsIgnoreCase(screen) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screen))) {
+    if (this.current() != null && this.current().getName().equalsIgnoreCase(screenName) || this.screens.stream().noneMatch(element -> element.getName().equalsIgnoreCase(screenName))) {
       // TODO: provide reasonable log, why the screen was not switched
       return;
     }
 
-    Optional<Screen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screen)).findFirst();
-    if (!opt.isPresent()) {
+    Screen screen = this.get(screenName);
+    if (screen == null) {
       return;
     }
 
-    displayScreen(opt.get());
+    this.display(screen);
   }
 
   @Override
@@ -129,7 +132,13 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   }
 
   @Override
-  public Screen getCurrentScreen() {
+  public Screen get(String screenName) {
+    Optional<Screen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screenName)).findFirst();
+    return opt.orElseGet(null);
+  }
+
+  @Override
+  public Screen current() {
     return this.currentScreen;
   }
 
@@ -178,7 +187,7 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
       if (gd.isFullScreenSupported()) {
         gd.setFullScreenWindow(this);
       } else {
-        System.err.println("Full screen is not supported on this device.");
+        log.log(Level.SEVERE, "Full screen is not supported on this device.");
         this.setExtendedState(Frame.MAXIMIZED_BOTH);
         setVisible(true);
       }
@@ -215,6 +224,18 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   public void onScreenChanged(final Consumer<Screen> screenConsumer) {
     if (!this.screenChangedConsumer.contains(screenConsumer)) {
       this.screenChangedConsumer.add(screenConsumer);
+    }
+  }
+
+  @Override
+  public void remove(Screen screen) {
+    this.screens.remove(screen);
+    if (this.current() == screen) {
+      if (!this.screens.isEmpty()) {
+        this.display(this.screens.get(0));
+      } else {
+        this.display((Screen) null);
+      }
     }
   }
 
