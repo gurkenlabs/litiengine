@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,7 +50,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
   public String getTypeOfProperty(String propertyName) {
     ICustomProperty property = this.getProperty(propertyName);
     if (property == null) {
-      throw new NoSuchElementException(propertyName);
+      return null;
     }
     return property.getType();
   }
@@ -75,11 +74,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public String getStringValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsString();
+    return this.getStringValue(propertyName, null);
   }
 
   @Override
@@ -93,11 +88,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public int getIntValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsInt();
+    return this.getIntValue(propertyName, 0);
   }
 
   @Override
@@ -120,11 +111,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public short getShortValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsShort();
+    return this.getShortValue(propertyName, (short)0);
   }
 
   @Override
@@ -138,11 +125,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public byte getByteValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsByte();
+    return this.getByteValue(propertyName, (byte)0);
   }
 
   @Override
@@ -156,11 +139,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public boolean getBoolValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsBool();
+    return this.getBoolValue(propertyName, false);
   }
 
   @Override
@@ -174,11 +153,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public float getFloatValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsFloat();
+    return this.getFloatValue(propertyName, 0f);
   }
 
   @Override
@@ -192,11 +167,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public double getDoubleValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsDouble();
+    return this.getDoubleValue(propertyName, 0.0);
   }
 
   @Override
@@ -210,11 +181,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public Color getColorValue(String propertyName) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsColor();
+    return this.getColorValue(propertyName, null);
   }
 
   @Override
@@ -228,11 +195,7 @@ public class CustomPropertyProvider implements ICustomPropertyProvider, Serializ
 
   @Override
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType) {
-    ICustomProperty property = this.getProperty(propertyName);
-    if (property == null) {
-      throw new NoSuchElementException(propertyName);
-    }
-    return property.getAsEnum(enumType);
+    return this.getEnumValue(propertyName, enumType, null);
   }
 
   @Override
