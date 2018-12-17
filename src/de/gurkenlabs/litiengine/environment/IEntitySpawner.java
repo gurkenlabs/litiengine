@@ -10,26 +10,28 @@ public interface IEntitySpawner<T extends IEntity> extends IUpdateable {
 
   /**
    * SpawnMode specifies the behaviour of the EntitySpawner:
-   * <li><b>ALLSPAWNPOINTS</b>: the specified spawnAmount is spawned at each of the SpawnPoints individually</li>
-   * <li><b>ONERANDOMSPAWNPOINT</b>: the specified spawnAmount is spawned at one random SpawnPoint</li>
-   * <li><b>RANDOMSPAWNPOINTS</b>: the specified spawnAmount is distributed equally to all of the SpawnPoints</li>
+   * <ul>
+   *  <li><b>ALLSPAWNPOINTS</b>: the specified spawnAmount is spawned at each of the SpawnPoints individually</li>
+   *  <li><b>ONERANDOMSPAWNPOINT</b>: the specified spawnAmount is spawned at one random SpawnPoint</li>
+   *  <li><b>RANDOMSPAWNPOINTS</b>: the specified spawnAmount is distributed equally to all of the SpawnPoints</li>
+   * </ul>
    */
   public enum SpawnMode {
 
-  /**
-   * Spawns the amount of mobs for all the spawnpoints available.
-   */
-  ALLSPAWNPOINTS,
+    /**
+     * Spawns the amount of mobs for all the spawnpoints available.
+     */
+    ALLSPAWNPOINTS,
 
-  /**
-   * Spawns the amount of mobs on one random spawnpoint.
-   */
-  ONERANDOMSPAWNPOINT,
+    /**
+     * Spawns the amount of mobs on one random spawnpoint.
+     */
+    ONERANDOMSPAWNPOINT,
 
-  /**
-   * Spawns the amount of mobs, distributed to random spawnpoints.
-   */
-  RANDOMSPAWNPOINTS
+    /**
+     * Spawns the amount of mobs, distributed to random spawnpoints.
+     */
+    RANDOMSPAWNPOINTS
   }
 
   /**

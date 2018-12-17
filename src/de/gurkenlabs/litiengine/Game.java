@@ -171,14 +171,14 @@ public final class Game {
    * This flag indicates whether the game should display the <code>GameWindow</code> or not.
    * This can only be set before the game has been initialized with the <code>Game.init(String...)</code> method. Afterwards it doesn't have an effect
    * anymore.
-   * If enabled, the <code>GameWindow#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
+   * If enabled, the <code>ScreenManager#setVisible(boolean)</code> method won't be set to true and the <code>RenderLoop</code> won't be started.
    * Also the <code>Camera</code> won't be updated.
    * 
    * @param noGui
    *          If set to true, the GUI will be hidden.
    * @see GameWindow
    * @see Game#init(String...)
-   * @see GameWindow#setVisible(boolean)
+   * @see ScreenManager#setVisible(boolean)
    * @see RenderLoop
    * @see Camera
    */
@@ -403,7 +403,7 @@ public final class Game {
    * <i>Examples: Menu Screen, Credits Screen, Game Screen, Inventory Screen</i>
    * </p>
    * 
-   * @return
+   * @return The game's screen manager.
    * 
    * @see Screen
    * @see Game#getEnvironment()
