@@ -21,7 +21,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
    * @return The loaded Sound from the specified path.
    */
   @Override
-  protected Sound load(String resourceName) {
+  protected Sound load(String resourceName) throws Exception {
     final InputStream is = FileUtilities.getGameResource(resourceName);
     if (is == null) {
 

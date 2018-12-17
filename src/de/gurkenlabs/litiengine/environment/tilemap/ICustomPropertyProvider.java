@@ -1,9 +1,8 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
-import java.util.List;
-
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * The Interface ICustomPropertyProvider is providing methods to get and set custom properties.
@@ -16,7 +15,17 @@ public interface ICustomPropertyProvider {
    *          the name of the custom property
    * @return true if a custom property with the given name is present. False otherwise.
    */
-  boolean hasCustomProperty(String propertyName);
+  public boolean hasCustomProperty(String propertyName);
+
+  public String getTypeOfProperty(String propertyName);
+
+  public void setTypeOfProperty(String propertyName, String type);
+
+  public ICustomProperty getProperty(String propertyName);
+
+  public void setValue(String propertyName, ICustomProperty value);
+
+  public void removeProperty(String propertyName);
 
   /**
    * Gets the string value of the custom property with the provided name.
@@ -24,6 +33,7 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the string value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
    */
   public String getStringValue(String propertyName);
 
@@ -44,6 +54,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the int value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not an integer or is not in range for an {@code int}
    */
   public int getIntValue(String propertyName);
 
@@ -64,8 +76,16 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the long value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not an integer or is not in range for a {@code long}
    */
-  public long getLongValue(String propertyName);
+  public default long getLongValue(String propertyName) {
+    ICustomProperty property = this.getProperty(propertyName);
+    if (property == null) {
+      throw new NoSuchElementException(propertyName);
+    }
+    return property.getAsLong();
+  }
 
   /**
    * Gets the long value of the custom property with the provided name. If the value is null, the provided default value is used as a fallback.
@@ -84,6 +104,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the short value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not an integer or is out of range for a {@code short}
    */
   public short getShortValue(String propertyName);
 
@@ -104,6 +126,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the byte value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not an integer or is out of range for a {@code byte}
    */
   public byte getByteValue(String propertyName);
 
@@ -124,6 +148,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the boolean value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not a {@code boolean} value
    */
   public boolean getBoolValue(String propertyName);
 
@@ -144,6 +170,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the float value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not a number
    */
   public float getFloatValue(String propertyName);
 
@@ -164,6 +192,8 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the double value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
+   * @throws NumberFormatException if the custom property is not a number
    */
   public double getDoubleValue(String propertyName);
 
@@ -184,6 +214,7 @@ public interface ICustomPropertyProvider {
    * @param propertyName
    *          the name of the custom property
    * @return the color value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
    */
   public Color getColorValue(String propertyName);
 
@@ -208,6 +239,7 @@ public interface ICustomPropertyProvider {
    * @param <T>
    *          the enum type to use
    * @return the enum value of the custom property
+   * @throws NoSuchElementException if the custom property does not exist
    */
   public <T extends Enum<T>> T getEnumValue(String propertyName, Class<T> enumType);
 
@@ -327,11 +359,11 @@ public interface ICustomPropertyProvider {
   public void setValue(String propertyName, Enum<?> value);
 
   /**
-   * Enumerates the custom properties for this object.
+   * Returns a {@code Map} view of the custom properties for this {@code ICustomPropertyProvider}.
    *
-   * @return a complete list of custom properties for this {@code ICustomPropertyProvider}
+   * @return a {@code Map} view of the custom properties for this {@code ICustomPropertyProvider}
    */
-  public List<Property> getProperties();
+  public Map<String, ICustomProperty> getProperties();
 
   /**
    * Sets all of the custom properties on this object to the provided values. Properties are added
@@ -341,5 +373,5 @@ public interface ICustomPropertyProvider {
    * @param props
    *          the new list of properties
    */
-  public void setProperties(List<Property> props);
+  public void setProperties(Map<String, ICustomProperty> props);
 }

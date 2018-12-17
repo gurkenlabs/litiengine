@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameData;
@@ -374,8 +375,11 @@ public class EditorScreen extends Screen {
 
   public void importEmitters() {
     XmlImportDialog.importXml("Emitter", file -> {
-      EmitterData emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
-      if (emitter == null) {
+      EmitterData emitter;
+      try {
+        emitter = XmlUtilities.readFromFile(EmitterData.class, file.toString());
+      } catch (JAXBException e) {
+        log.log(Level.SEVERE, "could not load emitter data from " + file, e);
         return;
       }
 
@@ -395,7 +399,13 @@ public class EditorScreen extends Screen {
 
   public void importBlueprints() {
     XmlImportDialog.importXml("Blueprint", file -> {
-      Blueprint blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
+      Blueprint blueprint;
+      try {
+        blueprint = XmlUtilities.readFromFile(Blueprint.class, file.toString());
+      } catch (JAXBException e) {
+        log.log(Level.SEVERE, "could not load blueprint from " + file, e);
+        return;
+      }
       if (blueprint == null) {
         return;
       }
@@ -417,8 +427,11 @@ public class EditorScreen extends Screen {
 
   public void importTilesets() {
     XmlImportDialog.importXml("Tilesets", Tileset.FILE_EXTENSION, file -> {
-      Tileset tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
-      if (tileset == null) {
+      Tileset tileset;
+      try {
+        tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
+      } catch (JAXBException e) {
+        log.log(Level.SEVERE, "could not load tileset from " + file, e);
         return;
       }
 

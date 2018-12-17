@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
@@ -23,7 +22,6 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
 /**
  * The Class ShapeLayer.
  */
-@XmlRootElement(name = "objectgroup")
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
   private static final long serialVersionUID = -6130660578937427531L;
 
