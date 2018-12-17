@@ -151,10 +151,12 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
       Iterator<SoundPlayback> iter = this.sounds.iterator();
       while (iter.hasNext()) {
         SoundPlayback s = iter.next();
-        if (s != null && !s.isPlaying()) {
-          iter.remove();
-        } else {
-          s.updateControls(this.listenerLocation);
+        if (s != null) {
+          if (!s.isPlaying()) {
+            iter.remove();
+          } else {
+            s.updateControls(this.listenerLocation);
+          }
         }
       }
     }
