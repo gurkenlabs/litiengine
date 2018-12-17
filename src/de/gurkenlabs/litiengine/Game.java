@@ -498,7 +498,7 @@ public final class Game {
    * @param args
    *          The arguments passed to the programs entry point.
    */
-  public static void init(String... args) {
+  public synchronized static void init(String... args) {
     if (initialized) {
       log.log(Level.INFO, "The game has already been initialized.");
       return;
@@ -588,7 +588,7 @@ public final class Game {
    * @see Input
    * @see GameListener#started()
    */
-  public static void start() {
+  public synchronized static void start() {
     if (!initialized) {
       throw new IllegalStateException("The game cannot be started without being first initialized. Call Game.init(...) before Game.start().");
     }
@@ -612,7 +612,7 @@ public final class Game {
    * This method <b>should not be called manually</b>. <br>
    * It's internally called when the main application shuts down.
    */
-  public static void terminate() {
+  public synchronized static void terminate() {
     for (final GameListener listener : gameListeners) {
       if (!listener.terminating()) {
         return;
