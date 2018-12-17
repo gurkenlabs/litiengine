@@ -243,6 +243,9 @@ public class MapObjectLoaderTests {
     when(mapObject.getStringValue("foo")).thenReturn("foovalue");
     when(mapObject.getStringValue("bar")).thenReturn("111");
 
+    when(mapObject.getStringValue("foo", null)).thenReturn("foovalue");
+    when(mapObject.getStringValue("bar", null)).thenReturn("111");
+
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
