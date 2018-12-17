@@ -59,21 +59,12 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) {
+  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) throws MapObjectException {
     IEntity entity;
     try {
       entity = invoke.invoke(environment, mapObject);
-    } catch (InvocationTargetException e) {
-      // propagate the exception if unchecked
-      Throwable cause = e.getCause();
-      if (cause instanceof RuntimeException)
-        throw (RuntimeException)cause;
-      if (cause instanceof Error)
-        throw (Error)cause;
-      
-      throw new MapObjectException(cause);
-    } catch (IllegalAccessException | InstantiationException e) {
-      throw new MapObjectException(e); // we shouldn't be getting these here
+    } catch (ReflectiveOperationException e) {
+      throw new MapObjectException(e);
     }
 
     loadDefaultProperties(entity, mapObject);

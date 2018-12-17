@@ -7,12 +7,10 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimationFrame;
 
-@XmlRootElement(name = "animation")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Animation implements ITileAnimation, Serializable {
   private static final long serialVersionUID = -6359129685451548791L;
@@ -30,16 +28,11 @@ public class Animation implements ITileAnimation, Serializable {
       return this.tileAnimationFrames;
     }
 
-    List<ITileAnimationFrame> fr = new ArrayList<>();
     if (this.frames == null) {
-      return fr;
+      return new ArrayList<>();
     }
 
-    for (ITileAnimationFrame frame : this.frames) {
-      fr.add(frame);
-    }
-
-    this.tileAnimationFrames = fr;
+    this.tileAnimationFrames = new ArrayList<>(this.frames);
     return this.tileAnimationFrames;
   }
 

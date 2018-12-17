@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -16,9 +17,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
 
@@ -93,9 +94,9 @@ public class CustomPanel extends PropertyPanel {
     if (mapObject == null || mapObject.getProperties() == null) {
       return;
     }
-    for (Property prop : mapObject.getProperties()) {
-      if (MapObjectProperty.isCustom(prop.getName())) {
-        this.model.addRow(new Object[] { prop.getName(), prop.getValue() });
+    for (Map.Entry<String, ICustomProperty> prop : mapObject.getProperties().entrySet()) {
+      if (MapObjectProperty.isCustom(prop.getKey())) {
+        this.model.addRow(new Object[] { prop.getKey(), prop.getValue().getAsString() });
       }
     }
   }
@@ -117,7 +118,7 @@ public class CustomPanel extends PropertyPanel {
         }
       }
 
-      getDataSource().getProperties().removeIf(p -> MapObjectProperty.isCustom(p.getName()) && !setProperties.contains(p.getName()));
+      getDataSource().getProperties().keySet().removeIf(p -> MapObjectProperty.isCustom(p) && !setProperties.contains(p));
       UndoManager.instance().mapObjectChanged(getDataSource());
     });
   }

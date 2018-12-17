@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,6 +20,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileAnimation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.ITilesetEntry;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -70,7 +70,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   private List<Terrain> terrainTypes = null;
 
   @XmlElement(name = "tile")
-  private List<Tile> tiles = null;
+  private List<TilesetEntry> tiles = null;
 
   @XmlTransient
   protected Tileset sourceTileset;
@@ -235,12 +235,12 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return terrains;
     }
 
-    Optional<Tile> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
+    Optional<TilesetEntry> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
     if (!optTile.isPresent()) {
       return terrains;
     }
 
-    Tile tile = optTile.get();
+    TilesetEntry tile = optTile.get();
     int[] tileTerrains = tile.getTerrainIds();
     for (int i = 0; i < 4; i++) {
       if (tileTerrains[i] < 0 || tileTerrains[i] >= this.getTerrainTypes().size()) {
@@ -268,7 +268,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return null;
     }
 
-    Optional<Tile> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
+    Optional<TilesetEntry> optTile = this.tiles.stream().filter(x -> x.getId() == tileId).findFirst();
     if (!optTile.isPresent()) {
       return null;
     }
@@ -296,7 +296,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public ITile getTile(int id) {
+  public ITilesetEntry getTile(int id) {
     if (sourceTileset != null) {
       return sourceTileset.getTile(id);
     }
@@ -305,7 +305,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       return null;
     }
 
-    for (Tile tile : tiles) {
+    for (TilesetEntry tile : tiles) {
       if (tile.getId() == id) {
         return tile;
       }
@@ -316,7 +316,8 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
 
   @Override
   public boolean containsTile(ITile tile) {
-    return this.containsTile(tile.getGridId());
+    ITilesetEntry entry = tile.getTilesetEntry();
+    return entry == null ? this.containsTile(tile.getGridId()) : this.containsTile(tile.getTilesetEntry());
   }
 
   @Override
@@ -329,12 +330,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return lastGridId >= tileId || this.sourceTileset != null && this.sourceTileset.containsTile(tileId);
   }
 
-  public void loadFromSource(String basePath) {
+  public void loadFromSource(String basePath) throws MissingExternalTilesetException {
     if (this.source == null || this.source.isEmpty()) {
       return;
     }
 
-    this.sourceTileset = Resources.tilesets().get(FileUtilities.combine(basePath, this.source));
+    String location = FileUtilities.combine(basePath, this.source);
+    this.sourceTileset = Resources.tilesets().get(location);
+    if (this.sourceTileset == null) {
+      throw new MissingExternalTilesetException(location);
+    }
   }
 
   public void saveSource(String basePath) {
@@ -363,8 +368,16 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     }
   }
 
-  @Override
-  void beforeMarshal(Marshaller m) {
+  public void updateTileTerrain() {
+    if (this.sourceTileset == null) {
+      for (TilesetEntry entry : this.tiles) {
+        entry.setTerrains(this.getTerrain(entry.getId()));
+      }
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void beforeMarshal(Marshaller m) {
     if (this.sourceTileset != null) {
       this.tilewidth = null;
       this.tileheight = null;
@@ -372,13 +385,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       this.columns = null;
     }
 
-    if (this.getProperties() != null && this.getProperties().isEmpty()) {
-      this.setProperties(null);
-    }
-  }
-
-  @SuppressWarnings("unused")
-  void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.margin != null && this.margin == 0) {
       this.margin = null;
     }
@@ -386,5 +392,22 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     if (this.spacing != null && this.spacing == 0) {
       this.spacing = null;
     }
+
+    if (this.getProperties() != null && this.getProperties().isEmpty()) {
+      this.setProperties(null);
+    }
+  }
+
+  @Override
+  public boolean containsTile(ITilesetEntry entry) {
+    if (entry == null) {
+      return false;
+    }
+
+    if (this.sourceTileset != null) {
+      return this.sourceTileset.containsTile(entry);
+    }
+
+    return this.tiles != null && this.tiles.contains(entry);
   }
 }

@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -9,12 +10,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
-import de.gurkenlabs.litiengine.environment.tilemap.xml.Property;
 import de.gurkenlabs.utiliti.components.MapComponent;
 
 public class UndoManager {
@@ -267,8 +268,8 @@ public class UndoManager {
     target.setWidth(restore.getWidth());
     target.setHeight(restore.getHeight());
     target.getProperties().clear();
-    for (Property prop : restore.getProperties()) {
-      target.setValue(prop.getName(), prop.getValue());
+    for (Map.Entry<String, ICustomProperty> prop : restore.getProperties().entrySet()) {
+      target.setValue(prop.getKey(), prop.getValue());
     }
 
     Game.getEnvironment().reloadFromMap(target.getId());

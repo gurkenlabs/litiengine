@@ -20,5 +20,5 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 public interface IMapObjectLoader {
   String getMapObjectType();
 
-  Collection<IEntity> load(IEnvironment environment, IMapObject mapObject);
+  Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) throws MapObjectException;
 }

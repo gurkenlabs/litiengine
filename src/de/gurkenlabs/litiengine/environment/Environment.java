@@ -1038,7 +1038,12 @@ public class Environment implements IEnvironment {
   public Collection<IEntity> load(final IMapObject mapObject) {
     IMapObjectLoader loader = mapObjectLoaders.get(mapObject.getType());
     if (loader != null) {
-      Collection<IEntity> loadedEntities = loader.load(this, mapObject);
+      Collection<IEntity> loadedEntities;
+      try {
+        loadedEntities = loader.load(this, mapObject);
+      } catch (MapObjectException e) {
+        return new ArrayList<>();
+      }
       for (IEntity entity : loadedEntities) {
         if (entity != null) {
           this.add(entity);

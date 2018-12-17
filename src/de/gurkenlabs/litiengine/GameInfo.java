@@ -32,7 +32,7 @@ public class GameInfo extends CustomPropertyProvider {
   private String name;
 
   @XmlElement
-  private String subTitle;
+  private String subtitle;
 
   @XmlElement
   private String description;
@@ -55,7 +55,7 @@ public class GameInfo extends CustomPropertyProvider {
   public GameInfo() {
     this.company = "gurkenlabs";
     this.name = "LITIengine Game";
-    this.subTitle = "The pure 2D java game engine";
+    this.subtitle = "The pure 2D java game engine";
     this.description = "A game, created with the allmighty LITIengine.";
     this.developers = new String[] { "Steffen Wilke", "Matthias Wilke" };
     this.version = "v1.0";
@@ -152,7 +152,7 @@ public class GameInfo extends CustomPropertyProvider {
    */
   @XmlTransient
   public String getSubTitle() {
-    return this.subTitle;
+    return this.subtitle;
   }
 
   /**
@@ -242,7 +242,7 @@ public class GameInfo extends CustomPropertyProvider {
    * @see #getTitle()
    */
   public void setSubTitle(final String subTitle) {
-    this.subTitle = subTitle;
+    this.subtitle = subTitle;
   }
 
   /**

@@ -62,6 +62,7 @@ public class MapTests {
 
     assertEquals("bar", map.getTileLayers().get(0).getTile(5, 3).getStringValue("foo"));
     assertEquals("bap", map.getTileLayers().get(0).getTile(9, 5).getStringValue("baz"));
+    assertEquals("multiline\nproperty", map.getTileLayers().get(0).getTile(10, 10).getStringValue("custom"));
   }
 
   @Test

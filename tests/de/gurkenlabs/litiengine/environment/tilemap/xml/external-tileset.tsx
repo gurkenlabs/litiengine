@@ -6,4 +6,10 @@
    <property name="baz" value="bap"/>
   </properties>
  </tile>
+ <tile id="1">
+  <properties>
+   <property name="custom">multiline
+property</property>
+  </properties>
+ </tile>
 </tileset>

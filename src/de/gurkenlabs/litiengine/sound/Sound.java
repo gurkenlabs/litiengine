@@ -2,8 +2,6 @@ package de.gurkenlabs.litiengine.sound;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -17,7 +15,6 @@ import de.gurkenlabs.litiengine.util.io.StreamUtilities;
  * system and provide a stream that can later on be used for the sound playback.
  */
 public final class Sound {
-  private static final Logger log = Logger.getLogger(Sound.class.getName());
 
   private AudioFormat format;
 
@@ -39,24 +36,23 @@ public final class Sound {
    *          The input stream to load the sound from.
    * @param name
    *          The name of this sound file.
+   * @throws IOException
+   *          If something went wrong loading the file
+   * @throws UnsupportedAudioFileException
+   *          If the audio format is not supported
    */
-  public Sound(InputStream is, String name) {
+  public Sound(InputStream is, String name) throws IOException, UnsupportedAudioFileException {
     this.name = name;
 
-    try {
-      AudioInputStream in = AudioSystem.getAudioInputStream(is);
-      if (in != null) {
-        final AudioFormat baseFormat = in.getFormat();
-        final AudioFormat decodedFormat = this.getOutFormat(baseFormat);
-        // Get AudioInputStream that will be decoded by underlying VorbisSPI
-        in = AudioSystem.getAudioInputStream(decodedFormat, in);
-        this.stream = in;
-        this.streamData = StreamUtilities.getBytes(this.stream);
-        this.format = this.stream.getFormat();
-      }
-    } catch (final UnsupportedAudioFileException | IOException e) {
-
-      log.log(Level.SEVERE, e.getMessage(), e);
+    AudioInputStream in = AudioSystem.getAudioInputStream(is);
+    if (in != null) {
+      final AudioFormat baseFormat = in.getFormat();
+      final AudioFormat decodedFormat = this.getOutFormat(baseFormat);
+      // Get AudioInputStream that will be decoded by underlying VorbisSPI
+      in = AudioSystem.getAudioInputStream(decodedFormat, in);
+      this.stream = in;
+      this.streamData = StreamUtilities.getBytes(this.stream);
+      this.format = this.stream.getFormat();
     }
   }
 

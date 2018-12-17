@@ -294,7 +294,7 @@ public abstract class ResourcesContainer<T> {
     return Optional.ofNullable(this.get(resourceName));
   }
 
-  protected abstract T load(String resourceName);
+  protected abstract T load(String resourceName) throws Exception;
 
   protected Map<String, T> getResources() {
     return this.resources;
@@ -304,11 +304,11 @@ public abstract class ResourcesContainer<T> {
     // the case is ignored when retrieving resources
     String identifier = resourceName.toLowerCase();
 
-    T newResource = this.load(identifier);
-
-    if (newResource == null) {
-
-      log.log(Level.SEVERE, "Could not load the game resource {0} because it was not found.", new Object[] { resourceName });
+    T newResource;
+    try {
+      newResource = this.load(identifier);
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "Could not load the game resource.", e);
       return null;
     }
 

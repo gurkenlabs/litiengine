@@ -59,7 +59,7 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
 
   public int getTileCount();
 
-  public ITile getTile(int id);
+  public ITilesetEntry getTile(int id);
 
   public List<ITerrain> getTerrainTypes();
 
@@ -67,7 +67,9 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
 
   public ITileAnimation getAnimation(int tileId);
 
-  public boolean containsTile(final ITile tile);
+  public boolean containsTile(ITile tile);
 
-  public boolean containsTile(final int tileId);
+  public boolean containsTile(ITilesetEntry entry);
+
+  public boolean containsTile(int tileId);
 }

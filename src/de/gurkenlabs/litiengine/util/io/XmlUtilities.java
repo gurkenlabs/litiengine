@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,26 +85,25 @@ public final class XmlUtilities {
     return null;
   }
 
-  public static <T> T readFromFile(Class<T> cls, String path) {
-    try {
-      final JAXBContext jaxbContext = getContext(cls);
-      if (jaxbContext == null) {
-        return null;
-      }
-
-      final Unmarshaller um = jaxbContext.createUnmarshaller();
-
-      InputStream stream = FileUtilities.getGameResource(path);
-      if (stream == null) {
-        stream = new FileInputStream(path);
-      }
-
-      return cls.cast(um.unmarshal(stream));
-    } catch (final JAXBException | IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
+  public static <T> T readFromFile(Class<T> cls, String path) throws JAXBException {
+    final JAXBContext jaxbContext = getContext(cls);
+    if (jaxbContext == null) {
+      return null;
     }
 
-    return null;
+    final Unmarshaller um = jaxbContext.createUnmarshaller();
+
+    InputStream stream = FileUtilities.getGameResource(path);
+    if (stream == null) {
+      try {
+        stream = new FileInputStream(path);
+      } catch (FileNotFoundException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+        return null;
+      }
+    }
+
+    return cls.cast(um.unmarshal(stream));
   }
 
   public static <T> String save(T object, String fileName) {
