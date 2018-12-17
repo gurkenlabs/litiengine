@@ -75,7 +75,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       return null;
     }
 
-    String cacheKey = Game.getEnvironment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
+    String cacheKey = Game.world().environment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
       final String name = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
       final String fallbackName = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase();
@@ -99,7 +99,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
   }
 
   private static Icon getIcon(Creature creature) {
-    String cacheKey = Game.getEnvironment().getMap().getName() + "-" + creature.getSpritePrefix() + "-" + creature.getMapId() + "-tree";
+    String cacheKey = Game.world().environment().getMap().getName() + "-" + creature.getSpritePrefix() + "-" + creature.getMapId() + "-tree";
     
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
       Collection<Spritesheet> sprites = Resources.spritesheets().get(s -> s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.IDLE) || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.WALK)

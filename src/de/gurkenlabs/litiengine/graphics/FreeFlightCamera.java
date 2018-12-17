@@ -52,7 +52,7 @@ public class FreeFlightCamera extends Camera implements IUpdateable {
   }
 
   private void handleFreeFlightCamera() {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
 

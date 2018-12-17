@@ -64,7 +64,7 @@ public class Mouse implements IMouse {
       throw e;
     }
 
-    this.location = new Point2D.Double(Game.getCamera().getViewport().getCenterX(), Game.getCamera().getViewport().getCenterY());
+    this.location = new Point2D.Double(Game.world().camera().getViewport().getCenterX(), Game.world().camera().getViewport().getCenterY());
     this.lastLocation = this.location;
     this.sensitivity = Game.config().input().getMouseSensitivity();
     this.grabMouse = true;
@@ -77,7 +77,7 @@ public class Mouse implements IMouse {
 
   @Override
   public Point2D getMapLocation() {
-    return Game.getCamera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.getCamera().getRenderScale(), this.getLocation().getY() / Game.getCamera().getRenderScale()));
+    return Game.world().camera().getMapLocation(new Point2D.Double(this.getLocation().getX() / Game.world().camera().getRenderScale(), this.getLocation().getY() / Game.world().camera().getRenderScale()));
   }
 
   @Override

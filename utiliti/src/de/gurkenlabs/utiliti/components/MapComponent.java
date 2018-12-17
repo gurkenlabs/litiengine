@@ -174,7 +174,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.transformRects = new ConcurrentHashMap<>();
     this.dragLocationMapObjects = new ConcurrentHashMap<>();
     this.screen = screen;
-    Game.getCamera().onZoomChanged(zoom -> {
+    Game.world().camera().onZoomChanged(zoom -> {
       this.currentTransformRectSize = TRANSFORM_RECT_SIZE / zoom;
       this.updateTransformControls();
     });
@@ -202,13 +202,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   @Override
   public void render(Graphics2D g) {
-    if (Game.getEnvironment() == null) {
+    if (Game.world().environment() == null) {
       return;
     }
 
     this.renderGrid(g);
 
-    final BasicStroke shapeStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+    final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
     if (Program.getUserPreferences().isRenderBoundingBoxes()) {
       this.renderMapObjectBounds(g);
     }
@@ -278,16 +278,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public IMapObject getFocusedMapObject() {
-    if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-      return this.focusedObjects.get(Game.getEnvironment().getMap().getName());
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      return this.focusedObjects.get(Game.world().environment().getMap().getName());
     }
 
     return null;
   }
 
   public List<IMapObject> getSelectedMapObjects() {
-    final String map = Game.getEnvironment().getMap().getName();
-    if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null && this.selectedObjects.containsKey(map)) {
+    final String map = Game.world().environment().getMap().getName();
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null && this.selectedObjects.containsKey(map)) {
       return this.selectedObjects.get(map);
     }
 
@@ -304,7 +304,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   @Override
   public void prepare() {
-    Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
+    Game.world().camera().setZoom(zooms[this.currentZoomIndex], 0);
     if (!this.initialized) {
       Game.window().getRenderComponent().addFocusListener(new FocusAdapter() {
         @Override
@@ -329,10 +329,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
     this.loading = true;
     try {
-      if (Game.getEnvironment() != null && Game.getEnvironment().getMap() != null) {
-        final String mapName = Game.getEnvironment().getMap().getName();
-        double x = Game.getCamera().getFocus().getX();
-        double y = Game.getCamera().getFocus().getY();
+      if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+        final String mapName = Game.world().environment().getMap().getName();
+        double x = Game.world().camera().getFocus().getX();
+        double y = Game.world().camera().getFocus().getY();
         Point2D newPoint = new Point2D.Double(x, y);
         this.cameraFocus.put(mapName, newPoint);
         this.selectedLayers.put(mapName, EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex());
@@ -347,7 +347,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.cameraFocus.put(map.getName(), newFocus);
       }
 
-      Game.getCamera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
+      Game.world().camera().setFocus(new Point2D.Double(newFocus.getX(), newFocus.getY()));
 
       if (!this.environments.containsKey(map.getName())) {
         Environment env = new Environment(map);
@@ -355,7 +355,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         this.environments.put(map.getName(), env);
       }
 
-      Game.loadEnvironment(this.environments.get(map.getName()));
+      Game.world().loadEnvironment(this.environments.get(map.getName()));
 
       Program.updateScrollBars();
 
@@ -376,11 +376,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void reloadEnvironment() {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
 
-    this.loadEnvironment((Map) Game.getEnvironment().getMap());
+    this.loadEnvironment((Map) Game.world().environment().getMap());
   }
 
   public void add(IMapObject mapObject) {
@@ -395,9 +395,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     this.getSelectedMapObjects().clear();
     this.setFocus(null, true);
     for (IMapObject mapObject : layer.getMapObjects()) {
-      Game.getEnvironment().loadFromMap(mapObject.getId());
+      Game.world().environment().loadFromMap(mapObject.getId());
       if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
       }
       this.setSelection(mapObject, false);
       this.setFocus(mapObject, false);
@@ -412,9 +412,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
     for (IMapObject mapObject : layer.getMapObjects()) {
       if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+        Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
       }
-      Game.getEnvironment().remove(mapObject.getId());
+      Game.world().environment().remove(mapObject.getId());
       if (mapObject.equals(this.getFocusedMapObject())) {
         this.setFocus(null, true);
       }
@@ -428,9 +428,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     layer.addMapObject(mapObject);
-    Game.getEnvironment().loadFromMap(mapObject.getId());
+    Game.world().environment().loadFromMap(mapObject.getId());
     if (MapObjectType.get(mapObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
     }
 
     Game.window().getRenderComponent().requestFocus();
@@ -518,10 +518,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     MapObjectType type = MapObjectType.get(mapObject.getType());
-    Game.getEnvironment().getMap().removeMapObject(mapObject.getId());
-    Game.getEnvironment().remove(mapObject.getId());
+    Game.world().environment().getMap().removeMapObject(mapObject.getId());
+    Game.world().environment().remove(mapObject.getId());
     if (type == MapObjectType.STATICSHADOW || type == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().updateSection(mapObject.getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(mapObject.getBoundingBox());
     }
 
     if (mapObject.equals(this.getFocusedMapObject())) {
@@ -552,7 +552,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      Game.getCamera().setFocus(new Point2D.Double(focus.getCenterX(), focus.getCenterY()));
+      Game.world().camera().setFocus(new Point2D.Double(focus.getCenterX(), focus.getCenterY()));
     }
   }
 
@@ -595,7 +595,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         return;
       }
 
-      if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+      if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
         return;
       }
 
@@ -606,9 +606,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       EditorScreen.instance().getMapObjectPanel().bind(mapObject);
       EditorScreen.instance().getMapSelectionPanel().focus(mapObject);
       if (mapObject == null) {
-        this.focusedObjects.remove(Game.getEnvironment().getMap().getName());
+        this.focusedObjects.remove(Game.world().environment().getMap().getName());
       } else {
-        this.focusedObjects.put(Game.getEnvironment().getMap().getName(), mapObject);
+        this.focusedObjects.put(Game.world().environment().getMap().getName(), mapObject);
       }
 
       for (Consumer<IMapObject> cons : this.focusChangedConsumer) {
@@ -631,7 +631,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    final String map = Game.getEnvironment().getMap().getName();
+    final String map = Game.world().environment().getMap().getName();
     if (!this.selectedObjects.containsKey(map)) {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
@@ -658,7 +658,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    final String map = Game.getEnvironment().getMap().getName();
+    final String map = Game.world().environment().getMap().getName();
     if (!this.selectedObjects.containsKey(map)) {
       this.selectedObjects.put(map, new CopyOnWriteArrayList<>());
     }
@@ -716,16 +716,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
 
-    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.getEnvironment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
+    int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("hud_deleteMapMessage") + "\n" + Game.world().environment().getMap().getName(), Resources.strings().get("hud_deleteMap"), JOptionPane.YES_NO_OPTION);
     if (n != JOptionPane.YES_OPTION) {
       return;
     }
 
-    this.getMaps().removeIf(x -> x.getName().equals(Game.getEnvironment().getMap().getName()));
+    this.getMaps().removeIf(x -> x.getName().equals(Game.world().environment().getMap().getName()));
 
     // TODO: remove all tile sets from the game file that are no longer needed
     // by any other map.
@@ -832,7 +832,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    Map map = (Map) Game.getEnvironment().getMap();
+    Map map = (Map) Game.world().environment().getMap();
     if (map == null) {
       return;
     }
@@ -911,16 +911,16 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private static boolean mapIsNull() {
-    return Game.getEnvironment() == null || Game.getEnvironment().getMap() == null;
+    return Game.world().environment() == null || Game.world().environment().getMap() == null;
   }
 
   private static IMapObjectLayer getCurrentLayer() {
     int layerIndex = EditorScreen.instance().getMapSelectionPanel().getSelectedLayerIndex();
-    if (layerIndex < 0 || layerIndex >= Game.getEnvironment().getMap().getMapObjectLayers().size()) {
+    if (layerIndex < 0 || layerIndex >= Game.world().environment().getMap().getMapObjectLayers().size()) {
       layerIndex = 0;
     }
 
-    return Game.getEnvironment().getMap().getMapObjectLayers().get(layerIndex);
+    return Game.world().environment().getMap().getMapObjectLayers().get(layerIndex);
   }
 
   private IMapObject createNewMapObject(MapObjectType type) {
@@ -934,7 +934,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     float height = (float) this.newObjectArea.getHeight();
     mo.setWidth(width == 0 ? 16 : width);
     mo.setHeight(height == 0 ? 16 : height);
-    mo.setId(Game.getEnvironment().getNextMapId());
+    mo.setId(Game.world().environment().getNextMapId());
     mo.setName("");
 
     switch (type) {
@@ -1102,9 +1102,9 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     transformObject.setX(this.snapX(newX));
     transformObject.setY(this.snapY(newY));
 
-    Game.getEnvironment().reloadFromMap(transformObject.getId());
+    Game.world().environment().reloadFromMap(transformObject.getId());
     if (MapObjectType.get(transformObject.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().updateSection(transformObject.getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(transformObject.getBoundingBox());
     }
 
     EditorScreen.instance().getMapObjectPanel().bind(transformObject);
@@ -1174,7 +1174,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       double y = Math.min(beforeBounds.getY(), afterBounds.getY());
       double width = Math.max(beforeBounds.getMaxX(), afterBounds.getMaxX()) - x;
       double height = Math.max(beforeBounds.getMaxY(), afterBounds.getMaxY()) - y;
-      Game.getEnvironment().getAmbientLight().updateSection(new Rectangle2D.Double(x, y, width, height));
+      Game.world().environment().getAmbientLight().updateSection(new Rectangle2D.Double(x, y, width, height));
     }
   }
 
@@ -1184,12 +1184,12 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       selected.setX(selected.getX() + snappedDeltaX);
       selected.setY(selected.getY() + snappedDeltaY);
 
-      IEntity entity = Game.getEnvironment().get(selected.getId());
+      IEntity entity = Game.world().environment().get(selected.getId());
       if (entity != null) {
         entity.setX(selected.getLocation().getX());
         entity.setY(selected.getLocation().getY());
       } else {
-        Game.getEnvironment().reloadFromMap(selected.getId());
+        Game.world().environment().reloadFromMap(selected.getId());
       }
 
       if (selected.equals(this.getFocusedMapObject())) {
@@ -1200,7 +1200,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void setCurrentZoom() {
-    Game.getCamera().setZoom(zooms[this.currentZoomIndex], 0);
+    Game.world().camera().setZoom(zooms[this.currentZoomIndex], 0);
   }
 
   private void setupKeyboardControls() {
@@ -1353,19 +1353,19 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    final Point2D currentFocus = Game.getCamera().getFocus();
+    final Point2D currentFocus = Game.world().camera().getFocus();
     // horizontal scrolling
     if (Input.keyboard().isPressed(KeyEvent.VK_CONTROL) && this.dragPoint == null) {
       if (e.getEvent().getWheelRotation() < 0) {
 
         Point2D newFocus = new Point2D.Double(currentFocus.getX() - this.scrollSpeed, currentFocus.getY());
-        Game.getCamera().setFocus(newFocus);
+        Game.world().camera().setFocus(newFocus);
       } else {
         Point2D newFocus = new Point2D.Double(currentFocus.getX() + this.scrollSpeed, currentFocus.getY());
-        Game.getCamera().setFocus(newFocus);
+        Game.world().camera().setFocus(newFocus);
       }
 
-      Program.getHorizontalScrollBar().setValue((int) Game.getCamera().getViewport().getCenterX());
+      Program.getHorizontalScrollBar().setValue((int) Game.world().camera().getViewport().getCenterX());
       return;
     }
 
@@ -1381,14 +1381,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     if (e.getEvent().getWheelRotation() < 0) {
       Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() - this.scrollSpeed);
-      Game.getCamera().setFocus(newFocus);
+      Game.world().camera().setFocus(newFocus);
 
     } else {
       Point2D newFocus = new Point2D.Double(currentFocus.getX(), currentFocus.getY() + this.scrollSpeed);
-      Game.getCamera().setFocus(newFocus);
+      Game.world().camera().setFocus(newFocus);
     }
 
-    Program.getVerticalcrollBar().setValue((int) Game.getCamera().getViewport().getCenterY());
+    Program.getVerticalcrollBar().setValue((int) Game.world().camera().getViewport().getCenterY());
   }
 
   /***
@@ -1560,7 +1560,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Rectangle2D rect = this.getCurrentMouseSelectionArea(false);
       boolean somethingIsFocused = false;
       boolean currentObjectFocused = false;
-      for (IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
+      for (IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
         if (layer == null || !EditorScreen.instance().getMapSelectionPanel().isVisibleMapObjectLayer(layer.getName())) {
           continue;
         }
@@ -1618,11 +1618,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private float snapX(double x) {
     if (Program.getUserPreferences().isSnapGrid()) {
       double snapped = ((int) (x / this.getGridWidth()) * this.getGridWidth());
-      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getWidth()));
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getWidth()));
     }
 
     if (Program.getUserPreferences().isSnapPixels()) {
-      return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getWidth());
+      return MathUtilities.clamp((int) Math.round(x), 0, (int) Game.world().environment().getMap().getSizeInPixels().getWidth());
     }
 
     return MathUtilities.round((float) x, 2);
@@ -1631,11 +1631,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private float snapY(double y) {
     if (Program.getUserPreferences().isSnapGrid()) {
       int snapped = (int) (y / this.getGridHeight()) * this.getGridHeight();
-      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.getEnvironment().getMap().getSizeInPixels().getHeight()));
+      return (int) Math.round(Math.min(Math.max(snapped, 0), Game.world().environment().getMap().getSizeInPixels().getHeight()));
     }
 
     if (Program.getUserPreferences().isSnapPixels()) {
-      return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.getEnvironment().getMap().getSizeInPixels().getHeight());
+      return MathUtilities.clamp((int) Math.round(y), 0, (int) Game.world().environment().getMap().getSizeInPixels().getHeight());
     }
 
     return MathUtilities.round((float) y, 2);
@@ -1657,7 +1657,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderMapObjectBounds(Graphics2D g) {
     // render all entities
-    for (final IMapObjectLayer layer : Game.getEnvironment().getMap().getMapObjectLayers()) {
+    for (final IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
       if (layer == null) {
         continue;
       }
@@ -1679,7 +1679,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         }
 
         MapObjectType type = MapObjectType.get(mapObject.getType());
-        final BasicStroke shapeStroke = new BasicStroke(1f / Game.getCamera().getRenderScale());
+        final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(COLOR_SPAWNPOINT);
@@ -1743,14 +1743,14 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderGrid(Graphics2D g) {
     // render the grid
-    if (Program.getUserPreferences().isShowGrid() && Game.getCamera().getRenderScale() >= 1) {
+    if (Program.getUserPreferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1) {
 
       g.setColor(this.getGridColor());
-      final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.getCamera().getRenderScale());
-      for (int x = 0; x < Game.getEnvironment().getMap().getWidth(); x++) {
-        for (int y = 0; y < Game.getEnvironment().getMap().getHeight(); y++) {
-          Shape tile = Game.getEnvironment().getMap().getTileShape(x, y);
-          if (Game.getCamera().getViewport().intersects(tile.getBounds2D())) {
+      final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.world().camera().getRenderScale());
+      for (int x = 0; x < Game.world().environment().getMap().getWidth(); x++) {
+        for (int y = 0; y < Game.world().environment().getMap().getHeight(); y++) {
+          Shape tile = Game.world().environment().getMap().getTileShape(x, y);
+          if (Game.world().camera().getViewport().intersects(tile.getBounds2D())) {
             Game.graphics().renderOutline(g, tile, stroke);
           }
         }
@@ -1793,19 +1793,19 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final Rectangle2D focus = this.getFocus();
     final IMapObject focusedMapObject = this.getFocusedMapObject();
     if (focus != null && focusedMapObject != null) {
-      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15);
+      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15);
 
       g.setColor(Color.BLACK);
 
       Game.graphics().renderOutline(g, focus, stroke);
 
-      Stroke whiteStroke = new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15 - 1f);
+      Stroke whiteStroke = new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 4, new float[] { 1f, 1f }, Game.loop().getTicks() / 15 - 1f);
       g.setColor(Color.WHITE);
       Game.graphics().renderOutline(g, focus, whiteStroke);
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+        Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           Game.graphics().renderShape(g, trans);
@@ -1816,7 +1816,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       // render transform rects
       if (!Input.keyboard().isPressed(KeyEvent.VK_CONTROL)) {
-        Stroke transStroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+        Stroke transStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
         for (Rectangle2D trans : this.transformRects.values()) {
           g.setColor(COLOR_TRANSFORM_RECT_FILL);
           Game.graphics().renderShape(g, trans);
@@ -1827,11 +1827,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     if (focusedMapObject != null) {
-      Point2D loc = Game.getCamera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
+      Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
       g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
-      TextRenderer.render(g, id, loc.getX() * Game.getCamera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.getCamera().getRenderScale() - (5 * this.currentTransformRectSize));
+      TextRenderer.render(g, id, loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.world().camera().getRenderScale() - (5 * this.currentTransformRectSize));
     }
   }
 
@@ -1841,7 +1841,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         continue;
       }
 
-      Stroke stroke = new BasicStroke(1 / Game.getCamera().getRenderScale());
+      Stroke stroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
 
       g.setColor(colorSelectionBorder);
       Game.graphics().renderOutline(g, mapObject.getBoundingBox(), stroke);
@@ -1910,7 +1910,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       Game.graphics().renderShape(g, collisionBox);
       g.setColor(collision ? COLOR_COLLISION_BORDER : COLOR_NOCOLLISION_BORDER);
 
-      Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.getCamera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
+      Stroke collisionStroke = collision ? shapeStroke : new BasicStroke(1 / Game.world().camera().getRenderScale(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 0, new float[] { 1f }, 0);
       Game.graphics().renderOutline(g, collisionBox, collisionStroke);
     }
   }

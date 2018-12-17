@@ -146,8 +146,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
 
   public void delete() {
     this.deactivate();
-    if (Game.getEnvironment() != null) {
-      Game.getEnvironment().remove(this);
+    if (Game.world().environment() != null) {
+      Game.world().environment().remove(this);
     }
   }
 
@@ -497,7 +497,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    if (Game.screens() != null && Game.getCamera() != null && !Game.getCamera().getViewport().intersects(this.getBoundingBox())) {
+    if (Game.screens() != null && Game.world().camera() != null && !Game.world().camera().getViewport().intersects(this.getBoundingBox())) {
       return;
     }
 

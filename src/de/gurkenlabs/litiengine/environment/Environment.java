@@ -61,6 +61,8 @@ public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
 
+  private static int environmentIdSequence;
+
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
   private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
@@ -86,8 +88,8 @@ public class Environment implements IEnvironment {
   private boolean loaded;
   private boolean initialized;
   private IMap map;
-
   private int localIdSequence = 0;
+  private String identifier;
 
   static {
     registerMapObjectLoader(new PropMapObjectLoader());
@@ -107,6 +109,8 @@ public class Environment implements IEnvironment {
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
     }
+
+    this.identifier = getEnvironmentIdentifier(this.getMap());
   }
 
   public Environment(final String mapPath) {
@@ -115,6 +119,8 @@ public class Environment implements IEnvironment {
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
     }
+
+    this.identifier = getEnvironmentIdentifier(this.getMap());
   }
 
   private Environment() {
@@ -736,6 +742,11 @@ public class Environment implements IEnvironment {
   }
 
   @Override
+  public String identifier() {
+    return this.identifier;
+  }
+
+  @Override
   public void load() {
     this.init();
     if (this.loaded) {
@@ -955,7 +966,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
+    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
 
     StringBuilder renderDetails = new StringBuilder();
     long renderStart = System.nanoTime();
@@ -994,7 +1005,7 @@ public class Environment implements IEnvironment {
       log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails, shadowTime, ambientTime });
     }
 
-    g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
+    g.scale(1.0 / Game.world().camera().getRenderScale(), 1.0 / Game.world().camera().getRenderScale());
   }
 
   private void fireEvent(Consumer<EnvironmentListener> cons) {
@@ -1077,6 +1088,16 @@ public class Environment implements IEnvironment {
       }
     }
     return null;
+  }
+
+  private static String getEnvironmentIdentifier(IMap map) {
+    StringBuilder sb = new StringBuilder("env: ");
+    if (map != null && map.getName() != null) {
+      sb.append(map.getName() + " ");
+    }
+
+    sb.append("#" + ++environmentIdSequence);
+    return sb.toString();
   }
 
   private String render(Graphics2D g, RenderType renderType) {

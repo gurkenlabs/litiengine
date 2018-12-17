@@ -22,13 +22,11 @@ import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
-import de.gurkenlabs.litiengine.environment.EnvironmentUnloadedListener;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.GameWindow;
-import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
@@ -80,14 +78,11 @@ public final class Game {
   public static final String COMMADLINE_ARG_RELEASE = "-release";
   public static final String COMMADLINE_ARG_NOGUI = "-nogui";
 
-  protected static long environmentLoadTick;
   private static final Logger log = Logger.getLogger(Game.class.getName());
   private static final String LOGGING_CONFIG_FILE = "logging.properties";
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
-  private static final List<EnvironmentLoadedListener> environmentLoadedListeners;
-  private static final List<EnvironmentUnloadedListener> environmentUnloadedListeners;
   private static final List<GameListener> gameListeners;
   private static final List<GameTerminatedListener> gameTerminatedListeners;
 
@@ -97,22 +92,19 @@ public final class Game {
   private static final IPhysicsEngine physicsEngine;
 
   private static final GameMetrics metrics;
-
   private static final GameTime gameTime;
-
   private static GameInfo gameInfo;
-  private static IEnvironment environment;
-  private static ICamera camera;
+
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
+
   private static ScreenManager screenManager;
+  private static GameWorld world;
 
   private static boolean hasStarted;
   private static boolean initialized;
 
   static {
-    environmentLoadedListeners = new CopyOnWriteArrayList<>();
-    environmentUnloadedListeners = new CopyOnWriteArrayList<>();
     gameListeners = new CopyOnWriteArrayList<>();
     gameTerminatedListeners = new CopyOnWriteArrayList<>();
 
@@ -127,6 +119,8 @@ public final class Game {
     // init configuration before init method in order to use configured values
     // to initialize components
     configuration = new GameConfiguration();
+    world = new GameWorld();
+    world.addLoadedListener(gameTime);
 
     addGameListener(new InputGameAdapter());
   }
@@ -406,73 +400,14 @@ public final class Game {
    * @return The game's screen manager.
    * 
    * @see Screen
-   * @see Game#getEnvironment()
+   * @see Game#environment()
    */
   public static IScreenManager screens() {
     return screenManager;
   }
 
-  public static ICamera getCamera() {
-    return camera;
-  }
-
-  public static void setCamera(final ICamera cam) {
-    if (getCamera() != null) {
-      Game.loop().detach(camera);
-    }
-
-    camera = cam;
-
-    if (!isInNoGUIMode()) {
-      Game.loop().attach(cam);
-      getCamera().updateFocus();
-    }
-  }
-
-  public static IEnvironment getEnvironment() {
-    return environment;
-  }
-
-  public static void unloadEnvironment() {
-    if (getEnvironment() != null) {
-      getEnvironment().unload();
-      for (final EnvironmentUnloadedListener listener : environmentUnloadedListeners) {
-        listener.environmentUnloaded(getEnvironment());
-      }
-    }
-  }
-
-  public static void loadEnvironment(final IEnvironment env) {
-    unloadEnvironment();
-
-    environment = env;
-    if (getEnvironment() != null) {
-      getEnvironment().load();
-    }
-
-    for (final EnvironmentLoadedListener listener : environmentLoadedListeners) {
-      listener.environmentLoaded(getEnvironment());
-    }
-
-    if (loop() != null) {
-      environmentLoadTick = loop().getTicks();
-    }
-  }
-
-  public static void addEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
-    environmentLoadedListeners.add(listener);
-  }
-
-  public static void removeEnvironmentLoadedListener(EnvironmentLoadedListener listener) {
-    environmentLoadedListeners.remove(listener);
-  }
-
-  public static void addEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
-    environmentUnloadedListeners.add(listener);
-  }
-
-  public static void removeEnvironmentUnloadedListener(EnvironmentUnloadedListener listener) {
-    environmentUnloadedListeners.remove(listener);
+  public static GameWorld world() {
+    return world;
   }
 
   public static boolean hasStarted() {
@@ -524,7 +459,7 @@ public final class Game {
 
     // initialize  the game window
     window().init();
-    setCamera(new Camera());
+    world.setCamera(new Camera());
 
     // init logging
     if (new File(LOGGING_CONFIG_FILE).exists()) {
@@ -670,7 +605,7 @@ public final class Game {
       info = XmlUtilities.readFromFile(GameInfo.class, gameInfoFile);
     } catch (JAXBException e) {
       log.log(Level.WARNING, "Could not read game info from {0}", new Object[] { gameInfoFile });
-      setInfo((GameInfo)null);
+      setInfo((GameInfo) null);
       return;
     }
 
