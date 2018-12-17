@@ -41,7 +41,7 @@ public class EntityNavigator implements IEntityNavigator {
     this.entity = entity;
     this.pathFinder = pathFinder;
     this.setAcceptableError(DEFAULT_ACCEPTABLE_ERROR);
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   @Override
@@ -108,7 +108,7 @@ public class EntityNavigator implements IEntityNavigator {
     }
 
     g.setColor(Color.MAGENTA);
-    Game.getRenderEngine().renderOutline(g, this.getPath().getPath());
+    Game.graphics().renderOutline(g, this.getPath().getPath());
   }
 
   @Override
@@ -185,6 +185,6 @@ public class EntityNavigator implements IEntityNavigator {
 
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), coordinates[0], coordinates[1]);
     final float pixelsPerTick = this.entity.getTickVelocity();
-    Game.getPhysicsEngine().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
+    Game.physics().move(this.entity, (float) angle, (float) (distance < pixelsPerTick ? distance : pixelsPerTick));
   }
 }

@@ -26,12 +26,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   @Override
   public void attach() {
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   @Override
   public void detach() {
-    Game.getLoop().detach(this);
+    Game.loop().detach(this);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   protected void moveEntity(double deltaX, double deltaY) {
     final Point2D newLocation = new Point2D.Double(this.getEntity().getX() + deltaX, this.getEntity().getY() + deltaY);
     final Point2D oldLocation = this.getEntity().getLocation();
-    Game.getPhysicsEngine().move(this.getEntity(), newLocation);
+    Game.physics().move(this.getEntity(), newLocation);
 
     final Point2D delta = new Point2D.Double(this.getEntity().getX() - oldLocation.getX(), this.getEntity().getY() - oldLocation.getY());
     for (Consumer<Point2D> cons : this.movedConsumer) {
@@ -110,7 +110,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
         this.getEntity().setLocation(entityLocation);
       } else {
         final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-        final boolean success = Game.getPhysicsEngine().move(this.getEntity(), (float) angle, Game.getLoop().getDeltaTime() * 0.001f * force.getStrength() * Game.getLoop().getTimeScale());
+        final boolean success = Game.physics().move(this.getEntity(), (float) angle, Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale());
         if (force.cancelOnCollision() && !success) {
           force.end();
         }

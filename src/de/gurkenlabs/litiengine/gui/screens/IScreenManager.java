@@ -1,53 +1,37 @@
 package de.gurkenlabs.litiengine.gui.screens;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.util.function.Consumer;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
 
 /**
- * The screen manager manages all screens of a game. The method
- * renderCurrentScreen is called from the render loop of the game and renders
- * the current screen to the getRenderComponent() of this manager.
+ * The <code>ScreenManager</code> holds instances of all available screen and handles whenever a different <code>Screen</code> should be shown to the
+ * player. It provides the
+ * currently active Screen for the Game’s <code>RenderComponent</code> which calls the <code>Screen.render(Graphics2D)</code> method on every tick of
+ * the <code>RenderLoop</code>.
+ * Overwriting this method provides the ability to define a customized render pipeline that suits the need of a particular Screen implementation. With
+ * the GameScreen, the LITIengine provides a simple default Screen implementation that renders the current <code>Environment</code> and all its
+ * <code>GuiComponents</code>.
+ * 
+ * @see Screen
+ * @see RenderComponent
+ * @see GameScreen
+ * @see Screen#render(java.awt.Graphics2D)
+ * @see Game#renderLoop()
  */
 public interface IScreenManager {
-  public void addScreen(final Screen screen);
+  public void add(Screen screen);
 
-  public void displayScreen(Screen screen);
+  public void remove(Screen screen);
 
-  public void displayScreen(String screenName);
+  public void display(Screen screen);
 
-  public Rectangle getBounds();
+  public void display(String screenName);
 
-  public Screen getCurrentScreen();
+  public Screen get(String screenName);
 
-  public RenderComponent getRenderComponent();
-
-  public Dimension getResolution();
-  
-  public Point2D getCenter();
-
-  public float getResolutionScale();
-
-  public Point getScreenLocation();
-
-  public String getTitle();
-
-  public void init(int width, int height, boolean fullscreen);
-
-  public boolean isFocusOwner();
-
-  public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
+  public Screen current();
 
   public void onScreenChanged(Consumer<Screen> screenConsumer);
-
-  public void setIconImage(Image image);
-
-  public void setTitle(String string);
-
-  public void setResolution(Resolution res);
 }

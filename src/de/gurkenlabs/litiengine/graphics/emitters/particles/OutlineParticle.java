@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 import de.gurkenlabs.litiengine.Game;
 
 public abstract class OutlineParticle extends ShapeParticle {
-  private float stroke = 1.0f / Game.getRenderEngine().getBaseRenderScale();
+  private float stroke = 1.0f / Game.graphics().getBaseRenderScale();
 
   public OutlineParticle(float width, float height, Color color, int ttl) {
     super(width, height, color, ttl);
@@ -18,7 +18,7 @@ public abstract class OutlineParticle extends ShapeParticle {
   public void render(final Graphics2D g, final Point2D emitterOrigin) {
     g.setColor(this.getColor());
 
-    Game.getRenderEngine().renderOutline(g, this.getShape(emitterOrigin), new BasicStroke(this.getStroke()));
+    Game.graphics().renderOutline(g, this.getShape(emitterOrigin), new BasicStroke(this.getStroke()));
   }
 
   public float getStroke() {

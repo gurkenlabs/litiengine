@@ -168,7 +168,7 @@ public class Prop extends CombatEntity {
     PropAnimationController<Prop> controller = new PropAnimationController<>(this);
     this.getControllers().addController(controller);
     if (Game.getEnvironment() != null && Game.getEnvironment().isLoaded()) {
-      Game.getLoop().attach(controller);
+      Game.loop().attach(controller);
     }
   }
 }

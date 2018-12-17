@@ -13,7 +13,7 @@ public class GameTest {
 
   @AfterEach
   public void cleanup() {
-    final File configFile = new File(Game.getConfiguration().getFileName());
+    final File configFile = new File(Game.config().getFileName());
     if (configFile.exists()) {
       configFile.delete();
     }
@@ -45,12 +45,12 @@ public class GameTest {
 
     assertTrue(initialized.wasCalled);
     assertFalse(started.wasCalled);
-    assertNotNull(Game.getRenderLoop());
-    assertNotNull(Game.getLoop());
+    assertNotNull(Game.renderLoop());
+    assertNotNull(Game.loop());
     assertNotNull(Game.getCamera());
-    assertNotNull(Game.getScreenManager());
-    assertNotNull(Game.getPhysicsEngine());
-    assertNotNull(Game.getRenderEngine());
+    assertNotNull(Game.screens());
+    assertNotNull(Game.physics());
+    assertNotNull(Game.graphics());
 
     Game.start();
     assertTrue(started.wasCalled);

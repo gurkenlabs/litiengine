@@ -25,10 +25,10 @@ public class AbilityExecution implements IUpdateable {
   public AbilityExecution(final Ability ability) {
     this.appliedEffects = new CopyOnWriteArrayList<>();
     this.ability = ability;
-    this.executionTicks = Game.getLoop().getTicks();
+    this.executionTicks = Game.loop().getTicks();
     this.impactArea = ability.calculateImpactArea();
     this.castLocation = ability.getExecutor().getCenter();
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   public Ability getAbility() {
@@ -60,7 +60,7 @@ public class AbilityExecution implements IUpdateable {
   public void update() {
     // if there a no effects to apply -> unregister this instance and we're done
     if (this.getAbility().getEffects().isEmpty() || this.getAbility().getEffects().size() == this.getAppliedEffects().size()) {
-      Game.getLoop().detach(this);
+      Game.loop().detach(this);
       return;
     }
 
@@ -68,7 +68,7 @@ public class AbilityExecution implements IUpdateable {
     for (final IEffect effect : this.getAbility().getEffects()) {
       // if the ability was not executed yet or the delay of the effect is not
       // yet reached
-      if (this.getAppliedEffects().contains(effect) || Game.getLoop().getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
+      if (this.getAppliedEffects().contains(effect) || Game.loop().getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {
         continue;
       }
 

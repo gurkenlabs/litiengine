@@ -8,7 +8,7 @@ public class RenderLoop extends UpdateLoop {
 
   public RenderLoop(String name) {
     super(name);
-    this.maxFps = Game.getConfiguration().client().getMaxFps();
+    this.maxFps = Game.config().client().getMaxFps();
   }
 
   @Override
@@ -20,7 +20,7 @@ public class RenderLoop extends UpdateLoop {
         Game.getCamera().updateFocus();
         this.update();
 
-        Game.getScreenManager().getRenderComponent().render();
+        Game.window().getRenderComponent().render();
 
         final long renderTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 

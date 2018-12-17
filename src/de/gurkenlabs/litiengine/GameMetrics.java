@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 
-public class GameMetrics implements IUpdateable, IRenderable {
+public final class GameMetrics implements IUpdateable, IRenderable {
   private static final int OFFSET_X = 5;
   private static final int OFFSET_Y = 12;
   
@@ -17,41 +17,20 @@ public class GameMetrics implements IUpdateable, IRenderable {
   private final List<Long> bytesSent;
 
   private long downStreamInBytes;
-  private final List<Long> fps;
-  private long framesPerSecond;
   private long lastNetworkTickTime;
   private int packagesReceived;
   private int packagesSent;
   private long ping;
-  private long updatesPerSecond;
-  private final List<Long> ups;
   private long upStreamInBytes;
+  
+  private long framesPerSecond;
+  private long updatesPerSecond;
+  
+  private float usedMemory;
 
-  /**
-   * Instantiates a new game metrics.
-   */
-  public GameMetrics() {
-    this.fps = new CopyOnWriteArrayList<>();
-    this.ups = new CopyOnWriteArrayList<>();
+  GameMetrics() {
     this.bytesSent = new CopyOnWriteArrayList<>();
     this.bytesReceived = new CopyOnWriteArrayList<>();
-  }
-
-  public float getAverageFramesPerSecond() {
-    if (this.fps.isEmpty()) {
-      return 0;
-    }
-
-    Optional<Long> opt = this.fps.stream().reduce((x, y) -> x + y);
-    return opt.isPresent() ? opt.get() / (float) this.fps.size() : 0;
-  }
-
-  public float getAverageUpdatesPerSecond() {
-    if (this.ups.isEmpty()) {
-      return 0;
-    }
-    Optional<Long> opt = this.ups.stream().reduce((x, y) -> x + y);
-    return opt.isPresent() ? opt.get() / (float) this.ups.size() : 0;
   }
 
   public float getDownStreamInBytes() {
@@ -81,6 +60,10 @@ public class GameMetrics implements IUpdateable, IRenderable {
   public float getUpStreamInBytes() {
     return this.upStreamInBytes;
   }
+  
+  public float getUsedMemory() {
+    return this.usedMemory;
+  }
 
   public void packageReceived(final long size) {
     this.bytesReceived.add(size);
@@ -91,7 +74,7 @@ public class GameMetrics implements IUpdateable, IRenderable {
   }
 
   public void recordNetworkTraffic() {
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
   }
 
   @Override
@@ -101,9 +84,8 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
     g.setColor(Color.RED);
     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-    final Runtime runtime = Runtime.getRuntime();
-    final float usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
-    final String memory = "memory: " + usedMemory + "MB";
+
+    final String memory = "memory: " + this.usedMemory + "MB";
     g.drawString(memory, OFFSET_X, currentOffsetY);
     currentOffsetY += OFFSET_Y;
 
@@ -111,8 +93,8 @@ public class GameMetrics implements IUpdateable, IRenderable {
     g.drawString(pingText, OFFSET_X, currentOffsetY);
     currentOffsetY += OFFSET_Y;
 
-    final float upStream = Math.round(Game.getMetrics().getUpStreamInBytes() / 1024f * 100) * 0.01f;
-    final float downStream = Math.round(Game.getMetrics().getDownStreamInBytes() / 1024f * 100) * 0.01f;
+    final float upStream = Math.round(Game.metrics().getUpStreamInBytes() / 1024f * 100) * 0.01f;
+    final float downStream = Math.round(Game.metrics().getDownStreamInBytes() / 1024f * 100) * 0.01f;
     final String in = "in: " + this.getPackagesReceived() + " - " + downStream + "kb/s";
     g.drawString(in, OFFSET_X, currentOffsetY);
     currentOffsetY += OFFSET_Y;
@@ -131,7 +113,6 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
   public void setFramesPerSecond(final long currentFramesPerSecond) {
     this.framesPerSecond = currentFramesPerSecond;
-    this.fps.add(this.framesPerSecond);
   }
 
   public void setPing(final long ping) {
@@ -140,11 +121,13 @@ public class GameMetrics implements IUpdateable, IRenderable {
 
   public void setUpdatesPerSecond(final long updatesPerSecond) {
     this.updatesPerSecond = updatesPerSecond;
-    this.ups.add(this.updatesPerSecond);
   }
 
   @Override
   public void update() {
+    final Runtime runtime = Runtime.getRuntime();
+    this.usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
+    
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;

@@ -83,16 +83,16 @@ public class AnimationController implements IAnimationController {
   }
 
   public void attach() {
-    Game.getLoop().attach(this);
+    Game.loop().attach(this);
     for (final Animation animation : this.getAnimations()) {
-      Game.getLoop().attach(animation);
+      Game.loop().attach(animation);
     }
   }
 
   public void detach() {
-    Game.getLoop().detach(this);
+    Game.loop().detach(this);
     for (final Animation animation : this.getAnimations()) {
-      Game.getLoop().detach(animation);
+      Game.loop().detach(animation);
     }
   }
 

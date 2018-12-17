@@ -120,7 +120,7 @@ public class Camera implements ICamera {
 
   @Override
   public float getRenderScale() {
-    return Game.getRenderEngine().getBaseRenderScale() * this.getZoom();
+    return Game.graphics().getBaseRenderScale() * this.getZoom();
   }
 
   @Override
@@ -174,11 +174,11 @@ public class Camera implements ICamera {
       this.zoomTick = 0;
       this.zoomStep = 0;
     } else {
-      this.zoomTick = Game.getLoop().getTicks();
+      this.zoomTick = Game.loop().getTicks();
       this.targetZoom = targetZoom;
       this.zoomDelay = delay;
 
-      final double tickduration = 1000 / (double) Game.getLoop().getUpdateRate();
+      final double tickduration = 1000 / (double) Game.loop().getUpdateRate();
       final double tickAmount = delay / tickduration;
       final float totalDelta = this.targetZoom - this.zoom;
       this.zoomStep = tickAmount > 0 ? (float) (totalDelta / tickAmount) : totalDelta;
@@ -187,7 +187,7 @@ public class Camera implements ICamera {
 
   @Override
   public void shake(final double intensity, final int delay, final int shakeDuration) {
-    this.shakeTick = Game.getLoop().getTicks();
+    this.shakeTick = Game.loop().getTicks();
     this.shakeDelay = delay;
     this.shakeIntensity = intensity;
     this.shakeDuration = shakeDuration;
@@ -200,7 +200,7 @@ public class Camera implements ICamera {
     }
 
     if (this.targetZoom > 0) {
-      if (Game.getLoop().getDeltaTime(this.zoomTick) >= this.zoomDelay) {
+      if (Game.loop().getDeltaTime(this.zoomTick) >= this.zoomDelay) {
         for (final Consumer<Float> cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
@@ -225,10 +225,10 @@ public class Camera implements ICamera {
       return;
     }
 
-    if (Game.getLoop().getDeltaTime(this.lastShake) > this.shakeDelay) {
+    if (Game.loop().getDeltaTime(this.lastShake) > this.shakeDelay) {
       this.shakeOffsetX = this.getShakeIntensity() * MathUtilities.randomSign();
       this.shakeOffsetY = this.getShakeIntensity() * MathUtilities.randomSign();
-      this.lastShake = Game.getLoop().getTicks();
+      this.lastShake = Game.loop().getTicks();
     }
   }
 
@@ -238,7 +238,7 @@ public class Camera implements ICamera {
 
     final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.getScreenManager().getResolution().getWidth() / this.getRenderScale(), Game.getScreenManager().getResolution().getHeight() / this.getRenderScale());
+    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getWidth() / this.getRenderScale(), Game.window().getHeight() / this.getRenderScale());
   }
 
   @Override
@@ -260,7 +260,7 @@ public class Camera implements ICamera {
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
 
     // TODO: Implement special handling for maps that are smaller than the camera area: use Align, Valign to determine where to render them
-    final Dimension resolution = Game.getScreenManager().getResolution();
+    final Dimension resolution = Game.window().getResolution();
     double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
     double maxX = mapSize.getWidth() - minX;
     double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
@@ -315,14 +315,14 @@ public class Camera implements ICamera {
   }
 
   private double getViewPortCenterX() {
-    return Game.getScreenManager().getResolution().getWidth() * 0.5 / this.getRenderScale();
+    return Game.window().getWidth() * 0.5 / this.getRenderScale();
   }
 
   private double getViewPortCenterY() {
-    return Game.getScreenManager().getResolution().getHeight() * 0.5 / this.getRenderScale();
+    return Game.window().getHeight() * 0.5 / this.getRenderScale();
   }
 
   private boolean isShakeEffectActive() {
-    return this.getShakeTick() != 0 && Game.getLoop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
+    return this.getShakeTick() != 0 && Game.loop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
   }
 }

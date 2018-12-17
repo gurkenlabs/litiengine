@@ -22,7 +22,7 @@ public class SoundEffect extends Effect {
       return;
     }
 
-    Game.getSoundEngine().playSound(entity, this.getRandomSound());
+    Game.audio().playSound(entity, this.getRandomSound());
   }
 
   private Sound getRandomSound() {

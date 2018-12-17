@@ -111,8 +111,8 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     }
 
     this.activated = true;
-    this.activationTick = Game.getLoop().getTicks();
-    Game.getLoop().attach(this);
+    this.activationTick = Game.loop().getTicks();
+    Game.loop().attach(this);
   }
 
   /**
@@ -141,7 +141,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
     this.aliveTime = 0;
     this.activationTick = 0;
     this.lastSpawn = 0;
-    Game.getLoop().detach(this);
+    Game.loop().detach(this);
   }
 
   public void delete() {
@@ -286,7 +286,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   public void render(final Graphics2D g) {
     this.renderParticles(g, RenderType.NONE);
 
-    if (Game.getConfiguration().debug().renderHitBoxes()) {
+    if (Game.config().debug().renderHitBoxes()) {
       DebugRenderer.renderEntityDebugInfo(g, this);
     }
   }
@@ -384,7 +384,7 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       return;
     }
 
-    final float updateRatio = (float) this.getParticleUpdateRate() / Game.getLoop().getUpdateRate();
+    final float updateRatio = (float) this.getParticleUpdateRate() / Game.loop().getUpdateRate();
     for (final Particle p : this.getParticles().stream().collect(Collectors.toList())) {
       if (this.particleCanBeRemoved(p)) {
         // remove dead particles
@@ -395,9 +395,9 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
       p.update(this.getOrigin(), updateRatio);
     }
 
-    this.aliveTime = Game.getLoop().getDeltaTime(this.activationTick);
+    this.aliveTime = Game.loop().getDeltaTime(this.activationTick);
 
-    if ((this.getSpawnRate() == 0 || Game.getLoop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate())) {
+    if ((this.getSpawnRate() == 0 || Game.loop().getDeltaTime(this.lastSpawn) >= this.getSpawnRate())) {
       this.spawnParticle();
     }
   }
@@ -493,11 +493,11 @@ public abstract class Emitter extends Entity implements IUpdateable, ITimeToLive
   }
 
   private void renderParticles(final Graphics2D g, final RenderType renderType) {
-    if (Game.getConfiguration().graphics().getGraphicQuality().getValue() < this.getRequiredQuality().getValue()) {
+    if (Game.config().graphics().getGraphicQuality().getValue() < this.getRequiredQuality().getValue()) {
       return;
     }
 
-    if (Game.getScreenManager() != null && Game.getCamera() != null && !Game.getCamera().getViewport().intersects(this.getBoundingBox())) {
+    if (Game.screens() != null && Game.getCamera() != null && !Game.getCamera().getViewport().intersects(this.getBoundingBox())) {
       return;
     }
 

@@ -16,12 +16,12 @@ public abstract class ImageEffect implements IImageEffect {
   protected ImageEffect(final int ttl, final String name) {
     this.ttl = ttl;
     this.name = name;
-    this.aliveTick = Game.getLoop().getTicks();
+    this.aliveTick = Game.loop().getTicks();
   }
 
   @Override
   public long getAliveTime() {
-    return Game.getLoop().getDeltaTime(this.aliveTick);
+    return Game.loop().getDeltaTime(this.aliveTick);
   }
 
   @Override

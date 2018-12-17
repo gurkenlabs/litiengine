@@ -27,7 +27,7 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
 
     final double maxPixelsPerTick = this.getEntity().getTickVelocity();
 
-    final long deltaTime = Game.getLoop().getDeltaTime();
+    final long deltaTime = Game.loop().getDeltaTime();
     double accelerationRatio = (double) deltaTime / (double) this.getEntity().getAcceleration();
     double decelerationRatio = (double) deltaTime / (double) this.getEntity().getDeceleration();
 
@@ -158,6 +158,6 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
   }
 
   protected double getStopThreshold() {
-    return 0.0025 * Game.getLoop().getDeltaTime();
+    return 0.0025 * Game.loop().getDeltaTime();
   }
 }

@@ -101,12 +101,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
 
   @Override
   public void update() {
-    if (Game.getLoop().getDeltaTime(this.lastSpawnWave) < this.getSpawnInterval()) {
+    if (Game.loop().getDeltaTime(this.lastSpawnWave) < this.getSpawnInterval()) {
       return;
     }
 
     this.spawnNewEntities();
-    this.lastSpawnWave = Game.getLoop().getTicks();
+    this.lastSpawnWave = Game.loop().getTicks();
   }
 
   /**

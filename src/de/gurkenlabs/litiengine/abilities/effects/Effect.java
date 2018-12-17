@@ -72,7 +72,7 @@ public abstract class Effect implements IEffect {
 
     // if it is the first appliance -> register for update
     if (this.appliances.size() == 1) {
-      Game.getLoop().attach(this);
+      Game.loop().attach(this);
     }
   }
 
@@ -178,7 +178,7 @@ public abstract class Effect implements IEffect {
 
     // 4. unregister if all appliances are finished
     if (this.getActiveAppliances().isEmpty()) {
-      Game.getLoop().detach(this);
+      Game.loop().detach(this);
     }
   }
 
@@ -209,7 +209,7 @@ public abstract class Effect implements IEffect {
   }
 
   protected boolean hasEnded(final EffectApplication appliance) {
-    final long effectDuration = Game.getLoop().getDeltaTime(appliance.getAppliedTicks());
+    final long effectDuration = Game.loop().getDeltaTime(appliance.getAppliedTicks());
     return effectDuration > this.getDuration();
   }
 

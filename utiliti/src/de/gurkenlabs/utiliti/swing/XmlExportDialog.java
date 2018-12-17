@@ -36,7 +36,7 @@ public final class XmlExportDialog {
       chooser.addChoosableFileFilter(filter);
       chooser.setSelectedFile(new File(filename + "." + extension));
 
-      int result = chooser.showSaveDialog(Game.getScreenManager().getRenderComponent());
+      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
         String newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
         log.log(Level.INFO, "exported {0} {1} to {2}", new Object[] { name, filename, newFile });

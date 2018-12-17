@@ -32,8 +32,8 @@ public class Gamepad implements IGamepad, IUpdateable {
 
   private final List<String> pressedComponents;
   
-  private float axisDeadzone = Game.getConfiguration().input().getGamepadAxisDeadzone();
-  private float triggerDeadzone = Game.getConfiguration().input().getGamepadTriggerDeadzone();
+  private float axisDeadzone = Game.config().input().getGamepadAxisDeadzone();
+  private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
 
   protected Gamepad(final int index, final Controller controller) {
     this.componentPollConsumer = new ConcurrentHashMap<>();

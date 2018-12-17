@@ -112,7 +112,7 @@ public class LightSource extends Entity implements IRenderable {
 
   @Override
   public void render(final Graphics2D g) {
-    if (Game.getConfiguration().graphics().renderDynamicShadows()) {
+    if (Game.config().graphics().renderDynamicShadows()) {
       this.renderShadows(g);
     }
   }

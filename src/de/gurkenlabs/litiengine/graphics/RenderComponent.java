@@ -78,14 +78,14 @@ public class RenderComponent extends Canvas implements IInitializable {
   public void fadeIn(final int ms) {
     this.fadeOutStart = -1;
     this.fadeOutTime = -1;
-    this.fadeInStart = Game.getLoop().getTicks();
+    this.fadeInStart = Game.loop().getTicks();
     this.fadeInTime = ms;
   }
 
   public void fadeOut(final int ms) {
     this.fadeInStart = -1;
     this.fadeInTime = -1;
-    this.fadeOutStart = Game.getLoop().getTicks();
+    this.fadeOutStart = Game.loop().getTicks();
     this.fadeOutTime = ms;
   }
 
@@ -141,10 +141,10 @@ public class RenderComponent extends Canvas implements IInitializable {
         g.setClip(bounds);
         g.fill(bounds);
 
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.getConfiguration().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, Game.config().graphics().colorInterpolation() ? RenderingHints.VALUE_INTERPOLATION_BILINEAR : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
-        final Screen currentScreen = Game.getScreenManager().getCurrentScreen();
+        final Screen currentScreen = Game.screens().current();
         if (currentScreen != null) {
           currentScreen.render(g);
         }
@@ -157,7 +157,7 @@ public class RenderComponent extends Canvas implements IInitializable {
           ImageRenderer.renderTransformed(g, this.cursorImage, locationWithOffset, this.getCursorTransform());
         }
 
-        if (Game.getConfiguration().debug().isRenderDebugMouse()) {
+        if (Game.config().debug().isRenderDebugMouse()) {
           g.setColor(Color.RED);
 
           g.draw(new Line2D.Double(Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() - DEBUG_MOUSE_SIZE, Input.mouse().getLocation().getX(), Input.mouse().getLocation().getY() + DEBUG_MOUSE_SIZE));
@@ -241,7 +241,7 @@ public class RenderComponent extends Canvas implements IInitializable {
 
   private void handleFade() {
     if (this.fadeOutStart != -1) {
-      final long timePassed = Game.getLoop().getDeltaTime(this.fadeOutStart);
+      final long timePassed = Game.loop().getDeltaTime(this.fadeOutStart);
       this.currentAlpha = MathUtilities.clamp(1 - timePassed / (float) this.fadeOutTime, 0, 1);
       if (this.currentAlpha == 0) {
         this.fadeOutStart = -1;
@@ -252,7 +252,7 @@ public class RenderComponent extends Canvas implements IInitializable {
     }
 
     if (this.fadeInStart != -1) {
-      final long timePassed = Game.getLoop().getDeltaTime(this.fadeInStart);
+      final long timePassed = Game.loop().getDeltaTime(this.fadeInStart);
       this.currentAlpha = MathUtilities.clamp(timePassed / (float) this.fadeInTime, 0, 1);
       if (this.currentAlpha == 1) {
         this.fadeInStart = -1;

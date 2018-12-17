@@ -11,6 +11,6 @@ public abstract class ClientMessageHandler<T extends Serializable> extends Messa
   @Override
   public void handle(final byte[] data, final InetAddress address, final int port) {
     super.handle(data, address, port);
-    Game.getMetrics().packageReceived(new MessagePacket<T>(data).getSize());
+    Game.metrics().packageReceived(new MessagePacket<T>(data).getSize());
   }
 }

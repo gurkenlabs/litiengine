@@ -13,9 +13,6 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-/**
- * The Class PhysicsEngine.
- */
 public final class PhysicsEngine implements IPhysicsEngine {
   private final List<ICollisionEntity> collisionEntities;
 
@@ -29,9 +26,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
   private final List<Rectangle2D> allCollisionBoxRectangles;
   private final List<Rectangle2D> entityCollisionBoxesRectangles;
 
-  /**
-   * Instantiates a new physics engine.
-   */
   public PhysicsEngine() {
     this.entityCollisionBoxes = new CopyOnWriteArrayList<>();
     this.collisionEntities = new CopyOnWriteArrayList<>();
