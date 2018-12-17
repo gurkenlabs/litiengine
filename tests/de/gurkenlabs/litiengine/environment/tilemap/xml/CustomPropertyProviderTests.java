@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Hashtable;
 
-import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
-
 import org.junit.jupiter.api.Test;
+
+import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 public class CustomPropertyProviderTests {
 

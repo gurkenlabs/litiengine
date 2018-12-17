@@ -52,6 +52,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
     when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
+    when(mapObject.getEnumValue(MapObjectProperty.PROP_MATERIAL, Material.class, Material.UNDEFINED)).thenReturn(Material.PLASTIC);
     when(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getBoolValue(MapObjectProperty.COLLISION)).thenReturn(true);
     when(mapObject.getBoolValue(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
@@ -61,7 +62,10 @@ public class MapObjectLoaderTests {
     when(mapObject.getFloatValue(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
 
     when(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
+    when(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER)).thenReturn(Align.LEFT);
+
     when(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
+    when(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN)).thenReturn(Valign.MIDDLE);
     when(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM)).thenReturn(1);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
