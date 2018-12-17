@@ -17,6 +17,8 @@ public class GameTest {
     if (configFile.exists()) {
       configFile.delete();
     }
+    
+    Game.terminate();
   }
 
   private class Status {

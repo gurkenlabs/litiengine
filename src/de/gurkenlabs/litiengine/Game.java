@@ -608,7 +608,11 @@ public final class Game {
     hasStarted = true;
   }
 
-  private static void terminate() {
+  /**
+   * This method <b>should not be called manually</b>. <br>
+   * It's internally called when the main application shuts down.
+   */
+  public static void terminate() {
     for (final GameListener listener : gameListeners) {
       if (!listener.terminating()) {
         return;

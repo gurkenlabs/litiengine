@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +26,11 @@ public class ParticleTests {
   @BeforeAll
   public static void setup() {
     Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
+  @AfterAll
+  public static void terminateGame() {
+    Game.terminate();
   }
 
   @Test

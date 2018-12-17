@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +61,11 @@ public class EnvironmentTests {
     // necessary because the environment need access to the game loop and other
     // stuff
     Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
+  @AfterAll
+  public static void terminateGame() {
+    Game.terminate();
   }
 
   @BeforeEach
@@ -135,7 +141,7 @@ public class EnvironmentTests {
 
     assertNotNull(noEntities);
     assertEquals(0, noEntities.size());
-    
+
     assertNotNull(entities);
     assertEquals(2, entities.size());
     assertTrue(entities.contains(combatEntity));

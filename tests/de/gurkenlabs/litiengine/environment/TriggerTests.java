@@ -38,5 +38,7 @@ public class TriggerTests {
 
     assertTrue(trigger.isActivated());
     verify(target, times(1)).sendMessage(trigger, trigger.getMessage());
+
+    Game.terminate();
   }
 }
