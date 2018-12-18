@@ -18,7 +18,7 @@ public final class GameTime implements EnvironmentLoadedListener {
   }
 
   @Override
-  public void environmentLoaded(IEnvironment environment) {
+  public void loaded(IEnvironment environment) {
     environmentLoaded = Game.loop().getTicks();
   }
 }

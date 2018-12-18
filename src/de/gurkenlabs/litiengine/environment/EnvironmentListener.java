@@ -8,14 +8,7 @@ package de.gurkenlabs.litiengine.environment;
  * @see IEnvironment#clear()
  * @see IEnvironment#init()
  */
-public interface EnvironmentListener extends EnvironmentLoadedListener {
-  /**
-   * This method was called after the environment was unloaded.
-   * 
-   * @param environment
-   *          The environment that was unloaded.
-   */
-  public void environmentUnloaded(IEnvironment environment);
+public interface EnvironmentListener extends EnvironmentLoadedListener, EnvironmentUnloadedListener {
 
   /**
    * This method was called after the environment was cleared.
@@ -23,7 +16,7 @@ public interface EnvironmentListener extends EnvironmentLoadedListener {
    * @param environment
    *          The environment that was cleared.
    */
-  public void environmentCleared(IEnvironment environment);
+  public void cleared(IEnvironment environment);
 
   /**
    * This method was called after the environment was initialized.
@@ -31,5 +24,5 @@ public interface EnvironmentListener extends EnvironmentLoadedListener {
    * @param environment
    *          The environment that was initialized.
    */
-  public void environmentInitialized(IEnvironment environment);
+  public void initialized(IEnvironment environment);
 }

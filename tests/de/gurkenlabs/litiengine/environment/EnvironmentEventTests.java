@@ -32,7 +32,7 @@ public class EnvironmentEventTests {
 
     this.testEnvironment.init();
 
-    verify(environmentListener, times(1)).environmentInitialized(this.testEnvironment);
+    verify(environmentListener, times(1)).initialized(this.testEnvironment);
 
   }
 
@@ -43,7 +43,7 @@ public class EnvironmentEventTests {
 
     this.testEnvironment.load();
 
-    verify(environmentListener, times(1)).environmentLoaded(this.testEnvironment);
+    verify(environmentListener, times(1)).loaded(this.testEnvironment);
   }
 
   @Test

@@ -15,5 +15,5 @@ public interface EnvironmentUnloadedListener extends EventListener {
    * @param environment
    *          The environment that was loaded.
    */
-  public void environmentUnloaded(IEnvironment environment);
+  public void unloaded(IEnvironment environment);
 }

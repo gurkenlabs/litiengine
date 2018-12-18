@@ -317,7 +317,7 @@ public class Environment implements IEnvironment {
 
     this.initialized = false;
 
-    this.fireEvent(l -> l.environmentCleared(this));
+    this.fireEvent(l -> l.cleared(this));
   }
 
   @Override
@@ -732,7 +732,7 @@ public class Environment implements IEnvironment {
       this.addAmbientLight();
     }
 
-    this.fireEvent(l -> l.environmentInitialized(this));
+    this.fireEvent(l -> l.initialized(this));
     this.initialized = true;
   }
 
@@ -770,7 +770,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = true;
-    this.fireEvent(l -> l.environmentLoaded(this));
+    this.fireEvent(l -> l.loaded(this));
   }
 
   @Override
@@ -1042,7 +1042,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = false;
-    this.fireEvent(l -> l.environmentUnloaded(this));
+    this.fireEvent(l -> l.unloaded(this));
   }
 
   @Override
@@ -1093,7 +1093,7 @@ public class Environment implements IEnvironment {
   private static String getEnvironmentIdentifier(IMap map) {
     StringBuilder sb = new StringBuilder("env: ");
     if (map != null && map.getName() != null) {
-      sb.append(map.getName() + " ");
+      sb.append(map.getName().toLowerCase() + " ");
     }
 
     sb.append("#" + ++environmentIdSequence);

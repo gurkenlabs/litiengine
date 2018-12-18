@@ -214,7 +214,7 @@ public class EditorScreen extends Screen {
       }
 
       if (Game.world().environment() != null) {
-        Game.world().loadEnvironment(null);
+        Game.world().unloadEnvironment();
       }
 
       // set up project settings
@@ -316,7 +316,7 @@ public class EditorScreen extends Screen {
       if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
       } else {
-        Game.world().loadEnvironment(null);
+        Game.world().unloadEnvironment();
       }
 
       this.changeComponent(ComponentType.MAP);

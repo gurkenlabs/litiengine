@@ -400,7 +400,8 @@ public final class Game {
    * @return The game's screen manager.
    * 
    * @see Screen
-   * @see Game#environment()
+   * @see GameWorld#environment()
+   * @see Game#world()
    */
   public static IScreenManager screens() {
     return screenManager;
