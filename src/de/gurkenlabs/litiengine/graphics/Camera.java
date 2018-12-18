@@ -271,7 +271,7 @@ public class Camera implements ICamera {
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
     if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
-      return focus;
+      return new Point2D.Double(focus.getX(), focus.getY());
     }
 
     final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
