@@ -17,10 +17,6 @@ public interface GameWindow {
   
   public Dimension getResolution();
 
-  public int getWidth();
-
-  public int getHeight();
-  
   public Rectangle getBounds();
 
   public Point2D getCenter();

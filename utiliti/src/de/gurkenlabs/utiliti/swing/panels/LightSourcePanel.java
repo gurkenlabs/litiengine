@@ -164,7 +164,7 @@ public class LightSourcePanel extends PropertyPanel {
     final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
     final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
 
-    boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
+    boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
     this.spinnerBrightness.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_ALPHA));
     this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.textFieldColor.setText(color);

@@ -13,7 +13,7 @@ public abstract class EditorComponent extends GuiComponent {
   private ComponentType componentType;
 
   public EditorComponent(final ComponentType componentType) {
-    super(0, EditorScreen.instance().getPadding(), Game.window().getWidth(), Game.window().getHeight() - Game.window().getHeight() * 1 / 15);
+    super(0, EditorScreen.instance().getPadding(), Game.window().getResolution().getWidth(), Game.window().getResolution().getHeight() - Game.window().getResolution().getHeight() * 1 / 15);
     this.componentType = componentType;
   }
 

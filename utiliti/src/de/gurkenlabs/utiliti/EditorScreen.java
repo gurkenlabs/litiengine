@@ -117,6 +117,7 @@ public class EditorScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
+
     Game.world().camera().updateFocus();
     if (Game.world().environment() != null) {
       Game.world().environment().render(g);
@@ -129,6 +130,7 @@ public class EditorScreen extends Screen {
 
     if (this.currentResourceFile != null) {
       Game.window().setTitle(Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile);
+
       String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null ? "\nMap: " + Game.world().environment().getMap().getName() : "";
       Program.getTrayIcon().setToolTip(Game.info().getName() + " " + Game.info().getVersion() + "\n" + this.currentResourceFile + mapName);
     } else if (this.getProjectPath() != null) {
@@ -145,9 +147,10 @@ public class EditorScreen extends Screen {
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
+
     TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.world().camera().getRenderScale() * 100) + " %", 10,
-        Game.window().getHeight() - 40);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getHeight() - 20);
+        Game.window().getResolution().getHeight() - 40);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
@@ -478,9 +481,11 @@ public class EditorScreen extends Screen {
   }
 
   public void saveMapSnapshot() {
+
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
+
 
     IMap currentMap = Game.world().environment().getMap();
     BufferedImage img = Game.graphics().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);

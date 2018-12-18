@@ -328,8 +328,8 @@ public class Mouse implements IMouse {
       this.lastLocation = new Point(e.getPoint().x - Game.window().getRenderComponent().getCursorOffsetX(), e.getPoint().y - Game.window().getRenderComponent().getCursorOffsetY());
     } else {
       // get diff relative from grabbed position
-      final double screenCenterX = Game.window().getWidth() * 0.5;
-      final double screenCenterY = Game.window().getHeight() * 0.5;
+      final double screenCenterX = Game.window().getResolution().getWidth() * 0.5;
+      final double screenCenterY = Game.window().getResolution().getHeight() * 0.5;
       final Point screenLocation = Game.window().getWindowLocation();
       final int grabX = (int) (screenLocation.x + screenCenterX);
       final int grabY = (int) (screenLocation.y + screenCenterY);

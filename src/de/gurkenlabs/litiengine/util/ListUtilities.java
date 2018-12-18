@@ -9,7 +9,7 @@ public class ListUtilities {
   }
 
   public static <E> boolean containsInstance(final List<E> list, final Class<? extends E> clazz) {
-    return list.stream().anyMatch(e -> clazz.isInstance(e));
+    return list.stream().anyMatch(clazz::isInstance);
   }
 
   public static List<Integer> getIntList(int... values) {

@@ -94,6 +94,29 @@ public interface ICamera extends IUpdateable {
 
   public void setFocus(double x, double y);
 
+  /**
+   * Pans the camera over the specified duration (in frames) to the target
+   * location, after accounting for modifications such as clamping to the
+   * map. Event listeners attached to this camera are notified when the pan
+   * completes.
+   * @param focus the new focus for the camera once the panning is complete
+   * @param duration the number of frames between this call and when the pan
+   *  completes
+   */
+  public void pan(Point2D focus, int duration);
+
+  /**
+   * Pans the camera over the specified duration (in frames) to the target
+   * location, after accounting for modifications such as clamping to the
+   * map. Event listeners attached to this camera are notified when the pan
+   * completes.
+   * @param x the new X position for the camera once the panning is complete
+   * @param y the new Y position for the camera once the panning is complete
+   * @param duration the number of frames between this call and when the pan
+   *  completes
+   */
+  public void pan(double x, double y, int duration);
+
   public void setZoom(float zoom, int delay);
 
   public boolean isClampToMap();
