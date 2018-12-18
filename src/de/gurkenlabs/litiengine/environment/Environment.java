@@ -715,9 +715,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<String> getUsedTags() {
-    final Collection<String> tags = new ArrayList<>(this.getEntitiesByTag().keySet());
-
-    return tags;
+    return new ArrayList<>(this.getEntitiesByTag().keySet());
   }
 
   @Override
