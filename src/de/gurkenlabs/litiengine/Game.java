@@ -89,7 +89,7 @@ public final class Game {
   private static final RenderEngine graphicsEngine;
   private static final SoundEngine soundEngine;
   private static final IPhysicsEngine physicsEngine;
-  
+
   private static final GameConfiguration configuration;
   private static final GameMetrics metrics;
   private static final GameTime gameTime;
@@ -559,6 +559,8 @@ public final class Game {
     gameLoop.terminate();
 
     soundEngine.terminate();
+
+    world().clear();
     if (!isInNoGUIMode()) {
       renderLoop.terminate();
     }

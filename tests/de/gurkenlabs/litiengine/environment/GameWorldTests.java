@@ -89,6 +89,34 @@ public class GameWorldTests {
     assertTrue(map2Initialized.wasCalled);
   }
 
+  @Test
+  public void testMapSpecificLoadedListeners() {
+    Status mapLoaded = new Status();
+
+    Game.world().addLoadedListener("test-map", e -> mapLoaded.wasCalled = true);
+
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+
+    Game.world().loadEnvironment(map);
+
+    assertTrue(mapLoaded.wasCalled);
+  }
+
+  @Test
+  public void testMapSpecificUnloadedListeners() {
+    Status mapUnloaded = new Status();
+
+    Game.world().addUnloadedListener("test-map", e -> mapUnloaded.wasCalled = true);
+
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+
+    Game.world().loadEnvironment(map);
+
+    Game.world().unloadEnvironment();
+
+    assertTrue(mapUnloaded.wasCalled);
+  }
+
   private class Status {
     boolean wasCalled = false;
   }

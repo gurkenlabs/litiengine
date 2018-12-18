@@ -68,6 +68,19 @@ public final class GameWorld {
     return this.camera;
   }
 
+  public void clear() {
+    this.unloadEnvironment();
+    this.environments.clear();
+    this.setCamera(null);
+
+    this.environmentListeners.clear();
+    this.environmentLoadedListeners.clear();
+    this.environmentUnloadedListeners.clear();
+
+    this.loadedListeners.clear();
+    this.unloadedListeners.clear();
+  }
+
   public IEnvironment environment() {
     return this.environment;
   }
@@ -123,6 +136,16 @@ public final class GameWorld {
       for (final EnvironmentLoadedListener listener : this.loadedListeners) {
         listener.loaded(env);
       }
+
+      // call map specific listeners
+      if (env.getMap() != null && env.getMap().getName() != null) {
+        String mapName = env.getMap().getName().toLowerCase();
+        if (this.environmentLoadedListeners.containsKey(mapName)) {
+          for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
+            listener.loaded(env);
+          }
+        }
+      }
     }
 
     this.environment = env;
@@ -164,6 +187,16 @@ public final class GameWorld {
 
       for (final EnvironmentUnloadedListener listener : this.unloadedListeners) {
         listener.unloaded(this.environment());
+      }
+
+      // call map specific listeners
+      if (this.environment().getMap() != null && this.environment().getMap().getName() != null) {
+        String mapName = this.environment().getMap().getName().toLowerCase();
+        if (this.environmentUnloadedListeners.containsKey(mapName)) {
+          for (EnvironmentUnloadedListener listener : this.environmentUnloadedListeners.get(mapName)) {
+            listener.unloaded(this.environment());
+          }
+        }
       }
     }
 
