@@ -282,7 +282,8 @@ public abstract class ResourcesContainer<T> {
    * to check whether a resource is present while also fetching it from the container.
    * </p>
    * 
-   * @param resourceName The name of the resource.
+   * @param resourceName
+   *          The name of the resource.
    * 
    * @return An Optional instance that holds the resource instance, if present on this container.
    * 
@@ -291,7 +292,11 @@ public abstract class ResourcesContainer<T> {
    * @see #get(String)
    */
   public Optional<T> tryGet(String resourceName) {
-    return Optional.ofNullable(this.get(resourceName));
+    if (this.contains(resourceName)) {
+      return Optional.of(this.get(resourceName));
+    }
+    
+    return Optional.empty();
   }
 
   protected abstract T load(String resourceName) throws Exception;
