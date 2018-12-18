@@ -448,6 +448,7 @@ public final class Game {
     gameLoop = new GameLoop("Main Update Loop", config().client().getUpdaterate());
     gameLoop.attach(physics());
     gameLoop.attach(metrics());
+    gameLoop.attach(world());
 
     final ScreenManager scrMgr = new ScreenManager(info().getTitle());
 

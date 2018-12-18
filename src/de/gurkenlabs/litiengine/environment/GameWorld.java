@@ -8,21 +8,39 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 
-public final class GameWorld {
+public final class GameWorld implements IUpdateable {
   private final List<EnvironmentLoadedListener> loadedListeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentUnloadedListener> unloadedListeners = new CopyOnWriteArrayList<>();
   private final Map<String, Collection<EnvironmentListener>> environmentListeners = new ConcurrentHashMap<>();
   private final Map<String, Collection<EnvironmentLoadedListener>> environmentLoadedListeners = new ConcurrentHashMap<>();
   private final Map<String, Collection<EnvironmentUnloadedListener>> environmentUnloadedListeners = new ConcurrentHashMap<>();
+  private final Map<String, Collection<IUpdateable>> updatables = new ConcurrentHashMap<>();
 
   private final Map<String, IEnvironment> environments = new ConcurrentHashMap<>();
 
   private IEnvironment environment;
   private ICamera camera;
+
+  @Override
+  public void update() {
+    if (this.environment() == null) {
+      return;
+    }
+
+    if (this.environment().getMap() != null && this.environment().getMap().getName() != null) {
+      String mapName = this.environment().getMap().getName().toLowerCase();
+      if (this.updatables.containsKey(mapName)) {
+        for (IUpdateable updatable : this.updatables.get(mapName)) {
+          updatable.update();
+        }
+      }
+    }
+  }
 
   public void addLoadedListener(EnvironmentLoadedListener listener) {
     this.loadedListeners.add(listener);
@@ -62,6 +80,14 @@ public final class GameWorld {
 
   public void removeListener(String mapName, EnvironmentListener listener) {
     remove(this.environmentListeners, mapName, listener);
+  }
+
+  public void attach(String mapName, IUpdateable updateable) {
+    add(this.updatables, mapName, updateable);
+  }
+
+  public void detach(String mapName, IUpdateable updateable) {
+    remove(this.updatables, mapName, updateable);
   }
 
   public ICamera camera() {
@@ -163,24 +189,6 @@ public final class GameWorld {
     return env;
   }
 
-  private void addEnvironment(IEnvironment env) {
-    if (this.containsEnvironment(env.identifier())) {
-      return;
-    }
-
-    this.environments.put(env.identifier(), env);
-
-    // wire up all previously registered listeners
-    if (env.getMap() != null && env.getMap().getName() != null) {
-      String mapName = env.getMap().getName().toLowerCase();
-      if (this.environmentListeners.containsKey(mapName)) {
-        for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
-          env.addListener(listener);
-        }
-      }
-    }
-  }
-
   public void unloadEnvironment() {
     if (this.environment() != null) {
       this.environment().unload();
@@ -273,4 +281,23 @@ public final class GameWorld {
 
     listeners.get(mapIdentifier).remove(listener);
   }
+
+  private void addEnvironment(IEnvironment env) {
+    if (this.containsEnvironment(env.identifier())) {
+      return;
+    }
+
+    this.environments.put(env.identifier(), env);
+
+    // wire up all previously registered listeners
+    if (env.getMap() != null && env.getMap().getName() != null) {
+      String mapName = env.getMap().getName().toLowerCase();
+      if (this.environmentListeners.containsKey(mapName)) {
+        for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
+          env.addListener(listener);
+        }
+      }
+    }
+  }
+
 }
