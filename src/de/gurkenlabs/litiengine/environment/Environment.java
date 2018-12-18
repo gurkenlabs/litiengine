@@ -1159,6 +1159,11 @@ public class Environment implements IEnvironment {
    * @param entity
    */
   private void load(final IEntity entity) {
+    // an entity can only exist on one environment at a time, so remove it from the current one
+    if (entity.getEnvironment() != null) {
+      entity.getEnvironment().remove(entity);
+    }
+    
     // 1. add to physics engine
     this.loadPhysicsEntity(entity);
 
@@ -1172,7 +1177,7 @@ public class Environment implements IEnvironment {
       this.updateColorLayers(entity);
     }
 
-    entity.loaded();
+    entity.loaded(this);
   }
 
   private void loadPhysicsEntity(IEntity entity) {
@@ -1253,6 +1258,6 @@ public class Environment implements IEnvironment {
       em.deactivate();
     }
 
-    entity.removed();
+    entity.removed(this);
   }
 }

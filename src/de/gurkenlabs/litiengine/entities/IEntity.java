@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
@@ -111,16 +112,23 @@ public interface IEntity {
   public ICustomPropertyProvider getProperties();
 
   /**
+   * Gets the environment the entity was loaded to or null if it is not loaded.
+   * 
+   * @return The entity's environment.
+   */
+  public IEnvironment getEnvironment();
+
+  /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.
    * 
    * @see IEntity#addListener(EntityListener)
    */
-  public void loaded();
+  public void loaded(IEnvironment environment);
 
   /**
    * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
    * 
    * @see IEntity#addListener(EntityListener)
    */
-  public void removed();
+  public void removed(IEnvironment environment);
 }
