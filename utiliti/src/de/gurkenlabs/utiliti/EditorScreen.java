@@ -146,8 +146,8 @@ public class EditorScreen extends Screen {
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
     TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
-        Game.window().getHeight() - 40);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getHeight() - 20);
+        Game.window().getResolution().getHeight() - 40);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
