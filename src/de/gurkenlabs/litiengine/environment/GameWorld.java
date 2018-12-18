@@ -16,7 +16,9 @@ public final class GameWorld {
   private final List<EnvironmentLoadedListener> loadedListeners = new CopyOnWriteArrayList<>();
   private final List<EnvironmentUnloadedListener> unloadedListeners = new CopyOnWriteArrayList<>();
   private final Map<String, Collection<EnvironmentListener>> environmentListeners = new ConcurrentHashMap<>();
-  
+  private final Map<String, Collection<EnvironmentLoadedListener>> environmentLoadedListeners = new ConcurrentHashMap<>();
+  private final Map<String, Collection<EnvironmentUnloadedListener>> environmentUnloadedListeners = new ConcurrentHashMap<>();
+
   private final Map<String, IEnvironment> environments = new ConcurrentHashMap<>();
 
   private IEnvironment environment;
@@ -38,30 +40,28 @@ public final class GameWorld {
     this.unloadedListeners.remove(listener);
   }
 
+  public void addLoadedListener(String mapName, EnvironmentLoadedListener listener) {
+    add(this.environmentLoadedListeners, mapName, listener);
+  }
+
+  public void removeLoadedListener(String mapName, EnvironmentLoadedListener listener) {
+    remove(this.environmentLoadedListeners, mapName, listener);
+  }
+
+  public void addUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
+    add(this.environmentUnloadedListeners, mapName, listener);
+  }
+
+  public void removeUnloadedListener(String mapName, EnvironmentUnloadedListener listener) {
+    add(this.environmentUnloadedListeners, mapName, listener);
+  }
+
   public void addListener(String mapName, EnvironmentListener listener) {
-    if (mapName == null || mapName.isEmpty()) {
-      return;
-    }
-
-    String mapIdentifier = mapName.toLowerCase();
-    if (!this.environmentListeners.containsKey(mapIdentifier)) {
-      this.environmentListeners.put(mapIdentifier, Collections.synchronizedCollection(ConcurrentHashMap.newKeySet()));
-    }
-
-    this.environmentListeners.get(mapIdentifier).add(listener);
+    add(this.environmentListeners, mapName, listener);
   }
 
   public void removeListener(String mapName, EnvironmentListener listener) {
-    if (mapName == null || mapName.isEmpty()) {
-      return;
-    }
-
-    String mapIdentifier = mapName.toLowerCase();
-    if (!this.environmentListeners.containsKey(mapIdentifier)) {
-      return;
-    }
-
-    this.environmentListeners.get(mapIdentifier).remove(listener);
+    remove(this.environmentListeners, mapName, listener);
   }
 
   public ICamera camera() {
@@ -188,7 +188,7 @@ public final class GameWorld {
       this.environments.remove(env.identifier());
 
       if (env.getMap() != null && env.getMap().getName() != null) {
-        
+
         // unwire all registered listeners for this particular map
         String mapName = map.getName().toLowerCase();
         if (this.environmentListeners.containsKey(mapName)) {
@@ -213,5 +213,31 @@ public final class GameWorld {
       Game.loop().attach(cam);
       this.camera().updateFocus();
     }
+  }
+
+  private static <T> void add(Map<String, Collection<T>> listeners, String mapName, T listener) {
+    if (mapName == null || mapName.isEmpty()) {
+      return;
+    }
+
+    String mapIdentifier = mapName.toLowerCase();
+    if (!listeners.containsKey(mapIdentifier)) {
+      listeners.put(mapIdentifier, Collections.synchronizedCollection(ConcurrentHashMap.newKeySet()));
+    }
+
+    listeners.get(mapIdentifier).add(listener);
+  }
+
+  private static <T> void remove(Map<String, Collection<T>> listeners, String mapName, T listener) {
+    if (mapName == null || mapName.isEmpty()) {
+      return;
+    }
+
+    String mapIdentifier = mapName.toLowerCase();
+    if (!listeners.containsKey(mapIdentifier)) {
+      return;
+    }
+
+    listeners.get(mapIdentifier).remove(listener);
   }
 }
