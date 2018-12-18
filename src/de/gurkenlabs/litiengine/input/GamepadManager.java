@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.input;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -211,7 +210,7 @@ public class GamepadManager implements IGamepadManager {
       final Constructor<?> ctor = clazz.getConstructor();
       ctor.setAccessible(true);
       env.set(null, ctor.newInstance());
-    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+    } catch (ReflectiveOperationException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }

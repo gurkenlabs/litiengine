@@ -567,9 +567,7 @@ public class Program {
 
     MenuItem saveMapSnapshot = new MenuItem(Resources.strings().get("menu_exportMapSnapshot"));
     saveMapSnapshot.setShortcut(new MenuShortcut(KeyEvent.VK_ENTER));
-    saveMapSnapshot.addActionListener(a -> {
-      EditorScreen.instance().saveMapSnapshot();
-    });
+    saveMapSnapshot.addActionListener(a -> EditorScreen.instance().saveMapSnapshot());
 
     MenuItem reassignIDs = new MenuItem(Resources.strings().get("menu_reassignMapIds"));
     reassignIDs.addActionListener(a -> {

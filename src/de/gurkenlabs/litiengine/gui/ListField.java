@@ -124,16 +124,6 @@ public class ListField extends GuiComponent {
     this.getChangeConsumer().add(c);
   }
 
-  @Override
-  public void suspend() {
-    super.suspend();
-  }
-
-  @Override
-  public void prepare() {
-    super.prepare();
-  }
-
   public void refresh() {
     for (int i = 0; i < this.getNumberOfShownElements(); i++) {
       if (this.getContentArray().length <= i) {
