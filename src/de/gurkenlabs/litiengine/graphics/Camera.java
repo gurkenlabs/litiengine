@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IEntity;
@@ -13,8 +14,8 @@ import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public class Camera implements ICamera {
-  private final List<Consumer<Float>> zoomChangedConsumer;
-  private final List<Consumer<Point2D>> focusChangedConsumer;
+  private final List<DoubleConsumer> zoomChangedConsumer = new CopyOnWriteArrayList<>();
+  private final List<Consumer<Point2D>> focusChangedConsumer = new CopyOnWriteArrayList<>();
   /**
    * Provides the center location for the viewport.
    */
@@ -50,10 +51,8 @@ public class Camera implements ICamera {
    * Instantiates a new camera.
    */
   public Camera() {
-    this.zoomChangedConsumer = new CopyOnWriteArrayList<>();
-    this.focusChangedConsumer = new CopyOnWriteArrayList<>();
-    this.focus = new Point2D.Double(0, 0);
-    this.viewPort = new Rectangle2D.Double(0, 0, 0, 0);
+    this.focus = new Point2D.Double();
+    this.viewPort = new Rectangle2D.Double();
     this.zoom = 1;
   }
 
@@ -127,7 +126,7 @@ public class Camera implements ICamera {
   }
 
   @Override
-  public void onZoomChanged(final Consumer<Float> zoomCons) {
+  public void onZoomChanged(final DoubleConsumer zoomCons) {
     this.zoomChangedConsumer.add(zoomCons);
   }
 
@@ -167,7 +166,7 @@ public class Camera implements ICamera {
   @Override
   public void setZoom(final float targetZoom, final int delay) {
     if (delay == 0) {
-      for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+      for (final DoubleConsumer cons : this.zoomChangedConsumer) {
         cons.accept(targetZoom);
       }
 
@@ -204,7 +203,7 @@ public class Camera implements ICamera {
 
     if (this.targetZoom > 0) {
       if (Game.loop().getDeltaTime(this.zoomTick) >= this.zoomDelay) {
-        for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+        for (final DoubleConsumer cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
 
@@ -216,7 +215,7 @@ public class Camera implements ICamera {
       } else {
 
         this.zoom += this.zoomStep;
-        for (final Consumer<Float> cons : this.zoomChangedConsumer) {
+        for (final DoubleConsumer cons : this.zoomChangedConsumer) {
           cons.accept(this.zoom);
         }
       }
