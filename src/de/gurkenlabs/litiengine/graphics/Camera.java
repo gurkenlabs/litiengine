@@ -40,6 +40,9 @@ public class Camera implements ICamera {
 
   private long zoomTick;
 
+  private Point2D targetFocus;
+  private int panTime = 0;
+
   // TODO: implement possiblity to provide a padding
   private boolean clampToMap;
 
@@ -219,6 +222,21 @@ public class Camera implements ICamera {
       }
     }
 
+    if (this.panTime > 0) {
+      if (--this.panTime <= 0) {
+        this.setFocus(this.targetFocus);
+        this.targetFocus = null;
+
+        for (Consumer<Point2D> cons : this.focusChangedConsumer) {
+          cons.accept(focus);
+        }
+      } else {
+        double diff = this.panTime / (this.panTime + 1.0);
+        this.focus = new Point2D.Double(this.focus.getX() * diff + this.targetFocus.getX() * (1.0 - diff),
+            this.focus.getY() * diff + this.targetFocus.getY() * (1.0 - diff));
+      }
+    }
+
     if (!this.isShakeEffectActive()) {
       this.shakeOffsetX = 0;
       this.shakeOffsetY = 0;
@@ -324,5 +342,16 @@ public class Camera implements ICamera {
 
   private boolean isShakeEffectActive() {
     return this.getShakeTick() != 0 && Game.loop().getDeltaTime(this.getShakeTick()) < this.getShakeDuration();
+  }
+
+  @Override
+  public void pan(Point2D focus, int duration) {
+    this.targetFocus = this.clampToMap(focus);
+    this.panTime = duration;
+  }
+
+  @Override
+  public void pan(double x, double y, int duration) {
+    this.pan(new Point2D.Double(x, y), duration);
   }
 }
