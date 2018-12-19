@@ -201,7 +201,7 @@ public abstract class Effect implements IEffect {
   }
 
   protected Collection<ICombatEntity> getEntitiesInImpactArea(final Shape impactArea) {
-    return Game.getEnvironment().findCombatEntities(impactArea);
+    return Game.world().environment().findCombatEntities(impactArea);
   }
 
   protected long getTotalDuration() {

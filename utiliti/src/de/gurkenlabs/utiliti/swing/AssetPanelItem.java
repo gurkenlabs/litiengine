@@ -315,11 +315,11 @@ public class AssetPanelItem extends JPanel {
 
       MapObject mo = new MapObject();
       mo.setType(MapObjectType.PROP.name());
-      mo.setX((int) Game.getCamera().getFocus().getX() - info.getWidth() / 2);
-      mo.setY((int) Game.getCamera().getFocus().getY() - info.getHeight() / 2);
+      mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2);
+      mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2);
       mo.setWidth((int) info.getWidth());
       mo.setHeight((int) info.getHeight());
-      mo.setId(Game.getEnvironment().getNextMapId());
+      mo.setId(Game.world().environment().getNextMapId());
       mo.setName("");
       mo.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, info.getWidth() * 0.4);
       mo.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, info.getHeight() * 0.4);
@@ -332,16 +332,16 @@ public class AssetPanelItem extends JPanel {
       return true;
     } else if (this.getOrigin() instanceof EmitterData) {
       MapObject newEmitter = (MapObject) EmitterMapObjectLoader.createMapObject((EmitterData) this.getOrigin());
-      newEmitter.setX((int) (Game.getCamera().getFocus().getX() - newEmitter.getWidth()));
-      newEmitter.setY((int) (Game.getCamera().getFocus().getY() - newEmitter.getHeight()));
-      newEmitter.setId(Game.getEnvironment().getNextMapId());
+      newEmitter.setX((int) (Game.world().camera().getFocus().getX() - newEmitter.getWidth()));
+      newEmitter.setY((int) (Game.world().camera().getFocus().getY() - newEmitter.getHeight()));
+      newEmitter.setId(Game.world().environment().getNextMapId());
       EditorScreen.instance().getMapComponent().add(newEmitter);
     } else if (this.getOrigin() instanceof Blueprint) {
       Blueprint blueprint = (Blueprint) this.getOrigin();
 
       UndoManager.instance().beginOperation();
       try {
-        List<IMapObject> newObjects = blueprint.build((int) Game.getCamera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.getCamera().getFocus().getY() - blueprint.getHeight() / 2);
+        List<IMapObject> newObjects = blueprint.build((int) Game.world().camera().getFocus().getX() - blueprint.getWidth() / 2, (int) Game.world().camera().getFocus().getY() - blueprint.getHeight() / 2);
         for (IMapObject newMapObject : newObjects) {
           EditorScreen.instance().getMapComponent().add(newMapObject);
         }

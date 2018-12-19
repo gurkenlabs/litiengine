@@ -198,7 +198,7 @@ public class Camera implements ICamera {
 
   @Override
   public void update() {
-    if (Game.getCamera() != null && !Game.getCamera().equals(this)) {
+    if (Game.world().camera() != null && !Game.world().camera().equals(this)) {
       return;
     }
 
@@ -271,11 +271,11 @@ public class Camera implements ICamera {
 
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null || !this.isClampToMap()) {
       return focus;
     }
 
-    final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
+    final Dimension mapSize = Game.world().environment().getMap().getSizeInPixels();
 
     // TODO: Implement special handling for maps that are smaller than the camera area: use Align, Valign to determine where to render them
     final Dimension resolution = Game.window().getResolution();

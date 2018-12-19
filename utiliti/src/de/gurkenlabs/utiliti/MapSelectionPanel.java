@@ -148,7 +148,7 @@ public class MapSelectionPanel extends JSplitPane {
 
       if (this.mapList.getSelectedIndex() < EditorScreen.instance().getMapComponent().getMaps().size() && this.mapList.getSelectedIndex() >= 0) {
         Map map = EditorScreen.instance().getMapComponent().getMaps().get(this.mapList.getSelectedIndex());
-        if (Game.getEnvironment() != null && Game.getEnvironment().getMap().equals(map)) {
+        if (Game.world().environment() != null && Game.world().environment().getMap().equals(map)) {
           return;
         }
 
@@ -261,7 +261,7 @@ public class MapSelectionPanel extends JSplitPane {
           if (node.getUserObject() instanceof IconTreeListItem) {
             IconTreeListItem item = (IconTreeListItem) node.getUserObject();
             if (item.getUserObject() instanceof IEntity) {
-              IMapObject obj = Game.getEnvironment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
+              IMapObject obj = Game.world().environment().getMap().getMapObject(((IEntity) item.getUserObject()).getMapId());
               if (obj != null) {
                 EditorScreen.instance().getMapComponent().setFocus(obj, true);
               }
@@ -842,62 +842,62 @@ public class MapSelectionPanel extends JSplitPane {
   }
 
   private void updateMapObjectTree() {
-    this.nodeRoot.setUserObject(new IconTreeListItem(Game.getEnvironment().getEntities().size() + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
+    this.nodeRoot.setUserObject(new IconTreeListItem(Game.world().environment().getEntities().size() + " " + Resources.strings().get("panel_mapselection_entities"), Icons.FOLDER));
     for (DefaultMutableTreeNode node : this.entityNodes) {
       node.removeAllChildren();
     }
 
-    this.nodeLights.setUserObject(new IconTreeListItem(Game.getEnvironment().getLightSources().size() + " " + Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT));
-    this.nodeProps.setUserObject(new IconTreeListItem(Game.getEnvironment().getProps().size() + " " + Resources.strings().get("panel_mapselection_props"), Icons.PROP));
-    this.nodeCreatures.setUserObject(new IconTreeListItem(Game.getEnvironment().getCreatures().size() + " " + Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE));
-    this.nodeTriggers.setUserObject(new IconTreeListItem(Game.getEnvironment().getTriggers().size() + " " + Resources.strings().get("panel_mapselection_triggers"), Icons.TRIGGER));
-    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.getEnvironment().getSpawnPoints().size() + " " + Resources.strings().get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
-    this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.getEnvironment().getCollisionBoxes().size() + " " + Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
-    this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.getEnvironment().getAreas().size() + " " + Resources.strings().get("panel_mapselection_areas"), Icons.MAPAREA));
-    this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.getEnvironment().getStaticShadows().size() + " " + Resources.strings().get("panel_mapselection_shadow"), Icons.SHADOWBOX));
-    this.nodeEmitter.setUserObject(new IconTreeListItem(Game.getEnvironment().getEmitters().size() + " " + Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
+    this.nodeLights.setUserObject(new IconTreeListItem(Game.world().environment().getLightSources().size() + " " + Resources.strings().get("panel_mapselection_lights"), Icons.LIGHT));
+    this.nodeProps.setUserObject(new IconTreeListItem(Game.world().environment().getProps().size() + " " + Resources.strings().get("panel_mapselection_props"), Icons.PROP));
+    this.nodeCreatures.setUserObject(new IconTreeListItem(Game.world().environment().getCreatures().size() + " " + Resources.strings().get("panel_mapselection_creatures"), Icons.CREATURE));
+    this.nodeTriggers.setUserObject(new IconTreeListItem(Game.world().environment().getTriggers().size() + " " + Resources.strings().get("panel_mapselection_triggers"), Icons.TRIGGER));
+    this.nodeSpawnpoints.setUserObject(new IconTreeListItem(Game.world().environment().getSpawnPoints().size() + " " + Resources.strings().get("panel_mapselection_spawnpoints"), Icons.SPAWNPOINT));
+    this.nodeCollisionBoxes.setUserObject(new IconTreeListItem(Game.world().environment().getCollisionBoxes().size() + " " + Resources.strings().get("panel_mapselection_collboxes"), Icons.COLLISIONBOX));
+    this.nodeMapAreas.setUserObject(new IconTreeListItem(Game.world().environment().getAreas().size() + " " + Resources.strings().get("panel_mapselection_areas"), Icons.MAPAREA));
+    this.nodeStaticShadows.setUserObject(new IconTreeListItem(Game.world().environment().getStaticShadows().size() + " " + Resources.strings().get("panel_mapselection_shadow"), Icons.SHADOWBOX));
+    this.nodeEmitter.setUserObject(new IconTreeListItem(Game.world().environment().getEmitters().size() + " " + Resources.strings().get("panel_mapselection_emitter"), Icons.EMITTER));
 
-    for (LightSource light : Game.getEnvironment().getLightSources()) {
+    for (LightSource light : Game.world().environment().getLightSources()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(light));
       this.nodeLights.add(node);
     }
 
-    for (Prop prop : Game.getEnvironment().getProps()) {
+    for (Prop prop : Game.world().environment().getProps()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(prop));
       this.nodeProps.add(node);
     }
 
-    for (Creature creature : Game.getEnvironment().getCreatures()) {
+    for (Creature creature : Game.world().environment().getCreatures()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(creature));
       this.nodeCreatures.add(node);
     }
 
-    for (Trigger trigger : Game.getEnvironment().getTriggers()) {
+    for (Trigger trigger : Game.world().environment().getTriggers()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(trigger));
       this.nodeTriggers.add(node);
     }
 
-    for (Spawnpoint spawn : Game.getEnvironment().getSpawnPoints()) {
+    for (Spawnpoint spawn : Game.world().environment().getSpawnPoints()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(spawn));
       this.nodeSpawnpoints.add(node);
     }
 
-    for (CollisionBox coll : Game.getEnvironment().getCollisionBoxes()) {
+    for (CollisionBox coll : Game.world().environment().getCollisionBoxes()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(coll));
       this.nodeCollisionBoxes.add(node);
     }
 
-    for (MapArea area : Game.getEnvironment().getAreas()) {
+    for (MapArea area : Game.world().environment().getAreas()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(area));
       this.nodeMapAreas.add(node);
     }
 
-    for (StaticShadow shadow : Game.getEnvironment().getStaticShadows()) {
+    for (StaticShadow shadow : Game.world().environment().getStaticShadows()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(shadow));
       this.nodeStaticShadows.add(node);
     }
 
-    for (Emitter emitter : Game.getEnvironment().getEmitters()) {
+    for (Emitter emitter : Game.world().environment().getEmitters()) {
       DefaultMutableTreeNode node = new DefaultMutableTreeNode(new IconTreeListItem(emitter));
       this.nodeEmitter.add(node);
     }

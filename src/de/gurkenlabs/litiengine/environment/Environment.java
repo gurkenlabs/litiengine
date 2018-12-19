@@ -61,6 +61,8 @@ public class Environment implements IEnvironment {
   private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
 
+  private static int environmentIdSequence;
+
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
   private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
@@ -86,7 +88,6 @@ public class Environment implements IEnvironment {
   private boolean loaded;
   private boolean initialized;
   private IMap map;
-
   private int localIdSequence = 0;
 
   static {
@@ -311,7 +312,7 @@ public class Environment implements IEnvironment {
 
     this.initialized = false;
 
-    this.fireEvent(l -> l.environmentCleared(this));
+    this.fireEvent(l -> l.cleared(this));
   }
 
   @Override
@@ -724,7 +725,7 @@ public class Environment implements IEnvironment {
       this.addAmbientLight();
     }
 
-    this.fireEvent(l -> l.environmentInitialized(this));
+    this.fireEvent(l -> l.initialized(this));
     this.initialized = true;
   }
 
@@ -757,7 +758,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = true;
-    this.fireEvent(l -> l.environmentLoaded(this));
+    this.fireEvent(l -> l.loaded(this));
   }
 
   @Override
@@ -953,7 +954,7 @@ public class Environment implements IEnvironment {
 
   @Override
   public void render(final Graphics2D g) {
-    g.scale(Game.getCamera().getRenderScale(), Game.getCamera().getRenderScale());
+    g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
 
     StringBuilder renderDetails = new StringBuilder();
     long renderStart = System.nanoTime();
@@ -992,7 +993,7 @@ public class Environment implements IEnvironment {
       log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails, shadowTime, ambientTime });
     }
 
-    g.scale(1.0 / Game.getCamera().getRenderScale(), 1.0 / Game.getCamera().getRenderScale());
+    g.scale(1.0 / Game.world().camera().getRenderScale(), 1.0 / Game.world().camera().getRenderScale());
   }
 
   private void fireEvent(Consumer<EnvironmentListener> cons) {
@@ -1029,7 +1030,7 @@ public class Environment implements IEnvironment {
     }
 
     this.loaded = false;
-    this.fireEvent(l -> l.environmentUnloaded(this));
+    this.fireEvent(l -> l.unloaded(this));
   }
 
   @Override
@@ -1138,6 +1139,11 @@ public class Environment implements IEnvironment {
    * @param entity
    */
   private void load(final IEntity entity) {
+    // an entity can only exist on one environment at a time, so remove it from the current one
+    if (entity.getEnvironment() != null) {
+      entity.getEnvironment().remove(entity);
+    }
+    
     // 1. add to physics engine
     this.loadPhysicsEntity(entity);
 
@@ -1151,7 +1157,7 @@ public class Environment implements IEnvironment {
       this.updateColorLayers(entity);
     }
 
-    entity.loaded();
+    entity.loaded(this);
   }
 
   private void loadPhysicsEntity(IEntity entity) {
@@ -1232,6 +1238,6 @@ public class Environment implements IEnvironment {
       em.deactivate();
     }
 
-    entity.removed();
+    entity.removed(this);
   }
 }

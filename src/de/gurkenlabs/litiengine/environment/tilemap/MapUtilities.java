@@ -53,11 +53,11 @@ public final class MapUtilities {
   }
 
   public static Point2D getCenterMapLocation() {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return new Point2D.Double();
     }
 
-    return getCenterMapLocation(Game.getEnvironment().getMap());
+    return getCenterMapLocation(Game.world().environment().getMap());
   }
 
   public static Point2D getCenterMapLocation(IMap map) {
@@ -65,11 +65,11 @@ public final class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final Point2D mapLocation) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return new Rectangle2D.Double();
     }
 
-    return getTileBoundingBox(Game.getEnvironment().getMap(), mapLocation);
+    return getTileBoundingBox(Game.world().environment().getMap(), mapLocation);
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point2D mapLocation) {
@@ -82,10 +82,10 @@ public final class MapUtilities {
   }
 
   public static Rectangle2D getTileBoundingBox(final Point tile) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return new Rectangle2D.Double();
     }
-    return getTileBoundingBox(Game.getEnvironment().getMap(), tile);
+    return getTileBoundingBox(Game.world().environment().getMap(), tile);
   }
 
   public static Rectangle2D getTileBoundingBox(final IMap map, final Point tile) {
@@ -109,10 +109,10 @@ public final class MapUtilities {
   }
 
   public static Point getTile(final Point2D mapLocation) {
-    if (Game.getEnvironment() == null) {
+    if (Game.world().environment() == null) {
       return new Point(-1, -1);
     }
-    return getTile(Game.getEnvironment().getMap(), mapLocation);
+    return getTile(Game.world().environment().getMap(), mapLocation);
   }
 
   public static Point getTile(final IMap map, final Point2D mapLocation) {
@@ -222,11 +222,11 @@ public final class MapUtilities {
   }
 
   public static ITile getTopMostTile(final Point2D location) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return null;
     }
 
-    return getTopMostTile(Game.getEnvironment().getMap(), location);
+    return getTopMostTile(Game.world().environment().getMap(), location);
   }
 
   public static ITile getTopMostTile(final IMap map, final Point2D location) {
@@ -238,11 +238,11 @@ public final class MapUtilities {
   }
 
   public static ITile getTopMostTile(final Point point) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return null;
     }
 
-    return getTopMostTile(Game.getEnvironment().getMap(), point);
+    return getTopMostTile(Game.world().environment().getMap(), point);
   }
 
   public static ITile getTopMostTile(final IMap map, final Point point) {

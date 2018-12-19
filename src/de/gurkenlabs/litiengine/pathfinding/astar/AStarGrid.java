@@ -125,7 +125,7 @@ public class AStarGrid implements IRenderable {
 
   @Override
   public void render(Graphics2D g) {
-    final Rectangle2D viewport = Game.getCamera().getViewport();
+    final Rectangle2D viewport = Game.world().camera().getViewport();
 
     final AStarNode startNode = this.getNode(viewport.getX(), viewport.getY());
     final AStarNode endNode = this.getNode(viewport.getMaxX(), viewport.getMaxY());
@@ -183,7 +183,7 @@ public class AStarGrid implements IRenderable {
 
     // by default we calculate a penalty for props that cannot be destroyed
     int penalty = 0;
-    for (Prop prop : Game.getEnvironment().getProps()) {
+    for (Prop prop : Game.world().environment().getProps()) {
       if (!prop.hasCollision() || !prop.isIndestructible() || !prop.getBoundingBox().intersects(node.getBounds())) {
         continue;
       }

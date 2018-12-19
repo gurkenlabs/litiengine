@@ -1,6 +1,10 @@
 package de.gurkenlabs.litiengine;
 
-public class GameTime {
+import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
+
+public final class GameTime implements EnvironmentLoadedListener {
+  private long environmentLoaded;
 
   protected GameTime() {
   }
@@ -10,6 +14,11 @@ public class GameTime {
   }
 
   public long sinceEnvironmentLoad() {
-    return Game.loop().convertToMs(Game.loop().getTicks() - Game.environmentLoadTick);
+    return Game.loop().convertToMs(Game.loop().getTicks() - this.environmentLoaded);
+  }
+
+  @Override
+  public void loaded(IEnvironment environment) {
+    environmentLoaded = Game.loop().getTicks();
   }
 }

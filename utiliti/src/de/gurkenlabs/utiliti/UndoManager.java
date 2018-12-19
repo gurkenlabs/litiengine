@@ -49,12 +49,12 @@ public class UndoManager {
   }
 
   public static UndoManager instance() {
-    if (instance.containsKey(Game.getEnvironment().getMap().getName())) {
-      return instance.get(Game.getEnvironment().getMap().getName());
+    if (instance.containsKey(Game.world().environment().getMap().getName())) {
+      return instance.get(Game.world().environment().getMap().getName());
     }
 
-    UndoManager newUndoManager = new UndoManager(Game.getEnvironment().getMap().getName());
-    instance.put(Game.getEnvironment().getMap().getName(), newUndoManager);
+    UndoManager newUndoManager = new UndoManager(Game.world().environment().getMap().getName());
+    instance.put(Game.world().environment().getMap().getName(), newUndoManager);
     return newUndoManager;
   }
 
@@ -272,9 +272,9 @@ public class UndoManager {
       target.setValue(prop.getKey(), prop.getValue());
     }
 
-    Game.getEnvironment().reloadFromMap(target.getId());
+    Game.world().environment().reloadFromMap(target.getId());
     if (MapObjectType.get(target.getType()) == MapObjectType.LIGHTSOURCE) {
-      Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds2D((MapObject) target, (MapObject) restore));
+      Game.world().environment().getAmbientLight().updateSection(MapObject.getBounds2D((MapObject) target, (MapObject) restore));
     }
 
     if (EditorScreen.instance().getMapComponent().getFocusedMapObject() != null && EditorScreen.instance().getMapComponent().getFocusedMapObject().getId() == target.getId()) {
@@ -330,7 +330,7 @@ public class UndoManager {
     public UndoState(IMapObject target, OperationType operationType) {
       this.operation = UndoManager.this.operation;
       this.target = target;
-      this.layer = Game.getEnvironment().getMap().getMapObjectLayer(target);
+      this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
       this.oldMapObject = null;
       this.newMapObject = null;
       this.operationType = operationType;
@@ -343,7 +343,7 @@ public class UndoManager {
       this.newMapObject = operationType != OperationType.DELETE ? newMapObject : null;
       this.operationType = operationType;
 
-      this.layer = Game.getEnvironment().getMap().getMapObjectLayer(target);
+      this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
     }
 
     @Override

@@ -15,8 +15,17 @@ public final class Maps extends ResourcesContainer<IMap> {
   Maps() {
   }
 
+  public static boolean isSupported(String fileName) {
+    String extension = FileUtilities.getExtension(fileName);
+    return extension != null && !extension.isEmpty() && extension.equalsIgnoreCase(Map.FILE_EXTENSION);
+  }
+
   @Override
   protected IMap load(String resourceName) throws TmxException {
+    if (!isSupported(resourceName)) {
+      return null;
+    }
+
     Map map;
     try {
       map = XmlUtilities.readFromFile(Map.class, resourceName);
@@ -44,5 +53,14 @@ public final class Maps extends ResourcesContainer<IMap> {
     map.updateTileTerrain();
 
     return map;
+  }
+
+  @Override
+  protected String getAlias(String resourceName, IMap resource) {
+    if (resource == null || resource.getName() == null || resource.getName().isEmpty() || resource.getName().equalsIgnoreCase(resourceName)) {
+      return null;
+    }
+
+    return resource.getName();
   }
 }

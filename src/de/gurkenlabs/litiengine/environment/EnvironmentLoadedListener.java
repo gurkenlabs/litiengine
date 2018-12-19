@@ -15,5 +15,5 @@ public interface EnvironmentLoadedListener extends EventListener {
    * @param environment
    *          The environment that was loaded.
    */
-  public void environmentLoaded(IEnvironment environment);
+  public void loaded(IEnvironment environment);
 }

@@ -103,7 +103,7 @@ public class EmitterPanel extends PropertyPanel {
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.emitter = (CustomEmitter) Game.getEnvironment().getEmitter(mapObject.getId());
+    this.emitter = (CustomEmitter) Game.world().environment().getEmitter(mapObject.getId());
     if (emitter == null) {
       this.btnPause.setSelected(false);
       return;

@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 
 import org.junit.jupiter.api.Test;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+
 public class ResourcesTests {
 
   @Test
@@ -38,5 +40,12 @@ public class ResourcesTests {
     assertEquals(testImage, Resources.images().remove(imageName));
 
     assertEquals(0, Resources.images().count());
+  }
+
+  @Test
+  public void testMapResourcesAlias() {
+    IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
+    
+    assertEquals(map, Resources.maps().get("test-map"));
   }
 }

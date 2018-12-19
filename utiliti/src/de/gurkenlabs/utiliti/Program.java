@@ -136,7 +136,7 @@ public class Program {
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.config().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
-    Game.getCamera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
+    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
 
     Game.screens().display(EditorScreen.instance());
 
@@ -207,11 +207,11 @@ public class Program {
 
   public static void updateScrollBars() {
     horizontalScroll.setMinimum(0);
-    horizontalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().width);
+    horizontalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().width);
     verticalScroll.setMinimum(0);
-    verticalScroll.setMaximum(Game.getEnvironment().getMap().getSizeInPixels().height);
-    horizontalScroll.setValue((int) Game.getCamera().getViewport().getCenterX());
-    verticalScroll.setValue((int) Game.getCamera().getViewport().getCenterY());
+    verticalScroll.setMaximum(Game.world().environment().getMap().getSizeInPixels().height);
+    horizontalScroll.setValue((int) Game.world().camera().getViewport().getCenterX());
+    verticalScroll.setValue((int) Game.world().camera().getViewport().getCenterY());
   }
 
   public static boolean notifyPendingChanges() {
@@ -414,16 +414,16 @@ public class Program {
         return;
       }
 
-      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.getCamera().getFocus().getY());
-      Game.getCamera().setFocus(newFocus);
+      Point2D newFocus = new Point2D.Double(horizontalScroll.getValue(), Game.world().camera().getFocus().getY());
+      Game.world().camera().setFocus(newFocus);
     });
 
     verticalScroll.addAdjustmentListener(e -> {
       if (EditorScreen.instance().getMapComponent().isLoading()) {
         return;
       }
-      Point2D newFocus = new Point2D.Double(Game.getCamera().getFocus().getX(), verticalScroll.getValue());
-      Game.getCamera().setFocus(newFocus);
+      Point2D newFocus = new Point2D.Double(Game.world().camera().getFocus().getX(), verticalScroll.getValue());
+      Game.world().camera().setFocus(newFocus);
     });
   }
 
@@ -573,7 +573,7 @@ public class Program {
     reassignIDs.addActionListener(a -> {
       try {
         int minID = Integer.parseInt(JOptionPane.showInputDialog(Resources.strings().get("panel_reassignMapIds"), 1));
-        EditorScreen.instance().getMapComponent().reassignIds(Game.getEnvironment().getMap(), minID);
+        EditorScreen.instance().getMapComponent().reassignIds(Game.world().environment().getMap(), minID);
       } catch (Exception e) {
         log.log(Level.SEVERE, "No parseable Integer found upon reading the min Map ID input. Try again.");
       }
@@ -591,24 +591,24 @@ public class Program {
       }
 
       MapPropertyPanel panel = new MapPropertyPanel();
-      panel.bind(Game.getEnvironment().getMap());
+      panel.bind(Game.world().environment().getMap());
 
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), panel, Resources.strings().get("menu_mapProperties"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option == JOptionPane.OK_OPTION) {
         panel.saveChanges();
 
-        final String colorProp = Game.getEnvironment().getMap().getStringValue(MapProperty.AMBIENTCOLOR);
+        final String colorProp = Game.world().environment().getMap().getStringValue(MapProperty.AMBIENTCOLOR);
         try {
           if (colorProp != null && !colorProp.isEmpty()) {
             Color ambientColor = ColorHelper.decode(colorProp);
-            Game.getEnvironment().getAmbientLight().setColor(ambientColor);
+            Game.world().environment().getAmbientLight().setColor(ambientColor);
           }
         } catch (final NumberFormatException nfe) {
           log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
         }
 
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
-        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.getEnvironment().getMap());
+        EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.world().environment().getMap());
       }
     });
 
@@ -907,14 +907,14 @@ public class Program {
     spinnerAmbientAlpha.setMaximumSize(new Dimension(50, 50));
     spinnerAmbientAlpha.setEnabled(true);
     spinnerAmbientAlpha.addChangeListener(e -> {
-      if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
+      if (Game.world().environment() == null || Game.world().environment().getMap() == null || isChanging) {
         return;
       }
 
-      Game.getEnvironment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
-      String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
+      Game.world().environment().getAmbientLight().setAlpha((int) spinnerAmbientAlpha.getValue());
+      String hex = ColorHelper.encode(Game.world().environment().getAmbientLight().getColor());
       colorText.setText(hex);
-      Game.getEnvironment().getMap().setValue(MapProperty.AMBIENTCOLOR, hex);
+      Game.world().environment().getMap().setValue(MapProperty.AMBIENTCOLOR, hex);
 
     });
 
@@ -925,7 +925,7 @@ public class Program {
     colorText.setEnabled(false);
 
     colorButton.addActionListener(a -> {
-      if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || isChanging) {
+      if (Game.world().environment() == null || Game.world().environment().getMap() == null || isChanging) {
         return;
       }
 
@@ -941,9 +941,9 @@ public class Program {
 
       spinnerAmbientAlpha.setValue(result.getAlpha());
 
-      Game.getEnvironment().getMap().setValue(MapProperty.AMBIENTCOLOR, colorText.getText());
-      Game.getEnvironment().getAmbientLight().setColor(result);
-      String hex = ColorHelper.encode(Game.getEnvironment().getAmbientLight().getColor());
+      Game.world().environment().getMap().setValue(MapProperty.AMBIENTCOLOR, colorText.getText());
+      Game.world().environment().getAmbientLight().setColor(result);
+      String hex = ColorHelper.encode(Game.world().environment().getAmbientLight().getColor());
       colorText.setText(hex);
     });
 
