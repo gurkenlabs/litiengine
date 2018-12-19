@@ -407,6 +407,28 @@ public final class Game {
     return screenManager;
   }
 
+  /**
+   * Gets the game's world which is a global environment manager that contains all <code>Environments</code>
+   * and provides the currently active <code>Environment</code> and
+   * <code>Camera</code>.<br>
+   * <p>
+   * The <code>GameWorld</code> returns the same instance for a particular map/mapName until the
+   * <code>GameWorld.reset(String)</code> method is called.
+   * </p>
+   * 
+   * Moreover, it provides the possibility to attach game logic via <code>EnvironmentListeners</code> to different events of the
+   * <code>Envrionment's</code> life cycle (e.g. loaded, initialized, ...).<br>
+   * <i>This is typically used to provide some per-level logic or to trigger
+   * general loading behavior.</i>
+   * 
+   * @return The game's environment manager.
+   * 
+   * @see GameWorld
+   * @see Environment
+   * @see Camera
+   * @see GameWorld#environment()
+   * @see GameWorld#camera()
+   */
   public static GameWorld world() {
     return world;
   }

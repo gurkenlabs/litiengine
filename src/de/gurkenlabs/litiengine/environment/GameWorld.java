@@ -115,15 +115,7 @@ public final class GameWorld implements IUpdateable {
     return this.environments.values();
   }
 
-  public IEnvironment getEnvironment(String environmentIdentifier) {
-    if (environmentIdentifier == null || environmentIdentifier.isEmpty()) {
-      return null;
-    }
-
-    return this.getEnvironments().stream().filter(e -> e.identifier().equals(environmentIdentifier)).findFirst().orElse(null);
-  }
-
-  public IEnvironment getEnvironmentByMapName(String mapName) {
+  public IEnvironment getEnvironment(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       return null;
     }
@@ -149,7 +141,7 @@ public final class GameWorld implements IUpdateable {
   }
 
   public boolean containsEnvironment(String identifier) {
-    return this.getEnvironment(identifier) != null;
+    return this.environments.containsKey(identifier.toLowerCase());
   }
 
   public void loadEnvironment(final IEnvironment env) {
@@ -164,12 +156,10 @@ public final class GameWorld implements IUpdateable {
       }
 
       // call map specific listeners
-      if (env.getMap() != null && env.getMap().getName() != null) {
-        String mapName = env.getMap().getName().toLowerCase();
-        if (this.environmentLoadedListeners.containsKey(mapName)) {
-          for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
-            listener.loaded(env);
-          }
+      String mapName = getMapName(env);
+      if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
+        for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
+          listener.loaded(env);
         }
       }
     }
@@ -177,7 +167,7 @@ public final class GameWorld implements IUpdateable {
     this.environment = env;
   }
 
-  public IEnvironment loadEnvironmentByMapName(String mapName) {
+  public IEnvironment loadEnvironment(String mapName) {
     IEnvironment env = this.getEnvironment(mapName);
     this.loadEnvironment(env);
     return env;
@@ -198,12 +188,10 @@ public final class GameWorld implements IUpdateable {
       }
 
       // call map specific listeners
-      if (this.environment().getMap() != null && this.environment().getMap().getName() != null) {
-        String mapName = this.environment().getMap().getName().toLowerCase();
-        if (this.environmentUnloadedListeners.containsKey(mapName)) {
-          for (EnvironmentUnloadedListener listener : this.environmentUnloadedListeners.get(mapName)) {
-            listener.unloaded(this.environment());
-          }
+      String mapName = getMapName(this.environment());
+      if (mapName != null && this.environmentUnloadedListeners.containsKey(mapName)) {
+        for (EnvironmentUnloadedListener listener : this.environmentUnloadedListeners.get(mapName)) {
+          listener.unloaded(this.environment());
         }
       }
     }
@@ -226,12 +214,11 @@ public final class GameWorld implements IUpdateable {
 
     IEnvironment env = this.getEnvironment(map);
     if (env != null) {
-      this.environments.remove(env.identifier());
-
-      if (env.getMap() != null && env.getMap().getName() != null) {
+      String mapName = getMapName(env);
+      if (mapName != null) {
+        this.environments.remove(mapName);
 
         // unwire all registered listeners for this particular map
-        String mapName = map.getName().toLowerCase();
         if (this.environmentListeners.containsKey(mapName)) {
           for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
             env.removeListener(listener);
@@ -282,22 +269,31 @@ public final class GameWorld implements IUpdateable {
     listeners.get(mapIdentifier).remove(listener);
   }
 
+  private static String getMapName(IEnvironment env) {
+    if (env.getMap() != null && env.getMap().getName() != null) {
+      return env.getMap().getName().toLowerCase();
+    }
+
+    return null;
+  }
+
   private void addEnvironment(IEnvironment env) {
-    if (this.containsEnvironment(env.identifier())) {
+    String mapName = getMapName(env);
+    if (mapName == null) {
       return;
     }
 
-    this.environments.put(env.identifier(), env);
+    if (this.containsEnvironment(mapName)) {
+      return;
+    }
+
+    this.environments.put(mapName, env);
 
     // wire up all previously registered listeners
-    if (env.getMap() != null && env.getMap().getName() != null) {
-      String mapName = env.getMap().getName().toLowerCase();
-      if (this.environmentListeners.containsKey(mapName)) {
-        for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
-          env.addListener(listener);
-        }
+    if (this.environmentListeners.containsKey(mapName)) {
+      for (EnvironmentListener listener : this.environmentListeners.get(mapName)) {
+        env.addListener(listener);
       }
     }
   }
-
 }

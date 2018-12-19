@@ -89,7 +89,6 @@ public class Environment implements IEnvironment {
   private boolean initialized;
   private IMap map;
   private int localIdSequence = 0;
-  private String identifier;
 
   static {
     registerMapObjectLoader(new PropMapObjectLoader());
@@ -109,8 +108,6 @@ public class Environment implements IEnvironment {
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
     }
-
-    this.identifier = getEnvironmentIdentifier(this.getMap());
   }
 
   public Environment(final String mapPath) {
@@ -119,8 +116,6 @@ public class Environment implements IEnvironment {
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
     }
-
-    this.identifier = getEnvironmentIdentifier(this.getMap());
   }
 
   private Environment() {
@@ -740,11 +735,6 @@ public class Environment implements IEnvironment {
   }
 
   @Override
-  public String identifier() {
-    return this.identifier;
-  }
-
-  @Override
   public void load() {
     this.init();
     if (this.loaded) {
@@ -1086,16 +1076,6 @@ public class Environment implements IEnvironment {
       }
     }
     return null;
-  }
-
-  private static String getEnvironmentIdentifier(IMap map) {
-    StringBuilder sb = new StringBuilder("env: ");
-    if (map != null && map.getName() != null) {
-      sb.append(map.getName().toLowerCase() + " ");
-    }
-
-    sb.append("#" + ++environmentIdSequence);
-    return sb.toString();
   }
 
   private String render(Graphics2D g, RenderType renderType) {

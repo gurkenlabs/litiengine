@@ -44,7 +44,6 @@ public class TriggerTests {
     trigger.addTarget(456);
 
     IEnvironment env = mock(IEnvironment.class);
-    when(env.identifier()).thenReturn("env: #123");
     Game.world().loadEnvironment(env);
     when(env.get(456)).thenReturn(target);
 

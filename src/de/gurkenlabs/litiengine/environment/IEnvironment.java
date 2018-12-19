@@ -196,8 +196,6 @@ public interface IEnvironment extends IInitializable, IRenderable {
 
   public Collection<IRenderable> getRenderables(RenderType renderType);
   
-  public String identifier();
-  
   public boolean isLoaded();
 
   public void load();
