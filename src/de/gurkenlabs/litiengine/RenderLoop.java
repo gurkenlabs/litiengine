@@ -17,7 +17,7 @@ public class RenderLoop extends UpdateLoop {
       final long fpsWait = (long) (1000.0 / this.maxFps);
       final long renderStart = System.nanoTime();
       try {
-        Game.getCamera().updateFocus();
+        Game.world().camera().updateFocus();
         this.update();
 
         Game.window().getRenderComponent().render();

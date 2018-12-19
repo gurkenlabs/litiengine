@@ -71,7 +71,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   public MapObject(MapObject mapObjectToBeCopied) {
     super(mapObjectToBeCopied);
     this.setName(mapObjectToBeCopied.getName());
-    this.setId(Game.getEnvironment().getNextMapId());
+    this.setId(Game.world().environment().getNextMapId());
     this.polyline = (mapObjectToBeCopied.getPolyline() != null && !mapObjectToBeCopied.getPolyline().getPoints().isEmpty()) ? new Polyline(mapObjectToBeCopied.getPolyline()) : null;
     this.setType(mapObjectToBeCopied.getType());
     this.setX(mapObjectToBeCopied.getX());

@@ -35,10 +35,10 @@ public class GridEditPanel extends JPanel {
     JLabel lblHeight = new JLabel(Resources.strings().get("menu_gridHeight"));
 
     this.heightSpinner = new JSpinner();
-    this.heightSpinner.setModel(new SpinnerNumberModel(gridHeight, null, null, new Integer(1)));
+    this.heightSpinner.setModel(new SpinnerNumberModel(gridHeight, null, null, 1));
 
     this.strokeSpinner = new JSpinner();
-    strokeSpinner.setModel(new SpinnerNumberModel((Float) strokeWidth, new Float(1), null, new Float(0.1)));
+    strokeSpinner.setModel(new SpinnerNumberModel((Float) strokeWidth, 1f, null, 0.1f));
 
     this.gridColor = strokeColor;
     this.buttonSetColor = new JButton("");

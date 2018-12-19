@@ -164,7 +164,7 @@ public class LightSourcePanel extends PropertyPanel {
     final String shape = mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE);
     final String active = mapObject.getStringValue(MapObjectProperty.LIGHT_ACTIVE);
 
-    boolean isActive = active != null && !active.isEmpty() ? Boolean.parseBoolean(active) : true;
+    boolean isActive = active == null || active.isEmpty() || Boolean.parseBoolean(active);
     this.spinnerBrightness.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_ALPHA));
     this.spinnerIntensity.setValue(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY));
     this.textFieldColor.setText(color);
@@ -188,39 +188,39 @@ public class LightSourcePanel extends PropertyPanel {
       this.spinnerBrightness.setValue(result.getAlpha());
       if (getDataSource() != null) {
         getDataSource().setValue(MapObjectProperty.LIGHT_COLOR, h);
-        Game.getEnvironment().reloadFromMap(getDataSource().getId());
-        Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+        Game.world().environment().reloadFromMap(getDataSource().getId());
+        Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
       }
     });
 
     this.spinnerBrightness.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_ALPHA, spinnerBrightness.getValue().toString());
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.spinnerIntensity.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_INTENSITY, spinnerIntensity.getValue().toString());
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.comboBoxLightShape.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_SHAPE, comboBoxLightShape.getSelectedItem().toString());
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.checkBoxIsActive.addActionListener(new MapObjectPropertyActionListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_ACTIVE, checkBoxIsActive.isSelected());
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetX.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETX, this.sliderOffsetX.getValue() / 100.0);
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
 
     this.sliderOffsetY.addChangeListener(new MapObjectPropertyChangeListener(m -> {
       m.setValue(MapObjectProperty.LIGHT_FOCUSOFFSETY, this.sliderOffsetY.getValue() / 100.0);
-      Game.getEnvironment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
+      Game.world().environment().getAmbientLight().updateSection(getDataSource().getBoundingBox());
     }));
   }
 }

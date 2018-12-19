@@ -117,9 +117,10 @@ public class EditorScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    Game.getCamera().updateFocus();
-    if (Game.getEnvironment() != null) {
-      Game.getEnvironment().render(g);
+
+    Game.world().camera().updateFocus();
+    if (Game.world().environment() != null) {
+      Game.world().environment().render(g);
     }
 
     if (Resources.images().count() > 200) {
@@ -129,7 +130,8 @@ public class EditorScreen extends Screen {
 
     if (this.currentResourceFile != null) {
       Game.window().setTitle(Game.info().getName() + " " + Game.info().getVersion() + " - " + this.currentResourceFile);
-      String mapName = Game.getEnvironment() != null && Game.getEnvironment().getMap() != null ? "\nMap: " + Game.getEnvironment().getMap().getName() : "";
+
+      String mapName = Game.world().environment() != null && Game.world().environment().getMap() != null ? "\nMap: " + Game.world().environment().getMap().getName() : "";
       Program.getTrayIcon().setToolTip(Game.info().getName() + " " + Game.info().getVersion() + "\n" + this.currentResourceFile + mapName);
     } else if (this.getProjectPath() != null) {
       Game.window().setTitle(Game.info().getTitle() + " - " + NEW_GAME_STRING);
@@ -145,9 +147,10 @@ public class EditorScreen extends Screen {
     g.setFont(g.getFont().deriveFont(11f));
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
-    TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.getCamera().getRenderScale() * 100) + " %", 10,
-        Game.window().getHeight() - 40);
-    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getHeight() - 20);
+
+    TextRenderer.render(g, "x: " + (int) Input.mouse().getMapLocation().getX() + " y: " + (int) Input.mouse().getMapLocation().getY() + " tile: [" + tile.x + ", " + tile.y + "]" + " zoom: " + (int) (Game.world().camera().getRenderScale() * 100) + " %", 10,
+        Game.window().getResolution().getHeight() - 40);
+    TextRenderer.render(g, Game.metrics().getFramesPerSecond() + " FPS", 10, Game.window().getResolution().getHeight() - 20);
 
     // render status
     if (this.currentStatus != null && !this.currentStatus.isEmpty()) {
@@ -213,8 +216,8 @@ public class EditorScreen extends Screen {
         return;
       }
 
-      if (Game.getEnvironment() != null) {
-        Game.loadEnvironment(null);
+      if (Game.world().environment() != null) {
+        Game.world().unloadEnvironment();
       }
 
       // set up project settings
@@ -316,7 +319,7 @@ public class EditorScreen extends Screen {
       if (!this.mapComponent.getMaps().isEmpty()) {
         this.mapComponent.loadEnvironment(this.mapComponent.getMaps().get(0));
       } else {
-        Game.loadEnvironment(null);
+        Game.world().unloadEnvironment();
       }
 
       this.changeComponent(ComponentType.MAP);
@@ -478,11 +481,13 @@ public class EditorScreen extends Screen {
   }
 
   public void saveMapSnapshot() {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
 
-    IMap currentMap = Game.getEnvironment().getMap();
+
+    IMap currentMap = Game.world().environment().getMap();
     BufferedImage img = Game.graphics().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);
 
     try {

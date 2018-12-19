@@ -30,7 +30,6 @@ public class SpritesheetEntityEmitter extends EntityEmitter {
   protected Particle createNewParticle() {
     final int life = this.getRandomParticleTTL();
 
-    final SpriteParticle p = new SpriteParticle(this.getRandomSprite(), life);
-    return p;
+    return new SpriteParticle(this.getRandomSprite(), life);
   }
 }

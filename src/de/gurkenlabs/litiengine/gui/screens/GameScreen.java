@@ -15,8 +15,8 @@ public class GameScreen extends Screen {
 
   @Override
   public void render(final Graphics2D g) {
-    if (Game.getEnvironment() != null) {
-      Game.getEnvironment().render(g);
+    if (Game.world().environment() != null) {
+      Game.world().environment().render(g);
     }
 
     super.render(g);

@@ -165,9 +165,9 @@ public abstract class PropertyPanel extends JPanel {
   protected void updateEnvironment(final IMapObject before) {
     if (getDataSource() instanceof IMapObject) {
       IMapObject obj = getDataSource();
-      Game.getEnvironment().reloadFromMap(obj.getId());
+      Game.world().environment().reloadFromMap(obj.getId());
       if (MapObjectType.get(obj.getType()) == MapObjectType.LIGHTSOURCE) {
-        Game.getEnvironment().getAmbientLight().updateSection(MapObject.getBounds(before, obj));
+        Game.world().environment().getAmbientLight().updateSection(MapObject.getBounds(before, obj));
       }
     }
   }

@@ -26,11 +26,13 @@ public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
 
   private final Map<String, T> resources;
+  private final Map<String, String> aliases;
   private final List<ResourcesContainerListener<T>> listeners;
   private final List<ResourcesContainerClearedListener> clearedListeners;
 
   protected ResourcesContainer() {
     this.resources = new ConcurrentHashMap<>();
+    this.aliases = new ConcurrentHashMap<>();
     this.listeners = new CopyOnWriteArrayList<>();
     this.clearedListeners = new CopyOnWriteArrayList<>();
   }
@@ -235,11 +237,12 @@ public abstract class ResourcesContainer<T> {
     }
 
     // the case is ignored when retrieving resources
-    String identifier = resourceName.toLowerCase();
+    String identifier = this.getIdentifier(resourceName);
 
     if (forceLoad) {
-      T resource = this.loadResource(resourceName);
+      T resource = this.loadResource(identifier);
       this.resources.put(identifier, resource);
+
       return resource;
     } else {
       return this.resources.computeIfAbsent(identifier, this::loadResource);
@@ -282,7 +285,8 @@ public abstract class ResourcesContainer<T> {
    * to check whether a resource is present while also fetching it from the container.
    * </p>
    * 
-   * @param resourceName The name of the resource.
+   * @param resourceName
+   *          The name of the resource.
    * 
    * @return An Optional instance that holds the resource instance, if present on this container.
    * 
@@ -291,19 +295,24 @@ public abstract class ResourcesContainer<T> {
    * @see #get(String)
    */
   public Optional<T> tryGet(String resourceName) {
-    return Optional.ofNullable(this.get(resourceName));
+    if (this.contains(resourceName)) {
+      return Optional.of(this.get(resourceName));
+    }
+    
+    return Optional.empty();
   }
 
   protected abstract T load(String resourceName) throws Exception;
+
+  protected String getAlias(String resourceName, T resource) {
+    return null;
+  }
 
   protected Map<String, T> getResources() {
     return this.resources;
   }
 
-  private T loadResource(String resourceName) {
-    // the case is ignored when retrieving resources
-    String identifier = resourceName.toLowerCase();
-
+  private T loadResource(String identifier) {
     T newResource;
     try {
       newResource = this.load(identifier);
@@ -313,9 +322,27 @@ public abstract class ResourcesContainer<T> {
     }
 
     for (ResourcesContainerListener<T> listener : this.listeners) {
-      listener.added(resourceName, newResource);
+      listener.added(identifier, newResource);
+    }
+
+    String alias = this.getAlias(identifier, newResource);
+    if (alias != null) {
+      this.aliases.put(alias.toLowerCase(), identifier);
     }
 
     return newResource;
+  }
+
+  private String getIdentifier(String resourceName) {
+    String res = resourceName.toLowerCase();
+    if (this.resources.containsKey(res)) {
+      return res;
+    }
+
+    if (this.aliases.containsKey(res)) {
+      return this.aliases.get(res);
+    }
+
+    return res;
   }
 }

@@ -197,7 +197,7 @@ public class Camera implements ICamera {
 
   @Override
   public void update() {
-    if (Game.getCamera() != null && !Game.getCamera().equals(this)) {
+    if (Game.world().camera() != null && !Game.world().camera().equals(this)) {
       return;
     }
 
@@ -255,7 +255,7 @@ public class Camera implements ICamera {
 
     final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getWidth() / this.getRenderScale(), Game.window().getHeight() / this.getRenderScale());
+    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getResolution().getWidth() / this.getRenderScale(), Game.window().getResolution().getHeight() / this.getRenderScale());
   }
 
   @Override
@@ -270,11 +270,12 @@ public class Camera implements ICamera {
 
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null || !this.isClampToMap()) {
+
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null || !this.isClampToMap()) {
       return new Point2D.Double(focus.getX(), focus.getY());
     }
 
-    final Dimension mapSize = Game.getEnvironment().getMap().getSizeInPixels();
+    final Dimension mapSize = Game.world().environment().getMap().getSizeInPixels();
 
     // TODO: Implement special handling for maps that are smaller than the camera area: use Align, Valign to determine where to render them
     final Dimension resolution = Game.window().getResolution();
@@ -332,11 +333,11 @@ public class Camera implements ICamera {
   }
 
   private double getViewPortCenterX() {
-    return Game.window().getWidth() * 0.5 / this.getRenderScale();
+    return Game.window().getResolution().getWidth() * 0.5 / this.getRenderScale();
   }
 
   private double getViewPortCenterY() {
-    return Game.window().getHeight() * 0.5 / this.getRenderScale();
+    return Game.window().getResolution().getHeight() * 0.5 / this.getRenderScale();
   }
 
   private boolean isShakeEffectActive() {

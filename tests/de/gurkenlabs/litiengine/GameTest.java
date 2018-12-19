@@ -49,7 +49,7 @@ public class GameTest {
     assertFalse(started.wasCalled);
     assertNotNull(Game.renderLoop());
     assertNotNull(Game.loop());
-    assertNotNull(Game.getCamera());
+    assertNotNull(Game.world().camera());
     assertNotNull(Game.screens());
     assertNotNull(Game.physics());
     assertNotNull(Game.graphics());

@@ -36,12 +36,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    */
   public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.environment = environment;
-    Game.addEnvironmentUnloadedListener(e -> {
+    Game.world().addUnloadedListener(e -> {
       if (e == this.environment) {
         loop.detach(this);
       }
     });
-    Game.addEnvironmentLoadedListener(e -> {
+    Game.world().addLoadedListener(e -> {
       if (e == this.environment) {
         loop.attach(this);
       }

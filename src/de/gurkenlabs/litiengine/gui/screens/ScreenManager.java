@@ -153,16 +153,6 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   }
 
   @Override
-  public int getWidth() {
-    return this.getResolution() != null ? this.getResolution().width : 0;
-  }
-
-  @Override
-  public int getHeight() {
-    return this.getResolution() != null ? this.getResolution().height : 0;
-  }
-
-  @Override
   public Point getWindowLocation() {
     if (this.screenLocation != null) {
       return this.screenLocation;

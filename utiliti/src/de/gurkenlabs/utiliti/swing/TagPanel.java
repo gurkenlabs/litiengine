@@ -211,7 +211,7 @@ public class TagPanel extends JPanel {
       return null;
     }
 
-    Optional<String> found = Game.getEnvironment().getUsedTags().stream().filter(x -> x != null && !this.getTagStrings().contains(x) && x.startsWith(currentText.toLowerCase())).findFirst();
+    Optional<String> found = Game.world().environment().getUsedTags().stream().filter(x -> x != null && !this.getTagStrings().contains(x) && x.startsWith(currentText.toLowerCase())).findFirst();
     return found.isPresent() ? found.get() : null;
   }
 }

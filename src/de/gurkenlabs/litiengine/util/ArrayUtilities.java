@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -83,7 +84,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(boolean[] arr, String separator) {
-    List<Boolean> list = new ArrayList<>();
+    List<Boolean> list = new ArrayList<>(arr.length);
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
@@ -112,7 +113,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(float[] arr, String separator) {
-    List<Float> list = new ArrayList<>();
+    List<Float> list = new ArrayList<>(arr.length);
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
@@ -124,7 +125,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(short[] arr, String separator) {
-    List<Short> list = new ArrayList<>();
+    List<Short> list = new ArrayList<>(arr.length);
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
@@ -144,7 +145,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(byte[] arr, String separator) {
-    List<Byte> list = new ArrayList<>();
+    List<Byte> list = new ArrayList<>(arr.length);
     for (int i = 0; i < arr.length; i++) {
       list.add(arr[i]);
     }
@@ -189,12 +190,27 @@ public final class ArrayUtilities {
   }
 
   public static <T> T getRandom(T[] arr) {
+    return getRandom(arr, ThreadLocalRandom.current());
+  }
+
+  public static <T> T getRandom(T[] arr, Random rand) {
     if (arr.length == 0) {
       return null;
     }
+    return arr[rand.nextInt(arr.length)];
+  }
 
-    final int randomIndex = new Random().nextInt(arr.length);
-    return arr[randomIndex];
+  public static void shuffle(Object[] arr) {
+    shuffle(arr, ThreadLocalRandom.current());
+  }
+
+  public static void shuffle(Object[] arr, Random rand) {
+    for (int i = arr.length - 1; i > 0; i--) {
+      int swap = rand.nextInt(i + 1);
+      Object temp = arr[i];
+      arr[i] = arr[swap];
+      arr[swap] = temp;
+    }
   }
 
   public static <T> boolean contains(T[] arr, T value) {
@@ -253,10 +269,10 @@ public final class ArrayUtilities {
   }
 
   public static int[] toIntegerArray(List<Integer> intList) {
-    Object[] objArray = intList.toArray();
+    Integer[] objArray = intList.toArray(new Integer[0]);
     int[] intArray = new int[objArray.length];
     for (int i = 0; i < intArray.length; i++) {
-      intArray[i] = (int) objArray[i];
+      intArray[i] = objArray[i];
     }
     return intArray;
   }

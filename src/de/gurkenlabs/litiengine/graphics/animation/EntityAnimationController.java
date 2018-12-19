@@ -71,7 +71,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   public void update() {
     super.update();
 
-    if (Game.getEnvironment() == null || Game.getEnvironment().getMap() == null) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
 
@@ -115,7 +115,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   @Override
   public void scaleSprite(float scaleX, float scaleY) {
-    final Point2D point = Game.getCamera().getViewportLocation(this.getEntity());
+    final Point2D point = Game.world().camera().getViewportLocation(this.getEntity());
     double deltaX = (point.getX() - (point.getX() * scaleX));
     double deltaY = (point.getY() - (point.getY() * scaleY));
 

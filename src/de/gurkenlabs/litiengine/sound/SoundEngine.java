@@ -24,7 +24,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   public SoundEngine() {
     this.sounds = Collections.synchronizedList(new ArrayList<>());
     this.maxDist = DEFAULT_MAX_DISTANCE;
-    this.setListenerLocationCallback(old -> Game.getCamera().getFocus());
+    this.setListenerLocationCallback(old -> Game.world().camera().getFocus());
   }
 
   @Override
@@ -112,7 +112,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   @Override
   public void start() {
     Input.getLoop().attach(this);
-    this.listenerLocation = Game.getCamera().getFocus();
+    this.listenerLocation = Game.world().camera().getFocus();
   }
 
   @Override
