@@ -95,12 +95,7 @@ public final class XmlUtilities {
 
     InputStream stream = FileUtilities.getGameResource(path);
     if (stream == null) {
-      try {
-        stream = new FileInputStream(path);
-      } catch (FileNotFoundException e) {
-        log.log(Level.SEVERE, e.getMessage(), e);
-        return null;
-      }
+      return null;
     }
 
     return cls.cast(um.unmarshal(stream));
