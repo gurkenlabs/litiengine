@@ -136,7 +136,8 @@ public class Program {
     JOptionPane.setDefaultLocale(Locale.getDefault());
 
     userPreferences = Game.config().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
-    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom(zoom));
+
+    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom((float)zoom));
 
     Game.screens().display(EditorScreen.instance());
 
