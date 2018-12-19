@@ -111,7 +111,7 @@ public class Environment implements IEnvironment {
 
   public Environment(final String mapPath) {
     this();
-    this.map = Resources.maps().get(FileUtilities.getFileName(mapPath));
+    this.map = Resources.maps().get(mapPath);
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
     }
