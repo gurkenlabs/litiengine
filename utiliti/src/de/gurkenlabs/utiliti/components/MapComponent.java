@@ -286,9 +286,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public List<IMapObject> getSelectedMapObjects() {
-    final String map = Game.world().environment().getMap().getName();
-    if (Game.world().environment() != null && Game.world().environment().getMap() != null && this.selectedObjects.containsKey(map)) {
-      return this.selectedObjects.get(map);
+    if (Game.world().environment() != null && Game.world().environment().getMap() != null) {
+      final String map = Game.world().environment().getMap().getName();
+      if (this.selectedObjects.containsKey(map)) {
+        return this.selectedObjects.get(map);
+      }
     }
 
     return new ArrayList<>();
@@ -1656,8 +1658,13 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   private void renderMapObjectBounds(Graphics2D g) {
+    if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
+      return;
+    }
+    
+    final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
     // render all entities
-    for (final IMapObjectLayer layer : Game.world().environment().getMap().getMapObjectLayers()) {
+    for (final IMapObjectLayer layer : layers) {
       if (layer == null) {
         continue;
       }
@@ -1743,13 +1750,18 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
   private void renderGrid(Graphics2D g) {
     // render the grid
-    if (Program.getUserPreferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1) {
+    if (Program.getUserPreferences().isShowGrid() && Game.world().camera().getRenderScale() >= 1 && Game.world().environment() != null) {
+
+      final IMap map = Game.world().environment().getMap();
+      if (map == null) {
+        return;
+      }
 
       g.setColor(this.getGridColor());
       final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.world().camera().getRenderScale());
-      for (int x = 0; x < Game.world().environment().getMap().getWidth(); x++) {
-        for (int y = 0; y < Game.world().environment().getMap().getHeight(); y++) {
-          Shape tile = Game.world().environment().getMap().getTileShape(x, y);
+      for (int x = 0; x < map.getWidth(); x++) {
+        for (int y = 0; y < map.getHeight(); y++) {
+          Shape tile = map.getTileShape(x, y);
           if (Game.world().camera().getViewport().intersects(tile.getBounds2D())) {
             Game.graphics().renderOutline(g, tile, stroke);
           }

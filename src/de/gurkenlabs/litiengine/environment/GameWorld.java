@@ -203,7 +203,7 @@ public final class GameWorld implements IUpdateable {
    */
   public void loadEnvironment(final IEnvironment env) {
     unloadEnvironment();
-
+    this.environment = env;
     if (env != null) {
       this.addEnvironment(env);
 
@@ -220,8 +220,6 @@ public final class GameWorld implements IUpdateable {
         }
       }
     }
-
-    this.environment = env;
   }
 
   /**
