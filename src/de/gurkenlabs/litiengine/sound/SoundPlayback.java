@@ -328,7 +328,9 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   private void restartDataLine() {
-    this.dataLine.drain();
+    if (this.dataLine != null) {
+      this.dataLine.drain();
+    }
     this.loadDataLine();
     this.initControls();
     this.dataLine.start();
