@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -155,11 +156,21 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
   @Override
   public boolean collides(final Rectangle2D rect, final CollisionType collisionType) {
+    return collides(rect, null, collisionType);
+  }
+
+  @Override
+  public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity) {
+    return this.collides(rect, collisionEntity, CollisionType.ALL);
+  }
+
+  @Override
+  public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity, CollisionType collisionType) {
     switch (collisionType) {
     case ALL:
       return this.collides(rect);
     case ENTITY:
-      return this.collidesWithAnyEntity(null, rect) != null;
+      return this.collidesWithAnyEntity(collisionEntity, rect) != null;
     case STATIC:
       return this.collidesWithAnyStaticCollisionBox(rect) != null;
     default:
