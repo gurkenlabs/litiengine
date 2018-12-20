@@ -326,8 +326,8 @@ public abstract class Entity implements IEntity {
     if (!this.getTags().contains(tag)) {
       this.getTags().add(tag);
     }
-    if (Game.world().environment() != null) {
-      Game.world().environment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
+    if (this.getEnvironment() != null) {
+      this.getEnvironment().getEntitiesByTag().computeIfAbsent(tag, t -> new CopyOnWriteArrayList<>()).add(this);
     }
   }
 
@@ -337,9 +337,9 @@ public abstract class Entity implements IEntity {
     if (Game.world().environment() == null) {
       return;
     }
-    Game.world().environment().getEntitiesByTag().get(tag).remove(this);
-    if (Game.world().environment().getEntitiesByTag().get(tag).isEmpty()) {
-      Game.world().environment().getEntitiesByTag().remove(tag);
+    this.getEnvironment().getEntitiesByTag().get(tag).remove(this);
+    if (this.getEnvironment().getEntitiesByTag().get(tag).isEmpty()) {
+      this.getEnvironment().getEntitiesByTag().remove(tag);
     }
   }
 
