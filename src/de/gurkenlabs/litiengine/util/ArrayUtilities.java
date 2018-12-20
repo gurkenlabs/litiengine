@@ -135,7 +135,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(List<?> list) {
-    return joinArray(list, ",");
+    return joinArray(list.toArray(), ",");
   }
 
   public static String join(List<?> list, String separator) {
@@ -159,7 +159,7 @@ public final class ArrayUtilities {
 
     int len = Array.getLength(arr);
     if (len == 0) {
-      return "";
+      return null;
     }
 
     StringBuilder sb = new StringBuilder(String.valueOf(Array.get(arr, 0)));
