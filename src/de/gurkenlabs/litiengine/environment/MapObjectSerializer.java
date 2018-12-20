@@ -62,7 +62,7 @@ public final class MapObjectSerializer {
       }
 
       mapObject.setValue(property.name(), getPropertyValue(field, value));
-    } catch (IllegalArgumentException | IllegalAccessException e) {
+    } catch (IllegalAccessException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
   }
