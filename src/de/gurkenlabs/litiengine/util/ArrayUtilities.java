@@ -151,11 +151,11 @@ public final class ArrayUtilities {
     return join(list, separator);
   }
 
-  public static <T> String join(List<T> list) {
+  public static String join(List<?> list) {
     return join(list, ",");
   }
 
-  public static <T> String join(List<T> list, String separator) {
+  public static String join(List<?> list, String separator) {
     if (list == null || list.isEmpty()) {
       return null;
     }
@@ -171,11 +171,11 @@ public final class ArrayUtilities {
     return sb.toString();
   }
 
-  public static <T> String join(T[] arr) {
+  public static String join(Object[] arr) {
     return join(Arrays.asList(arr), ",");
   }
 
-  public static <T> String join(T[] arr, String separator) {
+  public static String join(Object[] arr, String separator) {
     return join(Arrays.asList(arr), separator);
   }
 
@@ -212,12 +212,12 @@ public final class ArrayUtilities {
     }
   }
 
-  public static <T> boolean contains(T[] arr, T value) {
+  public static boolean contains(Object[] arr, Object value) {
     if (value == null) {
       return false;
     }
 
-    for (T v : arr) {
+    for (Object v : arr) {
       if (v != null && v.equals(value)) {
         return true;
       }
