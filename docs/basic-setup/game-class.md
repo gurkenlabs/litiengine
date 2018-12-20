@@ -23,7 +23,7 @@ Game.addTerminatedListener(() ->
   // do sth when game is shut down
 });
 
-System.out.println("Game version is: " + Game.getInfo().getVersion());
+System.out.println("Game version is: " + Game.info().getVersion());
 
-Game.getSoundEngine().playSound(Sound.get("test.ogg"));
+Game.audio().playSound(Sound.get("test.ogg"));
 ```
