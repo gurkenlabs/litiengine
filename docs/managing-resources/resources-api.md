@@ -1,4 +1,6 @@
-# The resources API
+# The Resources API
+![Resources API](../images/api-resources.png)
+
 `de.gurkenlabs.litiengine.resources.Resources` is the engine's entry point for accessing any kind of resource from within your LITIengine project.
 A resource is any non-executable data that is deployed with your game.
 The `Resources` class provides access to types of `de.gurkenlabs.litiengine.resources.ResourcesContainer` and is used by different (loading) mechanisms to make resources available during runtime.
