@@ -125,8 +125,10 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     }
     
     if (!this.cancelled) {
-      this.dataLine.drain();
-      this.dataLine.close();
+      if (this.dataLine != null) {
+        this.dataLine.drain();
+        this.dataLine.close();
+      }
       final SoundEvent event = new SoundEvent(this, this.sound);
       for (SoundPlaybackListener listener : this.playbackListeners) {
         listener.finished(event);
@@ -173,7 +175,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   public void resumePlayback() {
     this.paused = false;
     synchronized (this) {
-      this.notify();
+      this.notifyAll();
     }
   }
 
