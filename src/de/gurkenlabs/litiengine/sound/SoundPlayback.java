@@ -109,13 +109,14 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
       readCount = str.read(buffer, 0, buffer.length);
 
       if (readCount < 0) {
-        if (!this.loop || this.dataLine == null) {
-          break;
+        synchronized (this) {
+          if (!this.loop || this.dataLine == null) {
+            break;
+          }
+  
+          this.restartDataLine();
+          str = new ByteArrayInputStream(this.sound.getStreamData());
         }
-
-        this.restartDataLine();
-        str = new ByteArrayInputStream(this.sound.getStreamData());
-
       } else if (this.dataLine != null) {
         this.dataLine.write(buffer, 0, readCount);
       }
@@ -198,7 +199,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
     executorService.shutdownNow();
   }
 
-  private void dispose() {
+  private synchronized void dispose() {
     if (this.dataLine != null) {
       this.dataLine.stop();
       this.dataLine.flush();
@@ -328,9 +329,7 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
   }
 
   private void restartDataLine() {
-    if (this.dataLine != null) {
-      this.dataLine.drain();
-    }
+    this.dataLine.drain();
     this.loadDataLine();
     this.initControls();
     this.dataLine.start();
