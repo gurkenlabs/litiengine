@@ -339,10 +339,6 @@ public abstract class ResourcesContainer<T> {
       return res;
     }
 
-    if (this.aliases.containsKey(res)) {
-      return this.aliases.get(res);
-    }
-
-    return res;
+    return this.aliases.getOrDefault(res, res);
   }
 }
