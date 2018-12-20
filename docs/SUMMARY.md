@@ -36,7 +36,7 @@
     * Loading external maps
 
 * [Controlling entities](controlling-entities/README.md)
-    * [The Input API(controlling-entities/input.md)
+    * [The Input API](controlling-entities/input.md)
     * Animation
     * Movement and behaviours
     * The messaging system
