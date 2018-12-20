@@ -361,9 +361,9 @@ public final class GameWorld implements IUpdateable {
 
     camera = cam;
 
-    if (!Game.isInNoGUIMode()) {
+    if (cam != null && !Game.isInNoGUIMode()) {
       Game.loop().attach(cam);
-      this.camera().updateFocus();
+      cam.updateFocus();
     }
   }
 
