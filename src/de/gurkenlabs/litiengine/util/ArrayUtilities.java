@@ -79,56 +79,43 @@ public final class ArrayUtilities {
   }
 
   public static String join(boolean[] arr) {
-    return join(arr, ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(boolean[] arr, String separator) {
-    List<Boolean> list = new ArrayList<>(arr.length);
-    for (int i = 0; i < arr.length; i++) {
-      list.add(arr[i]);
-    }
-
-    return join(list, separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(int[] arr) {
-    return join(arr, ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(int[] arr, String separator) {
-    return join(Arrays.stream(arr).boxed().toArray(Integer[]::new), separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(double[] arr) {
-    return join(arr, ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(double[] arr, String separator) {
-    return join(Arrays.stream(arr).boxed().toArray(Double[]::new), separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(float[] arr) {
-    return join(arr, ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(float[] arr, String separator) {
-    List<Float> list = new ArrayList<>(arr.length);
-    for (int i = 0; i < arr.length; i++) {
-      list.add(arr[i]);
-    }
-    return join(list, separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(short[] arr) {
-    return join(arr, ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(short[] arr, String separator) {
-    List<Short> list = new ArrayList<>(arr.length);
-    for (int i = 0; i < arr.length; i++) {
-      list.add(arr[i]);
-    }
-    return join(list, separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(long[] arr) {
@@ -136,7 +123,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(long[] arr, String separator) {
-    return join(Arrays.stream(arr).boxed().toArray(Long[]::new), separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(byte[] arr) {
@@ -144,39 +131,44 @@ public final class ArrayUtilities {
   }
 
   public static String join(byte[] arr, String separator) {
-    List<Byte> list = new ArrayList<>(arr.length);
-    for (int i = 0; i < arr.length; i++) {
-      list.add(arr[i]);
-    }
-    return join(list, separator);
+    return joinArray(arr, separator);
   }
 
   public static String join(List<?> list) {
-    return join(list, ",");
+    return joinArray(list, ",");
   }
 
   public static String join(List<?> list, String separator) {
-    if (list == null || list.isEmpty()) {
-      return null;
-    }
-
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < list.size(); i++) {
-      sb.append(list.get(i));
-      if (i < list.size() - 1) {
-        sb.append(separator);
-      }
-    }
-
-    return sb.toString();
+    return joinArray(list.toArray(), separator);
   }
 
   public static String join(Object[] arr) {
-    return join(Arrays.asList(arr), ",");
+    return joinArray(arr, ",");
   }
 
   public static String join(Object[] arr, String separator) {
-    return join(Arrays.asList(arr), separator);
+    return joinArray(arr, separator);
+  }
+
+  // general method for joining an array
+  // encapsulated for type safety
+  private static String joinArray(Object arr, String separator) {
+    if (arr == null) {
+      return null;
+    }
+
+    int len = Array.getLength(arr);
+    if (len == 0) {
+      return "";
+    }
+
+    StringBuilder sb = new StringBuilder(String.valueOf(Array.get(arr, 0)));
+    for (int i = 1; i < len; i++) {
+      sb.append(separator);
+      sb.append(Array.get(arr, i));
+    }
+
+    return sb.toString();
   }
 
   public static <T> List<T> toList(T[][] arr) {
