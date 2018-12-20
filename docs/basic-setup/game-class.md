@@ -1,5 +1,7 @@
 # The Game Class
 
+![Game API](https://github.com/gurkenlabs/litiengine/blob/master/docs/images/api-game.png)
+
 [`de.gurkenlabs.litiengine.Game`](https://static.javadoc.io/de.gurkenlabs/litiengine/0.4.14/de/gurkenlabs/litiengine/Game.html) is 
 undoubtedly one of the classes that you will call the most when creating a game with LITIengine.
 It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the GameInfo, the RenderEngine, the SoundEngine and many other major components.
