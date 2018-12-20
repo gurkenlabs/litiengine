@@ -1,4 +1,4 @@
-# The Game Class
+# The Game API
 
 ![Game API](../images/api-game.png)
 
