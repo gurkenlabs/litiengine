@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class ArrayUtilities {
-  public static final String DEFALUT_SEPARATOR = ",";
   private static final Logger log = Logger.getLogger(ArrayUtilities.class.getName());
 
   private ArrayUtilities() {
@@ -80,7 +79,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(boolean[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(boolean[] arr, String separator) {
@@ -93,7 +92,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(int[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(int[] arr, String separator) {
@@ -101,7 +100,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(double[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(double[] arr, String separator) {
@@ -109,7 +108,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(float[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(float[] arr, String separator) {
@@ -121,7 +120,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(short[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(short[] arr, String separator) {
@@ -133,7 +132,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(long[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(long[] arr, String separator) {
@@ -141,7 +140,7 @@ public final class ArrayUtilities {
   }
 
   public static String join(byte[] arr) {
-    return join(arr, DEFALUT_SEPARATOR);
+    return join(arr, ",");
   }
 
   public static String join(byte[] arr, String separator) {
@@ -173,7 +172,7 @@ public final class ArrayUtilities {
   }
 
   public static <T> String join(T[] arr) {
-    return join(Arrays.asList(arr), DEFALUT_SEPARATOR);
+    return join(Arrays.asList(arr), ",");
   }
 
   public static <T> String join(T[] arr, String separator) {
