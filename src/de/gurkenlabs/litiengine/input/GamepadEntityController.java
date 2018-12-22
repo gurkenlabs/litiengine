@@ -4,11 +4,11 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.physics.AccelerationMovementController;
+import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import net.java.games.input.Component.Identifier;
 
-public class GamepadEntityController<T extends IMobileEntity> extends AccelerationMovementController<T> {
+public class GamepadEntityController<T extends IMobileEntity> extends MovementController<T> {
   private int gamePadIndex = -1;
   private double gamepadDeadzone = Game.config().input().getGamepadStickDeadzone();
   private double gamepadRightStick = Game.config().input().getGamepadStickDeadzone();

@@ -10,6 +10,14 @@ import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
 public interface IMovementController extends IEntityController {
 
+  public float getDx();
+
+  public void setDx(float dx);
+
+  public float getDy();
+
+  public void setDy(float dy);
+
   public void apply(Force force);
 
   public List<Force> getActiveForces();
