@@ -35,16 +35,12 @@ public class KeyboardEntityController<T extends IMobileEntity> extends Accelerat
   public void handlePressedKey(final KeyEvent keyCode) {
     if (this.up.contains(keyCode.getKeyCode())) {
       this.setDy(this.getDy() - 1);
-      this.setMovedY(true);
     } else if (this.down.contains(keyCode.getKeyCode())) {
-      this.setMovedY(true);
       this.setDy(this.getDy() + 1);
     } else if (this.left.contains(keyCode.getKeyCode())) {
       this.setDx(this.getDx() - 1);
-      this.setMovedX(true);
     } else if (this.right.contains(keyCode.getKeyCode())) {
       this.setDx(this.getDx() + 1);
-      this.setMovedX(true);
     }
   }
 

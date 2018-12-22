@@ -43,20 +43,18 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
 
     // update velocity x
     if (this.isMovedX()) {
-      this.setVelocityX(this.getVelocityX() + (this.getDx() > 0 ? inc : -inc));
-      this.setVelocityX(MathUtilities.clamp(this.getVelocityX(), -maxPixelsPerTick, maxPixelsPerTick));
+      double newVelocity = this.getVelocityX() + (this.getDx() > 0 ? inc : -inc);
+      this.setVelocityX(MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick));
       this.setDx(0);
-      this.setMovedX(false);
     } else {
       this.decellerateVelocityX(dec);
     }
 
     // update velocity y
     if (this.isMovedY()) {
-      this.setVelocityY(this.getVelocityY() + (this.getDy() > 0 ? inc : -inc));
-      this.setVelocityY(MathUtilities.clamp(this.getVelocityY(), -maxPixelsPerTick, maxPixelsPerTick));
+      double newVelocity = this.getVelocityY() + (this.getDy() > 0 ? inc : -inc);
+      this.setVelocityY(MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick));
       this.setDy(0);
-      this.setMovedY(false);
     } else {
       this.decellerateVelocityY(dec);
     }
@@ -75,6 +73,7 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
 
   public void setDx(float dx) {
     this.dx = dx;
+    this.setMovedX(this.dx != 0);
   }
 
   public float getDy() {
@@ -83,10 +82,11 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
 
   public void setDy(float dy) {
     this.dy = dy;
+    this.setMovedY(this.dy != 0);
   }
 
   public boolean isMovedX() {
-    return movedX;
+    return this.movedX;
   }
 
   public void setMovedX(boolean movedX) {
@@ -94,7 +94,7 @@ public abstract class AccelerationMovementController<T extends IMobileEntity> ex
   }
 
   public boolean isMovedY() {
-    return movedY;
+    return this.movedY;
   }
 
   public void setMovedY(boolean movedY) {

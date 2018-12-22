@@ -79,12 +79,10 @@ public class GamepadEntityController<T extends IMobileEntity> extends Accelerati
 
     if (Math.abs(x) > this.gamepadDeadzone) {
       this.setDx(x);
-      this.setMovedX(true);
     }
 
     if (Math.abs(y) > this.gamepadDeadzone) {
       this.setDy(y);
-      this.setMovedY(true);
     }
 
     if (this.isRotateWithRightStick()) {
