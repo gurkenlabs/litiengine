@@ -305,6 +305,10 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean addEntity() {
+    if(Game.world().environment() == null || Game.world().camera() == null) {
+      return false;
+    }
+    
     // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
