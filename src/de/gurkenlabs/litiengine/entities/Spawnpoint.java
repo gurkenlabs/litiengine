@@ -3,13 +3,15 @@ package de.gurkenlabs.litiengine.entities;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
 public class Spawnpoint extends Entity {
   @TmxProperty(name = MapObjectProperty.SPAWN_DIRECTION)
   private Direction direction;
-  
+
   @TmxProperty(name = MapObjectProperty.SPAWN_TYPE)
   private String spawnType;
 
@@ -61,5 +63,19 @@ public class Spawnpoint extends Entity {
 
   public void setSpawnType(String spawnType) {
     this.spawnType = spawnType;
+  }
+
+  public void spawn(IMobileEntity entity) {
+    entity.setLocation(this.getLocation());
+    entity.setAngle(Direction.toAngle(this.getDirection()));
+
+    IEnvironment env = this.getEnvironment();
+    if (env == null) {
+      env = Game.world().environment();
+    }
+
+    if (env != null && env.get(entity.getMapId()) == null) {
+      env.add(entity);
+    }
   }
 }
