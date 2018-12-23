@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.graphics.Camera;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
 
@@ -225,6 +226,12 @@ public final class GameWorld implements IUpdateable {
       // call map specific listeners
       String mapName = getMapName(env);
       if (mapName != null && this.environmentLoadedListeners.containsKey(mapName)) {
+        
+        // for the default camera we center the camera on the environment
+        if (this.camera().getClass().equals(Camera.class)) {
+          camera().setFocus(env.getCenter());
+        }
+        
         for (EnvironmentLoadedListener listener : this.environmentLoadedListeners.get(mapName)) {
           listener.loaded(env);
         }
