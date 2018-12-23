@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -52,6 +53,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
+import de.gurkenlabs.litiengine.physics.GravityForce;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -62,6 +64,7 @@ public class Environment implements IEnvironment {
 
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
+  private final Map<Integer, GravityForce> gravityForces = new ConcurrentHashMap<>();
   private final Map<RenderType, Map<Integer, IEntity>> entities = Collections.synchronizedMap(new EnumMap<>(RenderType.class));
   private final Map<String, Collection<IEntity>> entitiesByTag = new ConcurrentHashMap<>();
 
@@ -87,6 +90,8 @@ public class Environment implements IEnvironment {
   private IMap map;
   private int localIdSequence = 0;
 
+  private int gravity;
+
   static {
     registerMapObjectLoader(new PropMapObjectLoader());
     registerMapObjectLoader(new CollisionBoxMapObjectLoader());
@@ -104,15 +109,12 @@ public class Environment implements IEnvironment {
     this.map = map;
     if (this.getMap() != null) {
       Game.physics().setBounds(this.getMap().getBounds());
+      this.setGravity(this.getMap().getIntValue(MapProperty.GRAVITY));
     }
   }
 
   public Environment(final String mapPath) {
-    this();
-    this.map = Resources.maps().get(mapPath);
-    if (this.getMap() != null) {
-      Game.physics().setBounds(this.getMap().getBounds());
-    }
+    this(Resources.maps().get(mapPath));
   }
 
   private Environment() {
@@ -993,6 +995,33 @@ public class Environment implements IEnvironment {
     g.scale(1.0 / Game.world().camera().getRenderScale(), 1.0 / Game.world().camera().getRenderScale());
   }
 
+  public int getGravity() {
+    return this.gravity;
+  }
+
+  public void setGravity(int gravity) {
+    this.gravity = gravity;
+
+    if (this.getGravity() != 0) {
+
+      // if there are gravity forces for all mobile entities, just update the existing forces
+      if (this.gravityForces.size() == this.getMobileEntities().size()) {
+        for (GravityForce force : this.gravityForces.values()) {
+          force.setStrength(this.gravity);
+        }
+      } else {
+        // otherwise create a new force for every mobile entity in the environment
+        for (IMobileEntity entity : this.getMobileEntities()) {
+          this.addGravityForce(entity);
+        }
+      }
+    } else {
+      for (IMobileEntity entity : this.getMobileEntities()) {
+        this.removeGravity(entity);
+      }
+    }
+  }
+
   private void fireEvent(Consumer<EnvironmentListener> cons) {
     for (EnvironmentListener listener : this.listeners) {
       cons.accept(listener);
@@ -1140,14 +1169,19 @@ public class Environment implements IEnvironment {
     if (entity.getEnvironment() != null) {
       entity.getEnvironment().remove(entity);
     }
-    
+
     // 1. add to physics engine
     this.loadPhysicsEntity(entity);
 
     // 2. register for update or activate
     this.loadUpdatableOrEmitterEntity(entity);
 
-    // 3. attach all controllers
+    // 3. if a gravity is defined, add a gravity force to the entity
+    if (entity instanceof IMobileEntity && this.getGravity() != 0) {
+      this.addGravityForce((IMobileEntity) entity);
+    }
+
+    // 4. attach all controllers
     entity.attachControllers();
 
     if (entity instanceof LightSource || entity instanceof StaticShadow) {
@@ -1155,6 +1189,18 @@ public class Environment implements IEnvironment {
     }
 
     entity.loaded(this);
+  }
+
+  private void addGravityForce(IMobileEntity entity) {
+    GravityForce force = new GravityForce(entity, this.getGravity(), Direction.DOWN);
+    entity.getMovementController().apply(force);
+    this.gravityForces.put(entity.getMapId(), force);
+  }
+
+  private void removeGravity(IMobileEntity entity) {
+    if (this.gravityForces.containsKey(entity.getMapId())) {
+      this.gravityForces.get(entity.getMapId()).end();
+    }
   }
 
   private void loadPhysicsEntity(IEntity entity) {
@@ -1225,6 +1271,10 @@ public class Environment implements IEnvironment {
     // 2. unregister from update
     if (entity instanceof IUpdateable) {
       Game.loop().detach((IUpdateable) entity);
+    }
+
+    if (entity instanceof IMobileEntity) {
+      this.removeGravity((IMobileEntity) entity);
     }
 
     // 3. detach all controllers

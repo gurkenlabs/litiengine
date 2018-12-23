@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.resources.Resources;
@@ -25,6 +26,7 @@ public final class GameWorld implements IUpdateable {
 
   private IEnvironment environment;
   private ICamera camera;
+  private int gravity;
 
   @Override
   public void update() {
@@ -44,7 +46,7 @@ public final class GameWorld implements IUpdateable {
     this.loadedListeners.add(listener);
   }
 
-  public void removeLoadedListener(EnvironmentLoadedListener listener) { 
+  public void removeLoadedListener(EnvironmentLoadedListener listener) {
     this.loadedListeners.remove(listener);
   }
 
@@ -108,6 +110,10 @@ public final class GameWorld implements IUpdateable {
    */
   public IEnvironment environment() {
     return this.environment;
+  }
+
+  public int gravity() {
+    return this.gravity;
   }
 
   /**
@@ -206,6 +212,10 @@ public final class GameWorld implements IUpdateable {
     this.environment = env;
     if (env != null) {
       this.addEnvironment(env);
+
+      if (env.getGravity() == 0 && this.gravity() != 0) {
+        env.setGravity(this.gravity());
+      }
 
       env.load();
       for (final EnvironmentLoadedListener listener : this.loadedListeners) {
@@ -365,6 +375,19 @@ public final class GameWorld implements IUpdateable {
       Game.loop().attach(cam);
       cam.updateFocus();
     }
+  }
+
+  /**
+   * Specify the general gravity that will be used as default value for all environments that are loaded.
+   * The value's unit of measure is pixel/second (similar to the velocity of a <code>IMobileEntity</code>.
+   * 
+   * @param gravity
+   *          The default gravity for all environments.
+   * 
+   * @see IMobileEntity#getVelocity()
+   */
+  public void setGravity(int gravity) {
+    this.gravity = gravity;
   }
 
   private static <T> void add(Map<String, Collection<T>> listeners, String mapName, T listener) {

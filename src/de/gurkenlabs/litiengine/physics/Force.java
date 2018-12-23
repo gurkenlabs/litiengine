@@ -5,26 +5,13 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 
-/**
- * The Class Force.
- */
 public class Force {
-  /** The cancel on collision. */
   private boolean cancelOnCollision;
-
-  /** The cancel on force source reached. */
   private boolean cancelOnReached;
-
-  /** The has ended. */
   private boolean hasEnded;
-
-  /** The location. */
   private Point2D location;
-
   private final float size;
-
-  /** The strength. */
-  private final float strength;
+  private float strength;
 
   /**
    * Instantiates a new force.
@@ -103,5 +90,9 @@ public class Force {
 
   public void setLocation(final Point2D location) {
     this.location = location;
+  }
+  
+  public void setStrength(float strength) {
+    this.strength = strength;
   }
 }

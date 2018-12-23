@@ -217,4 +217,8 @@ public interface IEnvironment extends IInitializable, IRenderable {
   public void removeRenderable(IRenderable renderable);
 
   public void unload();
+  
+  public void setGravity(int gravity);
+  
+  public int getGravity();
 }
