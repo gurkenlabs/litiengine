@@ -1,6 +1,6 @@
 # Get LITIengine
 
-## Get the .jar library
+## Get the Java library
 
 So you want to build a 2D Java game with the *LITIengine*, that's great! Now, the first thing you want to do is to actually download the library.
 There are multiple ways to achieve this. The library is distributed over the [Maven Central Repository](https://search.maven.org/artifact/de.gurkenlabs/litiengine/) and you can grab the necessary .jar-file(s) from there by using your favorite build automation tool or manually download the library.
@@ -27,7 +27,7 @@ compile 'de.gurkenlabs:litiengine:0.4.14'
 > **Note:** This `.zip` archive contains all the required libraries and native assemblies
 
 ## Get the utiLITI editor
-The LITIengine comes with an editor that supports you with creating game environments and managing your resources. It is a stand alone product which produces a `.litidata` game project files that can than be loaded to your game. 
+The LITIengine comes with an editor that supports you with creating game environments and managing your resources. It is a stand alone product which produces a `.litidata` game project files that can then be loaded to your game. 
 
 > **Note:** The editor is not an IDE for Java development.
 
