@@ -17,7 +17,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   private final T mobileEntity;
   private final List<Predicate<IMobileEntity>> movementPredicates;
   private final List<Consumer<Point2D>> movedConsumer;
-  
+
   private float dx;
   private float dy;
   private boolean movedX;
@@ -80,7 +80,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     this.dy = dy;
     this.setMovedY(this.dy != 0);
   }
-  
+
   @Override
   public void onMovementCheck(final Predicate<IMobileEntity> predicate) {
     if (!this.movementPredicates.contains(predicate)) {
@@ -134,7 +134,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     // update velocity y
     if (this.isMovedY()) {
       double newVelocity = this.getVelocityY() + (this.getDy() > 0 ? inc : -inc);
-      this.setVelocityY(MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick));
+      newVelocity = MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick);
+      this.setVelocityY(newVelocity);
       this.setDy(0);
     } else {
       this.decellerateVelocityY(dec);
@@ -168,8 +169,12 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     return velocityX;
   }
 
-  public void setVelocityX(double velocityX) {
+  protected void setVelocityX(double velocityX) {
     this.velocityX = velocityX;
+  }
+
+  protected void setVelocityY(double velocityY) {
+    this.velocityY = velocityY;
   }
 
   public void decellerateVelocityX(double dec) {
@@ -214,10 +219,6 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
   public double getVelocityY() {
     return velocityY;
-  }
-
-  public void setVelocityY(double velocityY) {
-    this.velocityY = velocityY;
   }
 
   protected double getStopThreshold() {
