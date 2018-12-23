@@ -3,6 +3,7 @@
 ## Getting Started
 * [Creating a project](creating-a-project/README.md)
     * [Get LITIengine](creating-a-project/get-litiengine.md)
+    * [The utiLITI editor](creating-a-project/utiliti-editor.md)
 
 * [Setting up the basics](basic-setup/README.md)
     * [The Game class](basic-setup/game-class.md)
