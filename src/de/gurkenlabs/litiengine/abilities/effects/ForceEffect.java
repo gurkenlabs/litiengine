@@ -11,7 +11,6 @@ public abstract class ForceEffect extends Effect {
   protected ForceEffect(final Ability ability, final float strength, final EffectTarget... targets) {
     super(ability, targets);
     this.strength = strength;
-    this.setDuration(-1);
   }
 
   @Override
