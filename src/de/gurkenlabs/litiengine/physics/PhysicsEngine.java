@@ -24,7 +24,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   private final List<CollisionBox> allCollisionBoxes;
   private final List<CollisionBox> staticBoxes;
   private final List<Rectangle2D> allCollisionBoxRectangles;
-  private final List<Rectangle2D> entityCollisionBoxesRectangles;
+  private final List<Rectangle2D> entityCollisionBoxRectangles;
 
   public PhysicsEngine() {
     this.entityCollisionBoxes = new CopyOnWriteArrayList<>();
@@ -33,7 +33,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.allCollisionBoxes = new CopyOnWriteArrayList<>();
     this.staticBoxes = new CopyOnWriteArrayList<>();
     this.allCollisionBoxRectangles = new CopyOnWriteArrayList<>();
-    this.entityCollisionBoxesRectangles = new CopyOnWriteArrayList<>();
+    this.entityCollisionBoxRectangles = new CopyOnWriteArrayList<>();
   }
 
   @Override
@@ -226,37 +226,36 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public boolean move(final IMobileEntity entity, Point2D newPosition) {
+  public boolean move(final IMobileEntity entity, Point2D newLocation) {
     if (entity.turnOnMove()) {
-      entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newPosition));
+      entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newLocation));
     }
 
     // don't set new location if it is outside the boundaries of the map
-    if (!this.isInMap(entity.getCollisionBox(newPosition))) {
+    if (!this.isInMap(entity.getCollisionBox(newLocation))) {
       return false;
     }
 
     if (!entity.hasCollision()) {
-      entity.setLocation(newPosition);
+      entity.setLocation(newLocation);
       return true;
     }
 
-    boolean success = !this.resolveCollisionForCurrentLocation(entity);
-
-    if (this.resolveCollisionForNewPosition(entity, newPosition)) {
+    // check if there is any collision to resolve on the new location
+    if (this.resolveCollisionForNewPosition(entity, newLocation)) {
       return false;
     }
 
     // This method provides a simplified approach for a multi-sampling algorithm
     // to prevent glitching through collision boxes that are smaller than the
     // movement step size
-    if (this.resolveCollisionForRaycastToNewPosition(entity, newPosition)) {
+    if (this.resolveCollisionForRaycastToNewPosition(entity, newLocation)) {
       return false;
     }
 
     // set new map location
-    entity.setLocation(newPosition);
-    return success;
+    entity.setLocation(newLocation);
+    return true;
   }
 
   private boolean resolveCollisionForCurrentLocation(IMobileEntity entity) {
@@ -270,10 +269,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  private boolean resolveCollisionForNewPosition(IMobileEntity entity, Point2D newPosition) {
+  private boolean resolveCollisionForNewPosition(IMobileEntity entity, Point2D location) {
     // resolve collision for new location
-    if (this.collidesWithAnything(entity, entity.getCollisionBox(newPosition)) != null) {
-      final Point2D resolvedPosition = this.resolveCollision(entity, newPosition);
+    if (this.collidesWithAnything(entity, entity.getCollisionBox(location)) != null) {
+      final Point2D resolvedPosition = this.resolveCollision(entity, location);
       entity.setLocation(resolvedPosition);
       return true;
     }
@@ -353,7 +352,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   private List<Rectangle2D> getAllCollisionBoxRectangles(CollisionType collisionType) {
     switch (collisionType) {
     case ENTITY:
-      return this.entityCollisionBoxesRectangles;
+      return this.entityCollisionBoxRectangles;
     case STATIC:
       return this.staticCollisionBoxes;
     default:
@@ -373,8 +372,8 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.allCollisionBoxes.addAll(this.staticBoxes);
 
     this.allCollisionBoxRectangles.clear();
-    this.entityCollisionBoxesRectangles.clear();
-    this.entityCollisionBoxesRectangles.addAll(this.entityCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
+    this.entityCollisionBoxRectangles.clear();
+    this.entityCollisionBoxRectangles.addAll(this.entityCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
 
     this.allCollisionBoxRectangles.addAll(this.allCollisionBoxes.stream().map(CollisionBox::getCollisionBox).collect(Collectors.toList()));
   }
@@ -467,26 +466,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   /**
-   * Find location without collision.
-   *
-   * @param mob
-   *          the mob
-   * @param newPosition
-   *          the new position
-   * @return the point2 d
-   */
-  private Point2D findLocationWithoutCollision(final ICollisionEntity mob, final Point2D newPosition) {
-    for (final Point2D pointBetween : GeometricUtilities.getPointsBetweenPoints(newPosition, mob.getLocation())) {
-      final Rectangle2D newCollisionBox = mob.getCollisionBox(pointBetween);
-      if (this.collidesWithAnyEntity(mob, newCollisionBox) == null && this.collidesWithAnyStaticCollisionBox(newCollisionBox) == null) {
-        return pointBetween;
-      }
-    }
-
-    return mob.getLocation();
-  }
-
-  /**
    * Checks if is in map.
    *
    * @param collisionBox
@@ -507,20 +486,18 @@ public final class PhysicsEngine implements IPhysicsEngine {
    * moving entity and they also move towards the currently moving entity.
    *
    * @param entity
-   * @param newPosition
+   * @param targetPosition
    * @return
    */
-  private Point2D resolveCollision(final IMobileEntity entity, final Point2D newPosition) {
+  private Point2D resolveCollision(final IMobileEntity entity, final Point2D targetPosition) {
     // first resolve x-axis movement
-    Point2D resolvedPosition = new Point2D.Double(newPosition.getX(), entity.getY());
+    Point2D resolvedPosition = new Point2D.Double(targetPosition.getX(), entity.getY());
 
-    // resolve static collision boxes first
-    final Rectangle2D intersectionX = this.collidesWithAnything(entity, entity.getCollisionBox(resolvedPosition));
+    final Rectangle2D targetCollisionBoxX = entity.getCollisionBox(resolvedPosition);
+    final Rectangle2D intersectionX = this.collidesWithAnything(entity, targetCollisionBoxX);
     if (intersectionX != null) {
-      if (intersectionX.getWidth() > entity.getCollisionBox().getWidth() || intersectionX.getHeight() > entity.getCollisionBox().getHeight()) {
-        resolvedPosition = this.findLocationWithoutCollision(entity, resolvedPosition);
-      } else if (entity.getCollisionBox().getX() < intersectionX.getMaxX()) {
-        // new position is closer to the left side, so push out to the left
+      if (entity.getCollisionBox().getX() < targetCollisionBoxX.getX()) {
+        // entity was moved left -> right, so push out to the left
         resolvedPosition.setLocation(Math.max(entity.getX(), resolvedPosition.getX() - intersectionX.getWidth()), resolvedPosition.getY());
       } else {
         // push it out to the right
@@ -529,14 +506,13 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
 
     // then resolve y-axis movement
-    resolvedPosition.setLocation(resolvedPosition.getX(), newPosition.getY());
-    final Rectangle2D intersectionY = this.collidesWithAnything(entity, entity.getCollisionBox(resolvedPosition));
-
+    resolvedPosition.setLocation(resolvedPosition.getX(), targetPosition.getY());
+    
+    final Rectangle2D targetCollisionBoxY = entity.getCollisionBox(resolvedPosition);
+    final Rectangle2D intersectionY = this.collidesWithAnything(entity, targetCollisionBoxY);
     if (intersectionY != null) {
-      if (intersectionY.getWidth() > entity.getCollisionBox().getWidth() || intersectionY.getHeight() > entity.getCollisionBox().getHeight()) {
-        resolvedPosition = this.findLocationWithoutCollision(entity, resolvedPosition);
-      } else if (entity.getCollisionBox().getCenterY() - intersectionY.getCenterY() < 0) {
-        // new position is closer to the top
+      if (entity.getCollisionBox().getY() < targetCollisionBoxY.getY()) {
+        // entity was moved top -> bottom so push out towards the top
         resolvedPosition.setLocation(resolvedPosition.getX(), Math.max(entity.getY(), resolvedPosition.getY() - intersectionY.getHeight()));
       } else {
         resolvedPosition.setLocation(resolvedPosition.getX(), Math.min(entity.getY(), resolvedPosition.getY() + intersectionY.getHeight()));

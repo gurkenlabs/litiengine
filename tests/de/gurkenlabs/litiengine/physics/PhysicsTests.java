@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 
 public class PhysicsTests {
 
@@ -55,7 +55,7 @@ public class PhysicsTests {
 
   @Test
   public void testPointCollides() {
-    ICombatEntity ent = mock(ICombatEntity.class);
+    IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
@@ -77,7 +77,7 @@ public class PhysicsTests {
 
   @Test
   public void testRaycastCollides() {
-    ICombatEntity ent = mock(ICombatEntity.class);
+    IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
@@ -93,7 +93,7 @@ public class PhysicsTests {
 
   @Test
   public void testRectangleCollides() {
-    ICombatEntity ent = mock(ICombatEntity.class);
+    IMobileEntity ent = mock(IMobileEntity.class);
     when(ent.getCollisionBox()).thenReturn(new Rectangle2D.Double(0, 0, 10, 10));
     when(ent.hasCollision()).thenReturn(true);
 
