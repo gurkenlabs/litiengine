@@ -25,5 +25,5 @@ Game.addGameTerminatedListener(() ->
 
 System.out.println("Game version is: " + Game.getInfo().getVersion());
 
-Game.audio().playSound(Sound.get("test.ogg"));
+Game.getSoundEngine().playSound(Sound.get("test.ogg"));
 ```
