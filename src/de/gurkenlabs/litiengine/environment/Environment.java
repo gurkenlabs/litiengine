@@ -1051,7 +1051,7 @@ public class Environment implements IEnvironment {
       this.unload(entity);
     }
 
-    if (Game.screens() != null && Game.window().getRenderComponent() != null) {
+    if (Game.screens() != null && Game.window().getRenderComponent() != null && Game.hasStarted()) {
       Game.window().getRenderComponent().setBackground(RenderComponent.DEFAULT_BACKGROUND_COLOR);
     }
 

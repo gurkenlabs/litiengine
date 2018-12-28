@@ -577,6 +577,9 @@ public final class Game {
         return;
       }
     }
+    
+    hasStarted = false;
+    initialized = false;
 
     config().save();
     gameLoop.terminate();
@@ -591,9 +594,6 @@ public final class Game {
     for (final GameTerminatedListener listener : gameTerminatedListeners) {
       listener.terminated();
     }
-
-    hasStarted = false;
-    initialized = false;
   }
 
   /**
