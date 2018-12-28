@@ -33,4 +33,4 @@ The LITIengine comes with an editor that supports you with creating game environ
 
 [utiLITI for Windows](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-win.zip)
 
-[utiLITI for Linux / iOS](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-linux-mac.zip)
+[utiLITI for Linux / MacOS](https://github.com/gurkenlabs/litiengine/releases/download/v0.4.14-alpha/utiliti-v0.4.14-alpha-linux-mac.zip)
