@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public final class PhysicsEngine implements IPhysicsEngine {
@@ -233,7 +234,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
     // don't set new location if it is outside the boundaries of the map
     if (!this.isInMap(entity.getCollisionBox(newLocation))) {
-      return false;
+      newLocation = this.clamptoMap(entity, newLocation);
     }
 
     if (!entity.hasCollision()) {
@@ -256,47 +257,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     // set new map location
     entity.setLocation(newLocation);
     return true;
-  }
-
-  private boolean resolveCollisionForCurrentLocation(IMobileEntity entity) {
-    // resolve collision for current location
-    if (this.collidesWithAnything(entity, entity.getCollisionBox()) != null) {
-      final Point2D resolvedPosition = this.resolveCollision(entity, entity.getLocation());
-      entity.setLocation(resolvedPosition);
-      return true;
-    }
-
-    return false;
-  }
-
-  private boolean resolveCollisionForNewPosition(IMobileEntity entity, Point2D location) {
-    // resolve collision for new location
-    if (this.collidesWithAnything(entity, entity.getCollisionBox(location)) != null) {
-      final Point2D resolvedPosition = this.resolveCollision(entity, location);
-      entity.setLocation(resolvedPosition);
-      return true;
-    }
-
-    return false;
-  }
-
-  private boolean resolveCollisionForRaycastToNewPosition(IMobileEntity entity, Point2D newPosition) {
-    // special case to prevent entities to glitch through collision boxes if
-    // they have a large enough step size
-    final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
-    for (final CollisionBox collisionBox : this.getAllCollisionBoxesInternal()) {
-      if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
-        continue;
-      }
-
-      // there was a collision in between
-      final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
-      if (intersection != null) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   @Override
@@ -507,7 +467,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
 
     // then resolve y-axis movement
     resolvedPosition.setLocation(resolvedPosition.getX(), targetPosition.getY());
-    
+
     final Rectangle2D targetCollisionBoxY = entity.getCollisionBox(resolvedPosition);
     final Rectangle2D intersectionY = this.collidesWithAnything(entity, targetCollisionBoxY);
     if (intersectionY != null) {
@@ -520,6 +480,54 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
 
     return resolvedPosition;
+  }
+
+  private Point2D clamptoMap(IMobileEntity entity, Point2D newLocation) {
+    double collisionLocationX = entity.getCollisionBoxAlign().getLocation(entity.getWidth(), entity.getCollisionBoxWidth());
+    double leftBoundX = this.getBounds().getMinX() - collisionLocationX;
+    double deltaX = entity.getWidth() - entity.getCollisionBoxWidth() - collisionLocationX;
+    double rightBoundX = this.getBounds().getMaxX() - entity.getWidth() + deltaX;
+
+    double collisionLocationY = entity.getCollisionBoxValign().getLocation(entity.getHeight(), entity.getCollisionBoxHeight());
+    double topBoundY = this.getBounds().getMinY() - collisionLocationY;
+    double deltaY = entity.getHeight() - entity.getCollisionBoxHeight() - collisionLocationY;
+    double buttomBoundY = this.getBounds().getMaxY() - entity.getHeight() + deltaY;
+
+    // right and left border minus the collision box width
+    double x = MathUtilities.clamp(newLocation.getX(), leftBoundX, rightBoundX);
+    // bottom and top border minus the collision box height
+    double y = MathUtilities.clamp(newLocation.getY(), topBoundY, buttomBoundY);
+    return new Point2D.Double(x, y);
+  }
+
+  private boolean resolveCollisionForNewPosition(IMobileEntity entity, Point2D location) {
+    // resolve collision for new location
+    if (this.collidesWithAnything(entity, entity.getCollisionBox(location)) != null) {
+      final Point2D resolvedPosition = this.resolveCollision(entity, location);
+      entity.setLocation(resolvedPosition);
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean resolveCollisionForRaycastToNewPosition(IMobileEntity entity, Point2D newPosition) {
+    // special case to prevent entities to glitch through collision boxes if
+    // they have a large enough step size
+    final Line2D line = new Line2D.Double(entity.getCollisionBox().getCenterX(), entity.getCollisionBox().getCenterY(), entity.getCollisionBox(newPosition).getCenterX(), entity.getCollisionBox(newPosition).getCenterY());
+    for (final CollisionBox collisionBox : this.getAllCollisionBoxesInternal()) {
+      if (collisionBox.getEntity() != null && (collisionBox.getEntity().equals(entity) || !entity.canCollideWith(collisionBox.getEntity()))) {
+        continue;
+      }
+
+      // there was a collision in between
+      final Point2D intersection = GeometricUtilities.getIntersectionPoint(line, collisionBox.getCollisionBox());
+      if (intersection != null) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private class CollisionBox {
