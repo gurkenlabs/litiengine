@@ -18,12 +18,12 @@ Example snippet:
 ```java
 Game.init();
 Game.start();
-Game.addTerminatedListener(() -> 
+Game.addGameTerminatedListener(() -> 
 {
   // do sth when game is shut down
 });
 
-System.out.println("Game version is: " + Game.info().getVersion());
+System.out.println("Game version is: " + Game.getInfo().getVersion());
 
 Game.audio().playSound(Sound.get("test.ogg"));
 ```
