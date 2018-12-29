@@ -3,6 +3,8 @@ package de.gurkenlabs.utiliti.swing.dialogs;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,7 +21,10 @@ import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class GridEditPanel extends JPanel {
-  private JSpinner widthSpinner, heightSpinner, strokeSpinner;
+  private static final Logger log = Logger.getLogger(GridEditPanel.class.getName());
+  private JSpinner widthSpinner;
+  private JSpinner heightSpinner;
+  private JSpinner strokeSpinner;
   private JButton buttonSetColor;
   private Color gridColor;
 
@@ -73,8 +78,7 @@ public class GridEditPanel extends JPanel {
     try {
       this.strokeSpinner.commitEdit();
     } catch (ParseException e) {
-      System.err.println("Your edits in the grid line thickness spinner could not be parsed as Float.");
-      e.printStackTrace();
+      log.log(Level.WARNING, "Your edits in the grid line thickness spinner could not be parsed as Float.");
     }
     return (Float) this.strokeSpinner.getValue();
   }
@@ -84,8 +88,7 @@ public class GridEditPanel extends JPanel {
       this.widthSpinner.commitEdit();
       this.heightSpinner.commitEdit();
     } catch (ParseException e) {
-      System.err.println("One of your edits in the grid size spinners could not be parsed as Integer.");
-      e.printStackTrace();
+      log.log(Level.WARNING, "\"One of your edits in the grid size spinners could not be parsed as Integer.");
     }
     return new Dimension((Integer) this.widthSpinner.getValue(), (Integer) this.heightSpinner.getValue());
   }
