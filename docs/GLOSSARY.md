@@ -1,0 +1,2 @@
+## MapObject
+The term that describes an abstract object on a tiled map. It contains a set of properties that further define how the object will be used/processed by the game engine. For example it can define certain attributes for a CollisionBox, a Creature or other types of entities. in the LITIengine.
