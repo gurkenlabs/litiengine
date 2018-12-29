@@ -26,9 +26,10 @@ public class RenderLoop extends UpdateLoop {
 
         long wait = Math.max(0, fpsWait - renderTime);
         if (wait != 0) {
-          Thread.sleep(wait);
+          sleep(wait);
         }
       } catch (final InterruptedException e) {
+        interrupt();
         break;
       }
     }

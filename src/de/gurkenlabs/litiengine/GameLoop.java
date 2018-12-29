@@ -109,8 +109,9 @@ public class GameLoop extends UpdateLoop implements IGameLoop, AutoCloseable {
       final long lastUpdateTime = currentMillis;
       final long updateTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - updateStart);
       try {
-        Thread.sleep(Math.max(0, tickWait - updateTime));
+        sleep(Math.max(0, tickWait - updateTime));
       } catch (final InterruptedException e) {
+        interrupt();
         break;
       }
 

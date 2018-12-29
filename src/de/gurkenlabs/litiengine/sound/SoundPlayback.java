@@ -101,6 +101,8 @@ final class SoundPlayback implements Runnable, ISoundPlayback {
             this.wait();
           }
         } catch (InterruptedException e) {
+          this.cancel();
+          Thread.currentThread().interrupt();
           continue;
         }
       }
