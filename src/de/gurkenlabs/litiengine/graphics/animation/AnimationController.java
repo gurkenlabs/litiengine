@@ -164,7 +164,7 @@ public class AnimationController implements IAnimationController {
       return null;
     }
 
-    return this.getAnimations().stream().findFirst().orElseGet(null);
+    return this.getAnimations().stream().findFirst().orElse(null);
   }
 
   @Override
@@ -231,7 +231,7 @@ public class AnimationController implements IAnimationController {
     this.animations.remove(animation.getName().toLowerCase());
 
     if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
-      this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElseGet(null));
+      this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElse(null));
     }
   }
 

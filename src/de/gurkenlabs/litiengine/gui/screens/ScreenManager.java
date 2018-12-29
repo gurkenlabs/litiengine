@@ -134,7 +134,7 @@ public class ScreenManager extends JFrame implements IScreenManager, GameWindow 
   @Override
   public Screen get(String screenName) {
     Optional<Screen> opt = this.screens.stream().filter(element -> element.getName().equalsIgnoreCase(screenName)).findFirst();
-    return opt.orElseGet(null);
+    return opt.orElse(null);
   }
 
   @Override
