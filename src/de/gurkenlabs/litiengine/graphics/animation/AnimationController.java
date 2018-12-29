@@ -3,9 +3,12 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -17,7 +20,7 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
-  private final List<Animation> animations;
+  private final Map<String, Animation> animations;
   private final List<IImageEffect> imageEffects;
   private final List<Consumer<Animation>> playbackConsumer;
   private final List<Consumer<Animation>> playbackFinishedConsumer;
@@ -27,7 +30,7 @@ public class AnimationController implements IAnimationController {
   private AffineTransform affineTransform;
 
   public AnimationController() {
-    this.animations = new CopyOnWriteArrayList<>();
+    this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
     this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
     this.playbackConsumer = new CopyOnWriteArrayList<>();
@@ -52,7 +55,7 @@ public class AnimationController implements IAnimationController {
     if (animations != null && animations.length > 0) {
       for (final Animation anim : animations) {
         if (anim != null) {
-          this.animations.add(anim);
+          this.animations.put(anim.getName().toLowerCase(), anim);
         }
       }
     }
@@ -64,12 +67,7 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    final Optional<Animation> oldAnimation = this.animations.stream().filter(x -> x.getName().equalsIgnoreCase(animation.getName())).findFirst();
-    if (oldAnimation.isPresent()) {
-      this.animations.remove(oldAnimation.get());
-    }
-
-    this.animations.add(animation);
+    this.animations.put(animation.getName().toLowerCase(), animation);
   }
 
   @Override
@@ -102,18 +100,17 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public List<Animation> getAnimations() {
-    return this.animations;
+  public Collection<Animation> getAnimations() {
+    return this.animations.values();
   }
 
   @Override
   public Animation getAnimation(String animationName) {
-    final Optional<Animation> opt = this.getAnimations().stream().filter(x -> x != null && x.getName().equalsIgnoreCase(animationName)).findFirst();
-    if (!opt.isPresent()) {
+    if (animationName == null || animationName.isEmpty()) {
       return null;
     }
 
-    return opt.get();
+    return this.animations.getOrDefault(animationName, null);
   }
 
   @Override
@@ -167,7 +164,7 @@ public class AnimationController implements IAnimationController {
       return null;
     }
 
-    return this.getAnimations().get(0);
+    return this.getAnimations().stream().findFirst().orElseGet(null);
   }
 
   @Override
@@ -178,11 +175,11 @@ public class AnimationController implements IAnimationController {
 
   @Override
   public boolean hasAnimation(String animationName) {
-    if (animationName == null || animationName.isEmpty() || this.getAnimations() == null) {
+    if (animationName == null || animationName.isEmpty()) {
       return false;
     }
 
-    return this.getAnimations().stream().anyMatch(x -> x.getName() != null && x.getName().equalsIgnoreCase(animationName));
+    return this.animations.containsKey(animationName.toLowerCase());
   }
 
   @Override
@@ -231,10 +228,10 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    this.animations.remove(animation);
+    this.animations.remove(animation.getName().toLowerCase());
 
     if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
-      this.setDefaultAnimation(!this.getAnimations().isEmpty() ? this.getAnimations().get(0) : null);
+      this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElseGet(null));
     }
   }
 
@@ -250,12 +247,12 @@ public class AnimationController implements IAnimationController {
   @Override
   public void setDefaultAnimation(Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
-      this.animations.remove(this.defaultAnimation);
+      this.animations.remove(this.defaultAnimation.getName().toLowerCase());
     }
 
     this.defaultAnimation = defaultAnimation;
     if (this.defaultAnimation != null) {
-      this.animations.add(this.defaultAnimation);
+      this.animations.put(this.defaultAnimation.getName().toLowerCase(), this.defaultAnimation);
     }
   }
 

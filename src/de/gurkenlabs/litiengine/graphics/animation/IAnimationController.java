@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.graphics.animation;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -13,7 +14,7 @@ public interface IAnimationController extends IUpdateable {
 
   public void add(IImageEffect effect);
 
-  public List<Animation> getAnimations();
+  public Collection<Animation> getAnimations();
 
   public Animation getAnimation(String animationName);
 

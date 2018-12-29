@@ -12,9 +12,10 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 public final class GameMetrics implements IUpdateable, IRenderable {
   private static final int OFFSET_X = 5;
   private static final int OFFSET_Y = 12;
-  
+
   private final List<Long> bytesReceived;
   private final List<Long> bytesSent;
+  private final Runtime runtime;
 
   private long downStreamInBytes;
   private long lastNetworkTickTime;
@@ -22,15 +23,16 @@ public final class GameMetrics implements IUpdateable, IRenderable {
   private int packagesSent;
   private long ping;
   private long upStreamInBytes;
-  
+
   private long framesPerSecond;
   private long updatesPerSecond;
-  
+
   private float usedMemory;
 
   GameMetrics() {
     this.bytesSent = new CopyOnWriteArrayList<>();
     this.bytesReceived = new CopyOnWriteArrayList<>();
+    this.runtime = Runtime.getRuntime();
   }
 
   public float getDownStreamInBytes() {
@@ -60,7 +62,7 @@ public final class GameMetrics implements IUpdateable, IRenderable {
   public float getUpStreamInBytes() {
     return this.upStreamInBytes;
   }
-  
+
   public float getUsedMemory() {
     return this.usedMemory;
   }
@@ -125,25 +127,27 @@ public final class GameMetrics implements IUpdateable, IRenderable {
 
   @Override
   public void update() {
-    final Runtime runtime = Runtime.getRuntime();
-    this.usedMemory = Math.round((runtime.totalMemory() - runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
-    
+    this.usedMemory = Math.round((this.runtime.totalMemory() - this.runtime.freeMemory()) / (1024f * 1024f) * 10) * 0.1f;
+
     final long currentMillis = System.currentTimeMillis();
     if (currentMillis - this.lastNetworkTickTime >= 1000) {
       this.lastNetworkTickTime = currentMillis;
 
-      Optional<Long> sentOpt = this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2);
-      final long sumUp = !this.bytesSent.isEmpty() && sentOpt.isPresent() ? sentOpt.get() : 0;
-      this.upStreamInBytes = sumUp;
-      this.packagesSent = this.bytesSent.size();
+      if (!this.bytesSent.isEmpty()) {
+        Optional<Long> sentOpt = this.bytesSent.parallelStream().reduce((n1, n2) -> n1 + n2);
+        final long sumUp = !this.bytesSent.isEmpty() && sentOpt.isPresent() ? sentOpt.get() : 0;
+        this.upStreamInBytes = sumUp;
+        this.packagesSent = this.bytesSent.size();
+        this.bytesSent.clear();
+      }
 
-      Optional<Long> receivedOpt = this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2);
-      final long sumDown = !this.bytesReceived.isEmpty() && receivedOpt.isPresent() ? receivedOpt.get() : 0;
-      this.downStreamInBytes = sumDown;
-      this.packagesReceived = this.bytesReceived.size();
-
-      this.bytesSent.clear();
-      this.bytesReceived.clear();
+      if (!this.bytesReceived.isEmpty()) {
+        Optional<Long> receivedOpt = this.bytesReceived.parallelStream().reduce((n1, n2) -> n1 + n2);
+        final long sumDown = !this.bytesReceived.isEmpty() && receivedOpt.isPresent() ? receivedOpt.get() : 0;
+        this.downStreamInBytes = sumDown;
+        this.packagesReceived = this.bytesReceived.size();
+        this.bytesReceived.clear();
+      }
     }
   }
 }

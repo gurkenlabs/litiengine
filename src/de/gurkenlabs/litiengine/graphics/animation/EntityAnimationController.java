@@ -3,9 +3,8 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -17,14 +16,13 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EntityAnimationController<T extends IEntity> extends AnimationController implements IEntityAnimationController {
-  private final Map<Predicate<IEntity>, Function<IEntity, String>> animationRules;
+  private final List<AnimationRule> animationRules = new CopyOnWriteArrayList<>();
   private final T entity;
   private String spritePrefix;
   private boolean autoScaling;
 
   public EntityAnimationController(final T entity) {
     super();
-    this.animationRules = new ConcurrentHashMap<>();
     this.entity = entity;
 
     if (entity != null) {
@@ -34,7 +32,6 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   public EntityAnimationController(final T entity, final Animation defaultAnimation, final Animation... animations) {
     super(defaultAnimation, animations);
-    this.animationRules = new ConcurrentHashMap<>();
     this.entity = entity;
 
     this.spritePrefix = ArrayUtilities.getRandom(getDefaultSpritePrefixes(entity.getClass()));
@@ -59,7 +56,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
 
   @Override
   public void addAnimationRule(Predicate<IEntity> rule, Function<IEntity, String> animationName) {
-    this.animationRules.put(rule, animationName);
+    this.animationRules.add(new AnimationRule(rule, animationName));
   }
 
   @Override
@@ -83,9 +80,9 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
       return;
     }
 
-    for (Entry<Predicate<IEntity>, Function<IEntity, String>> animationRule : this.animationRules.entrySet()) {
-      if (animationRule.getKey().test(this.getEntity())) {
-        final String animationName = animationRule.getValue().apply(this.getEntity());
+    for (AnimationRule animationRule : this.animationRules) {
+      if (animationRule.getCondition().test(this.getEntity())) {
+        final String animationName = animationRule.getAnimationName().apply(this.getEntity());
         if (this.getCurrentAnimation() == null || animationName != null && !animationName.isEmpty() && !this.getCurrentAnimation().getName().equalsIgnoreCase(animationName)) {
           this.playAnimation(animationName);
         }
@@ -138,5 +135,23 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
   @Override
   public void scaleSprite(float scale) {
     this.scaleSprite(scale, scale);
+  }
+  
+  protected class AnimationRule{
+    private final Predicate<IEntity> condition;
+    private final Function<IEntity, String> animationName;
+    
+    AnimationRule(Predicate<IEntity> condition, Function<IEntity, String> animationName){
+      this.condition = condition;
+      this.animationName = animationName;
+    }
+    
+    Predicate<IEntity> getCondition(){
+      return this.condition;
+    }
+    
+    Function<IEntity, String> getAnimationName(){
+      return this.animationName;
+    }
   }
 }
