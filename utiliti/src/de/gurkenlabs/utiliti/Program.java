@@ -62,6 +62,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -129,7 +130,9 @@ public class Program {
 
     Game.config().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
-    Game.setUncaughtExceptionHandler(new EditorUncaughtExceptionHandler());
+    
+    // the editor should never crash, even if an exception occurs
+    Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
 
     forceBasicEditorConfiguration();
 

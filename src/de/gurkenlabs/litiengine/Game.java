@@ -477,7 +477,7 @@ public final class Game {
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
 
-    setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+    setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
     screenManager = scrMgr;
 
@@ -577,7 +577,7 @@ public final class Game {
         return;
       }
     }
-    
+
     hasStarted = false;
     initialized = false;
 

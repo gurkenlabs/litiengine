@@ -18,6 +18,8 @@ public class ClientConfiguration extends ConfigurationGroup {
 
   private int updaterate;
 
+  private boolean exitOnError;
+
   /**
    * Instantiates a new client configuration.
    */
@@ -26,6 +28,7 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.setUpdaterate(60);
     this.setMaxFps(60);
     this.setShowGameMetrics(false);
+    this.setExitOnError(false);
 
     this.setLanguage(Locale.getDefault().getLanguage());
     this.setCountry(Locale.getDefault().getCountry());
@@ -105,7 +108,15 @@ public class ClientConfiguration extends ConfigurationGroup {
     this.updaterate = updaterate;
   }
 
+  public void setExitOnError(boolean exit) {
+    this.exitOnError = exit;
+  }
+
   public boolean showGameMetrics() {
     return this.showGameMetrics;
+  }
+
+  public boolean exitOnError() {
+    return this.exitOnError;
   }
 }
