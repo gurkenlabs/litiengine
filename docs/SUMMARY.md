@@ -11,7 +11,7 @@
     * Configuring Default Behavior and Appearance
     * The Game Configuration File
 
-* [The Engine's Main Components (Game API)](game-api/README.md)
+* [The Main Components](game-api/README.md)
     * 2D Graphics 
     * 2D Audio
     * 2D Physics
@@ -19,13 +19,13 @@
     * Creating Screens
     * The Game World
 
-* [Managing Resources (Resources API)](managing-resources/README.md)
+* [Managing Resources](managing-resources/README.md)
     * Sounds and Music
     * Images
     * Custom Fonts
     * Text
 
-* [Managing Player Input (Input API)](managing-input/README.md)
+* [Managing Player Input](managing-input/README.md)
     * Keyboard Input
     * Mouse Input
     * GamePad Input
