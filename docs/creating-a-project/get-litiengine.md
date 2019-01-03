@@ -10,6 +10,8 @@ There are multiple ways to achieve this. The library is distributed over the [Ma
 compile 'de.gurkenlabs:litiengine:0.4.14'
 ```
 
+A basic example for a Gradle based LITIengine project can be found [HERE](https://github.com/gurkenlabs/litiengine/tree/master/examples/hello-liti-gradle).
+
 ### Apache Maven
 ```xml
 <dependency>
@@ -18,6 +20,8 @@ compile 'de.gurkenlabs:litiengine:0.4.14'
   <version>0.4.14</version>
 </dependency>
 ```
+
+A basic example for a Maven based LITIengine project can be found [HERE](https://github.com/gurkenlabs/litiengine/tree/master/examples/hello-liti-maven).
 
 ### Manual Download
 [litiengine-0.4.14.jar](https://search.maven.org/remotecontent?filepath=de/gurkenlabs/litiengine/0.4.14/litiengine-0.4.14.jar)
