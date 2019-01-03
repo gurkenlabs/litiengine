@@ -5,46 +5,74 @@
     * [Get LITIengine](creating-a-project/get-litiengine.md)
     * [The utiLITI editor](creating-a-project/utiliti-editor.md)
 
-* [Setting up the basics](basic-setup/README.md)
-    * [The Game API](basic-setup/game-class.md)
-    * The Game Loop
-    * Creating screens
+* [Setting up the Basics](basic-setup/README.md)
+    * Preparing the Game Window
+    * Setting Metadata
+    * Configuring Default Behavior and Appearance
+    * The Game Configuration File
 
-* [Managing resources](managing-resources/README.md)
-    * [The Resources API](managing-resources/resources-api.md)
-    * Sounds
+* [The Engine's Main Components (Game API)](game-api/README.md)
+    * 2D Graphics 
+    * 2D Audio
+    * 2D Physics
+    * Understanding GameLoops
+    * Creating Screens
+    * The Game World
+
+* [Managing Resources (Resources API)](managing-resources/README.md)
+    * Sounds and Music
     * Images
-    * Fonts
+    * Custom Fonts
     * Text
 
-* [Configuring the game](game-configuration/README.md)
-    * Setting Metadata
-    * Configuration Files
-    * Default behaviour
+* [Managing Player Input (Input API)](managing-input/README.md)
+    * Keyboard Input
+    * Mouse Input
+    * GamePad Input
 
-* [Creating a map](map-creation/README.md)
+* [Creating Maps](map-creation/README.md)
     * Map creation with Tiled
     * Importing maps into utiLITI
+    * Understanding MapObjects
     * The Environment
-    * MapObjects and Entities
-    * Lighting
-    * Triggers
-    * Emitters
 
 * [Importing Maps](importing-maps/README.md)
     * PropertyProviders
     * Loading maps from the .litidata file
     * Loading external maps
 
-* [Controlling entities](controlling-entities/README.md)
-    * [The Input API](controlling-entities/input.md)
-    * Animation
-    * Movement and behaviours
-    * The messaging system
+* [The Entity Framework](entity-framework/README.md)
+    * Default Entity Types
+    * Subscribing to Entity Events
+    * Using Annotations for static Information
+
+* [Controlling an Entity](controlling-entities/README.md)
+    * The Concept of EntityControllers
+    * Controlling Animation
+    * Controlling Movement
+    * Controlling Behavior
+    * The Messaging System
+    * The Ability Framework
 
 * [Graphical User Interface](graphical-user-interface/README.md)
     * GuiComponents: An Overview
     * Creating Menus
+
+## Advanced
+
+* Static Lighting
+* Dynamic Lighting
+* Advanced Entity Knowledge
+    * Triggers
+    * Custom Entity Implementations
+
+* Custom MapObjectLoaders
+* String Localization
+* The Particle System 
+* Network Communication
+* Utility Classes
+* Object Serialization
+* A few tips on performance
 
 ## Deployment
 

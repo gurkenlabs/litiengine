@@ -1,1 +1,1 @@
-# Getting Started
+# Graphical User Interface
