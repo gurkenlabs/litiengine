@@ -53,7 +53,7 @@ jar {
 
   from('resources') { include '**/*' }
   
-  version = 'v0.4.14-alpha'
+  version = 'v0.4.15-alpha'
   exclude '**/*.dll'
   exclude '**/*.jnilib'
   exclude '**/*.dylib'
@@ -86,13 +86,13 @@ task createJavadocs(type: Javadoc) {
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
   from javadoc
-  version = 'v0.4.14-alpha'
+  version = 'v0.4.15-alpha'
 }
 
 task sourcesJar(type: Jar) {
   classifier = 'sources'
   from sourceSets.main.allSource
-  version = 'v0.4.14-alpha'
+  version = 'v0.4.15-alpha'
 }
 
 artifacts {
@@ -106,7 +106,7 @@ tasks.withType(JavaCompile) {
 
 group = "de.gurkenlabs"
 archivesBaseName = "litiengine"
-version = "0.4.14"
+version = "0.4.15"
 
 uploadArchives {
   repositories {
