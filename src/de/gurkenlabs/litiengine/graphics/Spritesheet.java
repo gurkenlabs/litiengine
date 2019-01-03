@@ -106,10 +106,10 @@ public final class Spritesheet {
   }
 
   public BufferedImage getSprite(final int index, final int margin, final int spacing) {
-    if (this.emptySprites.contains(index)) {
+    if (this.emptySprites.contains(index) || this.sprites.length == 0) {
       return null;
     }
-
+    
     if (this.sprites[index] != null) {
       return this.sprites[index];
     }
