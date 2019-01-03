@@ -53,6 +53,10 @@ public class ImageLayer extends Layer implements IImageLayer {
   }
 
   public void setMapPath(final String path) {
+    if (this.image == null) {
+      return;
+    }
+
     this.image.setAbsolutePath(path);
   }
 
