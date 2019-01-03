@@ -9,13 +9,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public final class PhysicsEngine implements IPhysicsEngine {
+public final class PhysicsEngine implements IUpdateable {
   private final List<ICollisionEntity> collisionEntities;
 
   private Rectangle2D environmentBounds;
@@ -38,7 +39,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     this.entityCollisionBoxRectangles = new CopyOnWriteArrayList<>();
   }
 
-  @Override
   public void add(final ICollisionEntity entity) {
     if (entity instanceof Prop) {
       Prop prop = (Prop) entity;
@@ -53,41 +53,70 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
   }
 
-  @Override
   public void add(final Rectangle2D staticCollisionBox) {
     if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
       this.staticCollisionBoxes.add(staticCollisionBox);
     }
   }
 
-  @Override
+  public void remove(final ICollisionEntity entity) {
+    if (entity instanceof Prop) {
+      Prop prop = (Prop) entity;
+      if (prop.isObstacle()) {
+        this.remove(prop.getCollisionBox());
+        return;
+      }
+    }
+  
+    this.collisionEntities.remove(entity);
+  }
+
+  public void remove(final Rectangle2D staticCollisionBox) {
+    this.staticCollisionBoxes.remove(staticCollisionBox);
+  }
+
   public void clear() {
     this.staticCollisionBoxes.clear();
     this.collisionEntities.clear();
     this.setBounds(null);
   }
 
-  @Override
+  public List<Rectangle2D> getAllCollisionBoxes() {
+    return this.getAllCollisionBoxRectangles();
+  }
+
+  public List<ICollisionEntity> getCollisionEntities() {
+    return this.collisionEntities;
+  }
+
+  public List<Rectangle2D> getStaticCollisionBoxes() {
+    return this.staticCollisionBoxes;
+  }
+
+  public Rectangle2D getBounds() {
+    return this.environmentBounds;
+  }
+
+  public void setBounds(final Rectangle2D environmentBounds) {
+    this.environmentBounds = environmentBounds;
+  }
+
   public boolean collides(final double x, final double y) {
     return this.collides(new Point2D.Double(x, y));
   }
 
-  @Override
   public boolean collides(double x, double y, CollisionType collisionType) {
     return this.collides(new Point2D.Double(x, y), collisionType);
   }
 
-  @Override
   public boolean collides(double x, double y, ICollisionEntity collisionEntity) {
     return collides(new Point2D.Double(x, y), collisionEntity);
   }
 
-  @Override
   public boolean collides(Point2D point, ICollisionEntity collisionEntity) {
     return this.collidesWithAnyEntity(collisionEntity, point) || this.collidesWithAnyStaticCollisionBox(point);
   }
 
-  @Override
   public boolean collides(Point2D point, CollisionType collisionType) {
     switch (collisionType) {
     case ALL:
@@ -101,7 +130,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
   }
 
-  @Override
   public Point2D collides(Line2D rayCast, CollisionType collisionType) {
     final Point2D rayCastSource = new Point2D.Double(rayCast.getX1(), rayCast.getY1());
 
@@ -125,12 +153,10 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return null;
   }
 
-  @Override
   public Point2D collides(final Line2D rayCast) {
     return this.collides(rayCast, CollisionType.ALL);
   }
 
-  @Override
   public boolean collides(final Point2D point) {
     if (this.environmentBounds != null && !this.environmentBounds.contains(point)) {
       return true;
@@ -145,7 +171,6 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  @Override
   public boolean collides(final Rectangle2D rect) {
     for (final Rectangle2D collisionBox : this.getAllCollisionBoxes()) {
       if (GeometricUtilities.intersects(rect, collisionBox)) {
@@ -156,17 +181,29 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return false;
   }
 
-  @Override
+  /**
+   * Checks whether the specified rectangle collides with anything.
+   * 
+   * @param rect
+   *          The rectangle to check the collision for.
+   * @param collisionType
+   *          use the following flags
+   *          <ul>
+   *          <li>COLLTYPE_ENTITY</li>
+   *          <li>COLLTYPE_STATIC</li>
+   *          <li>COLLTYPE_ALL</li>
+   *          </ul>
+   * @return Returns true if the specified rectangle collides with any collision
+   *         box of the specified type(s); otherwise false.
+   */
   public boolean collides(final Rectangle2D rect, final CollisionType collisionType) {
     return collides(rect, null, collisionType);
   }
 
-  @Override
   public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity) {
     return this.collides(rect, collisionEntity, CollisionType.ALL);
   }
 
-  @Override
   public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity, CollisionType collisionType) {
     switch (collisionType) {
     case ALL:
@@ -180,58 +217,43 @@ public final class PhysicsEngine implements IPhysicsEngine {
     }
   }
 
-  @Override
   public boolean collides(ICollisionEntity collisionEntity) {
     return this.collides(collisionEntity, CollisionType.ALL);
   }
 
-  @Override
   public boolean collides(ICollisionEntity collisionEntity, CollisionType collisionType) {
     return this.collides(collisionEntity.getCollisionBox(), collisionEntity, collisionType);
   }
 
-  @Override
-  public List<Rectangle2D> getAllCollisionBoxes() {
-    return this.getAllCollisionBoxRectangles();
-  }
-
-  @Override
-  public List<ICollisionEntity> getCollisionEntities() {
-    return this.collisionEntities;
-  }
-
-  @Override
-  public List<Rectangle2D> getStaticCollisionBoxes() {
-    return this.staticCollisionBoxes;
-  }
-
-  @Override
-  public Rectangle2D getBounds() {
-    return this.environmentBounds;
-  }
-
-  @Override
+  /**
+   * Moves the specified entity by the delta in the direction of the angle.
+   *
+   * @param entity
+   *          the entity
+   * @param angle
+   *          the angle
+   * @param delta
+   *          the delta
+   * @return true, if successful, false if the physics engine detected a
+   *         collision.
+   */
   public boolean move(final IMobileEntity entity, final double angle, final double delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
   }
 
-  @Override
   public boolean move(IMobileEntity entity, Direction direction, double delta) {
     return this.move(entity, direction.toAngle(), delta);
   }
 
-  @Override
   public boolean move(final IMobileEntity entity, final double x, final double y, final float delta) {
     return this.move(entity, new Point2D.Double(x, y), delta);
   }
 
-  @Override
   public boolean move(final IMobileEntity entity, final float delta) {
     return this.move(entity, entity.getAngle(), delta);
   }
 
-  @Override
   public boolean move(final IMobileEntity entity, Point2D newLocation) {
     if (entity.turnOnMove()) {
       entity.setAngle((float) GeometricUtilities.calcRotationAngleInDegrees(entity.getLocation(), newLocation));
@@ -264,36 +286,11 @@ public final class PhysicsEngine implements IPhysicsEngine {
     return true;
   }
 
-  @Override
   public boolean move(final IMobileEntity entity, final Point2D target, final float delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), target, delta);
     return this.move(entity, newPosition);
   }
 
-  @Override
-  public void remove(final ICollisionEntity entity) {
-    if (entity instanceof Prop) {
-      Prop prop = (Prop) entity;
-      if (prop.isObstacle()) {
-        this.remove(prop.getCollisionBox());
-        return;
-      }
-    }
-
-    this.collisionEntities.remove(entity);
-  }
-
-  @Override
-  public void remove(final Rectangle2D staticCollisionBox) {
-    this.staticCollisionBoxes.remove(staticCollisionBox);
-  }
-
-  @Override
-  public void setBounds(final Rectangle2D environmentBounds) {
-    this.environmentBounds = environmentBounds;
-  }
-
-  @Override
   public void update() {
     this.updateAllCollisionBoxes();
   }

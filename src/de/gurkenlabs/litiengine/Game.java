@@ -38,7 +38,6 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
-import de.gurkenlabs.litiengine.physics.IPhysicsEngine;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.sound.ISoundEngine;
@@ -88,7 +87,7 @@ public final class Game {
 
   private static final RenderEngine graphicsEngine;
   private static final SoundEngine soundEngine;
-  private static final IPhysicsEngine physicsEngine;
+  private static final PhysicsEngine physicsEngine;
 
   private static final GameConfiguration configuration;
   private static final GameMetrics metrics;
@@ -317,7 +316,7 @@ public final class Game {
    * @see PhysicsEngine#move(IMobileEntity, float)
    * @see ICollisionEntity
    */
-  public static IPhysicsEngine physics() {
+  public static PhysicsEngine physics() {
     return physicsEngine;
   }
 

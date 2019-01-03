@@ -17,7 +17,7 @@ public class CollisionResolvingTests {
   public void testBasicMovement() {
     Creature ent = getNewCreature();
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
@@ -47,7 +47,7 @@ public class CollisionResolvingTests {
   public void testCollidingHorizontalMovement() {
     Creature ent = getNewCreature();
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
@@ -83,7 +83,7 @@ public class CollisionResolvingTests {
   public void testCollidingVerticalMovement() {
     Creature ent = getNewCreature();
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
 
     // large rectangle at the right of the entity
@@ -120,7 +120,7 @@ public class CollisionResolvingTests {
   public void testFailingPhysics() {
     Creature ent = getNewCreature();
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.add(ent);
 
     // large rectangle at the bottom of the entity
@@ -181,7 +181,7 @@ public class CollisionResolvingTests {
     ent.setCollisionBoxAlign(Align.CENTER);
     ent.setCollisionBoxValign(Valign.MIDDLE);
 
-    IPhysicsEngine engine = new PhysicsEngine();
+    PhysicsEngine engine = new PhysicsEngine();
     engine.setBounds(new Rectangle2D.Double(0, 0, 50, 50));
     engine.add(ent);
     
