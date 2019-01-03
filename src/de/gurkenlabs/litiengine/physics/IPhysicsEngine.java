@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
@@ -15,6 +16,20 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public void add(Rectangle2D staticCollisionBox);
 
+  public void remove(ICollisionEntity entity);
+
+  public void remove(Rectangle2D staticCollisionBox);
+
+  public List<Rectangle2D> getAllCollisionBoxes();
+
+  public List<ICollisionEntity> getCollisionEntities();
+
+  public List<Rectangle2D> getStaticCollisionBoxes();
+
+  public void setBounds(Rectangle2D environmentBounds);
+
+  public Rectangle2D getBounds();
+
   public void clear();
 
   public boolean collides(double x, double y);
@@ -23,15 +38,15 @@ public interface IPhysicsEngine extends IUpdateable {
 
   public boolean collides(double x, double y, CollisionType collisionType);
 
-  public Point2D collides(Line2D rayCast);
-  
-  public Point2D collides(Line2D rayCast, CollisionType collisionType);
-
   public boolean collides(Point2D point);
 
   public boolean collides(Point2D point, CollisionType collisionType);
 
   public boolean collides(Point2D point, ICollisionEntity collisionEntity);
+
+  public Point2D collides(Line2D rayCast);
+
+  public Point2D collides(Line2D rayCast, CollisionType collisionType);
 
   public boolean collides(Rectangle2D rect);
 
@@ -51,18 +66,14 @@ public interface IPhysicsEngine extends IUpdateable {
    *         box of the specified type(s); otherwise false.
    */
   public boolean collides(Rectangle2D rect, CollisionType collisionType);
-  
+
   public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity, CollisionType collisionType);
-  
+
   public boolean collides(Rectangle2D rect, ICollisionEntity collisionEntity);
 
-  public List<ICollisionEntity> collidesWithEntities(Rectangle2D rect);
+  public boolean collides(ICollisionEntity collisionEntity);
 
-  public List<Rectangle2D> getAllCollisionBoxes();
-
-  public List<ICollisionEntity> getCollisionEntities();
-
-  public List<Rectangle2D> getStaticCollisionBoxes();
+  public boolean collides(ICollisionEntity collisionEntity, CollisionType collisionType);
 
   /**
    * Moves the specified entity by the delta in the direction of the angle.
@@ -78,19 +89,13 @@ public interface IPhysicsEngine extends IUpdateable {
    */
   public boolean move(IMobileEntity entity, double angle, double delta);
 
+  public boolean move(IMobileEntity entity, Direction direction, double delta);
+
   public boolean move(IMobileEntity entity, double x, double y, float delta);
 
   public boolean move(IMobileEntity entity, float delta);
 
-  public boolean move(final IMobileEntity entity, Point2D newPosition);
+  public boolean move(IMobileEntity entity, Point2D newPosition);
 
   public boolean move(IMobileEntity entity, Point2D target, float delta);
-
-  public void remove(ICollisionEntity entity);
-
-  public void remove(Rectangle2D staticCollisionBox);
-
-  public void setBounds(Rectangle2D environmentBounds);
-
-  public Rectangle2D getBounds();
 }

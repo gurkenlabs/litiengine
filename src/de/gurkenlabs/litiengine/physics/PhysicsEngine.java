@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.entities.Prop;
@@ -63,6 +64,7 @@ public final class PhysicsEngine implements IPhysicsEngine {
   public void clear() {
     this.staticCollisionBoxes.clear();
     this.collisionEntities.clear();
+    this.setBounds(null);
   }
 
   @Override
@@ -179,15 +181,13 @@ public final class PhysicsEngine implements IPhysicsEngine {
   }
 
   @Override
-  public List<ICollisionEntity> collidesWithEntities(final Rectangle2D rect) {
-    final List<ICollisionEntity> collEntities = new CopyOnWriteArrayList<>();
-    for (final ICollisionEntity coll : this.getCollisionEntities()) {
-      if (coll.getCollisionBox().intersects(rect)) {
-        collEntities.add(coll);
-      }
-    }
+  public boolean collides(ICollisionEntity collisionEntity) {
+    return this.collides(collisionEntity, CollisionType.ALL);
+  }
 
-    return collEntities;
+  @Override
+  public boolean collides(ICollisionEntity collisionEntity, CollisionType collisionType) {
+    return this.collides(collisionEntity.getCollisionBox(), collisionEntity, collisionType);
   }
 
   @Override
@@ -214,6 +214,11 @@ public final class PhysicsEngine implements IPhysicsEngine {
   public boolean move(final IMobileEntity entity, final double angle, final double delta) {
     final Point2D newPosition = GeometricUtilities.project(entity.getLocation(), angle, delta);
     return this.move(entity, newPosition);
+  }
+
+  @Override
+  public boolean move(IMobileEntity entity, Direction direction, double delta) {
+    return this.move(entity, direction.toAngle(), delta);
   }
 
   @Override
