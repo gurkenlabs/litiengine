@@ -105,7 +105,7 @@ public abstract class ResourcesContainer<T> {
    * @see #tryGet(String)
    */
   public void add(String resourceName, T resource) {
-    String identifier = resourceName.toLowerCase();
+    String identifier = resourceName;
 
     this.resources.put(identifier, resource);
 
@@ -138,7 +138,7 @@ public abstract class ResourcesContainer<T> {
    * @see ResourcesContainer#contains(Object)
    */
   public boolean contains(String resourceName) {
-    return this.resources.containsKey(resourceName.toLowerCase());
+    return this.resources.containsKey(resourceName);
   }
 
   /**
@@ -207,7 +207,7 @@ public abstract class ResourcesContainer<T> {
    * @return T The resource with the specified name.
    */
   public T get(String resourceName, Supplier<T> loadCallback) {
-    String identifier = resourceName.toLowerCase();
+    String identifier = resourceName;
     Optional<T> opt = this.tryGet(identifier);
     if (opt.isPresent()) {
       return opt.get();
@@ -241,6 +241,10 @@ public abstract class ResourcesContainer<T> {
 
     if (forceLoad) {
       T resource = this.loadResource(identifier);
+      if (resource == null) {
+        return null;
+      }
+
       this.resources.put(identifier, resource);
 
       return resource;
@@ -266,7 +270,7 @@ public abstract class ResourcesContainer<T> {
    * @return The removed resource.
    */
   public T remove(String resourceName) {
-    T removedResource = this.resources.remove(resourceName.toLowerCase());
+    T removedResource = this.resources.remove(resourceName);
 
     if (removedResource != null) {
       for (ResourcesContainerListener<T> listener : this.listeners) {
@@ -298,7 +302,7 @@ public abstract class ResourcesContainer<T> {
     if (this.contains(resourceName)) {
       return Optional.of(this.get(resourceName));
     }
-    
+
     return Optional.empty();
   }
 
@@ -327,14 +331,14 @@ public abstract class ResourcesContainer<T> {
 
     String alias = this.getAlias(identifier, newResource);
     if (alias != null) {
-      this.aliases.put(alias.toLowerCase(), identifier);
+      this.aliases.put(alias, identifier);
     }
 
     return newResource;
   }
 
   private String getIdentifier(String resourceName) {
-    String res = resourceName.toLowerCase();
+    String res = resourceName;
     if (this.resources.containsKey(res)) {
       return res;
     }
