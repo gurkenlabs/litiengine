@@ -467,9 +467,8 @@ public final class Game {
     Locale.setDefault(new Locale(config().client().getCountry(), config().client().getLanguage()));
 
     gameLoop = new GameLoop("Main Update Loop", config().client().getUpdaterate());
-    gameLoop.attach(physics());
-    gameLoop.attach(metrics());
-    gameLoop.attach(world());
+    loop().attach(physics());
+    loop().attach(world());
 
     final ScreenManager scrMgr = new ScreenManager(info().getTitle());
 

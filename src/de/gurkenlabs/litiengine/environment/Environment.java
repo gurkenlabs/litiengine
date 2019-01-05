@@ -18,12 +18,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.GameMetrics;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -853,10 +853,12 @@ public class Environment implements IEnvironment {
     }
 
     for (String tag : entity.getTags()) {
-      this.getEntitiesByTag().get(tag).remove(entity);
+      if (this.getEntitiesByTag().containsKey(tag)) {
+        this.getEntitiesByTag().get(tag).remove(entity);
 
-      if (this.getEntitiesByTag().get(tag).isEmpty()) {
-        this.getEntitiesByTag().remove(tag);
+        if (this.getEntitiesByTag().get(tag).isEmpty()) {
+          this.getEntitiesByTag().remove(tag);
+        }
       }
     }
 
@@ -955,19 +957,18 @@ public class Environment implements IEnvironment {
   public void render(final Graphics2D g) {
     g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
 
-    StringBuilder renderDetails = new StringBuilder();
     long renderStart = System.nanoTime();
 
-    renderDetails.append(this.render(g, RenderType.BACKGROUND));
+    this.render(g, RenderType.BACKGROUND);
 
-    renderDetails.append(this.render(g, RenderType.GROUND));
+    this.render(g, RenderType.GROUND);
     if (Game.config().debug().isDebug()) {
       DebugRenderer.renderMapDebugInfo(g, this.getMap());
     }
 
-    renderDetails.append(this.render(g, RenderType.SURFACE));
+    this.render(g, RenderType.SURFACE);
 
-    renderDetails.append(this.render(g, RenderType.NORMAL));
+    this.render(g, RenderType.NORMAL);
 
     long shadowRenderStart = System.nanoTime();
     if (this.getStaticShadows().stream().anyMatch(x -> x.getShadowType() != StaticShadowType.NONE)) {
@@ -976,7 +977,7 @@ public class Environment implements IEnvironment {
 
     final double shadowTime = TimeUtilities.nanoToMs(System.nanoTime() - shadowRenderStart);
 
-    renderDetails.append(this.render(g, RenderType.OVERLAY));
+    this.render(g, RenderType.OVERLAY);
 
     long ambientStart = System.nanoTime();
     if (Game.config().graphics().getGraphicQuality().ordinal() >= Quality.MEDIUM.ordinal() && this.getAmbientLight() != null && this.getAmbientLight().getColor().getAlpha() != 0) {
@@ -985,11 +986,15 @@ public class Environment implements IEnvironment {
 
     final double ambientTime = TimeUtilities.nanoToMs(System.nanoTime() - ambientStart);
 
-    renderDetails.append(this.render(g, RenderType.UI));
+    this.render(g, RenderType.UI);
 
-    if (Game.config().debug().isLogDetailedRenderTimes()) {
+    if (Game.config().debug().trackRenderTimes()) {
+
       final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-      log.log(Level.INFO, "total render time: {0}ms \n{1} \tSHADOWS: {2}ms \n\tAMBIENT: {3}ms ", new Object[] { totalRenderTime, renderDetails, shadowTime, ambientTime });
+
+      Game.metrics().trackRenderTime("shadow", shadowTime);
+      Game.metrics().trackRenderTime("ambient", ambientTime);
+      Game.metrics().trackRenderTime("world", totalRenderTime);
     }
 
     g.scale(1.0 / Game.world().camera().getRenderScale(), 1.0 / Game.world().camera().getRenderScale());
@@ -1104,7 +1109,7 @@ public class Environment implements IEnvironment {
     return null;
   }
 
-  private String render(Graphics2D g, RenderType renderType) {
+  private void render(Graphics2D g, RenderType renderType) {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
@@ -1121,15 +1126,13 @@ public class Environment implements IEnvironment {
     // 4. fire event
     this.fireRenderEvent(g, renderType);
 
-    if (Game.config().debug().isLogDetailedRenderTimes()) {
+    if (Game.config().debug().trackRenderTimes()) {
       final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
-      return "\t" + renderType + ": " + renderTime + "ms ("
-          + this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count() + " layers, "
-          + this.getRenderables(renderType).size() + " renderables, "
-          + this.entities.get(renderType).size() + " entities)\n";
+      Game.metrics().trackRenderTime(renderType.toString().toLowerCase(), renderTime,
+          new GameMetrics.RenderInfo("layers", this.getMap().getRenderLayers().stream().filter(m -> m.getRenderType() == renderType).count()),
+          new GameMetrics.RenderInfo("renderables", this.getRenderables(renderType).size()),
+          new GameMetrics.RenderInfo("entities", this.entities.get(renderType).size()));
     }
-
-    return null;
   }
 
   private void addAmbientLight() {

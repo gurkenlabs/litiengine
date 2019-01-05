@@ -22,7 +22,7 @@ public class DebugConfiguration extends ConfigurationGroup {
 
   private boolean showTilesMetric = false;
 
-  private boolean logDetailedRenderTimes = false;
+  private boolean trackRenderTimes = false;
 
   /**
    * Checks if is debug enabled.
@@ -70,9 +70,31 @@ public class DebugConfiguration extends ConfigurationGroup {
   }
 
   public boolean renderGuiComponentBoundingBoxes() {
-    return renderGuiComponentBoundingBoxes;
+    return this.isDebugEnabled() && this.renderGuiComponentBoundingBoxes;
+  }
+  /**
+   * Show mouse target metric.
+   *
+   * @return true, if successful
+   */
+  public boolean showMouseTargetMetric() {
+    return this.isDebugEnabled() && this.showMouseTargetMetric;
   }
 
+  /**
+   * Show tiles metric.
+   *
+   * @return true, if successful
+   */
+  // game metric settings
+  public boolean showTilesMetric() {
+    return this.isDebugEnabled() && this.showTilesMetric;
+  }
+
+  public boolean trackRenderTimes() {
+    return this.isDebugEnabled() && this.trackRenderTimes;
+  }
+  
   public void setDebugEnabled(final boolean debugEnabled) {
     this.debugEnabled = debugEnabled;
   }
@@ -109,30 +131,7 @@ public class DebugConfiguration extends ConfigurationGroup {
     this.renderGuiComponentBoundingBoxes = renderGuiComponentBoundingBoxes;
   }
 
-  /**
-   * Show mouse target metric.
-   *
-   * @return true, if successful
-   */
-  public boolean showMouseTargetMetric() {
-    return this.isDebugEnabled() && this.showMouseTargetMetric;
-  }
-
-  /**
-   * Show tiles metric.
-   *
-   * @return true, if successful
-   */
-  // game metric settings
-  public boolean showTilesMetric() {
-    return this.isDebugEnabled() && this.showTilesMetric;
-  }
-
-  public boolean isLogDetailedRenderTimes() {
-    return logDetailedRenderTimes;
-  }
-
-  public void setLogDetailedRenderTimes(boolean logDetailedRenderTimes) {
-    this.logDetailedRenderTimes = logDetailedRenderTimes;
+  public void setTrackRenderTimes(boolean trackRenderTimes) {
+    this.trackRenderTimes = trackRenderTimes;
   }
 }

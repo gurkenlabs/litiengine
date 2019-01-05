@@ -30,6 +30,7 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
@@ -146,7 +147,13 @@ public class RenderComponent extends Canvas implements IInitializable {
 
         final Screen currentScreen = Game.screens().current();
         if (currentScreen != null) {
+          long renderStart = System.nanoTime();
           currentScreen.render(g);
+
+          if (Game.config().debug().trackRenderTimes()) {
+            final double totalRenderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+            Game.metrics().trackRenderTime("screen", totalRenderTime);
+          }
         }
 
         final Point locationOnScreen = this.getLocationOnScreen();

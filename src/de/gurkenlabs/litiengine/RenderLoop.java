@@ -22,9 +22,14 @@ public class RenderLoop extends UpdateLoop {
 
         Game.window().getRenderComponent().render();
 
-        final long renderTime = (long) TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+        final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
-        long wait = Math.max(0, fpsWait - renderTime);
+        Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / renderTime));
+        if (Game.config().debug().trackRenderTimes()) {
+          Game.metrics().trackRenderTime("total", renderTime);
+        }
+
+        long wait = Math.max(0, fpsWait - (long) renderTime);
         if (wait != 0) {
           sleep(wait);
         }
