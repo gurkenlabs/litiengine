@@ -237,7 +237,7 @@ public final class GameMetrics implements IRenderable {
       StringBuilder sb = new StringBuilder();
       sb.append(String.format("%-10.10s", this.getRenderName()));
       sb.append(": ");
-      sb.append(String.format("%-5.5s", this.getRenderTime()));
+      sb.append(String.format("%-4.4f", this.getRenderTime()));
       sb.append(" ms");
       if (!this.renderInfo.isEmpty()) {
         sb.append(" ");
