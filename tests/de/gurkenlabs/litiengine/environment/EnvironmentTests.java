@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -146,6 +147,39 @@ public class EnvironmentTests {
     assertEquals(2, entities.size());
     assertTrue(entities.contains(combatEntity));
     assertTrue(entities.contains(combatEntity2));
+  }
+  
+  @Test
+  public void testGetByTag() {
+    ICombatEntity combatEntity = mock(ICombatEntity.class);
+    when(combatEntity.getMapId()).thenReturn(1);
+    when(combatEntity.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity.getTags()).thenReturn(Arrays.asList("test"));
+    
+    ICombatEntity combatEntity2 = mock(ICombatEntity.class);
+    when(combatEntity2.getMapId()).thenReturn(2);
+    when(combatEntity2.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity2.getTags()).thenReturn(Arrays.asList("test"));
+    
+    ICombatEntity combatEntity3 = mock(ICombatEntity.class);
+    when(combatEntity3.getMapId()).thenReturn(3);
+    when(combatEntity3.getRenderType()).thenReturn(RenderType.NORMAL);
+    when(combatEntity3.getTags()).thenReturn(Arrays.asList("test2"));
+    
+    this.testEnvironment.add(combatEntity);
+    this.testEnvironment.add(combatEntity2);
+    this.testEnvironment.add(combatEntity3);
+    
+    Collection<ICombatEntity> result = this.testEnvironment.getByTag(ICombatEntity.class, "test");
+    
+    assertEquals(2, result.size());
+    assertTrue(result.contains(combatEntity));
+    assertTrue(result.contains(combatEntity2));
+    
+    Collection<IEntity> result2 = this.testEnvironment.getByTag("test2");
+    
+    assertEquals(1, result2.size());
+    assertTrue(result2.contains(combatEntity3));
   }
 
   @Test
