@@ -87,9 +87,13 @@ public class HexagonalMapRenderer extends MapRenderer {
    * rendering performance.
    *
    * @param g
+   *          The graphics object to render on.
    * @param layer
+   *          That layer that will be rendered.
    * @param map
+   *          The map that contains the layer.
    * @param viewport
+   *          The area of the map that will be rendered.
    */
   @Override
   protected void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
