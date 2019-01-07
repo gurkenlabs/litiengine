@@ -469,11 +469,24 @@ public class ImageProcessing {
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
 
-    final AffineTransform tx = new AffineTransform();
-    tx.rotate(radians, bufferedImage.getWidth() / 2.0, bufferedImage.getHeight() / 2.0);
+    double sin = Math.abs(Math.sin(radians));
+    double cos = Math.abs(Math.cos(radians));
 
-    final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    return op.filter(bufferedImage, null);
+    int w = bufferedImage.getWidth();
+    int h = bufferedImage.getHeight(null);
+
+    int neww = (int) Math.floor(w * cos + h * sin);
+    int newh = (int) Math.floor(h * cos + w * sin);
+
+    BufferedImage bimg = getCompatibleImage(neww, newh);
+    Graphics2D g = bimg.createGraphics();
+
+    g.translate((neww - w) / 2.0, (newh - h) / 2.0);
+    g.rotate(radians, w / 2.0, h / 2.0);
+    g.drawRenderedImage(toBufferedImage(bufferedImage), null);
+    g.dispose();
+
+    return bimg;
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final int max) {

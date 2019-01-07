@@ -42,6 +42,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
@@ -63,6 +64,7 @@ public class EditorScreen extends Screen {
   private static final String GAME_FILE_NAME = "Game Resource File";
   private static final String SPRITE_FILE_NAME = "Sprite Info File";
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
+  private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
   public static final Color COLLISION_COLOR = new Color(255, 0, 0, 125);
   public static final Color BOUNDINGBOX_COLOR = new Color(0, 0, 255, 125);
@@ -357,8 +359,29 @@ public class EditorScreen extends Screen {
     }
   }
 
+  public void importTextureAtlas() {
+    if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, "Import " + TEXTUREATLAS_FILE_NAME, false, "xml") == JFileChooser.APPROVE_OPTION) {
+      TextureAtlas atlas = TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
+      if (atlas == null) {
+        return;
+      }
+
+      Resources.images().load(atlas);
+      importSpriteSheets(atlas);
+    }
+  }
+
   public void importSpriteSheets(File... files) {
     SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(files);
+    this.processSpritesheets(spritePanel);
+  }
+
+  public void importSpriteSheets(TextureAtlas atlas) {
+    SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(atlas);
+    this.processSpritesheets(spritePanel);
+  }
+
+  private void processSpritesheets(SpritesheetImportPanel spritePanel) {
     int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     if (option != JOptionPane.OK_OPTION) {
       return;
@@ -485,7 +508,6 @@ public class EditorScreen extends Screen {
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
-
 
     IMap currentMap = Game.world().environment().getMap();
     BufferedImage img = Game.graphics().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);

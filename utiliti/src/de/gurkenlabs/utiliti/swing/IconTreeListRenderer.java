@@ -95,6 +95,10 @@ public class IconTreeListRenderer implements TreeCellRenderer {
       return ImageProcessing.scaleImage(sprite.getSprite(0), 16, 16, true);
     });
 
+    if(propImag == null) {
+      return null;
+    }
+    
     return new ImageIcon(propImag);
   }
 

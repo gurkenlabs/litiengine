@@ -25,6 +25,8 @@ public class ResourcesTests {
 
   @Test
   public void testResourceContainer() {
+    Resources.images().clear();
+    
     final String imageName = "my-test.jpg";
 
     BufferedImage testImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);

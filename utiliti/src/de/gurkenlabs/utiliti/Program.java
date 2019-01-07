@@ -538,7 +538,11 @@ public class Program {
 
     MenuItem importSprite = new MenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> EditorScreen.instance().importSpriteSheets());
-
+    
+    
+    MenuItem importTextureAtlas = new MenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
+    importTextureAtlas.addActionListener(a -> EditorScreen.instance().importTextureAtlas());
+    
     MenuItem importEmitters = new MenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
@@ -549,6 +553,7 @@ public class Program {
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
 
     mnProject.add(importSprite);
+    mnProject.add(importTextureAtlas);
     mnProject.add(importSpriteFile);
     mnProject.add(importEmitters);
     mnProject.add(importBlueprints);

@@ -214,8 +214,10 @@ public abstract class ResourcesContainer<T> {
     }
 
     T resource = loadCallback.get();
-    this.add(identifier, resource);
-
+    if (resource != null) {
+      this.add(identifier, resource);
+    }
+    
     return resource;
   }
 

@@ -6,11 +6,34 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Images extends ResourcesContainer<BufferedImage> {
   Images() {
+  }
+
+  /**
+   * Loads all images from the specified texture atlas.
+   * 
+   * @param textureAtlas
+   *          The texture atlas that contains all the images.
+   */
+  public void load(TextureAtlas textureAtlas) {
+    BufferedImage atlasImage = Resources.images().get(textureAtlas.getAbsolutImagePath());
+    if (atlasImage == null || atlasImage.getWidth() == 0 || atlasImage.getHeight() == 0) {
+      return;
+    }
+
+    for (TextureAtlas.Sprite sprite : textureAtlas.getSprites()) {
+      BufferedImage image = atlasImage.getSubimage(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+      if (sprite.isRotated()) {
+        image = ImageProcessing.rotate(image, Rotation.ROTATE_270);
+      }
+
+      Resources.images().add(sprite.getName(), image);
+    }
   }
 
   /**

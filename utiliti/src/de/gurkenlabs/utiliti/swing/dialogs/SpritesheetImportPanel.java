@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
@@ -49,35 +50,44 @@ public class SpritesheetImportPanel extends JPanel {
   private JSpinner spinnerHeight;
   private boolean isUpdating;
 
+  public SpritesheetImportPanel(TextureAtlas atlas) {
+    this();
+    for (TextureAtlas.Sprite sprite : atlas.getSprites()) {
+      fileListModel.addElement(new SpriteFileWrapper(sprite));
+    }
+    
+    this.initModel();
+  }
+
   public SpritesheetImportPanel(File... files) {
     this();
-    fileListModel = new DefaultListModel<>();
     for (File file : files) {
       fileListModel.addElement(new SpriteFileWrapper(file));
     }
 
-    this.fileList.setModel(this.fileListModel);
-
-    if (files.length > 0) {
-      this.fileList.setSelectedIndex(0);
-    }
+    this.initModel();
   }
 
   public SpritesheetImportPanel(SpritesheetInfo... infos) {
     this();
-    fileListModel = new DefaultListModel<>();
+
     for (SpritesheetInfo info : infos) {
       fileListModel.addElement(new SpriteFileWrapper(info));
     }
 
+    this.initModel();
+  }
+
+  private void initModel() {
     this.fileList.setModel(this.fileListModel);
 
-    if (infos.length > 0) {
+    if (this.fileListModel.size() > 0) {
       this.fileList.setSelectedIndex(0);
     }
   }
 
   public SpritesheetImportPanel() {
+    fileListModel = new DefaultListModel<>();
     setPreferredSize(new Dimension(454, 392));
     setLayout(new BorderLayout(0, 0));
 
@@ -281,6 +291,13 @@ public class SpritesheetImportPanel extends JPanel {
     private int spriteHeight;
 
     private String name;
+
+    public SpriteFileWrapper(TextureAtlas.Sprite sprite) {
+      this(Resources.images().get(sprite.getName()), sprite.getName());
+      this.spriteWidth = this.width;
+      this.spriteHeight = this.height;
+      this.updateSprite();
+    }
 
     public SpriteFileWrapper(File file) {
       this(Resources.images().get(file.getAbsolutePath()), FileUtilities.getFileName(file.getName()));
