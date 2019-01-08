@@ -3,16 +3,17 @@ package de.gurkenlabs.litiengine.resources;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.GameData;
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.util.TimeUtilities;
 
 /**
  * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
@@ -124,7 +125,7 @@ public final class Resources {
   public static Spritesheets spritesheets() {
     return spritesheets;
   }
-  
+
   /**
    * Load <code>Spritesheets</code>, <code>Tilesets</code> and <code>Maps</code> from a game resource file created with the utiLITI editor.
    * After loading, these resources can be accessed via this API (e.g. <code>Resources.maps().get("mapname")</code>.
@@ -133,18 +134,18 @@ public final class Resources {
    *          The file name of the game resource file
    */
   public static void load(final String gameResourceFile) {
+    final long loadStart = System.nanoTime();
+
     final GameData file = GameData.load(gameResourceFile);
     if (file == null) {
       return;
     }
 
-    int mapCnt = 0;
-    for (final IMap m : file.getMaps()) {
+    file.getMaps().parallelStream().forEach(m -> {
       Resources.maps().add(m.getName(), m);
-      mapCnt++;
-    }
+    });
 
-    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { mapCnt, gameResourceFile });
+    log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { file.getMaps().size(), gameResourceFile });
 
     int tileCnt = 0;
     for (final Tileset tileset : file.getTilesets()) {
@@ -158,11 +159,11 @@ public final class Resources {
 
     log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { tileCnt, gameResourceFile });
 
-    final List<Spritesheet> loadedSprites = new ArrayList<>();
-    for (final SpritesheetInfo tileset : file.getSpriteSheets()) {
-      final Spritesheet sprite = Resources.spritesheets().load(tileset);
+    final List<Spritesheet> loadedSprites = Collections.synchronizedList(new ArrayList<>());
+    file.getSpriteSheets().parallelStream().forEach(spriteSheetInfo -> {
+      final Spritesheet sprite = Resources.spritesheets().load(spriteSheetInfo);
       loadedSprites.add(sprite);
-    }
+    });
 
     log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
 
@@ -177,5 +178,8 @@ public final class Resources {
     }
 
     log.log(Level.INFO, "{0} sprites loaded to memory", new Object[] { spriteload });
+    final double loadTime = TimeUtilities.nanoToMs(System.nanoTime() - loadStart);
+
+    log.log(Level.INFO, "loading game resources from {0} took {1} ms", new Object[] { gameResourceFile, loadTime });
   }
 }
