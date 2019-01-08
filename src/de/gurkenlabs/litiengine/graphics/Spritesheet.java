@@ -42,7 +42,7 @@ public final class Spritesheet {
     this.updateRowsAndCols();
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
 
-    Resources.spritesheets().add(this.name.toLowerCase(), this);
+    Resources.spritesheets().add(this.name, this);
     Resources.images().addClearedListener(() -> {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];

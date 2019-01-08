@@ -42,7 +42,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
       return null;
     }
 
-    final String name = FileUtilities.getFileName(path).toLowerCase();
+    final String name = FileUtilities.getFileName(path);
 
     return this.getResources().getOrDefault(name, null);
   }
@@ -53,7 +53,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
   }
 
   public int[] getCustomKeyFrameDurations(final String name) {
-    return this.customKeyFrameDurations.getOrDefault(FileUtilities.getFileName(name).toLowerCase(), new int[0]);
+    return this.customKeyFrameDurations.getOrDefault(FileUtilities.getFileName(name), new int[0]);
   }
 
   public int[] getCustomKeyFrameDurations(final Spritesheet sprite) {
@@ -86,7 +86,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
     }
 
     if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
-      customKeyFrameDurations.put(sprite.getName().toLowerCase(), info.getKeyframes());
+      customKeyFrameDurations.put(sprite.getName(), info.getKeyframes());
     }
 
     return sprite;
@@ -143,7 +143,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
 
   @Override
   public Spritesheet remove(final String path) {
-    Spritesheet spriteToRemove = super.remove(path.toLowerCase());
+    Spritesheet spriteToRemove = super.remove(path);
     customKeyFrameDurations.remove(path);
     return spriteToRemove;
   }
@@ -153,7 +153,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
       return;
     }
 
-    final String spriteName = info.getName().toLowerCase();
+    final String spriteName = info.getName();
 
     Spritesheet spriteToRemove = this.remove(spriteName);
 
@@ -185,7 +185,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
             keyFrames[i] = keyFrame;
           }
 
-          customKeyFrameDurations.put(sprite.getName().toLowerCase(), keyFrames);
+          customKeyFrameDurations.put(sprite.getName(), keyFrames);
         }
       }
     } catch (final NumberFormatException e) {

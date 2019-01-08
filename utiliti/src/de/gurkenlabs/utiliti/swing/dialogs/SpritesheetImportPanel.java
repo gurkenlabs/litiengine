@@ -293,7 +293,7 @@ public class SpritesheetImportPanel extends JPanel {
     private String name;
 
     public SpriteFileWrapper(TextureAtlas.Sprite sprite) {
-      this(Resources.images().get(sprite.getName()), sprite.getName());
+      this(Resources.images().get(sprite.getName()), FileUtilities.getFileName(sprite.getName()));
       this.spriteWidth = this.width;
       this.spriteHeight = this.height;
       this.updateSprite();

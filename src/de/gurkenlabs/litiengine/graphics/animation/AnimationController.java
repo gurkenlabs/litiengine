@@ -55,7 +55,7 @@ public class AnimationController implements IAnimationController {
     if (animations != null && animations.length > 0) {
       for (final Animation anim : animations) {
         if (anim != null) {
-          this.animations.put(anim.getName().toLowerCase(), anim);
+          this.animations.put(anim.getName(), anim);
         }
       }
     }
@@ -67,7 +67,7 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    this.animations.put(animation.getName().toLowerCase(), animation);
+    this.animations.put(animation.getName(), animation);
   }
 
   @Override
@@ -179,7 +179,7 @@ public class AnimationController implements IAnimationController {
       return false;
     }
 
-    return this.animations.containsKey(animationName.toLowerCase());
+    return this.animations.containsKey(animationName);
   }
 
   @Override
@@ -228,7 +228,7 @@ public class AnimationController implements IAnimationController {
       return;
     }
 
-    this.animations.remove(animation.getName().toLowerCase());
+    this.animations.remove(animation.getName());
 
     if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
       this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElse(null));
@@ -247,12 +247,12 @@ public class AnimationController implements IAnimationController {
   @Override
   public void setDefaultAnimation(Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
-      this.animations.remove(this.defaultAnimation.getName().toLowerCase());
+      this.animations.remove(this.defaultAnimation.getName());
     }
 
     this.defaultAnimation = defaultAnimation;
     if (this.defaultAnimation != null) {
-      this.animations.put(this.defaultAnimation.getName().toLowerCase(), this.defaultAnimation);
+      this.animations.put(this.defaultAnimation.getName(), this.defaultAnimation);
     }
   }
 
