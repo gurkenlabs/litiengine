@@ -51,8 +51,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getName()).thenReturn("testProp");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
-    when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.name());
-    when(mapObject.getEnumValue(MapObjectProperty.PROP_MATERIAL, Material.class, Material.UNDEFINED)).thenReturn(Material.PLASTIC);
+    when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.getName());
+    when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL, Material.UNDEFINED.getName())).thenReturn(Material.PLASTIC.getName());
     when(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
     when(mapObject.getBoolValue(MapObjectProperty.COLLISION)).thenReturn(true);
     when(mapObject.getBoolValue(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);

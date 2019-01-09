@@ -35,6 +35,12 @@ public class ConsoleCommandListener extends Thread implements ICommandListener {
       s = scanner.nextLine();
 
       this.commandManagers.forEach(manager -> manager.executeCommand(s));
+      try {
+        sleep(10);
+      } catch (InterruptedException e) {
+        interrupt();
+        break;
+      }
     }
     scanner.close();
   }

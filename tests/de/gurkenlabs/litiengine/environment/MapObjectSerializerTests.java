@@ -64,7 +64,7 @@ public class MapObjectSerializerTests {
     assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_WIDTH));
     assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
-    assertEquals(Material.CERAMIC, mapObject.getEnumValue(MapObjectProperty.PROP_MATERIAL, Material.class));
+    assertEquals(Material.CERAMIC, Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
     assertEquals(Rotation.ROTATE_270, mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
@@ -85,7 +85,7 @@ public class MapObjectSerializerTests {
     assertEquals(5.5, mapObject.getDoubleValue("testDouble"));
     assertEquals(6.6f, mapObject.getFloatValue("testFloat"));
     assertEquals("test", mapObject.getStringValue("testString"));
-    
+
     assertEquals("false,false", mapObject.getStringValue("testBoolArr"));
     assertEquals("0", mapObject.getStringValue("testIntArr"));
     assertEquals("0,0", mapObject.getStringValue("testShortArr"));
@@ -100,7 +100,7 @@ public class MapObjectSerializerTests {
   private class TestProp extends Prop {
     @TmxProperty(name = "testBool")
     private boolean testBool = true;
-    
+
     @TmxProperty(name = "testInt")
     private int testInt = 1;
 
@@ -124,7 +124,7 @@ public class MapObjectSerializerTests {
 
     @TmxProperty(name = "testBoolArr")
     private boolean[] testBoolArr = new boolean[2];
-    
+
     @TmxProperty(name = "testIntArr")
     private int[] testIntArr = new int[1];
 

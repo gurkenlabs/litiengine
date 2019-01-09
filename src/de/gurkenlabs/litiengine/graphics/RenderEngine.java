@@ -186,7 +186,7 @@ public final class RenderEngine {
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
-
+    
     final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {

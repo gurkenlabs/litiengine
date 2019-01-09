@@ -3,6 +3,7 @@ package de.gurkenlabs.utiliti.swing.panels;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,6 +27,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -61,7 +63,7 @@ public class PropPanel extends PropertyPanel {
     JLabel lblMaterial = new JLabel(Resources.strings().get("panel_material"));
 
     this.comboBoxMaterial = new JComboBox<>();
-    this.comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.values()));
+    this.comboBoxMaterial.setModel(new DefaultComboBoxModel<Material>(Material.getMaterials().toArray(new Material[Material.getMaterials().size()])));
 
     JLabel lblSprite = new JLabel(Resources.strings().get("panel_sprite"));
 
@@ -154,7 +156,7 @@ public class PropPanel extends PropertyPanel {
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
 
-    final Material material = mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.valueOf(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL));
+    final Material material = mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL) == null ? Material.UNDEFINED : Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL));
     this.comboBoxMaterial.setSelectedItem(material);
 
     final Rotation rotation = mapObject.getStringValue(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getStringValue(MapObjectProperty.PROP_ROTATION));
@@ -175,7 +177,7 @@ public class PropPanel extends PropertyPanel {
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
       Material material = (Material) this.comboBoxMaterial.getSelectedItem();
-      m.setValue(MapObjectProperty.PROP_MATERIAL, material);
+      m.setValue(MapObjectProperty.PROP_MATERIAL, material.getName());
     }));
 
     this.comboBoxRotation.addActionListener(new MapObjectPropertyActionListener(m -> {
