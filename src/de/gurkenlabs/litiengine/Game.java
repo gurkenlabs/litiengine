@@ -1,6 +1,5 @@
 package de.gurkenlabs.litiengine;
 
-import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -437,10 +436,6 @@ public final class Game {
     return hasStarted;
   }
 
-  public static synchronized void init(String... args) {
-    init(null, args);
-  }
-
   /***
    * Initializes the infrastructure of the LITIengine game.
    * 
@@ -460,7 +455,7 @@ public final class Game {
    * @param args
    *          The arguments passed to the programs entry point.
    */
-  public static synchronized void init(Container hostControl, String... args) {
+  public static synchronized void init(String... args) {
     if (initialized) {
       log.log(Level.INFO, "The game has already been initialized.");
       return;
@@ -483,7 +478,7 @@ public final class Game {
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
     screenManager = scrMgr;
-    gameWindow = new GameWindow(hostControl);
+    gameWindow = new GameWindow();
 
     // initialize  the game window
     window().init();

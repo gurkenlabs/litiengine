@@ -34,7 +34,7 @@ public final class GameWindow {
 
   private final List<Consumer<Dimension>> resolutionChangedConsumer;
 
-  private final Container hostControl;
+  private final JFrame hostControl;
   private final RenderComponent renderCanvas;
 
   private float resolutionScale = 1;
@@ -43,11 +43,7 @@ public final class GameWindow {
   private Point screenLocation;
 
   public GameWindow() {
-    this(null);
-  }
-
-  public GameWindow(Container hostControl) {
-    this.hostControl = hostControl != null ? hostControl : new JFrame();
+    this.hostControl = new JFrame();
 
     this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
 
@@ -58,14 +54,11 @@ public final class GameWindow {
 
       this.initializeEventListeners();
 
-      JFrame window = this.getHostWindow();
-      if (window != null) {
-        window.setTitle(Game.info().getTitle());
-        window.setResizable(false);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.initializeWinowEventListeners(window);
-      }
+      this.hostControl.setTitle(Game.info().getTitle());
+      this.hostControl.setResizable(false);
+      this.hostControl.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      this.hostControl.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      this.initializeWinowEventListeners(this.hostControl);
     }
   }
 
@@ -76,16 +69,15 @@ public final class GameWindow {
       return;
     }
 
-    JFrame window = this.getHostWindow();
-    if (Game.config().graphics().isFullscreen() && window != null) {
-      window.setUndecorated(true);
+    if (Game.config().graphics().isFullscreen()) {
+      this.hostControl.setUndecorated(true);
       GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
       if (gd.isFullScreenSupported()) {
-        gd.setFullScreenWindow(window);
+        gd.setFullScreenWindow(this.hostControl);
       } else {
         log.log(Level.SEVERE, "Full screen is not supported on this device.");
-        window.setExtendedState(Frame.MAXIMIZED_BOTH);
+        this.hostControl.setExtendedState(Frame.MAXIMIZED_BOTH);
         this.hostControl.setVisible(true);
       }
       this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
@@ -161,17 +153,11 @@ public final class GameWindow {
   }
 
   public void setIconImage(Image image) {
-    JFrame window = this.getHostWindow();
-    if (window != null) {
-      window.setIconImage(image);
-    }
+    this.hostControl.setIconImage(image);
   }
 
   public void setTitle(String name) {
-    JFrame window = this.getHostWindow();
-    if (window != null) {
-      window.setTitle(name);
-    }
+    this.hostControl.setTitle(name);
   }
 
   private void setResolution(Dimension dim) {
@@ -183,14 +169,6 @@ public final class GameWindow {
     }
 
     this.hostControl.setSize(insetAwareDimension);
-  }
-
-  private JFrame getHostWindow() {
-    if (this.hostControl instanceof JFrame) {
-      return (JFrame) this.hostControl;
-    }
-
-    return null;
   }
 
   private void initializeEventListeners() {
