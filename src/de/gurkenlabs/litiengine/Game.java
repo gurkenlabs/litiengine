@@ -171,7 +171,6 @@ public final class Game {
    *          If set to true, the GUI will be hidden.
    * @see GameWindow
    * @see Game#init(String...)
-   * @see ScreenManager#setVisible(boolean)
    * @see RenderLoop
    * @see Camera
    */
