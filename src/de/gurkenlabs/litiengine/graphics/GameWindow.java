@@ -1,39 +1,245 @@
 package de.gurkenlabs.litiengine.graphics;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.gui.screens.Resolution;
 
-public interface GameWindow {
+public final class GameWindow {
+  private static final Logger log = Logger.getLogger(GameWindow.class.getName());
+  private static final int ICONIFIED_MAX_FPS = 1;
+  private static final int NONE_FOCUS_MAX_FPS = 10;
 
-  public RenderComponent getRenderComponent();
+  private final List<Consumer<Dimension>> resolutionChangedConsumer;
 
-  public Point getWindowLocation();
-  
-  public Dimension getResolution();
+  private final Container hostControl;
+  private final RenderComponent renderCanvas;
 
-  public Rectangle getBounds();
+  private float resolutionScale = 1;
 
-  public Point2D getCenter();
+  private Dimension resolution;
+  private Point screenLocation;
 
-  public float getResolutionScale();
+  public GameWindow() {
+    this(null);
+  }
 
-  public String getTitle();
+  public GameWindow(Container hostControl) {
+    this.hostControl = hostControl != null ? hostControl : new JFrame();
 
-  public void init();
+    this.resolutionChangedConsumer = new CopyOnWriteArrayList<>();
 
-  public boolean isFocusOwner();
+    this.renderCanvas = new RenderComponent(Game.config().graphics().getResolution());
+    if (!Game.isInNoGUIMode()) {
+      this.hostControl.setBackground(Color.BLACK);
+      this.hostControl.add(this.renderCanvas);
 
-  public void setIconImage(Image image);
+      this.initializeEventListeners();
 
-  public void setTitle(String string);
+      JFrame window = this.getHostWindow();
+      if (window != null) {
+        window.setTitle(Game.info().getTitle());
+        window.setResizable(false);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.initializeWinowEventListeners(window);
+      }
+    }
+  }
 
-  public void setResolution(Resolution res);
+  public void init() {
+    if (Game.isInNoGUIMode()) {
+      this.resolution = new Dimension(0, 0);
+      this.hostControl.setVisible(false);
+      return;
+    }
 
-  public void onResolutionChanged(Consumer<Dimension> resolutionConsumer);
+    JFrame window = this.getHostWindow();
+    if (Game.config().graphics().isFullscreen() && window != null) {
+      window.setUndecorated(true);
+      GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+      if (gd.isFullScreenSupported()) {
+        gd.setFullScreenWindow(window);
+      } else {
+        log.log(Level.SEVERE, "Full screen is not supported on this device.");
+        window.setExtendedState(Frame.MAXIMIZED_BOTH);
+        this.hostControl.setVisible(true);
+      }
+      this.setResolution(Resolution.custom(this.getSize().width, this.getSize().height, "fullscreen"));
+    } else {
+      this.setResolution(Game.config().graphics().getResolution());
+      this.hostControl.setVisible(true);
+    }
+
+    this.getRenderComponent().init();
+    this.resolution = this.getRenderComponent().getSize();
+    this.hostControl.requestFocus();
+  }
+
+  public boolean isFocusOwner() {
+    if (this.getRenderComponent() instanceof Component && this.getRenderComponent().isFocusOwner()) {
+      return true;
+    }
+
+    return this.hostControl.isFocusOwner();
+  }
+
+  public void onResolutionChanged(final Consumer<Dimension> resolutionConsumer) {
+    if (this.resolutionChangedConsumer.contains(resolutionConsumer)) {
+      return;
+    }
+
+    this.resolutionChangedConsumer.add(resolutionConsumer);
+  }
+
+  public void setResolution(Resolution res) {
+    this.setResolution(res.getDimension());
+  }
+
+  public float getResolutionScale() {
+    return this.resolutionScale;
+  }
+
+  public Point2D getCenter() {
+    return new Point2D.Double(this.getWidth() / 2.0, this.getHeight() / 2.0);
+  }
+
+  public Container getHostControl() {
+    return this.hostControl;
+  }
+
+  public Dimension getSize() {
+    return this.hostControl.getSize();
+  }
+
+  public int getWidth() {
+    return this.hostControl.getWidth();
+  }
+
+  public int getHeight() {
+    return this.hostControl.getHeight();
+  }
+
+  public RenderComponent getRenderComponent() {
+    return this.renderCanvas;
+  }
+
+  public Dimension getResolution() {
+    return this.resolution;
+  }
+
+  public Point getWindowLocation() {
+    if (this.screenLocation != null) {
+      return this.screenLocation;
+    }
+
+    this.screenLocation = this.hostControl.getLocationOnScreen();
+    return this.screenLocation;
+  }
+
+  public void setIconImage(Image image) {
+    JFrame window = this.getHostWindow();
+    if (window != null) {
+      window.setIconImage(image);
+    }
+  }
+
+  public void setTitle(String name) {
+    JFrame window = this.getHostWindow();
+    if (window != null) {
+      window.setTitle(name);
+    }
+  }
+
+  private void setResolution(Dimension dim) {
+    Dimension insetAwareDimension = new Dimension(dim.width + this.hostControl.getInsets().left + this.hostControl.getInsets().right, dim.height + this.hostControl.getInsets().top + this.hostControl.getInsets().bottom);
+
+    if (Game.config().graphics().enableResolutionScaling()) {
+      this.resolutionScale = (float) (dim.getWidth() / Resolution.Ratio16x9.RES_1920x1080.getWidth());
+      Game.graphics().setBaseRenderScale(Game.graphics().getBaseRenderScale() * this.resolutionScale);
+    }
+
+    this.hostControl.setSize(insetAwareDimension);
+  }
+
+  private JFrame getHostWindow() {
+    if (this.hostControl instanceof JFrame) {
+      return (JFrame) this.hostControl;
+    }
+
+    return null;
+  }
+
+  private void initializeEventListeners() {
+    this.getRenderComponent().addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(final ComponentEvent evt) {
+        resolution = getRenderComponent().getSize();
+        resolutionChangedConsumer.forEach(consumer -> consumer.accept(GameWindow.this.getSize()));
+      }
+    });
+
+    this.hostControl.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentMoved(final ComponentEvent evt) {
+        screenLocation = null;
+      }
+    });
+
+  }
+
+  private void initializeWinowEventListeners(Window window) {
+
+    window.addWindowStateListener(e -> {
+      if (e.getNewState() == Frame.ICONIFIED) {
+        Game.renderLoop().setMaxFps(ICONIFIED_MAX_FPS);
+      } else {
+        Game.renderLoop().setMaxFps(Game.config().client().getMaxFps());
+      }
+    });
+
+    window.addWindowFocusListener(new WindowFocusListener() {
+      @Override
+      public void windowLostFocus(WindowEvent e) {
+        if (Game.config().graphics().reduceFramesWhenNotFocused()) {
+          Game.renderLoop().setMaxFps(NONE_FOCUS_MAX_FPS);
+        }
+      }
+
+      @Override
+      public void windowGainedFocus(WindowEvent e) {
+        Game.renderLoop().setMaxFps(Game.config().client().getMaxFps());
+      }
+    });
+
+    window.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(final WindowEvent event) {
+        System.exit(Game.EXIT_GAME_CLOSED);
+      }
+    });
+  }
 }

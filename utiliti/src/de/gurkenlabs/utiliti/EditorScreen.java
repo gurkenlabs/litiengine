@@ -214,7 +214,7 @@ public class EditorScreen extends Screen {
       chooser = new JFileChooser(new File(".").getCanonicalPath());
       chooser.setDialogTitle(Resources.strings().get("input_select_project_folder"));
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      if (chooser.showOpenDialog((JFrame) Game.screens()) != JFileChooser.APPROVE_OPTION) {
+      if (chooser.showOpenDialog((JFrame) Game.window().getHostControl()) != JFileChooser.APPROVE_OPTION) {
         return;
       }
 
@@ -544,7 +544,7 @@ public class EditorScreen extends Screen {
         chooser.addChoosableFileFilter(filter);
         chooser.setSelectedFile(new File(DEFAULT_GAME_NAME + "." + GameData.FILE_EXTENSION));
 
-        int result = chooser.showSaveDialog((JFrame) Game.screens());
+        int result = chooser.showSaveDialog((JFrame) Game.window().getHostControl());
         if (result == JFileChooser.APPROVE_OPTION) {
           String newFile = this.saveGameFile(chooser.getSelectedFile().toString());
           this.currentResourceFile = newFile;

@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine;
 
+import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -33,7 +34,6 @@ import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
-import de.gurkenlabs.litiengine.gui.screens.IScreenManager;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.gui.screens.ScreenManager;
 import de.gurkenlabs.litiengine.input.Input;
@@ -98,6 +98,7 @@ public final class Game {
   private static RenderLoop renderLoop;
 
   private static ScreenManager screenManager;
+  private static GameWindow gameWindow;
   private static GameWorld world;
 
   private static boolean hasStarted;
@@ -274,7 +275,7 @@ public final class Game {
    * @see GameWindow#setIconImage(java.awt.Image)
    */
   public static GameWindow window() {
-    return screenManager;
+    return gameWindow;
   }
 
   /**
@@ -402,7 +403,7 @@ public final class Game {
    * @see GameWorld#environment()
    * @see Game#world()
    */
-  public static IScreenManager screens() {
+  public static ScreenManager screens() {
     return screenManager;
   }
 
@@ -436,6 +437,10 @@ public final class Game {
     return hasStarted;
   }
 
+  public static synchronized void init(String... args) {
+    init(null, args);
+  }
+
   /***
    * Initializes the infrastructure of the LITIengine game.
    * 
@@ -455,7 +460,7 @@ public final class Game {
    * @param args
    *          The arguments passed to the programs entry point.
    */
-  public static synchronized void init(String... args) {
+  public static synchronized void init(Container hostControl, String... args) {
     if (initialized) {
       log.log(Level.INFO, "The game has already been initialized.");
       return;
@@ -470,7 +475,7 @@ public final class Game {
     loop().attach(physics());
     loop().attach(world());
 
-    final ScreenManager scrMgr = new ScreenManager(info().getTitle());
+    final ScreenManager scrMgr = new ScreenManager();
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
@@ -478,6 +483,7 @@ public final class Game {
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
     screenManager = scrMgr;
+    gameWindow = new GameWindow(hostControl);
 
     // initialize  the game window
     window().init();

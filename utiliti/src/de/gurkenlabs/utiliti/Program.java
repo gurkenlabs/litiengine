@@ -303,7 +303,7 @@ public class Program {
   }
 
   private static JFrame initWindow() {
-    JFrame window = ((JFrame) Game.screens());
+    JFrame window = ((JFrame) Game.window().getHostControl());
     window.setResizable(true);
 
     Game.addGameListener(new GameAdapter() {
@@ -654,7 +654,7 @@ public class Program {
     payPalMenuItem.addActionListener(event -> UriUtilities.openWebpage(URI.create(Resources.strings().get("link_LITIengine_wiki"))));
 
     MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
-    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.screens()),
+    aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()),
         Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(),
         JOptionPane.INFORMATION_MESSAGE));
 
