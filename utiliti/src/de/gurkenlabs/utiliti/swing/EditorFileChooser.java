@@ -27,7 +27,7 @@ public final class EditorFileChooser extends JFileChooser {
     instance().setFileSelectionMode(JFileChooser.FILES_ONLY);
     instance().setMultiSelectionEnabled(multiselect);
     instance().setDialogTitle(title);
-    return instance().showOpenDialog((JFrame) Game.screens());
+    return instance().showOpenDialog((JFrame) Game.window().getHostControl());
   }
 
   public static int showFileDialog(String description, boolean multiselect, String... extensions) {
