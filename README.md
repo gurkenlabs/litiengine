@@ -91,7 +91,7 @@ The [LITIengine documentation pages](https://docs.litiengine.com/) containing in
 * Forum [forum.litiengine.com](https://forum.litiengine.com/)
 
 ## Authors
-![Gurkenlabs](https://gurkenlabs.de/wp-content/uploads/2017/01/logo_banner_4-1.png "Gurkenlabs")
+![Gurkenlabs](https://gurkenlabs.de/wp-content/uploads/2018/12/logo-banner-website.png "Gurkenlabs")
 
 **Gurkenlabs** is an indie game development project by two brothers from Bavaria:
 * Steffen Wilke ([steffen-wilke](https://github.com/steffen-wilke))
