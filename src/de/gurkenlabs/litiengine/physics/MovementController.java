@@ -128,7 +128,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       this.setVelocityX(MathUtilities.clamp(newVelocity, -maxPixelsPerTick, maxPixelsPerTick));
       this.setDx(0);
     } else {
-      this.decellerateVelocityX(dec);
+      this.decelerateVelocityX(dec);
     }
 
     // update velocity y
@@ -138,7 +138,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       this.setVelocityY(newVelocity);
       this.setDy(0);
     } else {
-      this.decellerateVelocityY(dec);
+      this.decelerateVelocityY(dec);
     }
 
     if (this.getVelocityX() == 0 && this.getVelocityY() == 0) {
@@ -177,7 +177,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     this.velocityY = velocityY;
   }
 
-  public void decellerateVelocityX(double dec) {
+  public void decelerateVelocityX(double dec) {
     if (this.getVelocityX() > 0) {
       if (dec > this.getVelocityX()) {
         this.setVelocityX(0);
@@ -197,7 +197,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     }
   }
 
-  public void decellerateVelocityY(double dec) {
+  public void decelerateVelocityY(double dec) {
     if (this.getVelocityY() > 0) {
       if (dec > this.getVelocityY()) {
         this.setVelocityY(0);
