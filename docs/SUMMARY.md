@@ -1,6 +1,7 @@
 # Summary
 
 ## Getting Started
+
 * [Creating a project](creating-a-project/README.md)
     * [Get LITIengine](creating-a-project/get-litiengine.md)
     * [The utiLITI editor](creating-a-project/utiliti-editor.md)
