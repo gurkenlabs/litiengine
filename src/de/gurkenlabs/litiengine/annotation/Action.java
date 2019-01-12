@@ -21,7 +21,7 @@ public @interface Action {
    * </i>
    * </p>
    * 
-   * @return
+   * @return The name of the EntityAction.
    */
   String name() default "";
 
