@@ -2,12 +2,17 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.annotation.Action;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
@@ -18,9 +23,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
+import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
 @EntityInfo
 public abstract class Entity implements IEntity {
+  private static final Logger log = Logger.getLogger(Entity.class.getName());
   public static final String ANY_MESSAGE = "";
   private final List<EntityTransformListener> transformListeners;
   private final List<EntityListener> listeners;
@@ -31,6 +38,8 @@ public abstract class Entity implements IEntity {
   private final List<String> tags;
 
   private final EntityControllers controllers;
+
+  private final EntityActionMap actions;
 
   private ICustomPropertyProvider properties;
 
@@ -63,6 +72,7 @@ public abstract class Entity implements IEntity {
     this.properties = new CustomPropertyProvider();
 
     this.controllers = new EntityControllers();
+    this.actions = new EntityActionMap();
 
     this.mapLocation = new Point2D.Double(0, 0);
     final EntityInfo info = this.getClass().getAnnotation(EntityInfo.class);
@@ -74,6 +84,8 @@ public abstract class Entity implements IEntity {
     for (Tag t : tagAnnotations) {
       this.addTag(t.value());
     }
+
+    this.registerActions();
   }
 
   protected Entity(int mapId) {
@@ -235,6 +247,23 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
+  public EntityActionMap actions() {
+    return this.actions;
+  }
+
+  @Override
+  public void perform(String actionName) {
+    if (this.actions.exists(actionName)) {
+      this.actions.get(actionName).perform();
+    }
+  }
+
+  @Override
+  public EntityAction register(String name, Runnable action) {
+    return this.actions.register(name, action);
+  }
+
+  @Override
   public String sendMessage(final Object sender, final String message) {
     MessageEvent event = this.fireMessageReceived(sender, ANY_MESSAGE, message, null);
     this.fireMessageReceived(sender, message, message, event);
@@ -369,7 +398,7 @@ public abstract class Entity implements IEntity {
   @Override
   public void loaded(IEnvironment environment) {
     this.environment = environment;
-    
+
     for (EntityListener listener : this.listeners) {
       listener.loaded(this, this.getEnvironment());
     }
@@ -422,5 +451,37 @@ public abstract class Entity implements IEntity {
     }
 
     return event;
+  }
+
+  /**
+   * Registers all default actions that are annotated with a <code>EntityAction</code> annotation.
+   */
+  private void registerActions() {
+    List<Method> methods = ReflectionUtilities.getMethodsAnnotatedWith(this.getClass(), Action.class);
+
+    // iterate over all methods that have the EntityActionInfo annotation and register them
+    for (Method method : methods) {
+      if (method.isAccessible()) {
+        continue;
+      }
+
+      Action info = method.getAnnotation(Action.class);
+      if (info == null) {
+        continue;
+      }
+
+      final String actionName = info.name() == null || info.name().isEmpty() ? method.getName() : info.name();
+      EntityAction action = this.register(actionName, () -> {
+        try {
+          method.invoke(this);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          log.log(Level.SEVERE, "Could not perform the entity action " + actionName, e);
+        }
+      });
+
+      if (action != null) {
+        action.setDescription(info.description());
+      }
+    }
   }
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class EntityControllers {
   private Map<Class<? extends IEntityController>, IEntityController> controllers;
 
-  public EntityControllers() {
+  EntityControllers() {
     this.controllers = new ConcurrentHashMap<>();
   }
 

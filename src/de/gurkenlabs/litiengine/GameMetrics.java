@@ -52,7 +52,7 @@ public final class GameMetrics implements IRenderable {
     return this.downStreamInBytes;
   }
 
-  public long getFramesPerSecond() {
+  public int getFramesPerSecond() {
     return this.framesPerSecond;
   }
 

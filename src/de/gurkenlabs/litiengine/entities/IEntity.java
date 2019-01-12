@@ -37,6 +37,44 @@ public interface IEntity {
 
   public <T extends IEntityController> T getController(Class<T> clss);
 
+  /**
+   * All registered actions of this entity.
+   * 
+   * @return The EntityActionMap that holds all registered EntityActions for this instance.
+   * 
+   * @see EntityActionMap
+   * @see IEntity#register(String, Runnable)
+   */
+  public EntityActionMap actions();
+
+  /**
+   * Performs an <code>EntityAction</code> that was previously registered for this entity.
+   * <p><i>Does nothing in case no action has been registered for the specified <code>actionName</code>.</i></p>
+   * 
+   * @param actionName
+   *          The name of the action to be performed.
+   * 
+   * @see IEntity#actions()
+   * @see IEntity#register(String, Runnable)
+   */
+  public void perform(String actionName);
+
+  /**
+   * Registers an <code>EntityAction</code> with the specified name.
+   * It's later possible to execute these actions on the entity by using the <code>Entity.perform(String actionName)</code> method.
+   * 
+   * @param name
+   *          The name of the action to be registered.
+   * @param action
+   *          The action to be performed by the entity.
+   * 
+   * @return The created EntityAction instance; or null if the name or action parameter were invalid.
+   * 
+   * @see IEntity#perform(String)
+   * @see IEntity#actions()
+   */
+  public EntityAction register(String name, Runnable action);
+
   public void detachControllers();
 
   public void attachControllers();
@@ -121,7 +159,8 @@ public interface IEntity {
   /**
    * This method provides the possibility to implement behavior whenever this entity was added to the environment.
    * 
-   * @param environment The environment that the entity was added to
+   * @param environment
+   *          The environment that the entity was added to
    * 
    * @see IEntity#addListener(EntityListener)
    */
@@ -130,7 +169,8 @@ public interface IEntity {
   /**
    * This method provides the possibility to implement behavior whenever this entity was removed from the environment.
    * 
-   * @param environment The environment that the entity was removed from
+   * @param environment
+   *          The environment that the entity was removed from
    * 
    * @see IEntity#addListener(EntityListener)
    */
