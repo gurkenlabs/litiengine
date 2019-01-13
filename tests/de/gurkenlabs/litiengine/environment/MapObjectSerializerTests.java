@@ -70,7 +70,7 @@ public class MapObjectSerializerTests {
     assertEquals(Rotation.ROTATE_270, mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
-    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_SCALE));
+    assertEquals(true, mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
   }
 
   @Test

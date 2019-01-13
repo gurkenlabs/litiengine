@@ -25,6 +25,7 @@ public final class MapObjectProperty {
 
   // general entity stuff
   public static final String SPRITESHEETNAME = "spritesheetName";
+  public static final String SCALE_SPRITE = "scaling";
   
   // creature
   public static final String CREATURE_TYPE = "creature-type";
@@ -41,7 +42,6 @@ public final class MapObjectProperty {
   public static final String PROP_ROTATION = "rotationSprite";
   public static final String PROP_FLIPHORIZONTALLY = "flipHorizontally";
   public static final String PROP_FLIPVERTICALLY = "flipVertically";
-  public static final String PROP_SCALE = "scaling";
 
   // light source
   public static final String LIGHT_ALPHA = "lightBrightness";

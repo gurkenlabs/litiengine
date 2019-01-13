@@ -14,7 +14,6 @@ import de.gurkenlabs.litiengine.attributes.Modification;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Prop;
-import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -75,22 +74,13 @@ public class PropMapObjectLoader extends MapObjectLoader {
     final Prop prop = this.createNewProp(mapObject, mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME));
     loadDefaultProperties(prop, mapObject);
     loadCollisionProperties(prop, mapObject);
+    
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
-    prop.setObstacle(mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
-
-    prop.setSpriteRotation(mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class, Rotation.NONE));
-
+    
     prop.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-
     AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getIntValue(MapObjectProperty.COMBAT_HEALTH));
     prop.getHitPoints().modifyMaxBaseValue(mod);
     prop.getHitPoints().modifyBaseValue(mod);
-
-    prop.setAddShadow(mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
-
-    prop.setFlipHorizontally(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
-    prop.setFlipVertically(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
-    prop.setScaling(mapObject.getBoolValue(MapObjectProperty.PROP_SCALE));
 
     prop.setTeam(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
 

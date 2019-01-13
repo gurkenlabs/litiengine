@@ -26,7 +26,7 @@ public class Prop extends CombatEntity {
   @TmxProperty(name = MapObjectProperty.PROP_FLIPVERTICALLY)
   private boolean flipVertically;
 
-  @TmxProperty(name = MapObjectProperty.PROP_SCALE)
+  @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
   private boolean scaling;
 
   @TmxProperty(name = MapObjectProperty.PROP_ROTATION)

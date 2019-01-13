@@ -48,7 +48,7 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
   public String getType();
 
   public IPolyline getPolyline();
-  
+
   public IMapObjectLayer getLayer();
 
   public void setGridId(int gid);
@@ -62,6 +62,10 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
   public void setX(float x);
 
   public void setY(float y);
+
+  public void setLocation(Point2D location);
+
+  public void setLocation(float x, float y);
 
   public void setWidth(float width);
 

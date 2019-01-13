@@ -256,6 +256,21 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
+  public void setLocation(Point2D location) {
+    if (location == null) {
+      return;
+    }
+
+    this.setLocation((float) location.getX(), (float) location.getY());
+  }
+
+  @Override
+  public void setLocation(float x, float y) {
+    this.setX(x);
+    this.setY(y);
+  }
+
+  @Override
   public float getX() {
     if (this.isInfiniteMap()) {
       Map map = (Map) this.getLayer().getMap();

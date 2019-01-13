@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 
 public class MapObjectLoaderTests {
 
@@ -45,28 +46,21 @@ public class MapObjectLoaderTests {
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
     IEnvironment environment = mock(IEnvironment.class);
-    IMapObject mapObject = mock(IMapObject.class);
-    when(mapObject.getType()).thenReturn(MapObjectType.PROP.name());
-    when(mapObject.getId()).thenReturn(111);
-    when(mapObject.getName()).thenReturn("testProp");
-    when(mapObject.getLocation()).thenReturn(new Point(100, 100));
-
-    when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)).thenReturn(Material.PLASTIC.getName());
-    when(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL, Material.UNDEFINED.getName())).thenReturn(Material.PLASTIC.getName());
-    when(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE)).thenReturn(true);
-    when(mapObject.getBoolValue(MapObjectProperty.COLLISION)).thenReturn(true);
-    when(mapObject.getBoolValue(eq(MapObjectProperty.COLLISION), any(boolean.class))).thenReturn(true);
-    when(mapObject.getIntValue(MapObjectProperty.COMBAT_HEALTH)).thenReturn(100);
-
-    when(mapObject.getFloatValue(eq(MapObjectProperty.COLLISIONBOX_WIDTH), any(float.class))).thenReturn(100.0f);
-    when(mapObject.getFloatValue(eq(MapObjectProperty.COLLISIONBOX_HEIGHT), any(float.class))).thenReturn(100.0f);
-
-    when(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)).thenReturn("LEFT");
-    when(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER)).thenReturn(Align.LEFT);
-
-    when(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)).thenReturn("MIDDLE");
-    when(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN)).thenReturn(Valign.MIDDLE);
-    when(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM)).thenReturn(1);
+    MapObject mapObject = new MapObject();
+    mapObject.setType(MapObjectType.PROP.name());
+    mapObject.setId(111);
+    mapObject.setName("testProp");
+    mapObject.setLocation(100, 100);
+    mapObject.setValue(MapObjectProperty.PROP_MATERIAL, Material.PLASTIC.getName());
+    mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
+    mapObject.setValue(MapObjectProperty.COLLISION, true);
+    mapObject.setValue(MapObjectProperty.COMBAT_HEALTH, 100);
+    
+    mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
+    mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
+    mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
+    mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
+    mapObject.setValue(MapObjectProperty.COMBAT_TEAM, 1);
 
     Collection<IEntity> entities = loader.load(environment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
@@ -74,23 +68,23 @@ public class MapObjectLoaderTests {
 
     IEntity entity = entities.stream().findFirst().get();
     assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testProp");
-    assertEquals(entity.getX(), 100, 0.0001);
-    assertEquals(entity.getY(), 100, 0.0001);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testProp", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
 
     Prop prop = (Prop) entity;
-    assertEquals(prop.getMaterial(), Material.PLASTIC);
+    assertEquals(Material.PLASTIC, prop.getMaterial());
     assertTrue(prop.isIndestructible());
     assertTrue(prop.hasCollision());
-    assertEquals(prop.getHitPoints().getMaxValue().intValue(), 100);
-    assertEquals(prop.getHitPoints().getCurrentValue().intValue(), 100);
+    assertEquals(100, prop.getHitPoints().getMaxValue().intValue());
+    assertEquals(100, prop.getHitPoints().getCurrentValue().intValue());
 
-    assertEquals(prop.getCollisionBoxWidth(), 100.0, 0.0001);
-    assertEquals(prop.getCollisionBoxHeight(), 100.0, 0.0001);
-    assertEquals(prop.getCollisionBoxAlign(), Align.LEFT);
-    assertEquals(prop.getCollisionBoxValign(), Valign.MIDDLE);
-    assertEquals(prop.getTeam(), 1);
+    assertEquals(100.0, prop.getCollisionBoxWidth(), 0.0001);
+    assertEquals(100.0, prop.getCollisionBoxHeight(), 0.0001);
+    assertEquals(Align.LEFT, prop.getCollisionBoxAlign());
+    assertEquals(Valign.MIDDLE, prop.getCollisionBoxValign());
+    assertEquals(1, prop.getTeam());
   }
 
   @Test
@@ -112,15 +106,15 @@ public class MapObjectLoaderTests {
     IEntity entity = entities.stream().findFirst().get();
 
     assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testCollider");
-    assertEquals(entity.getX(), 100, 0.0001);
-    assertEquals(entity.getY(), 100, 0.0001);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testCollider", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
 
     CollisionBox collider = (CollisionBox) entity;
 
-    assertEquals(collider.getCollisionBoxWidth(), 200.0, 0.0001);
-    assertEquals(collider.getCollisionBoxHeight(), 200.0, 0.0001);
+    assertEquals(200.0, collider.getCollisionBoxWidth(), 0.0001);
+    assertEquals(200.0, collider.getCollisionBoxHeight(), 0.0001);
   }
 
   @Test
@@ -148,10 +142,10 @@ public class MapObjectLoaderTests {
     IEntity entity = entities.stream().findFirst().get();
 
     assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testTrigger");
-    assertEquals(entity.getX(), 100, 0.0001);
-    assertEquals(entity.getY(), 100, 0.0001);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testTrigger", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
 
     Trigger trigger = (Trigger) entity;
 
@@ -180,10 +174,10 @@ public class MapObjectLoaderTests {
     IEntity entity = entities.stream().findFirst().get();
 
     assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testEmitter");
-    assertEquals(entity.getX(), 100, 0.0001);
-    assertEquals(entity.getY(), 100, 0.0001);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testEmitter", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
   }
 
   @Test
@@ -209,10 +203,10 @@ public class MapObjectLoaderTests {
     IEntity entity = entities.stream().findFirst().get();
 
     assertNotNull(entity);
-    assertEquals(entity.getMapId(), 111);
-    assertEquals(entity.getName(), "testLight");
-    assertEquals(entity.getX(), 100, 0.0001);
-    assertEquals(entity.getY(), 100, 0.0001);
+    assertEquals(111, entity.getMapId());
+    assertEquals("testLight", entity.getName());
+    assertEquals(100, entity.getX(), 0.0001);
+    assertEquals(100, entity.getY(), 0.0001);
 
     LightSource light = (LightSource) entity;
     assertTrue(light.isActive());

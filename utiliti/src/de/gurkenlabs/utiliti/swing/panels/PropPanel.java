@@ -168,7 +168,7 @@ public class PropPanel extends PropertyPanel {
     this.chckbxIsObstacle.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
     this.checkBoxHorizontalFlip.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
     this.checkBoxVerticalFlip.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPVERTICALLY));
-    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_SCALE));
+    this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
   }
 
   private void setupChangedListeners() {
@@ -195,7 +195,7 @@ public class PropPanel extends PropertyPanel {
 
     this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_FLIPHORIZONTALLY, checkBoxHorizontalFlip.isSelected())));
     this.checkBoxVerticalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_FLIPVERTICALLY, checkBoxVerticalFlip.isSelected())));
-    this.checkBoxScale.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_SCALE, checkBoxScale.isSelected())));
+    this.checkBoxScale.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SCALE_SPRITE, checkBoxScale.isSelected())));
   }
 
   private void loadAvailableProps() {
