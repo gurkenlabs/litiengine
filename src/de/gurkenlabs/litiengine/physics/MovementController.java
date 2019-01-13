@@ -12,7 +12,6 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class MovementController<T extends IMobileEntity> implements IMovementController {
-  private static final double FORCE_APPLY_ACCEPTED_ERROR = 0.1;
   private final List<Force> activeForces;
   private final T mobileEntity;
   private final List<Predicate<IMobileEntity>> movementPredicates;
@@ -258,6 +257,8 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
     boolean turn = this.getEntity().turnOnMove();
     this.getEntity().setTurnOnMove(false);
     try {
+      double deltaX = 0;
+      double deltaY = 0;
       for (final Force force : this.activeForces) {
         if (force.cancelOnReached() && force.hasReached(this.getEntity())) {
           force.end();
@@ -265,14 +266,17 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
         }
 
         final Point2D collisionBoxCenter = this.getEntity().getCollisionBoxCenter();
-        if (collisionBoxCenter.distance(force.getLocation()) < FORCE_APPLY_ACCEPTED_ERROR) {
-          final double yDelta = this.getEntity().getHeight() - this.getEntity().getCollisionBox().getHeight() + this.getEntity().getCollisionBox().getHeight() / 2;
-          final Point2D entityLocation = new Point2D.Double(force.getLocation().getX() - this.getEntity().getWidth() / 2, force.getLocation().getY() - yDelta);
-          this.getEntity().setLocation(entityLocation);
-        } else {
-          final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
-          final boolean success = Game.physics().move(this.getEntity(), (float) angle, Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale());
-          if (force.cancelOnCollision() && !success) {
+        final double angle = GeometricUtilities.calcRotationAngleInDegrees(collisionBoxCenter, force.getLocation());
+        final double strength = Game.loop().getDeltaTime() * 0.001f * force.getStrength() * Game.loop().getTimeScale();
+        deltaX += GeometricUtilities.getXDelta(angle, strength);
+        deltaY += GeometricUtilities.getYDelta(angle, strength);
+      }
+
+      final Point2D target = new Point2D.Double(this.getEntity().getX() + deltaX, this.getEntity().getY() + deltaY);
+      final boolean success = Game.physics().move(this.getEntity(), target);
+      if (!success) {
+        for (final Force force : this.activeForces) {
+          if (force.cancelOnCollision()) {
             force.end();
           }
         }

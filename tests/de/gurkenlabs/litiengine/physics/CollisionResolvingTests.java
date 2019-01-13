@@ -97,23 +97,18 @@ public class CollisionResolvingTests {
     assertEquals(10, ent.getX(), EPSILON);
     assertEquals(20, ent.getY(), EPSILON);
 
-    // move back 10 px up
-    engine.move(ent, 180, 10);
-
-    assertEquals(10, ent.getY(), EPSILON);
-
     // now "slide" along the rectangle to the bottom right
 
     engine.move(ent, 45, 14.14213562373095);
 
     assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(20, ent.getY(), EPSILON);
+    assertEquals(30, ent.getY(), EPSILON);
 
     // now "slide" along the rectangle to the top left
     engine.move(ent, 135, 14.14213562373095);
 
     assertEquals(10, ent.getX(), EPSILON);
-    assertEquals(10, ent.getY(), EPSILON);
+    assertEquals(20, ent.getY(), EPSILON);
   }
 
   @Test

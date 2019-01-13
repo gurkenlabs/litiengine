@@ -619,11 +619,11 @@ public class GeometricUtilities {
     return t.createTransformedShape(shape);
   }
 
-  private static double getXDelta(final double angle, final double delta) {
-    return Math.sin((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  public static double getXDelta(final double angle, final double delta) {
+    return Math.sin(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 
-  private static double getYDelta(final double angle, final double delta) {
-    return Math.cos((float) Math.toRadians(angle)) * delta * 100 / 100.0;
+  public static double getYDelta(final double angle, final double delta) {
+    return Math.cos(Math.toRadians(angle)) * delta * 100 / 100.0;
   }
 }
