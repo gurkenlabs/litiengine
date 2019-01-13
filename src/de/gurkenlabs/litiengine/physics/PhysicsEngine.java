@@ -60,6 +60,11 @@ public final class PhysicsEngine implements IUpdateable {
   /**
    * Adds the specified collision aware entity to the physics engine which will make it respect the entity's collision box for upcoming calls.
    * 
+   * <p>
+   * <i>If you add a <code>ICollisionEntiy</code> to your Environment, it will automatically be added to the the PhysicsEngine. There is typically no
+   * need to call this explicitly.</i>
+   * </p>
+   * 
    * @param entity
    *          The collision entity to be added.
    * 
@@ -94,6 +99,13 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
+  /**
+   * Removes the specified entity from any collision processing. Typically this method is implicitly called when an entity is removed from the current
+   * environment.
+   * 
+   * @param entity
+   *          The entity that is about to be removed.
+   */
   public void remove(final ICollisionEntity entity) {
     if (entity instanceof Prop) {
       Prop prop = (Prop) entity;
@@ -106,13 +118,27 @@ public final class PhysicsEngine implements IUpdateable {
     this.collisionEntities.remove(entity);
   }
 
+  /**
+   * Removes the specified static collision box.
+   * 
+   * @param staticCollisionBox
+   *          The static collision box that is about to be removed.
+   */
   public void remove(final Rectangle2D staticCollisionBox) {
     this.staticCollisionBoxes.remove(staticCollisionBox);
   }
 
+  /**
+   * Clears all previously registered participants in the collision process from this instance.
+   * This includes all entities, static collision boxes and the map boundaries.
+   */
   public void clear() {
-    this.staticCollisionBoxes.clear();
     this.collisionEntities.clear();
+    this.staticCollisionBoxes.clear();
+    this.allCollisionBoxes.clear();
+    this.staticBoxes.clear();
+    this.allCollisionBoxRectangles.clear();
+    this.entityCollisionBoxRectangles.clear();
     this.setBounds(null);
   }
 
