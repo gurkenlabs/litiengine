@@ -53,6 +53,7 @@ import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
 import de.gurkenlabs.utiliti.swing.dialogs.SpritesheetImportPanel;
+import de.gurkenlabs.utiliti.swing.panels.CreaturePanel;
 import de.gurkenlabs.utiliti.swing.panels.PropPanel;
 
 @SuppressWarnings("serial")
@@ -305,20 +306,27 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean addEntity() {
-    if(Game.world().environment() == null || Game.world().camera() == null) {
+    if (Game.world().environment() == null || Game.world().camera() == null) {
       return false;
     }
-    
+
     // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
-      String propName = PropPanel.getIdentifierBySpriteName(info.getName());
-      if (propName == null) {
-        return false;
-      }
 
       MapObject mo = new MapObject();
-      mo.setType(MapObjectType.PROP.name());
+      String propName = PropPanel.getIdentifierBySpriteName(info.getName());
+      String creatureName = CreaturePanel.getCreatureSpriteName(info.getName());
+      if (propName != null) {
+        mo.setType(MapObjectType.PROP.name());
+        mo.setValue(MapObjectProperty.SPRITESHEETNAME, propName);
+      } else if (creatureName != null) {
+        mo.setType(MapObjectType.CREATURE.name());
+        mo.setValue(MapObjectProperty.SPRITESHEETNAME, creatureName);
+      } else {
+        return false;
+      }
+      
       mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2);
       mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2);
       mo.setWidth((int) info.getWidth());
@@ -330,7 +338,6 @@ public class AssetPanelItem extends JPanel {
       mo.setValue(MapObjectProperty.COLLISION, true);
       mo.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, false);
       mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
-      mo.setValue(MapObjectProperty.SPRITESHEETNAME, propName);
 
       EditorScreen.instance().getMapComponent().add(mo);
       return true;
@@ -455,7 +462,7 @@ public class AssetPanelItem extends JPanel {
     if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
       String propName = PropPanel.getIdentifierBySpriteName(info.getName());
-      return propName != null && !propName.isEmpty();
+      return propName != null && !propName.isEmpty() || CreaturePanel.getCreatureSpriteName(info.getName()) != null;
     }
 
     return this.getOrigin() instanceof MapObject || this.getOrigin() instanceof EmitterData;

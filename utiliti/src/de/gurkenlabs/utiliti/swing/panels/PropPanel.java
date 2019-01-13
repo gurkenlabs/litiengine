@@ -106,7 +106,7 @@ public class PropPanel extends PropertyPanel {
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
-
+  
   public static String getIdentifierBySpriteName(String spriteName) {
     if (spriteName == null || spriteName.isEmpty()) {
       return null;
