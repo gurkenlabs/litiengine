@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
-@AnimationInfo(spritePrefix = "prop-")
+@AnimationInfo(spritePrefix = PropAnimationController.PROP_IDENTIFIER)
 public class Prop extends CombatEntity {
 
   @TmxProperty(name = MapObjectProperty.PROP_MATERIAL)

@@ -25,6 +25,7 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
@@ -109,17 +110,12 @@ public class PropPanel extends PropertyPanel {
     this.setupChangedListeners();
   }
 
-  public static String getNameBySpriteName(String spriteName) {
+  public static String getIdentifierBySpriteName(String spriteName) {
     if (spriteName == null || spriteName.isEmpty()) {
       return null;
     }
 
-    AnimationInfo info = Prop.class.getAnnotation(AnimationInfo.class);
-    if (info == null || info.spritePrefix() == null || info.spritePrefix().length == 0) {
-      return null;
-    }
-
-    if (Arrays.asList(info.spritePrefix()).stream().noneMatch(x -> spriteName.toLowerCase().startsWith(x))) {
+    if (!spriteName.toLowerCase().startsWith(PropAnimationController.PROP_IDENTIFIER)) {
       return null;
     }
 
@@ -203,7 +199,7 @@ public class PropPanel extends PropertyPanel {
     Map<String, String> m = new TreeMap<>();
     for (Spritesheet s : Resources.spritesheets().getAll()) {
       String spriteName = s.getName();
-      String propName = getNameBySpriteName(spriteName);
+      String propName = getIdentifierBySpriteName(spriteName);
 
       if (propName == null) {
         continue;

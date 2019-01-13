@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 
 public class PropMapObjectLoader extends MapObjectLoader {
   private static final Logger log = Logger.getLogger(PropMapObjectLoader.class.getName());
@@ -92,7 +93,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
   protected Prop createNewProp(IMapObject mapObject, String spriteSheet) {
     for (Class<? extends Prop> customProp : customPropType) {
       for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
-        if (prefix != null && ("prop-" + spriteSheet).equalsIgnoreCase(prefix)) {
+        if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
           Prop created = this.createCustomProp(customProp, spriteSheet);
           if (created != null) {
             return created;

@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
+  public static final String PROP_IDENTIFIER = "prop-";
   private static final String DAMAGED = "damaged";
   private static final String DESTROYED = "destroyed";
   private static final String INTACT = "intact";
@@ -110,14 +111,14 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     }
 
     final String propState = state.name().toLowerCase();
-    final String name = "prop-" + prop.getSpritesheetName().toLowerCase() + "-" + propState;
+    final String name = PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase() + "-" + propState;
     Optional<Spritesheet> opt = Resources.spritesheets().tryGet(name);
 
     if (opt.isPresent()) {
       return opt.get();
     }
 
-    final String fallbackName = "prop-" + prop.getSpritesheetName().toLowerCase();
+    final String fallbackName = PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase();
     return Resources.spritesheets().get(fallbackName);
   }
 }

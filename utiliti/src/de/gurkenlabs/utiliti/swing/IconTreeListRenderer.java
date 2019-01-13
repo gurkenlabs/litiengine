@@ -22,6 +22,7 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
@@ -77,8 +78,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
 
     String cacheKey = Game.world().environment().getMap().getName() + "-" + prop.getSpritesheetName().toLowerCase() + "-tree";
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
-      final String name = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
-      final String fallbackName = Program.PROP_SPRITE_PREFIX + prop.getSpritesheetName().toLowerCase();
+      final String name = PropAnimationController.PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase() + "-" + PropState.INTACT.toString().toLowerCase();
+      final String fallbackName = PropAnimationController.PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase();
 
       Optional<Spritesheet> opt = Resources.spritesheets().tryGet(name);
       Spritesheet sprite = null;

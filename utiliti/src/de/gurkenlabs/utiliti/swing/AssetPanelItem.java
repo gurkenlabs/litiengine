@@ -312,7 +312,7 @@ public class AssetPanelItem extends JPanel {
     // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
-      String propName = PropPanel.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getIdentifierBySpriteName(info.getName());
       if (propName == null) {
         return false;
       }
@@ -452,9 +452,9 @@ public class AssetPanelItem extends JPanel {
   }
 
   private boolean canAdd() {
-    if (this.getOrigin() != null && this.getOrigin() instanceof SpritesheetInfo) {
+    if (this.getOrigin() instanceof SpritesheetInfo) {
       SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
-      String propName = PropPanel.getNameBySpriteName(info.getName());
+      String propName = PropPanel.getIdentifierBySpriteName(info.getName());
       return propName != null && !propName.isEmpty();
     }
 

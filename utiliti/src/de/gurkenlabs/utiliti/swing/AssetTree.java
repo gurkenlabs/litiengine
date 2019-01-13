@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
+import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -92,11 +93,11 @@ public class AssetTree extends JTree {
     if (selectedPath.equals(spritePath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(Program.PROP_SPRITE_PREFIX)).collect(Collectors.toList()));
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && x.getName().contains(PropAnimationController.PROP_IDENTIFIER)).collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(creaturePath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && CreaturePanel.getCreatureSpriteName(x.getName()) != null).collect(Collectors.toList()));
     }else if (selectedPath.equals(miscPath)) {
-      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(Program.PROP_SPRITE_PREFIX) && CreaturePanel.getCreatureSpriteName(x.getName()) == null).collect(Collectors.toList()));
+      Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().filter(x -> x.getName() != null && !x.getName().contains(PropAnimationController.PROP_IDENTIFIER) && CreaturePanel.getCreatureSpriteName(x.getName()) == null).collect(Collectors.toList()));
     } else if (selectedPath.equals(tilesetPath)) {
       ArrayList<Tileset> allTilesets = new ArrayList<>();
       allTilesets.addAll(gameFile.getTilesets().stream().filter(x -> x.getName() != null).collect(Collectors.toList()));

@@ -93,7 +93,6 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_VERTICAL = Resources.images().get("cursor-trans-vertical.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.images().get("cursor-trans-315.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
-  public static final String PROP_SPRITE_PREFIX = "prop-";
 
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;
