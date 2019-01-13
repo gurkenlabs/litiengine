@@ -1,13 +1,11 @@
 package de.gurkenlabs.litiengine.entities;
 
-/**
- * The Enum DestructableState.
- */
 public enum PropState {
-  /** The Damaged. */
+  INTACT,
   DAMAGED,
-  /** The Destroyed. */
-  DESTROYED,
-  /** The Intact. */
-  INTACT
+  DESTROYED;
+
+  public String spriteString() {
+    return this.name().toLowerCase();
+  }
 }

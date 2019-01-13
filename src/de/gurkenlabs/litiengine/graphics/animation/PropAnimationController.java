@@ -12,9 +12,6 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
 
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   public static final String PROP_IDENTIFIER = "prop-";
-  private static final String DAMAGED = "damaged";
-  private static final String DESTROYED = "destroyed";
-  private static final String INTACT = "intact";
 
   public PropAnimationController(final T prop) {
     super(prop);
@@ -77,23 +74,27 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   @Override
   public void update() {
     super.update();
-    switch (this.getEntity().getState()) {
-    case DAMAGED:
-      this.playAnimation(DAMAGED);
-      break;
-    case DESTROYED:
-      this.playAnimation(DESTROYED);
-      break;
-    case INTACT:
-    default:
-      this.playAnimation(INTACT);
-      break;
-    }
+    this.playAnimation(this.getEntity().getState().spriteString());
   }
 
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
+  }
+
+  public static String getSpriteName(final Prop prop, boolean appendState) {
+    return getSpriteName(prop, prop.getState(), appendState);
+  }
+
+  public static String getSpriteName(final Prop prop, PropState state, boolean appendState) {
+    StringBuilder sb = new StringBuilder(PROP_IDENTIFIER);
+    sb.append(prop.getSpritesheetName());
+    if (appendState) {
+      sb.append("-");
+      sb.append(state.spriteString());
+    }
+
+    return sb.toString();
   }
 
   private Animation createAnimation(final Prop prop, final PropState state) {
@@ -110,15 +111,12 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
       return null;
     }
 
-    final String propState = state.name().toLowerCase();
-    final String name = PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase() + "-" + propState;
-    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(name);
+    Optional<Spritesheet> opt = Resources.spritesheets().tryGet(getSpriteName(prop, state, true));
 
     if (opt.isPresent()) {
       return opt.get();
     }
 
-    final String fallbackName = PROP_IDENTIFIER + prop.getSpritesheetName().toLowerCase();
-    return Resources.spritesheets().get(fallbackName);
+    return Resources.spritesheets().get(getSpriteName(prop, state, false));
   }
 }
