@@ -81,7 +81,6 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
 
     // TODO: load IMobileEntity and ICombatEntity properties
     creature.setFacingDirection(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
-
     entities.add(creature);
     return entities;
   }

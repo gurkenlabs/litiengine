@@ -74,7 +74,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     for (final Field field : entity.getClass().getDeclaredFields()) {
       TmxProperty property = field.getAnnotation(TmxProperty.class);
       if (property == null) {
-        return;
+        continue;
       }
 
       String value = mapObject.getStringValue(property.name(), null);

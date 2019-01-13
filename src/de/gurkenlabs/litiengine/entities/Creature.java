@@ -6,6 +6,8 @@ import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.attributes.Attribute;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
@@ -23,6 +25,9 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private Attribute<Float> velocity;
   private String spritePrefix;
 
+  @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
+  private boolean scaling;
+  
   public Creature() {
     this(null);
   }
@@ -96,6 +101,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
     return this.velocity;
   }
 
+  public boolean isScaling() {
+    return this.scaling;
+  }
+
   /**
    * Checks if is idle.
    *
@@ -147,6 +156,10 @@ public class Creature extends CombatEntity implements IMobileEntity {
     this.spritePrefix = spritePrefix;
   }
 
+  public void setScaling(boolean scaling) {
+    this.scaling = scaling;
+  }
+  
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;

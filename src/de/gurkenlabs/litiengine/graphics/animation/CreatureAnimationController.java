@@ -53,6 +53,17 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     super(entity, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
+  
+  @Override
+  public boolean isAutoScaling() {
+    return this.getEntity().isScaling();
+  }
+
+  public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
+    final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
+    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
+    return new Animation(leftIdleSpritesheet, true);
+  }
 
   @Override
   protected String getSpritePrefix() {
@@ -169,12 +180,6 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     if (!rightWalkAnimation.isPresent() && leftWalkAnimation.isPresent()) {
       this.add(flipAnimation(leftWalkAnimation.get().getSpritesheet(), rightWalk));
     }
-  }
-
-  public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
-    final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
-    Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
-    return new Animation(leftIdleSpritesheet, true);
   }
 
   private String getIdleSpriteName(Direction dir) {
