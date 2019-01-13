@@ -4,6 +4,8 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -48,13 +50,15 @@ public final class PhysicsEngine implements IUpdateable {
    * @see Game#physics()
    */
   public PhysicsEngine() {
-    this.entityCollisionBoxes = new CopyOnWriteArrayList<>();
     this.collisionEntities = new CopyOnWriteArrayList<>();
     this.staticCollisionBoxes = new CopyOnWriteArrayList<>();
-    this.allCollisionBoxes = new CopyOnWriteArrayList<>();
-    this.staticBoxes = new CopyOnWriteArrayList<>();
-    this.allCollisionBoxRectangles = new CopyOnWriteArrayList<>();
-    this.entityCollisionBoxRectangles = new CopyOnWriteArrayList<>();
+    
+    // these collections are updated every tick so they don't use a CopyOnWriteArrayList due to performance
+    this.entityCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
+    this.allCollisionBoxes = Collections.synchronizedList(new ArrayList<>());
+    this.staticBoxes = Collections.synchronizedList(new ArrayList<>());
+    this.allCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
+    this.entityCollisionBoxRectangles = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**
