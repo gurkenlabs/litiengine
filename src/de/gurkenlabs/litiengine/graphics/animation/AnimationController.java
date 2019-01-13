@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
@@ -22,8 +21,7 @@ public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private final Map<String, Animation> animations;
   private final List<IImageEffect> imageEffects;
-  private final List<Consumer<Animation>> playbackConsumer;
-  private final List<Consumer<Animation>> playbackFinishedConsumer;
+  private final List<AnimationListener> listeners;
 
   private Animation currentAnimation;
   private Animation defaultAnimation;
@@ -32,8 +30,7 @@ public class AnimationController implements IAnimationController {
   public AnimationController() {
     this.animations = new ConcurrentHashMap<>();
     this.imageEffects = new CopyOnWriteArrayList<>();
-    this.playbackFinishedConsumer = new CopyOnWriteArrayList<>();
-    this.playbackConsumer = new CopyOnWriteArrayList<>();
+    this.listeners = new CopyOnWriteArrayList<>();
   }
 
   public AnimationController(final Animation defaultAnimation) {
@@ -92,6 +89,16 @@ public class AnimationController implements IAnimationController {
     for (final Animation animation : this.getAnimations()) {
       Game.loop().detach(animation);
     }
+  }
+
+  @Override
+  public void addListener(AnimationListener listener) {
+    this.listeners.add(listener);
+  }
+
+  @Override
+  public void removeListener(AnimationListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override
@@ -188,16 +195,6 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void onPlayback(final Consumer<Animation> cons) {
-    this.playbackConsumer.add(cons);
-  }
-
-  @Override
-  public void onPlaybackEnded(final Consumer<Animation> cons) {
-    this.playbackFinishedConsumer.add(cons);
-  }
-
-  @Override
   public void playAnimation(final String animationName) {
     // if we have no animation with the name or it is already playing, do nothing
     if (this.isPlaying(animationName) || !this.hasAnimation(animationName)) {
@@ -217,8 +214,8 @@ public class AnimationController implements IAnimationController {
     this.currentAnimation = anim;
     this.currentAnimation.start();
 
-    for (final Consumer<Animation> cons : this.playbackConsumer) {
-      cons.accept(this.getCurrentAnimation());
+    for (AnimationListener listener : this.listeners) {
+      listener.played(this.getCurrentAnimation());
     }
   }
 
@@ -264,8 +261,8 @@ public class AnimationController implements IAnimationController {
 
     final boolean playbackFinished = this.getCurrentAnimation() != null && !this.getCurrentAnimation().isPlaying();
     if (playbackFinished) {
-      for (final Consumer<Animation> cons : this.playbackFinishedConsumer) {
-        cons.accept(this.getCurrentAnimation());
+      for (AnimationListener listener : this.listeners) {
+        listener.finished(this.getCurrentAnimation());
       }
     }
 

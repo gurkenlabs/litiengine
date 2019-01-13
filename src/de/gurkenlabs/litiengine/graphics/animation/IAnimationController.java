@@ -4,12 +4,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 
 public interface IAnimationController extends IUpdateable {
+  public void addListener(AnimationListener listener);
+
+  public void removeListener(AnimationListener listener);
+
   public void add(Animation animation);
 
   public void add(IImageEffect effect);
@@ -33,10 +36,6 @@ public interface IAnimationController extends IUpdateable {
   public boolean hasAnimation(String animationName);
 
   public boolean isPlaying(String animationName);
-
-  public void onPlayback(Consumer<Animation> cons);
-
-  public void onPlaybackEnded(Consumer<Animation> cons);
 
   public void playAnimation(final String animationName);
 
