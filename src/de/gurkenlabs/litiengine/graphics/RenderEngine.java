@@ -25,7 +25,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
-import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 import de.gurkenlabs.litiengine.gui.GuiProperties;
 
@@ -249,14 +248,14 @@ public final class RenderEngine {
       }
     }
 
-    final IAnimationController animationController = entity.getAnimationController();
+    final IEntityAnimationController animationController = entity.getAnimationController();
     if (animationController != null) {
       final BufferedImage img = animationController.getCurrentSprite();
       if (img == null) {
         return;
       }
 
-      if (animationController instanceof IEntityAnimationController && ((IEntityAnimationController) animationController).isAutoScaling()) {
+      if (animationController.isAutoScaling()) {
         final double ratioX = entity.getWidth() / img.getWidth();
         final double ratioY = entity.getHeight() / img.getHeight();
         ImageRenderer.renderScaled(g, img, Game.world().camera().getViewportLocation(entity.getLocation()), ratioX, ratioY);

@@ -21,7 +21,6 @@ public class Creature extends CombatEntity implements IMobileEntity {
   private Point2D moveDestination;
   private boolean turnOnMove;
   private Attribute<Float> velocity;
-
   private String spritePrefix;
 
   public Creature() {
