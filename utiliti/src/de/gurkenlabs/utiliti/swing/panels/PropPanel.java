@@ -2,7 +2,6 @@ package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,9 +17,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Material;
-import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;

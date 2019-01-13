@@ -6,6 +6,7 @@ import java.util.Optional;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.annotation.AnimationInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -32,10 +33,6 @@ import de.gurkenlabs.litiengine.util.ImageProcessing;
  * @see de.gurkenlabs.litiengine.entities.IEntity#getName()
  */
 public class CreatureAnimationController<T extends Creature> extends EntityAnimationController<T> {
-  public static final String IDLE = "-idle";
-  public static final String WALK = "-walk";
-  public static final String DEAD = "-dead";
-
   private String[] customDeathAnimations;
   private String randomDeathSprite;
 
@@ -53,7 +50,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     super(entity, defaultAnimation, animations);
     this.init(useFlippedSpritesAsFallback);
   }
-  
+
   @Override
   public boolean isAutoScaling() {
     return this.getEntity().isScaling();
@@ -115,7 +112,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
       }
     }
 
-    String deadName = this.getSpritePrefix() + DEAD;
+    String deadName = this.getSpriteName(CreatureAnimationState.DEAD);
     if (this.hasAnimation(deadName)) {
       return deadName;
     }
@@ -126,42 +123,42 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   private void initializeAvailableAnimations() {
     for (Direction dir : Direction.values()) {
       // initialize walking animations
-      Spritesheet walkSprite = Resources.spritesheets().get(this.getSpriteName(WALK) + "-" + dir.toString().toLowerCase());
+      Spritesheet walkSprite = Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.WALK, dir));
       if (walkSprite != null) {
         this.add(new Animation(walkSprite, true));
       }
 
       // initialize idle animations
-      Spritesheet idleSprite = Resources.spritesheets().get(this.getSpriteName(IDLE) + "-" + dir.toString().toLowerCase());
+      Spritesheet idleSprite = Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.IDLE, dir));
       if (idleSprite != null) {
         this.add(new Animation(idleSprite, true));
       }
     }
 
-    Spritesheet deadSprite = Resources.spritesheets().get(this.getSpritePrefix() + DEAD);
+    Spritesheet deadSprite = Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.DEAD));
     if (deadSprite != null) {
       this.add(new Animation(deadSprite, true));
     }
 
-    Spritesheet baseIdle = Resources.spritesheets().get(this.getSpriteName(IDLE));
+    Spritesheet baseIdle = Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.IDLE));
     if (baseIdle != null) {
       this.add(new Animation(baseIdle, true));
     }
 
-    Spritesheet baseWalk = Resources.spritesheets().get(this.getSpriteName(WALK));
+    Spritesheet baseWalk = Resources.spritesheets().get(this.getSpriteName(CreatureAnimationState.WALK));
     if (baseWalk != null) {
       this.add(new Animation(baseWalk, true));
     }
   }
 
   private void initializeFlippedAnimations() {
-    String leftIdle = this.getSpriteName(IDLE) + "-left";
-    String leftWalk = this.getSpriteName(WALK) + "-left";
+    String leftIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.LEFT);
+    String leftWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.LEFT);
     Optional<Animation> leftIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftIdle)).findFirst();
     Optional<Animation> leftWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(leftWalk)).findFirst();
 
-    String rightIdle = this.getSpriteName(IDLE) + "-right";
-    String rightWalk = this.getSpriteName(WALK) + "-right";
+    String rightIdle = this.getSpriteName(CreatureAnimationState.IDLE, Direction.RIGHT);
+    String rightWalk = this.getSpriteName(CreatureAnimationState.WALK, Direction.RIGHT);
     Optional<Animation> rightIdleAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightIdle)).findFirst();
     Optional<Animation> rightWalkAnimation = this.getAnimations().stream().filter(x -> x.getName().equals(rightWalk)).findFirst();
 
@@ -183,15 +180,15 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   private String getIdleSpriteName(Direction dir) {
-    return this.getSpriteNameWithDirection(IDLE, dir);
+    return this.getSpriteNameWithDirection(CreatureAnimationState.IDLE, dir);
   }
 
   private String getWalkSpriteName(Direction dir) {
-    return getSpriteNameWithDirection(WALK, dir);
+    return getSpriteNameWithDirection(CreatureAnimationState.WALK, dir);
   }
 
-  private String getSpriteNameWithDirection(String state, Direction dir) {
-    String name = this.getSpriteName(state) + "-" + dir.toString().toLowerCase();
+  private String getSpriteNameWithDirection(CreatureAnimationState state, Direction dir) {
+    String name = this.getSpriteName(state, dir);
     if (this.hasAnimation(name)) {
       return name;
     }
@@ -199,12 +196,8 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     return getFallbackSpriteName(state, dir);
   }
 
-  private static String getOppositeState(String state) {
-    return state.equalsIgnoreCase(IDLE) ? WALK : IDLE;
-  }
-
-  private String getFallbackSpriteName(String state, Direction dir) {
-    String fallbackStateName = this.getSpriteName(getOppositeState(state)) + "-" + dir.toString().toLowerCase();
+  private String getFallbackSpriteName(CreatureAnimationState state, Direction dir) {
+    String fallbackStateName = this.getSpriteName(state.getOpposite(), dir);
     if (this.hasAnimation(fallbackStateName)) {
       return fallbackStateName;
     }
@@ -216,7 +209,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
     // search for any animation for the specified state with dir information
     for (Direction d : Direction.values()) {
-      final String name = this.getSpriteName(state) + "-" + d.toString().toLowerCase();
+      final String name = this.getSpriteName(state, d);
       if (this.hasAnimation(name)) {
         return name;
       }
@@ -225,8 +218,20 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     return this.getDefaultAnimation() != null ? this.getDefaultAnimation().getName() : null;
   }
 
-  private String getSpriteName(String state) {
-    return this.getSpritePrefix() + state;
+  public static String getSpriteName(Creature creature, CreatureAnimationState state) {
+    return creature.getSpritePrefix() + "-" + state.spriteString();
+  }
+
+  public static String getSpriteName(Creature creature, CreatureAnimationState state, Direction direction) {
+    return getSpriteName(creature, state) + "-" + direction.name().toLowerCase();
+  }
+
+  private String getSpriteName(CreatureAnimationState state) {
+    return getSpriteName(this.getEntity(), state);
+  }
+
+  private String getSpriteName(CreatureAnimationState state, Direction direction) {
+    return getSpriteName(this.getEntity(), state, direction);
   }
 
   private void init(boolean useFlippedSpritesAsFallback) {

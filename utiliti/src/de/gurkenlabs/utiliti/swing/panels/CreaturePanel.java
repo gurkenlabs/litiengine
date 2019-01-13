@@ -19,8 +19,8 @@ import javax.swing.border.TitledBorder;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
@@ -82,27 +82,21 @@ public class CreaturePanel extends PropertyPanel {
   }
 
   public static String getCreatureSpriteName(String name) {
-    if (name.endsWith(CreatureAnimationController.IDLE)) {
-      return name.substring(0, name.length() - CreatureAnimationController.IDLE.length());
-    }
-
-    if (name.endsWith(CreatureAnimationController.WALK)) {
-      return name.substring(0, name.length() - CreatureAnimationController.WALK.length());
-    }
-
-    if (name.endsWith(CreatureAnimationController.DEAD)) {
-      return name.substring(0, name.length() - CreatureAnimationController.DEAD.length());
+    for (CreatureAnimationState state : CreatureAnimationState.values()) {
+      if (name.endsWith(state.spriteString())) {
+        return name.substring(0, name.length() - state.spriteString().length() - 1);
+      }
     }
 
     for (Direction dir : Direction.values()) {
-      String idle = CreatureAnimationController.IDLE + "-" + dir.toString().toLowerCase();
+      String idle = CreatureAnimationState.IDLE.spriteString() + "-" + dir.toString().toLowerCase();
       if (name.endsWith(idle)) {
-        return name.substring(0, name.length() - idle.length());
+        return name.substring(0, name.length() - idle.length() - 1);
       }
 
-      String walk = CreatureAnimationController.WALK + "-" + dir.toString().toLowerCase();
+      String walk = CreatureAnimationState.WALK.spriteString() + "-" + dir.toString().toLowerCase();
       if (name.endsWith(walk)) {
-        return name.substring(0, name.length() - walk.length());
+        return name.substring(0, name.length() - walk.length() - 1);
       }
     }
 

@@ -20,13 +20,13 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.entities.PropState;
+import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
 import de.gurkenlabs.utiliti.Icons;
-import de.gurkenlabs.utiliti.Program;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
 
@@ -106,8 +106,8 @@ public class IconTreeListRenderer implements TreeCellRenderer {
     String cacheKey = Game.world().environment().getMap().getName() + "-" + creature.getSpritePrefix() + "-" + creature.getMapId() + "-tree";
 
     BufferedImage propImag = Resources.images().get(cacheKey, () -> {
-      Collection<Spritesheet> sprites = Resources.spritesheets().get(s -> s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.IDLE) || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.WALK)
-          || s.getName().equals(creature.getSpritePrefix() + CreatureAnimationController.DEAD) || s.getName().startsWith(creature.getSpritePrefix() + "-"));
+      Collection<Spritesheet> sprites = Resources.spritesheets().get(s -> s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.IDLE)) || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.WALK))
+          || s.getName().equals(CreatureAnimationController.getSpriteName(creature, CreatureAnimationState.DEAD)) || s.getName().startsWith(creature.getSpritePrefix() + "-"));
       if (sprites.isEmpty()) {
         return null;
       }
