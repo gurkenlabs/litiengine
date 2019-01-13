@@ -107,9 +107,9 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
 
     final double maxPixelsPerTick = this.getEntity().getTickVelocity();
 
-    final long deltaTime = Game.loop().getDeltaTime();
-    double accelerationRatio = (double) deltaTime / (double) this.getEntity().getAcceleration();
-    double decelerationRatio = (double) deltaTime / (double) this.getEntity().getDeceleration();
+    final double deltaTime = Game.loop().getDeltaTime() * Game.loop().getTimeScale();
+    double accelerationRatio = deltaTime / (double) this.getEntity().getAcceleration();
+    double decelerationRatio = deltaTime / (double) this.getEntity().getDeceleration();
 
     double inc = this.getEntity().getAcceleration() == 0 ? maxPixelsPerTick : accelerationRatio * maxPixelsPerTick;
     final double dec = this.getEntity().getDeceleration() == 0 ? maxPixelsPerTick : decelerationRatio * maxPixelsPerTick;
@@ -118,7 +118,7 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
       // we don't want the entity to move faster when moving diagonally
       // calculate a new x by dissolving the formula for diagonals of squares
       // sqrt(2 * x^2)
-      inc /= Math.sqrt(2);
+      inc /= (Math.sqrt(2) / Game.loop().getTimeScale());
     }
 
     // update velocity x
