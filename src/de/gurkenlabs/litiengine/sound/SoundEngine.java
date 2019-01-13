@@ -13,7 +13,17 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.input.Input;
 
-public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable {
+/**
+ * This class provides all methods to playback sounds and music in your
+ * game. It allows to define the 2D coordinates of the sound or even pass in the
+ * source entity of the sound which will adjust the position according to the
+ * position of the entity. The LILIengine sound engine supports .wav, .mp3 and
+ * .ogg by default. If you need other file extensions, you have to write an own
+ * SPI implementation and inject it in your project.
+ * 
+ * @see Game#audio()
+ */
+public final class SoundEngine implements IUpdateable, ILaunchable {
   public static final int DEFAULT_MAX_DISTANCE = 150;
   private Point2D listenerLocation;
   private Function<Point2D, Point2D> listenerLocationCallback;
@@ -21,23 +31,57 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
   private SoundPlayback music;
   private final List<SoundPlayback> sounds;
 
+  /**
+   * Instantiates a new SoundEngine instance.
+   * 
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.audio()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#audio()
+   */
   public SoundEngine() {
     this.sounds = Collections.synchronizedList(new ArrayList<>());
     this.maxDist = DEFAULT_MAX_DISTANCE;
     this.setListenerLocationCallback(old -> Game.world().camera().getFocus());
   }
 
-  @Override
+  /**
+   * Gets the maximum distance from the listener at which a sound source can
+   * still be heard.
+   * 
+   * @return The maximum distance at which a sound can be heard.
+   */
   public float getMaxDistance() {
     return this.maxDist;
   }
 
-  @Override
+  /**
+   * Loops the specified sound file as background music. If another music was
+   * specified beforehand, its play-back will get interrupted and the new one
+   * will be played.
+   * 
+   * @param sound
+   *          The sound from which to play the background music.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playMusic(final Sound sound) {
     return this.playMusic(sound, true);
   }
 
-  @Override
+  /**
+   * Plays the specified sound file as background music. If another music was
+   * specified beforehand, its play-back will get interrupted and the new one
+   * will be played.
+   * 
+   * @param sound
+   *          The sound from which to play the background music.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playMusic(final Sound sound, boolean loop) {
     if (sound == null || this.music != null && sound.equals(this.music.getSound())) {
       return null;
@@ -52,12 +96,35 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     return this.music;
   }
 
-  @Override
+  /**
+   * Plays the specified sound and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
     return playSound(entity, sound, false);
   }
 
-  @Override
+  /**
+   * Plays the specified sound and updates its volume and pan by the current
+   * entity location in relation to the listener location.
+   * 
+   * @param entity
+   *          The entity at which location the sound should be played.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final IEntity entity, final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
@@ -69,12 +136,35 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     return playback;
   }
 
-  @Override
+  /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final Point2D location, final Sound sound) {
     return this.playSound(location, sound, false);
   }
 
-  @Override
+  /**
+   * Plays the specified sound at the specified location and updates the volume
+   * and pan in relation to the listener location.
+   * 
+   * @param location
+   *          The location at which to play the sound.
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final Point2D location, final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
@@ -86,12 +176,31 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     return playback;
   }
 
-  @Override
+  /**
+   * Plays the specified sound with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param sound
+   *          The sound to play.
+   * 
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final Sound sound) {
     return playSound(sound, false);
   }
 
-  @Override
+  /**
+   * Plays the specified sound with the volume configured in the SOUND config
+   * with a center pan.
+   * 
+   * @param sound
+   *          The sound to play.
+   * @param loop
+   *          Determines whether this playback should be looped or not.
+   * @return A {@link ISoundPlayback} instance that allows to further process
+   *         and control the played sound.
+   */
   public ISoundPlayback playSound(final Sound sound, boolean loop) {
     if (sound == null) {
       return null;
@@ -104,18 +213,21 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     return playback;
   }
 
-  @Override
+  /**
+   * Sets the maximum distance from the listener at which a sound source can
+   * still be heard. If the distance between the sound source and the listener
+   * is greater than the specified value, the volume is set to 0.
+   * 
+   * @param distance
+   *          The maximum distance at which sounds can still be heard.
+   */
   public void setMaxDistance(final float radius) {
     this.maxDist = radius;
   }
 
-  @Override
-  public void start() {
-    Input.getLoop().attach(this);
-    this.listenerLocation = Game.world().camera().getFocus();
-  }
-
-  @Override
+  /**
+   * Stops the playback of the current background music.
+   */
   public void stopMusic() {
     if (music == null) {
       return;
@@ -123,6 +235,26 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
 
     this.music.cancel();
     this.music = null;
+  }
+
+  /**
+   * This method allows to set the callback that is used by the SoundEngine to
+   * determine where the listener location is.
+   * 
+   * If not explicitly set, the SoundEngine uses the camera focus (center of the
+   * screen) as listener location.
+   * 
+   * @param listenerLocationCallback
+   *          The callback that determines the location of the sound listener.
+   */
+  public void setListenerLocationCallback(Function<Point2D, Point2D> listenerLocationCallback) {
+    this.listenerLocationCallback = listenerLocationCallback;
+  }
+
+  @Override
+  public void start() {
+    Input.getLoop().attach(this);
+    this.listenerLocation = Game.world().camera().getFocus();
   }
 
   @Override
@@ -137,7 +269,7 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
       for (SoundPlayback playback : this.sounds) {
         playback.cancel();
       }
-  
+
       this.sounds.clear();
     }
     SoundPlayback.terminate();
@@ -169,10 +301,5 @@ public final class SoundEngine implements ISoundEngine, IUpdateable, ILaunchable
     if (this.music != null && !this.music.isPlaying()) {
       this.playMusic(this.music.getSound());
     }
-  }
-
-  @Override
-  public void setListenerLocationCallback(Function<Point2D, Point2D> listenerLocationCallback) {
-    this.listenerLocationCallback = listenerLocationCallback;
   }
 }

@@ -39,7 +39,6 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.input.Input.InputGameAdapter;
 import de.gurkenlabs.litiengine.physics.PhysicsEngine;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.sound.ISoundEngine;
 import de.gurkenlabs.litiengine.sound.ISoundPlayback;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.sound.SoundEngine;
@@ -292,10 +291,10 @@ public final class Game {
    * @see Sound
    * @see Resources#sounds()
    * @see ISoundPlayback
-   * @see ISoundEngine#playSound(de.gurkenlabs.litiengine.sound.Sound)
-   * @see ISoundEngine#playMusic(de.gurkenlabs.litiengine.sound.Sound)
+   * @see SoundEngine#playSound(de.gurkenlabs.litiengine.sound.Sound)
+   * @see SoundEngine#playMusic(de.gurkenlabs.litiengine.sound.Sound)
    */
-  public static ISoundEngine audio() {
+  public static SoundEngine audio() {
     return soundEngine;
   }
 
