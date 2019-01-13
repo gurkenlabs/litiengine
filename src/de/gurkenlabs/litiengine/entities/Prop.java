@@ -19,13 +19,13 @@ public class Prop extends CombatEntity {
 
   @TmxProperty(name = MapObjectProperty.PROP_ADDSHADOW)
   private boolean addShadow;
-  
+
   @TmxProperty(name = MapObjectProperty.PROP_FLIPHORIZONTALLY)
   private boolean flipHorizontally;
-  
+
   @TmxProperty(name = MapObjectProperty.PROP_FLIPVERTICALLY)
   private boolean flipVertically;
-  
+
   @TmxProperty(name = MapObjectProperty.PROP_SCALE)
   private boolean scaling;
 
@@ -87,6 +87,11 @@ public class Prop extends CombatEntity {
     return this.addShadow;
   }
 
+  /**
+   * Gets whether this instance should be treated like an obstacle (static collision box).
+   * 
+   * @return True if this instance is defined as obstacle; otherwise false.
+   */
   public boolean isObstacle() {
     return this.isObstacle;
   }

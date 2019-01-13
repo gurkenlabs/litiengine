@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Direction;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
@@ -16,6 +17,14 @@ import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+/**
+ * This class is used to hold all collision aware instances and static collision boxes.
+ * It is responsible for resolving movement that respects the collision boxes in the game. This is achieved by the <b><code>move</code></b> method
+ * group.
+ * <br>
+ * The <b><code>collides</code></b> method group can detect a collision at a certain location, for rectangles, or collision aware entities.
+ * Also, there's an overload that takes a <code>Line2D</code> to perform a basic raycast check.
+ */
 public final class PhysicsEngine implements IUpdateable {
   private final List<ICollisionEntity> collisionEntities;
 
@@ -29,6 +38,15 @@ public final class PhysicsEngine implements IUpdateable {
   private final List<Rectangle2D> allCollisionBoxRectangles;
   private final List<Rectangle2D> entityCollisionBoxRectangles;
 
+  /**
+   * Instantiates a new PhysicsEngine instance.
+   * 
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.physics()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#physics()
+   */
   public PhysicsEngine() {
     this.entityCollisionBoxes = new CopyOnWriteArrayList<>();
     this.collisionEntities = new CopyOnWriteArrayList<>();
@@ -39,7 +57,18 @@ public final class PhysicsEngine implements IUpdateable {
     this.entityCollisionBoxRectangles = new CopyOnWriteArrayList<>();
   }
 
+  /**
+   * Adds the specified collision aware entity to the physics engine which will make it respect the entity's collision box for upcoming calls.
+   * 
+   * @param entity
+   *          The collision entity to be added.
+   * 
+   * @see ICollisionEntity#getCollisionBox()
+   * @see PhysicsEngine#remove(ICollisionEntity)
+   */
   public void add(final ICollisionEntity entity) {
+
+    // special handling for making props be handled like static collision boxes.
     if (entity instanceof Prop) {
       Prop prop = (Prop) entity;
       if (prop.isObstacle()) {
@@ -53,6 +82,12 @@ public final class PhysicsEngine implements IUpdateable {
     }
   }
 
+  /**
+   * Adds the specified static collision box to the physics engine.
+   * 
+   * @param staticCollisionBox
+   *          The static collision box to be added.
+   */
   public void add(final Rectangle2D staticCollisionBox) {
     if (!this.staticCollisionBoxes.contains(staticCollisionBox)) {
       this.staticCollisionBoxes.add(staticCollisionBox);
@@ -67,7 +102,7 @@ public final class PhysicsEngine implements IUpdateable {
         return;
       }
     }
-  
+
     this.collisionEntities.remove(entity);
   }
 

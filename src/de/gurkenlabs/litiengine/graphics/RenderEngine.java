@@ -40,6 +40,15 @@ public final class RenderEngine {
 
   private float baseRenderScale;
 
+  /**
+   * Instantiates a new RenderEngine instance.
+   * 
+   * <p>
+   * <b>You should never call this manually! Instead use the <code>Game.graphics()</code> instance.</b>
+   * </p>
+   * 
+   * @see Game#graphics()
+   */
   public RenderEngine() {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
@@ -100,7 +109,6 @@ public final class RenderEngine {
     if (shape == null) {
       return;
     }
-
 
     final AffineTransform t = new AffineTransform();
     t.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
@@ -186,7 +194,7 @@ public final class RenderEngine {
   public void renderEntities(final Graphics2D g, final Collection<? extends IEntity> entities, final boolean sort) {
     // in order to render the entities in a 2.5D manner, we sort them by their
     // max Y Coordinate
-    
+
     final List<? extends IEntity> entitiesToRender = entities.stream().filter(x -> Game.world().camera().getViewport().intersects(x.getBoundingBox())).collect(Collectors.toList());
 
     if (sort) {
