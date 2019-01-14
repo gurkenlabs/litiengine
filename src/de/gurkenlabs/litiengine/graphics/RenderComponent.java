@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
@@ -36,6 +37,7 @@ import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 @SuppressWarnings("serial")
 public class RenderComponent extends Canvas implements IInitializable {
   public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
+  public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
   private static final int DEBUG_MOUSE_SIZE = 5;
 
   private final transient List<Consumer<Integer>> fpsChangedConsumer;
@@ -65,6 +67,7 @@ public class RenderComponent extends Canvas implements IInitializable {
     this.fpsChangedConsumer = new CopyOnWriteArrayList<>();
 
     this.setBackground(DEFAULT_BACKGROUND_COLOR);
+    this.setFont(DEFAULT_FONT);
 
     // hide default cursor
     final BufferedImage cursorImg = ImageProcessing.getCompatibleImage(16, 16);
