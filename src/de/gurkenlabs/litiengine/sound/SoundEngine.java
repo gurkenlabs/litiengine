@@ -218,7 +218,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * still be heard. If the distance between the sound source and the listener
    * is greater than the specified value, the volume is set to 0.
    * 
-   * @param distance
+   * @param radius
    *          The maximum distance at which sounds can still be heard.
    */
   public void setMaxDistance(final float radius) {
