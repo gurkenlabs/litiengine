@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,11 +9,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JSpinner;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.entities.Material;
 import de.gurkenlabs.litiengine.entities.Rotation;
@@ -29,8 +23,6 @@ import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 @SuppressWarnings("serial")
 public class PropPanel extends PropertyPanel {
   private JComboBox<JLabel> comboBoxSpriteSheets;
-  private JCheckBox chckbxIndestructible;
-  private JSpinner spinnerHealth;
   private JComboBox<Material> comboBoxMaterial;
   private JCheckBox chckbxIsObstacle;
   private JCheckBox chckbxShadow;
@@ -45,16 +37,8 @@ public class PropPanel extends PropertyPanel {
    * Create the panel.
    */
   public PropPanel() {
+    super("panel_prop");
     Resources.images().addClearedListener(() -> this.propsLoaded = false);
-
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_prop"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
-
-    JLabel lblHealth = new JLabel(Resources.strings().get("panel_health"));
-
-    this.spinnerHealth = new JSpinner();
-    this.spinnerHealth.setModel(new SpinnerNumberModel(100, 0, 1000000, 1));
 
     JLabel lblMaterial = new JLabel(Resources.strings().get("panel_material"));
 
@@ -65,8 +49,6 @@ public class PropPanel extends PropertyPanel {
 
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
-
-    this.chckbxIndestructible = new JCheckBox(Resources.strings().get("panel_destructible"));
     this.chckbxIsObstacle = new JCheckBox(Resources.strings().get("panel_isObstacle"));
     this.chckbxShadow = new JCheckBox("shadow");
 
@@ -81,28 +63,63 @@ public class PropPanel extends PropertyPanel {
     this.checkBoxScale = new JCheckBox("stretch sprite");
 
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()
-        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 51,
-            GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(ComponentPlacement.RELATED)
-        .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxIsObstacle).addComponent(chckbxIndestructible, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE).addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(checkBoxHorizontalFlip).addComponent(checkBoxVerticalFlip, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxScale, GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)).addContainerGap())
-            .addGroup(groupLayout.createSequentialGroup()
-                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(comboBoxMaterial, 0, 191, Short.MAX_VALUE).addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxRotation, 0, 191, Short.MAX_VALUE))
-                .addGap(5))))
-        .addGroup(groupLayout.createSequentialGroup().addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxSpriteSheets, 0, 191, Short.MAX_VALUE).addGap(5)))));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+    groupLayout.setHorizontalGroup(
+      groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblHealth, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(spinnerHealth, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxMaterial, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-            .addGap(7).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxRotation, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(chckbxIndestructible, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxHorizontalFlip)).addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxVerticalFlip)).addPreferredGap(ComponentPlacement.UNRELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
-            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+          .addContainerGap()
+          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addComponent(comboBoxSpriteSheets, 0, 370, Short.MAX_VALUE))
+            .addGroup(groupLayout.createSequentialGroup()
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE))
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addGroup(groupLayout.createSequentialGroup()
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chckbxIsObstacle)
+                    .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
+                  .addGap(18)
+                  .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(checkBoxHorizontalFlip)
+                    .addComponent(checkBoxVerticalFlip, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))
+                  .addPreferredGap(ComponentPlacement.RELATED, 165, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                  .addComponent(comboBoxMaterial, 0, 370, Short.MAX_VALUE)
+                  .addComponent(comboBoxRotation, 0, 370, Short.MAX_VALUE)))))
+          .addGap(5))
+    );
+    groupLayout.setVerticalGroup(
+      groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
+            .addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+          .addPreferredGap(ComponentPlacement.RELATED)
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
+            .addComponent(comboBoxMaterial, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+          .addGap(7)
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+            .addComponent(comboBoxRotation, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblRotation, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+            .addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+            .addGroup(groupLayout.createSequentialGroup()
+              .addComponent(checkBoxHorizontalFlip)
+              .addPreferredGap(ComponentPlacement.RELATED)
+              .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(checkBoxVerticalFlip)
+                .addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))))
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(chckbxShadow, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+          .addContainerGap(131, Short.MAX_VALUE))
+    );
     setLayout(groupLayout);
     this.setupChangedListeners();
   }
@@ -133,13 +150,11 @@ public class PropPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-    this.chckbxIndestructible.setSelected(false);
     this.chckbxIsObstacle.setSelected(false);
     this.chckbxShadow.setSelected(false);
     this.checkBoxScale.setSelected(false);
     this.comboBoxMaterial.setSelectedItem(Material.UNDEFINED);
     this.comboBoxRotation.setSelectedItem(Rotation.NONE);
-    this.spinnerHealth.setValue(0);
     this.comboBoxSpriteSheets.setSelectedItem(null);
   }
 
@@ -153,8 +168,6 @@ public class PropPanel extends PropertyPanel {
     final Rotation rotation = mapObject.getStringValue(MapObjectProperty.PROP_ROTATION) == null ? Rotation.NONE : Rotation.valueOf(mapObject.getStringValue(MapObjectProperty.PROP_ROTATION));
     this.comboBoxRotation.setSelectedItem(rotation);
 
-    this.spinnerHealth.setValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HEALTH));
-    this.chckbxIndestructible.setSelected(!mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
     this.chckbxShadow.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
     this.chckbxIsObstacle.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_OBSTACLE));
     this.checkBoxHorizontalFlip.setSelected(mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));
@@ -163,7 +176,6 @@ public class PropPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIndestructible.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, !chckbxIndestructible.isSelected())));
     this.chckbxShadow.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_ADDSHADOW, chckbxShadow.isSelected())));
 
     this.comboBoxMaterial.addActionListener(new MapObjectPropertyActionListener(m -> {
@@ -180,8 +192,6 @@ public class PropPanel extends PropertyPanel {
       JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
       m.setValue(MapObjectProperty.SPRITESHEETNAME, selected.getText());
     }));
-
-    this.spinnerHealth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(MapObjectProperty.COMBAT_HEALTH, (int) this.spinnerHealth.getValue())));
     this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_OBSTACLE, chckbxIsObstacle.isSelected())));
 
     this.checkBoxHorizontalFlip.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_FLIPHORIZONTALLY, checkBoxHorizontalFlip.isSelected())));

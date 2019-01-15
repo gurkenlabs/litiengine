@@ -54,6 +54,7 @@ import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.physics.GravityForce;
+import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
@@ -1195,9 +1196,13 @@ public class Environment implements IEnvironment {
   }
 
   private void addGravityForce(IMobileEntity entity) {
-    GravityForce force = new GravityForce(entity, this.getGravity(), Direction.DOWN);
-    entity.getMovementController().apply(force);
-    this.gravityForces.put(entity.getMapId(), force);
+    IMovementController mvmtControl = entity.getMovementController();
+    if (mvmtControl != null) {
+      GravityForce force = new GravityForce(entity, this.getGravity(), Direction.DOWN);
+      entity.getMovementController().apply(force);
+      this.gravityForces.put(entity.getMapId(), force);
+    }
+
   }
 
   private void removeGravity(IMobileEntity entity) {

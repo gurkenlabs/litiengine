@@ -14,4 +14,8 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface CombatInfo {
   int hitpoints() default 100;
+
+  int team() default 0;
+
+  boolean isIndestructible() default false;
 }

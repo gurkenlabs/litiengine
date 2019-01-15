@@ -79,7 +79,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     prop.setMaterial(Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
     
     prop.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
-    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getIntValue(MapObjectProperty.COMBAT_HEALTH));
+    AttributeModifier<Integer> mod = new AttributeModifier<>(Modification.SET, mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS));
     prop.getHitPoints().modifyMaxBaseValue(mod);
     prop.getHitPoints().modifyBaseValue(mod);
 

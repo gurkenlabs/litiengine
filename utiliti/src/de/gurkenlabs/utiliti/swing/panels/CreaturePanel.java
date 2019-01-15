@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,8 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -35,9 +31,7 @@ public class CreaturePanel extends PropertyPanel {
    * Create the panel.
    */
   public CreaturePanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_creature"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
+    super("panel_creature");
 
     JLabel lblSprite = new JLabel(Resources.strings().get("panel_sprite"));
 

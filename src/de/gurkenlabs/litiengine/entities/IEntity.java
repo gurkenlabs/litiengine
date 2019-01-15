@@ -26,6 +26,14 @@ public interface IEntity {
   public void removeListener(EntityListener listener);
 
   public float getAngle();
+  
+  /**
+   * Sets the angle (in degrees) in which the entity is directed.
+   *
+   * @param angle
+   *          the new angle in degrees
+   */
+  public void setAngle(float angle);
 
   public IEntityAnimationController getAnimationController();
 

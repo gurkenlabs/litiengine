@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +11,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
@@ -30,9 +26,7 @@ public class CustomPanel extends PropertyPanel {
   private DefaultTableModel model;
 
   public CustomPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_customProperties"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
+    super("panel_customProperties");
 
     this.scrollPane = new JScrollPane();
 

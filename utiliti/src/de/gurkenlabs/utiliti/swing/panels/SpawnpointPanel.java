@@ -1,8 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -10,8 +7,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -24,9 +19,7 @@ public class SpawnpointPanel extends PropertyPanel {
   private JComboBox<Direction> comboBoxDirection;
 
   public SpawnpointPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_spawnPoint"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
+    super("panel_spawnPoint");
 
     JLabel lblShadowType = new JLabel(Resources.strings().get("panel_entity"));
 

@@ -32,6 +32,9 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
 
   @TmxProperty(name = MapObjectProperty.COMBAT_TEAM)
   private int team;
+  
+  @TmxProperty(name = MapObjectProperty.COMBAT_HITPOINTS)
+  private int initialHitpoints;
 
   private ICombatEntity target;
   private long lastHit;
@@ -44,8 +47,11 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
     this.appliedEffects = new CopyOnWriteArrayList<>();
 
     final CombatInfo info = this.getClass().getAnnotation(CombatInfo.class);
-    this.hitPoints = new RangeAttribute<>(info.hitpoints(), 0, info.hitpoints());
-    this.setIndestructible(false);
+    this.initialHitpoints = info.hitpoints();
+    this.setTeam(info.team());
+    this.setIndestructible(info.isIndestructible());
+
+    this.hitPoints = new RangeAttribute<>(this.initialHitpoints, 0, this.initialHitpoints);
   }
 
   @Override

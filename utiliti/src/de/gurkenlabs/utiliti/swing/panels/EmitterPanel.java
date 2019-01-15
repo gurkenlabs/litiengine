@@ -1,8 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 
 import javax.swing.Box;
 import javax.swing.GroupLayout;
@@ -11,8 +9,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -28,9 +24,7 @@ public class EmitterPanel extends PropertyPanel {
   private transient CustomEmitter emitter;
 
   public EmitterPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_emitter"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
+    super("panel_emitter");
 
     Box horizontalBox = Box.createHorizontalBox();
 

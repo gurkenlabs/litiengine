@@ -62,14 +62,6 @@ public interface IMobileEntity extends ICollisionEntity {
   public void setAcceleration(int acceleration);
 
   /**
-   * Sets the angle (in degrees) in which the entity is directed.
-   *
-   * @param angle
-   *          the new angle in degrees
-   */
-  public void setAngle(float angle);
-
-  /**
    * Sets the deceleration for this entity. deceleration is a value that defines how long it takes the entity to stop when slowing down from movements (in ms).
    *
    * @param deceleration

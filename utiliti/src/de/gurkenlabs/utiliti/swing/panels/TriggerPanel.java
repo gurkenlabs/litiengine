@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +16,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
@@ -41,9 +37,7 @@ public class TriggerPanel extends PropertyPanel {
   private JTable tableTargets;
 
   public TriggerPanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_trigger"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
+    super("panel_trigger");
 
     JLabel lblShadowType = new JLabel(Resources.strings().get("panel_message"));
 

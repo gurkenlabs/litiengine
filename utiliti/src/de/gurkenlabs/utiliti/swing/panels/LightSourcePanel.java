@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
 import java.awt.Color;
-import java.awt.Font;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -16,8 +15,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
@@ -39,10 +36,8 @@ public class LightSourcePanel extends PropertyPanel {
   private JLabel lblOffsety;
 
   public LightSourcePanel() {
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_lightSource"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
-
+    super("panel_lightSource");
+    
     JLabel lblShadowType = new JLabel("alpha");
 
     this.spinnerBrightness = new JSpinner();

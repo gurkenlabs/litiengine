@@ -52,7 +52,7 @@ public class MapObjectLoaderTests {
     mapObject.setValue(MapObjectProperty.PROP_MATERIAL, Material.PLASTIC.getName());
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
     mapObject.setValue(MapObjectProperty.COLLISION, true);
-    mapObject.setValue(MapObjectProperty.COMBAT_HEALTH, 100);
+    mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
     
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);

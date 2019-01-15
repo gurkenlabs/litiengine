@@ -151,7 +151,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
    * Create the dialog.
    */
   public EmitterPropertyPanel() {
-    super();
+    super("panel_emitterProperties");
     rdbtnLockParticleTTL.setSelected(true);
     setBounds(100, 100, 700, 464);
     this.setBorder(new EmptyBorder(5, 5, 5, 5));

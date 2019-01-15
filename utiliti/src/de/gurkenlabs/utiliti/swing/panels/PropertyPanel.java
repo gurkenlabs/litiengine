@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -16,6 +18,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -32,12 +36,25 @@ import de.gurkenlabs.utiliti.UndoManager;
 public abstract class PropertyPanel extends JPanel {
   protected boolean isFocussing;
   private transient IMapObject dataSource;
+  private String identifier;
+
+  public PropertyPanel(String identifier) {
+    this.identifier = identifier;
+    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get(this.getIdentifier()), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
+    setBorder(border);
+
+  }
 
   public PropertyPanel() {
   }
 
   protected IMapObject getDataSource() {
     return this.dataSource;
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
   }
 
   public void bind(IMapObject mapObject) {

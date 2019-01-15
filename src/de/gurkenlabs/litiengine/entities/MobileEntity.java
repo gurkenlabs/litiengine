@@ -6,16 +6,26 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameLoop;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.attributes.Attribute;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.physics.IMovementController;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @MovementInfo
 public class MobileEntity extends CollisionEntity implements IMobileEntity {
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_ACCELERATION)
   private int acceleration;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_DECELERATION)
   private int deceleration;
-  private Point2D moveDestination;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_TURNONMOVE)
   private boolean turnOnMove;
+  
+  @TmxProperty(name = MapObjectProperty.MOVEMENT_VELOCITY)
   private Attribute<Float> velocity;
+  
+  private Point2D moveDestination;
 
   public MobileEntity() {
     final MovementInfo info = this.getClass().getAnnotation(MovementInfo.class);
