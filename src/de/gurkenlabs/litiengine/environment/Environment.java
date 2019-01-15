@@ -18,7 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Direction;
@@ -59,7 +58,6 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class Environment implements IEnvironment {
-  private static final Logger log = Logger.getLogger(Environment.class.getName());
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
 
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
