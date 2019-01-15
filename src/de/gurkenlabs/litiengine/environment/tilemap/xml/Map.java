@@ -547,10 +547,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof Map) || anObject == null) {
+    if (!(anObject instanceof Map)) {
       return false;
     }
-    return Objects.equals(this.name, ((Map)anObject).name);
+    return Objects.equals(this.name, ((Map) anObject).name);
   }
 
   @Override

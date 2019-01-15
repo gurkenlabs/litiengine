@@ -73,7 +73,7 @@ public class Polyline implements IPolyline, Serializable {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof IPolyline) || anObject == null) {
+    if (!(anObject instanceof IPolyline)) {
       return false;
     }
     IPolyline other = (IPolyline) anObject;

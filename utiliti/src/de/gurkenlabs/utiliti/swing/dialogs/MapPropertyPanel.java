@@ -23,7 +23,7 @@ import de.gurkenlabs.utiliti.Program;
 
 @SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
-
+  private static final Font LABEL_FONT = new Font("Tahoma", Font.PLAIN, 10);
   private final JTextField textFieldDescription;
   private final JTextField textFieldTitle;
   private final JSpinner spinnerGravity;
@@ -48,7 +48,7 @@ public class MapPropertyPanel extends JPanel {
     textFieldDescription.setColumns(10);
 
     JLabel lblMapTitle = new JLabel("title");
-    lblMapTitle.setFont(new Font("Tahoma", Font.PLAIN, 10));
+    lblMapTitle.setFont(LABEL_FONT);
 
     textFieldTitle = new JTextField();
     textFieldTitle.setFont(Program.TEXT_FONT);
@@ -77,7 +77,7 @@ public class MapPropertyPanel extends JPanel {
     textFieldAmbientColor.setColumns(10);
 
     JLabel lblAlpha = new JLabel("alpha");
-    lblAlpha.setFont(new Font("Tahoma", Font.PLAIN, 10));
+    lblAlpha.setFont(LABEL_FONT);
 
     spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
@@ -97,7 +97,7 @@ public class MapPropertyPanel extends JPanel {
     lblAmbientLight.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(12f));
 
     JLabel lblDesc = new JLabel("description");
-    lblDesc.setFont(new Font("Tahoma", Font.PLAIN, 10));
+    lblDesc.setFont(LABEL_FONT);
 
     textFieldName = new JTextField();
     textFieldName.setFont(Program.TEXT_FONT);
@@ -107,7 +107,7 @@ public class MapPropertyPanel extends JPanel {
     lblStaticShadows.setFont(new Font("Dialog", Font.BOLD, 12));
 
     JLabel labelAlpha = new JLabel("alpha");
-    labelAlpha.setFont(new Font("Tahoma", Font.PLAIN, 10));
+    labelAlpha.setFont(LABEL_FONT);
 
     spinnerShadowAlpha = new JSpinner();
     spinnerShadowAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
@@ -120,7 +120,7 @@ public class MapPropertyPanel extends JPanel {
     });
 
     JLabel labelColor = new JLabel("color");
-    labelColor.setFont(new Font("Tahoma", Font.PLAIN, 10));
+    labelColor.setFont(LABEL_FONT);
 
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {

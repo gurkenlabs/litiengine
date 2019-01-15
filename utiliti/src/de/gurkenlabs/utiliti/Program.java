@@ -106,8 +106,6 @@ public class Program {
   private static JPopupMenu canvasPopup;
   private static JPopupMenu addPopupMenu;
   private static JLabel statusBar;
-  private static JSpinner spinnerAmbientAlpha;
-  private static JButton colorButton;
   private static JTextField colorText;
   private static boolean isChanging;
 
@@ -129,7 +127,7 @@ public class Program {
 
     Game.config().getConfigurationGroups().add(new UserPreferenceConfiguration());
     Game.init(args);
-    
+
     // the editor should never crash, even if an exception occurs
     Game.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(false));
 
@@ -139,7 +137,7 @@ public class Program {
 
     userPreferences = Game.config().getConfigurationGroup("user_", UserPreferenceConfiguration.class);
 
-    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom((float)zoom));
+    Game.world().camera().onZoomChanged(zoom -> userPreferences.setZoom((float) zoom));
 
     Game.screens().display(EditorScreen.instance());
 
@@ -537,11 +535,10 @@ public class Program {
 
     MenuItem importSprite = new MenuItem(Resources.strings().get("menu_assets_importSprite"));
     importSprite.addActionListener(a -> EditorScreen.instance().importSpriteSheets());
-    
-    
+
     MenuItem importTextureAtlas = new MenuItem(Resources.strings().get("menu_assets_importTextureAtlas"));
     importTextureAtlas.addActionListener(a -> EditorScreen.instance().importTextureAtlas());
-    
+
     MenuItem importEmitters = new MenuItem(Resources.strings().get("menu_assets_importEmitters"));
     importEmitters.addActionListener(a -> EditorScreen.instance().importEmitters());
 
@@ -654,8 +651,8 @@ public class Program {
 
     MenuItem aboutMenuItem = new MenuItem(Resources.strings().get("menu_help_about"));
     aboutMenuItem.addActionListener(event -> JOptionPane.showMessageDialog(((JFrame) Game.window().getHostControl()),
-        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"), Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(),
-        JOptionPane.INFORMATION_MESSAGE));
+        Resources.strings().get("menu_help_abouttext") + "\n" + Resources.strings().get("menu_help_releases") + Resources.strings().get("link_LITIengine_releases") + "\n\n" + Resources.strings().get("copyright_gurkenlabs") + "\n" + Resources.strings().get("copyright_LITIengine"),
+        Resources.strings().get("menu_help_about") + " " + Game.info().getVersion(), JOptionPane.INFORMATION_MESSAGE));
 
     helpMenu.add(tutorialMenuItem);
     helpMenu.add(wikiMenuItem);
@@ -701,8 +698,6 @@ public class Program {
 
   private static Component initConsole() {
     // TODO: implement possibility to configure the desired log level
-    //// Logger root = Logger.getLogger("de.gurkenlabs");
-    //// root.setLevel(Level.FINE);
     Logger root = Logger.getLogger("");
     JTextPane consoleTextArea = new JTextPane();
     JScrollPane consoleScrollPane = new JScrollPane();
@@ -904,11 +899,11 @@ public class Program {
 
     basicMenu.addSeparator();
 
-    colorButton = new JButton();
+    JButton colorButton = new JButton();
     colorButton.setIcon(Icons.COLOR);
     colorButton.setEnabled(false);
 
-    spinnerAmbientAlpha = new JSpinner();
+    JSpinner spinnerAmbientAlpha= new JSpinner();
     spinnerAmbientAlpha.setToolTipText("Adjust ambient alpha.");
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
     spinnerAmbientAlpha.setFont(Program.TEXT_FONT);

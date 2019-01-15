@@ -141,9 +141,7 @@ public final class Resources {
       return;
     }
 
-    file.getMaps().parallelStream().forEach(m -> {
-      Resources.maps().add(m.getName(), m);
-    });
+    file.getMaps().parallelStream().forEach(m -> Resources.maps().add(m.getName(), m));
 
     log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { file.getMaps().size(), gameResourceFile });
 

@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
+  private static final String STRING_TYPE = "string";
   @XmlAccessorType(XmlAccessType.FIELD)
   static class Property {
     @XmlAttribute
@@ -33,19 +34,19 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
     Property(String name, String type) {
       this.name = name;
-      this.type = type == null ? "string" : type;
+      this.type = type == null ? STRING_TYPE : type;
     }
 
     @SuppressWarnings("unused")
     private void afterUnmarshal(Unmarshaller u, Object parent) {
       if (this.type == null) {
-        this.type = "string";
+        this.type = STRING_TYPE;
       }
     }
 
     @SuppressWarnings("unused")
     private void beforeMarshal(Marshaller m) {
-      if (this.type.equals("string")) {
+      if (this.type.equals(STRING_TYPE)) {
         this.type = null;
       }
     }
