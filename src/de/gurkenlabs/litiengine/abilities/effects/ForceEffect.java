@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.abilities.effects;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.physics.Force;
 
 public abstract class ForceEffect extends Effect {
@@ -21,7 +22,14 @@ public abstract class ForceEffect extends Effect {
       return;
     }
 
-    final Force force = this.applyForce(affectedEntity);
+    IMobileEntity forceEntity = null;
+    if (affectedEntity instanceof IMobileEntity) {
+      forceEntity = (IMobileEntity) affectedEntity;
+    } else {
+      return;
+    }
+
+    final Force force = this.applyForce(forceEntity);
     if (force != null) {
       this.appliedForce = force;
     }
@@ -31,7 +39,7 @@ public abstract class ForceEffect extends Effect {
     return this.strength;
   }
 
-  protected abstract Force applyForce(final ICombatEntity affectedEntity);
+  protected abstract Force applyForce(final IMobileEntity affectedEntity);
 
   @Override
   protected void cease(final EffectApplication appliance) {
