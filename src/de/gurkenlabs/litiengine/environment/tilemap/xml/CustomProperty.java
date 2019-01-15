@@ -135,7 +135,7 @@ public class CustomProperty implements ICustomProperty {
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ICustomProperty) || anObject == null) {
+    if (!(anObject instanceof ICustomProperty)) {
       return false;
     }
     ICustomProperty other = (ICustomProperty) anObject;

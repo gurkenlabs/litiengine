@@ -468,7 +468,6 @@ public class ImageProcessing {
   }
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final double radians) {
-
     double sin = Math.abs(Math.sin(radians));
     double cos = Math.abs(Math.cos(radians));
 
@@ -479,6 +478,10 @@ public class ImageProcessing {
     int newh = (int) Math.floor(h * cos + w * sin);
 
     BufferedImage bimg = getCompatibleImage(neww, newh);
+    if (bimg == null) {
+      return bufferedImage;
+    }
+    
     Graphics2D g = bimg.createGraphics();
 
     g.translate((neww - w) / 2.0, (newh - h) / 2.0);

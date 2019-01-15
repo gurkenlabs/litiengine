@@ -334,7 +334,8 @@ public class EditorScreen extends Screen {
   }
 
   public void importSpriteFile() {
-    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, "Import " + SPRITE_FILE_NAME, false, SpritesheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+    
+    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), false, SpritesheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
@@ -354,13 +355,13 @@ public class EditorScreen extends Screen {
   }
 
   public void importSpriteSheets() {
-    if (EditorFileChooser.showFileDialog(SPRITESHEET_FILE_NAME, "Import " + SPRITESHEET_FILE_NAME, true, ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(SPRITESHEET_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), true, ImageFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
       this.importSpriteSheets(EditorFileChooser.instance().getSelectedFiles());
     }
   }
 
   public void importTextureAtlas() {
-    if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, "Import " + TEXTUREATLAS_FILE_NAME, false, "xml") == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, Resources.strings().get("import_something", TEXTUREATLAS_FILE_NAME), false, "xml") == JFileChooser.APPROVE_OPTION) {
       TextureAtlas atlas = TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
       if (atlas == null) {
         return;

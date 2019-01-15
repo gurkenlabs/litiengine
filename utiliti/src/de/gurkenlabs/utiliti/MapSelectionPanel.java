@@ -76,7 +76,6 @@ public class MapSelectionPanel extends JSplitPane {
   private final JCheckBoxList listObjectLayers;
   private final DefaultListModel<String> model;
   private final DefaultListModel<JCheckBox> layerModel;
-  private int lastSelection;
   private final JScrollPane mapScrollPane;
   private final JScrollPane layerScrollPane;
   private final JScrollPane entityScrollPane;
@@ -600,7 +599,7 @@ public class MapSelectionPanel extends JSplitPane {
     }
 
     Map map = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
-    this.lastSelection = listObjectLayers.getSelectedIndex();
+    int lastSelection = listObjectLayers.getSelectedIndex();
     this.saveLayerVisibility();
     this.layerModel.clear();
     for (IMapObjectLayer layer : map.getMapObjectLayers()) {
@@ -638,7 +637,7 @@ public class MapSelectionPanel extends JSplitPane {
     int end = mapList.getModel().getSize() - 1;
     if (end >= 0) {
       listObjectLayers.setSelectionInterval(start, end);
-      this.selectLayer(this.lastSelection);
+      this.selectLayer(lastSelection);
     }
   }
 

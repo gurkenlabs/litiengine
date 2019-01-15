@@ -38,6 +38,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel {
+  private static final Font LABEL_FONT = new Font("Tahoma", Font.PLAIN, 15);
   private JTextField textField;
   private JTable tableKeyFrames;
   private JList<SpriteFileWrapper> fileList;
@@ -160,16 +161,16 @@ public class SpritesheetImportPanel extends JPanel {
     });
 
     JLabel lblNewLabel = new JLabel("width:");
-    lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
+    lblNewLabel.setFont(LABEL_FONT);
 
     labelWidth = new JLabel("XXX");
-    labelWidth.setFont(new Font("Tahoma", Font.PLAIN, 15));
+    labelWidth.setFont(LABEL_FONT);
 
     labelHeight = new JLabel("XXX");
-    labelHeight.setFont(new Font("Tahoma", Font.PLAIN, 15));
+    labelHeight.setFont(LABEL_FONT);
 
     JLabel lblHeightText = new JLabel("height:");
-    lblHeightText.setFont(new Font("Tahoma", Font.PLAIN, 15));
+    lblHeightText.setFont(LABEL_FONT);
 
     JLabel lblName = new JLabel("name:");
 

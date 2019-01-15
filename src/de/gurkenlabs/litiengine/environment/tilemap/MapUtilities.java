@@ -146,10 +146,10 @@ public final class MapUtilities {
     xCoord = x < 0 ? (int) (x / jumpWidth) - 1 : (int) (x / jumpWidth);
     yCoord = y < 0 ? (int) (y / jumpHeight) - 1 : (int) (y / jumpHeight);
     if (staggerAxis == StaggerAxis.X && isStaggeredRowOrColumn(staggerIndex, xCoord)) {
-      yCoord = (int) ((y - jumpHeight / 2) / jumpHeight);
+      yCoord = (int) ((y - jumpHeight / 2.0) / jumpHeight);
       yCoord = y < jumpHeight / 2 ? yCoord - 1 : yCoord;
     } else if (staggerAxis == StaggerAxis.Y && isStaggeredRowOrColumn(staggerIndex, yCoord)) {
-      xCoord = (int) ((x - jumpWidth / 2) / jumpWidth);
+      xCoord = (int) ((x - jumpWidth / 2.0) / jumpWidth);
       xCoord = x < jumpWidth / 2 ? xCoord - 1 : xCoord;
     }
     return assessHexStaggering(staggerAxis, staggerIndex, new Point(xCoord, yCoord), s, t, r, jumpWidth, jumpHeight, x, y);

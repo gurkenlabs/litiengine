@@ -89,12 +89,14 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   @Override
   public boolean equals(Object anObject) {
+    if (!(anObject instanceof IMapImage)) {
+      return false;
+    }
+    
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof IMapImage) || anObject == null) {
-      return false;
-    }
+    
     IMapImage other = (IMapImage) anObject;
     return this.getTransparentColor().equals(other.getTransparentColor()) && this.getAbsoluteSourcePath().equals(other.getAbsoluteSourcePath());
   }

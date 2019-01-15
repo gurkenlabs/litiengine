@@ -23,7 +23,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
     if (entityType.isInterface() || Modifier.isAbstract(entityType.getModifiers())) {
       throw new IllegalArgumentException("cannot create loader for interface or abstract class");
     }
-    ConstructorInvocation invoke = null;
+    ConstructorInvocation inv = null;
     Constructor<?>[] constructors = entityType.getConstructors();
     int priority = 0; // env+mo, mo+env, mo, env, nullary
     for (int i = 0; i < constructors.length; i++) {
@@ -31,31 +31,33 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
       Class<?>[] classes = constructor.getParameterTypes();
       if (classes.length == 2) {
         if (classes[0] == IEnvironment.class && classes[1] == IMapObject.class) {
-          invoke = (e, o) -> (IEntity) constructor.newInstance(e, o);
+          inv = (e, o) -> (IEntity) constructor.newInstance(e, o);
           break; // exit early because we've already found the highest priority constructor
         } else if (classes[0] == IMapObject.class && classes[1] == IEnvironment.class) {
-          invoke = (e, o) -> (IEntity) constructor.newInstance(o, e);
+          inv = (e, o) -> (IEntity) constructor.newInstance(o, e);
           priority = 3;
         }
       } else if (classes.length == 1) {
         if (priority < 3) {
           if (classes[0] == IMapObject.class) {
-            invoke = (e, o) -> (IEntity) constructor.newInstance(o);
+            inv = (e, o) -> (IEntity) constructor.newInstance(o);
             priority = 2;
           } else if (priority < 2 && classes[0] == IEnvironment.class) {
-            invoke = (e, o) -> (IEntity) constructor.newInstance(e);
+            inv = (e, o) -> (IEntity) constructor.newInstance(e);
             priority = 1;
           }
         }
       } else if (classes.length == 0 && priority < 1) {
-        invoke = (e, o) -> (IEntity) constructor.newInstance();
+        inv = (e, o) -> (IEntity) constructor.newInstance();
         // priority is already 0
       }
     }
-    if (invoke == null) {
+
+    if (inv == null) {
       throw new IllegalArgumentException("could not find suitable constructor");
     }
-    this.invoke = invoke;
+
+    this.invoke = inv;
   }
 
   @Override
@@ -69,7 +71,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
 
     loadDefaultProperties(entity, mapObject);
     if (entity instanceof ICollisionEntity)
-      loadCollisionProperties((ICollisionEntity)entity, mapObject);
+      loadCollisionProperties((ICollisionEntity) entity, mapObject);
     return Arrays.asList(entity);
   }
 }

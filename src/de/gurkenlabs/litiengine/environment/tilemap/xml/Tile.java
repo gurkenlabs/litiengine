@@ -116,7 +116,7 @@ public class Tile extends CustomPropertyProvider implements ITile, Serializable 
     if (this == anObject) {
       return true;
     }
-    if (!(anObject instanceof ITile) || anObject == null) {
+    if (!(anObject instanceof ITile)) {
       return false;
     }
     ITile other = (ITile) anObject;
