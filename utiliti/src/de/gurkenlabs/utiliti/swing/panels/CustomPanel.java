@@ -46,8 +46,8 @@ public class CustomPanel extends PropertyPanel {
     groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
         .addGroup(groupLayout.createSequentialGroup()
             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(buttonAdd).addPreferredGap(ComponentPlacement.RELATED).addComponent(buttonRemove, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
-                .addGroup(groupLayout.createSequentialGroup().addGap(11).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)))
-            .addContainerGap()));
+                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)))
+            .addGap(CONTROL_MARGIN)));
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED)
         .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(buttonRemove).addComponent(buttonAdd)).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 

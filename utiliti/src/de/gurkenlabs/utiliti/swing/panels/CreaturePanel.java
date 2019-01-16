@@ -5,13 +5,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -118,45 +115,12 @@ public class CreaturePanel extends PropertyPanel {
   }
   
   private LayoutManager createLayout() {
-    JLabel lblSprite = new JLabel(Resources.strings().get("panel_sprite"));
-    JLabel label = new JLabel("direction");
-    JLabel lblType = new JLabel("type");
+    LayoutItem[] layoutItems = new LayoutItem [] {
+        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+        new LayoutItem("panel_direction", this.comboBoxDirection),
+        new LayoutItem("panel_type", this.textFieldType),
+    };
     
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-      groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-          .addGap(CONTROL_MARGIN)
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-            .addComponent(lblType, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-            .addComponent(lblSprite, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-            .addComponent(label, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
-          .addPreferredGap(ComponentPlacement.RELATED, LABEL_GAP, Short.MAX_VALUE)
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addComponent(comboBoxSpriteSheets, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-            .addComponent(comboBoxDirection,  CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-            .addComponent(textFieldType, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-            .addComponent(checkBoxScale, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE))
-          .addGap(CONTROL_MARGIN)));
-    
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.TRAILING)
-        .addGroup(groupLayout.createSequentialGroup()
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-              .addComponent(comboBoxDirection, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-              .addComponent(label, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-              .addComponent(textFieldType, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-              .addComponent(lblType, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-          .addPreferredGap(ComponentPlacement.UNRELATED)
-          .addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)));
-    
-    return groupLayout;
+    return this.createLayout(layoutItems, this.checkBoxScale);
   }
 }

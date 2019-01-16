@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import java.awt.Component;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -11,6 +13,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -18,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -112,13 +119,13 @@ public abstract class PropertyPanel extends JPanel {
     checkbox.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
   }
 
-  protected <T extends Enum<?>> void setup(JComboBox<T> comboBox, String property) {
+  protected <T> void setup(JComboBox<T> comboBox, String property) {
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
       T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
-      m.setValue(property, value);
+      m.setValue(property, value.toString());
     }));
   }
-  
+
   protected void setupL(JComboBox<JLabel> comboBox, String property) {
     comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
       JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
@@ -219,11 +226,84 @@ public abstract class PropertyPanel extends JPanel {
     }
   }
 
+  protected LayoutManager createLayout(LayoutItem[] layoutItems, Component... additionalComponents) {
+    GroupLayout groupLayout = new GroupLayout(this);
+
+    // prepare the parallel group for the labels
+    ParallelGroup labels = groupLayout.createParallelGroup(Alignment.LEADING, false);
+    for (LayoutItem item : layoutItems) {
+      labels.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE);
+    }
+
+    // prepare the parallel group for the components
+    ParallelGroup components = groupLayout.createParallelGroup(Alignment.LEADING);
+    for (LayoutItem item : layoutItems) {
+      components.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+    }
+
+    // add additional components to the group
+    for (Component component : additionalComponents) {
+      components.addComponent(component, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+    }
+
+    // initialize the horizontal layout group with the parallel groups for
+    // labels and components and some additional gaps
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+            .addGap(CONTROL_MARGIN)
+            .addGroup(labels)
+            .addPreferredGap(ComponentPlacement.RELATED, LABEL_GAP, Short.MAX_VALUE)
+            .addGroup(components).addGap(CONTROL_MARGIN)));
+
+    // now prepare the vertical groups
+    SequentialGroup seq = groupLayout.createSequentialGroup();
+    SequentialGroup current = seq.addGap(CONTROL_MARGIN);
+
+    for (LayoutItem item : layoutItems) {
+      current = current
+          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+              .addComponent(item.getComponent(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+              .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+          .addGap(CONTROL_MARGIN);
+    }
+
+    for (Component component : additionalComponents) {
+      current = current.addComponent(component, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE);
+    }
+
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));
+    return groupLayout;
+  }
+
   private void applyChanges(Consumer<IMapObject> updateAction) {
     final IMapObject before = new MapObject((MapObject) getDataSource());
     UndoManager.instance().mapObjectChanging(getDataSource());
     updateAction.accept(getDataSource());
     UndoManager.instance().mapObjectChanged(getDataSource());
     updateEnvironment(before);
+  }
+
+  protected class LayoutItem {
+    private final String caption;
+    private final Component component;
+    private final JLabel label;
+
+    public LayoutItem(String resource, Component component) {
+      this.caption = Resources.strings().get(resource);
+      this.component = component;
+      this.label = new JLabel(this.caption);
+    }
+
+    public String getCaption() {
+      return this.caption;
+    }
+
+    public JLabel getLabel() {
+      return this.label;
+    }
+
+    public Component getComponent() {
+      return this.component;
+    }
   }
 }

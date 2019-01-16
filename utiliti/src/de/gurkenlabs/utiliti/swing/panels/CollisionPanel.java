@@ -3,20 +3,15 @@ package de.gurkenlabs.utiliti.swing.panels;
 import java.awt.LayoutManager;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JSpinner;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
@@ -71,52 +66,13 @@ public class CollisionPanel extends PropertyPanel {
   }
   
   private LayoutManager createLayout() {
-    JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
-    JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
-    JLabel lblHorizontalAlignment = new JLabel("align");
-    JLabel lblVerticalAlignment = new JLabel("valign");
+    LayoutItem[] layoutItems = new LayoutItem [] {
+        new LayoutItem("panel_width", this.spinnerWidth),
+        new LayoutItem("panel_height", this.spinnerHeight),
+        new LayoutItem("panel_align", this.comboBoxAlign),
+        new LayoutItem("panel_valign", this.comboBoxValign),
+    };
     
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-                .addComponent(lblWidth, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-                .addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-                .addComponent(lblHorizontalAlignment, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-                .addComponent(lblVerticalAlignment, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
-            .addPreferredGap(ComponentPlacement.RELATED, LABEL_GAP, Short.MAX_VALUE)
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                .addComponent(spinnerHeight, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-                .addComponent(spinnerWidth, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-                .addComponent(comboBoxAlign, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-                .addComponent(comboBoxValign, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
-                .addComponent(chckbxHasCollision, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE))
-            .addGap(CONTROL_MARGIN)));
-
-    groupLayout.setVerticalGroup(
-        groupLayout.createParallelGroup(Alignment.TRAILING)
-        .addGroup(groupLayout.createSequentialGroup()
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(comboBoxAlign, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblHorizontalAlignment, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(comboBoxValign, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblVerticalAlignment, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addComponent(chckbxHasCollision, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)));
-    
-    return groupLayout;
+    return this.createLayout(layoutItems, this.chckbxHasCollision);
   }
 }

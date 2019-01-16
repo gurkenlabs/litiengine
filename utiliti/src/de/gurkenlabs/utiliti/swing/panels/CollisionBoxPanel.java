@@ -1,9 +1,8 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import java.awt.LayoutManager;
+
 import javax.swing.JCheckBox;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -18,16 +17,9 @@ public class CollisionBoxPanel extends PropertyPanel {
     super("panel_collisionBox");
 
     this.chckbxIsObstacle = new JCheckBox(Resources.strings().get("panel_isObstacle"));
-
     this.chckbxIsObstructingLights = new JCheckBox(Resources.strings().get("panel_isObstructingLights"));
 
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(
-        groupLayout.createSequentialGroup().addContainerGap().addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE).addComponent(chckbxIsObstructingLights)).addContainerGap(326, Short.MAX_VALUE)));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup().addComponent(chckbxIsObstacle, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(chckbxIsObstructingLights).addContainerGap(235, Short.MAX_VALUE)));
-    setLayout(groupLayout);
-
+    setLayout(this.createLayout());
     this.setupChangedListeners();
   }
 
@@ -44,7 +36,14 @@ public class CollisionBoxPanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.chckbxIsObstacle.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.PROP_OBSTACLE, chckbxIsObstacle.isSelected())));
-    this.chckbxIsObstructingLights.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS, chckbxIsObstructingLights.isSelected())));
+    this.setup(this.chckbxIsObstacle, MapObjectProperty.PROP_OBSTACLE);
+    this.setup(this.chckbxIsObstructingLights, MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
+  }
+  
+  private LayoutManager createLayout() {
+    LayoutItem[] layoutItems = new LayoutItem [] {
+    };
+    
+    return this.createLayout(layoutItems, this.chckbxIsObstacle, this.chckbxIsObstructingLights);
   }
 }
