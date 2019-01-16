@@ -230,30 +230,27 @@ public abstract class PropertyPanel extends JPanel {
     GroupLayout groupLayout = new GroupLayout(this);
 
     // prepare the parallel group for the labels
-    ParallelGroup labels = groupLayout.createParallelGroup(Alignment.LEADING, false);
-    for (LayoutItem item : layoutItems) {
-      labels.addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE);
-    }
-
-    // prepare the parallel group for the components
-    ParallelGroup components = groupLayout.createParallelGroup(Alignment.LEADING);
-    for (LayoutItem item : layoutItems) {
-      components.addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
-    }
-
     // add additional components to the group
+    ParallelGroup parallel = groupLayout.createParallelGroup(Alignment.TRAILING);
     for (Component component : additionalComponents) {
-      components.addComponent(component, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+      parallel.addComponent(component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
+    }
+    
+    for (LayoutItem item : layoutItems) {
+      parallel.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+          .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+          .addPreferredGap(ComponentPlacement.UNRELATED)
+          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE));
     }
 
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+    groupLayout.setHorizontalGroup(
+        groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup()
-            .addGap(CONTROL_MARGIN)
-            .addGroup(labels)
-            .addPreferredGap(ComponentPlacement.RELATED, LABEL_GAP, Short.MAX_VALUE)
-            .addGroup(components).addGap(CONTROL_MARGIN)));
+            .addContainerGap()
+            .addGroup(parallel)
+            ));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
@@ -267,6 +264,7 @@ public abstract class PropertyPanel extends JPanel {
           .addGap(CONTROL_MARGIN);
     }
 
+    current.addPreferredGap(ComponentPlacement.UNRELATED);
     for (Component component : additionalComponents) {
       current = current.addComponent(component, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE);
     }
