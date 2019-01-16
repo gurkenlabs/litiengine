@@ -261,9 +261,9 @@ public abstract class PropertyPanel extends JPanel {
 
     for (LayoutItem item : layoutItems) {
       current = current
-          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-              .addComponent(item.getComponent(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-              .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+          .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+              .addComponent(item.getComponent(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
+              .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, LABEL_HEIGHT))
           .addGap(CONTROL_MARGIN);
     }
 
