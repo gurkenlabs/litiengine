@@ -22,7 +22,6 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + LightSourceMapObjectLoader.class);
     }
 
-    final int alpha = mapObject.getIntValue(MapObjectProperty.LIGHT_ALPHA);
     final int intensity = mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, LightSource.DEFAULT_INTENSITY);
     final Color color = mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR);
     final boolean active = mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true);
@@ -45,7 +44,7 @@ public class LightSourceMapObjectLoader extends MapObjectLoader {
       break;
     }
 
-    final LightSource light = this.createLightSource(mapObject, intensity, new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha), lightType, active);
+    final LightSource light = this.createLightSource(mapObject, intensity, color, lightType, active);
     loadDefaultProperties(light, mapObject);
     light.setFocusOffsetX(focusOffsetX);
     light.setFocusOffsetY(focusOffsetY);
