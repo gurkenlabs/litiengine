@@ -1,5 +1,7 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import java.awt.LayoutManager;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -68,14 +70,15 @@ public class CollisionPanel extends PropertyPanel {
     this.setup(this.comboBoxValign, MapObjectProperty.COLLISION_VALIGN);
   }
   
-  private GroupLayout createLayout() {
+  private LayoutManager createLayout() {
     JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
     JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
-    JLabel lblHorizontalAlignment = new JLabel("horizontal alignment");
-    JLabel lblVerticalAlignment = new JLabel("vertical alignment");
+    JLabel lblHorizontalAlignment = new JLabel("align");
+    JLabel lblVerticalAlignment = new JLabel("valign");
     
     GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+    groupLayout.setHorizontalGroup(
+        groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup()
             .addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
@@ -92,7 +95,8 @@ public class CollisionPanel extends PropertyPanel {
                 .addComponent(chckbxHasCollision, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE))
             .addGap(CONTROL_MARGIN)));
 
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+    groupLayout.setVerticalGroup(
+        groupLayout.createParallelGroup(Alignment.TRAILING)
         .addGroup(groupLayout.createSequentialGroup()
             .addGap(CONTROL_MARGIN)
             .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)

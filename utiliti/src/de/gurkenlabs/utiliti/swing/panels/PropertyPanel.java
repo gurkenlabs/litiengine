@@ -17,6 +17,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -31,13 +32,13 @@ import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
-  public static final int LABEL_WIDTH = 120;
+  public static final int LABEL_WIDTH = 80;
   public static final int LABEL_HEIGHT = 25;
   public static final int CONTROL_MIN_WIDTH = 120;
   public static final int CONTROL_WIDTH = 200;
   public static final int CONTROL_HEIGHT = 25;
   public static final int CONTROL_MARGIN = 5;
-  public static final int LABEL_GAP = 10;
+  public static final int LABEL_GAP = 0;
 
   protected boolean isFocussing;
   private transient IMapObject dataSource;
@@ -106,7 +107,7 @@ public abstract class PropertyPanel extends JPanel {
   protected abstract void clearControls();
 
   protected abstract void setControlValues(IMapObject mapObject);
-  
+
   protected void setup(JCheckBox checkbox, String property) {
     checkbox.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
   }
@@ -117,9 +118,21 @@ public abstract class PropertyPanel extends JPanel {
       m.setValue(property, value);
     }));
   }
+  
+  protected void setupL(JComboBox<JLabel> comboBox, String property) {
+    comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
+      JLabel value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+      m.setValue(property, value.getText());
+    }));
+  }
 
   protected void setup(JSpinner spinner, String property) {
     spinner.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(property, spinner.getValue().toString())));
+  }
+
+  protected void setup(JTextField textField, String property) {
+    textField.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textField.getText())));
+    textField.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textField.getText())));
   }
 
   protected class MapObjectPropertyItemListener implements ItemListener {
