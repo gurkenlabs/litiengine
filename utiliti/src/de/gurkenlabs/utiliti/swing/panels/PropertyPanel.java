@@ -36,6 +36,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.components.TextList;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
@@ -142,6 +143,10 @@ public abstract class PropertyPanel extends JPanel {
     textField.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textField.getText())));
   }
 
+  protected void setup(TextList textList, String property) {
+    textList.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, textList.getJoinedString())));
+  }
+
   protected class MapObjectPropertyItemListener implements ItemListener {
     private final Consumer<IMapObject> updateAction;
 
@@ -235,38 +240,26 @@ public abstract class PropertyPanel extends JPanel {
     for (Component component : additionalComponents) {
       parallel.addComponent(component, Alignment.LEADING, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE);
     }
-    
+
     for (LayoutItem item : layoutItems) {
-      parallel.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-          .addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
-          .addPreferredGap(ComponentPlacement.UNRELATED)
-          .addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE));
+      parallel.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup().addComponent(item.getLabel(), LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE).addPreferredGap(ComponentPlacement.UNRELATED).addComponent(item.getComponent(), CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE));
     }
 
     // initialize the horizontal layout group with the parallel groups for
     // labels and components and some additional gaps
-    groupLayout.setHorizontalGroup(
-        groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(parallel)
-            ));
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addContainerGap().addGroup(parallel)));
 
     // now prepare the vertical groups
     SequentialGroup seq = groupLayout.createSequentialGroup();
     SequentialGroup current = seq.addGap(CONTROL_MARGIN);
 
     for (LayoutItem item : layoutItems) {
-      current = current
-          .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-              .addComponent(item.getComponent(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT)
-              .addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, LABEL_HEIGHT))
-          .addGap(CONTROL_MARGIN);
+      current = current.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addComponent(item.getComponent(), GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, CONTROL_HEIGHT).addComponent(item.getLabel(), GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, LABEL_HEIGHT)).addGap(CONTROL_MARGIN);
     }
 
     current.addPreferredGap(ComponentPlacement.UNRELATED);
     for (Component component : additionalComponents) {
-      current = current.addComponent(component, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE);
+      current = current.addComponent(component, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addGap(CONTROL_MARGIN);
     }
 
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(seq));
