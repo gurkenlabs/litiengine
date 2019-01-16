@@ -1,7 +1,5 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -14,12 +12,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -34,16 +31,21 @@ import de.gurkenlabs.utiliti.UndoManager;
 
 @SuppressWarnings("serial")
 public abstract class PropertyPanel extends JPanel {
+  public static final int LABEL_WIDTH = 120;
+  public static final int LABEL_HEIGHT = 25;
+  public static final int CONTROL_MIN_WIDTH = 120;
+  public static final int CONTROL_WIDTH = 200;
+  public static final int CONTROL_HEIGHT = 25;
+  public static final int CONTROL_MARGIN = 5;
+  public static final int LABEL_GAP = 10;
+
   protected boolean isFocussing;
   private transient IMapObject dataSource;
   private String identifier;
 
   public PropertyPanel(String identifier) {
     this.identifier = identifier;
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get(this.getIdentifier()), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(border.getTitleFont().deriveFont(Font.BOLD));
-    setBorder(border);
-
+    setBorder(null);
   }
 
   public PropertyPanel() {
@@ -104,6 +106,21 @@ public abstract class PropertyPanel extends JPanel {
   protected abstract void clearControls();
 
   protected abstract void setControlValues(IMapObject mapObject);
+  
+  protected void setup(JCheckBox checkbox, String property) {
+    checkbox.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, checkbox.isSelected())));
+  }
+
+  protected <T extends Enum<?>> void setup(JComboBox<T> comboBox, String property) {
+    comboBox.addActionListener(new MapObjectPropertyActionListener(m -> {
+      T value = comboBox.getModel().getElementAt(comboBox.getSelectedIndex());
+      m.setValue(property, value);
+    }));
+  }
+
+  protected void setup(JSpinner spinner, String property) {
+    spinner.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(property, spinner.getValue().toString())));
+  }
 
   protected class MapObjectPropertyItemListener implements ItemListener {
     private final Consumer<IMapObject> updateAction;

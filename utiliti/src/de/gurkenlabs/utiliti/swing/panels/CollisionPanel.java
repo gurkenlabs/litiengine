@@ -18,14 +18,11 @@ import de.gurkenlabs.litiengine.resources.Resources;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
-  private JCheckBox chckbxHasCollision;
-  private JSpinner spinnerWidth;
-  private JSpinner spinnerHeight;
-  private JComboBox<Align> comboBoxAlign;
-  private JComboBox<Valign> comboBoxValign;
-  private JLabel lblHorizontalAlignment;
-  private JLabel lblVerticalAlignment;
-  private JLabel lblCollision;
+  private final JCheckBox chckbxHasCollision;
+  private final JSpinner spinnerWidth;
+  private final JSpinner spinnerHeight;
+  private final JComboBox<Align> comboBoxAlign;
+  private final JComboBox<Valign> comboBoxValign;
 
   /**
    * Create the panel.
@@ -33,112 +30,25 @@ public class CollisionPanel extends PropertyPanel {
   public CollisionPanel() {
     super("panel_collisionEntity");
 
-    JLabel lblMaterial = new JLabel(Resources.strings().get("panel_width"));
-
-    this.chckbxHasCollision = new JCheckBox("");
-
-    JLabel lblHeightFactor = new JLabel(Resources.strings().get("panel_height"));
-
+    this.chckbxHasCollision = new JCheckBox("collision");
     this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
-
     this.spinnerHeight = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));
-
     this.comboBoxAlign = new JComboBox<>();
-    this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
-
+    this.comboBoxAlign.setModel(new DefaultComboBoxModel<>(Align.values()));
     this.comboBoxValign = new JComboBox<>();
-    this.comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
+    this.comboBoxValign.setModel(new DefaultComboBoxModel<>(Valign.values()));
     
-    lblHorizontalAlignment = new JLabel("horizontal Alignment");
-    
-    lblVerticalAlignment = new JLabel("vertical alignment");
-    
-    lblCollision = new JLabel("collision");
-
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout.setHorizontalGroup(
-      groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-          .addContainerGap()
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblCollision, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-              .addPreferredGap(ComponentPlacement.RELATED))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblMaterial)
-              .addPreferredGap(ComponentPlacement.RELATED))
-            .addComponent(lblHeightFactor, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblHorizontalAlignment, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-              .addPreferredGap(ComponentPlacement.RELATED))
-            .addGroup(groupLayout.createSequentialGroup()
-              .addComponent(lblVerticalAlignment, GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-              .addPreferredGap(ComponentPlacement.RELATED)))
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addGroup(groupLayout.createSequentialGroup()
-              .addPreferredGap(ComponentPlacement.RELATED)
-              .addComponent(chckbxHasCollision, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-              .addComponent(comboBoxValign, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-              .addComponent(spinnerHeight, Alignment.LEADING)
-              .addComponent(comboBoxAlign, Alignment.LEADING, 0, 147, Short.MAX_VALUE)
-              .addComponent(spinnerWidth, Alignment.LEADING)))
-          .addContainerGap())
-    );
-    groupLayout.setVerticalGroup(
-      groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-          .addContainerGap()
-          .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-            .addComponent(lblCollision, GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-            .addComponent(chckbxHasCollision, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-          .addGap(5)
-          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblMaterial, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-            .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-          .addPreferredGap(ComponentPlacement.RELATED)
-          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            .addComponent(lblHeightFactor, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
-            .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-          .addGap(6)
-          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            .addComponent(comboBoxAlign, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblHorizontalAlignment, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-          .addPreferredGap(ComponentPlacement.RELATED)
-          .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-            .addComponent(comboBoxValign, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-            .addComponent(lblVerticalAlignment, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-          .addGap(143))
-    );
-    setLayout(groupLayout);
+    this.setLayout(this.createLayout());
     this.setupChangedListeners();
   }
-
-  private void setupChangedListeners() {
-    this.chckbxHasCollision.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.COLLISION, chckbxHasCollision.isSelected())));
-
-    this.spinnerWidth.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, this.spinnerWidth.getValue().toString())));
-
-    this.spinnerHeight.addChangeListener(new MapObjectPropertyChangeListener(m -> m.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, this.spinnerHeight.getValue().toString())));
-
-    this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      Align align = (Align) this.comboBoxAlign.getSelectedItem();
-      m.setValue(MapObjectProperty.COLLISION_ALIGN, align);
-    }));
-
-    this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      Valign valign = (Valign) this.comboBoxValign.getSelectedItem();
-      m.setValue(MapObjectProperty.COLLISION_VALIGN, valign);
-    }));
-  }
-
+  
   @Override
   protected void clearControls() {
     this.chckbxHasCollision.setSelected(false);
     this.spinnerWidth.setValue(0.0);
     this.spinnerHeight.setValue(0.0);
     this.comboBoxAlign.setSelectedItem(Align.CENTER);
-    this.comboBoxAlign.setSelectedItem(Valign.DOWN);
+    this.comboBoxValign.setSelectedItem(Valign.DOWN);
   }
 
   @Override
@@ -146,8 +56,63 @@ public class CollisionPanel extends PropertyPanel {
     this.chckbxHasCollision.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISION));
     this.spinnerWidth.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_WIDTH));
     this.spinnerHeight.setValue(mapObject.getDoubleValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
-
     this.comboBoxAlign.setSelectedItem(Align.get(mapObject.getStringValue(MapObjectProperty.COLLISION_ALIGN)));
     this.comboBoxValign.setSelectedItem(Valign.get(mapObject.getStringValue(MapObjectProperty.COLLISION_VALIGN)));
+  }
+  
+  private void setupChangedListeners() {
+    this.setup(this.chckbxHasCollision, MapObjectProperty.COLLISION);
+    this.setup(this.spinnerWidth, MapObjectProperty.COLLISIONBOX_WIDTH);
+    this.setup(this.spinnerHeight, MapObjectProperty.COLLISIONBOX_HEIGHT);
+    this.setup(this.comboBoxAlign, MapObjectProperty.COLLISION_ALIGN);
+    this.setup(this.comboBoxValign, MapObjectProperty.COLLISION_VALIGN);
+  }
+  
+  private GroupLayout createLayout() {
+    JLabel lblWidth = new JLabel(Resources.strings().get("panel_width"));
+    JLabel lblHeight = new JLabel(Resources.strings().get("panel_height"));
+    JLabel lblHorizontalAlignment = new JLabel("horizontal alignment");
+    JLabel lblVerticalAlignment = new JLabel("vertical alignment");
+    
+    GroupLayout groupLayout = new GroupLayout(this);
+    groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+        .addGroup(groupLayout.createSequentialGroup()
+            .addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+                .addComponent(lblWidth, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+                .addComponent(lblHeight, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+                .addComponent(lblHorizontalAlignment, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE)
+                .addComponent(lblVerticalAlignment, LABEL_WIDTH, LABEL_WIDTH, Short.MAX_VALUE))
+            .addPreferredGap(ComponentPlacement.RELATED, LABEL_GAP, Short.MAX_VALUE)
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+                .addComponent(spinnerHeight, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
+                .addComponent(spinnerWidth, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
+                .addComponent(comboBoxAlign, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
+                .addComponent(comboBoxValign, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE)
+                .addComponent(chckbxHasCollision, CONTROL_MIN_WIDTH, CONTROL_WIDTH, Short.MAX_VALUE))
+            .addGap(CONTROL_MARGIN)));
+
+    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+        .addGroup(groupLayout.createSequentialGroup()
+            .addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(comboBoxAlign, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblHorizontalAlignment, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(comboBoxValign, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblVerticalAlignment, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(CONTROL_MARGIN)
+            .addComponent(chckbxHasCollision, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)));
+    
+    return groupLayout;
   }
 }
