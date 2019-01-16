@@ -1,16 +1,14 @@
 package de.gurkenlabs.utiliti.swing.panels;
 
+import java.awt.LayoutManager;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -33,45 +31,17 @@ public class CreaturePanel extends PropertyPanel {
   public CreaturePanel() {
     super("panel_creature");
 
-    JLabel lblSprite = new JLabel(Resources.strings().get("panel_sprite"));
-
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());
 
     this.comboBoxDirection = new JComboBox<>();
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
+    this.checkBoxScale = new JCheckBox("stretch sprite");
+    
+    this.textFieldType = new JTextField();
+    this.textFieldType.setColumns(10);
 
-    JLabel label = new JLabel("direction");
-
-    textFieldType = new JTextField();
-    textFieldType.setColumns(10);
-
-    JLabel lblType = new JLabel("type");
-
-    checkBoxScale = new JCheckBox("stretch sprite");
-    GroupLayout groupLayout = new GroupLayout(this);
-    groupLayout
-        .setHorizontalGroup(
-            groupLayout
-                .createParallelGroup(
-                    Alignment.LEADING)
-                .addGroup(
-                    groupLayout.createSequentialGroup().addContainerGap()
-                        .addGroup(
-                            groupLayout.createParallelGroup(Alignment.LEADING)
-                                .addGroup(groupLayout.createSequentialGroup().addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxSpriteSheets, 0, 365, Short.MAX_VALUE))
-                                .addGroup(groupLayout.createSequentialGroup().addComponent(lblType, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                                    .addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, 272, GroupLayout.PREFERRED_SIZE).addGroup(groupLayout.createSequentialGroup().addComponent(textFieldType, GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE).addPreferredGap(ComponentPlacement.RELATED)
-                                        .addComponent(label, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE).addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxDirection, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
-                        .addContainerGap()));
-    groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-        .addGroup(groupLayout.createSequentialGroup()
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxSpriteSheets, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(lblSprite, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.RELATED)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldType, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE)
-                .addComponent(label, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE).addComponent(comboBoxDirection, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(checkBoxScale, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE).addContainerGap(205, Short.MAX_VALUE)));
-    setLayout(groupLayout);
+    setLayout(this.createLayout());
     this.setupChangedListeners();
   }
 
@@ -114,6 +84,7 @@ public class CreaturePanel extends PropertyPanel {
     this.comboBoxSpriteSheets.setSelectedItem(null);
     this.textFieldType.setText(null);
     this.comboBoxDirection.setSelectedItem(Direction.UNDEFINED);
+    this.checkBoxScale.setSelected(false);
   }
 
   @Override
@@ -125,18 +96,10 @@ public class CreaturePanel extends PropertyPanel {
   }
 
   private void setupChangedListeners() {
-    this.comboBoxSpriteSheets.addActionListener(new MapObjectPropertyActionListener(m -> {
-      JLabel selected = (JLabel) this.comboBoxSpriteSheets.getSelectedItem();
-      m.setValue(MapObjectProperty.SPRITESHEETNAME, selected.getText());
-    }));
-
-    this.comboBoxDirection.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.SPAWN_DIRECTION, this.comboBoxDirection.getSelectedItem().toString());
-    }));
-
-    this.textFieldType.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.textFieldType.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textFieldType.getText())));
-    this.checkBoxScale.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SCALE_SPRITE, checkBoxScale.isSelected())));
+    this.setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
+    this.setup(this.comboBoxDirection, MapObjectProperty.SPAWN_DIRECTION);
+    this.setup(this.textFieldType, MapObjectProperty.SPAWN_TYPE);
+    this.setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
   }
 
   private void loadAvailableCreatureSprites() {
@@ -149,5 +112,15 @@ public class CreaturePanel extends PropertyPanel {
     }
 
     populateComboBoxWithSprites(this.comboBoxSpriteSheets, m);
+  }
+  
+  private LayoutManager createLayout() {
+    LayoutItem[] layoutItems = new LayoutItem [] {
+        new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
+        new LayoutItem("panel_direction", this.comboBoxDirection),
+        new LayoutItem("panel_type", this.textFieldType),
+    };
+    
+    return this.createLayout(layoutItems, this.checkBoxScale);
   }
 }

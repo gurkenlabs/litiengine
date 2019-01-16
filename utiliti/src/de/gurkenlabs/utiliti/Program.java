@@ -34,7 +34,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -59,8 +58,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler;
 import de.gurkenlabs.litiengine.Game;
@@ -94,12 +91,13 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_LEFT = Resources.images().get("cursor-trans-315.png");
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
 
+  private static final Logger log = Logger.getLogger(Program.class.getName());
+  
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
   private static TrayIcon trayIcon;
 
-  private static final Logger log = Logger.getLogger(Program.class.getName());
   private static Menu recentFiles;
   private static AssetPanel assetPanel;
   private static AssetTree assetTree;
@@ -110,15 +108,9 @@ public class Program {
   private static boolean isChanging;
 
   public static void main(String[] args) {
-
-    try {
-      JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      UIManager.getDefaults().put("SplitPane.border", BorderFactory.createEmptyBorder());
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-      log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-    }
-
+    
+    Style.initSwingComponentStyle();
+    
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
     Game.info().setVersion("v0.4.15-alpha");

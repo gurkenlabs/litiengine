@@ -15,6 +15,33 @@ public final class Fonts extends ResourcesContainer<Font> {
   Fonts() {
   }
 
+  public Font get(String name, float size) {
+    Font font = this.get(name);
+    if (font == null) {
+      return null;
+    }
+
+    return font.deriveFont(size);
+  }
+
+  public Font get(String name, int style) {
+    Font font = this.get(name);
+    if (font == null) {
+      return null;
+    }
+
+    return font.deriveFont(style);
+  }
+
+  public Font get(String name, int style, float size) {
+    Font font = this.get(name);
+    if (font == null) {
+      return null;
+    }
+
+    return font.deriveFont(style, size);
+  }
+
   /***
    * Loads a custom font with the specified name from game's resources.
    * As a fallback, when no font could be found by the specified <code>fontName</code>, it tries to get the font from the environment by calling.

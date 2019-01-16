@@ -51,7 +51,6 @@ public final class MapObjectProperty {
   public static final String PROP_FLIPVERTICALLY = "flipVertically";
 
   // light source
-  public static final String LIGHT_ALPHA = "lightBrightness";
   public static final String LIGHT_COLOR = "lightColor";
   public static final String LIGHT_INTENSITY = "lightIntensity";
   public static final String LIGHT_SHAPE = "lightShape";

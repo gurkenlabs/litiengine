@@ -53,7 +53,7 @@ public class MapObjectLoaderTests {
     mapObject.setValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE, true);
     mapObject.setValue(MapObjectProperty.COLLISION, true);
     mapObject.setValue(MapObjectProperty.COMBAT_HITPOINTS, 100);
-    
+
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_WIDTH, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISIONBOX_HEIGHT, 100.0f);
     mapObject.setValue(MapObjectProperty.COLLISION_ALIGN, Align.LEFT);
@@ -188,9 +188,8 @@ public class MapObjectLoaderTests {
     when(mapObject.getName()).thenReturn("testLight");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
-    when(mapObject.getIntValue(MapObjectProperty.LIGHT_ALPHA)).thenReturn(100);
     when(mapObject.getIntValue(MapObjectProperty.LIGHT_INTENSITY, 100)).thenReturn(100);
-    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(Color.WHITE);
+    when(mapObject.getColorValue(MapObjectProperty.LIGHT_COLOR)).thenReturn(new Color(255, 255, 255, 100));
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 

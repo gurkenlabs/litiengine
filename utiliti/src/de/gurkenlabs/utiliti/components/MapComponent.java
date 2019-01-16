@@ -948,7 +948,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       mo.setValue(MapObjectProperty.PROP_ADDSHADOW, true);
       break;
     case LIGHTSOURCE:
-      mo.setValue(MapObjectProperty.LIGHT_ALPHA, 180);
       mo.setValue(MapObjectProperty.LIGHT_COLOR, Color.WHITE);
       mo.setValue(MapObjectProperty.LIGHT_SHAPE, LightSource.ELLIPSE);
       mo.setValue(MapObjectProperty.LIGHT_ACTIVE, true);

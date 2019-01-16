@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
+import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
 @SuppressWarnings("serial")
 public class TagPanel extends JPanel {
@@ -44,7 +45,7 @@ public class TagPanel extends JPanel {
     this.setLayout(wrapLayout);
 
     this.textFieldInput = new JTextField();
-    this.textFieldInput.setPreferredSize(new Dimension(6, 21));
+    this.textFieldInput.setPreferredSize(new Dimension(6, PropertyPanel.CONTROL_HEIGHT));
     add(textFieldInput);
     this.textFieldInput.setColumns(7);
     this.textFieldInput.addActionListener(e -> {
