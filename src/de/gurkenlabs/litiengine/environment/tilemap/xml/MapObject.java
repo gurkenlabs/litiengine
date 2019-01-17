@@ -327,6 +327,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     if (this.name != null && this.name.isEmpty()) {
       this.name = null;
     }
+
+    if (this.polyline != null && this.polyline.getPoints().isEmpty()) {
+      this.polyline = null;
+    }
   }
 
   protected void setLayer(MapObjectLayer layer) {
