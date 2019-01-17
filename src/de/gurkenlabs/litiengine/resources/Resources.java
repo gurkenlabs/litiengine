@@ -11,10 +11,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -210,7 +213,13 @@ public final class Resources {
   }
 
   private static InputStream getResource(final String file) {
+    // get resource from web
+    if (file.startsWith("http://") || file.startsWith("https://")) {
+      return getWebResource(file);
+    }
+
     try {
+      // get resource from class loader (required for jars)
       InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
       if (resourceStream != null) {
         return resourceStream;
@@ -221,6 +230,7 @@ public final class Resources {
         return resourceStream;
       }
 
+      // get resource from the local file system
       File f;
       try {
         URI uri = new URI(file);
@@ -237,6 +247,24 @@ public final class Resources {
         return null;
       }
     } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+      return null;
+    }
+  }
+
+  private static InputStream getWebResource(String file) {
+
+    try {
+      URL url = new URL(file);
+      final long downloadStart = System.nanoTime();
+      try (InputStream in = url.openStream()) {
+        File tmpFile = File.createTempFile(UUID.randomUUID().toString(), null);
+        long downloaded = Files.copy(in, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        final double downloadTime = TimeUtilities.nanoToMs(System.nanoTime() - downloadStart);
+        log.log(Level.INFO, "[Download: {0} bytes; {1} ms] from {2}", new Object[] { downloaded, downloadTime, url });
+        return new FileInputStream(tmpFile);
+      }
+    } catch (IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
       return null;
     }
