@@ -19,6 +19,9 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 public abstract class Layer extends CustomPropertyProvider implements ILayer, Serializable {
   private static final long serialVersionUID = -5136089511774411328L;
 
+  @XmlAttribute
+  private int id;
+
   /** The name. */
   @XmlAttribute
   private String name;
@@ -89,6 +92,11 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     }
 
     return this.height;
+  }
+
+  @Override
+  public int getId() {
+    return this.id;
   }
 
   @Override

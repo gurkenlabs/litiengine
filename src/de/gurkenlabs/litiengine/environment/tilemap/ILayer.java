@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
  */
 public interface ILayer extends ICustomPropertyProvider {
 
+  public int getId();
   /**
    * Gets the name.
    *

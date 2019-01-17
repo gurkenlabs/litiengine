@@ -455,7 +455,7 @@ public class AssetPanelItem extends JPanel {
     }
 
     Blueprint mapObject = (Blueprint) this.getOrigin();
-    XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName());
+    XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
   private boolean canAdd() {

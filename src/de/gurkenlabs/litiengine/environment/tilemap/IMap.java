@@ -169,7 +169,9 @@ public interface IMap extends ICustomPropertyProvider {
   public String getName();
 
   public int getNextObjectId();
-
+  
+  public int getNextLayerId();
+  
   public Color getBackgroundColor();
 
   public boolean isInfinite();

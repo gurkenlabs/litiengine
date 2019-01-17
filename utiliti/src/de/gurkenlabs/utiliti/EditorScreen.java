@@ -453,7 +453,7 @@ public class EditorScreen extends Screen {
       this.gameFile.getBluePrints().add(blueprint);
       log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
 
-    }, "xml", Blueprint.FILE_EXTENSION);
+    }, Blueprint.BLUEPRINT_FILE_EXTENSION, Blueprint.TEMPLATE_FILE_EXTENSION);
   }
 
   public void importTilesets() {

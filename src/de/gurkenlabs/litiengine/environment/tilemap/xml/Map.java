@@ -82,7 +82,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private int infinite;
 
   @XmlAttribute
-  private int hexsidelength;
+  private Integer hexsidelength;
 
   @XmlTransient
   private StaggerAxis staggerAxisEnum = StaggerAxis.UNDEFINED;
@@ -101,6 +101,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @XmlAttribute(name = "nextobjectid")
   private int nextObjectId;
+
+  @XmlAttribute(name = "nextlayerid")
+  private int nextLayerId;
 
   @XmlAttribute(required = false)
   private String name;
@@ -147,6 +150,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public int getNextObjectId() {
     return this.nextObjectId;
+  }
+
+  @Override
+  public int getNextLayerId() {
+    return this.nextLayerId;
   }
 
   @Override
@@ -668,6 +676,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
     if (this.isInfinite()) {
       this.updateDimensionsByTileLayers();
+    }
+
+    if (this.getOrientation() != MapOrientation.HEXAGONAL) {
+      this.hexsidelength = null;
     }
   }
 

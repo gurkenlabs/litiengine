@@ -14,7 +14,15 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
 @XmlRootElement(name = "template")
 public class Blueprint extends MapObject {
-  public static final String FILE_EXTENSION = "tx";
+  /**
+   * Templates in this format typically come from the Tiled editor and only support a single MapObject.
+   */
+  public static final String TEMPLATE_FILE_EXTENSION = "tx";
+  
+  /**
+   * Blueprint in this format support multiple map objects as children (extended template XML).
+   */
+  public static final String BLUEPRINT_FILE_EXTENSION = "xtx";
   private static final long serialVersionUID = -7235380251249427834L;
 
   @XmlElement(name = "object")

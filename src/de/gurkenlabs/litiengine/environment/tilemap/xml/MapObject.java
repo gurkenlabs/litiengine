@@ -147,7 +147,7 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
       return -1;
     }
-    
+
     if (obj.getName() == null) {
       return 1;
     }
@@ -220,6 +220,11 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   @XmlTransient
   public void setName(String name) {
+    if (name != null && name.isEmpty()) {
+      this.name = null;
+      return;
+    }
+
     this.name = name;
   }
 
@@ -309,15 +314,19 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
     return this.height;
   }
 
+  @Override
+  public IMapObjectLayer getLayer() {
+    return this.layer;
+  }
+
   void afterUnmarshal(Unmarshaller u, Object parent) {
     if (this.gid != null && this.gid == 0) {
       this.gid = null;
     }
-  }
 
-  @Override
-  public IMapObjectLayer getLayer() {
-    return this.layer;
+    if (this.name != null && this.name.isEmpty()) {
+      this.name = null;
+    }
   }
 
   protected void setLayer(MapObjectLayer layer) {
