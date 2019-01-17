@@ -18,7 +18,28 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
-  private static final String STRING_TYPE = "string";
+  private static class PropertyType {
+    private static final String STRING = "string";
+    private static final String FLOAT = "float";
+    private static final String INT = "int";
+    private static final String BOOL = "bool";
+    private static final String FILE = "file";
+    private static final String COLOR = "color";
+
+    private static String[] values() {
+      return new String[] { STRING, FLOAT, INT, BOOL, FILE, COLOR };
+    }
+
+    private static boolean isValid(String type) {
+      for (String valid : values()) {
+        if (valid.equalsIgnoreCase(type)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }
 
   @XmlAccessorType(XmlAccessType.FIELD)
   static class Property implements Comparable<Property> {
@@ -36,19 +57,19 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
 
     Property(String name, String type) {
       this.name = name;
-      this.type = type == null ? STRING_TYPE : type;
+      this.type = type == null || !PropertyType.isValid(type) ? PropertyType.STRING : type;
     }
 
     @SuppressWarnings("unused")
     private void afterUnmarshal(Unmarshaller u, Object parent) {
       if (this.type == null) {
-        this.type = STRING_TYPE;
+        this.type = PropertyType.STRING;
       }
     }
 
     @SuppressWarnings("unused")
     private void beforeMarshal(Marshaller m) {
-      if (this.type.equals(STRING_TYPE)) {
+      if (this.type.equals(PropertyType.STRING)) {
         this.type = null;
       }
     }
@@ -87,8 +108,9 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
   @Override
   public Map<String, ICustomProperty> unmarshal(PropertyList v) {
     Map<String, ICustomProperty> map = new Hashtable<>(v.properties.size()); // use hashtable to reject null keys/values
-    for (Property property : v.properties)
+    for (Property property : v.properties) {
       map.put(property.name, new CustomProperty(property.type, property.value != null ? property.value : property.contents));
+    }
     return map;
   }
 
@@ -101,6 +123,10 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
     for (Map.Entry<String, ICustomProperty> entry : v.entrySet()) {
       ICustomProperty property = entry.getValue();
       String value = property.getAsString();
+      if (value == null || value.isEmpty()) {
+        continue;
+      }
+
       Property saved = new Property(entry.getKey(), property.getType());
       if (value.contains("\n")) {
         saved.contents = value;
