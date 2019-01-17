@@ -1,6 +1,7 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,9 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 
 public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.PropertyList, Map<String, ICustomProperty>> {
   private static final String STRING_TYPE = "string";
+
   @XmlAccessorType(XmlAccessType.FIELD)
-  static class Property {
+  static class Property implements Comparable<Property> {
     @XmlAttribute
     String name;
     @XmlAttribute
@@ -49,6 +51,23 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       if (this.type.equals(STRING_TYPE)) {
         this.type = null;
       }
+    }
+
+    @Override
+    public int compareTo(Property o) {
+      if (o == null) {
+        return 1;
+      }
+
+      if (o.name == null && this.name == null) {
+        return 0;
+      }
+
+      if (this.name == null) {
+        return -1;
+      }
+
+      return this.name.compareTo(o.name);
     }
   }
 
@@ -90,6 +109,8 @@ public class CustomPropertyAdapter extends XmlAdapter<CustomPropertyAdapter.Prop
       }
       list.add(saved);
     }
+
+    Collections.sort(list);
     return new PropertyList(list);
   }
 }
