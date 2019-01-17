@@ -147,6 +147,10 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
       return -1;
     }
+    
+    if (obj.getName() == null) {
+      return 1;
+    }
 
     return this.getName().compareTo(obj.getName());
   }

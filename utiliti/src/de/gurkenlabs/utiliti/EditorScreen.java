@@ -334,7 +334,7 @@ public class EditorScreen extends Screen {
   }
 
   public void importSpriteFile() {
-    
+
     if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), false, SpritesheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
@@ -436,6 +436,10 @@ public class EditorScreen extends Screen {
       if (blueprint == null) {
         return;
       }
+      
+      if(blueprint.getName() == null || blueprint.getName().isEmpty()) {
+        blueprint.setName(FileUtilities.getFileName(file.getPath()));
+      }
 
       if (this.gameFile.getBluePrints().stream().anyMatch(x -> x.getName().equals(blueprint.getName()))) {
         int result = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), Resources.strings().get("import_blueprint_question", blueprint.getName()), Resources.strings().get("import_blueprint_title"), JOptionPane.YES_NO_OPTION);
@@ -449,11 +453,11 @@ public class EditorScreen extends Screen {
       this.gameFile.getBluePrints().add(blueprint);
       log.log(Level.INFO, "imported blueprint {0} from {1}", new Object[] { blueprint.getName(), file });
 
-    });
+    }, "xml", Blueprint.FILE_EXTENSION);
   }
 
   public void importTilesets() {
-    XmlImportDialog.importXml("Tilesets", Tileset.FILE_EXTENSION, file -> {
+    XmlImportDialog.importXml("Tilesets", file -> {
       Tileset tileset;
       try {
         tileset = XmlUtilities.readFromFile(Tileset.class, file.toString());
@@ -475,7 +479,7 @@ public class EditorScreen extends Screen {
       }
 
       log.log(Level.INFO, "imported tileset {0} from {1}", new Object[] { tileset.getName(), file });
-    });
+    }, Tileset.FILE_EXTENSION);
   }
 
   public boolean isLoading() {

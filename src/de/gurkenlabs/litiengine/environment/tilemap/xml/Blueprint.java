@@ -6,18 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 
-@XmlRootElement(name = "blueprint")
+@XmlRootElement(name = "template")
 public class Blueprint extends MapObject {
+  public static final String FILE_EXTENSION = "tx";
   private static final long serialVersionUID = -7235380251249427834L;
 
-  @XmlElementWrapper(name = "items")
   @XmlElement(name = "object")
   private List<MapObject> items = new ArrayList<>();
 
@@ -35,7 +34,9 @@ public class Blueprint extends MapObject {
   public Blueprint(String name, boolean keepIds, MapObject... items) {
     this.keepIds = keepIds;
     this.setType(MapObjectType.AREA.toString());
-    this.setName(name);
+    if (name != null && !name.isEmpty()) {
+      this.setName(name);
+    }
 
     final Rectangle2D bounds = MapObject.getBounds(items);
     this.setWidth((float) bounds.getWidth());

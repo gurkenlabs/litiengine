@@ -746,7 +746,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       return;
     }
 
-    XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
+    XmlImportDialog.importXml("Tilemap", file -> {
       String mapPath = file.toURI().toString();
       Map map = (Map) Resources.maps().get(mapPath);
       if (map == null) {
@@ -807,7 +807,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       EditorScreen.instance().getMapSelectionPanel().bind(this.getMaps(), true);
       this.loadEnvironment(map);
       log.log(Level.INFO, "imported map {0}", new Object[] { map.getName() });
-    });
+    }, Map.FILE_EXTENSION);
   }
 
   public void loadTileset(ITileset tileset, boolean embedded) {
