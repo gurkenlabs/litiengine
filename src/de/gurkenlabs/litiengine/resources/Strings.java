@@ -17,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Strings {
   public static final String DEFAULT_BUNDLE = "strings";
@@ -97,7 +96,7 @@ public final class Strings {
       return new String[0];
     }
 
-    try (InputStream is = FileUtilities.getGameResource(textFile)) {
+    try (InputStream is = Resources.get(textFile)) {
       if (is == null) {
         return new String[0];
       }

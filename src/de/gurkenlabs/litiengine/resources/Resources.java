@@ -2,6 +2,16 @@ package de.gurkenlabs.litiengine.resources;
 
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 /**
  * This class is the engines entry point for accessing any kind of resources. A resource is any non-executable data that is deployed with your game.
@@ -179,5 +190,55 @@ public final class Resources {
     final double loadTime = TimeUtilities.nanoToMs(System.nanoTime() - loadStart);
 
     log.log(Level.INFO, "loading game resources from {0} took {1} ms", new Object[] { gameResourceFile, loadTime });
+  }
+
+  /**
+   * Gets the specified file as InputStream from either a resource folder or the file system.
+   * 
+   * @param file
+   *          The path to the file.
+   * @return The contents of the specified file as {@code InputStream}.
+   * @see Resources
+   */
+  public static InputStream get(String file) {
+    InputStream stream = getResource(file);
+    if (stream == null) {
+      return null;
+    }
+
+    return stream.markSupported() ? stream : new BufferedInputStream(stream);
+  }
+
+  private static InputStream getResource(final String file) {
+    try {
+      InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
+      if (resourceStream != null) {
+        return resourceStream;
+      }
+
+      resourceStream = FileUtilities.class.getResourceAsStream(file);
+      if (resourceStream != null) {
+        return resourceStream;
+      }
+
+      File f;
+      try {
+        URI uri = new URI(file);
+        f = Paths.get(uri).toFile();
+      } catch (URISyntaxException | IllegalArgumentException | FileSystemNotFoundException e) {
+        f = new File(file);
+      }
+
+      if (f.exists()) {
+        resourceStream = new FileInputStream(f.getAbsolutePath());
+        return resourceStream;
+      } else {
+        log.log(Level.INFO, "{0} could not be found.", file);
+        return null;
+      }
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+      return null;
+    }
   }
 }

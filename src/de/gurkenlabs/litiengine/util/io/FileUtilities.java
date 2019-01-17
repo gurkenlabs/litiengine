@@ -1,10 +1,9 @@
 package de.gurkenlabs.litiengine.util.io;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,13 +11,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.resources.Resources;
-
 public final class FileUtilities {
   private static final Logger log = Logger.getLogger(FileUtilities.class.getName());
   private static final String[] DIR_BLACKLIST = new String[] { "\\bin", "\\screenshots" };
   private static final String FILE_SEPARATOR_WIN = "\\";
-  private static final String FILE_SEPARATOR_LINUX = "/";
+  private static final String FILE_SEPARATOR = "/";
 
   private FileUtilities() {
     throw new UnsupportedOperationException();
@@ -121,7 +118,7 @@ public final class FileUtilities {
   }
 
   public static String getFileName(final String path, boolean extension) {
-    if (path == null || path.isEmpty() || path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR_LINUX)) {
+    if (path == null || path.isEmpty() || path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR)) {
       return "";
     }
 
@@ -134,7 +131,7 @@ public final class FileUtilities {
       }
     }
 
-    final int lastBackslash = name.lastIndexOf(FILE_SEPARATOR_LINUX);
+    final int lastBackslash = name.lastIndexOf(FILE_SEPARATOR);
     if (lastBackslash != -1) {
       name = name.substring(lastBackslash + 1, name.length());
     } else {
@@ -147,53 +144,18 @@ public final class FileUtilities {
     return name;
   }
 
-  /**
-   * Gets the specified file as InputStream from either a resource folder or the file system.
-   * 
-   * @param file
-   *          The path to the file.
-   * @return The contents of the specified file as {@code InputStream}.
-   * @see Resources
-   */
-  public static InputStream getGameResource(String file) {
-    InputStream stream = findGameResource(file);
-    return stream == null ? null : stream.markSupported() ? stream : new BufferedInputStream(stream);
-  }
-  
-  private static InputStream findGameResource(final String file) {
+  public static String getParentDirPath(final String uri) {
     try {
-      InputStream resourceStream = ClassLoader.getSystemResourceAsStream(file);
-      if (resourceStream != null) {
-        return resourceStream;
-      }
-
-      resourceStream = FileUtilities.class.getResourceAsStream(file);
-      if (resourceStream != null) {
-        return resourceStream;
-      }
-
-      File f = new File(file);
-      if (f.exists()) {
-        resourceStream = new FileInputStream(file);
-        return resourceStream;
-      } else {
-        log.log(Level.INFO, "{0} could not be found.", file);
-        return null;
-      }
-    } catch (final IOException e) {
+      return getParentDirPath(new URI(uri));
+    } catch (URISyntaxException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
       return null;
     }
   }
 
-  public static String getParentDirPath(final String fileOrDirPath) {
-    if (fileOrDirPath.contains(FILE_SEPARATOR_WIN)) {
-      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(FILE_SEPARATOR_WIN) + 1);
-    } else if (fileOrDirPath.contains(FILE_SEPARATOR_LINUX)) {
-      return fileOrDirPath.substring(0, fileOrDirPath.lastIndexOf(FILE_SEPARATOR_LINUX) + 1);
-    }
-
-    return "";
+  public static String getParentDirPath(final URI uri) {
+    URI parent = uri.getPath().endsWith(FILE_SEPARATOR) ? uri.resolve("..") : uri.resolve(".");
+    return parent.toString();
   }
 
   /**
@@ -206,38 +168,25 @@ public final class FileUtilities {
    *          The parts of the path to be constructed.
    * @return The combined path.
    */
-  public static String combine(final String basePath, final String... paths) {
-    String combined = ensurePathSeparator(new File(basePath).toPath().normalize().toString(), Character.toString(File.separatorChar));
-    for (String path : paths) {
-      if (path == null) {
-        continue;
+  public static String combine(String basePath, final String... paths) {
+    basePath = basePath.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
+    try {
+      URI uri = new URI(basePath);
+
+      for (String path : paths) {
+        if (path == null) {
+          continue;
+        }
+        
+        path = path.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
+
+        uri = uri.resolve(path);
       }
 
-      combined = ensurePathSeparator(new File(combined).toPath().resolve(path).normalize().toString(), Character.toString(File.separatorChar));
+      return uri.toString();
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+      return basePath;
     }
-
-    return combined;
-  }
-
-  public static String ensurePathSeparator(final String path, final String separator) {
-    final String separatorToReplace = separator == FILE_SEPARATOR_LINUX ? FILE_SEPARATOR_WIN : FILE_SEPARATOR_LINUX;
-
-    return path.replace(separatorToReplace, separator);
-  }
-
-  public static String removeTrailingSeparator(final String path) {
-    if (path.endsWith(FILE_SEPARATOR_WIN) || path.endsWith(FILE_SEPARATOR_LINUX)) {
-      return path.substring(0, path.length() - 1);
-    }
-
-    return path;
-  }
-
-  public static String removeLeadingSeparator(final String path) {
-    if (path.startsWith(FILE_SEPARATOR_WIN) || path.startsWith(FILE_SEPARATOR_LINUX)) {
-      return path.substring(1);
-    }
-
-    return path;
   }
 }

@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
-
 public final class Fonts extends ResourcesContainer<Font> {
   private static final Logger log = Logger.getLogger(Fonts.class.getName());
 
@@ -56,7 +54,7 @@ public final class Fonts extends ResourcesContainer<Font> {
   @Override
   protected Font load(String resourceName) {
     try {
-      final InputStream fontStream = FileUtilities.getGameResource(resourceName);
+      final InputStream fontStream = Resources.get(resourceName);
       if (fontStream == null) {
         log.log(Level.SEVERE, "font {0} could not be loaded", resourceName);
         return null;

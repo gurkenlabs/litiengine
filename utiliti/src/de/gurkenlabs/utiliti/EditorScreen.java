@@ -293,7 +293,7 @@ public class EditorScreen extends Screen {
       Program.getUserPreferences().setLastGameFile(gameFile.getPath());
       Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
       Program.loadRecentFiles();
-      this.setProjectPath(FileUtilities.getParentDirPath(gameFile.getAbsolutePath()));
+      this.setProjectPath(gameFile.getPath());
 
       // load maps from game file
       this.mapComponent.loadMaps(this.getGameFile().getMaps());
@@ -462,7 +462,7 @@ public class EditorScreen extends Screen {
         return;
       }
 
-      String path = FileUtilities.getParentDirPath(file.getPath());
+      String path = FileUtilities.getParentDirPath(file.toURI());
       tileset.setMapPath(path);
 
       if (this.gameFile.getTilesets().stream().anyMatch(x -> x.getName().equals(tileset.getName()))) {
@@ -624,8 +624,8 @@ public class EditorScreen extends Screen {
   private void saveMaps() {
     for (Map map : EditorScreen.instance().getMapComponent().getMaps()) {
       UndoManager.save(map);
-      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(this.getProjectPath(), "maps"), map.getName() + "." + Map.FILE_EXTENSION)) {
-        String newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
+      for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + Map.FILE_EXTENSION)) {
+        File newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);
         log.log(Level.INFO, "synchronized map {0}", new Object[] { newFile });
       }
     }

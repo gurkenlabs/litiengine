@@ -38,7 +38,7 @@ public final class XmlExportDialog {
 
       int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
-        String newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
+        File newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
         log.log(Level.INFO, "exported {0} {1} to {2}", new Object[] { name, filename, newFile });
       }
     } catch (IOException e) {

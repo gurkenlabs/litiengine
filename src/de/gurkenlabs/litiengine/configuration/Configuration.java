@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 public class Configuration {
   private static final Logger log = Logger.getLogger(Configuration.class.getName());
@@ -135,7 +135,7 @@ public class Configuration {
    */
   private void loadFromFile() {
     final File settingsFile = new File(this.getFileName());
-    try (InputStream settingsStream = FileUtilities.getGameResource(this.getFileName())) {
+    try (InputStream settingsStream = Resources.get(this.getFileName())) {
       if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
         final OutputStream out = new FileOutputStream(settingsFile);
         this.createDefaultSettingsFile(out);

@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Sounds extends ResourcesContainer<Sound> {
   private static final Logger log = Logger.getLogger(Sounds.class.getName());
@@ -22,7 +21,7 @@ public final class Sounds extends ResourcesContainer<Sound> {
    */
   @Override
   protected Sound load(String resourceName) throws Exception {
-    final InputStream is = FileUtilities.getGameResource(resourceName);
+    final InputStream is = Resources.get(resourceName);
     if (is == null) {
 
       log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resourceName });

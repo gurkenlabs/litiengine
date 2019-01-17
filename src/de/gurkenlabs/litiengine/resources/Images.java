@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Images extends ResourcesContainer<BufferedImage> {
   Images() {
@@ -54,7 +53,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     // try to get image from resource folder first and as a fallback get it from
     // a normal folder
     BufferedImage img = null;
-    final InputStream imageFile = FileUtilities.getGameResource(resourceName);
+    final InputStream imageFile = Resources.get(resourceName);
     if (imageFile != null) {
       img = ImageIO.read(imageFile);
     }

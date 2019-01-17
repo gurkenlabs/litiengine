@@ -747,7 +747,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     }
 
     XmlImportDialog.importXml("Tilemap", Map.FILE_EXTENSION, file -> {
-      String mapPath = file.toString();
+      String mapPath = file.toURI().toString();
       Map map = (Map) Resources.maps().get(mapPath);
       if (map == null) {
         log.log(Level.WARNING, "could not load map from file {0}", new Object[] { mapPath });
@@ -858,11 +858,11 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
       int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
-        String newFile = XmlUtilities.save(map, chooser.getSelectedFile().toString(), Map.FILE_EXTENSION);
+        File newFile = XmlUtilities.save(map, chooser.getSelectedFile().toString(), Map.FILE_EXTENSION);
 
         // save all tilesets manually because a map has a relative reference to
         // the tilesets
-        String dir = FileUtilities.getParentDirPath(newFile);
+        String dir = FileUtilities.getParentDirPath(newFile.toURI());
         for (ITileset tileSet : map.getTilesets()) {
           ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
           ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);

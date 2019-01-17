@@ -1,9 +1,6 @@
 package de.gurkenlabs.litiengine.util.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
-
-import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +8,8 @@ public class FileUtilitiesTests {
 
   @Test
   public void testCombinePaths() {
-    String path1 = "test/test2/";
-    String replativePath = "./test/test2";
+    String path1 = "/test/test2/";
+    String relativePath = "./test/test2";
     String relativePath2 = "../test/test2/";
     String relativePath3 = "../somepath/123/456/";
     
@@ -22,25 +19,24 @@ public class FileUtilitiesTests {
     String someOtherFile = "file.txt";
 
     String combined = FileUtilities.combine(path1, otherPath);
-    String combined2 = FileUtilities.combine(otherPath, replativePath);
-    String combined3 = FileUtilities.combine(relativePath3, replativePath);
-    String combined4 = FileUtilities.combine(relativePath2, replativePath);
-    String combined5 = FileUtilities.combine(relativePath2, replativePath, otherPath);
+    String combined2 = FileUtilities.combine(otherPath, relativePath);
+    String combined3 = FileUtilities.combine(relativePath3, relativePath);
+    String combined4 = FileUtilities.combine(relativePath2, relativePath);
+    String combined5 = FileUtilities.combine(relativePath2, relativePath, relativePath3);
     String combined6 = FileUtilities.combine(otherPath, somefile);
     String combined7 = FileUtilities.combine(otherPath, someOtherFile);
 
-    assertEquals(new File("test/test2/somepath/123/456").toPath().toString(), combined);
-    assertEquals(new File("somepath/123/456/test/test2").toPath().toString(), combined2);
-    assertEquals(new File("../somepath/123/456/test/test2").toPath().toString(), combined3);
-    assertEquals(new File("../test/test2/test/test2").toPath().toString(), combined4);
-    assertEquals(new File("../test/test2/test/test2/somepath/123/456").toPath().toString(), combined5);
-    assertEquals(new File("somepath/123/file.txt").toPath().toString(), combined6);
-    assertEquals(new File("somepath/123/456/file.txt").toPath().toString(), combined7);
+    assertEquals("/test/test2/somepath/123/456/", combined);
+    assertEquals("somepath/123/456/test/test2", combined2);
+    assertEquals("../somepath/123/456/test/test2", combined3);
+    assertEquals("../test/test2/test/test2", combined4);
+    assertEquals("../test/test2/somepath/123/456/", combined5);
+    assertEquals("somepath/123/file.txt", combined6);
+    assertEquals("somepath/123/456/file.txt", combined7);
   }
 
   @Test
   public void testCombinePathsWin() {
-    assumeTrue(System.getProperty("os.name").startsWith("Windows"));
     String winPath = "\\test\\test2\\";
     String linuxPath = "somepath/123/456/";
 
@@ -59,13 +55,13 @@ public class FileUtilitiesTests {
     String combined6 = FileUtilities.combine(linuxPath, somefile);
     String combined7 = FileUtilities.combine(linuxPath, someOtherFile);
 
-    assertEquals(new File("/test/test2/somepath/123/456").toPath().toString(), combined);
-    assertEquals(new File("somepath/123/456/test/test2").toPath().toString(), combined2);
-    assertEquals(new File("../somepath/123/456/test/test2").toPath().toString(), combined3);
-    assertEquals(new File("../test/test2/test/test2").toPath().toString(), combined4);
-    assertEquals(new File("../test/test2/test/test2/somepath/123/456").toPath().toString(), combined5);
-    assertEquals(new File("somepath/123/file.txt").toPath().toString(), combined6);
-    assertEquals(new File("somepath/123/456/file.txt").toPath().toString(), combined7);
+    assertEquals("/test/test2/somepath/123/456/", combined);
+    assertEquals("somepath/123/456/test/test2/", combined2);
+    assertEquals("../somepath/123/456/test/test2/", combined3);
+    assertEquals("../test/test2/test/test2/", combined4);
+    assertEquals("../test/test2/test/test2/somepath/123/456/", combined5);
+    assertEquals("somepath/123/file.txt", combined6);
+    assertEquals("somepath/123/456/file.txt", combined7);
   }
 
   @Test

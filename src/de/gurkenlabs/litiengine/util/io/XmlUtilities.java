@@ -24,6 +24,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
+import de.gurkenlabs.litiengine.resources.Resources;
+
 public final class XmlUtilities {
   private static final Logger log = Logger.getLogger(XmlUtilities.class.getName());
 
@@ -91,7 +93,7 @@ public final class XmlUtilities {
 
     final Unmarshaller um = jaxbContext.createUnmarshaller();
 
-    InputStream stream = FileUtilities.getGameResource(path);
+    InputStream stream = Resources.get(path);
     if (stream == null) {
       return null;
     }
@@ -99,7 +101,7 @@ public final class XmlUtilities {
     return cls.cast(um.unmarshal(stream));
   }
 
-  public static <T> String save(T object, String fileName) {
+  public static <T> File save(T object, String fileName) {
     if (fileName == null || fileName.isEmpty()) {
       return null;
     }
@@ -130,10 +132,10 @@ public final class XmlUtilities {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
 
-    return newFile.toString();
+    return newFile;
   }
 
-  public static <T> String save(T object, String fileName, String extension) {
+  public static <T> File save(T object, String fileName, String extension) {
     String fileNameWithExtension = fileName;
     if (!fileNameWithExtension.endsWith("." + extension)) {
       fileNameWithExtension += "." + extension;

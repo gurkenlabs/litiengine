@@ -103,7 +103,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
   public List<Spritesheet> loadFrom(final String spriteInfoFile) {
 
     final ArrayList<Spritesheet> sprites = new ArrayList<>();
-    final InputStream fileStream = FileUtilities.getGameResource(spriteInfoFile);
+    final InputStream fileStream = Resources.get(spriteInfoFile);
     if (fileStream == null) {
       return sprites;
     }

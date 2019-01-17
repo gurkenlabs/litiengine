@@ -31,7 +31,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
+import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "litidata")
@@ -171,7 +171,7 @@ public class GameData implements Serializable {
   private static GameData getGameFileFromFile(String file) throws JAXBException, IOException {
     final JAXBContext jaxbContext = XmlUtilities.getContext(GameData.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
-    try (InputStream inputStream = FileUtilities.getGameResource(file)) {
+    try (InputStream inputStream = Resources.get(file)) {
 
       // try to get compressed game file
       final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
