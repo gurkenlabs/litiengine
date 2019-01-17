@@ -82,7 +82,7 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
         continue;
       }
 
-      ReflectionUtilities.setFieldValue(entity.getClass(), entity, property.name(), value);
+      ReflectionUtilities.setFieldValue(entity.getClass(), entity, field.getName(), value);
     }
   }
 
