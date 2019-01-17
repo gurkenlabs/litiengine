@@ -488,8 +488,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
-  public void setOrientation(String orientation) {
-    this.orientation = orientation;
+  public void setOrientation(MapOrientation orientation) {
+    this.mapOrientation = orientation;
+    this.orientation = this.mapOrientation.name().toLowerCase();
   }
 
   @XmlTransient

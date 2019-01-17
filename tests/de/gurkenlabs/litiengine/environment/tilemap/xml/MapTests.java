@@ -68,7 +68,7 @@ public class MapTests {
   @Test
   public void testSettingProperties() {
     Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-    map.setOrientation(MapOrientation.SHIFTED.name());
+    map.setOrientation(MapOrientation.SHIFTED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
     map.setWidth(64);
