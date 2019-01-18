@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.environment.IPolygon;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 
@@ -50,6 +52,15 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
 
   @XmlElement(name = "polyline")
   private Polyline polyline;
+
+  @XmlElement(name = "polygon")
+  private Polygon polygon;
+
+  @XmlElement(name = "point")
+  private String pointElement;
+
+  @XmlElement(name = "ellipse")
+  private String ellipseElement;
 
   private transient MapObjectLayer layer;
 
@@ -200,6 +211,20 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
+  public IPolygon getPolygon() {
+    return this.polygon;
+  }
+
+  @Override
+  public Ellipse2D getEllipse() {
+    if (!this.isEllipse()) {
+      return null;
+    }
+
+    return new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+  }
+
+  @Override
   @XmlTransient
   public void setGridId(int gid) {
     this.gid = gid;
@@ -317,6 +342,26 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   @Override
   public IMapObjectLayer getLayer() {
     return this.layer;
+  }
+
+  @Override
+  public boolean isPolyline() {
+    return this.polyline != null;
+  }
+
+  @Override
+  public boolean isPolygon() {
+    return this.polygon != null;
+  }
+
+  @Override
+  public boolean isPoint() {
+    return this.pointElement != null;
+  }
+
+  @Override
+  public boolean isEllipse() {
+    return this.ellipseElement != null;
   }
 
   void afterUnmarshal(Unmarshaller u, Object parent) {

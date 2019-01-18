@@ -330,33 +330,40 @@ public final class MapUtilities {
     return match;
   }
 
-  public static Path2D convertPolylineToPath(final IMapObject mapObject) {
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+  public static Path2D convertPolyshapeToPath(final IMapObject mapObject) {
+    if (mapObject == null || (!mapObject.isPolygon() && !mapObject.isPolyline())) {
+      return null;
+    }
+
+    List<Point2D> points = mapObject.getPolyline() != null ? mapObject.getPolyline().getPoints() : mapObject.getPolygon().getPoints();
+    if (points.isEmpty()) {
       return null;
     }
 
     Path2D path = new Path2D.Float();
     path.moveTo(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-    for (int i = 1; i < mapObject.getPolyline().getPoints().size(); i++) {
-      Point2D point = mapObject.getPolyline().getPoints().get(i);
+    for (int i = 1; i < points.size(); i++) {
+      Point2D point = points.get(i);
       path.lineTo(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY());
+    }
+
+    if (mapObject.isPolygon()) {
+      path.closePath();
     }
 
     return path;
   }
 
-  public static List<Point2D> convertPolylineToPointList(final IMapObject mapObject) {
-    List<Point2D> points = new ArrayList<>();
-    if (mapObject == null || mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
-      return points;
+  public static List<Point2D> getAbsolutePolyshapePoints(final IMapObject mapObject) {
+    if (mapObject.isPolygon()) {
+      return mapObject.getPolygon().getAbsolutePoints(mapObject.getLocation());
     }
 
-    for (int i = 1; i < mapObject.getPolyline().getPoints().size(); i++) {
-      Point2D point = mapObject.getPolyline().getPoints().get(i);
-      points.add(new Point2D.Double(mapObject.getLocation().getX() + point.getX(), mapObject.getLocation().getY() + point.getY()));
+    if (mapObject.isPolyline()) {
+      return mapObject.getPolyline().getAbsolutePoints(mapObject.getLocation());
     }
 
-    return points;
+    return new ArrayList<>();
   }
 
   public static IMapObject findMapObject(final IMap map, final int id) {

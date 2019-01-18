@@ -1698,7 +1698,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           }
 
           // found the path for the rat
-          final Path2D path = MapUtilities.convertPolylineToPath(mapObject);
+          final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
           if (path == null) {
             continue;
           }

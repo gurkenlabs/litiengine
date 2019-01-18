@@ -1,7 +1,10 @@
 package de.gurkenlabs.litiengine.environment.tilemap;
 
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
+import de.gurkenlabs.litiengine.environment.IPolygon;
 
 /**
  * This interface represents an instance on a map that can define various things
@@ -48,6 +51,10 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
   public String getType();
 
   public IPolyline getPolyline();
+  
+  public IPolygon getPolygon();
+  
+  public Ellipse2D getEllipse();
 
   public IMapObjectLayer getLayer();
 
@@ -78,4 +85,12 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
   public float getWidth();
 
   public float getHeight();
+  
+  public boolean isPolyline();
+  
+  public boolean isPolygon();
+
+  public boolean isPoint();
+
+  public boolean isEllipse();
 }

@@ -41,6 +41,7 @@ import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
@@ -1065,7 +1066,16 @@ public class Environment implements IEnvironment {
 
   @Override
   public Collection<IEntity> load(final IMapObject mapObject) {
-    IMapObjectLoader loader = mapObjectLoaders.get(mapObject.getType());
+    IMapObjectLoader loader = null;
+    if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
+      // this makes it possible to register custom MapObjectLoaders that can handle a MapObject without a type specified
+      // by default, the engine doesn't provide such a loader (because it's not clear what Entity the MapObject should be mapped to)
+      // it might be useful for some games to do some custom handling e.g. for polygon, ellipse, polyline or point MapObjects.
+      loader = mapObjectLoaders.getOrDefault(MapObjectType.UNDEFINED_MAPOBJECTTYPE, null);
+    } else {
+      loader = mapObjectLoaders.get(mapObject.getType());
+    }
+
     if (loader != null) {
       Collection<IEntity> loadedEntities;
       try {
@@ -1239,10 +1249,6 @@ public class Environment implements IEnvironment {
   private void loadMapObjects() {
     for (final IMapObjectLayer layer : this.getMap().getMapObjectLayers()) {
       for (final IMapObject mapObject : layer.getMapObjects()) {
-        if (mapObject.getType() == null || mapObject.getType().isEmpty()) {
-          continue;
-        }
-
         this.load(mapObject);
       }
     }

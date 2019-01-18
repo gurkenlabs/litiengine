@@ -136,12 +136,12 @@ public class MapObjectLayer extends Layer implements IMapObjectLayer {
   public Collection<IMapObject> getMapObjects(String... types) {
     List<IMapObject> objs = new ArrayList<>();
     for (IMapObject mapObject : this.getMapObjects()) {
-      if (mapObject == null || mapObject.getType() == null || mapObject.getType().isEmpty()) {
+      if (mapObject == null) {
         continue;
       }
 
       for (String type : types) {
-        if (mapObject.getType().equals(type)) {
+        if (mapObject.getType() != null && mapObject.getType().equals(type)) {
           objs.add(mapObject);
         }
       }
