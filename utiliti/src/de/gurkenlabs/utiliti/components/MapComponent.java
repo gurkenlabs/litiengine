@@ -101,7 +101,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private static final Color COLOR_TRIGGER_BORDER = Color.YELLOW;
   private static final Color COLOR_TRIGGER_FILL = new Color(255, 255, 0, 15);
   private static final Color COLOR_SPAWNPOINT = Color.GREEN;
-  private static final Color COLOR_LANE = Color.YELLOW;
+  private static final Color COLOR_UNSUPPORTED = new Color(180, 180, 180, 200);
+  private static final Color COLOR_UNSUPPORTED_FILL = new Color(180, 180, 180, 15);
   private static final Color COLOR_NEWOBJECT_FILL = new Color(0, 255, 0, 50);
   private static final Color COLOR_NEWOBJECT_BORDER = Color.GREEN.darker();
   private static final Color COLOR_TRANSFORM_RECT_FILL = new Color(255, 255, 255, 100);
@@ -1572,7 +1573,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
           }
 
           MapObjectType type = MapObjectType.get(mapObject.getType());
-          if (type == MapObjectType.PATH) {
+          if (type == null) {
             continue;
           }
 
@@ -1660,7 +1661,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     if (Game.world().environment() == null || Game.world().environment().getMap() == null) {
       return;
     }
-    
+
     final List<IMapObjectLayer> layers = Game.world().environment().getMap().getMapObjectLayers();
     // render all entities
     for (final IMapObjectLayer layer : layers) {
@@ -1686,28 +1687,71 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         MapObjectType type = MapObjectType.get(mapObject.getType());
         final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
+        if (type == null) {
+          g.setColor(COLOR_UNSUPPORTED);
+          Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
+          StringBuilder info = new StringBuilder("#");
+          info.append(mapObject.getId());
+          if (mapObject.getName() != null && !mapObject.getName().isEmpty()) {
+            info.append("(");
+            info.append(mapObject.getName());
+            info.append(")");
+          }
+
+          Game.graphics().renderText(g, info.toString(), start.getX(), start.getY() - 5);
+          Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
+
+          if (mapObject.isPolyline()) {
+
+            if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+              continue;
+            }
+
+            // found the path for the rat
+            final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
+            if (path == null) {
+              continue;
+            }
+
+            Game.graphics().renderOutline(g, path, shapeStroke);
+          } else if (mapObject.isPolygon()) {
+            if (mapObject.getPolygon() == null || mapObject.getPolygon().getPoints().isEmpty()) {
+              continue;
+            }
+
+            // found the path for the rat
+            final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
+            if (path == null) {
+              continue;
+            }
+            
+            g.setColor(COLOR_UNSUPPORTED_FILL);
+            Game.graphics().renderShape(g, path);
+            g.setColor(COLOR_UNSUPPORTED);
+            Game.graphics().renderOutline(g, path, shapeStroke);
+          }else if (mapObject.isEllipse()) {
+            if (mapObject.getEllipse() == null) {
+              return;
+            }
+            g.setColor(COLOR_UNSUPPORTED_FILL);
+            Game.graphics().renderShape(g, mapObject.getEllipse());
+            
+            g.setColor(COLOR_UNSUPPORTED);
+            Game.graphics().renderOutline(g, mapObject.getEllipse(), shapeStroke);
+          } else {
+            g.setColor(COLOR_UNSUPPORTED_FILL);
+            Game.graphics().renderShape(g, mapObject.getBoundingBox());
+            g.setColor(COLOR_UNSUPPORTED);
+            Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+          }
+
+          continue;
+        }
+
         // render spawn points
         if (type == MapObjectType.SPAWNPOINT) {
           g.setColor(COLOR_SPAWNPOINT);
           Game.graphics().renderShape(g, new Rectangle2D.Double(mapObject.getBoundingBox().getCenterX() - 1, mapObject.getBoundingBox().getCenterY() - 1, 2, 2));
-        } else if (type == MapObjectType.PATH) {
-          // render lane
-
-          if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
-            continue;
-          }
-
-          // found the path for the rat
-          final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
-          if (path == null) {
-            continue;
-          }
-
-          g.setColor(COLOR_LANE);
-          Game.graphics().renderOutline(g, path, shapeStroke);
-          Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-          Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
-          Game.graphics().renderText(g, "#" + mapObject.getId() + "(" + mapObject.getName() + ")", start.getX(), start.getY() - 5);
         }
 
         if (type != MapObjectType.COLLISIONBOX) {
