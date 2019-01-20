@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 
 public class Material extends CustomPropertyProvider {
-  private static final Map<String, Material> materials= new ConcurrentHashMap<>();
+  private static final Map<String, Material> materials = new ConcurrentHashMap<>();
   public static final Material UNDEFINED = new Material("UNDEFINED");
   public static final Material CERAMIC = new Material("CERAMIC");
   public static final Material FLESH = new Material("FLESH");
