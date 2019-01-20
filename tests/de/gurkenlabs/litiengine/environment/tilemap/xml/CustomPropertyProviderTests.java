@@ -14,7 +14,6 @@ public class CustomPropertyProviderTests {
 
   @Test
   public void testSetCustomProperty() {
-    @SuppressWarnings("serial")
     CustomPropertyProvider propProvider = new CustomPropertyProvider() {};
     propProvider.setValue("test", "testvalue");
 

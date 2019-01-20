@@ -23,7 +23,6 @@ public class Blueprint extends MapObject {
    * Blueprint in this format support multiple map objects as children (extended template XML).
    */
   public static final String BLUEPRINT_FILE_EXTENSION = "xtx";
-  private static final long serialVersionUID = -7235380251249427834L;
 
   @XmlElement(name = "object")
   private List<MapObject> items = new ArrayList<>();

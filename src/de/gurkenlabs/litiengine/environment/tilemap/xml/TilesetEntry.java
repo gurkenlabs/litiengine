@@ -15,8 +15,6 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TilesetEntry extends CustomPropertyProvider implements ITilesetEntry {
 
-  private static final long serialVersionUID = -3356859779159630943L;
-
   private transient ITerrain[] terrains;
 
   @XmlAttribute

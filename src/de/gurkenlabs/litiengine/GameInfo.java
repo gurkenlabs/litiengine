@@ -26,7 +26,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomPropertyProvider;
 @XmlRootElement(name = "gameinfo")
 public class GameInfo extends CustomPropertyProvider {
   private static final Logger log = Logger.getLogger(GameInfo.class.getName());
-  private static final long serialVersionUID = 3340166298303962177L;
 
   @XmlElement
   private String name;
