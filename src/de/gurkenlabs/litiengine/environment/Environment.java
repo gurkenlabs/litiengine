@@ -61,6 +61,7 @@ import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 public class Environment implements IEnvironment {
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
+  private static final String GRAVITY_IDENTIFIER = "GRAVITY";
 
   private final Map<Integer, ICombatEntity> combatEntities = new ConcurrentHashMap<>();
   private final Map<Integer, IMobileEntity> mobileEntities = new ConcurrentHashMap<>();
@@ -1207,6 +1208,7 @@ public class Environment implements IEnvironment {
     IMovementController mvmtControl = entity.getMovementController();
     if (mvmtControl != null) {
       GravityForce force = new GravityForce(entity, this.getGravity(), Direction.DOWN);
+      force.setIdentifier(GRAVITY_IDENTIFIER);
       entity.getMovementController().apply(force);
       this.gravityForces.put(entity.getMapId(), force);
     }

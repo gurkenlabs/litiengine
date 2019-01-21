@@ -12,6 +12,7 @@ public class Force {
   private Point2D location;
   private final float size;
   private float strength;
+  private String identifier;
 
   /**
    * Instantiates a new force.
@@ -67,6 +68,10 @@ public class Force {
     return this.strength;
   }
 
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
   /**
    * Checks for ended.
    *
@@ -91,8 +96,23 @@ public class Force {
   public void setLocation(final Point2D location) {
     this.location = location;
   }
-  
+
   public void setStrength(float strength) {
     this.strength = strength;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.identifier != null && !this.identifier.isEmpty() ? this.identifier : "Force");
+    sb.append(": ");
+    sb.append(this.getStrength());
+    sb.append("px/sec; ");
+    sb.append(this.getLocation());
+    return sb.toString();
   }
 }

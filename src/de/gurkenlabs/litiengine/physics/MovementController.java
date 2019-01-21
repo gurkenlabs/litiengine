@@ -165,7 +165,16 @@ public class MovementController<T extends IMobileEntity> implements IMovementCon
   }
 
   public double getVelocityX() {
-    return velocityX;
+    return this.velocityX;
+  }
+
+  @Override
+  public Force getForce(String identifier) {
+    if (identifier == null || identifier.isEmpty()) {
+      return null;
+    }
+
+    return this.getActiveForces().stream().filter(x -> x.getIdentifier() != null && x.getIdentifier().equals(identifier)).findFirst().orElse(null);
   }
 
   protected void setVelocityX(double velocityX) {

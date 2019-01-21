@@ -57,6 +57,8 @@ public interface IMovementController extends IEntityController {
    * @return the active forces
    */
   public List<Force> getActiveForces();
+  
+  public Force getForce(String identifier);
 
   /**
    * Checks given conditions before moving.

@@ -153,8 +153,8 @@ public abstract class Ability implements IRenderable {
     return (float) (!this.canCast() ? (this.getAttributes().getCooldown().getCurrentValue() - loop.getDeltaTime(this.getCurrentExecution().getExecutionTicks())) * 0.001 : 0);
   }
 
-  public boolean isCasting(final IGameLoop gameLoop) {
-    return this.getCurrentExecution() != null && gameLoop.getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
+  public boolean isActive() {
+    return this.getCurrentExecution() != null && Game.loop().getDeltaTime(this.getCurrentExecution().getExecutionTicks()) < this.getAttributes().getDuration().getCurrentValue();
   }
 
   public boolean isMultiTarget() {
