@@ -1,7 +1,6 @@
 package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
-import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -15,9 +14,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ICustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CustomPropertyProvider implements ICustomPropertyProvider, Serializable {
-  private static final long serialVersionUID = 5564165255132042594L;
-
+public class CustomPropertyProvider implements ICustomPropertyProvider {
   @XmlElement
   @XmlJavaTypeAdapter(CustomPropertyAdapter.class)
   private Map<String, ICustomProperty> properties;

@@ -30,7 +30,6 @@ import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tileset extends CustomPropertyProvider implements ITileset {
   public static final String FILE_EXTENSION = "tsx";
-  private static final long serialVersionUID = 1711536300667154031L;
 
   @XmlAttribute
   private int firstgid;

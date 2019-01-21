@@ -9,8 +9,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TileOffset extends CustomPropertyProvider implements ITileOffset {
 
-  private static final long serialVersionUID = 8543461379051662633L;
-
   @XmlAttribute
   private int x;
 

@@ -20,8 +20,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
  * The Class MapObject.
  */
 public class MapObject extends CustomPropertyProvider implements IMapObject {
-  private static final long serialVersionUID = -6001981756772928868L;
-
   @XmlAttribute
   private int id;
 
