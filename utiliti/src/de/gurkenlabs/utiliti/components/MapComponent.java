@@ -1688,61 +1688,8 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         MapObjectType type = MapObjectType.get(mapObject.getType());
         final BasicStroke shapeStroke = new BasicStroke(1f / Game.world().camera().getRenderScale());
         if (type == null) {
-          g.setColor(COLOR_UNSUPPORTED);
-          Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
-          StringBuilder info = new StringBuilder("#");
-          info.append(mapObject.getId());
-          if (mapObject.getName() != null && !mapObject.getName().isEmpty()) {
-            info.append("(");
-            info.append(mapObject.getName());
-            info.append(")");
-          }
-
-          Game.graphics().renderText(g, info.toString(), start.getX(), start.getY() - 5);
-          Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
-
-          if (mapObject.isPolyline()) {
-
-            if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
-              continue;
-            }
-
-            // found the path for the rat
-            final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
-            if (path == null) {
-              continue;
-            }
-
-            Game.graphics().renderOutline(g, path, shapeStroke);
-          } else if (mapObject.isPolygon()) {
-            if (mapObject.getPolygon() == null || mapObject.getPolygon().getPoints().isEmpty()) {
-              continue;
-            }
-
-            // found the path for the rat
-            final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
-            if (path == null) {
-              continue;
-            }
-            
-            g.setColor(COLOR_UNSUPPORTED_FILL);
-            Game.graphics().renderShape(g, path);
-            g.setColor(COLOR_UNSUPPORTED);
-            Game.graphics().renderOutline(g, path, shapeStroke);
-          }else if (mapObject.isEllipse()) {
-            if (mapObject.getEllipse() == null) {
-              return;
-            }
-            g.setColor(COLOR_UNSUPPORTED_FILL);
-            Game.graphics().renderShape(g, mapObject.getEllipse());
-            
-            g.setColor(COLOR_UNSUPPORTED);
-            Game.graphics().renderOutline(g, mapObject.getEllipse(), shapeStroke);
-          } else {
-            g.setColor(COLOR_UNSUPPORTED_FILL);
-            Game.graphics().renderShape(g, mapObject.getBoundingBox());
-            g.setColor(COLOR_UNSUPPORTED);
-            Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
+          if (Program.getUserPreferences().isRenderCustomMapObjects()) {
+            renderUnsupportedMapObject(g, mapObject, shapeStroke);
           }
 
           continue;
@@ -1760,6 +1707,65 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
         this.renderCollisionBox(g, mapObject, shapeStroke);
       }
+    }
+  }
+
+  private static void renderUnsupportedMapObject(Graphics2D g, IMapObject mapObject, BasicStroke shapeStroke) {
+    g.setColor(COLOR_UNSUPPORTED);
+    Point2D start = new Point2D.Double(mapObject.getLocation().getX(), mapObject.getLocation().getY());
+    StringBuilder info = new StringBuilder("#");
+    info.append(mapObject.getId());
+    if (mapObject.getName() != null && !mapObject.getName().isEmpty()) {
+      info.append("(");
+      info.append(mapObject.getName());
+      info.append(")");
+    }
+
+    Game.graphics().renderText(g, info.toString(), start.getX(), start.getY() - 5);
+    Game.graphics().renderShape(g, new Ellipse2D.Double(start.getX() - 1, start.getY() - 1, 3, 3));
+
+    if (mapObject.isPolyline()) {
+
+      if (mapObject.getPolyline() == null || mapObject.getPolyline().getPoints().isEmpty()) {
+        return;
+      }
+
+      // found the path for the rat
+      final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
+      if (path == null) {
+        return;
+      }
+
+      Game.graphics().renderOutline(g, path, shapeStroke);
+    } else if (mapObject.isPolygon()) {
+      if (mapObject.getPolygon() == null || mapObject.getPolygon().getPoints().isEmpty()) {
+        return;
+      }
+
+      // found the path for the rat
+      final Path2D path = MapUtilities.convertPolyshapeToPath(mapObject);
+      if (path == null) {
+        return;
+      }
+
+      g.setColor(COLOR_UNSUPPORTED_FILL);
+      Game.graphics().renderShape(g, path);
+      g.setColor(COLOR_UNSUPPORTED);
+      Game.graphics().renderOutline(g, path, shapeStroke);
+    } else if (mapObject.isEllipse()) {
+      if (mapObject.getEllipse() == null) {
+        return;
+      }
+      g.setColor(COLOR_UNSUPPORTED_FILL);
+      Game.graphics().renderShape(g, mapObject.getEllipse());
+
+      g.setColor(COLOR_UNSUPPORTED);
+      Game.graphics().renderOutline(g, mapObject.getEllipse(), shapeStroke);
+    } else {
+      g.setColor(COLOR_UNSUPPORTED_FILL);
+      Game.graphics().renderShape(g, mapObject.getBoundingBox());
+      g.setColor(COLOR_UNSUPPORTED);
+      Game.graphics().renderOutline(g, mapObject.getBoundingBox(), shapeStroke);
     }
   }
 

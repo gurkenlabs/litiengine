@@ -92,7 +92,7 @@ public class Program {
   public static final BufferedImage CURSOR_TRANS_DIAGONAL_RIGHT = Resources.images().get("cursor-trans-45.png");
 
   private static final Logger log = Logger.getLogger(Program.class.getName());
-  
+
   private static UserPreferenceConfiguration userPreferences;
   private static JScrollBar horizontalScroll;
   private static JScrollBar verticalScroll;
@@ -108,9 +108,9 @@ public class Program {
   private static boolean isChanging;
 
   public static void main(String[] args) {
-    
+
     Style.initSwingComponentStyle();
-    
+
     Game.info().setName("utiLITI");
     Game.info().setSubTitle("LITIengine Creation Kit");
     Game.info().setVersion("v0.4.15-alpha");
@@ -480,6 +480,11 @@ public class Program {
     renderCollision.setShortcut(new MenuShortcut(KeyEvent.VK_H));
     renderCollision.addItemListener(e -> userPreferences.setRenderBoundingBoxes(renderCollision.getState()));
 
+    CheckboxMenuItem renderCustomMapObjects = new CheckboxMenuItem(Resources.strings().get("menu_renderCustomMapObjects"));
+    renderCustomMapObjects.setState(userPreferences.isRenderCustomMapObjects());
+    renderCustomMapObjects.setShortcut(new MenuShortcut(KeyEvent.VK_K));
+    renderCustomMapObjects.addItemListener(e -> userPreferences.setRenderCustomMapObjects(renderCustomMapObjects.getState()));
+
     MenuItem setGrid = new MenuItem(Resources.strings().get("menu_gridSettings"));
     setGrid.addActionListener(a -> {
       GridEditPanel panel = new GridEditPanel(EditorScreen.instance().getMapComponent().getGridWidth(), EditorScreen.instance().getMapComponent().getGridHeight(), EditorScreen.instance().getMapComponent().getGridStrokeFactor(), EditorScreen.instance().getMapComponent().getGridColor());
@@ -503,6 +508,7 @@ public class Program {
     mnView.add(snapToGrid);
     mnView.add(renderGrid);
     mnView.add(renderCollision);
+    mnView.add(renderCustomMapObjects);
     mnView.add(setGrid);
     mnView.addSeparator();
     mnView.add(zoomIn);
@@ -895,7 +901,7 @@ public class Program {
     colorButton.setIcon(Icons.COLOR);
     colorButton.setEnabled(false);
 
-    JSpinner spinnerAmbientAlpha= new JSpinner();
+    JSpinner spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setToolTipText("Adjust ambient alpha.");
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
     spinnerAmbientAlpha.setFont(Program.TEXT_FONT);

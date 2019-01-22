@@ -16,6 +16,7 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
   private boolean snapPixels;
   private boolean snapGrid;
   private boolean renderBoundingBoxes;
+  private boolean renderCustomMapObjects;
   private boolean compressFile;
   private boolean syncMaps;
   private int frameState;
@@ -112,6 +113,14 @@ public class UserPreferenceConfiguration extends ConfigurationGroup {
 
   public void setRenderBoundingBoxes(boolean renderBoundingBoxes) {
     this.renderBoundingBoxes = renderBoundingBoxes;
+  }
+
+  public boolean isRenderCustomMapObjects() {
+    return this.renderCustomMapObjects;
+  }
+
+  public void setRenderCustomMapObjects(boolean renderCustomMapObjects) {
+    this.renderCustomMapObjects = renderCustomMapObjects;
   }
 
   public String getLastGameFile() {
