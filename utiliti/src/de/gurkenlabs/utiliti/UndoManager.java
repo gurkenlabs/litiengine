@@ -171,15 +171,26 @@ public class UndoManager {
       return;
     }
 
-    this.changing.add(new MapObject((MapObject)mapObject,true));
+    this.changing.add(new MapObject((MapObject) mapObject, true));
   }
 
   public void mapObjectChanged(IMapObject mapObject) {
+    this.mapObjectChanged(mapObject, mapObject.getId());
+  }
+  
+  /**
+   * This method overload is only used for when the ID of a map object was
+   * changed.
+   * 
+   * @param mapObject
+   * @param mapId
+   */
+  public void mapObjectChanged(IMapObject mapObject, int previousMapId) {
     if (executing || mapObject == null) {
       return;
     }
 
-    Optional<IMapObject> trackedMapObject = this.changing.stream().filter(x -> x.getId() == mapObject.getId()).findFirst();
+    Optional<IMapObject> trackedMapObject = this.changing.stream().filter(x -> x.getId() == previousMapId).findFirst();
     if (!trackedMapObject.isPresent()) {
       // didn't track the changing event and therefore cannot provide an undo
       return;
@@ -190,7 +201,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject((MapObject)mapObject,true), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject((MapObject) mapObject, true), OperationType.CHANGE);
     fireUndoStackChangedEvent(this);
   }
 
