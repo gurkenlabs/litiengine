@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -27,20 +26,28 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
+import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
+import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
-public class SpritesheetImportPanel extends JPanel {
-  private static final Font LABEL_FONT = new Font("Tahoma", Font.PLAIN, 15);
+public class SpritesheetImportPanel extends JPanel implements IUpdateable {
+  private final int PREVIEW_SIZE = 128;
+
   private JTextField textField;
   private JTable tableKeyFrames;
+  private JLabel labelAnimationPreview;
   private JList<SpriteFileWrapper> fileList;
   private DefaultListModel<SpriteFileWrapper> fileListModel;
   private DefaultTableModel treeModel;
@@ -50,13 +57,14 @@ public class SpritesheetImportPanel extends JPanel {
   private JSpinner spinnerWidth;
   private JSpinner spinnerHeight;
   private boolean isUpdating;
+  private transient AnimationController controller;
 
   public SpritesheetImportPanel(TextureAtlas atlas) {
     this();
     for (TextureAtlas.Sprite sprite : atlas.getSprites()) {
       fileListModel.addElement(new SpriteFileWrapper(sprite));
     }
-    
+
     this.initModel();
   }
 
@@ -79,15 +87,8 @@ public class SpritesheetImportPanel extends JPanel {
     this.initModel();
   }
 
-  private void initModel() {
-    this.fileList.setModel(this.fileListModel);
-
-    if (this.fileListModel.size() > 0) {
-      this.fileList.setSelectedIndex(0);
-    }
-  }
-
   public SpritesheetImportPanel() {
+    this.controller = new AnimationController();
     fileListModel = new DefaultListModel<>();
     setPreferredSize(new Dimension(454, 392));
     setLayout(new BorderLayout(0, 0));
@@ -107,17 +108,18 @@ public class SpritesheetImportPanel extends JPanel {
     fileList.getSelectionModel().addListSelectionListener(e -> {
       this.isUpdating = true;
       try {
-
         SpriteFileWrapper file = fileList.getSelectedValue();
         labelImage.setIcon(file.getIcon());
         labelWidth.setText(file.getWidth() + "px");
         labelHeight.setText(file.getHeight() + "px");
-
-        spinnerWidth.setValue(file.getSpriteWidth());
-        spinnerHeight.setValue(file.getSpriteHeight());
-
+        spinnerWidth.setModel(new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
+        spinnerHeight.setModel(new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
+        
         this.updateKeyframeTable(file);
         textField.setText(file.getName());
+
+        this.updatePreview(file);
+
       } finally {
         this.isUpdating = false;
       }
@@ -127,6 +129,13 @@ public class SpritesheetImportPanel extends JPanel {
     scrollPane.setPreferredSize(new Dimension(150, 2));
     scrollPane.setViewportView(fileList);
     add(scrollPane, BorderLayout.WEST);
+
+    labelAnimationPreview = new JLabel("");
+    labelAnimationPreview.setPreferredSize(new Dimension(0, PREVIEW_SIZE));
+    labelAnimationPreview.setMinimumSize(new Dimension(0, PREVIEW_SIZE));
+    labelAnimationPreview.setMaximumSize(new Dimension(0, PREVIEW_SIZE));
+    labelAnimationPreview.setHorizontalAlignment(SwingConstants.CENTER);
+    scrollPane.setColumnHeaderView(labelAnimationPreview);
 
     JPanel panel = new JPanel();
     panel.setBorder(null);
@@ -143,7 +152,7 @@ public class SpritesheetImportPanel extends JPanel {
 
       fileList.getSelectedValue().setSpriteWidth((int) this.spinnerWidth.getValue());
       this.updateKeyframeTable(fileList.getSelectedValue());
-      this.labelImage.setIcon(fileList.getSelectedValue().getIcon());
+      this.updatePreview(fileList.getSelectedValue());
     });
 
     JLabel lblSpriteheight = new JLabel("spriteheight:");
@@ -157,20 +166,16 @@ public class SpritesheetImportPanel extends JPanel {
 
       fileList.getSelectedValue().setSpriteHeight((int) this.spinnerHeight.getValue());
       this.updateKeyframeTable(fileList.getSelectedValue());
-      this.labelImage.setIcon(fileList.getSelectedValue().getIcon());
+      this.updatePreview(fileList.getSelectedValue());
     });
 
     JLabel lblNewLabel = new JLabel("width:");
-    lblNewLabel.setFont(LABEL_FONT);
 
     labelWidth = new JLabel("XXX");
-    labelWidth.setFont(LABEL_FONT);
 
     labelHeight = new JLabel("XXX");
-    labelHeight.setFont(LABEL_FONT);
 
     JLabel lblHeightText = new JLabel("height:");
-    lblHeightText.setFont(LABEL_FONT);
 
     JLabel lblName = new JLabel("name:");
 
@@ -248,8 +253,26 @@ public class SpritesheetImportPanel extends JPanel {
         int keyFrame = (int) treeModel.getValueAt(row, 1);
         fileList.getSelectedValue().getKeyFrames()[row] = keyFrame;
       }
+
+      this.updatePreview(fileList.getSelectedValue());
     });
     panel.setLayout(glPanel);
+
+    Game.renderLoop().attach(this);
+  }
+
+  @Override
+  public void update() {
+    if(this.isUpdating || !this.isVisible()) {
+      return;
+    }
+    
+    BufferedImage img = this.controller.getCurrentSprite();
+    if (img != null) {
+      this.labelAnimationPreview.setIcon(new ImageIcon(img));
+    } else {
+      this.labelAnimationPreview.setIcon(null);
+    }
   }
 
   public Collection<SpritesheetInfo> getSpriteSheets() {
@@ -275,6 +298,34 @@ public class SpritesheetImportPanel extends JPanel {
       for (int i = 0; i < file.getKeyFrames().length; i++) {
         treeModel.addRow(new Object[] { i + 1, file.getKeyFrames()[i] });
       }
+    } finally {
+      this.isUpdating = false;
+    }
+  }
+
+  private void initModel() {
+    this.fileList.setModel(this.fileListModel);
+
+    if (this.fileListModel.size() > 0) {
+      this.fileList.setSelectedIndex(0);
+    }
+  }
+
+  private void updatePreview(SpriteFileWrapper file) {
+    this.isUpdating = true;
+    try {
+      this.labelImage.setIcon(file.getIcon());
+      this.controller.getAnimations().clear();
+
+      int factor = PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
+
+      BufferedImage img = ImageProcessing.scaleImage(file.getImage(), factor, true);
+
+      Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", file.getSpriteWidth() * factor, file.getSpriteHeight() * factor);
+      Animation newAnim = new Animation(sprite, true, file.keyFrames);
+
+      this.controller.setDefaultAnimation(newAnim);
+      this.controller.playAnimation(newAnim.getName());
     } finally {
       this.isUpdating = false;
     }
@@ -347,6 +398,10 @@ public class SpritesheetImportPanel extends JPanel {
       return icon;
     }
 
+    public BufferedImage getImage() {
+      return this.image;
+    }
+
     public int getWidth() {
       return width;
     }
@@ -356,12 +411,12 @@ public class SpritesheetImportPanel extends JPanel {
     }
 
     public void setSpriteWidth(int spriteWidth) {
-      this.spriteWidth = spriteWidth;
+      this.spriteWidth = MathUtilities.clamp(spriteWidth, 1, this.getWidth());
       this.updateSprite();
     }
 
     public void setSpriteHeight(int spriteHeight) {
-      this.spriteHeight = spriteHeight;
+      this.spriteHeight = MathUtilities.clamp(spriteHeight, 1, this.getHeight());
       this.updateSprite();
     }
 

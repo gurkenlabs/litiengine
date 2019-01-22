@@ -481,7 +481,7 @@ public class ImageProcessing {
     if (bimg == null) {
       return bufferedImage;
     }
-    
+
     Graphics2D g = bimg.createGraphics();
 
     g.translate((neww - w) / 2.0, (newh - h) / 2.0);
@@ -498,10 +498,15 @@ public class ImageProcessing {
   }
 
   public static BufferedImage scaleImage(final BufferedImage image, final float factor) {
+    return scaleImage(image, factor, false);
+  }
+
+  public static BufferedImage scaleImage(final BufferedImage image, final float factor, boolean keepRatio) {
+
     final double width = image.getWidth();
     final double height = image.getHeight();
 
-    return scaleImage(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)));
+    return scaleImage(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
   }
 
   /**

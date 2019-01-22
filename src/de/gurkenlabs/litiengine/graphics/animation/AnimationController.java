@@ -226,6 +226,9 @@ public class AnimationController implements IAnimationController {
     }
 
     this.animations.remove(animation.getName());
+    if (this.currentAnimation != null && this.currentAnimation.equals(animation)) {
+      this.currentAnimation = null;
+    }
 
     if (this.getDefaultAnimation() != null && this.getDefaultAnimation().equals(animation)) {
       this.setDefaultAnimation(this.getAnimations().stream().findFirst().orElse(null));
@@ -245,6 +248,9 @@ public class AnimationController implements IAnimationController {
   public void setDefaultAnimation(Animation defaultAnimation) {
     if (this.defaultAnimation != null) {
       this.animations.remove(this.defaultAnimation.getName());
+      if (this.currentAnimation != null && this.currentAnimation.equals(this.defaultAnimation)) {
+        this.currentAnimation = null;
+      }
     }
 
     this.defaultAnimation = defaultAnimation;
