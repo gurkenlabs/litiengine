@@ -610,6 +610,7 @@ public class Program {
           log.log(Level.SEVERE, nfe.getLocalizedMessage(), nfe);
         }
 
+        UndoManager.instance().recordChanges();
         EditorScreen.instance().getMapComponent().loadMaps(EditorScreen.instance().getGameFile().getMaps());
         EditorScreen.instance().getMapComponent().loadEnvironment((Map) Game.world().environment().getMap());
       }
