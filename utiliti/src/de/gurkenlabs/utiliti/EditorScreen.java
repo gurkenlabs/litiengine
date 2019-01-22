@@ -626,7 +626,7 @@ public class EditorScreen extends Screen {
   }
 
   private void saveMaps() {
-    for (Map map : EditorScreen.instance().getMapComponent().getMaps()) {
+    for (Map map : this.getChangedMaps()) {
       UndoManager.save(map);
       for (String file : FileUtilities.findFilesByExtension(new ArrayList<>(), Paths.get(FileUtilities.combine(this.getProjectPath(), "maps")), map.getName() + "." + Map.FILE_EXTENSION)) {
         File newFile = XmlUtilities.save(map, file, Map.FILE_EXTENSION);

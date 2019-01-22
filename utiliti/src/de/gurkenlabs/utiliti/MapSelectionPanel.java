@@ -348,6 +348,7 @@ public class MapSelectionPanel extends JSplitPane {
         this.listObjectLayers.setSelectedIndex(selIndex);
       }
       EditorScreen.instance().getMapComponent().updateTransformControls();
+      UndoManager.instance().recordChanges();
     });
     layerButtonBox.add(buttonAddLayer);
 
@@ -374,6 +375,7 @@ public class MapSelectionPanel extends JSplitPane {
       currentMap.removeMapObjectLayer(this.getSelectedLayerIndex());
       layerModel.remove(this.getSelectedLayerIndex());
       EditorScreen.instance().getMapComponent().updateTransformControls();
+      UndoManager.instance().recordChanges();
     });
     layerButtonBox.add(buttonRemoveLayer);
 
@@ -393,6 +395,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
       currentMap.getMapObjectLayers().get(this.getSelectedLayerIndex()).setColor(ColorHelper.encode(newColor));
       this.updateMapLayerControl();
+      UndoManager.instance().recordChanges();
     });
     layerButtonBox.add(buttonSetColor);
 
@@ -411,6 +414,7 @@ public class MapSelectionPanel extends JSplitPane {
       currentMap.addMapObjectLayer(this.getSelectedLayerIndex(), copiedLayer);
       this.updateMapLayerControl();
       EditorScreen.instance().getMapComponent().add(copiedLayer);
+      UndoManager.instance().recordChanges();
     });
 
     buttonRenameLayer = new JButton("");
@@ -431,6 +435,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
       selectedLayer.setName(newLayerName);
       this.updateMapLayerControl();
+      UndoManager.instance().recordChanges();
     });
 
     layerButtonBox.add(buttonRenameLayer);
@@ -458,6 +463,7 @@ public class MapSelectionPanel extends JSplitPane {
       }
       this.updateMapLayerControl();
       EditorScreen.instance().getMapComponent().updateTransformControls();
+      UndoManager.instance().recordChanges();
     });
 
     layerButtonBox.add(buttonHideOtherLayers);
@@ -479,6 +485,7 @@ public class MapSelectionPanel extends JSplitPane {
       currentMap.addMapObjectLayer(selLayerIndex - 1, selectedLayer);
       this.listObjectLayers.setSelectedIndex(selLayerIndex - 1);
       this.updateMapLayerControl();
+      UndoManager.instance().recordChanges();
     });
 
     layerButtonBox.add(buttonLiftLayer);
@@ -500,6 +507,7 @@ public class MapSelectionPanel extends JSplitPane {
       currentMap.addMapObjectLayer(selLayerIndex + 1, selectedLayer);
       this.listObjectLayers.setSelectedIndex(selLayerIndex + 1);
       this.updateMapLayerControl();
+      UndoManager.instance().recordChanges();
     });
 
     layerButtonBox.add(buttonLowerLayer);
@@ -629,6 +637,7 @@ public class MapSelectionPanel extends JSplitPane {
         Map currentMap = EditorScreen.instance().getMapComponent().getMaps().get(mapList.getSelectedIndex());
         int boxIndex = this.layerModel.indexOf(newBox);
         currentMap.getMapObjectLayers().get(boxIndex).setVisible(newBox.isSelected());
+        UndoManager.instance().recordChanges();
       });
       layerModel.addElement(newBox);
     }
