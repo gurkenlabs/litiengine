@@ -20,22 +20,12 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public class ImageProcessing {
-  private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
+public final class Imaging {
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
   public static final int CROP_ALIGN_RIGHT = 2;
@@ -47,7 +37,7 @@ public class ImageProcessing {
 
   private static GraphicsConfiguration graphicsConfig;
 
-  private ImageProcessing() {
+  private Imaging() {
     throw new UnsupportedOperationException();
   }
 
@@ -190,23 +180,23 @@ public class ImageProcessing {
    * @param cropAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER
    *          CROP_ALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_LEFT
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT
    *          CROP_ALIGN_LEFT}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_RIGHT
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT
    *          CROP_ALIGN_RIGHT}</li>
    *          </ul>
    * @param cropVerticlaAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER
    *          CROP_VALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOP
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP
    *          CROP_VALIGN_TOP}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOPCENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER
    *          CROP_VALIGN_TOPCENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_BOTTOM
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM
    *          CROP_VALIGN_BOTTOM}</li>
    *          </ul>
    * @param width
@@ -255,49 +245,6 @@ public class ImageProcessing {
     return image.getSubimage(x, y, width, height);
   }
 
-  public static BufferedImage decodeToImage(final String imageString) {
-    if (imageString == null) {
-      return null;
-    }
-
-    BufferedImage image = null;
-    byte[] imageByte;
-    try {
-      imageByte = Base64.getDecoder().decode(imageString);
-      final ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-      image = ImageIO.read(bis);
-      bis.close();
-    } catch (final Exception e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    return image;
-  }
-
-  public static String encodeToString(final BufferedImage image) {
-    return encodeToString(image, ImageFormat.PNG);
-  }
-
-  public static String encodeToString(final BufferedImage image, ImageFormat imageFormat) {
-    if (image == null) {
-      return null;
-    }
-
-    String imageString = null;
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-    try {
-      ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
-      final byte[] imageBytes = bos.toByteArray();
-
-      imageString = Base64.getEncoder().encodeToString(imageBytes);
-
-      bos.close();
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    return imageString;
-  }
-
   /**
    * All pixels that are not transparent are replaced by a pixel of the
    * specified flashColor.
@@ -332,14 +279,14 @@ public class ImageProcessing {
   }
 
   public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
     if (flippedSprite == null) {
       return null;
     }
 
     final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
     for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.horizontalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+      g.drawImage(Imaging.horizontalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
     }
     g.dispose();
 
@@ -347,14 +294,14 @@ public class ImageProcessing {
   }
 
   public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
+    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
     if (flippedSprite == null) {
       return null;
     }
 
     final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
     for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.verticalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
+      g.drawImage(Imaging.verticalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
     }
     g.dispose();
 
@@ -492,21 +439,21 @@ public class ImageProcessing {
     return bimg;
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int max) {
+  public static BufferedImage scale(final BufferedImage image, final int max) {
     Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
-    return scaleImage(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
+    return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final float factor) {
-    return scaleImage(image, factor, false);
+  public static BufferedImage scale(final BufferedImage image, final float factor) {
+    return scale(image, factor, false);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final float factor, boolean keepRatio) {
+  public static BufferedImage scale(final BufferedImage image, final float factor, boolean keepRatio) {
 
     final double width = image.getWidth();
     final double height = image.getHeight();
 
-    return scaleImage(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
+    return scale(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
   }
 
   /**
@@ -522,15 +469,15 @@ public class ImageProcessing {
    *          the height
    * @return the buffered image
    */
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
-    return scaleImage(image, width, height, false);
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
+    return scale(image, width, height, false);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
-    return scaleImage(image, width, height, keepRatio, true);
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
+    return scale(image, width, height, keepRatio, true);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -575,7 +522,7 @@ public class ImageProcessing {
     return newImg;
   }
 
-  public static BufferedImage scaleImageWidth(final BufferedImage image, final int newWidth) {
+  public static BufferedImage scaleWidth(final BufferedImage image, final int newWidth) {
     final double width = image.getWidth();
     final double height = image.getHeight();
     if (width == 0 || height == 0) {
@@ -585,7 +532,7 @@ public class ImageProcessing {
     final double ratio = newWidth / width;
     final double newHeight = height * ratio;
 
-    return scaleImage(image, newWidth, (int) newHeight);
+    return scale(image, newWidth, (int) newHeight);
   }
 
   public static BufferedImage setOpacity(final Image img, final float opacity) {

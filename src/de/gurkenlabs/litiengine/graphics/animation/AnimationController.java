@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.IImageEffect;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
@@ -158,7 +158,7 @@ public class AnimationController implements IAnimationController {
       return opt.get();
     }
 
-    return ImageProcessing.scaleImage(this.getCurrentSprite(), width, height);
+    return Imaging.scale(this.getCurrentSprite(), width, height);
   }
 
   @Override

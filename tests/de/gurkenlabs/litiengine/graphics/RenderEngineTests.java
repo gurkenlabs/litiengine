@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class RenderEngineTests {
 
@@ -29,7 +29,7 @@ public class RenderEngineTests {
   public void testRenderImage() {
     Graphics2D graphics = mock(Graphics2D.class);
 
-    final Image img = ImageProcessing.getCompatibleImage(5, 5);
+    final Image img = Imaging.getCompatibleImage(5, 5);
     ImageRenderer.render(graphics, img, new Point2D.Double(10, 20));
 
     ArgumentCaptor<Image> captor = ArgumentCaptor.forClass(Image.class);

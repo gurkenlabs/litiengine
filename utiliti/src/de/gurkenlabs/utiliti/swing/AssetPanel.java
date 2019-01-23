@@ -18,7 +18,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
@@ -47,7 +47,7 @@ public class AssetPanel extends JPanel {
         Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
 
         if (opt.isPresent() && opt.get().getSprite(0) != null) {
-          icon = new ImageIcon(ImageProcessing.scaleImage(opt.get().getSprite(0), 64, 64, true));
+          icon = new ImageIcon(Imaging.scale(opt.get().getSprite(0), 64, 64, true));
         } else {
           icon = null;
         }

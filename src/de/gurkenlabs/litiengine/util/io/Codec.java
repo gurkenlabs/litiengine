@@ -1,8 +1,20 @@
 package de.gurkenlabs.litiengine.util.io;
 
-public class SerializationHelper {
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-  private SerializationHelper() {
+import javax.imageio.ImageIO;
+
+import de.gurkenlabs.litiengine.graphics.ImageFormat;
+
+public final class Codec {
+  private static final Logger log = Logger.getLogger(Codec.class.getName());
+  private Codec() {
     throw new UnsupportedOperationException();
   }
 
@@ -84,5 +96,48 @@ public class SerializationHelper {
     }
 
     return (short) (smallNumber * Math.pow(10, precision) - Short.MAX_VALUE);
+  }
+  
+  public static BufferedImage decodeImage(final String imageString) {
+    if (imageString == null) {
+      return null;
+    }
+
+    BufferedImage image = null;
+    byte[] imageByte;
+    try {
+      imageByte = Base64.getDecoder().decode(imageString);
+      final ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+      image = ImageIO.read(bis);
+      bis.close();
+    } catch (final Exception e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+    return image;
+  }
+
+  public static String encode(final BufferedImage image) {
+    return encode(image, ImageFormat.PNG);
+  }
+
+  public static String encode(final BufferedImage image, ImageFormat imageFormat) {
+    if (image == null) {
+      return null;
+    }
+
+    String imageString = null;
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+    try {
+      ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
+      final byte[] imageBytes = bos.toByteArray();
+
+      imageString = Base64.getEncoder().encodeToString(imageBytes);
+
+      bos.close();
+    } catch (final IOException e) {
+      log.log(Level.SEVERE, e.getMessage(), e);
+    }
+    return imageString;
   }
 }

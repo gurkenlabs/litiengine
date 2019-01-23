@@ -8,7 +8,7 @@ import de.gurkenlabs.litiengine.entities.PropState;
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class PropAnimationController<T extends Prop> extends EntityAnimationController<T> {
   public static final String PROP_IDENTIFIER = "prop-";
@@ -48,15 +48,15 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     }
 
     if (this.getEntity().getSpriteRotation() != Rotation.NONE) {
-      currentImage = ImageProcessing.rotate(currentImage, this.getEntity().getSpriteRotation());
+      currentImage = Imaging.rotate(currentImage, this.getEntity().getSpriteRotation());
     }
 
     if (this.getEntity().flipHorizontally()) {
-      currentImage = ImageProcessing.horizontalFlip(currentImage);
+      currentImage = Imaging.horizontalFlip(currentImage);
     }
 
     if (this.getEntity().flipVertically()) {
-      currentImage = ImageProcessing.verticalFlip(currentImage);
+      currentImage = Imaging.verticalFlip(currentImage);
     }
 
     if (!this.getEntity().isAddShadow()) {
@@ -65,7 +65,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
 
     // add a shadow at the lower end of the current sprite.
     final int ShadowYOffset = currentImage.getHeight();
-    final BufferedImage shadow = ImageProcessing.addShadow(currentImage, 0, ShadowYOffset);
+    final BufferedImage shadow = Imaging.addShadow(currentImage, 0, ShadowYOffset);
     Resources.images().add(cacheKey, shadow);
 
     return shadow;

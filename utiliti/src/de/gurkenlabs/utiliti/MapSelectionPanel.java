@@ -64,7 +64,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
@@ -620,7 +620,7 @@ public class MapSelectionPanel extends JSplitPane {
         final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
 
         BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
-          BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
+          BufferedImage img = Imaging.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();
           g.setColor(layer.getColor());
           g.fillRect(0, 0, 9, 9);
