@@ -329,6 +329,19 @@ public final class Imaging {
     return graphicsConfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
+  /**
+   * Gets a two dimensional grid that contains parts of the specified image.
+   * Splits up the specified image into a grid with the defined number of rows and columns.
+   * 
+   * @param image
+   *          The base image that will be split up.
+   * @param rows
+   *          The number of rows.
+   * @param columns
+   *          The number or columns.
+   *
+   * @return A two dimensional array with all the sub-images.
+   */
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
     final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
     final int smallWidth = image.getWidth() / columns;
@@ -346,11 +359,11 @@ public final class Imaging {
   }
 
   /**
-   * Horizontalflip.
+   * Flips the specified image horizontally.
    *
    * @param img
-   *          the img
-   * @return the buffered image
+   *          The image to be flipped.
+   * @return The flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
     final int w = img.getWidth();
@@ -365,49 +378,26 @@ public final class Imaging {
     g.dispose();
     return dimg;
   }
-
+  
   /**
-   * Needs border.
+   * Flips the specified image vertically.
    *
-   * @param image
-   *          the image
-   * @param x
-   *          the x
-   * @param y
-   *          the y
-   * @return true, if successful
+   * @param img
+   *          The image to be flipped.
+   * @return The flipped image.
    */
-  public static boolean needsBorder(final BufferedImage image, final int x, final int y) {
-    if (y < 0 || y >= image.getHeight()) {
-      return false;
+  public static BufferedImage verticalFlip(final BufferedImage img) {
+    final int w = img.getWidth();
+    final int h = img.getHeight();
+    if (w == 0 || h == 0) {
+      return img;
     }
 
-    if (x < 0 || x >= image.getWidth()) {
-      return false;
-    }
-
-    // if the current pixel is not transparent, we cannot stroke it
-    if (image.getRGB(x, y) >> 24 != 0x00) {
-      return false;
-    }
-
-    // check pixel above the current one
-    if (y > 0 && image.getRGB(x, y - 1) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check below pixel
-    if (y < image.getHeight() - 1 && image.getRGB(x, y + 1) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check left pixel
-    if (x > 0 && image.getRGB(x - 1, y) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check right pixel
-    return x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00;
+    final BufferedImage dimg = getCompatibleImage(w, h);
+    final Graphics2D g = dimg.createGraphics();
+    g.drawImage(img, 0, 0 + h, w, -h, null);
+    g.dispose();
+    return dimg;
   }
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final Rotation rotation) {
@@ -419,7 +409,7 @@ public final class Imaging {
     double cos = Math.abs(Math.cos(radians));
 
     int w = bufferedImage.getWidth();
-    int h = bufferedImage.getHeight(null);
+    int h = bufferedImage.getHeight();
 
     int neww = (int) Math.floor(w * cos + h * sin);
     int newh = (int) Math.floor(h * cos + w * sin);
@@ -444,11 +434,11 @@ public final class Imaging {
     return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
   }
 
-  public static BufferedImage scale(final BufferedImage image, final float factor) {
+  public static BufferedImage scale(final BufferedImage image, final double factor) {
     return scale(image, factor, false);
   }
 
-  public static BufferedImage scale(final BufferedImage image, final float factor, boolean keepRatio) {
+  public static BufferedImage scale(final BufferedImage image, final double factor, boolean keepRatio) {
 
     final double width = image.getWidth();
     final double height = image.getHeight();
@@ -569,42 +559,5 @@ public final class Imaging {
     bGr.dispose();
 
     return bimage;
-  }
-
-  public static BufferedImage verticalFlip(final BufferedImage img) {
-    final int w = img.getWidth();
-    final int h = img.getHeight();
-    if (w == 0 || h == 0) {
-      return img;
-    }
-
-    final BufferedImage dimg = getCompatibleImage(w, h);
-    final Graphics2D g = dimg.createGraphics();
-    g.drawImage(img, 0, 0 + h, w, -h, null);
-    g.dispose();
-    return dimg;
-  }
-
-  public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
-    final int newImageWidth = (int) (image.getWidth() * zoomLevel);
-    final int newImageHeight = (int) (image.getHeight() * zoomLevel);
-    final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
-    if (resizedImage == null) {
-      return image;
-    }
-
-    final Graphics2D g = resizedImage.createGraphics();
-    g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
-    g.dispose();
-
-    return resizedImage;
-  }
-
-  public static BufferedImage convertToGrayScale(BufferedImage image) {
-    BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-    Graphics2D g = result.createGraphics();
-    g.drawImage(image, 0, 0, null);
-    g.dispose();
-    return result;
   }
 }
