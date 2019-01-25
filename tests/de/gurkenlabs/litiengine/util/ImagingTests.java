@@ -2,6 +2,7 @@ package de.gurkenlabs.litiengine.util;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 public class ImagingTests {
 
@@ -124,5 +124,45 @@ public class ImagingTests {
     int[] actualPixelsFlash = ((DataBufferInt) flash.getData().getDataBuffer()).getData();
 
     assertArrayEquals(expectedPixelsFlash, actualPixelsFlash);
+  }
+
+  @Test
+  public void testAlpha() {
+    BufferedImage expected = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+    BufferedImage alpha = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-alpha.png");
+
+    int[] expectedPixels = ((DataBufferInt) expected.getData().getDataBuffer()).getData();
+
+    BufferedImage alphaResolved = Imaging.applyAlphaChannel(alpha, Color.RED);
+
+    int[] actualAlphaResolved = ((DataBufferInt) alphaResolved.getData().getDataBuffer()).getData();
+
+    assertArrayEquals(expectedPixels, actualAlphaResolved);
+  }
+
+  @Test
+  public void testBorder() {
+    BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
+    BufferedImage expectedBorder = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-border.png");
+    BufferedImage expectedBorderOnly = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-border-only.png");
+
+    int[] expectedPixels = ((DataBufferInt) expectedBorder.getData().getDataBuffer()).getData();
+    int[] expectedPixelsBorderOnly = ((DataBufferInt) expectedBorderOnly.getData().getDataBuffer()).getData();
+
+    BufferedImage border = Imaging.borderAlpha(image, Color.RED, false);
+    BufferedImage borderOnly = Imaging.borderAlpha(image, Color.RED, true);
+
+    int[] actualPixelsBorder = ((DataBufferInt) border.getData().getDataBuffer()).getData();
+    int[] actualPixelsBorderOnly = ((DataBufferInt) borderOnly.getData().getDataBuffer()).getData();
+
+    assertArrayEquals(expectedPixels, actualPixelsBorder);
+    assertArrayEquals(expectedPixelsBorderOnly, actualPixelsBorderOnly);
+  }
+
+  @Test
+  public void testEmpty() {
+    BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-empty.png");
+
+    assertTrue(Imaging.isEmpty(image));
   }
 }
