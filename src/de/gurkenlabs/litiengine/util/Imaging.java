@@ -98,7 +98,7 @@ public final class Imaging {
    *          the color
    * @return the image
    */
-  public static Image applyAlphaChannel(final Image img, final Color color) {
+  public static BufferedImage applyAlphaChannel(final BufferedImage img, final Color color) {
     if (color == null || img == null) {
       return img;
     }
@@ -121,7 +121,7 @@ public final class Imaging {
     };
 
     final ImageProducer ip = new FilteredImageSource(img.getSource(), filter);
-    return Toolkit.getDefaultToolkit().createImage(ip);
+    return toBufferedImage(Toolkit.getDefaultToolkit().createImage(ip));
   }
 
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
@@ -378,7 +378,7 @@ public final class Imaging {
     g.dispose();
     return dimg;
   }
-  
+
   /**
    * Flips the specified image vertically.
    *
