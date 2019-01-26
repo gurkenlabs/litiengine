@@ -20,6 +20,7 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
+import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -45,7 +46,10 @@ public final class Imaging {
    * Adds a shadow effect by executing the following steps: 1. Transform visible
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
    * down 4. Render original image and shadow on a buffered image
-   *
+   * <p>
+   * TODO: Add support for different shadow types. Add an ellipse shadow, similar to the Lepus reatures.
+   * </p>
+   * 
    * @param image
    *          the image
    * @param xOffset
@@ -279,39 +283,24 @@ public final class Imaging {
   }
 
   public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
-    if (flippedSprite == null) {
-      return null;
-    }
-
-    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
-    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(Imaging.horizontalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
-    }
-    g.dispose();
-
-    return flippedSprite;
+    return flipSprites(sprite, Imaging::horizontalFlip);
   }
 
   public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
-    if (flippedSprite == null) {
-      return null;
-    }
-
-    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
-    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(Imaging.verticalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
-    }
-    g.dispose();
-
-    return flippedSprite;
+    return flipSprites(sprite, Imaging::verticalFlip);
   }
 
-  public static BufferedImage getCopy(BufferedImage bi) {
-    ColorModel cm = bi.getColorModel();
+  /**
+   * Creates a new <code>BufferedImage</code> instance from the specified image.
+   * 
+   * @param image
+   *          The image to be copied.
+   * @return A copy of the specified image.
+   */
+  public static BufferedImage copy(BufferedImage image) {
+    ColorModel cm = image.getColorModel();
     boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-    WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
+    WritableRaster raster = image.copyData(image.getRaster().createCompatibleWritableRaster());
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
   }
 
@@ -512,19 +501,6 @@ public final class Imaging {
     return newImg;
   }
 
-  public static BufferedImage scaleWidth(final BufferedImage image, final int newWidth) {
-    final double width = image.getWidth();
-    final double height = image.getHeight();
-    if (width == 0 || height == 0) {
-      return null;
-    }
-
-    final double ratio = newWidth / width;
-    final double newHeight = height * ratio;
-
-    return scale(image, newWidth, (int) newHeight);
-  }
-
   public static BufferedImage setOpacity(final Image img, final float opacity) {
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
     if (bimage == null) {
@@ -559,5 +535,24 @@ public final class Imaging {
     bGr.dispose();
 
     return bimage;
+  }
+
+  private static BufferedImage flipSprites(final Spritesheet sprite, Function<BufferedImage, BufferedImage> flipFunction) {
+    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getColumns(), sprite.getSpriteHeight() * sprite.getRows());
+    if (flippedSprite == null) {
+      return null;
+    }
+
+    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
+    int index = 0;
+    for (int column = 0; column < sprite.getColumns(); column++) {
+      for (int row = 0; row < sprite.getRows(); row++) {
+        g.drawImage(flipFunction.apply(sprite.getSprite(index)), column * sprite.getSpriteWidth(), row * sprite.getSpriteHeight(), null);
+        index++;
+      }
+    }
+
+    g.dispose();
+    return flippedSprite;
   }
 }
