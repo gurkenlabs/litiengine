@@ -8,7 +8,7 @@
     * [Run the Game](getting-started/run-the-game.md)
 
 * [Game Architecture](game-api/README.md)
-    * 2D Graphics 
+    * [2D Graphics](game-api/render-engine.md) 
     * 2D Audio
     * 2D Physics
     * Loops
