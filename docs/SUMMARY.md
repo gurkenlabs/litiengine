@@ -43,7 +43,7 @@
 * [Entity Framework](entity-framework/README.md)
     * Default Entity Types
     * Subscribe to Entity Events
-    * Use Annotations for static Information
+    * Annotations for static information
 
 * [Control Entities](control-entities/README.md)
     * The Concept of EntityControllers
