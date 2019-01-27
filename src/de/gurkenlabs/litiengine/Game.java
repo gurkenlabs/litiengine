@@ -94,7 +94,7 @@ public final class Game {
 
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
-
+  private static GameLoop inputLoop;
   private static ScreenManager screenManager;
   private static GameWindow gameWindow;
   private static GameWorld world;
@@ -363,6 +363,19 @@ public final class Game {
   }
 
   /**
+   * Gets the game's input loop that processes all the player input.
+   * 
+   * <p>
+   * <i>We need an own update loop because otherwise input won't work if the game has been paused.</i>
+   * </p>
+   * 
+   * @return The game's input loop.
+   */
+  public static IGameLoop inputLoop() {
+    return inputLoop;
+  }
+
+  /**
    * Gets the game's loop that executes the rendering process on the GameFrame's <code>RenderComponent</code>.<br>
    * This internally renders the currently active screen which passes the <code>Graphics2D</code> object to all <code>GuiComponents</code> and the
    * Environment for rendering. This loop will try to execute at the configured frames-per-second and limit the frames to this value.
@@ -472,6 +485,7 @@ public final class Game {
 
     // setup default exception handling for render and update loop
     renderLoop = new RenderLoop("Render Loop");
+    inputLoop = new GameLoop("Input Loop", loop().getUpdateRate());
 
     setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(config().client().exitOnError()));
 
@@ -550,12 +564,13 @@ public final class Game {
     }
 
     gameLoop.start();
-
-    soundEngine.start();
+    inputLoop.start();
 
     if (!isInNoGUIMode()) {
       renderLoop.start();
     }
+
+    soundEngine.start();
 
     for (final GameListener listener : gameListeners) {
       listener.started();
@@ -580,6 +595,7 @@ public final class Game {
 
     config().save();
     gameLoop.terminate();
+    inputLoop.terminate();
 
     soundEngine.terminate();
 

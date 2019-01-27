@@ -31,7 +31,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   private final List<BiConsumer<String, Float>> releasedConsumer;
 
   private final List<String> pressedComponents;
-  
+
   private float axisDeadzone = Game.config().input().getGamepadAxisDeadzone();
   private float triggerDeadzone = Game.config().input().getGamepadTriggerDeadzone();
 
@@ -47,7 +47,7 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     this.index = index;
     this.controller = controller;
-    Input.getLoop().attach(this);
+    Game.inputLoop().attach(this);
   }
 
   @Override
@@ -73,11 +73,11 @@ public class Gamepad implements IGamepad, IUpdateable {
   public float getAxisDeadzone() {
     return this.axisDeadzone;
   }
-  
+
   public float getTriggerDeadzone() {
     return this.triggerDeadzone;
   }
-  
+
   @Override
   public void onPoll(final String identifier, final Consumer<Float> consumer) {
     GamepadManager.addComponentConsumer(this.componentPollConsumer, identifier, consumer);
@@ -119,7 +119,7 @@ public class Gamepad implements IGamepad, IUpdateable {
 
     this.releasedConsumer.add(consumer);
   }
-  
+
   public void setAxisDeadzone(float gamepadAxisDeadzone) {
     this.axisDeadzone = gamepadAxisDeadzone;
   }
@@ -190,7 +190,7 @@ public class Gamepad implements IGamepad, IUpdateable {
   }
 
   private void dispose() {
-    Input.getLoop().detach(this);
+    Game.inputLoop().detach(this);
     this.componentPollConsumer.clear();
     this.componentPressedConsumer.clear();
     Input.gamepadManager().remove(this);

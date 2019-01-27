@@ -11,7 +11,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.input.Input;
 
 /**
  * This class provides all methods to playback sounds and music in your
@@ -261,13 +260,13 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   @Override
   public void start() {
-    Input.getLoop().attach(this);
+    Game.inputLoop().attach(this);
     this.listenerLocation = Game.world().camera().getFocus();
   }
 
   @Override
   public void terminate() {
-    Input.getLoop().detach(this);
+    Game.inputLoop().detach(this);
     if (this.music != null && this.music.isPlaying()) {
       this.music.cancel();
       this.music = null;
