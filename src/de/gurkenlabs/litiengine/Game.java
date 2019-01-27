@@ -355,7 +355,7 @@ public final class Game {
    * @see IUpdateable
    * @see ILoop#attach(IUpdateable)
    * @see ILoop#detach(IUpdateable)
-   * @see Input#getLoop()
+   * @see Game#inputLoop()
    * @see Game#renderLoop()
    */
   public static IGameLoop loop() {
