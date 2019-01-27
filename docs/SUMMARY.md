@@ -1,11 +1,11 @@
 # Summary
 
-## Getting Started
+## Basics
 
-* [Create a project](creating-a-project/README.md)
-    * [Get LITIengine](creating-a-project/get-litiengine.md)
-    * [The utiLITI editor](creating-a-project/utiliti-editor.md)
-    * [Run the Game](creating-a-project/run-the-game.md)
+* [Getting Started](getting-started/README.md)
+    * [Get LITIengine](getting-started/get-litiengine.md)
+    * [The utiLITI editor](getting-started/utiliti-editor.md)
+    * [Run the Game](getting-started/run-the-game.md)
 
 * [Game Architecture](game-api/README.md)
     * 2D Graphics 
