@@ -8,7 +8,7 @@ The `Canvas` provides a `Graphics2D` object which is passed though the engine on
 For more information, read the [Official Java Documentation on Graphics2D](https://docs.oracle.com/javase/7/docs/api/java/awt/Graphics2D.html).
 
 ## The Render Engine - `Game.graphics()`
-The 2D `RenderEngine` is used to render texts, shapes and entities at their location in the
+The 2D `RenderEngine` is used to render texts, shapes, images and entities at their location in the
 `Environment` and with respect to the `Camera`'s location and zoom. Notice that the location lies within the coordinate space of the current `Environment`. The `RenderEngine` will translate the coordinates to a location on the screen.
 
 Internally, it uses the static renderer implementations to actually execute the drawing operations on the `Graphics2D` object. This class basically prepares the specified render subject and passes them to a renderer with the current correct context.
