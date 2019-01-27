@@ -14,7 +14,6 @@ import de.gurkenlabs.litiengine.net.messages.IMessageHandler;
 import de.gurkenlabs.litiengine.net.messages.IMessageHandlerProvider;
 import de.gurkenlabs.litiengine.net.messages.MessageType;
 import de.gurkenlabs.litiengine.util.CommandManager;
-import de.gurkenlabs.litiengine.util.ICommandManager;
 import de.gurkenlabs.litiengine.util.io.CompressionUtilities;
 
 public class UdpServer implements IServer {
@@ -25,7 +24,7 @@ public class UdpServer implements IServer {
   /** The client connection manager. */
   private final IClientConnectionManager clientConnectionManager;
 
-  private final ICommandManager commandManager;
+  private final CommandManager commandManager;
 
   /** The message handler provider. */
   private final IMessageHandlerProvider messageHandlerProvider;
@@ -49,7 +48,7 @@ public class UdpServer implements IServer {
   }
 
   @Override
-  public ICommandManager getCommandManager() {
+  public CommandManager getCommandManager() {
     return this.commandManager;
   }
 
