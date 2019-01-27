@@ -14,3 +14,5 @@ While you can use LITIengine entirely without it, especially beginners are advis
     Create Props, Creatures, Lights, Triggers, SpawnPoints, CollisionBoxes, Areas, StaticShadows, and Emitters and instantly see your results rendered in LITIengine, allowing for more efficient adjustments.
     * Adjust your MapObjects' properties more comprehensively with sliders, spinners, checkboxes, dropdown menus, and add custom properties to MapObjects.
     * Set Map properties such as colors for ambient light and static shadows, Map title, and description.
+
+![The utiLITI editor](../images/utiliti-screenshot.png)
