@@ -46,12 +46,12 @@
     * Annotations for static information
 
 * [Control Entities](control-entities/README.md)
-    * The Concept of EntityControllers
-    * Control Animation
-    * Control Movement
-    * Control Behavior
-    * The Messaging System
-    * The Ability Framework
+    * Entity Controllers
+    * Animation Controller
+    * Movement Controller
+    * Behavior Controller
+    * Messaging System
+    * Ability Framework
 
 * [User Interface](user-interface/README.md)
     * GuiComponents: An Overview
