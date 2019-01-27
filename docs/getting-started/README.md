@@ -1,6 +1,6 @@
 # Creating a project
 
-## Choosing an IDE
+## Chose an IDE
 
 We highly recommend you to develop your LITIengine game with an IDE (Integrated Development Environment). This will serve you with a ton of useful development tools, like *code completion*, *debugging*, *build tools*, *unit test execution* and much more that a plain text editor simply doesn't provide.
 
@@ -10,13 +10,13 @@ But [IntelliJ IDEA](https://www.jetbrains.com/idea/) is also a valid choice if y
 Currently, there is no build-in support for any IDE but for future releases we plan to develop plugins that will help you creating and developing a LITIengine project. 
 >We've already started development on a [LITIengine Eclipse Plugin](https://github.com/gurkenlabs/litiengine-eclipse-plugin).
 
-## Choosing a build system
+## Chose a build system
 We also recommend you to get familiar with [Gradle](https://gradle.org/) or [Maven](https://maven.apache.org/) because these tools can help you greatly when developing Java projects. LITIengine itself is build upon **Gradle** and uses it to seamlessly manage its build steps and dependent libraries.
 
 Of course, it's still possible to just download the LITIengie .jar and import and use the library manually the "oldschool" way.
 >We don't encourage using a manually downloaded .jar  for your game project. Trust us, it will be way easier for you in the future to update dependencies on e.g. the LITIengine and to better control and integrate the whole development life cycle.
 
-## Initializing the project structure
+## Initialize the project structure
 
 Now, depending on the chosen build system, your project structure might look slightly different. The LITIengine doesn't restrict you in how you want to organize your project. However there are some common practices that we think are useful to apply for a Game project with the LITIengine:
 
