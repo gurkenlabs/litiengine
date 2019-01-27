@@ -2,7 +2,7 @@ package de.gurkenlabs.litiengine.graphics;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.Image;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -20,14 +20,30 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.environment.GameWorld;
 import de.gurkenlabs.litiengine.environment.tilemap.HexagonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
-import de.gurkenlabs.litiengine.gui.GuiProperties;
 
+/**
+ * The 2D Render Engine is used to render texts, shapes and entities at their location in the
+ * <code>Environment</code> and with respect to the <code>Camera</code> location and zoom.
+ * 
+ * <p>
+ * <i>Internally, it uses the static renderer implementations to actually execute the rendering process.
+ * This class basically prepares the specified render subject and passed them to a renderer with the current correct context.</i>
+ * </p>
+ * 
+ * @see GameWorld#environment()
+ * @see GameWorld#camera()
+ * @see IEntity#getLocation()
+ * @see ShapeRenderer
+ * @see TextRenderer
+ * @see ImageRenderer
+ */
 public final class RenderEngine {
   public static final float DEFAULT_RENDERSCALE = 3.0f;
 
@@ -77,11 +93,8 @@ public final class RenderEngine {
     if (text == null || text.isEmpty()) {
       return;
     }
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-    final Point2D viewPortLocation = Game.world().camera().getViewportLocation(x, y);
-    g.drawString(text, (float) viewPortLocation.getX() * Game.world().camera().getRenderScale(), (float) viewPortLocation.getY() * Game.world().camera().getRenderScale());
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, GuiProperties.getDefaultAppearance().getTextAntialiasing());
+    TextRenderer.render(g, text, x, y);
   }
 
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
@@ -116,12 +129,19 @@ public final class RenderEngine {
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
   }
 
+  public void renderImage(Graphics2D g, final Image image, double x, double y) {
+    this.renderImage(g, image, new Point2D.Double(x, y));
+  }
+
+  public void renderImage(Graphics2D g, final Image image, Point2D location) {
+    Point2D viewPortLocation = Game.world().camera().getViewportLocation(location); 
+    ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().camera().getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale());
+  }
+
   public boolean canRender(final IEntity entity) {
-    if (!this.entityRenderingConditions.isEmpty()) {
-      for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
-        if (!consumer.test(entity)) {
-          return false;
-        }
+    for (final Predicate<IEntity> consumer : this.entityRenderingConditions) {
+      if (!consumer.test(entity)) {
+        return false;
       }
     }
 
