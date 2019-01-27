@@ -200,7 +200,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
       this.displayedText += this.currentTextQueue.poll();
       this.lastCharPoll = Game.loop().getTicks();
       if (this.typeSound != null) {
-        Game.audio().playSound(this.getEntity(), this.typeSound);
+        Game.audio().playSound(this.typeSound, this.getEntity());
       }
     }
 

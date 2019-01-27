@@ -108,8 +108,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
-    return playSound(entity, sound, false);
+  public ISoundPlayback playSound(final Sound sound, final IEntity entity) {
+    return playSound(sound, entity, false);
   }
 
   /**
@@ -125,7 +125,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final IEntity entity, final Sound sound, boolean loop) {
+  public ISoundPlayback playSound(final Sound sound, final IEntity entity, boolean loop) {
     if (sound == null) {
       return null;
     }
@@ -148,8 +148,12 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Point2D location, final Sound sound) {
-    return this.playSound(location, sound, false);
+  public ISoundPlayback playSound(final Sound sound, final Point2D location) {
+    return this.playSound(sound, location, false);
+  }
+
+  public ISoundPlayback playSound(final Sound sound, double x, double y) {
+    return this.playSound(sound, x, y, false);
   }
 
   /**
@@ -165,15 +169,19 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Point2D location, final Sound sound, boolean loop) {
+  public ISoundPlayback playSound(final Sound sound, final Point2D location, boolean loop) {
     if (sound == null) {
       return null;
     }
 
-    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation);
+    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation, location);
     playback.play(loop);
     this.sounds.add(playback);
     return playback;
+  }
+
+  public ISoundPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
+    return this.playSound(sound, new Point2D.Double(x, y), loop);
   }
 
   /**

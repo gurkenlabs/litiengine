@@ -10,12 +10,6 @@ An example implementation would look like this:
 ```java
 public class Program {
 
-  /**
-   * The main entry point for the Game.
-   * 
-   * @param args
-   *          The command line arguments.
-   */
   public static void main(String[] args) {
   }
 }
@@ -30,12 +24,6 @@ After successfully setting up the application entry point, it's time to actually
 ```java
 public class Program {
 
-  /**
-   * The main entry point for the Game.
-   * 
-   * @param args
-   *          The command line arguments.
-   */
   public static void main(String[] args) {
     Game.init(args);
     Game.start();
