@@ -7,8 +7,6 @@ The LILIengine sound engine supports **.wav**, **.mp3** and **.ogg** by default.
 
 For more information, read the [Official Java Documentation on Service Provider Interfaces](https://docs.oracle.com/javase/tutorial/sound/SPI-intro.html).
 
-### The `Sound` class
-
 
 ```java
 Sound mySound = Resources.sounds().get("my-sound.ogg");
