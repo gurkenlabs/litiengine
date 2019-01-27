@@ -3,7 +3,7 @@
 ![Game API](../images/api-game.png)
 
 The static `Game` class is undoubtedly one of the classes that you will call the most when creating a game with LITIengine.
-It is designed to be the static container that provides access to all important aspects of the engine, e.g. it holds the GameInfo, the RenderEngine, the SoundEngine and many other major components.
+It is designed to be the static container that provides access to all important aspects of the engine., e.g. it holds the GameInfo, the RenderEngine, the SoundEngine and many other major components.
 
 We designed the API such that all important parts that make up the game are directly accessible via the Game class statically.
 To be more technical, it is essentially a collection of core Singleton instances.
@@ -23,6 +23,24 @@ Game.addTerminatedListener(() ->
 });
 
 System.out.println("Game version is: " + Game.info().getVersion());
-
-Game.audio().playSound(Sound.get("test.ogg"));
 ```
+## Major Components
+ * `Game.graphics()`
+ * `Game.audio()`
+ * `Game.physics()`
+
+## Meta Components
+ * `Game.config()`
+ * `Game.info()`
+ * `Game.metrics()`
+ * `Game.time()`
+
+## Game Loops
+ * `Game.loop()`
+ * `Game.renderLoop()`
+ * `Game.inputLoop()`
+
+## Composition
+ * `Game.world()`
+ * `Game.window()`
+ * `Game.screens()`
