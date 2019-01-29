@@ -93,8 +93,12 @@ public final class RenderEngine {
     if (text == null || text.isEmpty()) {
       return;
     }
+    
+    final Point2D viewPortLocation = Game.world().camera().getViewportLocation(x, y);
+    double viewPortX = (float) viewPortLocation.getX() * Game.world().camera().getRenderScale();
+    double yiewPortY = (float) viewPortLocation.getY() * Game.world().camera().getRenderScale();
 
-    TextRenderer.render(g, text, x, y);
+    TextRenderer.render(g, text, viewPortX, yiewPortY);
   }
 
   public void renderText(final Graphics2D g, final String text, final Point2D location) {
