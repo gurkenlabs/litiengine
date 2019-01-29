@@ -31,7 +31,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Align;
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -41,6 +40,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -169,7 +169,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxSpriteType.addItem(Resources.strings().get("panel_animation"));
     this.comboBoxSpriteType.addItem(Resources.strings().get("panel_spritesheet"));
     this.comboBoxSpriteType.setSelectedIndex(0);
-    for (SpritesheetInfo s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
+    for (SpritesheetResource s : EditorScreen.instance().getGameFile().getSpriteSheets()) {
       this.comboBoxSprite.addItem(s.getName());
     }
     

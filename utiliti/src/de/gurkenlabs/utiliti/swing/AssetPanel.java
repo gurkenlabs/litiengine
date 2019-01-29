@@ -11,13 +11,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Icons;
 
@@ -39,10 +39,10 @@ public class AssetPanel extends JPanel {
     // TODO: implement support for arrow keys to change focus
   }
 
-  public void loadSprites(List<SpritesheetInfo> infos) {
+  public void loadSprites(List<SpritesheetResource> infos) {
     this.load(infos, () -> {
       Collections.sort(infos);
-      for (SpritesheetInfo info : infos) {
+      for (SpritesheetResource info : infos) {
         Icon icon;
         Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
 

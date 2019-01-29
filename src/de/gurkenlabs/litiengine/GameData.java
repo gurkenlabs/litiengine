@@ -32,6 +32,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "litidata")
@@ -51,7 +52,7 @@ public class GameData implements Serializable {
 
   @XmlElementWrapper(name = "spriteSheets")
   @XmlElement(name = "sprite")
-  private List<SpritesheetInfo> spriteSheets;
+  private List<SpritesheetResource> spriteSheets;
 
   @XmlElementWrapper(name = "tilesets")
   @XmlElement(name = "tileset")
@@ -102,7 +103,7 @@ public class GameData implements Serializable {
   }
 
   @XmlTransient
-  public List<SpritesheetInfo> getSpriteSheets() {
+  public List<SpritesheetResource> getSpriteSheets() {
     return this.spriteSheets;
   }
 
@@ -184,8 +185,8 @@ public class GameData implements Serializable {
   }
 
   void beforeMarshal(Marshaller m) {
-    List<SpritesheetInfo> distinctList = new ArrayList<>();
-    for (SpritesheetInfo sprite : this.getSpriteSheets()) {
+    List<SpritesheetResource> distinctList = new ArrayList<>();
+    for (SpritesheetResource sprite : this.getSpriteSheets()) {
       if (distinctList.stream().anyMatch(x -> x.getName().equals(sprite.getName()) && x.getImage().equals(sprite.getImage()))) {
         continue;
       }

@@ -27,7 +27,6 @@ import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameData;
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
@@ -42,6 +41,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
@@ -335,16 +335,16 @@ public class EditorScreen extends Screen {
 
   public void importSpriteFile() {
 
-    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), false, SpritesheetInfo.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
+    if (EditorFileChooser.showFileDialog(SPRITE_FILE_NAME, Resources.strings().get("import_something", SPRITE_FILE_NAME), false, SpritesheetResource.PLAIN_TEXT_FILE_EXTENSION) == JFileChooser.APPROVE_OPTION) {
       File spriteFile = EditorFileChooser.instance().getSelectedFile();
       if (spriteFile == null) {
         return;
       }
 
       List<Spritesheet> loaded = Resources.spritesheets().loadFrom(spriteFile.toString());
-      List<SpritesheetInfo> infos = new ArrayList<>();
+      List<SpritesheetResource> infos = new ArrayList<>();
       for (Spritesheet sprite : loaded) {
-        SpritesheetInfo info = new SpritesheetInfo(sprite);
+        SpritesheetResource info = new SpritesheetResource(sprite);
         infos.add(info);
         this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
         this.getGameFile().getSpriteSheets().add(info);
@@ -390,8 +390,8 @@ public class EditorScreen extends Screen {
 
     // TODO: somehow improve this to allow keeping the animation frames and only
     // update the image
-    Collection<SpritesheetInfo> sprites = spritePanel.getSpriteSheets();
-    for (SpritesheetInfo info : sprites) {
+    Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
+    for (SpritesheetResource info : sprites) {
       this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
       this.getGameFile().getSpriteSheets().add(info);
       log.log(Level.INFO, "imported spritesheet {0}", new Object[] { info.getName() });
@@ -486,7 +486,7 @@ public class EditorScreen extends Screen {
     return this.loading;
   }
 
-  public void loadSpriteSheets(Collection<SpritesheetInfo> infos, boolean forceAssetTreeUpdate) {
+  public void loadSpriteSheets(Collection<SpritesheetResource> infos, boolean forceAssetTreeUpdate) {
     infos.parallelStream().forEach(info -> {
       Optional<Spritesheet> opt = Resources.spritesheets().tryGet(info.getName());
       if (opt.isPresent()) {
@@ -642,7 +642,7 @@ public class EditorScreen extends Screen {
   }
 
   private void loadSpriteSheets(Map map) {
-    List<SpritesheetInfo> infos = new ArrayList<>();
+    List<SpritesheetResource> infos = new ArrayList<>();
     int cnt = 0;
     for (ITileset tileSet : map.getTilesets()) {
       if (tileSet.getImage() == null) {
@@ -660,7 +660,7 @@ public class EditorScreen extends Screen {
         sprite = opt.get();
       }
 
-      infos.add(new SpritesheetInfo(sprite));
+      infos.add(new SpritesheetResource(sprite));
       cnt++;
     }
 
@@ -681,7 +681,7 @@ public class EditorScreen extends Screen {
         sprite = opt.get();
       }
 
-      SpritesheetInfo info = new SpritesheetInfo(sprite);
+      SpritesheetResource info = new SpritesheetResource(sprite);
       infos.add(info);
       this.getGameFile().getSpriteSheets().removeIf(x -> x.getName().equals(info.getName()));
       this.getGameFile().getSpriteSheets().add(info);
@@ -689,7 +689,7 @@ public class EditorScreen extends Screen {
     }
 
     this.loadSpriteSheets(infos, false);
-    for (SpritesheetInfo info : infos) {
+    for (SpritesheetResource info : infos) {
       if (!this.getGameFile().getSpriteSheets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
         this.getGameFile().getSpriteSheets().add(info);
       }

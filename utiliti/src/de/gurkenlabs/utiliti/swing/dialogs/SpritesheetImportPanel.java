@@ -31,11 +31,11 @@ import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -78,10 +78,10 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     this.initModel();
   }
 
-  public SpritesheetImportPanel(SpritesheetInfo... infos) {
+  public SpritesheetImportPanel(SpritesheetResource... infos) {
     this();
 
-    for (SpritesheetInfo info : infos) {
+    for (SpritesheetResource info : infos) {
       fileListModel.addElement(new SpriteFileWrapper(info));
     }
 
@@ -276,8 +276,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
   }
 
-  public Collection<SpritesheetInfo> getSpriteSheets() {
-    ArrayList<SpritesheetInfo> infos = new ArrayList<>();
+  public Collection<SpritesheetResource> getSpriteSheets() {
+    ArrayList<SpritesheetResource> infos = new ArrayList<>();
 
     for (int i = 0; i < this.fileList.getModel().getSize(); i++) {
       SpriteFileWrapper wrap = this.fileListModel.getElementAt(i);
@@ -359,7 +359,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.updateSprite();
     }
 
-    public SpriteFileWrapper(SpritesheetInfo info) {
+    public SpriteFileWrapper(SpritesheetResource info) {
       this(Codec.decodeImage(info.getImage()), info.getName());
       this.spriteWidth = info.getWidth();
       this.spriteHeight = info.getHeight();
@@ -461,8 +461,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.icon = new ImageIcon(img);
     }
 
-    public SpritesheetInfo createSpritesheetInfo() {
-      SpritesheetInfo info = new SpritesheetInfo(this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
+    public SpritesheetResource createSpritesheetInfo() {
+      SpritesheetResource info = new SpritesheetResource(this.image, this.getName(), this.getSpriteWidth(), this.getSpriteHeight());
 
       boolean nonDefaultFrames = false;
       for (int i = 0; i < this.getKeyFrames().length; i++) {
