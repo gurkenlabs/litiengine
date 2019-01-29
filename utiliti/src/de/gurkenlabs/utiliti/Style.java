@@ -36,10 +36,6 @@ public final class Style {
       if (value instanceof javax.swing.plaf.FontUIResource) {
         UIManager.put(key, font);
       }
-
-      if(value instanceof javax.swing.plaf.ColorUIResource) {
-        System.out.println(key + ": " + value);
-      }
     }
   }
 }
