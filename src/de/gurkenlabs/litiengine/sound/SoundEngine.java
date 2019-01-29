@@ -20,6 +20,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
  * .ogg by default. If you need other file extensions, you have to write an own
  * SPI implementation and inject it in your project.
  * 
+ * TODO: Provide overloads that only require the name of the sound
  * @see Game#audio()
  */
 public final class SoundEngine implements IUpdateable, ILaunchable {

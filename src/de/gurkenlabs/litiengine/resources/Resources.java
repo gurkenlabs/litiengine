@@ -178,6 +178,14 @@ public final class Resources {
 
     log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
 
+    final List<Sound> loadedSounds = Collections.synchronizedList(new ArrayList<>());
+    file.getSounds().parallelStream().forEach(soundResource -> {
+      final Sound sound = Resources.sounds().load(soundResource);
+      loadedSounds.add(sound);
+    });
+
+    log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { loadedSounds.size(), gameResourceFile });
+
     int spriteload = 0;
     for (final Spritesheet s : loadedSprites) {
       for (int i = 0; i < s.getRows() * s.getColumns(); i++) {

@@ -5,8 +5,11 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -41,8 +45,10 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
+import de.gurkenlabs.litiengine.sound.SoundFormat;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
@@ -63,6 +69,7 @@ public class EditorScreen extends Screen {
 
   private static final String GAME_FILE_NAME = "Game Resource File";
   private static final String SPRITE_FILE_NAME = "Sprite Info File";
+  private static final String AUDIO_FILE_NAME = "Audio File";
   private static final String SPRITESHEET_FILE_NAME = "Spritesheet Image";
   private static final String TEXTUREATLAS_FILE_NAME = "Texture Atlas XML (generic)";
 
@@ -306,8 +313,17 @@ public class EditorScreen extends Screen {
       // 2. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
 
-      log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
+      this.getGameFile().getSounds().parallelStream().forEach(soundResource -> {
+        Resources.sounds().load(soundResource);
+      });
 
+      log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { this.getGameFile().getMaps().size(), this.currentResourceFile });
+      log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
+      log.log(Level.INFO, "{0} tilesets loaded from {1}", new Object[] { this.getGameFile().getTilesets().size(), this.currentResourceFile });
+      log.log(Level.INFO, "{0} emitters loaded from {1}", new Object[] { this.getGameFile().getEmitters().size(), this.currentResourceFile });
+      log.log(Level.INFO, "{0} blueprints loaded from {1}", new Object[] { this.getGameFile().getBluePrints().size(), this.currentResourceFile });
+      log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { this.getGameFile().getSounds().size(), this.currentResourceFile });
+      
       for (Map map : this.mapComponent.getMaps()) {
         this.loadSpriteSheets(map);
       }
@@ -360,6 +376,12 @@ public class EditorScreen extends Screen {
     }
   }
 
+  public void importSounds() {
+    if (EditorFileChooser.showFileDialog(AUDIO_FILE_NAME, Resources.strings().get("import_something", AUDIO_FILE_NAME), true, SoundFormat.getAllExtensions()) == JFileChooser.APPROVE_OPTION) {
+      this.importSounds(EditorFileChooser.instance().getSelectedFiles());
+    }
+  }
+
   public void importTextureAtlas() {
     if (EditorFileChooser.showFileDialog(TEXTUREATLAS_FILE_NAME, Resources.strings().get("import_something", TEXTUREATLAS_FILE_NAME), false, "xml") == JFileChooser.APPROVE_OPTION) {
       TextureAtlas atlas = TextureAtlas.read(EditorFileChooser.instance().getSelectedFile().getAbsolutePath());
@@ -375,6 +397,19 @@ public class EditorScreen extends Screen {
   public void importSpriteSheets(File... files) {
     SpritesheetImportPanel spritePanel = new SpritesheetImportPanel(files);
     this.processSpritesheets(spritePanel);
+  }
+
+  private void importSounds(File... selectedFiles) {
+    for (File file : selectedFiles) {
+      try (InputStream stream = new FileInputStream(file.getAbsolutePath())) {
+        SoundResource resource = new SoundResource(new BufferedInputStream(stream), FileUtilities.getFileName(file.getName()));
+        this.getGameFile().getSounds().removeIf(x -> x.getName().equals(resource.getName()));
+        this.getGameFile().getSounds().add(resource);
+        log.log(Level.INFO, "imported sound {0}", new Object[] { resource.getName() });
+      } catch (IOException | UnsupportedAudioFileException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+      }
+    }
   }
 
   public void importSpriteSheets(TextureAtlas atlas) {
@@ -436,8 +471,8 @@ public class EditorScreen extends Screen {
       if (blueprint == null) {
         return;
       }
-      
-      if(blueprint.getName() == null || blueprint.getName().isEmpty()) {
+
+      if (blueprint.getName() == null || blueprint.getName().isEmpty()) {
         blueprint.setName(FileUtilities.getFileName(file.getPath()));
       }
 
@@ -613,8 +648,8 @@ public class EditorScreen extends Screen {
     Program.getUserPreferences().setLastGameFile(this.currentResourceFile);
     Program.getUserPreferences().addOpenedFile(this.currentResourceFile);
     Program.loadRecentFiles();
-    log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints to {5}",
-        new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.currentResourceFile });
+    log.log(Level.INFO, "saved {0} maps, {1} spritesheets, {2} tilesets, {3} emitters, {4} blueprints, {5} sounds to {6}",
+        new Object[] { this.getGameFile().getMaps().size(), this.getGameFile().getSpriteSheets().size(), this.getGameFile().getTilesets().size(), this.getGameFile().getEmitters().size(), this.getGameFile().getBluePrints().size(), this.getGameFile().getSounds().size(), this.currentResourceFile });
     this.setCurrentStatus(Resources.strings().get("status_gamefile_saved"));
 
     if (Program.getUserPreferences().isSyncMaps()) {

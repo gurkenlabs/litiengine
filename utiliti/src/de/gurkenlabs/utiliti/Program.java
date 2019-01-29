@@ -543,6 +543,9 @@ public class Program {
 
     MenuItem importTilesets = new MenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
+    
+    MenuItem importSounds = new MenuItem(Resources.strings().get("menu_assets_importSounds"));
+    importSounds.addActionListener(a -> EditorScreen.instance().importSounds());
 
     mnProject.add(importSprite);
     mnProject.add(importTextureAtlas);
@@ -550,6 +553,7 @@ public class Program {
     mnProject.add(importEmitters);
     mnProject.add(importBlueprints);
     mnProject.add(importTilesets);
+    mnProject.add(importSounds);
     mnProject.addSeparator();
     mnProject.add(compress);
     mnProject.add(sync);

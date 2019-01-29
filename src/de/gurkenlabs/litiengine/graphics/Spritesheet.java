@@ -40,8 +40,9 @@ public final class Spritesheet {
 
     this.updateRowsAndCols();
     this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
-
+    
     Resources.spritesheets().add(this.name, this);
+    
     Resources.images().addClearedListener(() -> {
       this.emptySprites.clear();
       this.sprites = new BufferedImage[this.getTotalNumberOfSprites()];
@@ -182,11 +183,11 @@ public final class Spritesheet {
   private void checkWidth(int value) {
     checkDimension(value, this.getImage().getWidth(), "width");
   }
-  
+
   private void checkHeight(int value) {
     checkDimension(value, this.getImage().getHeight(), "height");
   }
-  
+
   private static void checkDimension(int value, int imageValue, String dimension) {
     if (value <= 0) {
       throw new IllegalArgumentException("Invalid sprite dimensions! Sprite " + dimension + " must to be greater than 0.");
