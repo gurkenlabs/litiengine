@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class SpawnpointPanel extends PropertyPanel {
@@ -16,7 +17,7 @@ public class SpawnpointPanel extends PropertyPanel {
   private final JComboBox<Direction> comboBoxDirection;
 
   public SpawnpointPanel() {
-    super("panel_spawnPoint");
+    super("panel_spawnPoint", Icons.SPAWNPOINT);
     
     this.textFieldType = new JTextField();
     this.textFieldType.setColumns(10);

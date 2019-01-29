@@ -905,7 +905,6 @@ public class Program {
     JSpinner spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setToolTipText("Adjust ambient alpha.");
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-    spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
     spinnerAmbientAlpha.setMaximumSize(new Dimension(50, 50));
     spinnerAmbientAlpha.setEnabled(true);
     spinnerAmbientAlpha.addChangeListener(e -> {

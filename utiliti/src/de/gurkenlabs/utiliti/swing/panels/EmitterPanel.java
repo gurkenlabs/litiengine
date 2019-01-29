@@ -24,7 +24,7 @@ public class EmitterPanel extends PropertyPanel {
   private transient CustomEmitter emitter;
 
   public EmitterPanel() {
-    super("panel_emitter");
+    super("panel_emitter", Icons.EMITTER);
 
     Box horizontalBox = Box.createHorizontalBox();
 

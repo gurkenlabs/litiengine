@@ -17,6 +17,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -51,13 +52,21 @@ public abstract class PropertyPanel extends JPanel {
   protected boolean isFocussing;
   private transient IMapObject dataSource;
   private String identifier;
+  private transient Icon icon;
+
+  public PropertyPanel(String identifier, Icon icon) {
+    this(identifier);
+    this.icon = icon;
+  }
 
   public PropertyPanel(String identifier) {
+    this();
     this.identifier = identifier;
-    setBorder(null);
+
   }
 
   public PropertyPanel() {
+    setBorder(null);
   }
 
   protected IMapObject getDataSource() {
@@ -66,6 +75,14 @@ public abstract class PropertyPanel extends JPanel {
 
   public String getIdentifier() {
     return this.identifier;
+  }
+
+  public Icon getIcon() {
+    return this.icon;
+  }
+
+  public void setIcon(Icon icon) {
+    this.icon = icon;
   }
 
   public void bind(IMapObject mapObject) {
