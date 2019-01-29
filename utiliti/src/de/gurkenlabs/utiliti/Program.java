@@ -307,15 +307,13 @@ public class Program {
       }
     });
 
-    if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
+    window.setLocationRelativeTo(null);
+    if (userPreferences.getFrameState() != JFrame.ICONIFIED && userPreferences.getFrameState() != JFrame.NORMAL) {
+      window.setExtendedState(userPreferences.getFrameState());
+    } else if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
       window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
     }
 
-    if (userPreferences.getFrameState() != JFrame.ICONIFIED && userPreferences.getFrameState() != JFrame.NORMAL) {
-      window.setExtendedState(userPreferences.getFrameState());
-    }
-
-    window.setLocationRelativeTo(null);
     return window;
   }
 
