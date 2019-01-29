@@ -5,13 +5,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.environment.IPolygon;
+import de.gurkenlabs.litiengine.resources.Resource;
 
 /**
  * This interface represents an instance on a map that can define various things
  * for an engine. e.g. it can be used to define static collision boxes or other
  * special regions on the map.
  */
-public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObject> {
+public interface IMapObject extends ICustomPropertyProvider, Resource {
 
   /**
    * Gets the grid id.
@@ -40,13 +41,6 @@ public interface IMapObject extends ICustomPropertyProvider, Comparable<IMapObje
    * @return the location
    */
   public Point2D getLocation();
-
-  /**
-   * Gets the name.
-   *
-   * @return the name
-   */
-  public String getName();
 
   public String getType();
 

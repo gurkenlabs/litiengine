@@ -24,26 +24,30 @@ public final class Sound {
 
   private byte[] streamData;
 
+  private byte[] data;
+
   /**
    * Creates a new Sound instance by the specified file path. Loads the sound
    * data into a byte array and also retrieves information about the format of
    * the sound file.
    * 
    * Note that the constructor is private. In order to load files use the static
-   * <code>Resources.sounds()get(String)</code> method.
+   * <code>Resources.sounds().get(String)</code> method.
    * 
    * @param is
    *          The input stream to load the sound from.
    * @param name
    *          The name of this sound file.
    * @throws IOException
-   *          If something went wrong loading the file
+   *           If something went wrong loading the file
    * @throws UnsupportedAudioFileException
-   *          If the audio format is not supported
+   *           If the audio format is not supported
    */
   public Sound(InputStream is, String name) throws IOException, UnsupportedAudioFileException {
     this.name = name;
 
+    this.data = StreamUtilities.getBytes(is);
+   
     AudioInputStream in = AudioSystem.getAudioInputStream(is);
     if (in != null) {
       final AudioFormat baseFormat = in.getFormat();
@@ -70,6 +74,10 @@ public final class Sound {
     }
 
     return this.streamData.clone();
+  }
+
+  public byte[] getRawData() {
+    return this.data;
   }
 
   private AudioFormat getOutFormat(final AudioFormat inFormat) {

@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine;
+package de.gurkenlabs.litiengine.resources;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,13 +31,11 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
-import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 
 @XmlRootElement(name = "litidata")
-public class GameData implements Serializable {
-  private static final Logger log = Logger.getLogger(GameData.class.getName());
+public class ResourceBundle implements Serializable {
+  private static final Logger log = Logger.getLogger(ResourceBundle.class.getName());
   public static final String FILE_EXTENSION = "litidata";
   public static final float CURRENT_VERSION = 1.0f;
 
@@ -66,17 +64,22 @@ public class GameData implements Serializable {
   @XmlElement(name = "blueprint")
   private List<Blueprint> blueprints;
 
-  public GameData() {
+  @XmlElementWrapper(name = "sounds")
+  @XmlElement(name = "sound")
+  private List<SoundResource> sounds;
+
+  public ResourceBundle() {
     this.spriteSheets = new ArrayList<>();
     this.maps = new ArrayList<>();
     this.tilesets = new ArrayList<>();
     this.emitters = new ArrayList<>();
     this.blueprints = new ArrayList<>();
+    this.sounds = new ArrayList<>();
   }
 
-  public static GameData load(final String file) {
+  public static ResourceBundle load(final String file) {
     try {
-      GameData gameFile = getGameFileFromFile(file);
+      ResourceBundle gameFile = getGameFileFromFile(file);
       if (gameFile == null) {
         return null;
       }
@@ -85,7 +88,7 @@ public class GameData implements Serializable {
         for (final Tileset tileset : map.getRawTilesets()) {
           tileset.load(gameFile.getTilesets());
         }
-        
+
         map.updateTileTerrain();
       });
 
@@ -121,6 +124,11 @@ public class GameData implements Serializable {
   public List<Blueprint> getBluePrints() {
     return this.blueprints;
   }
+  
+  @XmlTransient
+  public List<SoundResource> getSounds() {
+    return this.sounds;
+  }
 
   public String save(final String fileName, final boolean compress) {
     String fileNameWithExtension = fileName;
@@ -138,9 +146,14 @@ public class GameData implements Serializable {
     }
 
     Collections.sort(this.getMaps());
+    Collections.sort(this.getSpriteSheets());
+    Collections.sort(this.getTilesets());
+    Collections.sort(this.getEmitters());
+    Collections.sort(this.getBluePrints());
+    Collections.sort(this.getSounds());
 
     try (FileOutputStream fileOut = new FileOutputStream(newFile, false)) {
-      final JAXBContext jaxbContext = XmlUtilities.getContext(GameData.class);
+      final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
       final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
       // output pretty printed
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -169,18 +182,18 @@ public class GameData implements Serializable {
     return newFile.toString();
   }
 
-  private static GameData getGameFileFromFile(String file) throws JAXBException, IOException {
-    final JAXBContext jaxbContext = XmlUtilities.getContext(GameData.class);
+  private static ResourceBundle getGameFileFromFile(String file) throws JAXBException, IOException {
+    final JAXBContext jaxbContext = XmlUtilities.getContext(ResourceBundle.class);
     final Unmarshaller um = jaxbContext.createUnmarshaller();
     try (InputStream inputStream = Resources.get(file)) {
 
       // try to get compressed game file
       final GZIPInputStream zipStream = new GZIPInputStream(inputStream);
-      return (GameData) um.unmarshal(zipStream);
+      return (ResourceBundle) um.unmarshal(zipStream);
     } catch (final ZipException e) {
 
       // if it fails to load the compressed file, get it from plain XML
-      return XmlUtilities.readFromFile(GameData.class, file);
+      return XmlUtilities.readFromFile(ResourceBundle.class, file);
     }
   }
 

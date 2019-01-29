@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 
 @XmlRootElement(name = "sprite")
-public class SpritesheetResource implements Serializable, Comparable<SpritesheetResource> {
+public class SpritesheetResource extends NamedResource implements Serializable {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
@@ -22,9 +22,6 @@ public class SpritesheetResource implements Serializable, Comparable<Spritesheet
 
   @XmlAttribute(name = "height")
   private int height;
-
-  @XmlAttribute(name = "name")
-  private String name;
 
   @XmlElement(required = false)
   private String image;
@@ -53,23 +50,6 @@ public class SpritesheetResource implements Serializable, Comparable<Spritesheet
     this.setName(name);
   }
 
-  @Override
-  public int compareTo(SpritesheetResource obj) {
-    if (obj == null) {
-      return 1;
-    }
-
-    if (this.getName() == null) {
-      if (obj.getName() == null) {
-        return 0;
-      }
-
-      return -1;
-    }
-
-    return this.getName().compareTo(obj.getName());
-  }
-
   @XmlTransient
   public int getHeight() {
     return this.height;
@@ -80,10 +60,6 @@ public class SpritesheetResource implements Serializable, Comparable<Spritesheet
     return this.image;
   }
 
-  @XmlTransient
-  public String getName() {
-    return this.name;
-  }
 
   @XmlTransient
   public int getWidth() {
@@ -105,10 +81,6 @@ public class SpritesheetResource implements Serializable, Comparable<Spritesheet
 
   public void setImage(final String image) {
     this.image = image;
-  }
-
-  public void setName(final String n) {
-    this.name = n;
   }
 
   public void setWidth(final int w) {
