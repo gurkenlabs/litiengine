@@ -14,8 +14,8 @@ public class VerticalSlider extends Slider {
   private double minSliderY;
   private double maxSliderY;
 
-  public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final boolean showArrowButtons) {
-    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite, showArrowButtons);
+  public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite) {
+    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite);
   }
 
   @Override
@@ -24,23 +24,18 @@ public class VerticalSlider extends Slider {
   }
 
   @Override
-  public void prepare() {
-    if (this.arrowButtonsShown()) {
-      this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_UP.getText(), null));
-      this.getButton1().setFont(ARROW_UP.getFont());
-      this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), this.getButtonSprite(), ARROW_DOWN.getText(), null));
-      this.getButton2().setFont(ARROW_DOWN.getFont());
-    
-      this.getComponents().add(this.getButton1());
-      this.getComponents().add(this.getButton2());
-    }
+  protected void initializeComponents() {
+    super.initializeComponents();
+    System.out.println("X: " + this.getX() + "  Y: " + this.getY() + "width" + this.getWidth());
+    this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), ARROW_UP.getText()));
+    this.getButton1().setFont(ARROW_UP.getFont());
+    this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), ARROW_DOWN.getText()));
+    this.getButton2().setFont(ARROW_DOWN.getFont());
 
     final double sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6.0;
     this.minSliderY = this.getY() + this.getWidth();
     this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
-    this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSprite(), "", null));
-    this.getComponents().add(this.getSliderComponent());
-    super.prepare();
+    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSprite(), "", null));
   }
 
   @Override

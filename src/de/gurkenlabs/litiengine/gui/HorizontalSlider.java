@@ -35,7 +35,7 @@ public class HorizontalSlider extends Slider {
       this.getComponents().add(this.getButton1());
       this.getComponents().add(this.getButton2());
     }
-    this.setSlider(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null));
+    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getHeight() * 2, this.getHeight(), this.getSliderSprite(), "", null));
     this.getComponents().add(this.getSliderComponent());
     super.prepare();
   }

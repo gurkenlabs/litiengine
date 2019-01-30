@@ -11,7 +11,7 @@ import de.gurkenlabs.litiengine.input.Input;
 public abstract class Slider extends GuiComponent {
   private ImageComponent button1;
   private ImageComponent button2;
-  private ImageComponent sliderBar;
+  private ImageComponent sliderComponent;
   private final Spritesheet buttonSprite;
   private final Spritesheet sliderSprite;
   private final List<Consumer<Float>> changeConsumer;
@@ -19,10 +19,9 @@ public abstract class Slider extends GuiComponent {
   private boolean isDragging;
   private final float minValue;
   private final float maxValue;
-  private final boolean showArrowButtons;
   private float stepSize;
 
-  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite, final boolean showArrowButtons) {
+  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.minValue = minValue;
@@ -30,11 +29,7 @@ public abstract class Slider extends GuiComponent {
     this.stepSize = stepSize;
     this.buttonSprite = buttonSprite;
     this.sliderSprite = sliderSprite;
-    this.showArrowButtons = showArrowButtons;
-  }
-
-  public boolean arrowButtonsShown() {
-    return this.showArrowButtons;
+    this.onChange(e -> this.sliderComponent.setLocation(this.getRelativeSliderPosition()));
   }
 
   public ImageComponent getButton1() {
@@ -68,7 +63,7 @@ public abstract class Slider extends GuiComponent {
   public abstract Point2D getRelativeSliderPosition();
 
   public ImageComponent getSliderComponent() {
-    return this.sliderBar;
+    return this.sliderComponent;
   }
 
   public Spritesheet getSliderSprite() {
@@ -90,8 +85,6 @@ public abstract class Slider extends GuiComponent {
   @Override
   public void prepare() {
     super.prepare();
-    this.setCurrentValue((this.getMinValue() + this.getMaxValue()) / 2);
-    this.onChange(e -> this.sliderBar.setLocation(this.getRelativeSliderPosition()));
   }
 
   public void setCurrentValue(final float newValue) {
@@ -116,7 +109,7 @@ public abstract class Slider extends GuiComponent {
       this.setCurrentValue(this.getCurrentValue() - this.getStepSize());
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
     });
-    this.getComponents().add(button1);
+    this.getComponents().add(this.getButton1());
   }
 
   protected void setButton2(final ImageComponent button2) {
@@ -126,13 +119,13 @@ public abstract class Slider extends GuiComponent {
       this.getChangeConsumer().forEach(consumer -> consumer.accept(this.getCurrentValue()));
 
     });
-    this.getComponents().add(button2);
+    this.getComponents().add(this.getButton2());
 
   }
 
-  protected void setSlider(final ImageComponent slider) {
-    this.sliderBar = slider;
-    this.sliderBar.onMousePressed(e -> this.isDragging = true);
+  protected void setSliderComponent(final ImageComponent slider) {
+    this.sliderComponent = slider;
+    this.sliderComponent.onMousePressed(e -> this.isDragging = true);
     Input.mouse().onDragged(e -> {
       if (this.isDragging()) {
         this.setValueRelativeToMousePosition();
@@ -145,6 +138,6 @@ public abstract class Slider extends GuiComponent {
         this.isDragging = false;
       }
     });
-    this.getComponents().add(slider);
+    this.getComponents().add(this.getSliderComponent());
   }
 }
