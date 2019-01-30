@@ -25,17 +25,10 @@ import java.util.stream.Collectors;
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
 
-  private final Map<String, T> resources;
-  private final Map<String, String> aliases;
-  private final List<ResourcesContainerListener<? super T>> listeners;
-  private final List<ResourcesContainerClearedListener> clearedListeners;
-
-  protected ResourcesContainer() {
-    this.resources = new ConcurrentHashMap<>();
-    this.aliases = new ConcurrentHashMap<>();
-    this.listeners = new CopyOnWriteArrayList<>();
-    this.clearedListeners = new CopyOnWriteArrayList<>();
-  }
+  private final Map<String, T> resources = new ConcurrentHashMap<>();
+  private final Map<String, String> aliases = new ConcurrentHashMap<>();
+  private final List<ResourcesContainerListener<? super T>> listeners = new CopyOnWriteArrayList<>();
+  private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
 
   /**
    * Add a new container listener to this instance in order to observe resource life cycles.
