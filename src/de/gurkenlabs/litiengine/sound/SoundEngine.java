@@ -11,7 +11,6 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.input.Input;
 
 /**
  * This class provides all methods to playback sounds and music in your
@@ -108,8 +107,8 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final IEntity entity, final Sound sound) {
-    return playSound(entity, sound, false);
+  public ISoundPlayback playSound(final Sound sound, final IEntity entity) {
+    return playSound(sound, entity, false);
   }
 
   /**
@@ -125,7 +124,7 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final IEntity entity, final Sound sound, boolean loop) {
+  public ISoundPlayback playSound(final Sound sound, final IEntity entity, boolean loop) {
     if (sound == null) {
       return null;
     }
@@ -148,8 +147,12 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Point2D location, final Sound sound) {
-    return this.playSound(location, sound, false);
+  public ISoundPlayback playSound(final Sound sound, final Point2D location) {
+    return this.playSound(sound, location, false);
+  }
+
+  public ISoundPlayback playSound(final Sound sound, double x, double y) {
+    return this.playSound(sound, x, y, false);
   }
 
   /**
@@ -165,15 +168,19 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    * @return A {@link ISoundPlayback} instance that allows to further process
    *         and control the played sound.
    */
-  public ISoundPlayback playSound(final Point2D location, final Sound sound, boolean loop) {
+  public ISoundPlayback playSound(final Sound sound, final Point2D location, boolean loop) {
     if (sound == null) {
       return null;
     }
 
-    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation);
+    final SoundPlayback playback = new SoundPlayback(sound, this.listenerLocation, location);
     playback.play(loop);
     this.sounds.add(playback);
     return playback;
+  }
+
+  public ISoundPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
+    return this.playSound(sound, new Point2D.Double(x, y), loop);
   }
 
   /**
@@ -253,13 +260,13 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
 
   @Override
   public void start() {
-    Input.getLoop().attach(this);
+    Game.inputLoop().attach(this);
     this.listenerLocation = Game.world().camera().getFocus();
   }
 
   @Override
   public void terminate() {
-    Input.getLoop().detach(this);
+    Game.inputLoop().detach(this);
     if (this.music != null && this.music.isPlaying()) {
       this.music.cancel();
       this.music = null;

@@ -3,11 +3,11 @@ package de.gurkenlabs.litiengine.net.server;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.net.IIncomingPacketObserver;
 import de.gurkenlabs.litiengine.net.IPacketSender;
-import de.gurkenlabs.litiengine.util.ICommandManager;
+import de.gurkenlabs.litiengine.util.CommandManager;
 
 public interface IServer extends IIncomingPacketObserver, ILaunchable {
 
-  public ICommandManager getCommandManager();
+  public CommandManager getCommandManager();
 
   /**
    * Gets the connection manager.

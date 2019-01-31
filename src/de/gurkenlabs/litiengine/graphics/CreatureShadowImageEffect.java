@@ -7,7 +7,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 import de.gurkenlabs.litiengine.entities.Creature;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class CreatureShadowImageEffect extends ImageEffect {
   private static final Color DEFAULT_SHADOW_COLOR = new Color(124, 164, 174, 120);
@@ -35,7 +35,7 @@ public class CreatureShadowImageEffect extends ImageEffect {
       return image;
     }
 
-    final BufferedImage buffer = ImageProcessing.getCompatibleImage(image.getWidth() * 2 + 2, image.getHeight() * 2);
+    final BufferedImage buffer = Imaging.getCompatibleImage(image.getWidth() * 2 + 2, image.getHeight() * 2);
     final Graphics2D graphics = buffer.createGraphics();
     float offsetX = image.getWidth() / 2.0f;
     float offsetY = image.getHeight() / 2.0f;

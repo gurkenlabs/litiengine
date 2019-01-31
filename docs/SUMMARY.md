@@ -1,61 +1,59 @@
 # Summary
 
-## Getting Started
+## Basics
 
-* [Creating a project](creating-a-project/README.md)
-    * [Get LITIengine](creating-a-project/get-litiengine.md)
-    * [The utiLITI editor](creating-a-project/utiliti-editor.md)
+* [Getting Started](getting-started/README.md)
+    * [Get LITIengine](getting-started/get-litiengine.md)
+    * [The utiLITI editor](getting-started/utiliti-editor.md)
+    * [Run the Game](getting-started/run-the-game.md)
 
-* [Setting up the Basics](basic-setup/README.md)
-    * Preparing the Game Window
-    * Setting Metadata
-    * Configuring Default Behavior and Appearance
-    * The Game Configuration File
-
-* [The Main Components](game-api/README.md)
-    * 2D Graphics 
-    * 2D Audio
+* [Game Architecture](game-api/README.md)
+    * [2D Graphics](game-api/render-engine.md) 
+    * [2D Audio](game-api/sound-engine.md) 
     * 2D Physics
-    * Understanding GameLoops
-    * Creating Screens
-    * The Game World
+    * Loops
+    * Game World
+    * Game Window
+    * Screens
 
-* [Managing Resources](managing-resources/README.md)
+* [Configuration](configuration/README.md)
+    * Basic Information
+    * Configuration File
+    * Default Behavior and Appearance
+
+* [Manage Resources](manage-resources/README.md)
     * Sounds and Music
     * Images
     * Custom Fonts
     * Text
 
-* [Managing Player Input](managing-input/README.md)
+* [Manage Maps](manage-maps/README.md)
+    * Map creation with Tiled
+    * Map Objects
+    * Custom Properties
+    * Import maps with utiLITI
+    * Load maps from the .litidata file
+    * Load external maps
+
+* [Player Input](player-input/README.md)
     * Keyboard Input
     * Mouse Input
     * GamePad Input
 
-* [Creating Maps](map-creation/README.md)
-    * Map creation with Tiled
-    * Importing maps into utiLITI
-    * Understanding MapObjects
-    * The Environment
-
-* [Importing Maps](importing-maps/README.md)
-    * PropertyProviders
-    * Loading maps from the .litidata file
-    * Loading external maps
-
-* [The Entity Framework](entity-framework/README.md)
+* [Entity Framework](entity-framework/README.md)
     * Default Entity Types
-    * Subscribing to Entity Events
-    * Using Annotations for static Information
+    * Subscribe to Entity Events
+    * Annotations for static information
 
-* [Controlling an Entity](controlling-entities/README.md)
-    * The Concept of EntityControllers
-    * Controlling Animation
-    * Controlling Movement
-    * Controlling Behavior
-    * The Messaging System
-    * The Ability Framework
+* [Control Entities](control-entities/README.md)
+    * Entity Controllers
+    * Animation Controller
+    * Movement Controller
+    * Behavior Controller
+    * Messaging System
+    * Ability Framework
 
-* [Graphical User Interface](graphical-user-interface/README.md)
+* [User Interface](user-interface/README.md)
     * GuiComponents: An Overview
     * Creating Menus
 

@@ -1,7 +1,6 @@
 package de.gurkenlabs.utiliti.swing.dialogs;
 
 import java.awt.Color;
-import java.awt.Font;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,11 +18,10 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.MapProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.utiliti.Program;
+
 
 @SuppressWarnings("serial")
 public class MapPropertyPanel extends JPanel {
-  private static final Font LABEL_FONT = new Font("Tahoma", Font.PLAIN, 10);
   private final JTextField textFieldDescription;
   private final JTextField textFieldTitle;
   private final JSpinner spinnerGravity;
@@ -41,21 +39,16 @@ public class MapPropertyPanel extends JPanel {
     setBounds(100, 100, 450, 302);
     this.setBorder(new EmptyBorder(5, 5, 5, 5));
     JLabel lblMapName = new JLabel("name");
-    lblMapName.setFont(Program.TEXT_FONT);
 
     textFieldDescription = new JTextField();
-    textFieldDescription.setFont(Program.TEXT_FONT);
     textFieldDescription.setColumns(10);
 
     JLabel lblMapTitle = new JLabel("title");
-    lblMapTitle.setFont(LABEL_FONT);
 
     textFieldTitle = new JTextField();
-    textFieldTitle.setFont(Program.TEXT_FONT);
     textFieldTitle.setColumns(10);
 
     JLabel label = new JLabel("color");
-    label.setFont(Program.TEXT_FONT);
 
     JButton buttonAmbientColor = new JButton("...");
     buttonAmbientColor.addActionListener(a -> {
@@ -68,20 +61,16 @@ public class MapPropertyPanel extends JPanel {
       textFieldAmbientColor.setText(h);
       spinnerAmbientAlpha.setValue(result.getAlpha());
     });
-    buttonAmbientColor.setFont(Program.TEXT_FONT.deriveFont(10f));
 
     textFieldAmbientColor = new JTextField();
     textFieldAmbientColor.setText("#ffffff");
-    textFieldAmbientColor.setFont(Program.TEXT_FONT);
     textFieldAmbientColor.setEditable(false);
     textFieldAmbientColor.setColumns(10);
 
     JLabel lblAlpha = new JLabel("alpha");
-    lblAlpha.setFont(LABEL_FONT);
 
     spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-    spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
     spinnerAmbientAlpha.addChangeListener(e -> {
       Color oldColor = ColorHelper.decode(textFieldAmbientColor.getText());
       Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) spinnerAmbientAlpha.getValue());
@@ -91,27 +80,20 @@ public class MapPropertyPanel extends JPanel {
     });
 
     JLabel lblNewLabel = new JLabel("General");
-    lblNewLabel.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(12f));
 
     JLabel lblAmbientLight = new JLabel("Ambient Light");
-    lblAmbientLight.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(12f));
 
     JLabel lblDesc = new JLabel("description");
-    lblDesc.setFont(LABEL_FONT);
 
     textFieldName = new JTextField();
-    textFieldName.setFont(Program.TEXT_FONT);
     textFieldName.setColumns(10);
 
     JLabel lblStaticShadows = new JLabel("Static Shadows");
-    lblStaticShadows.setFont(new Font("Dialog", Font.BOLD, 12));
 
     JLabel labelAlpha = new JLabel("alpha");
-    labelAlpha.setFont(LABEL_FONT);
 
     spinnerShadowAlpha = new JSpinner();
     spinnerShadowAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-    spinnerShadowAlpha.setFont(null);
     spinnerShadowAlpha.addChangeListener(e -> {
       Color oldColor = ColorHelper.decode(textFieldShadowColor.getText());
       Color newColor = new Color(oldColor.getRed(), oldColor.getGreen(), oldColor.getBlue(), (int) spinnerShadowAlpha.getValue());
@@ -120,7 +102,6 @@ public class MapPropertyPanel extends JPanel {
     });
 
     JLabel labelColor = new JLabel("color");
-    labelColor.setFont(LABEL_FONT);
 
     JButton buttonColorShadow = new JButton("...");
     buttonColorShadow.addActionListener(a -> {
@@ -133,11 +114,10 @@ public class MapPropertyPanel extends JPanel {
       textFieldShadowColor.setText(h);
       spinnerShadowAlpha.setValue(result.getAlpha());
     });
-    buttonColorShadow.setFont(null);
+
 
     textFieldShadowColor = new JTextField();
     textFieldShadowColor.setText("#ffffff");
-    textFieldShadowColor.setFont(null);
     textFieldShadowColor.setEditable(false);
     textFieldShadowColor.setColumns(10);
     

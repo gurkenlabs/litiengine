@@ -354,4 +354,8 @@ public class Camera implements ICamera {
   public void pan(double x, double y, int duration) {
     this.pan(new Point2D.Double(x, y), duration);
   }
+
+  protected int panTime() {
+    return this.panTime;
+  }
 }

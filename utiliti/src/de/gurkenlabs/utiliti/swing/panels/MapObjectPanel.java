@@ -111,36 +111,19 @@ public class MapObjectPanel extends PropertyPanel {
                                             .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addComponent(spinnerY, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE).addComponent(spinnerHeight, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)))
                                         .addComponent(comboBoxType, 0, 372, Short.MAX_VALUE).addComponent(textFieldName, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))))
                         .addGap(CONTROL_MARGIN)));
-    
+
     groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
         .addGroup(groupLayout.createSequentialGroup().addContainerGap()
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(labelEntityID, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(labelEntityID, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)).addGap(CONTROL_MARGIN)
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblX, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
             .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(lblX, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(spinnerX, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblYcoordinate, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(spinnerY, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                .addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblName, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup()
-                .addGap(CONTROL_MARGIN)
-                .addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
-                .addGroup(groupLayout.createSequentialGroup()
-                    .addGap(CONTROL_MARGIN)
-                    .addComponent(lblTags, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)))
-            .addGap(CONTROL_MARGIN)
-            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(spinnerWidth, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblHeight, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)
+                .addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblWidth, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(textFieldName, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblName, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+            .addGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(tagPanel, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE))
+                .addGroup(groupLayout.createSequentialGroup().addGap(CONTROL_MARGIN).addComponent(lblTags, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE)))
+            .addGap(CONTROL_MARGIN).addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(comboBoxType, GroupLayout.PREFERRED_SIZE, CONTROL_HEIGHT, GroupLayout.PREFERRED_SIZE).addComponent(lblType, GroupLayout.PREFERRED_SIZE, LABEL_HEIGHT, GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(ComponentPlacement.RELATED).addComponent(tabbedPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addContainerGap()));
     setLayout(groupLayout);
 
@@ -208,11 +191,11 @@ public class MapObjectPanel extends PropertyPanel {
       this.currentPanel.bind(null);
       this.tabbedPanel.remove(this.currentPanel);
     }
-    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel);
+    tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
 
     // TODO: support all types that implement ICollisionEntity
     if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
       tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
@@ -221,12 +204,12 @@ public class MapObjectPanel extends PropertyPanel {
 
     // TODO: support all types that implement IMobileEntity
     if (type == MapObjectType.CREATURE) {
-      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel);
+      tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
     } else {
       this.tabbedPanel.remove(this.movementPanel);
     }
 
-    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel);
+    tabbedPanel.addTab(Resources.strings().get(this.customPanel.getIdentifier()), this.customPanel.getIcon(), this.customPanel);
 
     this.currentPanel = panel;
     this.currentPanel.bind(this.getDataSource());

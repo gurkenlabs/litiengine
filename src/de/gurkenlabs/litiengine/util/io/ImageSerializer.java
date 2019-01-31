@@ -14,7 +14,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
 import de.gurkenlabs.litiengine.graphics.ImageFormat;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class ImageSerializer {
   private static final Logger log = Logger.getLogger(ImageSerializer.class.getName());
@@ -36,7 +36,7 @@ public final class ImageSerializer {
         return null;
       }
 
-      final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
+      final BufferedImage compatibleImg = Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
       compatibleImg.createGraphics().drawImage(img, 0, 0, null);
       compatibleImg.createGraphics().dispose();
 

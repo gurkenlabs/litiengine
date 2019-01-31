@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -29,7 +30,7 @@ public class CreaturePanel extends PropertyPanel {
    * Create the panel.
    */
   public CreaturePanel() {
-    super("panel_creature");
+    super("panel_creature", Icons.CREATURE);
 
     this.comboBoxSpriteSheets = new JComboBox<>();
     this.comboBoxSpriteSheets.setRenderer(new LabelListCellRenderer());

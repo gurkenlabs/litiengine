@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public abstract class MapRenderer implements IMapRenderer {
 
@@ -42,7 +42,7 @@ public abstract class MapRenderer implements IMapRenderer {
       return opt.get();
     }
 
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
+    final BufferedImage img = Imaging.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
     final Graphics2D g = img.createGraphics();
 
     for (final ITileLayer layer : map.getTileLayers()) {
@@ -167,16 +167,16 @@ public abstract class MapRenderer implements IMapRenderer {
     BufferedImage tileImage = sprite.getSprite(index, tileset.getMargin(), tileset.getSpacing());
     if (tile.isFlipped()) {
       if (tile.isFlippedDiagonally()) {
-        tileImage = ImageProcessing.rotate(tileImage, -Math.PI / 2);
-        tileImage = ImageProcessing.verticalFlip(tileImage);
+        tileImage = Imaging.rotate(tileImage, -Math.PI / 2);
+        tileImage = Imaging.verticalFlip(tileImage);
       }
 
       if (tile.isFlippedHorizontally()) {
-        tileImage = ImageProcessing.horizontalFlip(tileImage);
+        tileImage = Imaging.horizontalFlip(tileImage);
       }
 
       if (tile.isFlippedVertically()) {
-        tileImage = ImageProcessing.verticalFlip(tileImage);
+        tileImage = Imaging.verticalFlip(tileImage);
       }
     }
 

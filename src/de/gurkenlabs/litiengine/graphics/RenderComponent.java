@@ -29,7 +29,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
@@ -70,7 +70,7 @@ public class RenderComponent extends Canvas implements IInitializable {
     this.setFont(DEFAULT_FONT);
 
     // hide default cursor
-    final BufferedImage cursorImg = ImageProcessing.getCompatibleImage(16, 16);
+    final BufferedImage cursorImg = Imaging.getCompatibleImage(16, 16);
     final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
     this.setCursor(blankCursor);
     this.setSize(size);

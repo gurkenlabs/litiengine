@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameAdapter;
-import de.gurkenlabs.litiengine.GameLoop;
-import de.gurkenlabs.litiengine.IGameLoop;
 
 /**
  * The static <code>Input</code> class is the LITIengine's access point to devices that capture physical player input.
@@ -22,23 +20,17 @@ import de.gurkenlabs.litiengine.IGameLoop;
 public final class Input {
   private static final Logger log = Logger.getLogger(Input.class.getName());
 
-  private static final IGameLoop InputLoop;
+
   private static IGamepadManager gamePadManager;
   private static List<IGamepad> gamePads;
   private static IKeyboard keyboard;
   private static IMouse mouse;
 
   static {
-    // we need an own update loop because otherwise input won't work if the game has been paused
-    InputLoop = new GameLoop("Input Loop", Game.loop().getUpdateRate());
   }
 
   private Input() {
     throw new UnsupportedOperationException();
-  }
-
-  public static IGameLoop getLoop() {
-    return InputLoop;
   }
 
   public static IGamepadManager gamepadManager() {
@@ -108,7 +100,6 @@ public final class Input {
   public static final class InputGameAdapter extends GameAdapter {
     @Override
     public void terminated() {
-      InputLoop.terminate();
       if (gamePadManager != null) {
         gamePadManager.terminate();
       }
@@ -121,7 +112,6 @@ public final class Input {
 
     @Override
     public void started() {
-      InputLoop.start();
       if (gamePadManager != null) {
         gamePadManager.start();
       }

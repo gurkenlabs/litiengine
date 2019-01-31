@@ -25,17 +25,10 @@ import java.util.stream.Collectors;
 public abstract class ResourcesContainer<T> {
   private static final Logger log = Logger.getLogger(ResourcesContainer.class.getName());
 
-  private final Map<String, T> resources;
-  private final Map<String, String> aliases;
-  private final List<ResourcesContainerListener<T>> listeners;
-  private final List<ResourcesContainerClearedListener> clearedListeners;
-
-  protected ResourcesContainer() {
-    this.resources = new ConcurrentHashMap<>();
-    this.aliases = new ConcurrentHashMap<>();
-    this.listeners = new CopyOnWriteArrayList<>();
-    this.clearedListeners = new CopyOnWriteArrayList<>();
-  }
+  private final Map<String, T> resources = new ConcurrentHashMap<>();
+  private final Map<String, String> aliases = new ConcurrentHashMap<>();
+  private final List<ResourcesContainerListener<? super T>> listeners = new CopyOnWriteArrayList<>();
+  private final List<ResourcesContainerClearedListener> clearedListeners = new CopyOnWriteArrayList<>();
 
   /**
    * Add a new container listener to this instance in order to observe resource life cycles.
@@ -46,7 +39,7 @@ public abstract class ResourcesContainer<T> {
    * 
    * @see #removeContainerListener(ResourcesContainerListener)
    */
-  public void addContainerListener(ResourcesContainerListener<T> listener) {
+  public void addContainerListener(ResourcesContainerListener<? super T> listener) {
     this.listeners.add(listener);
   }
 
@@ -109,7 +102,7 @@ public abstract class ResourcesContainer<T> {
 
     this.resources.put(identifier, resource);
 
-    for (ResourcesContainerListener<T> listener : this.listeners) {
+    for (ResourcesContainerListener<? super T> listener : this.listeners) {
       listener.added(resourceName, resource);
     }
   }
@@ -120,7 +113,7 @@ public abstract class ResourcesContainer<T> {
   public void clear() {
     this.resources.clear();
 
-    for (ResourcesContainerListener<T> listener : this.listeners) {
+    for (ResourcesContainerListener<? super T> listener : this.listeners) {
       listener.cleared();
     }
   }
@@ -168,7 +161,7 @@ public abstract class ResourcesContainer<T> {
    *          The condition that a resource must fulfill in order to be returned.
    * @return All resources that match the specified condition.
    */
-  public Collection<T> get(Predicate<T> pred) {
+  public Collection<T> get(Predicate<? super T> pred) {
     if (pred == null) {
       return new ArrayList<>();
     }
@@ -206,7 +199,7 @@ public abstract class ResourcesContainer<T> {
    *          The callback that is used to load the resource on-demand if it's not present on this container.
    * @return T The resource with the specified name.
    */
-  public T get(String resourceName, Supplier<T> loadCallback) {
+  public T get(String resourceName, Supplier<? extends T> loadCallback) {
     String identifier = resourceName;
     Optional<T> opt = this.tryGet(identifier);
     if (opt.isPresent()) {
@@ -275,7 +268,7 @@ public abstract class ResourcesContainer<T> {
     T removedResource = this.resources.remove(resourceName);
 
     if (removedResource != null) {
-      for (ResourcesContainerListener<T> listener : this.listeners) {
+      for (ResourcesContainerListener<? super T> listener : this.listeners) {
         listener.removed(resourceName, removedResource);
       }
     }
@@ -327,7 +320,7 @@ public abstract class ResourcesContainer<T> {
       return null;
     }
 
-    for (ResourcesContainerListener<T> listener : this.listeners) {
+    for (ResourcesContainerListener<? super T> listener : this.listeners) {
       listener.added(identifier, newResource);
     }
 

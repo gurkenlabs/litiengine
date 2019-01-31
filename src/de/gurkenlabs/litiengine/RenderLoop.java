@@ -16,26 +16,25 @@ public class RenderLoop extends UpdateLoop {
     while (!interrupted()) {
       final long fpsWait = (long) (1000.0 / this.maxFps);
       final long renderStart = System.nanoTime();
-      try {
-        Game.world().camera().updateFocus();
-        this.update();
+      Game.world().camera().updateFocus();
+      this.update();
 
-        Game.window().getRenderComponent().render();
+      Game.window().getRenderComponent().render();
 
-        final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
+      final double renderTime = TimeUtilities.nanoToMs(System.nanoTime() - renderStart);
 
-        Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / renderTime));
-        if (Game.config().debug().trackRenderTimes()) {
-          Game.metrics().trackRenderTime("total", renderTime);
-        }
+      Game.metrics().setEstimatedMaxFramesPerSecond((int) (1000.0 / renderTime));
+      if (Game.config().debug().trackRenderTimes()) {
+        Game.metrics().trackRenderTime("total", renderTime);
+      }
 
-        long wait = Math.max(0, fpsWait - (long) renderTime);
-        if (wait != 0) {
+      long wait = Math.max(0, fpsWait - (long) renderTime);
+      if (wait != 0) {
+        try {
           sleep(wait);
+        } catch (InterruptedException e) {
+          break;
         }
-      } catch (final InterruptedException e) {
-        interrupt();
-        break;
       }
     }
   }

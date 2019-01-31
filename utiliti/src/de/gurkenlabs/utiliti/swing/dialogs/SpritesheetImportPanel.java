@@ -37,8 +37,9 @@ import de.gurkenlabs.litiengine.graphics.animation.Animation;
 import de.gurkenlabs.litiengine.graphics.animation.AnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.TextureAtlas;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
@@ -319,7 +320,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
       int factor = PREVIEW_SIZE / Math.max(file.getSpriteWidth(), file.getSpriteHeight());
 
-      BufferedImage img = ImageProcessing.scaleImage(file.getImage(), factor, true);
+      BufferedImage img = Imaging.scale(file.getImage(), factor, true);
 
       Spritesheet sprite = new Spritesheet(img, file.getName() + "-preview", file.getSpriteWidth() * factor, file.getSpriteHeight() * factor);
       Animation newAnim = new Animation(sprite, true, file.keyFrames);
@@ -359,7 +360,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     public SpriteFileWrapper(SpritesheetInfo info) {
-      this(ImageProcessing.decodeToImage(info.getImage()), info.getName());
+      this(Codec.decodeImage(info.getImage()), info.getName());
       this.spriteWidth = info.getWidth();
       this.spriteHeight = info.getHeight();
 
@@ -435,8 +436,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
     }
 
     private void updateGridImage() {
-      BufferedImage scaled = ImageProcessing.scaleImage(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
-      BufferedImage img = ImageProcessing.getCompatibleImage(scaled.getWidth() + 1, scaled.getHeight() + 1);
+      BufferedImage scaled = Imaging.scale(this.image, MAX_WIDTH_ICON, MAX_HEIGHT_ICON, true, false);
+      BufferedImage img = Imaging.getCompatibleImage(scaled.getWidth() + 1, scaled.getHeight() + 1);
       int cols = this.getWidth() / this.getSpriteWidth();
       int rows = this.getHeight() / this.getSpriteHeight();
 

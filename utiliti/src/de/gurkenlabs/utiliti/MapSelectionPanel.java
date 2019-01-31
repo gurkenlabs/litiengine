@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -64,7 +63,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObjectLayer;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.swing.IconTreeListItem;
 import de.gurkenlabs.utiliti.swing.IconTreeListRenderer;
 import de.gurkenlabs.utiliti.swing.JCheckBoxList;
@@ -171,7 +170,6 @@ public class MapSelectionPanel extends JSplitPane {
     mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
     popupMenu.add(mntmDeleteMap);
     TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
-    border.setTitleFont(Program.TEXT_FONT.deriveFont(Font.BOLD).deriveFont(11f));
     mapScrollPane.setViewportBorder(null);
 
     layerScrollPane = new JScrollPane();
@@ -620,7 +618,7 @@ public class MapSelectionPanel extends JSplitPane {
         final String cacheKey = map.getName() + layer.getName() + "#" + Integer.toHexString(layerColor.getRGB());
 
         BufferedImage newIconImage = Resources.images().get(cacheKey, () -> {
-          BufferedImage img = ImageProcessing.getCompatibleImage(10, 10);
+          BufferedImage img = Imaging.getCompatibleImage(10, 10);
           Graphics2D g = (Graphics2D) img.getGraphics();
           g.setColor(layer.getColor());
           g.fillRect(0, 0, 9, 9);

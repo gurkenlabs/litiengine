@@ -5,6 +5,13 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+/**
+ * This static implementation renders an <code>Image</code> to a given <code>Graphics2D</code> object at the specified screen coordinates.
+ * This class be very useful when composing a GUI that contains images which are rendered at a certain location on the screen.
+ * 
+ * @see Image
+ * @see Graphics2D
+ */
 public final class ImageRenderer {
 
   private ImageRenderer() {

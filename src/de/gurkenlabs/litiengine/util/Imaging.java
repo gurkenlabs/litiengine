@@ -20,22 +20,13 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
+import java.util.function.Function;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public class ImageProcessing {
-  private static final Logger log = Logger.getLogger(ImageProcessing.class.getName());
+public final class Imaging {
   public static final int CROP_ALIGN_CENTER = 0;
   public static final int CROP_ALIGN_LEFT = 1;
   public static final int CROP_ALIGN_RIGHT = 2;
@@ -47,7 +38,7 @@ public class ImageProcessing {
 
   private static GraphicsConfiguration graphicsConfig;
 
-  private ImageProcessing() {
+  private Imaging() {
     throw new UnsupportedOperationException();
   }
 
@@ -55,7 +46,10 @@ public class ImageProcessing {
    * Adds a shadow effect by executing the following steps: 1. Transform visible
    * pixels to a semi-transparent black 2. Flip the image vertically 3. Scale it
    * down 4. Render original image and shadow on a buffered image
-   *
+   * <p>
+   * TODO: Add support for different shadow types. Add an ellipse shadow, similar to the Lepus reatures.
+   * </p>
+   * 
    * @param image
    *          the image
    * @param xOffset
@@ -108,7 +102,7 @@ public class ImageProcessing {
    *          the color
    * @return the image
    */
-  public static Image applyAlphaChannel(final Image img, final Color color) {
+  public static BufferedImage applyAlphaChannel(final BufferedImage img, final Color color) {
     if (color == null || img == null) {
       return img;
     }
@@ -131,7 +125,7 @@ public class ImageProcessing {
     };
 
     final ImageProducer ip = new FilteredImageSource(img.getSource(), filter);
-    return Toolkit.getDefaultToolkit().createImage(ip);
+    return toBufferedImage(Toolkit.getDefaultToolkit().createImage(ip));
   }
 
   public static BufferedImage borderAlpha(final BufferedImage image, final Color strokeColor, boolean borderOnly) {
@@ -190,23 +184,23 @@ public class ImageProcessing {
    * @param cropAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_CENTER
    *          CROP_ALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_LEFT
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_LEFT
    *          CROP_ALIGN_LEFT}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_ALIGN_RIGHT
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_ALIGN_RIGHT
    *          CROP_ALIGN_RIGHT}</li>
    *          </ul>
    * @param cropVerticlaAlignment
    *          use the following consts: <br>
    *          <ul>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_CENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_CENTER
    *          CROP_VALIGN_CENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOP
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOP
    *          CROP_VALIGN_TOP}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_TOPCENTER
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_TOPCENTER
    *          CROP_VALIGN_TOPCENTER}</li>
-   *          <li>{@link de.gurkenlabs.litiengine.util.ImageProcessing#CROP_VALIGN_BOTTOM
+   *          <li>{@link de.gurkenlabs.litiengine.util.Imaging#CROP_VALIGN_BOTTOM
    *          CROP_VALIGN_BOTTOM}</li>
    *          </ul>
    * @param width
@@ -255,49 +249,6 @@ public class ImageProcessing {
     return image.getSubimage(x, y, width, height);
   }
 
-  public static BufferedImage decodeToImage(final String imageString) {
-    if (imageString == null) {
-      return null;
-    }
-
-    BufferedImage image = null;
-    byte[] imageByte;
-    try {
-      imageByte = Base64.getDecoder().decode(imageString);
-      final ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-      image = ImageIO.read(bis);
-      bis.close();
-    } catch (final Exception e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    return image;
-  }
-
-  public static String encodeToString(final BufferedImage image) {
-    return encodeToString(image, ImageFormat.PNG);
-  }
-
-  public static String encodeToString(final BufferedImage image, ImageFormat imageFormat) {
-    if (image == null) {
-      return null;
-    }
-
-    String imageString = null;
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-    try {
-      ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
-      final byte[] imageBytes = bos.toByteArray();
-
-      imageString = Base64.getEncoder().encodeToString(imageBytes);
-
-      bos.close();
-    } catch (final IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    return imageString;
-  }
-
   /**
    * All pixels that are not transparent are replaced by a pixel of the
    * specified flashColor.
@@ -332,39 +283,24 @@ public class ImageProcessing {
   }
 
   public static BufferedImage flipSpritesHorizontally(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
-    if (flippedSprite == null) {
-      return null;
-    }
-
-    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
-    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.horizontalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
-    }
-    g.dispose();
-
-    return flippedSprite;
+    return flipSprites(sprite, Imaging::horizontalFlip);
   }
 
   public static BufferedImage flipSpritesVertically(final Spritesheet sprite) {
-    final BufferedImage flippedSprite = ImageProcessing.getCompatibleImage(sprite.getSpriteWidth() * sprite.getTotalNumberOfSprites(), sprite.getSpriteHeight());
-    if (flippedSprite == null) {
-      return null;
-    }
-
-    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
-    for (int i = 0; i < sprite.getTotalNumberOfSprites(); i++) {
-      g.drawImage(ImageProcessing.verticalFlip(sprite.getSprite(i)), i * sprite.getSpriteWidth(), 0, null);
-    }
-    g.dispose();
-
-    return flippedSprite;
+    return flipSprites(sprite, Imaging::verticalFlip);
   }
 
-  public static BufferedImage getCopy(BufferedImage bi) {
-    ColorModel cm = bi.getColorModel();
+  /**
+   * Creates a new <code>BufferedImage</code> instance from the specified image.
+   * 
+   * @param image
+   *          The image to be copied.
+   * @return A copy of the specified image.
+   */
+  public static BufferedImage copy(BufferedImage image) {
+    ColorModel cm = image.getColorModel();
     boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-    WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
+    WritableRaster raster = image.copyData(image.getRaster().createCompatibleWritableRaster());
     return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
   }
 
@@ -382,6 +318,19 @@ public class ImageProcessing {
     return graphicsConfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
   }
 
+  /**
+   * Gets a two dimensional grid that contains parts of the specified image.
+   * Splits up the specified image into a grid with the defined number of rows and columns.
+   * 
+   * @param image
+   *          The base image that will be split up.
+   * @param rows
+   *          The number of rows.
+   * @param columns
+   *          The number or columns.
+   *
+   * @return A two dimensional array with all the sub-images.
+   */
   public static BufferedImage[][] getSubImages(final BufferedImage image, final int rows, final int columns) {
     final BufferedImage[][] smallImages = new BufferedImage[rows][columns];
     final int smallWidth = image.getWidth() / columns;
@@ -399,11 +348,11 @@ public class ImageProcessing {
   }
 
   /**
-   * Horizontalflip.
+   * Flips the specified image horizontally.
    *
    * @param img
-   *          the img
-   * @return the buffered image
+   *          The image to be flipped.
+   * @return The flipped image.
    */
   public static BufferedImage horizontalFlip(final BufferedImage img) {
     final int w = img.getWidth();
@@ -420,47 +369,24 @@ public class ImageProcessing {
   }
 
   /**
-   * Needs border.
+   * Flips the specified image vertically.
    *
-   * @param image
-   *          the image
-   * @param x
-   *          the x
-   * @param y
-   *          the y
-   * @return true, if successful
+   * @param img
+   *          The image to be flipped.
+   * @return The flipped image.
    */
-  public static boolean needsBorder(final BufferedImage image, final int x, final int y) {
-    if (y < 0 || y >= image.getHeight()) {
-      return false;
+  public static BufferedImage verticalFlip(final BufferedImage img) {
+    final int w = img.getWidth();
+    final int h = img.getHeight();
+    if (w == 0 || h == 0) {
+      return img;
     }
 
-    if (x < 0 || x >= image.getWidth()) {
-      return false;
-    }
-
-    // if the current pixel is not transparent, we cannot stroke it
-    if (image.getRGB(x, y) >> 24 != 0x00) {
-      return false;
-    }
-
-    // check pixel above the current one
-    if (y > 0 && image.getRGB(x, y - 1) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check below pixel
-    if (y < image.getHeight() - 1 && image.getRGB(x, y + 1) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check left pixel
-    if (x > 0 && image.getRGB(x - 1, y) >> 24 != 0x00) {
-      return true;
-    }
-
-    // check right pixel
-    return x < image.getWidth() - 1 && image.getRGB(x + 1, y) >> 24 != 0x00;
+    final BufferedImage dimg = getCompatibleImage(w, h);
+    final Graphics2D g = dimg.createGraphics();
+    g.drawImage(img, 0, 0 + h, w, -h, null);
+    g.dispose();
+    return dimg;
   }
 
   public static BufferedImage rotate(final BufferedImage bufferedImage, final Rotation rotation) {
@@ -472,7 +398,7 @@ public class ImageProcessing {
     double cos = Math.abs(Math.cos(radians));
 
     int w = bufferedImage.getWidth();
-    int h = bufferedImage.getHeight(null);
+    int h = bufferedImage.getHeight();
 
     int neww = (int) Math.floor(w * cos + h * sin);
     int newh = (int) Math.floor(h * cos + w * sin);
@@ -492,21 +418,21 @@ public class ImageProcessing {
     return bimg;
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int max) {
+  public static BufferedImage scale(final BufferedImage image, final int max) {
     Dimension2D newDimension = GeometricUtilities.scaleWithRatio(image.getWidth(), image.getHeight(), max);
-    return scaleImage(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
+    return scale(image, (int) newDimension.getWidth(), (int) newDimension.getHeight());
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final float factor) {
-    return scaleImage(image, factor, false);
+  public static BufferedImage scale(final BufferedImage image, final double factor) {
+    return scale(image, factor, false);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final float factor, boolean keepRatio) {
+  public static BufferedImage scale(final BufferedImage image, final double factor, boolean keepRatio) {
 
     final double width = image.getWidth();
     final double height = image.getHeight();
 
-    return scaleImage(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
+    return scale(image, (int) Math.max(1, Math.round(width * factor)), (int) Math.max(1, Math.round(height * factor)), keepRatio);
   }
 
   /**
@@ -522,15 +448,15 @@ public class ImageProcessing {
    *          the height
    * @return the buffered image
    */
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height) {
-    return scaleImage(image, width, height, false);
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height) {
+    return scale(image, width, height, false);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
-    return scaleImage(image, width, height, keepRatio, true);
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio) {
+    return scale(image, width, height, keepRatio, true);
   }
 
-  public static BufferedImage scaleImage(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
+  public static BufferedImage scale(final BufferedImage image, final int width, final int height, final boolean keepRatio, final boolean fill) {
     if (width == 0 || height == 0 || image == null) {
       return null;
     }
@@ -575,19 +501,6 @@ public class ImageProcessing {
     return newImg;
   }
 
-  public static BufferedImage scaleImageWidth(final BufferedImage image, final int newWidth) {
-    final double width = image.getWidth();
-    final double height = image.getHeight();
-    if (width == 0 || height == 0) {
-      return null;
-    }
-
-    final double ratio = newWidth / width;
-    final double newHeight = height * ratio;
-
-    return scaleImage(image, newWidth, (int) newHeight);
-  }
-
   public static BufferedImage setOpacity(final Image img, final float opacity) {
     final BufferedImage bimage = getCompatibleImage(img.getWidth(null), img.getHeight(null));
     if (bimage == null) {
@@ -624,40 +537,22 @@ public class ImageProcessing {
     return bimage;
   }
 
-  public static BufferedImage verticalFlip(final BufferedImage img) {
-    final int w = img.getWidth();
-    final int h = img.getHeight();
-    if (w == 0 || h == 0) {
-      return img;
+  private static BufferedImage flipSprites(final Spritesheet sprite, Function<BufferedImage, BufferedImage> flipFunction) {
+    final BufferedImage flippedSprite = Imaging.getCompatibleImage(sprite.getSpriteWidth() * sprite.getColumns(), sprite.getSpriteHeight() * sprite.getRows());
+    if (flippedSprite == null) {
+      return null;
     }
 
-    final BufferedImage dimg = getCompatibleImage(w, h);
-    final Graphics2D g = dimg.createGraphics();
-    g.drawImage(img, 0, 0 + h, w, -h, null);
-    g.dispose();
-    return dimg;
-  }
-
-  public static BufferedImage zoom(final BufferedImage image, final float zoomLevel) {
-    final int newImageWidth = (int) (image.getWidth() * zoomLevel);
-    final int newImageHeight = (int) (image.getHeight() * zoomLevel);
-    final BufferedImage resizedImage = getCompatibleImage(newImageWidth, newImageHeight);
-    if (resizedImage == null) {
-      return image;
+    final Graphics2D g = (Graphics2D) flippedSprite.getGraphics();
+    int index = 0;
+    for (int column = 0; column < sprite.getColumns(); column++) {
+      for (int row = 0; row < sprite.getRows(); row++) {
+        g.drawImage(flipFunction.apply(sprite.getSprite(index)), column * sprite.getSpriteWidth(), row * sprite.getSpriteHeight(), null);
+        index++;
+      }
     }
 
-    final Graphics2D g = resizedImage.createGraphics();
-    g.drawImage(image, 0, 0, newImageWidth, newImageHeight, null);
     g.dispose();
-
-    return resizedImage;
-  }
-
-  public static BufferedImage convertToGrayScale(BufferedImage image) {
-    BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
-    Graphics2D g = result.createGraphics();
-    g.drawImage(image, 0, 0, null);
-    g.dispose();
-    return result;
+    return flippedSprite;
   }
 }

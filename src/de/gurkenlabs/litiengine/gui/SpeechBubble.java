@@ -28,7 +28,7 @@ import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.sound.Sound;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
   public static final SpeechBubbleAppearance DEFAULT_APPEARANCE = new SpeechBubbleAppearance(Color.WHITE, new Color(16, 20, 19, 150), new Color(16, 20, 19), 4.0f);
@@ -200,7 +200,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
       this.displayedText += this.currentTextQueue.poll();
       this.lastCharPoll = Game.loop().getTicks();
       if (this.typeSound != null) {
-        Game.audio().playSound(this.getEntity(), this.typeSound);
+        Game.audio().playSound(this.typeSound, this.getEntity());
       }
     }
 
@@ -216,7 +216,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
   }
 
   private void createBubbleImage() {
-    final BufferedImage img = ImageProcessing.getCompatibleImage(500, 500);
+    final BufferedImage img = Imaging.getCompatibleImage(500, 500);
     final Graphics2D g = img.createGraphics();
     g.setFont(this.getFont());
     final float stringWidth = g.getFontMetrics().stringWidth(this.currentText);
@@ -258,6 +258,6 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     ShapeRenderer.renderOutline(g, ar);
     g.dispose();
 
-    this.bubble = ImageProcessing.crop(img, ImageProcessing.CROP_ALIGN_LEFT, ImageProcessing.CROP_VALIGN_TOP, width + 1, height + 1);
+    this.bubble = Imaging.crop(img, Imaging.CROP_ALIGN_LEFT, Imaging.CROP_VALIGN_TOP, width + 1, height + 1);
   }
 }

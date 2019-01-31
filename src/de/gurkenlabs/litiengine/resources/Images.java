@@ -7,7 +7,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import de.gurkenlabs.litiengine.entities.Rotation;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public final class Images extends ResourcesContainer<BufferedImage> {
   Images() {
@@ -28,7 +28,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     for (TextureAtlas.Sprite sprite : textureAtlas.getSprites()) {
       BufferedImage image = atlasImage.getSubimage(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
       if (sprite.isRotated()) {
-        image = ImageProcessing.rotate(image, Rotation.ROTATE_270);
+        image = Imaging.rotate(image, Rotation.ROTATE_270);
       }
 
       Resources.images().add(sprite.getName(), image);
@@ -62,7 +62,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
       return null;
     }
 
-    final BufferedImage compatibleImg = ImageProcessing.getCompatibleImage(img.getWidth(), img.getHeight());
+    final BufferedImage compatibleImg = Imaging.getCompatibleImage(img.getWidth(), img.getHeight());
     compatibleImg.createGraphics().drawImage(img, 0, 0, null);
 
     return compatibleImg;

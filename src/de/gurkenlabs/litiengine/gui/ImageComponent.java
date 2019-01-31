@@ -14,7 +14,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class ImageComponent extends GuiComponent {
   public static final int BACKGROUND_INDEX = 0;
@@ -86,7 +86,7 @@ public class ImageComponent extends GuiComponent {
       spriteIndex = BACKGROUND_HOVER_INDEX;
     }
 
-    BufferedImage img = ImageProcessing.scaleImage(this.getSpritesheet().getSprite(spriteIndex), (int) this.getWidth(), (int) this.getHeight());
+    BufferedImage img = Imaging.scale(this.getSpritesheet().getSprite(spriteIndex), (int) this.getWidth(), (int) this.getHeight());
     if (img != null) {
       Resources.images().add(cacheKey, img);
     }
@@ -113,12 +113,12 @@ public class ImageComponent extends GuiComponent {
       return opt.get();
     }
 
-    BufferedImage bufferedImage = ImageProcessing.toBufferedImage(this.image);
+    BufferedImage bufferedImage = Imaging.toBufferedImage(this.image);
     if (bufferedImage == null) {
       return this.image;
     }
 
-    BufferedImage img = ImageProcessing.scaleImage(bufferedImage, imageWidth, imageHeight);
+    BufferedImage img = Imaging.scale(bufferedImage, imageWidth, imageHeight);
     Resources.images().add(cacheKey, img);
     return img;
   }

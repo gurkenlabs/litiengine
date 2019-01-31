@@ -123,32 +123,32 @@ public final class ReflectionUtilities {
   public static <T> void setFieldValue(final Class<T> cls, final Object instance, final String fieldName, final String value) {
     // if a setter is present, instance method will use it, otherwise it will
     // directly try to set the field.
-    final Field field = ReflectionUtilities.getField(cls, fieldName);
+    final Field field = getField(cls, fieldName);
     if (field == null) {
       return;
     }
 
     try {
       if (field.getType().equals(boolean.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Boolean.parseBoolean(value));
+        setValue(cls, instance, fieldName, Boolean.parseBoolean(value));
       } else if (field.getType().equals(int.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Integer.parseInt(value));
+        setValue(cls, instance, fieldName, Integer.parseInt(value));
       } else if (field.getType().equals(float.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Float.parseFloat(value));
+        setValue(cls, instance, fieldName, Float.parseFloat(value));
       } else if (field.getType().equals(double.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Double.parseDouble(value));
+        setValue(cls, instance, fieldName, Double.parseDouble(value));
       } else if (field.getType().equals(short.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Short.parseShort(value));
+        setValue(cls, instance, fieldName, Short.parseShort(value));
       } else if (field.getType().equals(byte.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Byte.parseByte(value));
+        setValue(cls, instance, fieldName, Byte.parseByte(value));
       } else if (field.getType().equals(long.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, Long.parseLong(value));
+        setValue(cls, instance, fieldName, Long.parseLong(value));
       } else if (field.getType().equals(String.class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, value);
+        setValue(cls, instance, fieldName, value);
       } else if (field.getType().equals(String[].class)) {
-        ReflectionUtilities.setValue(cls, instance, fieldName, value.split(","));
+        setValue(cls, instance, fieldName, value.split(","));
       } else if (field.getType() instanceof Class && field.getType().isEnum()) {
-        ReflectionUtilities.setEnumPropertyValue(cls, instance, field, fieldName, value);
+        setEnumPropertyValue(cls, instance, field, fieldName, value);
       }
     } catch (final NumberFormatException e) {
       log.log(Level.SEVERE, e.getMessage(), e);

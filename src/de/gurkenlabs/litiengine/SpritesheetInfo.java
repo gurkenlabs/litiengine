@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.Codec;
 
 @XmlRootElement(name = "sprite")
 public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo> {
@@ -39,13 +39,13 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
 
   public SpritesheetInfo(final Spritesheet sprite) {
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
-    this.setImage(ImageProcessing.encodeToString(sprite.getImage(), sprite.getImageFormat()));
+    this.setImage(Codec.encode(sprite.getImage(), sprite.getImageFormat()));
     this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
   public SpritesheetInfo(final BufferedImage image, String name, final int width, final int height) {
     this(width, height, name);
-    this.setImage(ImageProcessing.encodeToString(image));
+    this.setImage(Codec.encode(image));
   }
 
   private SpritesheetInfo(int width, int height, String name) {

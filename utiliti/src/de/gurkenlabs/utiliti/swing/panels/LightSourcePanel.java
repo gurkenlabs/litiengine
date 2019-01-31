@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.components.ColorControl;
 
 @SuppressWarnings("serial")
@@ -25,7 +26,7 @@ public class LightSourcePanel extends PropertyPanel {
   private final ColorControl colorControl;
 
   public LightSourcePanel() {
-    super("panel_lightSource");
+    super("panel_lightSource", Icons.LIGHT);
 
     this.colorControl = new ColorControl();
 

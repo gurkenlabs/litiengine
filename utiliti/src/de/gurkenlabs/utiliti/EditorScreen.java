@@ -146,7 +146,7 @@ public class EditorScreen extends Screen {
 
     // render mouse/zoom and fps
 
-    g.setFont(g.getFont().deriveFont(11f));
+    g.setFont(Program.TEXT_FONT);
     g.setColor(Color.WHITE);
     Point tile = Input.mouse().getTile();
 

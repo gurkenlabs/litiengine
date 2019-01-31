@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class HexagonalMapRenderer extends MapRenderer {
 
@@ -39,7 +39,7 @@ public class HexagonalMapRenderer extends MapRenderer {
       return opt.get();
     }
 
-    final BufferedImage bufferedImage = ImageProcessing.getCompatibleImage(map.getSizeInPixels().width, map.getSizeInPixels().height);
+    final BufferedImage bufferedImage = Imaging.getCompatibleImage(map.getSizeInPixels().width, map.getSizeInPixels().height);
 
     // we need a graphics 2D object to work with transparency
     final Graphics2D imageGraphics = bufferedImage.createGraphics();

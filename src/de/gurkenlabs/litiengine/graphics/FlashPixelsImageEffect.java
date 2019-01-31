@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.graphics;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class FlashPixelsImageEffect extends ImageEffect {
   private final Color color;
@@ -15,6 +15,6 @@ public class FlashPixelsImageEffect extends ImageEffect {
 
   @Override
   public BufferedImage apply(final BufferedImage image) {
-    return ImageProcessing.flashVisiblePixels(image, this.color);
+    return Imaging.flashVisiblePixels(image, this.color);
   }
 }

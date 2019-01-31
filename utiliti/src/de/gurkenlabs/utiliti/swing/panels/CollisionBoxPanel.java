@@ -7,6 +7,7 @@ import javax.swing.JCheckBox;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
@@ -14,7 +15,7 @@ public class CollisionBoxPanel extends PropertyPanel {
   private JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
-    super("panel_collisionBox");
+    super("panel_collisionBox", Icons.COLLISIONBOX);
 
     this.chckbxIsObstacle = new JCheckBox(Resources.strings().get("panel_isObstacle"));
     this.chckbxIsObstructingLights = new JCheckBox(Resources.strings().get("panel_isObstructingLights"));

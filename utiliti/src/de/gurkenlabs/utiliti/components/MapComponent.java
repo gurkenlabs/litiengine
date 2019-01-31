@@ -1777,8 +1777,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private void renderName(Graphics2D g, Color nameColor, IMapObject mapObject) {
     final int MAX_TAGS_RENDER_CHARS = 30;
     g.setColor(nameColor.getAlpha() > 100 ? nameColor : Color.WHITE);
-    float textSize = 2.5f * zooms[this.currentZoomIndex];
-    g.setFont(Program.TEXT_FONT.deriveFont(textSize).deriveFont(Font.PLAIN));
 
     String objectName = mapObject.getName();
     if (objectName != null && !objectName.isEmpty()) {
@@ -1894,7 +1892,6 @@ public class MapComponent extends EditorComponent implements IUpdateable {
 
     if (focusedMapObject != null) {
       Point2D loc = Game.world().camera().getViewportLocation(new Point2D.Double(focusedMapObject.getX() + focusedMapObject.getWidth() / 2, focusedMapObject.getY()));
-      g.setFont(Program.TEXT_FONT.deriveFont(Font.BOLD, 15f));
       g.setColor(Color.WHITE);
       String id = "#" + focusedMapObject.getId();
       TextRenderer.render(g, id, loc.getX() * Game.world().camera().getRenderScale() - g.getFontMetrics().stringWidth(id) / 2.0, loc.getY() * Game.world().camera().getRenderScale() - (5 * this.currentTransformRectSize));

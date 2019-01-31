@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
+import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class CollisionPanel extends PropertyPanel {
@@ -25,7 +26,7 @@ public class CollisionPanel extends PropertyPanel {
    * Create the panel.
    */
   public CollisionPanel() {
-    super("panel_collisionEntity");
+    super("panel_collisionEntity", Icons.COLLISIONBOX);
 
     this.chckbxHasCollision = new JCheckBox("collision");
     this.spinnerWidth = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 0.1));

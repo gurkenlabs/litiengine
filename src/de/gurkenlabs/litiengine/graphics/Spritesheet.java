@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheet {
@@ -67,9 +67,9 @@ public final class Spritesheet {
       scaled = opt.get();
     } else {
       if (img != null) {
-        scaled = ImageProcessing.scaleImage(img, dimension, dimension, true);
+        scaled = Imaging.scale(img, dimension, dimension, true);
       } else {
-        scaled = ImageProcessing.getCompatibleImage(dimension, dimension);
+        scaled = Imaging.getCompatibleImage(dimension, dimension);
       }
 
       Resources.images().add(cacheKey, scaled);
@@ -121,7 +121,7 @@ public final class Spritesheet {
     final Point position = this.getLocation(index, margin, spacing);
     try {
       final BufferedImage sprite = this.getImage().getSubimage(position.x, position.y, this.spriteWidth, this.spriteHeight);
-      if (ImageProcessing.isEmpty(sprite)) {
+      if (Imaging.isEmpty(sprite)) {
         emptySprites.add(index);
         return null;
       }

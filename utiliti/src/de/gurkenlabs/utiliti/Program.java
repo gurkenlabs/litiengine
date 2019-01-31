@@ -307,15 +307,13 @@ public class Program {
       }
     });
 
-    if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
+    window.setLocationRelativeTo(null);
+    if (userPreferences.getFrameState() != JFrame.ICONIFIED && userPreferences.getFrameState() != JFrame.NORMAL) {
+      window.setExtendedState(userPreferences.getFrameState());
+    } else if (userPreferences.getWidth() != 0 && userPreferences.getHeight() != 0) {
       window.setSize(userPreferences.getWidth(), userPreferences.getHeight());
     }
 
-    if (userPreferences.getFrameState() != JFrame.ICONIFIED && userPreferences.getFrameState() != JFrame.NORMAL) {
-      window.setExtendedState(userPreferences.getFrameState());
-    }
-
-    window.setLocationRelativeTo(null);
     return window;
   }
 
@@ -905,7 +903,6 @@ public class Program {
     JSpinner spinnerAmbientAlpha = new JSpinner();
     spinnerAmbientAlpha.setToolTipText("Adjust ambient alpha.");
     spinnerAmbientAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-    spinnerAmbientAlpha.setFont(Program.TEXT_FONT);
     spinnerAmbientAlpha.setMaximumSize(new Dimension(50, 50));
     spinnerAmbientAlpha.setEnabled(true);
     spinnerAmbientAlpha.addChangeListener(e -> {

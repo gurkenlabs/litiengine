@@ -25,7 +25,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Icons;
 
 public class IconTreeListRenderer implements TreeCellRenderer {
@@ -92,7 +92,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         return null;
       }
 
-      return ImageProcessing.scaleImage(sprite.getSprite(0), 16, 16, true);
+      return Imaging.scale(sprite.getSprite(0), 16, 16, true);
     });
 
     if (propImag == null) {
@@ -112,7 +112,7 @@ public class IconTreeListRenderer implements TreeCellRenderer {
         return null;
       }
 
-      return ImageProcessing.scaleImage(sprites.iterator().next().getSprite(0), 16, 16, true);
+      return Imaging.scale(sprites.iterator().next().getSprite(0), 16, 16, true);
     });
 
     return new ImageIcon(propImag);

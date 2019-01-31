@@ -10,7 +10,7 @@ import de.gurkenlabs.litiengine.graphics.CreatureAnimationState;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 /**
  * This {@link AnimationController} implementation provides animation rules that
@@ -57,7 +57,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
   }
 
   public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
-    final BufferedImage leftIdleSprite = ImageProcessing.flipSpritesHorizontally(spriteToFlip);
+    final BufferedImage leftIdleSprite = Imaging.flipSpritesHorizontally(spriteToFlip);
     Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
   }

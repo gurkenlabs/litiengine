@@ -16,6 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.utiliti.Icons;
 import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 
 @SuppressWarnings("serial")
@@ -35,7 +36,7 @@ public class PropPanel extends PropertyPanel {
    * Create the panel.
    */
   public PropPanel() {
-    super("panel_prop");
+    super("panel_prop", Icons.PROP);
     Resources.images().addClearedListener(() -> this.propsLoaded = false);
 
     this.comboBoxSpriteSheets = new JComboBox<>();

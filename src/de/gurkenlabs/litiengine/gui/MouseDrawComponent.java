@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 
 public class MouseDrawComponent extends ImageComponent {
   private double brushSize = 2;
@@ -19,7 +19,7 @@ public class MouseDrawComponent extends ImageComponent {
 
   public MouseDrawComponent(double x, double y, double width, double height, Spritesheet spritesheet, String text, Image image) {
     super(x, y, width, height, spritesheet, text, image);
-    this.drawingSpace = ImageProcessing.getCompatibleImage((int) width, (int) height);
+    this.drawingSpace = Imaging.getCompatibleImage((int) width, (int) height);
   }
 
   @Override

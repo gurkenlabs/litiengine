@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileOffset;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -90,7 +90,7 @@ public abstract class ColorLayer implements IRenderable {
     if (tileSection == null) {
       return;
     }
-    final BufferedImage img = ImageProcessing.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
+    final BufferedImage img = Imaging.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
     final Graphics2D g = img.createGraphics();
 
     this.renderSection(g, tileSection);
@@ -117,7 +117,7 @@ public abstract class ColorLayer implements IRenderable {
         int subX = MathUtilities.clamp((int) (tile.getBounds().getX() - startTileShape.getBounds().getX()), 0, img.getWidth() - map.getTileWidth());
         int subY = MathUtilities.clamp((int) (tile.getBounds().getY() - startTileShape.getBounds().getY()), 0, img.getHeight() - map.getTileHeight());
         final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileWidth(), map.getTileHeight());
-        final BufferedImage clippedImage = ImageProcessing.getCompatibleImage(smallImage.getWidth(), smallImage.getHeight());
+        final BufferedImage clippedImage = Imaging.getCompatibleImage(smallImage.getWidth(), smallImage.getHeight());
         Graphics2D g = clippedImage.createGraphics();
         g.clip(translatedTile);
         g.drawImage(smallImage, 0, 0, null);

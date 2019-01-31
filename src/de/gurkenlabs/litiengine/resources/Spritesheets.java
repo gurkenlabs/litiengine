@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.util.ImageProcessing;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 public final class Spritesheets extends ResourcesContainer<Spritesheet> {
@@ -82,7 +82,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
       log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
       return null;
     } else {
-      sprite = load(ImageProcessing.decodeToImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
+      sprite = load(Codec.decodeImage(info.getImage()), info.getName(), info.getWidth(), info.getHeight());
     }
 
     if (info.getKeyframes() != null && info.getKeyframes().length > 0) {
