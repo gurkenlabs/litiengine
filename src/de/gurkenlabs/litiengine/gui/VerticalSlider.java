@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
-import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.input.Input;
 
 public class VerticalSlider extends Slider {
@@ -14,8 +13,8 @@ public class VerticalSlider extends Slider {
   private double minSliderY;
   private double maxSliderY;
 
-  public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite) {
-    super(x, y, width, height, minValue, maxValue, stepSize, buttonSprite, sliderSprite);
+  public VerticalSlider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize) {
+    super(x, y, width, height, minValue, maxValue, stepSize);
   }
 
   @Override
@@ -26,16 +25,20 @@ public class VerticalSlider extends Slider {
   @Override
   protected void initializeComponents() {
     super.initializeComponents();
-    System.out.println("X: " + this.getX() + "  Y: " + this.getY() + "width" + this.getWidth());
     this.setButton1(new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getWidth(), ARROW_UP.getText()));
     this.getButton1().setFont(ARROW_UP.getFont());
+    this.getButton1().setSpriteSheet(this.getButtonSpritesheet());
     this.setButton2(new ImageComponent(this.getX(), this.getY() + this.getHeight() - this.getWidth(), this.getWidth(), this.getWidth(), ARROW_DOWN.getText()));
     this.getButton2().setFont(ARROW_DOWN.getFont());
+    this.getButton2().setSpriteSheet(this.getButtonSpritesheet());
+
 
     final double sliderHeight = (this.getHeight() - this.getWidth() * 2) * 1 / 6.0;
     this.minSliderY = this.getY() + this.getWidth();
     this.maxSliderY = this.getY() + this.getHeight() - (this.getWidth() + sliderHeight);
-    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSprite(), "", null));
+    this.setSliderComponent(new ImageComponent(this.getRelativeSliderPosition().getX(), this.getRelativeSliderPosition().getY(), this.getWidth(), sliderHeight, this.getSliderSpritesheet(), "", null));
+    this.getSliderComponent().setSpriteSheet(this.getSliderSpritesheet());
+
   }
 
   @Override

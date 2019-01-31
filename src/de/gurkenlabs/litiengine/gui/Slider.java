@@ -12,8 +12,9 @@ public abstract class Slider extends GuiComponent {
   private ImageComponent button1;
   private ImageComponent button2;
   private ImageComponent sliderComponent;
-  private final Spritesheet buttonSprite;
-  private final Spritesheet sliderSprite;
+
+  private Spritesheet buttonSprite;
+  private Spritesheet sliderSprite;
   private final List<Consumer<Float>> changeConsumer;
   private float currentValue;
   private boolean isDragging;
@@ -21,14 +22,12 @@ public abstract class Slider extends GuiComponent {
   private final float maxValue;
   private float stepSize;
 
-  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize, final Spritesheet buttonSprite, final Spritesheet sliderSprite) {
+  public Slider(final double x, final double y, final double width, final double height, final float minValue, final float maxValue, final float stepSize) {
     super(x, y, width, height);
     this.changeConsumer = new CopyOnWriteArrayList<>();
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.stepSize = stepSize;
-    this.buttonSprite = buttonSprite;
-    this.sliderSprite = sliderSprite;
     this.onChange(e -> this.sliderComponent.setLocation(this.getRelativeSliderPosition()));
   }
 
@@ -40,7 +39,7 @@ public abstract class Slider extends GuiComponent {
     return this.button2;
   }
 
-  public Spritesheet getButtonSprite() {
+  public Spritesheet getButtonSpritesheet() {
     return this.buttonSprite;
   }
 
@@ -66,7 +65,7 @@ public abstract class Slider extends GuiComponent {
     return this.sliderComponent;
   }
 
-  public Spritesheet getSliderSprite() {
+  public Spritesheet getSliderSpritesheet() {
     return this.sliderSprite;
   }
 
@@ -82,9 +81,12 @@ public abstract class Slider extends GuiComponent {
     this.getChangeConsumer().add(c);
   }
 
-  @Override
-  public void prepare() {
-    super.prepare();
+  public void setButtonSpritesheet(Spritesheet buttonSprite) {
+    this.buttonSprite = buttonSprite;
+  }
+
+  public void setSliderSpritesheet(Spritesheet sliderSprite) {
+    this.sliderSprite = sliderSprite;
   }
 
   public void setCurrentValue(final float newValue) {

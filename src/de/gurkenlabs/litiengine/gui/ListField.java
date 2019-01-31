@@ -189,7 +189,7 @@ public class ListField extends GuiComponent {
   private void initContentList() {
     final int sliderMax = this.getContentArray().length - this.getNumberOfShownElements();
     if (sliderMax > 0) {
-      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, sliderMax, 1, this.buttonSprite, this.buttonSprite);
+      this.slider = new VerticalSlider(this.getX() + this.getWidth(), this.getY(), this.getHeight() / this.getNumberOfShownElements(), this.getHeight(), 0, sliderMax, 1);
       this.getSlider().setCurrentValue(this.getLowerBound());
       this.getComponents().add(this.getSlider());
     }
@@ -204,7 +204,7 @@ public class ListField extends GuiComponent {
       } else {
         entryComponent = new ImageComponent(this.getX(), this.getY() + this.getHeight() / this.getNumberOfShownElements() * i, this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.entrySprite, this.contents[i].toString(), null);
       }
-      entryComponent.setTextAlignment(Align.LEFT);
+      entryComponent.setTextAlign(Align.LEFT);
       this.getListEntries().add(entryComponent);
     }
     this.getComponents().addAll(this.getListEntries());
