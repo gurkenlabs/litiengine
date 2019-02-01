@@ -48,7 +48,7 @@ public class TextFieldComponent extends ImageComponent {
       }
     });
 
-    this.setTextAlignment(Align.LEFT);
+    this.setTextAlign(Align.LEFT);
   }
 
   public String getFormat() {

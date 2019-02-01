@@ -39,9 +39,14 @@ public class ImageComponent extends GuiComponent {
     super(x, y, width, height);
   }
 
+  public ImageComponent(final double x, final double y, final double width, final double height, final String text) {
+    super(x, y, width, height);
+    this.setText(text);
+  }
+
   public ImageComponent(final double x, final double y, final double width, final double height, final Image image) {
     super(x, y, width, height);
-    this.image = image;
+    this.setImage(image);
   }
 
   public ImageComponent(final double x, final double y, final double width, final double height, final Spritesheet spritesheet, final String text, final Image image) {

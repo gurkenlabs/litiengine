@@ -98,7 +98,7 @@ public class DropdownListField extends GuiComponent {
   public void prepare() {
     this.contentList = new ListField(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.getContentArray(), this.numberOfShownElements, this.entrySprite, this.buttonSprite);
     this.chosenElementComponent = new ImageComponent(this.getX(), this.getY(), this.getWidth(), this.getHeight() / this.getNumberOfShownElements(), this.getEntrySprite(), "", null);
-    this.chosenElementComponent.setTextAlignment(Align.LEFT);
+    this.chosenElementComponent.setTextAlign(Align.LEFT);
     final double buttonHeight = this.getHeight() / this.getNumberOfShownElements();
     double buttonWidth = buttonHeight;
     this.dropDownButton = new ImageComponent(this.getX() - buttonWidth, this.getY(), buttonWidth, buttonHeight, this.getButtonSprite(), ARROW_DOWN.getText(), null);
