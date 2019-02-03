@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class EnvironmentEventTests {
-  private IEnvironment testEnvironment;
+  private Environment testEnvironment;
   
   @BeforeAll
   public static void initGame() {

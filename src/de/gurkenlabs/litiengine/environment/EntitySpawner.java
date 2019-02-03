@@ -13,7 +13,7 @@ import de.gurkenlabs.litiengine.entities.Spawnpoint;
 public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner<T> {
   private static final Logger log = Logger.getLogger(EntitySpawner.class.getName());
   private int amount;
-  private IEnvironment environment;
+  private Environment environment;
   private int interval;
   private long lastSpawnWave;
   private int spawnDelay;
@@ -34,7 +34,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
    * @param amount
    *          the amount
    */
-  public EntitySpawner(final IEnvironment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
+  public EntitySpawner(final Environment environment, final IGameLoop loop, final List<Spawnpoint> spawnpoints, final int interval, final int amount) {
     this.environment = environment;
     Game.world().addUnloadedListener(e -> {
       if (e == this.environment) {

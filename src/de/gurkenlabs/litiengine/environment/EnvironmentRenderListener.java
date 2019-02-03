@@ -6,13 +6,13 @@ import java.util.EventListener;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 /**
- * This listener provides call backs for different points during rendering an <code>IEnvironment</code>.
+ * This listener provides call backs for different points during rendering an <code>Environment</code>.
  * 
- * @see IEnvironment#render(Graphics2D)
+ * @see Environment#render(Graphics2D)
  */
 public interface EnvironmentRenderListener extends EventListener {
   /**
-   * This method is called after the <code>IEnvironment</code> rendered everything of the specified <code>RenderType</code>.
+   * This method is called after the <code>Environment</code> rendered everything of the specified <code>RenderType</code>.
    * 
    * @param g
    *          The graphics object that is being rendered to.

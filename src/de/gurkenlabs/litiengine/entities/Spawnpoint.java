@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 
@@ -69,7 +69,7 @@ public class Spawnpoint extends Entity {
     entity.setLocation(this.getLocation());
     entity.setAngle(Direction.toAngle(this.getDirection()));
 
-    IEnvironment env = this.getEnvironment();
+    Environment env = this.getEnvironment();
     if (env == null) {
       env = Game.world().environment();
     }

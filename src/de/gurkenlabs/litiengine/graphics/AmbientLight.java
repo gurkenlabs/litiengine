@@ -16,7 +16,7 @@ import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.geom.Vector2D;
@@ -24,7 +24,7 @@ import de.gurkenlabs.litiengine.util.geom.Vector2D;
 public class AmbientLight extends ColorLayer {
   public static final Color DEFAULT_COLOR = new Color(0, 0, 0, 0);
 
-  public AmbientLight(final IEnvironment env, final Color ambientColor) {
+  public AmbientLight(final Environment env, final Color ambientColor) {
     super(env, ambientColor);
   }
 

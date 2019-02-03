@@ -2,11 +2,11 @@ package de.gurkenlabs.litiengine.entities;
 
 import java.util.EventListener;
 
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 
 public interface EntityListener extends EventListener {
 
-  public void loaded(IEntity entity, IEnvironment environment);
+  public void loaded(IEntity entity, Environment environment);
 
-  public void removed(IEntity entity, IEnvironment environment);
+  public void removed(IEntity entity, Environment environment);
 }

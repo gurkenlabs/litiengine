@@ -15,7 +15,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
 
   @FunctionalInterface
   private interface ConstructorInvocation {
-    IEntity invoke(IEnvironment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+    IEntity invoke(Environment environment, IMapObject mapObject) throws InvocationTargetException, IllegalAccessException, InstantiationException;
   }
 
   protected CustomMapObjectLoader(String mapObjectType, Class<? extends IEntity> entityType) {
@@ -30,10 +30,10 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
       final Constructor<?> constructor = constructors[i];
       Class<?>[] classes = constructor.getParameterTypes();
       if (classes.length == 2) {
-        if (classes[0] == IEnvironment.class && classes[1] == IMapObject.class) {
+        if (classes[0] == Environment.class && classes[1] == IMapObject.class) {
           inv = (e, o) -> (IEntity) constructor.newInstance(e, o);
           break; // exit early because we've already found the highest priority constructor
-        } else if (classes[0] == IMapObject.class && classes[1] == IEnvironment.class) {
+        } else if (classes[0] == IMapObject.class && classes[1] == Environment.class) {
           inv = (e, o) -> (IEntity) constructor.newInstance(o, e);
           priority = 3;
         }
@@ -42,7 +42,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
           if (classes[0] == IMapObject.class) {
             inv = (e, o) -> (IEntity) constructor.newInstance(o);
             priority = 2;
-          } else if (priority < 2 && classes[0] == IEnvironment.class) {
+          } else if (priority < 2 && classes[0] == Environment.class) {
             inv = (e, o) -> (IEntity) constructor.newInstance(e);
             priority = 1;
           }
@@ -61,7 +61,7 @@ public final class CustomMapObjectLoader extends MapObjectLoader {
   }
 
   @Override
-  public Collection<IEntity> load(IEnvironment environment, IMapObject mapObject) throws MapObjectException {
+  public Collection<IEntity> load(Environment environment, IMapObject mapObject) throws MapObjectException {
     IEntity entity;
     try {
       entity = invoke.invoke(environment, mapObject);

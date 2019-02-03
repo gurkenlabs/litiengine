@@ -1,7 +1,7 @@
 package de.gurkenlabs.litiengine;
 
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.EnvironmentLoadedListener;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 
 public final class GameTime implements EnvironmentLoadedListener {
   private long environmentLoaded;
@@ -18,7 +18,7 @@ public final class GameTime implements EnvironmentLoadedListener {
   }
 
   @Override
-  public void loaded(IEnvironment environment) {
+  public void loaded(Environment environment) {
     environmentLoaded = Game.loop().getTicks();
   }
 }

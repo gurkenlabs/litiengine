@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 
 /**
  * An abstract implementation of a <code>EntityListener</code> that allows to only overwrite
@@ -11,10 +11,10 @@ import de.gurkenlabs.litiengine.environment.IEnvironment;
 public abstract class EntityAdapter implements EntityListener {
 
   @Override
-  public void loaded(IEntity entity, IEnvironment environment) {
+  public void loaded(IEntity entity, Environment environment) {
   }
 
   @Override
-  public void removed(IEntity entity, IEnvironment environment) {
+  public void removed(IEntity entity, Environment environment) {
   }
 }

@@ -23,9 +23,9 @@ public final class GameWorld implements IUpdateable {
   private final Map<String, Collection<EnvironmentUnloadedListener>> environmentUnloadedListeners = new ConcurrentHashMap<>();
   private final Map<String, Collection<IUpdateable>> updatables = new ConcurrentHashMap<>();
 
-  private final Map<String, IEnvironment> environments = new ConcurrentHashMap<>();
+  private final Map<String, Environment> environments = new ConcurrentHashMap<>();
 
-  private IEnvironment environment;
+  private Environment environment;
   private ICamera camera;
   private int gravity;
 
@@ -109,7 +109,7 @@ public final class GameWorld implements IUpdateable {
    * 
    * @see Environment
    */
-  public IEnvironment environment() {
+  public Environment environment() {
     return this.environment;
   }
 
@@ -139,7 +139,7 @@ public final class GameWorld implements IUpdateable {
    * 
    * @return All known environments.
    */
-  public Collection<IEnvironment> getEnvironments() {
+  public Collection<Environment> getEnvironments() {
     return this.environments.values();
   }
 
@@ -151,7 +151,7 @@ public final class GameWorld implements IUpdateable {
    *          The map name by which the environment is identified.
    * @return The environment for the map name or null if no such map can be found.
    */
-  public IEnvironment getEnvironment(String mapName) {
+  public Environment getEnvironment(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       return null;
     }
@@ -168,12 +168,12 @@ public final class GameWorld implements IUpdateable {
    *          The map by which the environment is identified.
    * @return The environment for the map or null if no such map can be found.
    */
-  public IEnvironment getEnvironment(IMap map) {
+  public Environment getEnvironment(IMap map) {
     if (map == null || map.getName() == null || map.getName().isEmpty()) {
       return null;
     }
 
-    IEnvironment env = this.getEnvironments().stream().filter(e -> e.getMap().equals(map)).findFirst().orElse(null);
+    Environment env = this.getEnvironments().stream().filter(e -> e.getMap().equals(map)).findFirst().orElse(null);
     if (env != null) {
       return env;
     }
@@ -208,7 +208,7 @@ public final class GameWorld implements IUpdateable {
    * 
    * @see GameWorld#environment()
    */
-  public void loadEnvironment(final IEnvironment env) {
+  public void loadEnvironment(final Environment env) {
     unloadEnvironment();
     this.environment = env;
     if (env != null) {
@@ -252,10 +252,10 @@ public final class GameWorld implements IUpdateable {
    * @return The loaded environment.
    * 
    * @see GameWorld#environment()
-   * @see GameWorld#loadEnvironment(IEnvironment)
+   * @see GameWorld#loadEnvironment(Environment)
    */
-  public IEnvironment loadEnvironment(String mapName) {
-    IEnvironment env = this.getEnvironment(mapName);
+  public Environment loadEnvironment(String mapName) {
+    Environment env = this.getEnvironment(mapName);
     this.loadEnvironment(env);
     return env;
   }
@@ -273,10 +273,10 @@ public final class GameWorld implements IUpdateable {
    * @return The loaded environment.
    * 
    * @see GameWorld#environment()
-   * @see GameWorld#loadEnvironment(IEnvironment)
+   * @see GameWorld#loadEnvironment(Environment)
    */
-  public IEnvironment loadEnvironment(IMap map) {
-    IEnvironment env = this.getEnvironment(map);
+  public Environment loadEnvironment(IMap map) {
+    Environment env = this.getEnvironment(map);
     this.loadEnvironment(env);
     return env;
   }
@@ -319,7 +319,7 @@ public final class GameWorld implements IUpdateable {
    * @see GameWorld#getEnvironment(String)
    * @see GameWorld#reset(IMap)
    */
-  public IEnvironment reset(String mapName) {
+  public Environment reset(String mapName) {
     if (mapName == null || mapName.isEmpty()) {
       return null;
     }
@@ -342,12 +342,12 @@ public final class GameWorld implements IUpdateable {
    * @see GameWorld#getEnvironment(String)
    * @see GameWorld#reset(IMap)
    */
-  public IEnvironment reset(IMap map) {
+  public Environment reset(IMap map) {
     if (map == null) {
       return null;
     }
 
-    IEnvironment env = this.getEnvironment(map);
+    Environment env = this.getEnvironment(map);
     if (env != null) {
       String mapName = getMapName(env);
       if (mapName != null) {
@@ -423,7 +423,7 @@ public final class GameWorld implements IUpdateable {
     listeners.get(mapIdentifier).remove(listener);
   }
 
-  private static String getMapName(IEnvironment env) {
+  private static String getMapName(Environment env) {
     if (env.getMap() != null && env.getMap().getName() != null) {
       return env.getMap().getName().toLowerCase();
     }
@@ -431,7 +431,7 @@ public final class GameWorld implements IUpdateable {
     return null;
   }
 
-  private void addEnvironment(IEnvironment env) {
+  private void addEnvironment(Environment env) {
     String mapName = getMapName(env);
     if (mapName == null) {
       return;

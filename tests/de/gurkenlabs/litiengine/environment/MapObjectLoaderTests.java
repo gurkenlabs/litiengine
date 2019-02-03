@@ -11,14 +11,19 @@ import static org.mockito.Mockito.when;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.gurkenlabs.litiengine.Align;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.CollisionBox;
@@ -34,16 +39,41 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
 
 public class MapObjectLoaderTests {
+  private Environment testEnvironment;
+  
+  @BeforeAll
+  public static void initGame() {
 
+    // necessary because the environment need access to the game loop and other
+    // stuff
+    Game.init(Game.COMMADLINE_ARG_NOGUI);
+  }
+
+  @AfterAll
+  public static void terminateGame() {
+    Game.terminate();
+  }
+  
+  @BeforeEach
+  public void initEnvironment() {
+    IMap map = mock(IMap.class);
+    when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
+    when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
+    when(map.getOrientation()).thenReturn(MapOrientation.ORTHOGONAL);
+    when(map.getRenderLayers()).thenReturn(new ArrayList<>());
+    
+    this.testEnvironment = new Environment(map);
+  }
+  
   @Test
   public void testPropMapObjectLoader() {
     PropMapObjectLoader loader = new PropMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
     MapObject mapObject = new MapObject();
     mapObject.setType(MapObjectType.PROP.name());
     mapObject.setId(111);
@@ -60,7 +90,7 @@ public class MapObjectLoaderTests {
     mapObject.setValue(MapObjectProperty.COLLISION_VALIGN, Valign.MIDDLE);
     mapObject.setValue(MapObjectProperty.COMBAT_TEAM, 1);
 
-    Collection<IEntity> entities = loader.load(environment, mapObject);
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -88,7 +118,6 @@ public class MapObjectLoaderTests {
   @Test
   public void testColliderMapObjectLoader() {
     CollisionBoxMapObjectLoader loader = new CollisionBoxMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.COLLISIONBOX.name());
     when(mapObject.getId()).thenReturn(111);
@@ -97,7 +126,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getWidth()).thenReturn(200f);
     when(mapObject.getHeight()).thenReturn(200f);
 
-    Collection<IEntity> entities = loader.load(environment, mapObject);
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -118,7 +147,6 @@ public class MapObjectLoaderTests {
   @Test
   public void testTriggerMapObjectLoader() {
     TriggerMapObjectLoader loader = new TriggerMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.TRIGGER.name());
     when(mapObject.getId()).thenReturn(111);
@@ -133,7 +161,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ACTIVATORS)).thenReturn("4,5,6");
     when(mapObject.getStringValue(MapObjectProperty.TRIGGER_ONETIME)).thenReturn("false");
 
-    Collection<IEntity> entities = loader.load(environment, mapObject);
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -158,14 +186,13 @@ public class MapObjectLoaderTests {
   @Test
   public void testEmitterMapObjectLoader() {
     EmitterMapObjectLoader loader = new EmitterMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.EMITTER.name());
     when(mapObject.getId()).thenReturn(111);
     when(mapObject.getName()).thenReturn("testEmitter");
     when(mapObject.getLocation()).thenReturn(new Point(100, 100));
 
-    Collection<IEntity> entities = loader.load(environment, mapObject);
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 
@@ -181,7 +208,6 @@ public class MapObjectLoaderTests {
   @Test
   public void testLightSourceMapObjectLoader() {
     LightSourceMapObjectLoader loader = new LightSourceMapObjectLoader();
-    IEnvironment environment = mock(IEnvironment.class);
     IMapObject mapObject = mock(IMapObject.class);
     when(mapObject.getType()).thenReturn(MapObjectType.LIGHTSOURCE.name());
     when(mapObject.getId()).thenReturn(111);
@@ -193,7 +219,7 @@ public class MapObjectLoaderTests {
     when(mapObject.getBoolValue(MapObjectProperty.LIGHT_ACTIVE, true)).thenReturn(true);
     when(mapObject.getStringValue(MapObjectProperty.LIGHT_SHAPE)).thenReturn(LightSource.ELLIPSE);
 
-    Collection<IEntity> entities = loader.load(environment, mapObject);
+    Collection<IEntity> entities = loader.load(this.testEnvironment, mapObject);
     Optional<IEntity> opt = entities.stream().findFirst();
     assertTrue(opt.isPresent());
 

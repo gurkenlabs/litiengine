@@ -44,7 +44,6 @@ import de.gurkenlabs.litiengine.entities.CollisionEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.LightSource;
 import de.gurkenlabs.litiengine.environment.Environment;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -123,7 +122,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   private final java.util.Map<String, Point2D> cameraFocus;
   private final java.util.Map<String, IMapObject> focusedObjects;
   private final java.util.Map<String, List<IMapObject>> selectedObjects;
-  private final java.util.Map<String, IEnvironment> environments;
+  private final java.util.Map<String, Environment> environments;
   private final java.util.Map<IMapObject, Point2D> dragLocationMapObjects;
 
   private int currentEditMode = EDITMODE_EDIT;

@@ -7,10 +7,10 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
 import de.gurkenlabs.litiengine.entities.StaticShadow;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 
 public class StaticShadowLayer extends ColorLayer {
-  public StaticShadowLayer(IEnvironment env, Color color) {
+  public StaticShadowLayer(Environment env, Color color) {
     super(env, color);
   }
 

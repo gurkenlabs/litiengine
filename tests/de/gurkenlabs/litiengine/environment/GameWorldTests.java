@@ -36,22 +36,22 @@ public class GameWorldTests {
 
     Game.world().addListener("test-map", new EnvironmentAdapter() {
       @Override
-      public void initialized(IEnvironment environment) {
+      public void initialized(Environment environment) {
         mapInitialized.wasCalled = true;
       }
 
       @Override
-      public void loaded(IEnvironment environment) {
+      public void loaded(Environment environment) {
         mapLoaded.wasCalled = true;
       }
 
       @Override
-      public void unloaded(IEnvironment environment) {
+      public void unloaded(Environment environment) {
         mapUnloaded.wasCalled = true;
       }
 
       @Override
-      public void cleared(IEnvironment environment) {
+      public void cleared(Environment environment) {
         mapCleared.wasCalled = true;
       }
     });
@@ -59,19 +59,19 @@ public class GameWorldTests {
     Game.world().addListener("test-mapobject", new EnvironmentAdapter() {
 
       @Override
-      public void initialized(IEnvironment environment) {
+      public void initialized(Environment environment) {
         map2Initialized.wasCalled = true;
       }
 
       @Override
-      public void loaded(IEnvironment environment) {
+      public void loaded(Environment environment) {
         map2Loaded.wasCalled = true;
       }
     });
 
     IMap map = Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
 
-    IEnvironment env = Game.world().loadEnvironment(map);
+    Environment env = Game.world().loadEnvironment(map);
 
     assertTrue(mapLoaded.wasCalled);
     assertTrue(mapInitialized.wasCalled);

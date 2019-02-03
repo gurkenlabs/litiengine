@@ -16,7 +16,7 @@ import de.gurkenlabs.litiengine.annotation.Action;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.Tag;
 import de.gurkenlabs.litiengine.entities.ai.IBehaviorController;
-import de.gurkenlabs.litiengine.environment.IEnvironment;
+import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.environment.tilemap.ICustomPropertyProvider;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
@@ -43,7 +43,7 @@ public abstract class Entity implements IEntity {
 
   private ICustomPropertyProvider properties;
 
-  private IEnvironment environment;
+  private Environment environment;
 
   private float angle;
 
@@ -391,12 +391,12 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public IEnvironment getEnvironment() {
+  public Environment getEnvironment() {
     return this.environment;
   }
 
   @Override
-  public void loaded(IEnvironment environment) {
+  public void loaded(Environment environment) {
     this.environment = environment;
 
     for (EntityListener listener : this.listeners) {
@@ -405,7 +405,7 @@ public abstract class Entity implements IEntity {
   }
 
   @Override
-  public void removed(IEnvironment environment) {
+  public void removed(Environment environment) {
     for (EntityListener listener : this.listeners) {
       listener.removed(this, this.getEnvironment());
     }
