@@ -5,23 +5,23 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
-import de.gurkenlabs.litiengine.pathfinding.IEntityNavigator;
+import de.gurkenlabs.litiengine.pathfinding.EntityNavigator;
 import de.gurkenlabs.litiengine.physics.MovementController;
 
 public class MousePathController extends MovementController<IMobileEntity> {
   /** The player is navigating. */
   private boolean navigating;
 
-  private final IEntityNavigator navigator;
+  private final EntityNavigator navigator;
 
-  public MousePathController(final IEntityNavigator navigator, final IMobileEntity entity) {
+  public MousePathController(final EntityNavigator navigator, final IMobileEntity entity) {
     super(entity);
     this.navigator = navigator;
     Input.mouse().onPressed(this::mousePressed);
     Input.mouse().onReleased(this::mouseReleased);
   }
 
-  public IEntityNavigator getNavigator() {
+  public EntityNavigator getNavigator() {
     return this.navigator;
   }
 

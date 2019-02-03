@@ -15,7 +15,7 @@ import net.java.games.input.Component.Identifier;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 
-public class Gamepad implements IGamepad, IUpdateable {
+public class Gamepad implements GamepadEvents, IUpdateable {
   private static final Map<String, Identifier> components = new HashMap<>();
 
   private final Controller controller;
@@ -50,17 +50,14 @@ public class Gamepad implements IGamepad, IUpdateable {
     Game.inputLoop().attach(this);
   }
 
-  @Override
   public int getIndex() {
     return this.index;
   }
 
-  @Override
   public String getName() {
     return this.controller.getName();
   }
 
-  @Override
   public float getPollData(final Identifier identifier) {
     final Component comp = this.controller.getComponent(identifier);
     if (comp == null) {

@@ -3,7 +3,7 @@ package de.gurkenlabs.litiengine.input;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public interface IGamepadEvents {
+public interface GamepadEvents {
 
   public void onPoll(String identifier, Consumer<Float> consumer);
   public void onPoll(BiConsumer<String, Float> consumer);

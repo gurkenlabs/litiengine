@@ -21,8 +21,8 @@ public final class Input {
   private static final Logger log = Logger.getLogger(Input.class.getName());
 
 
-  private static IGamepadManager gamePadManager;
-  private static List<IGamepad> gamePads;
+  private static GamepadManager gamePadManager;
+  private static List<Gamepad> gamePads;
   private static IKeyboard keyboard;
   private static IMouse mouse;
 
@@ -33,7 +33,7 @@ public final class Input {
     throw new UnsupportedOperationException();
   }
 
-  public static IGamepadManager gamepadManager() {
+  public static GamepadManager gamepadManager() {
     return gamePadManager;
   }
 
@@ -45,16 +45,16 @@ public final class Input {
     return mouse;
   }
 
-  public static List<IGamepad> gamepads() {
+  public static List<Gamepad> gamepads() {
     return gamePads;
   }
 
   /**
    * Gets the first game pad that is currently available.
    *
-   * @return The first available {@link IGamepad} instance
+   * @return The first available {@link Gamepad} instance
    */
-  public static IGamepad getGamepad() {
+  public static Gamepad getGamepad() {
     if (gamePads.isEmpty()) {
       return null;
     }
@@ -67,15 +67,15 @@ public final class Input {
    * re-plugging a controller while the game is running, its index might change.
    *
    * @param index
-   *          The index of the {@link IGamepad}.
-   * @return The {@link IGamepad} with the specified index.
+   *          The index of the {@link Gamepad}.
+   * @return The {@link Gamepad} with the specified index.
    */
-  public static IGamepad getGamepad(final int index) {
+  public static Gamepad getGamepad(final int index) {
     if (gamePads.isEmpty()) {
       return null;
     }
 
-    for (final IGamepad gamepad : gamePads) {
+    for (final Gamepad gamepad : gamePads) {
       if (gamepad.getIndex() == index) {
         return gamepad;
       }

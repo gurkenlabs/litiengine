@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.graphics.IImageEffect;
+import de.gurkenlabs.litiengine.graphics.ImageEffect;
 
 public interface IAnimationController extends IUpdateable {
   public void addListener(AnimationListener listener);
@@ -15,7 +15,7 @@ public interface IAnimationController extends IUpdateable {
 
   public void add(Animation animation);
 
-  public void add(IImageEffect effect);
+  public void add(ImageEffect effect);
 
   public Collection<Animation> getAnimations();
 
@@ -31,7 +31,7 @@ public interface IAnimationController extends IUpdateable {
 
   public Animation getDefaultAnimation();
 
-  public List<IImageEffect> getImageEffects();
+  public List<ImageEffect> getImageEffects();
 
   public boolean hasAnimation(String animationName);
 
@@ -45,5 +45,5 @@ public interface IAnimationController extends IUpdateable {
 
   public void remove(Animation animation);
 
-  public void remove(IImageEffect effect);
+  public void remove(ImageEffect effect);
 }

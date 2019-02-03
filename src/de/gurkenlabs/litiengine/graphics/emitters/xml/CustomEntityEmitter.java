@@ -4,8 +4,8 @@ import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.annotation.EmitterInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
-import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 @EmitterInfo(maxParticles = 0, spawnAmount = 0, activateOnInit = true)

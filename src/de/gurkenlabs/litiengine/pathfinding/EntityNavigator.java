@@ -10,10 +10,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
+import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public class EntityNavigator implements IEntityNavigator {
+public class EntityNavigator implements IUpdateable, IRenderable {
 
   private static final float DEFAULT_ACCEPTABLE_ERROR = 0.3f;
 
@@ -21,7 +23,7 @@ public class EntityNavigator implements IEntityNavigator {
   private final List<NavigationListener> listeners;
 
   private final IMobileEntity entity;
-  private final IPathFinder pathFinder;
+  private final PathFinder pathFinder;
 
   private int currentSegment;
   private Path path;
@@ -35,7 +37,7 @@ public class EntityNavigator implements IEntityNavigator {
    * @param pathFinder
    *          The pathfinder that is used to navigate the entity
    */
-  public EntityNavigator(final IMobileEntity entity, final IPathFinder pathFinder) {
+  public EntityNavigator(final IMobileEntity entity, final PathFinder pathFinder) {
     this.cancelNavigationConditions = new CopyOnWriteArrayList<>();
     this.listeners = new CopyOnWriteArrayList<>();
     this.entity = entity;
@@ -44,55 +46,45 @@ public class EntityNavigator implements IEntityNavigator {
     Game.loop().attach(this);
   }
 
-  @Override
   public void addNavigationListener(NavigationListener listener) {
     this.listeners.add(listener);
   }
 
-  @Override
   public void removeNavigationListener(NavigationListener listener) {
     this.listeners.remove(listener);
   }
 
-  @Override
   public void cancelNavigation(final Predicate<IMobileEntity> predicate) {
     if (!this.cancelNavigationConditions.contains(predicate)) {
       this.cancelNavigationConditions.add(predicate);
     }
   }
 
-  @Override
   public IMobileEntity getEntity() {
     return this.entity;
   }
 
-  @Override
   public Path getPath() {
     return this.path;
   }
 
-  @Override
-  public IPathFinder getPathFinder() {
+  public PathFinder getPathFinder() {
     return this.pathFinder;
   }
 
-  @Override
   public float getAcceptableError() {
     return this.acceptableError;
   }
 
-  @Override
   public boolean isNavigating() {
     return this.path != null;
   }
 
-  @Override
   public boolean navigate(final Path2D path) {
     this.path = new Path(path);
     return this.path != null;
   }
 
-  @Override
   public boolean navigate(final Point2D target) {
     if (this.getPathFinder() != null) {
       this.path = this.getPathFinder().findPath(this.entity, target);
@@ -111,18 +103,15 @@ public class EntityNavigator implements IEntityNavigator {
     Game.graphics().renderOutline(g, this.getPath().getPath());
   }
 
-  @Override
   public void rotateTowards(final Point2D target) {
     final double angle = GeometricUtilities.calcRotationAngleInDegrees(this.entity.getCollisionBox().getCenterX(), this.entity.getCollisionBox().getCenterY(), target.getX(), target.getY());
     this.entity.setAngle((float) angle);
   }
 
-  @Override
   public void setAcceptableError(float acceptableError) {
     this.acceptableError = acceptableError;
   }
 
-  @Override
   public void stop() {
     this.currentSegment = 0;
     this.path = null;

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.graphics.IImageEffect;
+import de.gurkenlabs.litiengine.graphics.ImageEffect;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.util.Imaging;
 public class AnimationController implements IAnimationController {
   private static final int MAX_IMAGE_EFFECTS = 20;
   private final Map<String, Animation> animations;
-  private final List<IImageEffect> imageEffects;
+  private final List<ImageEffect> imageEffects;
   private final List<AnimationListener> listeners;
 
   private Animation currentAnimation;
@@ -68,7 +68,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void add(final IImageEffect effect) {
+  public void add(final ImageEffect effect) {
     if (this.getImageEffects().size() >= MAX_IMAGE_EFFECTS) {
       return;
     }
@@ -139,7 +139,7 @@ public class AnimationController implements IAnimationController {
     }
 
     BufferedImage sprite = current.getSpritesheet().getSprite(current.getCurrentKeyFrame().getSpriteIndex());
-    for (final IImageEffect effect : this.getImageEffects()) {
+    for (final ImageEffect effect : this.getImageEffects()) {
       sprite = effect.apply(sprite);
     }
 
@@ -175,7 +175,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public List<IImageEffect> getImageEffects() {
+  public List<ImageEffect> getImageEffects() {
     this.removeFinishedImageEffects();
     return this.imageEffects;
   }
@@ -236,7 +236,7 @@ public class AnimationController implements IAnimationController {
   }
 
   @Override
-  public void remove(IImageEffect effect) {
+  public void remove(ImageEffect effect) {
     if (effect == null) {
       return;
     }
@@ -296,8 +296,8 @@ public class AnimationController implements IAnimationController {
   }
 
   private void removeFinishedImageEffects() {
-    final List<IImageEffect> effectsToRemove = new ArrayList<>();
-    for (final IImageEffect effect : this.imageEffects) {
+    final List<ImageEffect> effectsToRemove = new ArrayList<>();
+    for (final ImageEffect effect : this.imageEffects) {
       if (effect == null) {
         continue;
       }

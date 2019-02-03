@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.GameMetrics;
-import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.configuration.Quality;
@@ -60,7 +59,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public final class Environment implements IInitializable, IRenderable {
+public final class Environment implements IRenderable {
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
   private static final String GRAVITY_IDENTIFIER = "GRAVITY";
 

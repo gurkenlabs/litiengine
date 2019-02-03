@@ -1,8 +1,11 @@
 package de.gurkenlabs.litiengine.graphics;
 
-import de.gurkenlabs.litiengine.Game;
+import java.awt.image.BufferedImage;
 
-public abstract class ImageEffect implements IImageEffect {
+import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.ITimeToLive;
+
+public abstract class ImageEffect implements ITimeToLive, Comparable<ImageEffect> {
   private final long aliveTick;
 
   private String name;
@@ -24,7 +27,6 @@ public abstract class ImageEffect implements IImageEffect {
     return Game.loop().getDeltaTime(this.aliveTick);
   }
 
-  @Override
   public String getName() {
     return this.name;
   }
@@ -39,12 +41,10 @@ public abstract class ImageEffect implements IImageEffect {
     return this.getTimeToLive() > 0 && this.getAliveTime() > this.getTimeToLive();
   }
 
-  @Override
   public int getPriority() {
     return priority;
   }
 
-  @Override
   public void setPriority(int priority) {
     this.priority = priority;
   }
@@ -54,7 +54,9 @@ public abstract class ImageEffect implements IImageEffect {
   }
 
   @Override
-  public int compareTo(IImageEffect other) {
+  public int compareTo(ImageEffect other) {
     return Integer.compare(this.getPriority(), other.getPriority());
   }
+
+  public abstract BufferedImage apply(BufferedImage image);
 }

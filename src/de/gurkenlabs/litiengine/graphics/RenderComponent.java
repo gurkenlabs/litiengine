@@ -26,7 +26,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.IInitializable;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.util.Imaging;
@@ -35,7 +34,7 @@ import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 
 @SuppressWarnings("serial")
-public class RenderComponent extends Canvas implements IInitializable {
+public class RenderComponent extends Canvas {
   public static final Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
   public static final Font DEFAULT_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
   private static final int DEBUG_MOUSE_SIZE = 5;
@@ -109,7 +108,6 @@ public class RenderComponent extends Canvas implements IInitializable {
     return this.cursorOffsetY;
   }
 
-  @Override
   public void init() {
     this.createBufferStrategy(2);
     this.currentBufferStrategy = this.getBufferStrategy();

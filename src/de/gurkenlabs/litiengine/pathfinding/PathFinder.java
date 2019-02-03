@@ -10,12 +10,23 @@ import java.util.List;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
-public abstract class PathFinder implements IPathFinder {
+public abstract class PathFinder {
   private static final float PATH_MARGIN = 2.0f;
-
-  public Path findDirectPath(final Point2D start, final Point2D target) {
+  /**
+   * Gets the path.
+   *
+   * @param start
+   *          the start
+   * @param target
+   *          the goal
+   * @return the path
+   */
+  public abstract Path findPath(IMobileEntity start, Point2D target);
+  
+  protected Path findDirectPath(final Point2D start, final Point2D target) {
     final Path2D path2D = new GeneralPath(Path2D.WIND_NON_ZERO);
     path2D.moveTo(start.getX(), start.getY());
     path2D.lineTo(target.getX(), target.getY());

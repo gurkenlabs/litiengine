@@ -30,7 +30,7 @@ public class GamepadEntityController<T extends IMobileEntity> extends MovementCo
     Input.gamepadManager().onGamepadRemoved(pad -> {
       if (this.gamePadIndex == pad.getIndex()) {
         this.gamePadIndex = -1;
-        final IGamepad newGamePad = Input.getGamepad();
+        final Gamepad newGamePad = Input.getGamepad();
         if (newGamePad != null) {
           this.gamePadIndex = newGamePad.getIndex();
         }
