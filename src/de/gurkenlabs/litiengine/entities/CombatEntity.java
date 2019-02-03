@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.abilities.effects.IEffect;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.CombatInfo;
 import de.gurkenlabs.litiengine.attributes.AttributeModifier;
@@ -21,7 +21,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 @CombatInfo
 @CollisionInfo(collision = true)
 public class CombatEntity extends CollisionEntity implements ICombatEntity {
-  private final List<IEffect> appliedEffects;
+  private final List<Effect> appliedEffects;
   private final List<CombatEntityListener> listeners;
   private final List<CombatEntityDeathListener> deathListeners;
   private final List<CombatEntityHitListener> hitListeners;
@@ -101,7 +101,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
   }
 
   @Override
-  public List<IEffect> getAppliedEffects() {
+  public List<Effect> getAppliedEffects() {
     return this.appliedEffects;
   }
 

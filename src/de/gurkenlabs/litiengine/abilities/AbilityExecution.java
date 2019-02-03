@@ -7,11 +7,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.abilities.effects.IEffect;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 
 public class AbilityExecution implements IUpdateable {
   private final Ability ability;
-  private final List<IEffect> appliedEffects;
+  private final List<Effect> appliedEffects;
   private final Point2D castLocation;
   private final long executionTicks;
   private final Shape impactArea;
@@ -35,7 +35,7 @@ public class AbilityExecution implements IUpdateable {
     return this.ability;
   }
 
-  public List<IEffect> getAppliedEffects() {
+  public List<Effect> getAppliedEffects() {
     return this.appliedEffects;
   }
 
@@ -65,7 +65,7 @@ public class AbilityExecution implements IUpdateable {
     }
 
     // handle all effects from the ability that were not applied yet
-    for (final IEffect effect : this.getAbility().getEffects()) {
+    for (final Effect effect : this.getAbility().getEffects()) {
       // if the ability was not executed yet or the delay of the effect is not
       // yet reached
       if (this.getAppliedEffects().contains(effect) || Game.loop().getDeltaTime(this.getExecutionTicks()) < effect.getDelay()) {

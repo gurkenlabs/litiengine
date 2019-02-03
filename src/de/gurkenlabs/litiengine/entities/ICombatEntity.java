@@ -4,7 +4,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
-import de.gurkenlabs.litiengine.abilities.effects.IEffect;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.attributes.RangeAttribute;
 
 public interface ICombatEntity extends ICollisionEntity {
@@ -22,7 +22,7 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public void die();
 
-  public List<IEffect> getAppliedEffects();
+  public List<Effect> getAppliedEffects();
 
   public RangeAttribute<Integer> getHitPoints();
 

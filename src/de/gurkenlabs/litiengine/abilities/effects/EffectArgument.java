@@ -4,9 +4,9 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
 
 public class EffectArgument {
   private final ICombatEntity combatEntity;
-  private final IEffect effect;
+  private final Effect effect;
 
-  public EffectArgument(final IEffect effect, final ICombatEntity combatEntity) {
+  public EffectArgument(final Effect effect, final ICombatEntity combatEntity) {
     this.effect = effect;
     this.combatEntity = combatEntity;
   }
@@ -15,7 +15,7 @@ public class EffectArgument {
     return this.combatEntity;
   }
 
-  public IEffect getEffect() {
+  public Effect getEffect() {
     return this.effect;
   }
 }

@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.abilities.Ability;
 import de.gurkenlabs.litiengine.entities.EntityComparator;
 import de.gurkenlabs.litiengine.entities.EntityDistanceComparator;
@@ -22,7 +23,7 @@ import de.gurkenlabs.litiengine.entities.ICombatEntity;
  * environment to apply certain effects to them defined by the overwritten
  * implementation of apply/cease.
  */
-public abstract class Effect implements IEffect {
+public abstract class Effect implements IUpdateable {
   public static final int NO_DURATION = -1;
   
   private final Ability ability;
@@ -30,7 +31,7 @@ public abstract class Effect implements IEffect {
   private final List<Consumer<EffectArgument>> appliedConsumer;
   private final List<Consumer<EffectArgument>> ceasedConsumer;
   private final EffectTarget[] effectTargets;
-  private final List<IEffect> followUpEffects;
+  private final List<Effect> followUpEffects;
   
   private int delay;
   private int duration;
@@ -61,7 +62,12 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  @Override
+  /**
+   * Applies the effect in the specified impact area on the specified environment.
+   * 
+   * @param impactArea
+   *          The impact area
+   */
   public void apply(final Shape impactArea) {
     final List<ICombatEntity> affected = this.lookForAffectedEntities(impactArea);
     for (final ICombatEntity affectedEntity : affected) {
@@ -76,7 +82,6 @@ public abstract class Effect implements IEffect {
     }
   }
 
-  @Override
   public void cease(final ICombatEntity entity) {
     entity.getAppliedEffects().remove(this);
     final EffectArgument arg = new EffectArgument(this, entity);
@@ -89,28 +94,23 @@ public abstract class Effect implements IEffect {
     return this.ability;
   }
 
-  @Override
   public List<EffectApplication> getActiveAppliances() {
     return this.appliances;
   }
 
-  @Override
   public int getDelay() {
     return this.delay;
   }
 
-  @Override
   public int getDuration() {
     return this.duration;
   }
 
-  @Override
   public EffectTarget[] getEffectTargets() {
     return this.effectTargets;
   }
 
-  @Override
-  public List<IEffect> getFollowUpEffects() {
+  public List<Effect> getFollowUpEffects() {
     return this.followUpEffects;
   }
 
@@ -118,7 +118,6 @@ public abstract class Effect implements IEffect {
     return this.targetPriorityComparator;
   }
 
-  @Override
   public boolean isActive(final ICombatEntity entity) {
     for (final EffectApplication app : this.getActiveAppliances()) {
       for (final ICombatEntity affected : app.getAffectedEntities()) {
@@ -131,14 +130,12 @@ public abstract class Effect implements IEffect {
     return false;
   }
 
-  @Override
   public void onEffectApplied(final Consumer<EffectArgument> consumer) {
     if (!this.appliedConsumer.contains(consumer)) {
       this.appliedConsumer.add(consumer);
     }
   }
 
-  @Override
   public void onEffectCeased(final Consumer<EffectArgument> consumer) {
     if (!this.ceasedConsumer.contains(consumer)) {
       this.ceasedConsumer.add(consumer);

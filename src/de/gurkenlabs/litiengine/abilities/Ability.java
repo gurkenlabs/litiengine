@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IGameLoop;
+import de.gurkenlabs.litiengine.abilities.effects.Effect;
 import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
-import de.gurkenlabs.litiengine.abilities.effects.IEffect;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
@@ -27,7 +27,7 @@ public abstract class Ability implements IRenderable {
   private final AbilityAttributes attributes;
   private final CastType castType;
   private final String description;
-  private final List<IEffect> effects;
+  private final List<Effect> effects;
   private final Creature executor;
   private final boolean multiTarget;
   private final String name;
@@ -56,7 +56,7 @@ public abstract class Ability implements IRenderable {
     this.originType = info.origin();
   }
 
-  public void addEffect(final IEffect effect) {
+  public void addEffect(final Effect effect) {
     this.getEffects().add(effect);
   }
 
@@ -168,14 +168,14 @@ public abstract class Ability implements IRenderable {
   }
 
   public void onEffectApplied(final Consumer<EffectArgument> consumer) {
-    for (final IEffect effect : this.getEffects()) {
+    for (final Effect effect : this.getEffects()) {
       // registers to all effects and their follow up effects recursively
       this.onEffectApplied(effect, consumer);
     }
   }
 
   public void onEffectCeased(final Consumer<EffectArgument> consumer) {
-    for (final IEffect effect : this.getEffects()) {
+    for (final Effect effect : this.getEffects()) {
       // registers to all effects and their follow up effects recursively
       this.onEffectCeased(effect, consumer);
     }
@@ -204,7 +204,7 @@ public abstract class Ability implements IRenderable {
     this.origin = origin;
   }
 
-  protected List<IEffect> getEffects() {
+  protected List<Effect> getEffects() {
     return this.effects;
   }
 
@@ -224,18 +224,18 @@ public abstract class Ability implements IRenderable {
     return new Arc2D.Double(appliedRange.getX(), appliedRange.getY(), impact, impact, start, impactAngle, Arc2D.PIE);
   }
 
-  private void onEffectApplied(final IEffect effect, final Consumer<EffectArgument> consumer) {
+  private void onEffectApplied(final Effect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectApplied(consumer);
 
-    for (final IEffect followUp : effect.getFollowUpEffects()) {
+    for (final Effect followUp : effect.getFollowUpEffects()) {
       this.onEffectApplied(followUp, consumer);
     }
   }
 
-  private void onEffectCeased(final IEffect effect, final Consumer<EffectArgument> consumer) {
+  private void onEffectCeased(final Effect effect, final Consumer<EffectArgument> consumer) {
     effect.onEffectCeased(consumer);
 
-    for (final IEffect followUp : effect.getFollowUpEffects()) {
+    for (final Effect followUp : effect.getFollowUpEffects()) {
       this.onEffectCeased(followUp, consumer);
     }
   }

@@ -316,6 +316,8 @@ public abstract class GuiComponent implements MouseListener, MouseMotionListener
    * Gets only the non-cropped bits of Text visible on this GuiComponent.m
    * To retrieve only the entire text associated with this GuiComponent, use <code>GuiComponent.getText()</code>.
    *
+   * @param g
+   *          The graphics object to render on.
    * @return the text to render
    */
   public String getTextToRender(final Graphics2D g) {
