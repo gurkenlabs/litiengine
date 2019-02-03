@@ -144,27 +144,6 @@ public class MapObject extends CustomPropertyProvider implements IMapObject {
   }
 
   @Override
-  public int compareTo(IMapObject obj) {
-    if (obj == null) {
-      return 1;
-    }
-
-    if (this.getName() == null) {
-      if (obj.getName() == null) {
-        return 0;
-      }
-
-      return -1;
-    }
-
-    if (obj.getName() == null) {
-      return 1;
-    }
-
-    return this.getName().compareTo(obj.getName());
-  }
-
-  @Override
   public int getGridId() {
     if (this.gid == null) {
       return 0;

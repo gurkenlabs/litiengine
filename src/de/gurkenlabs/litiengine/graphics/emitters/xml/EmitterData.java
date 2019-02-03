@@ -18,12 +18,13 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.resources.Resource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 @XmlRootElement(name = "emitter")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EmitterData implements Serializable, Comparable<EmitterData> {
+public class EmitterData implements Serializable, Resource {
   private static final long serialVersionUID = 50238884097993529L;
 
   @XmlElementWrapper(name = "colors")
@@ -177,23 +178,6 @@ public class EmitterData implements Serializable, Comparable<EmitterData> {
     this.originValign = data.getOriginValign();
     this.originAlign = data.getOriginAlign();
     this.fade = data.fade;
-  }
-
-  @Override
-  public int compareTo(EmitterData obj) {
-    if (obj == null) {
-      return 1;
-    }
-
-    if (this.getName() == null) {
-      if (obj.getName() == null) {
-        return 0;
-      }
-
-      return -1;
-    }
-
-    return this.getName().compareTo(obj.getName());
   }
 
   @XmlTransient

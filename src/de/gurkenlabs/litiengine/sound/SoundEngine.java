@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.ILaunchable;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.resources.Resources;
 
 /**
  * This class provides all methods to playback sounds and music in your
@@ -69,6 +70,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return this.playMusic(sound, true);
   }
 
+  public ISoundPlayback playMusic(final String sound) {
+    return this.playMusic(Resources.sounds().get(sound), true);
+  }
+
   /**
    * Plays the specified sound file as background music. If another music was
    * specified beforehand, its play-back will get interrupted and the new one
@@ -95,6 +100,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return this.music;
   }
 
+  public ISoundPlayback playMusic(final String sound, boolean loop) {
+    return this.playMusic(Resources.sounds().get(sound), loop);
+  }
+
   /**
    * Plays the specified sound and updates its volume and pan by the current
    * entity location in relation to the listener location.
@@ -109,6 +118,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    */
   public ISoundPlayback playSound(final Sound sound, final IEntity entity) {
     return playSound(sound, entity, false);
+  }
+
+  public ISoundPlayback playSound(final String sound, final IEntity entity) {
+    return playSound(Resources.sounds().get(sound), entity, false);
   }
 
   /**
@@ -135,6 +148,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playback;
   }
 
+  public ISoundPlayback playSound(final String sound, final IEntity entity, boolean loop) {
+    return this.playSound(Resources.sounds().get(sound), entity, loop);
+  }
+
   /**
    * Plays the specified sound at the specified location and updates the volume
    * and pan in relation to the listener location.
@@ -151,8 +168,16 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return this.playSound(sound, location, false);
   }
 
+  public ISoundPlayback playSound(final String sound, final Point2D location) {
+    return this.playSound(Resources.sounds().get(sound), location, false);
+  }
+
   public ISoundPlayback playSound(final Sound sound, double x, double y) {
     return this.playSound(sound, x, y, false);
+  }
+
+  public ISoundPlayback playSound(final String sound, double x, double y) {
+    return this.playSound(Resources.sounds().get(sound), x, y, false);
   }
 
   /**
@@ -179,8 +204,16 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     return playback;
   }
 
+  public ISoundPlayback playSound(final String sound, final Point2D location, boolean loop) {
+    return this.playSound(Resources.sounds().get(sound), location, loop);
+  }
+
   public ISoundPlayback playSound(final Sound sound, final double x, final double y, boolean loop) {
     return this.playSound(sound, new Point2D.Double(x, y), loop);
+  }
+
+  public ISoundPlayback playSound(final String sound, final double x, final double y, boolean loop) {
+    return this.playSound(Resources.sounds().get(sound), x, y, loop);
   }
 
   /**
@@ -195,6 +228,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
    */
   public ISoundPlayback playSound(final Sound sound) {
     return playSound(sound, false);
+  }
+
+  public ISoundPlayback playSound(final String sound) {
+    return playSound(Resources.sounds().get(sound));
   }
 
   /**
@@ -218,6 +255,10 @@ public final class SoundEngine implements IUpdateable, ILaunchable {
     this.sounds.add(playback);
 
     return playback;
+  }
+
+  public ISoundPlayback playSound(final String sound, boolean loop) {
+    return this.playSound(Resources.sounds().get(sound), loop);
   }
 
   /**

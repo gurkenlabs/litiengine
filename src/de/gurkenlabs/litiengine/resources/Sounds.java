@@ -1,10 +1,15 @@
 package de.gurkenlabs.litiengine.resources;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import de.gurkenlabs.litiengine.sound.Sound;
+import de.gurkenlabs.litiengine.util.io.Codec;
 
 public final class Sounds extends ResourcesContainer<Sound> {
   private static final Logger log = Logger.getLogger(Sounds.class.getName());
@@ -28,5 +33,20 @@ public final class Sounds extends ResourcesContainer<Sound> {
       return null;
     }
     return new Sound(is, resourceName);
+  }
+
+  public Sound load(final SoundResource resource) {
+    byte[] data = Codec.decode(resource.getData());
+    ByteArrayInputStream input = new ByteArrayInputStream(data);
+    Sound sound;
+    try {
+      sound = new Sound(input, resource.getName());
+      this.add(resource.getName(), sound);
+      return sound;
+    } catch (IOException | UnsupportedAudioFileException e) {
+      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resource.getName() });
+    }
+
+    return null;
   }
 }

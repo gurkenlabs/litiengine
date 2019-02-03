@@ -1,4 +1,4 @@
-package de.gurkenlabs.litiengine;
+package de.gurkenlabs.litiengine.resources;
 
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
@@ -10,12 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
-import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 
 @XmlRootElement(name = "sprite")
-public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo> {
+public class SpritesheetResource extends NamedResource implements Serializable {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";
   private static final long serialVersionUID = 3864637034834813554L;
   @XmlAttribute(name = "width")
@@ -24,51 +23,31 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
   @XmlAttribute(name = "height")
   private int height;
 
-  @XmlAttribute(name = "name")
-  private String name;
-
   @XmlElement(required = false)
   private String image;
 
   @XmlElement(required = false)
   private String keyframes;
 
-  public SpritesheetInfo() {
+  public SpritesheetResource() {
     // keep empty constructor for serialization
   }
 
-  public SpritesheetInfo(final Spritesheet sprite) {
+  public SpritesheetResource(final Spritesheet sprite) {
     this(sprite.getSpriteWidth(), sprite.getSpriteHeight(), sprite.getName());
     this.setImage(Codec.encode(sprite.getImage(), sprite.getImageFormat()));
     this.setKeyframes(Resources.spritesheets().getCustomKeyFrameDurations(sprite));
   }
 
-  public SpritesheetInfo(final BufferedImage image, String name, final int width, final int height) {
+  public SpritesheetResource(final BufferedImage image, String name, final int width, final int height) {
     this(width, height, name);
     this.setImage(Codec.encode(image));
   }
 
-  private SpritesheetInfo(int width, int height, String name) {
+  private SpritesheetResource(int width, int height, String name) {
     this.setWidth(width);
     this.setHeight(height);
     this.setName(name);
-  }
-
-  @Override
-  public int compareTo(SpritesheetInfo obj) {
-    if (obj == null) {
-      return 1;
-    }
-
-    if (this.getName() == null) {
-      if (obj.getName() == null) {
-        return 0;
-      }
-
-      return -1;
-    }
-
-    return this.getName().compareTo(obj.getName());
   }
 
   @XmlTransient
@@ -81,10 +60,6 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
     return this.image;
   }
 
-  @XmlTransient
-  public String getName() {
-    return this.name;
-  }
 
   @XmlTransient
   public int getWidth() {
@@ -106,10 +81,6 @@ public class SpritesheetInfo implements Serializable, Comparable<SpritesheetInfo
 
   public void setImage(final String image) {
     this.image = image;
-  }
-
-  public void setName(final String n) {
-    this.name = n;
   }
 
   public void setWidth(final int w) {

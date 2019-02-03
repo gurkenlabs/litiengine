@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.EmitterMapObjectLoader;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
@@ -47,6 +47,10 @@ import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SoundResource;
+import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.sound.SoundFormat;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -101,7 +105,7 @@ public class AssetPanelItem extends JPanel {
         // TODO: We might need to provide multiple JPanels that contain the
         // buttons for
         // a certain usage and swap them out
-        if (getOrigin() instanceof SpritesheetInfo || getOrigin() instanceof EmitterData) {
+        if (getOrigin() instanceof SpritesheetResource || getOrigin() instanceof EmitterData) {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
@@ -116,7 +120,13 @@ public class AssetPanelItem extends JPanel {
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
           btnExport.setVisible(true);
+        } else if (getOrigin() instanceof SoundResource) {
+          btnEdit.setVisible(false);
+          btnAdd.setVisible(false);
+          btnDelete.setVisible(true);
+          btnExport.setVisible(true);
         }
+
       }
 
       @Override
@@ -197,19 +207,19 @@ public class AssetPanelItem extends JPanel {
     btnEdit = new JButton("");
     btnEdit.setToolTipText("Edit Asset");
     btnEdit.addActionListener(e -> {
-      if (!(this.getOrigin() instanceof SpritesheetInfo)) {
+      if (!(this.getOrigin() instanceof SpritesheetResource)) {
         return;
       }
-      SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetInfo) this.getOrigin());
+      SpritesheetImportPanel spritePanel = new SpritesheetImportPanel((SpritesheetResource) this.getOrigin());
       int option = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), spritePanel, Resources.strings().get("menu_assets_editSprite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
       if (option != JOptionPane.OK_OPTION) {
         return;
       }
 
-      final Collection<SpritesheetInfo> sprites = spritePanel.getSpriteSheets();
-      for (SpritesheetInfo spriteFile : sprites) {
+      final Collection<SpritesheetResource> sprites = spritePanel.getSpriteSheets();
+      for (SpritesheetResource spriteFile : sprites) {
         int index = -1;
-        Optional<SpritesheetInfo> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
+        Optional<SpritesheetResource> old = EditorScreen.instance().getGameFile().getSpriteSheets().stream().filter((x -> x.getName().equals(spriteFile.getName()))).findFirst();
         if (old.isPresent()) {
           index = EditorScreen.instance().getGameFile().getSpriteSheets().indexOf(old.get());
           EditorScreen.instance().getGameFile().getSpriteSheets().remove(index);
@@ -273,8 +283,8 @@ public class AssetPanelItem extends JPanel {
   }
 
   private void deleteAsset() {
-    if (getOrigin() instanceof SpritesheetInfo) {
-      SpritesheetInfo info = (SpritesheetInfo) getOrigin();
+    if (getOrigin() instanceof SpritesheetResource) {
+      SpritesheetResource info = (SpritesheetResource) getOrigin();
       int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the spritesheet [" + info.getName() + "]?\n Entities that use the sprite won't be rendered anymore!", "Delete Spritesheet?", JOptionPane.YES_NO_OPTION);
 
       if (n == JOptionPane.OK_OPTION) {
@@ -302,6 +312,13 @@ public class AssetPanelItem extends JPanel {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
         Program.getAssetTree().forceUpdate();
       }
+    } else if (getOrigin() instanceof SoundResource) {
+      SoundResource sound = (SoundResource) getOrigin();
+      int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the sound [" + sound.getName() + "]?", "Delete Sound?", JOptionPane.YES_NO_OPTION);
+      if (n == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getGameFile().getSounds().remove(getOrigin());
+        Program.getAssetTree().forceUpdate();
+      }
     }
   }
 
@@ -311,8 +328,8 @@ public class AssetPanelItem extends JPanel {
     }
 
     // TODO: experimental code... this needs to be refactored with issue #66
-    if (this.getOrigin() instanceof SpritesheetInfo) {
-      SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
+    if (this.getOrigin() instanceof SpritesheetResource) {
+      SpritesheetResource info = (SpritesheetResource) this.getOrigin();
 
       MapObject mo = new MapObject();
       String propName = PropPanel.getIdentifierBySpriteName(info.getName());
@@ -326,7 +343,7 @@ public class AssetPanelItem extends JPanel {
       } else {
         return false;
       }
-      
+
       mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2);
       mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2);
       mo.setWidth((int) info.getWidth());
@@ -375,22 +392,20 @@ public class AssetPanelItem extends JPanel {
   private void export() {
     if (this.getOrigin() instanceof Tileset) {
       this.exportTileset();
-      return;
-    } else if (this.getOrigin() instanceof SpritesheetInfo) {
+    } else if (this.getOrigin() instanceof SpritesheetResource) {
       this.exportSpritesheet();
-      return;
     } else if (this.getOrigin() instanceof EmitterData) {
       this.exportEmitter();
-      return;
     } else if (this.getOrigin() instanceof MapObject) {
       this.exportBlueprint();
-      return;
+    } else if (this.getOrigin() instanceof SoundResource) {
+      this.exportSound();
     }
   }
 
   private void exportSpritesheet() {
-    if (this.getOrigin() instanceof SpritesheetInfo) {
-      SpritesheetInfo spriteSheetInfo = (SpritesheetInfo) this.getOrigin();
+    if (this.getOrigin() instanceof SpritesheetResource) {
+      SpritesheetResource spriteSheetInfo = (SpritesheetResource) this.getOrigin();
 
       Optional<Spritesheet> opt = Resources.spritesheets().tryGet(spriteSheetInfo.getName());
       if (!opt.isPresent()) {
@@ -458,9 +473,44 @@ public class AssetPanelItem extends JPanel {
     XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
   }
 
+  private void exportSound() {
+    if (!(this.getOrigin() instanceof SoundResource)) {
+      return;
+    }
+
+    SoundResource sound = (SoundResource) this.getOrigin();
+    SoundFormat format = sound.getFormat();
+    if (format == SoundFormat.UNDEFINED) {
+      return;
+    }
+
+    FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Sound", format.toString());
+    try {
+      JFileChooser chooser;
+      String source = EditorScreen.instance().getProjectPath();
+      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+      chooser.setDialogTitle("Export Sound");
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      chooser.setSelectedFile(new File(sound.getName() + format.toExtension()));
+
+      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+      if (result == JFileChooser.APPROVE_OPTION) {
+        try (FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().toString())) {
+          fos.write(Codec.decode(sound.getData()));
+          log.log(Level.INFO, "exported sound {0} to {1}", new Object[] { sound.getName(), chooser.getSelectedFile() });
+        }
+      }
+    } catch (IOException ex) {
+      log.log(Level.SEVERE, ex.getMessage(), ex);
+    }
+  }
+
   private boolean canAdd() {
-    if (this.getOrigin() instanceof SpritesheetInfo) {
-      SpritesheetInfo info = (SpritesheetInfo) this.getOrigin();
+    if (this.getOrigin() instanceof SpritesheetResource) {
+      SpritesheetResource info = (SpritesheetResource) this.getOrigin();
       String propName = PropPanel.getIdentifierBySpriteName(info.getName());
       return propName != null && !propName.isEmpty() || CreaturePanel.getCreatureSpriteName(info.getName()) != null;
     }

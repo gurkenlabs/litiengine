@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.SpritesheetInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.io.Codec;
@@ -76,7 +75,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
     return new Spritesheet(Resources.images().get(tileset.getImage().getAbsoluteSourcePath(), true), tileset.getImage().getSource(), tileset.getTileDimension().width, tileset.getTileDimension().height);
   }
 
-  public Spritesheet load(final SpritesheetInfo info) {
+  public Spritesheet load(final SpritesheetResource info) {
     Spritesheet sprite = null;
     if (info.getImage() == null || info.getImage().isEmpty()) {
       log.log(Level.SEVERE, "Sprite {0} could not be loaded because no image is defined.", new Object[] { info.getName() });
@@ -148,7 +147,7 @@ public final class Spritesheets extends ResourcesContainer<Spritesheet> {
     return spriteToRemove;
   }
 
-  public void update(final SpritesheetInfo info) {
+  public void update(final SpritesheetResource info) {
     if (info == null || info.getName() == null) {
       return;
     }

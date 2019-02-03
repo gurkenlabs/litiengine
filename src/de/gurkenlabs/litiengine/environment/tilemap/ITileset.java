@@ -4,11 +4,12 @@ import java.awt.Dimension;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
+import de.gurkenlabs.litiengine.resources.Resource;
 
 /**
  * The Interface ITileset.
  */
-public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> {
+public interface ITileset extends ICustomPropertyProvider, Resource {
 
   /**
    * Gets the first grid id.
@@ -29,13 +30,6 @@ public interface ITileset extends ICustomPropertyProvider, Comparable<ITileset> 
   public int getMargin();
 
   public int getSpacing();
-
-  /**
-   * Gets the name.
-   *
-   * @return the name
-   */
-  public String getName();
 
   /**
    * Gets the tile dimension.

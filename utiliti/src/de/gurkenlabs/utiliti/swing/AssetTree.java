@@ -9,11 +9,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.animation.PropAnimationController;
+import de.gurkenlabs.litiengine.resources.ResourceBundle;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -28,6 +28,7 @@ public class AssetTree extends JTree {
   private final DefaultMutableTreeNode nodeSpriteProps;
   private final DefaultMutableTreeNode nodeSpriteMisc;
   private final DefaultMutableTreeNode nodeTileSets;
+  private final DefaultMutableTreeNode nodeSounds;
   private final DefaultMutableTreeNode nodeEmitters;
   private final DefaultMutableTreeNode nodeBlueprints;
   private final DefaultMutableTreeNode nodeCreatures;
@@ -40,6 +41,7 @@ public class AssetTree extends JTree {
     this.nodeSpriteProps = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_props"), Icons.PROP));
     this.nodeSpriteMisc = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_spritesheets_misc"), Icons.MISC));
     this.nodeTileSets = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_tilesets"), Icons.TILESET));
+    this.nodeSounds = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_sounds"), Icons.SOUND));
     this.nodeEmitters = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_emitters"), Icons.EMITTER));
     this.nodeBlueprints = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_blueprints"), Icons.BLUEPRINT));
     this.nodeCreatures = new DefaultMutableTreeNode(new IconTreeListItem(Resources.strings().get("assettree_creatures"), Icons.CREATURE));
@@ -52,6 +54,7 @@ public class AssetTree extends JTree {
     this.nodeRoot.add(this.nodeEmitters);
     this.nodeRoot.add(this.nodeBlueprints);
     this.nodeRoot.add(this.nodeTileSets);
+    this.nodeRoot.add(this.nodeSounds);
 
     this.entitiesTreeModel = new DefaultTreeModel(this.nodeRoot);
 
@@ -88,8 +91,9 @@ public class AssetTree extends JTree {
     final TreePath tilesetPath = new TreePath(this.nodeTileSets.getPath());
     final TreePath emitterPath = new TreePath(this.nodeEmitters.getPath());
     final TreePath blueprintPath = new TreePath(this.nodeBlueprints.getPath());
+    final TreePath soundPath = new TreePath(this.nodeSounds.getPath());
 
-    final GameData gameFile = EditorScreen.instance().getGameFile();
+    final ResourceBundle gameFile = EditorScreen.instance().getGameFile();
     if (selectedPath.equals(spritePath)) {
       Program.getAssetPanel().loadSprites(gameFile.getSpriteSheets().stream().collect(Collectors.toList()));
     } else if (this.getSelectionPath().equals(propPath)) {
@@ -117,6 +121,8 @@ public class AssetTree extends JTree {
       Program.getAssetPanel().loadEmitters(gameFile.getEmitters());
     } else if (selectedPath.equals(blueprintPath)) {
       Program.getAssetPanel().loadBlueprints(gameFile.getBluePrints());
+    } else if (selectedPath.equals(soundPath)) {
+      Program.getAssetPanel().loadSounds(gameFile.getSounds());
     }
   }
 }

@@ -81,23 +81,6 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   }
 
   @Override
-  public int compareTo(ITileset obj) {
-    if (obj == null || obj.getName() == null) {
-      return 1;
-    }
-
-    if (this.getName() == null) {
-      if (obj.getName() == null) {
-        return 0;
-      }
-
-      return -1;
-    }
-
-    return this.getName().compareTo(obj.getName());
-  }
-
-  @Override
   public int getFirstGridId() {
     return this.firstgid;
   }
@@ -127,6 +110,11 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
   @Override
   public String getName() {
     return this.sourceTileset != null ? this.sourceTileset.getName() : this.name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**

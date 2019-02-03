@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.gurkenlabs.litiengine.GameData;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
@@ -150,7 +149,7 @@ public final class Resources {
   public static void load(final String gameResourceFile) {
     final long loadStart = System.nanoTime();
 
-    final GameData file = GameData.load(gameResourceFile);
+    final ResourceBundle file = ResourceBundle.load(gameResourceFile);
     if (file == null) {
       return;
     }
@@ -178,6 +177,14 @@ public final class Resources {
     });
 
     log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { loadedSprites.size(), gameResourceFile });
+
+    final List<Sound> loadedSounds = Collections.synchronizedList(new ArrayList<>());
+    file.getSounds().parallelStream().forEach(soundResource -> {
+      final Sound sound = Resources.sounds().load(soundResource);
+      loadedSounds.add(sound);
+    });
+
+    log.log(Level.INFO, "{0} sounds loaded from {1}", new Object[] { loadedSounds.size(), gameResourceFile });
 
     int spriteload = 0;
     for (final Spritesheet s : loadedSprites) {

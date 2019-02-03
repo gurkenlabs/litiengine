@@ -1,14 +1,14 @@
-package de.gurkenlabs.litiengine.graphics;
+package de.gurkenlabs.litiengine.sound;
 
 import java.io.File;
 
 import de.gurkenlabs.litiengine.resources.DataFormat;
 
-public enum ImageFormat {
-  UNDEFINED, PNG, GIF, BMP, JPG;
-
-  public static ImageFormat get(String imageFormat) {
-    return DataFormat.get(imageFormat, values(), UNDEFINED);
+public enum SoundFormat {
+  UNDEFINED, OGG, MP3, WAV;
+  
+  public static SoundFormat get(String format) {
+    return DataFormat.get(format, values(), UNDEFINED);
   }
 
   public static boolean isSupported(File file) {

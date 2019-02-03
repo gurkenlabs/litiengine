@@ -29,6 +29,7 @@ public final class Icons {
   public static final Icon DELETE_X7_DISABLED = new ImageIcon(Resources.images().get("button-delete-disabledx7.png"));
   public static final Icon DOC_BLUEPRINT = new ImageIcon(Resources.images().get("document-blueprint.png"));
   public static final Icon DOC_EMITTER = new ImageIcon(Resources.images().get("document-emitter.png"));
+  public static final Icon DOC_SOUND = new ImageIcon(Resources.images().get("document-sound.png"));
   public static final Icon DOC_TILESET = new ImageIcon(Resources.images().get("document-tsx.png"));
   public static final Icon EDIT = new ImageIcon(Resources.images().get("button-edit.png"));
   public static final Icon EMITTER = new ImageIcon(Resources.images().get("emitter.png"));
@@ -59,6 +60,7 @@ public final class Icons {
   public static final Icon SHADOWBOX = new ImageIcon(Resources.images().get("shadowbox.png"));
   public static final Icon SPAWNPOINT = new ImageIcon(Resources.images().get("spawnpoint.png"));
   public static final Icon SPRITESHEET = new ImageIcon(Resources.images().get("spritesheet.png"));
+  public static final Icon SOUND = new ImageIcon(Resources.images().get("sound.png"));
   public static final Icon TILESET = new ImageIcon(Resources.images().get("tileset.png"));
   public static final Icon TRIGGER = new ImageIcon(Resources.images().get("trigger.png"));
   public static final Icon UNDO = new ImageIcon(Resources.images().get("button-undo.png"));

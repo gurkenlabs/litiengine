@@ -14,6 +14,7 @@ import de.gurkenlabs.litiengine.graphics.ImageFormat;
 
 public final class Codec {
   private static final Logger log = Logger.getLogger(Codec.class.getName());
+
   private Codec() {
     throw new UnsupportedOperationException();
   }
@@ -97,7 +98,7 @@ public final class Codec {
 
     return (short) (smallNumber * Math.pow(10, precision) - Short.MAX_VALUE);
   }
-  
+
   public static BufferedImage decodeImage(final String imageString) {
     if (imageString == null) {
       return null;
@@ -106,7 +107,7 @@ public final class Codec {
     BufferedImage image = null;
     byte[] imageByte;
     try {
-      imageByte = Base64.getDecoder().decode(imageString);
+      imageByte = decode(imageString);
       final ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
       image = ImageIO.read(bis);
       bis.close();
@@ -132,12 +133,20 @@ public final class Codec {
       ImageIO.write(image, imageFormat != ImageFormat.UNDEFINED ? imageFormat.toString() : ImageFormat.PNG.toString(), bos);
       final byte[] imageBytes = bos.toByteArray();
 
-      imageString = Base64.getEncoder().encodeToString(imageBytes);
+      imageString = encode(imageBytes);
 
       bos.close();
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
     }
     return imageString;
+  }
+
+  public static String encode(byte[] data) {
+    return Base64.getEncoder().encodeToString(data);
+  }
+
+  public static byte[] decode(String base64) {
+    return Base64.getDecoder().decode(base64);
   }
 }

@@ -39,12 +39,20 @@ public final class StreamUtilities {
   public static void copy(final InputStream in, final OutputStream out) throws IOException {
     final byte[] buffer = new byte[1024];
 
+    if (in.markSupported()) {
+      in.mark(Integer.MAX_VALUE);
+    }
+    
     while (true) {
       final int readCount = in.read(buffer);
       if (readCount < 0) {
         break;
       }
       out.write(buffer, 0, readCount);
+    }
+    
+    if (in.markSupported()) {
+      in.reset();
     }
   }
 
