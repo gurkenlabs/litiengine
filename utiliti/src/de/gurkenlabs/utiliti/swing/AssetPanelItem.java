@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +47,10 @@ import de.gurkenlabs.litiengine.graphics.ImageFormat;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
+import de.gurkenlabs.litiengine.sound.SoundFormat;
+import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Icons;
@@ -116,7 +120,13 @@ public class AssetPanelItem extends JPanel {
           btnAdd.setVisible(true);
           btnDelete.setVisible(true);
           btnExport.setVisible(true);
+        } else if (getOrigin() instanceof SoundResource) {
+          btnEdit.setVisible(false);
+          btnAdd.setVisible(false);
+          btnDelete.setVisible(true);
+          btnExport.setVisible(true);
         }
+
       }
 
       @Override
@@ -302,6 +312,13 @@ public class AssetPanelItem extends JPanel {
         EditorScreen.instance().getGameFile().getBluePrints().remove(getOrigin());
         Program.getAssetTree().forceUpdate();
       }
+    } else if (getOrigin() instanceof SoundResource) {
+      SoundResource sound = (SoundResource) getOrigin();
+      int n = JOptionPane.showConfirmDialog(Game.window().getRenderComponent(), "Do you really want to delete the sound [" + sound.getName() + "]?", "Delete Sound?", JOptionPane.YES_NO_OPTION);
+      if (n == JOptionPane.OK_OPTION) {
+        EditorScreen.instance().getGameFile().getSounds().remove(getOrigin());
+        Program.getAssetTree().forceUpdate();
+      }
     }
   }
 
@@ -326,7 +343,7 @@ public class AssetPanelItem extends JPanel {
       } else {
         return false;
       }
-      
+
       mo.setX((int) Game.world().camera().getFocus().getX() - info.getWidth() / 2);
       mo.setY((int) Game.world().camera().getFocus().getY() - info.getHeight() / 2);
       mo.setWidth((int) info.getWidth());
@@ -375,16 +392,14 @@ public class AssetPanelItem extends JPanel {
   private void export() {
     if (this.getOrigin() instanceof Tileset) {
       this.exportTileset();
-      return;
     } else if (this.getOrigin() instanceof SpritesheetResource) {
       this.exportSpritesheet();
-      return;
     } else if (this.getOrigin() instanceof EmitterData) {
       this.exportEmitter();
-      return;
     } else if (this.getOrigin() instanceof MapObject) {
       this.exportBlueprint();
-      return;
+    } else if (this.getOrigin() instanceof SoundResource) {
+      this.exportSound();
     }
   }
 
@@ -456,6 +471,41 @@ public class AssetPanelItem extends JPanel {
 
     Blueprint mapObject = (Blueprint) this.getOrigin();
     XmlExportDialog.export(mapObject, "Blueprint", mapObject.getName(), Blueprint.BLUEPRINT_FILE_EXTENSION);
+  }
+
+  private void exportSound() {
+    if (!(this.getOrigin() instanceof SoundResource)) {
+      return;
+    }
+
+    SoundResource sound = (SoundResource) this.getOrigin();
+    SoundFormat format = sound.getFormat();
+    if (format == SoundFormat.UNDEFINED) {
+      return;
+    }
+
+    FileFilter filter = new FileNameExtensionFilter(format.toString() + " - Sound", format.toString());
+    try {
+      JFileChooser chooser;
+      String source = EditorScreen.instance().getProjectPath();
+      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
+      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+      chooser.setDialogTitle("Export Sound");
+      chooser.setFileFilter(filter);
+      chooser.addChoosableFileFilter(filter);
+      chooser.setSelectedFile(new File(sound.getName() + format.toExtension()));
+
+      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
+      if (result == JFileChooser.APPROVE_OPTION) {
+        try (FileOutputStream fos = new FileOutputStream(chooser.getSelectedFile().toString())) {
+          fos.write(Codec.decode(sound.getData()));
+          log.log(Level.INFO, "exported sound {0} to {1}", new Object[] { sound.getName(), chooser.getSelectedFile() });
+        }
+      }
+    } catch (IOException ex) {
+      log.log(Level.SEVERE, ex.getMessage(), ex);
+    }
   }
 
   private boolean canAdd() {

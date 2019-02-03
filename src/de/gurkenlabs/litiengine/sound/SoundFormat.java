@@ -7,8 +7,8 @@ import de.gurkenlabs.litiengine.resources.DataFormat;
 public enum SoundFormat {
   UNDEFINED, OGG, MP3, WAV;
   
-  public static SoundFormat get(String imageFormat) {
-    return DataFormat.get(imageFormat, values(), UNDEFINED);
+  public static SoundFormat get(String format) {
+    return DataFormat.get(format, values(), UNDEFINED);
   }
 
   public static boolean isSupported(File file) {

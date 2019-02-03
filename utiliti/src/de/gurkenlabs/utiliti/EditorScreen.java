@@ -402,7 +402,8 @@ public class EditorScreen extends Screen {
   private void importSounds(File... selectedFiles) {
     for (File file : selectedFiles) {
       try (InputStream stream = new FileInputStream(file.getAbsolutePath())) {
-        SoundResource resource = new SoundResource(new BufferedInputStream(stream), FileUtilities.getFileName(file.getName()));
+        SoundFormat format = SoundFormat.get(FileUtilities.getExtension(file));
+        SoundResource resource = new SoundResource(new BufferedInputStream(stream), FileUtilities.getFileName(file.getName()), format);
         this.getGameFile().getSounds().removeIf(x -> x.getName().equals(resource.getName()));
         this.getGameFile().getSounds().add(resource);
         log.log(Level.INFO, "imported sound {0}", new Object[] { resource.getName() });

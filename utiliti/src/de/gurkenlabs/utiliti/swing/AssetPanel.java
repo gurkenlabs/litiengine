@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
 import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.resources.Resources;
+import de.gurkenlabs.litiengine.resources.SoundResource;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.Imaging;
 import de.gurkenlabs.utiliti.Icons;
@@ -86,6 +87,17 @@ public class AssetPanel extends JPanel {
       Collections.sort(blueprints);
       for (MapObject blueprint : blueprints) {
         AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_BLUEPRINT, blueprint.getName(), blueprint);
+        this.add(panelItem);
+        panelItem.validate();
+      }
+    });
+  }
+
+  public void loadSounds(List<SoundResource> sounds) {
+    this.load(sounds, () -> {
+      Collections.sort(sounds);
+      for (SoundResource sound : sounds) {
+        AssetPanelItem panelItem = new AssetPanelItem(Icons.DOC_SOUND, sound.getName(), sound);
         this.add(panelItem);
         panelItem.validate();
       }
