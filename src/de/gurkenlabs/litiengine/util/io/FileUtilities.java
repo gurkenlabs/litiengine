@@ -177,7 +177,7 @@ public final class FileUtilities {
         if (path == null) {
           continue;
         }
-        
+
         path = path.replace(FILE_SEPARATOR_WIN, FILE_SEPARATOR);
 
         uri = uri.resolve(path);
@@ -185,7 +185,7 @@ public final class FileUtilities {
 
       return uri.toString();
     } catch (URISyntaxException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, e.getMessage(), e);
       return basePath;
     }
   }
