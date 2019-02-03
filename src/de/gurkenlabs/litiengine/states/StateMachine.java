@@ -3,19 +3,19 @@ package de.gurkenlabs.litiengine.states;
 import java.util.Collections;
 import java.util.List;
 
-public class StateMachine implements IStateMachine {
-  private IState currentState;
+import de.gurkenlabs.litiengine.IUpdateable;
+
+public class StateMachine implements IUpdateable {
+  private State currentState;
 
   protected StateMachine() {
   }
 
-  @Override
-  public IState getCurrentState() {
+  public State getCurrentState() {
     return this.currentState;
   }
 
-  @Override
-  public void setState(final IState newState) {
+  public void setState(final State newState) {
     if (this.currentState != null) {
       this.currentState.exit();
     }
@@ -30,11 +30,11 @@ public class StateMachine implements IStateMachine {
       return;
     }
 
-    this.currentState.executeBehaviour();
-    final List<ITransition> transitions = this.currentState.getTransitions();
+    this.currentState.perform();
+    final List<Transition> transitions = this.currentState.getTransitions();
     Collections.sort(transitions);
 
-    for (final ITransition transition : transitions) {
+    for (final Transition transition : transitions) {
       if (transition.conditionsFullfilled()) {
         this.currentState.exit();
         this.currentState = transition.getNextState();

@@ -3,8 +3,8 @@ package de.gurkenlabs.litiengine.graphics.animation;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.IEntityController;
+import de.gurkenlabs.litiengine.entities.IEntity;
 
 public interface IEntityAnimationController extends IAnimationController, IEntityController {
   /**
