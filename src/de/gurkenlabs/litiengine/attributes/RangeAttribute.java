@@ -59,10 +59,6 @@ public class RangeAttribute<T extends Number> extends Attribute<T> {
   }
 
   protected T applyMaxModifiers(final T maxValue) {
-    if (this.getMaxModifiers().isEmpty()) {
-      return maxValue;
-    }
-
     T currentValue = maxValue;
     for (final AttributeModifier<T> modifier : this.getMaxModifiers()) {
       currentValue = modifier.modify(currentValue);

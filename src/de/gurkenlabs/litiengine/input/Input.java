@@ -71,10 +71,6 @@ public final class Input {
    * @return The {@link Gamepad} with the specified index.
    */
   public static Gamepad getGamepad(final int index) {
-    if (gamePads.isEmpty()) {
-      return null;
-    }
-
     for (final Gamepad gamepad : gamePads) {
       if (gamepad.getIndex() == index) {
         return gamepad;

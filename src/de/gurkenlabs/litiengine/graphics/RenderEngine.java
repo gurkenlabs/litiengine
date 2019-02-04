@@ -266,10 +266,8 @@ public final class RenderEngine {
       return;
     }
     final RenderEvent<IEntity> renderEvent = new RenderEvent<>(g, entity);
-    if (!this.entityRenderingConsumer.isEmpty()) {
-      for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
-        consumer.accept(renderEvent);
-      }
+    for (final Consumer<RenderEvent<IEntity>> consumer : this.entityRenderingConsumer) {
+      consumer.accept(renderEvent);
     }
 
     final IEntityAnimationController animationController = entity.getAnimationController();

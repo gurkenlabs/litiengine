@@ -274,17 +274,15 @@ public class Trigger extends CollisionEntity implements IUpdateable {
     this.isActivated = true;
 
     // if we actually have a trigger target, we send the message to the target
-    if (!triggerTargets.isEmpty()) {
-      for (final int target : triggerTargets) {
-        final IEntity entity = Game.world().environment().get(target);
-        if (entity == null) {
-          log.log(Level.WARNING, "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment", new Object[] { this.getName(), target });
-          continue;
-        }
-
-        entity.sendMessage(this, this.message);
-        this.activated.add(activator);
+    for (final int target : triggerTargets) {
+      final IEntity entity = Game.world().environment().get(target);
+      if (entity == null) {
+        log.log(Level.WARNING, "trigger [{0}] was activated, but the trigger target [{1}] could not be found on the environment", new Object[] { this.getName(), target });
+        continue;
       }
+
+      entity.sendMessage(this, this.message);
+      this.activated.add(activator);
     }
 
     // also send the trigger event to all registered consumers

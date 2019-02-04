@@ -348,7 +348,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public Collection<IMapObject> getMapObjects() {
     List<IMapObject> mapObjects = new ArrayList<>();
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+    if (this.getMapObjectLayers() == null) {
       return mapObjects;
     }
 
@@ -369,7 +369,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public IMapObject getMapObject(int mapId) {
-    if (this.getMapObjectLayers() == null || this.getMapObjectLayers().isEmpty()) {
+    if (this.getMapObjectLayers() == null) {
       return null;
     }
 
@@ -421,7 +421,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   public void setPath(final String path) {
     this.path = path;
-    if (this.rawImageLayers != null && !this.rawImageLayers.isEmpty()) {
+    if (this.rawImageLayers != null) {
       for (final ImageLayer imgLayer : this.rawImageLayers) {
         if (imgLayer == null) {
           continue;
@@ -431,7 +431,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       }
     }
 
-    if (this.rawTilesets != null && !this.rawTilesets.isEmpty()) {
+    if (this.rawTilesets != null) {
       for (final Tileset tileSet : this.rawTilesets) {
         if (tileSet == null) {
           continue;
