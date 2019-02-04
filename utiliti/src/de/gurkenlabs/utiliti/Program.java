@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
@@ -186,8 +187,12 @@ public class Program {
     return verticalScroll;
   }
 
-  public static TrayIcon getTrayIcon() {
-    return trayIcon;
+  public static void setTrayToolTip(String tooltipText) {
+    if (!SystemTray.isSupported() || trayIcon == null) {
+      return;
+    }
+
+    trayIcon.setToolTip(tooltipText);
   }
 
   public static UserPreferenceConfiguration getUserPreferences() {
@@ -223,31 +228,19 @@ public class Program {
   }
 
   private static void handleArgs(String[] args) {
-    if (args.length == 0) {
+    if (args.length == 0 || args[0] == null || args[0].isEmpty()) {
       return;
     }
 
-    for (int i = 0; i < args.length; i++) {
-      if (args[i] == null || args[i].isEmpty()) {
-        continue;
-      }
-
-      // handle file loading
-      if (i == 0) {
-        if (args[i] == null || args[i].isEmpty()) {
-          continue;
-        }
-
-        try {
-          Paths.get(args[i]);
-        } catch (InvalidPathException e) {
-          continue;
-        }
-
-        File f = new File(args[i]);
-        EditorScreen.instance().load(f);
-      }
+    // handle file loading
+    try {
+      Paths.get(args[0]);
+    } catch (InvalidPathException e) {
+      return;
     }
+
+    File f = new File(args[0]);
+    EditorScreen.instance().load(f);
   }
 
   private static void setupInterface() {
@@ -543,7 +536,7 @@ public class Program {
 
     MenuItem importTilesets = new MenuItem(Resources.strings().get("menu_assets_importTilesets"));
     importTilesets.addActionListener(a -> EditorScreen.instance().importTilesets());
-    
+
     MenuItem importSounds = new MenuItem(Resources.strings().get("menu_assets_importSounds"));
     importSounds.addActionListener(a -> EditorScreen.instance().importSounds());
 
@@ -698,7 +691,6 @@ public class Program {
   }
 
   private static Component initConsole() {
-    // TODO: implement possibility to configure the desired log level
     Logger root = Logger.getLogger("");
     JTextPane consoleTextArea = new JTextPane();
     JScrollPane consoleScrollPane = new JScrollPane();
@@ -713,50 +705,28 @@ public class Program {
     return consoleScrollPane;
   }
 
+  private static JButton initButton(Icon icon, ActionListener listener) {
+    JButton button = new JButton();
+    button.setIcon(icon);
+    button.addActionListener(listener);
+    requestFocusOnMouseDown(button);
+    return button;
+  }
+
   private static JToolBar initToolBar() {
     // create basic icon toolbar
     JToolBar basicMenu = new JToolBar();
 
-    JButton cr = new JButton();
-    cr.setIcon(Icons.CREATE);
-    basicMenu.add(cr);
-    cr.addActionListener(a -> EditorScreen.instance().create());
-    requestFocusOnMouseDown(cr);
-
-    JButton op = new JButton();
-    op.setIcon(Icons.LOAD);
-    basicMenu.add(op);
-    op.addActionListener(a -> EditorScreen.instance().load());
-    requestFocusOnMouseDown(op);
-
-    JButton sv = new JButton();
-    sv.setIcon(Icons.SAVE);
-    basicMenu.add(sv);
-    sv.addActionListener(a -> EditorScreen.instance().save(false));
-    requestFocusOnMouseDown(sv);
-
-    basicMenu.addSeparator();
-
-    JButton undo = new JButton();
-    undo.setIcon(Icons.UNDO);
-    basicMenu.add(undo);
-    undo.addActionListener(a -> UndoManager.instance().undo());
-    requestFocusOnMouseDown(undo);
-
-    JButton redo = new JButton();
-    redo.setIcon(Icons.REDO);
-    basicMenu.add(redo);
-    redo.addActionListener(a -> UndoManager.instance().redo());
-    requestFocusOnMouseDown(redo);
-
+    JButton cr = initButton(Icons.CREATE, a -> EditorScreen.instance().create());
+    JButton op = initButton(Icons.LOAD, a -> EditorScreen.instance().load());
+    JButton sv = initButton(Icons.SAVE, a -> EditorScreen.instance().save(false));
+    JButton undo = initButton(Icons.UNDO, a -> UndoManager.instance().undo());
+    JButton redo = initButton(Icons.REDO, a -> UndoManager.instance().redo());
     undo.setEnabled(false);
     redo.setEnabled(false);
 
-    basicMenu.addSeparator();
-
     JToggleButton place = new JToggleButton();
     place.setIcon(Icons.PLACEOBJECT);
-    basicMenu.add(place);
     requestFocusOnMouseDown(place);
 
     JToggleButton ed = new JToggleButton();
@@ -779,8 +749,6 @@ public class Program {
 
       Game.window().getRenderComponent().setCursor(CURSOR, 0, 0);
     });
-    basicMenu.add(ed);
-    basicMenu.add(mv);
 
     place.addActionListener(a -> {
       addPopupMenu.show(place, 0, place.getHeight());
@@ -839,14 +807,12 @@ public class Program {
 
     JButton del = new JButton();
     del.setIcon(Icons.DELETE);
-    basicMenu.add(del);
     del.setEnabled(false);
     del.addActionListener(a -> EditorScreen.instance().getMapComponent().delete());
 
     // copy
     JButton cop = new JButton();
     cop.setIcon(Icons.COPY);
-    basicMenu.add(cop);
     cop.setEnabled(false);
     ActionListener copyAction = a -> EditorScreen.instance().getMapComponent().copy();
     cop.addActionListener(copyAction);
@@ -857,7 +823,7 @@ public class Program {
     // paste
     JButton paste = new JButton();
     paste.setIcon(Icons.PASTE);
-    basicMenu.add(paste);
+
     ActionListener pasteAction = a -> EditorScreen.instance().getMapComponent().paste();
     paste.addActionListener(pasteAction);
     paste.getModel().setMnemonic('V');
@@ -867,7 +833,6 @@ public class Program {
     // cut
     JButton cut = new JButton();
     cut.setIcon(Icons.CUT);
-    basicMenu.add(cut);
     cut.setEnabled(false);
     ActionListener cutAction = a -> EditorScreen.instance().getMapComponent().cut();
     cut.addActionListener(cutAction);
@@ -897,8 +862,6 @@ public class Program {
       undo.setEnabled(manager.canUndo());
       redo.setEnabled(manager.canRedo());
     });
-
-    basicMenu.addSeparator();
 
     JButton colorButton = new JButton();
     colorButton.setIcon(Icons.COLOR);
@@ -964,6 +927,24 @@ public class Program {
 
       isChanging = false;
     });
+
+    basicMenu.add(cr);
+    basicMenu.add(op);
+    basicMenu.add(sv);
+    basicMenu.addSeparator();
+
+    basicMenu.add(undo);
+    basicMenu.add(redo);
+    basicMenu.addSeparator();
+
+    basicMenu.add(place);
+    basicMenu.add(ed);
+    basicMenu.add(mv);
+    basicMenu.add(del);
+    basicMenu.add(cop);
+    basicMenu.add(paste);
+    basicMenu.add(cut);
+    basicMenu.addSeparator();
 
     basicMenu.add(colorButton);
     basicMenu.add(Box.createHorizontalStrut(5));

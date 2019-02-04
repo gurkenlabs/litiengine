@@ -462,7 +462,7 @@ public final class Environment implements IRenderable {
     return foundEntities;
   }
 
-  public <T> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
+  public <T extends IEntity> Collection<T> getByTag(Class<? extends T> clss, String... tags) {
     Collection<T> foundEntities = new ArrayList<>();
     for (String rawTag : tags) {
       String tag = rawTag.toLowerCase();

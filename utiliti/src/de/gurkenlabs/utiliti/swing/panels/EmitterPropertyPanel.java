@@ -47,7 +47,6 @@ import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class EmitterPropertyPanel extends PropertyPanel {
-  // TODO: implement support to adjust rendertype (GROUND, NORMAL, OVERLAY)
   private static final double PARTICLESPINNER_MAX_VALUE = 100.0;
   private static final double PARTICLEDELTA_MAX_VALUE = 1.0;
   private static final double PARTICLEDELTA_DEFAULT_VALUE = 0.1;
@@ -69,7 +68,6 @@ public class EmitterPropertyPanel extends PropertyPanel {
   private final JComboBox<Align> comboBoxAlign = new JComboBox<>();
   private final JComboBox<Valign> comboBoxValign = new JComboBox<>();
   
-  // TODO: refactor this code to use a custom ParticleParameter JPanel implementation that wraps the controls and logic
   private final JRadioButton rdbtnLockDeltaX = new JRadioButton("");
   private final JRadioButton rdbtnLockDeltaY = new JRadioButton("");
   private final JRadioButton rdbtnLockGravityX = new JRadioButton("");
@@ -187,7 +185,6 @@ public class EmitterPropertyPanel extends PropertyPanel {
 
     JScrollPane scrollPane = new JScrollPane();
 
-    // TODO: implement percentage logic
     this.table = new JTable();
     this.table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "percentage", "color" }));
     this.model = (DefaultTableModel) table.getModel();
@@ -957,9 +954,9 @@ public class EmitterPropertyPanel extends PropertyPanel {
       m.setValue(MapObjectProperty.Emitter.PARTICLETYPE, particleType);
     }));
     
-    this.comboBoxCollisionType.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString());
-    }));
+    this.comboBoxCollisionType.addActionListener(new MapObjectPropertyActionListener(m -> 
+      m.setValue(MapObjectProperty.Particle.COLLISIONTYPE, this.comboBoxCollisionType.getSelectedItem().toString())
+    ));
     
     this.comboBoxSprite.addActionListener(new MapObjectPropertyActionListener(m -> {
       String sprite = this.comboBoxSprite.getSelectedItem().toString();
@@ -1112,7 +1109,6 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.spinnerTTL.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.TIMETOLIVE));
     this.spinnerMaxParticles.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.MAXPARTICLES, Emitter.DEFAULT_MAXPARTICLES));
 
-    // TODO: implement this
     this.spinnerColorDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.COLORDEVIATION));
     this.spinnerAlphaDeviation.setValue(mapObject.getDoubleValue(MapObjectProperty.Emitter.ALPHADEVIATION));
 
