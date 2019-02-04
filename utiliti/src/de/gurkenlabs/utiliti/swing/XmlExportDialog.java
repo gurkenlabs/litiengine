@@ -2,6 +2,7 @@ package de.gurkenlabs.utiliti.swing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 
@@ -24,6 +26,11 @@ public final class XmlExportDialog {
   }
 
   public static <T> void export(T object, String name, String filename, String extension) {
+    export(object, name, filename, extension, d -> {
+    });
+  }
+
+  public static <T> void export(T object, String name, String filename, String extension, Consumer<String> consumer) {
     JFileChooser chooser;
     try {
       String source = EditorScreen.instance().getProjectPath();
@@ -39,6 +46,8 @@ public final class XmlExportDialog {
       int result = chooser.showSaveDialog(Game.window().getRenderComponent());
       if (result == JFileChooser.APPROVE_OPTION) {
         File newFile = XmlUtilities.save(object, chooser.getSelectedFile().toString(), extension);
+        String dir = FileUtilities.getParentDirPath(newFile.getAbsolutePath());
+        consumer.accept(dir);
         log.log(Level.INFO, "exported {0} {1} to {2}", new Object[] { name, filename, newFile });
       }
     } catch (IOException e) {

@@ -27,7 +27,7 @@ public class ColorControl extends JPanel {
   public ColorControl() {
     this.listeners = new ArrayList<>();
     this.textFieldColor = new JTextField();
-    this.textFieldColor.setText("#ffffffff");
+    this.textFieldColor.setText(DEFAULT_COLOR);
     this.textFieldColor.setEditable(false);
     this.textFieldColor.setColumns(10);
 

@@ -193,16 +193,18 @@ public class MapObjectPanel extends PropertyPanel {
     }
     tabbedPanel.addTab(Resources.strings().get(panel.getIdentifier()), panel.getIcon(), panel);
 
-    // TODO: support all types that implement ICollisionEntity
     if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.collisionPanel.getIdentifier()), this.collisionPanel.getIcon(), this.collisionPanel);
-      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
     } else {
       this.tabbedPanel.remove(this.collisionPanel);
+    }
+
+    if (type == MapObjectType.PROP || type == MapObjectType.CREATURE) {
+      tabbedPanel.addTab(Resources.strings().get(this.combatPanel.getIdentifier()), this.combatPanel);
+    } else {
       this.tabbedPanel.remove(this.combatPanel);
     }
 
-    // TODO: support all types that implement IMobileEntity
     if (type == MapObjectType.CREATURE) {
       tabbedPanel.addTab(Resources.strings().get(this.movementPanel.getIdentifier()), this.movementPanel.getIcon(), this.movementPanel);
     } else {

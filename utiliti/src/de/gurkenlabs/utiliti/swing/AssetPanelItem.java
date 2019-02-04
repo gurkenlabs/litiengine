@@ -102,9 +102,6 @@ public class AssetPanelItem extends JPanel {
         textField.setForeground(defaults.getColor("Tree.selectionForeground"));
         setBorder(focusBorder);
 
-        // TODO: We might need to provide multiple JPanels that contain the
-        // buttons for
-        // a certain usage and swap them out
         if (getOrigin() instanceof SpritesheetResource || getOrigin() instanceof EmitterData) {
           btnEdit.setVisible(true);
           btnAdd.setVisible(true);
@@ -233,9 +230,6 @@ public class AssetPanelItem extends JPanel {
         }
       }
 
-      // TODO: in case the asset has been renamed: update all props that uses
-      // the
-      // asset to use the new name (assets are treated as reference by name)
       EditorScreen.instance().loadSpriteSheets(EditorScreen.instance().getGameFile().getSpriteSheets(), true);
     });
     btnEdit.setMaximumSize(new Dimension(16, 16));
@@ -327,7 +321,6 @@ public class AssetPanelItem extends JPanel {
       return false;
     }
 
-    // TODO: experimental code... this needs to be refactored with issue #66
     if (this.getOrigin() instanceof SpritesheetResource) {
       SpritesheetResource info = (SpritesheetResource) this.getOrigin();
 

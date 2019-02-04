@@ -15,8 +15,6 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,11 +28,8 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
@@ -71,10 +66,10 @@ import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 import de.gurkenlabs.litiengine.util.io.ImageSerializer;
-import de.gurkenlabs.litiengine.util.io.XmlUtilities;
 import de.gurkenlabs.utiliti.EditorScreen;
 import de.gurkenlabs.utiliti.Program;
 import de.gurkenlabs.utiliti.UndoManager;
+import de.gurkenlabs.utiliti.swing.XmlExportDialog;
 import de.gurkenlabs.utiliti.swing.XmlImportDialog;
 
 public class MapComponent extends EditorComponent implements IUpdateable {
@@ -843,41 +838,17 @@ public class MapComponent extends EditorComponent implements IUpdateable {
   }
 
   public void exportMap(Map map) {
-    // TODO: replace by XmlExportDialog call
-    JFileChooser chooser;
-    try {
-      String source = EditorScreen.instance().getProjectPath();
-      chooser = new JFileChooser(source != null ? source : new File(".").getCanonicalPath());
-      chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-      chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-      chooser.setDialogTitle("Export Map");
-      FileFilter filter = new FileNameExtensionFilter("tmx - Tilemap XML", Map.FILE_EXTENSION);
-      chooser.setFileFilter(filter);
-      chooser.addChoosableFileFilter(filter);
-      chooser.setSelectedFile(new File(map.getName() + "." + Map.FILE_EXTENSION));
+    XmlExportDialog.export(map, "Map", map.getName(), Map.FILE_EXTENSION, dir -> {
+      for (ITileset tileSet : map.getTilesets()) {
+        ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
+        ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);
 
-      int result = chooser.showSaveDialog(Game.window().getRenderComponent());
-      if (result == JFileChooser.APPROVE_OPTION) {
-        File newFile = XmlUtilities.save(map, chooser.getSelectedFile().toString(), Map.FILE_EXTENSION);
-
-        // save all tilesets manually because a map has a relative reference to
-        // the tilesets
-        String dir = FileUtilities.getParentDirPath(newFile.toURI());
-        for (ITileset tileSet : map.getTilesets()) {
-          ImageFormat format = ImageFormat.get(FileUtilities.getExtension(tileSet.getImage().getSource()));
-          ImageSerializer.saveImage(Paths.get(dir, tileSet.getImage().getSource()).toString(), Resources.spritesheets().get(tileSet.getImage().getSource()).getImage(), format);
-
-          Tileset tile = (Tileset) tileSet;
-          if (tile.isExternal()) {
-            tile.saveSource(dir);
-          }
+        Tileset tile = (Tileset) tileSet;
+        if (tile.isExternal()) {
+          tile.saveSource(dir);
         }
-
-        log.log(Level.INFO, "exported {0} to {1}", new Object[] { map.getName(), newFile });
       }
-    } catch (IOException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
+    });
   }
 
   public void zoomIn() {

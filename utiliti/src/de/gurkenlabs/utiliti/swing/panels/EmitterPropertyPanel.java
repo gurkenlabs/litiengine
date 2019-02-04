@@ -966,13 +966,13 @@ public class EmitterPropertyPanel extends PropertyPanel {
       m.setValue(MapObjectProperty.Particle.SPRITE, sprite);
     }));
     
-    this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString());
-    }));
+    this.comboBoxAlign.addActionListener(new MapObjectPropertyActionListener(m -> 
+      m.setValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, this.comboBoxAlign.getSelectedItem().toString())
+    ));
     
-    this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> {
-      m.setValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString());
-    }));
+    this.comboBoxValign.addActionListener(new MapObjectPropertyActionListener(m -> 
+      m.setValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, this.comboBoxValign.getSelectedItem().toString())
+    ));
     
     this.spinnerSpawnRate.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNRATE, this.spinnerSpawnRate));
     this.spinnerSpawnAmount.addChangeListener(new SpinnerListener(MapObjectProperty.Emitter.SPAWNAMOUNT, this.spinnerSpawnAmount));
@@ -1104,7 +1104,6 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.CENTER));
     this.comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.MIDDLE));
     
-    // TODO: implement this
     this.comboBoxSpriteType.setSelectedIndex(0);
 
     this.spinnerSpawnRate.setValue(mapObject.getIntValue(MapObjectProperty.Emitter.SPAWNRATE));

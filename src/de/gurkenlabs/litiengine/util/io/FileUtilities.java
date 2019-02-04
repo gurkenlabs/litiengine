@@ -145,11 +145,16 @@ public final class FileUtilities {
   }
 
   public static String getParentDirPath(final String uri) {
+    if (uri == null || uri.isEmpty()) {
+      return uri;
+    }
+    
     try {
       return getParentDirPath(new URI(uri));
     } catch (URISyntaxException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-      return null;
+      String parent = new File(uri).getParent();
+      parent += File.separator;
+      return parent;
     }
   }
 
