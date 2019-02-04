@@ -1,5 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
+import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -121,7 +122,7 @@ public class CombatEntity extends CollisionEntity implements ICombatEntity {
    * @return the hit box
    */
   @Override
-  public Ellipse2D getHitBox() {
+  public Shape getHitBox() {
     return new Ellipse2D.Double(this.getX(), this.getY(), this.getWidth(), this.getHeight());
   }
 

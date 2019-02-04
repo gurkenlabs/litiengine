@@ -1,6 +1,6 @@
 package de.gurkenlabs.litiengine.entities;
 
-import java.awt.geom.Ellipse2D;
+import java.awt.Shape;
 import java.util.List;
 
 import de.gurkenlabs.litiengine.abilities.Ability;
@@ -26,9 +26,7 @@ public interface ICombatEntity extends ICollisionEntity {
 
   public RangeAttribute<Integer> getHitPoints();
 
-  // TODO: This could be refactored to be a shape which would allow for the game
-  // developer to decide what he wants to use.
-  public Ellipse2D getHitBox();
+  public Shape getHitBox();
 
   public ICombatEntity getTarget();
 
