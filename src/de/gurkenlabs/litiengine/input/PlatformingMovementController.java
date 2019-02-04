@@ -26,7 +26,7 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
    * @see IEntity#register(String, Runnable)
    * @see Action
    */
-  public static final String JUMP = "jump";
+  public static final String JUMP_ACTION = "jump";
 
   /** The list of jump keys, represented by their integer values. */
   private final List<Integer> jump;
@@ -62,7 +62,7 @@ public class PlatformingMovementController<T extends IMobileEntity> extends Keyb
   public void handlePressedKey(KeyEvent keyCode) {
     super.handlePressedKey(keyCode);
     if (this.jump.contains(keyCode.getKeyCode())) {
-      this.getEntity().perform(JUMP);
+      this.getEntity().perform(JUMP_ACTION);
     }
   }
 

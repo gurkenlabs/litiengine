@@ -210,7 +210,7 @@ public abstract class ResourcesContainer<T> {
     if (resource != null) {
       this.add(identifier, resource);
     }
-    
+
     return resource;
   }
 
@@ -303,6 +303,15 @@ public abstract class ResourcesContainer<T> {
 
   protected abstract T load(String resourceName) throws Exception;
 
+  /**
+   * Gets an alias for the specified resourceName. Note that the process of providing an alias is up to the ResourceContainer implementation.
+   * 
+   * @param resourceName
+   *          The original name of the resource.
+   * @param resource
+   *          The resource.
+   * @return An alias for the specified resource.
+   */
   protected String getAlias(String resourceName, T resource) {
     return null;
   }

@@ -156,8 +156,8 @@ public abstract class PropertyPanel extends JPanel {
   }
 
   protected void setup(JTextField textField, String property) {
-    textField.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textField.getText())));
-    textField.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(MapObjectProperty.SPAWN_TYPE, textField.getText())));
+    textField.addFocusListener(new MapObjectPropteryFocusListener(m -> m.setValue(property, textField.getText())));
+    textField.addActionListener(new MapObjectPropertyActionListener(m -> m.setValue(property, textField.getText())));
   }
 
   protected void setup(TextList textList, String property) {
