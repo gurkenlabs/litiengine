@@ -1,9 +1,0 @@
-apply plugin: 'java'
-
-repositories {
-  mavenCentral()
-}
-
-dependencies {
-  compile 'de.gurkenlabs:litiengine:0.4.15'
-}
