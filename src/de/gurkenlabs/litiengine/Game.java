@@ -80,17 +80,17 @@ public final class Game {
 
   private static boolean debug = true;
   private static boolean noGUIMode = false;
-  private static final List<GameListener> gameListeners;
-  private static final List<GameTerminatedListener> gameTerminatedListeners;
+  private static final List<GameListener> gameListeners = new CopyOnWriteArrayList<>();
+  private static final List<GameTerminatedListener> gameTerminatedListeners = new CopyOnWriteArrayList<>();
 
-  private static final RenderEngine graphicsEngine;
-  private static final SoundEngine soundEngine;
-  private static final PhysicsEngine physicsEngine;
+  private static final RenderEngine graphicsEngine = new RenderEngine();
+  private static final SoundEngine soundEngine = new SoundEngine();
+  private static final PhysicsEngine physicsEngine = new PhysicsEngine();
 
   private static final GameConfiguration configuration;
-  private static final GameMetrics metrics;
+  private static final GameMetrics metrics = new GameMetrics();
   private static final GameTime gameTime;
-  private static GameInfo gameInfo;
+  private static GameInfo gameInfo = new GameInfo();
 
   private static GameLoop gameLoop;
   private static RenderLoop renderLoop;
@@ -103,15 +103,6 @@ public final class Game {
   private static boolean initialized;
 
   static {
-    gameListeners = new CopyOnWriteArrayList<>();
-    gameTerminatedListeners = new CopyOnWriteArrayList<>();
-
-    graphicsEngine = new RenderEngine();
-    physicsEngine = new PhysicsEngine();
-    soundEngine = new SoundEngine();
-
-    metrics = new GameMetrics();
-    gameInfo = new GameInfo();
     gameTime = new GameTime();
 
     // init configuration before init method in order to use configured values
