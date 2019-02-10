@@ -281,7 +281,7 @@ public class MapObjectLoaderTests {
   }
 
   @EntityInfo(customMapObjectType = "customEntity")
-  public static class CustomEntity extends Entity {
+  static class CustomEntity extends Entity {
     @TmxProperty(name = "foo")
     private String foo;
 

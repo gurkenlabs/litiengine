@@ -163,7 +163,7 @@ public final class Spritesheet {
   }
 
   public boolean isLoaded() {
-    return Resources.spritesheets().contains(this);
+    return Resources.spritesheets().contains(this.getName());
   }
 
   public void setSpriteHeight(final int spriteHeight) {
