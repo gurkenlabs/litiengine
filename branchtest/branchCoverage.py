@@ -26,9 +26,6 @@ if __name__ == '__main__':
 
         nb = len(data)
         coverage = round((nb - np.sum(data))/nb,2)
-        print(nb)
-
-        print (data)
 
         with open(outfile_name, 'w') as outfile:
             outfile.write("----------------------------------------\n")
