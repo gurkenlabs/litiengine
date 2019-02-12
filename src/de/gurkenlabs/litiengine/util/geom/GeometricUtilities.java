@@ -294,12 +294,12 @@ public class GeometricUtilities {
     branches[5] = 1;
 
     try {
-      FileWriter fw = new FileWriter("branchtest/test_10.txt", true);
+      FileWriter fw = new FileWriter("branchtest/test_10.csv", true);
       BufferedWriter bw = new BufferedWriter(fw);
       PrintWriter pw = new PrintWriter(bw);
       pw.print(branches[0]);
       for (int i = 1; i < numberOfBranches; i++) {
-        pw.print(" ");
+        pw.print(",");
         pw.print(branches[i]);
       }
       pw.println();
