@@ -7,3 +7,5 @@ crash.txt
 /.idea
 /out/production/classes/de/gurkenlabs/litiengine
 /out/test/classes/de/gurkenlabs/litiengine
+/branchtest/*.txt
+/branchtest/*.csv
