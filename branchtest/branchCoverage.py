@@ -16,6 +16,7 @@ if __name__ == '__main__':
         try:
             data = loadtxt(filenames[i], dtype=int, delimiter=',')
         except IOError:
+            print(filenames[i] + ' not found')
             continue
 
         # Sum over columns to see what branches are untested
