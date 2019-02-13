@@ -22,4 +22,4 @@ echo " * Running the branch coverage python script..."
 python3 branchCoverage.py
 
 echo < "result.txt"
-echo "✅ Result printed to result.txt"
+echo "✅ Result printed to branchtest/result.txt"
