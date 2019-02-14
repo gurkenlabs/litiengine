@@ -59,6 +59,10 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
 public final class Environment implements IRenderable {
   private static final Map<String, IMapObjectLoader> mapObjectLoaders = new ConcurrentHashMap<>();
   private static final String GRAVITY_IDENTIFIER = "GRAVITY";
@@ -160,66 +164,85 @@ public final class Environment implements IRenderable {
    * @param entity
    *          The entity to add to the environment.
    */
+  //QuickFind2
   public void add(final IEntity entity) {
+    int numberOfBranches = 19;
+    int branches[] = new int [numberOfBranches];
     if (entity == null) {
+      branches[1] = 1;
       return;
     }
 
     // set local map id if none is set for the entity
     if (entity.getMapId() == 0) {
+      branches[2] = 1;
       entity.setMapId(this.getLocalMapId());
     }
 
     if (entity instanceof Emitter) {
+      branches[3] = 1;
       Emitter emitter = (Emitter) entity;
       this.addEmitter(emitter);
     }
 
     if (entity instanceof ICombatEntity) {
+      branches[4] = 1;
       this.combatEntities.put(entity.getMapId(), (ICombatEntity) entity);
     }
 
     if (entity instanceof IMobileEntity) {
+      branches[5] = 1;
       this.mobileEntities.put(entity.getMapId(), (IMobileEntity) entity);
     }
 
     if (entity instanceof Prop) {
+      branches[6] = 1;
       this.props.add((Prop) entity);
     }
 
     if (entity instanceof Creature) {
+      branches[7] = 1;
       this.creatures.add((Creature) entity);
     }
 
     if (entity instanceof CollisionBox) {
+      branches[8] = 1;
       this.colliders.add((CollisionBox) entity);
     }
 
     if (entity instanceof LightSource) {
+      branches[9] = 1;
       this.lightSources.add((LightSource) entity);
     }
 
     if (entity instanceof Trigger) {
+      branches[10] = 1;
       this.triggers.add((Trigger) entity);
     }
 
     if (entity instanceof Spawnpoint) {
+      branches[11] = 1;
       this.spawnPoints.add((Spawnpoint) entity);
     }
 
     if (entity instanceof StaticShadow) {
+      branches[12] = 1;
       this.staticShadows.add((StaticShadow) entity);
     } else if (entity instanceof MapArea) {
+      branches[13] = 1;
       this.mapAreas.add((MapArea) entity);
     }
 
     for (String rawTag : entity.getTags()) {
+      branches[14] = 1;
       if (rawTag == null) {
+        branches[15] = 1;
         continue;
       }
 
       final String tag = rawTag.trim().toLowerCase();
       if (tag.isEmpty()) {
+        branches[16] = 1;
         continue;
       }
 
@@ -229,12 +252,31 @@ public final class Environment implements IRenderable {
     // if the environment has already been loaded,
     // we need to load the new entity manually
     if (this.loaded) {
+      branches[17] = 1;
       this.load(entity);
     }
 
+    branches[18] = 1;
     this.entities.get(entity.getRenderType()).put(entity.getMapId(), entity);
 
     this.fireEntityEvent(l -> l.entityAdded(entity));
+
+    try {
+      FileWriter fw = new FileWriter("branchtest/test_02.csv", true);
+      BufferedWriter bw = new BufferedWriter(fw);
+      PrintWriter pw = new PrintWriter(bw);
+      pw.print(branches[0]);
+      for (int i = 1; i < numberOfBranches; i++) {
+        pw.print(",");
+        pw.print(branches[i]);
+      }
+      pw.println();
+      pw.flush();
+      bw.close();
+      fw.close();
+    } catch (Exception e) {
+      System.exit(1);
+    }
   }
 
   private void addEmitter(Emitter emitter) {
@@ -806,77 +848,113 @@ public final class Environment implements IRenderable {
     this.remove(mapId);
     this.loadFromMap(mapId);
   }
-
+  //QuickFind3
   public void remove(final IEntity entity) {
+    int numberOfBranches = 18;
+    int branches[] = new int [numberOfBranches];
     if (entity == null) {
+      branches[1] = 1;
       return;
     }
 
     if (this.entities.get(entity.getRenderType()) != null) {
+      branches[2] = 1;
       this.entities.get(entity.getRenderType()).entrySet().removeIf(e -> e.getValue().getMapId() == entity.getMapId());
     }
 
     for (String tag : entity.getTags()) {
+      branches[3] = 1;
       if (this.getEntitiesByTag().containsKey(tag)) {
+        branches[4] = 1;
         this.getEntitiesByTag().get(tag).remove(entity);
 
         if (this.getEntitiesByTag().get(tag).isEmpty()) {
+          branches[5] = 1;
           this.getEntitiesByTag().remove(tag);
         }
       }
     }
 
     if (entity instanceof Emitter) {
+      branches[6] = 1;
       Emitter emitter = (Emitter) entity;
       this.removeEmitter(emitter);
     }
 
     if (entity instanceof MapArea) {
+      branches[7] = 1;
       this.mapAreas.remove(entity);
     }
 
     if (entity instanceof Prop) {
+      branches[8] = 1;
       this.props.remove(entity);
     }
 
     if (entity instanceof Creature) {
+      branches[9] = 1;
       this.creatures.remove(entity);
     }
 
     if (entity instanceof CollisionBox) {
+      branches[10] = 1;
       this.colliders.remove(entity);
       this.staticShadows.removeIf(x -> x.getOrigin() != null && x.getOrigin().equals(entity));
     }
 
     if (entity instanceof LightSource) {
+      branches[11] = 1;
       this.lightSources.remove(entity);
       this.updateColorLayers(entity);
     }
 
     if (entity instanceof Trigger) {
+      branches[12] = 1;
       this.triggers.remove(entity);
     }
 
     if (entity instanceof Spawnpoint) {
+      branches[13] = 1;
       this.spawnPoints.remove(entity);
     }
 
     if (entity instanceof StaticShadow) {
+      branches[14] = 1;
       this.staticShadows.remove(entity);
       this.updateColorLayers(entity);
     }
 
     if (entity instanceof IMobileEntity) {
+      branches[15] = 1;
       this.mobileEntities.values().remove(entity);
     }
 
     if (entity instanceof ICombatEntity) {
+      branches[16] = 1;
       this.combatEntities.values().remove(entity);
     }
+    branches[17] = 1;
 
     this.unload(entity);
 
     this.fireEntityEvent(l -> l.entityRemoved(entity));
+
+    try {
+      FileWriter fw = new FileWriter("branchtest/test_03.csv", true);
+      BufferedWriter bw = new BufferedWriter(fw);
+      PrintWriter pw = new PrintWriter(bw);
+      pw.print(branches[0]);
+      for (int i = 1; i < numberOfBranches; i++) {
+        pw.print(",");
+        pw.print(branches[i]);
+      }
+      pw.println();
+      pw.flush();
+      bw.close();
+      fw.close();
+    } catch (Exception e) {
+      System.exit(1);
+    }
   }
 
   public void remove(final int mapId) {
