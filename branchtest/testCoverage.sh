@@ -10,6 +10,12 @@ echo "----------------- Running test coverage ------------------"
 echo " * Deleting old .csv files..."
 find *.csv -type f -delete
 
+# Delete old result.txt file
+echo " * Deleting old result.txt file..."
+if [ -f result.txt ] ; then
+    rm result.txt
+fi
+
 # Run gradle build followed by gradle test
 echo " * Building and testing..."
 cd ../ 
