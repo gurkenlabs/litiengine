@@ -6,7 +6,7 @@ public class CSV {
 
   public static void write(int branches[], int functionNumber) throws Exception {
     try {
-      FileWriter fw = new FileWriter("branchtest/test_" + functionNumber + ".csv", true);
+      FileWriter fw = new FileWriter("branchtest/test_" + (functionNumber < 10 ? "0" + functionNumber : functionNumber) + ".csv", true);
       BufferedWriter bw = new BufferedWriter(fw);
       PrintWriter pw = new PrintWriter(bw);
       pw.print(branches[0]);
