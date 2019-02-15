@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import de.gurkenlabs.litiengine.util.io.CSV;
 
 import de.gurkenlabs.litiengine.util.ReflectionUtilities;
 
@@ -143,20 +144,9 @@ public abstract class ConfigurationGroup {
     }
     branches[26] = 1;
     try {
-      FileWriter fw = new FileWriter("branchtest/test_01.csv", true);
-      BufferedWriter bw = new BufferedWriter(fw);
-      PrintWriter pw = new PrintWriter(bw);
-      pw.print(branches[0]);
-      for (int i = 1; i < numberOfBranches; i++) {
-        pw.print(",");
-        pw.print(branches[i]);
-      }
-      pw.println();
-      pw.flush();
-      bw.close();
-      fw.close();
+      CSV.write(branches, 1);
     } catch (Exception e) {
-      System.exit(1);
+      System.err.println("Error: " + e);
     }
   }
 
