@@ -62,7 +62,7 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
    * Copy Constructor for copying instances of Layers.
    *
    * @param layerToBeCopied
-   *          the layer we want to copy
+   *                          the layer we want to copy
    */
   public Layer(Layer layerToBeCopied) {
     super(layerToBeCopied);
@@ -233,8 +233,16 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
 
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
+    int numberOfBranches = 17;
+    int branches[] = new int[numberOfBranches];
+
+    branches[0] = 1;
+
     if (parent instanceof Map) {
       this.parentMap = (Map) parent;
+      branches[1] = 1;
+    } else {
+      branches[2] = 1;
     }
 
     int order = this.getIntValue(LayerProperty.LAYER_ORDER, -1);
@@ -243,30 +251,52 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
       layerCnt += this.parentMap.getRawMapObjectLayers().size();
       layerCnt += this.parentMap.getRawTileLayers().size();
       this.setOrder(layerCnt);
+
+      branches[3] = 1;
+    } else {
+      branches[4] = 1;
     }
 
     if (this.offsetx != null && this.offsetx.intValue() == 0) {
       this.offsetx = null;
+      branches[5] = 1;
+    } else {
+      branches[6] = 1;
     }
 
     if (this.offsety != null && this.offsety.intValue() == 0) {
       this.offsety = null;
+      branches[7] = 1;
+    } else {
+      branches[8] = 1;
     }
 
     if (this.width != null && this.width.intValue() == 0) {
       this.width = null;
+      branches[9] = 1;
+    } else {
+      branches[10] = 1;
     }
 
     if (this.height != null && this.height.intValue() == 0) {
       this.height = null;
+      branches[11] = 1;
+    } else {
+      branches[12] = 1;
     }
 
     if (this.opacity != null && this.opacity.floatValue() == 1.0f) {
       this.opacity = null;
+      branches[13] = 1;
+    } else {
+      branches[14] = 1;
     }
 
     if (this.visible != null && this.visible.intValue() == 1) {
       this.visible = null;
+      branches[15] = 1;
+    } else {
+      branches[16] = 1;
     }
   }
 }
