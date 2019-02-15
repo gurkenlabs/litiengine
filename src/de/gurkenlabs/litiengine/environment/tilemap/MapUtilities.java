@@ -14,6 +14,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+import de.gurkenlabs.litiengine.util.io.CSV;
+
 public final class MapUtilities {
   private static final Map<String, ITileAnimation> animations;
   private static final Map<String, Boolean> hasAnimation;
@@ -159,10 +161,11 @@ public final class MapUtilities {
    * Check if the row or column with the given index is staggered.
    * 
    * @param staggerIndex
-   *          the staggerIndex property of the map. Every second row (or column, depending on the {@link StaggerAxis} of the map is staggered half a
-   *          tile.
+   *                       the staggerIndex property of the map. Every second row (or column, depending on the {@link StaggerAxis} of the map is
+   *                       staggered half a
+   *                       tile.
    * @param index
-   *          the index of the current row or column for which we want to determine if it's staggered or not.
+   *                       the index of the current row or column for which we want to determine if it's staggered or not.
    * @return a boolean representing if the row or column with the given index is staggered.
    */
   public static boolean isStaggeredRowOrColumn(StaggerIndex staggerIndex, int index) {
@@ -170,33 +173,77 @@ public final class MapUtilities {
   }
 
   private static Point assessHexStaggering(StaggerAxis staggerAxis, StaggerIndex staggerIndex, Point tileLocation, int s, int t, int r, int jumpWidth, int jumpHeight, double mouseX, double mouseY) {
+    int numberOfBranches = 17;
+    int branches[] = new int[numberOfBranches];
+
+    branches[0] = 1;
+
     int xIndex = tileLocation.x;
     int yIndex = tileLocation.y;
+
     int x = isStaggeredRowOrColumn(staggerIndex, yIndex) && staggerAxis == StaggerAxis.Y ? xIndex * jumpWidth + r : xIndex * jumpWidth;
+    if (isStaggeredRowOrColumn(staggerIndex, yIndex) && staggerAxis == StaggerAxis.Y) {
+      branches[1] = 1;
+    } else {
+      branches[2] = 1;
+    }
+
     int y = isStaggeredRowOrColumn(staggerIndex, xIndex) && staggerAxis == StaggerAxis.X ? yIndex * jumpHeight + r : yIndex * jumpHeight;
+    if (isStaggeredRowOrColumn(staggerIndex, xIndex) && staggerAxis == StaggerAxis.X) {
+      branches[3] = 1;
+    } else {
+      branches[4] = 1;
+    }
+
     Polygon hex = GeometricUtilities.getHex(x, y, staggerAxis, s, r, t);
     //we don't need any further computation if the mouse is already inside the hex
     if (hex.contains(mouseX, mouseY)) {
+      branches[5] = 1;
       return new Point(xIndex, yIndex);
     } else if (mouseY < hex.getBounds2D().getY() + hex.getBounds2D().getHeight() / 2) { //is the mouse in the upper left triangle outside the hex -> switch to the hex left and above the current hex
+      branches[6] = 1;
+
       if (staggerAxis == StaggerAxis.X) {
         yIndex = isStaggeredRowOrColumn(staggerIndex, xIndex) ? yIndex : yIndex - 1;
         xIndex -= 1;
+        branches[7] = 1;
+      } else {
+        branches[8] = 1;
       }
       if (staggerAxis == StaggerAxis.Y) {
         xIndex = isStaggeredRowOrColumn(staggerIndex, yIndex) ? xIndex : xIndex - 1;
         yIndex -= 1;
+        branches[9] = 1;
+      } else {
+        branches[10] = 1;
       }
     } else if (mouseY >= hex.getBounds2D().getY() + hex.getBounds2D().getHeight() / 2) { //is the mouse in the lower left triangle outside the hex-> switch to the hex left and below the current hex
+      branches[11] = 1;
       if (staggerAxis == StaggerAxis.X) {
         yIndex = isStaggeredRowOrColumn(staggerIndex, xIndex) ? yIndex + 1 : yIndex;
         xIndex -= 1;
+        branches[12] = 1;
+      } else {
+        branches[13] = 1;
       }
+
       if (staggerAxis == StaggerAxis.Y) {
         xIndex = isStaggeredRowOrColumn(staggerIndex, yIndex) ? xIndex + 1 : xIndex;
         yIndex -= 1;
+        branches[14] = 1;
+      } else {
+        branches[15] = 1;
       }
+    } else {
+      branches[16] = 1;
     }
+
+    try {
+      CSV.write(branches, 9);
+    } catch (Exception e) {
+      System.err.println("Error: " + e);
+    }
+
     return new Point(xIndex, yIndex);
   }
 
@@ -308,9 +355,9 @@ public final class MapUtilities {
    * the grid id.
    *
    * @param map
-   *          the map
+   *               the map
    * @param tile
-   *          the tile
+   *               the tile
    * @return the tileset
    */
   public static ITileset findTileSet(final IMap map, final ITile tile) {
