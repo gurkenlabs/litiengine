@@ -13,6 +13,8 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.LayerProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
+import de.gurkenlabs.litiengine.util.io.CSV;
+
 /**
  * The Class Layer.
  */
@@ -297,6 +299,12 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
       branches[15] = 1;
     } else {
       branches[16] = 1;
+    }
+
+    try {
+      CSV.write(branches, 8);
+    } catch (Exception e) {
+      System.err.println("Error: " + e);
     }
   }
 }
