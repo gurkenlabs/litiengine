@@ -59,6 +59,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.TimeUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
+import de.gurkenlabs.litiengine.util.io.CSV;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -998,20 +999,9 @@ public final class Environment implements IRenderable {
     this.fireEntityEvent(l -> l.entityRemoved(entity));
 
     try {
-      FileWriter fw = new FileWriter("branchtest/test_03.csv", true);
-      BufferedWriter bw = new BufferedWriter(fw);
-      PrintWriter pw = new PrintWriter(bw);
-      pw.print(branches[0]);
-      for (int i = 1; i < numberOfBranches; i++) {
-        pw.print(",");
-        pw.print(branches[i]);
-      }
-      pw.println();
-      pw.flush();
-      bw.close();
-      fw.close();
+      CSV.write(branches, 3);
     } catch (Exception e) {
-      System.exit(1);
+      System.err.println("Error: " + e);
     }
   }
 
