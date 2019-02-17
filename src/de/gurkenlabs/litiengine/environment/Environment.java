@@ -157,6 +157,14 @@ public final class Environment implements IRenderable {
     this.entityListeners.remove(listener);
   }
 
+  //DD2480: Add helper function to bypass private access.
+ /* public int checkEntitiesEmpty() {
+    if(entities.size()==0)
+      return entities.size();
+    else
+      return entities.size();
+  }*/
+
   /**
    * Adds the specified entity to the environment container. This also loads the
    * entity (register entity and controllers for update) if the environment has
