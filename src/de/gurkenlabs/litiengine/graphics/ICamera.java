@@ -5,7 +5,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 
 /**
@@ -123,6 +125,12 @@ public interface ICamera extends IUpdateable {
   public boolean isClampToMap();
  
   public void setClampToMap(final boolean clampToMap);
+
+  public void setClampAlign(Align align, Valign valign);
+
+  public Align getClampAlign();
+
+  public Valign getClampValign();
 
   public void shake(double intensity, final int delay, int duration);
 

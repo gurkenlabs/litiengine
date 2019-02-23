@@ -4,11 +4,14 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
+import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.graphics.animation.IAnimationController;
 import de.gurkenlabs.litiengine.util.MathUtilities;
@@ -44,8 +47,9 @@ public class Camera implements ICamera {
   private Point2D targetFocus;
   private int panTime = 0;
 
-  // TODO: implement possiblity to provide a padding
   private boolean clampToMap;
+  private Align align = Align.LEFT;
+  private Valign valign = Valign.TOP;
 
   /**
    * Instantiates a new camera.
@@ -267,6 +271,24 @@ public class Camera implements ICamera {
   public void setClampToMap(final boolean clampToMap) {
     this.clampToMap = clampToMap;
   }
+  
+  @Override
+  public void setClampAlign(Align align, Valign valign) {
+    Objects.requireNonNull(align);
+    Objects.requireNonNull(valign);
+    this.align = align;
+    this.valign = valign;
+  }
+
+  @Override
+  public Align getClampAlign() {
+    return this.align;
+  }
+
+  @Override
+  public Valign getClampValign() {
+    return this.valign;
+  }
 
   // TODO: write a unit test for this
   protected Point2D clampToMap(Point2D focus) {
@@ -277,15 +299,15 @@ public class Camera implements ICamera {
 
     final Dimension mapSize = Game.world().environment().getMap().getSizeInPixels();
 
-    // TODO: Implement special handling for maps that are smaller than the camera area: use Align, Valign to determine where to render them
     final Dimension resolution = Game.window().getResolution();
     double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
     double maxX = mapSize.getWidth() - minX;
     double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
-    double x = mapSize.getWidth() * this.getRenderScale() < resolution.getWidth() ? minX : MathUtilities.clamp(focus.getX(), minX, maxX);
-    double y = mapSize.getHeight() * this.getRenderScale() < resolution.getHeight() ? minY : MathUtilities.clamp(focus.getY(), minY, maxY);
+    // implementation note: inside the "true" sections, min and max are effectively swapped and become max and min for alignment
+    double x = maxX < minX ? maxX + this.align.getValue(minX - maxX - mapSize.getWidth()) : MathUtilities.clamp(focus.getX(), minX, maxX);
+    double y = maxY < minY ? maxY + this.valign.getValue(minY - maxY - mapSize.getHeight()) : MathUtilities.clamp(focus.getY(), minY, maxY);
 
     return new Point2D.Double(x, y);
   }
