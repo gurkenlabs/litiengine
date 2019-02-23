@@ -23,6 +23,10 @@ public enum Align {
     }
   }
 
+  public float getValue(float width) {
+    return width * this.portion;
+  }
+
   public double getValue(double width) {
     return width * this.portion;
   }

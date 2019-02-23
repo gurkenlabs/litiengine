@@ -23,6 +23,10 @@ public enum Valign {
     }
   }
 
+  public float getValue(float height) {
+    return height * this.portion;
+  }
+
   public double getValue(double height) {
     return height * this.portion;
   }
