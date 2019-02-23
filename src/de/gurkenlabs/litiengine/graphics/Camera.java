@@ -259,7 +259,7 @@ public class Camera implements ICamera {
 
     final double viewPortX = this.getFocus().getX() - this.getViewPortCenterX();
     final double viewPortY = this.getFocus().getY() - this.getViewPortCenterY();
-    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, Game.window().getResolution().getWidth() / this.getRenderScale(), Game.window().getResolution().getHeight() / this.getRenderScale());
+    this.viewPort = new Rectangle2D.Double(viewPortX, viewPortY, this.getViewportWidth(), this.getViewportHeight());
   }
 
   @Override
@@ -299,10 +299,9 @@ public class Camera implements ICamera {
 
     final Dimension mapSize = Game.world().environment().getMap().getSizeInPixels();
 
-    final Dimension resolution = Game.window().getResolution();
-    double minX = resolution.getWidth() / this.getRenderScale() / 2.0;
+    double minX = this.getViewportWidth() / 2.0;
     double maxX = mapSize.getWidth() - minX;
-    double minY = resolution.getHeight() / this.getRenderScale() / 2.0;
+    double minY = this.getViewportHeight() / 2.0;
     double maxY = mapSize.getHeight() - minY;
 
     // implementation note: inside the "true" sections, min and max are effectively swapped and become max and min for alignment
@@ -354,12 +353,20 @@ public class Camera implements ICamera {
     return this.shakeTick;
   }
 
+  protected double getViewportWidth() {
+    return Game.window().getResolution().getWidth() / this.getRenderScale();
+  }
+
+  protected double getViewportHeight() {
+    return Game.window().getResolution().getHeight() / this.getRenderScale();
+  }
+
   private double getViewPortCenterX() {
-    return Game.window().getResolution().getWidth() * 0.5 / this.getRenderScale();
+    return this.getViewportWidth() * 0.5;
   }
 
   private double getViewPortCenterY() {
-    return Game.window().getResolution().getHeight() * 0.5 / this.getRenderScale();
+    return this.getViewportHeight() * 0.5;
   }
 
   private boolean isShakeEffectActive() {
