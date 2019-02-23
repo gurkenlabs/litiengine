@@ -2,11 +2,9 @@ package de.gurkenlabs.litiengine.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtilities {
-  private static Random random = new Random();
-
   private MathUtilities() {
     throw new UnsupportedOperationException();
   }
@@ -112,7 +110,7 @@ public class MathUtilities {
    * @return A random index within the range of the specified array.
    */
   public static int getRandomIndex(final double[] indexProbabilities) {
-    final double rnd = random.nextDouble();
+    final double rnd = ThreadLocalRandom.current().nextDouble();
     double probSum = 0;
     for (int i = 0; i < indexProbabilities.length; i++) {
       final double newProbSum = probSum + indexProbabilities[i];
@@ -135,12 +133,12 @@ public class MathUtilities {
   }
 
   public static boolean probabilityIsTrue(final double probability) {
-    double rnd = random.nextDouble();
+    double rnd = ThreadLocalRandom.current().nextDouble();
     return rnd < probability;
   }
 
   public static boolean randomBoolean() {
-    return random.nextDouble() < 0.5;
+    return ThreadLocalRandom.current().nextDouble() < 0.5;
   }
 
   public static double randomInRange(final double min, final double max) {
@@ -152,7 +150,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return min + random.nextDouble() * (max - min);
+    return min + ThreadLocalRandom.current().nextDouble() * (max - min);
   }
 
   public static int randomInRange(final int min, final int max) {
@@ -164,7 +162,7 @@ public class MathUtilities {
       throw new IllegalArgumentException("min value is > than max value");
     }
 
-    return random.nextInt(max - min) + min;
+    return ThreadLocalRandom.current().nextInt(max - min) + min;
   }
 
   public static int randomSign() {
