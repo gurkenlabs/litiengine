@@ -3,7 +3,13 @@ package de.gurkenlabs.litiengine;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
 public enum Align {
-  CENTER, LEFT, RIGHT, CENTER_LEFT, CENTER_RIGHT;
+  CENTER(0.5f), LEFT(0f), RIGHT(1f), CENTER_LEFT(0.25f), CENTER_RIGHT(0.75f);
+
+  public final float portion;
+
+  private Align(float portion) {
+    this.portion = portion;
+  }
 
   public static Align get(final String align) {
     if (align == null || align.isEmpty()) {
@@ -18,19 +24,7 @@ public enum Align {
   }
 
   public double getValue(double width) {
-    switch (this) {
-    case RIGHT:
-      return width;
-    case CENTER:
-      return width / 2.0;
-    case CENTER_RIGHT:
-      return width * 0.75;
-    case CENTER_LEFT:
-      return width * 0.25;
-    case LEFT:
-    default:
-      return 0;
-    }
+    return width * this.portion;
   }
 
   public double getLocation(final double width, final double objectWidth) {
