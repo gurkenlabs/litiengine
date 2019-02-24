@@ -72,7 +72,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.offsetx = layerToBeCopied.offsetx;
     this.offsety = layerToBeCopied.offsety;
     this.setOpacity(layerToBeCopied.getOpacity());
-    this.setOrder(layerToBeCopied.getOrder());
     this.setVisible(layerToBeCopied.isVisible());
   }
 
@@ -176,11 +175,6 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
   }
 
   @Override
-  public int getOrder() {
-    return this.getIntValue(LayerProperty.LAYER_ORDER, -1);
-  }
-
-  @Override
   public IMap getMap() {
     return this.parentMap;
   }
@@ -227,22 +221,10 @@ public abstract class Layer extends CustomPropertyProvider implements ILayer, Se
     this.parentMap = map;
   }
 
-  private void setOrder(int order) {
-    this.setValue(LayerProperty.LAYER_ORDER, order);
-  }
-
   @SuppressWarnings("unused")
   private void afterUnmarshal(Unmarshaller u, Object parent) {
     if (parent instanceof Map) {
       this.parentMap = (Map) parent;
-    }
-
-    int order = this.getIntValue(LayerProperty.LAYER_ORDER, -1);
-    if (order == -1 && parentMap != null) {
-      int layerCnt = this.parentMap.getRawImageLayers().size();
-      layerCnt += this.parentMap.getRawMapObjectLayers().size();
-      layerCnt += this.parentMap.getRawTileLayers().size();
-      this.setOrder(layerCnt);
     }
 
     if (this.offsetx != null && this.offsetx.intValue() == 0) {

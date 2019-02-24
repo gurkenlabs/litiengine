@@ -51,15 +51,15 @@ public interface IMap extends ICustomPropertyProvider {
    */
   public List<IMapObjectLayer> getMapObjectLayers();
 
-  public void addMapObjectLayer(IMapObjectLayer layer);
+  public void addLayer(ILayer layer);
 
-  public void addMapObjectLayer(int index, IMapObjectLayer layer);
+  public void addLayer(int index, ILayer layer);
 
-  public void removeMapObjectLayer(IMapObjectLayer layer);
+  public void removeLayer(ILayer layer);
 
   public IMapObjectLayer getMapObjectLayer(IMapObject mapObject);
 
-  public void removeMapObjectLayer(int index);
+  public void removeLayer(int index);
 
   public Collection<IMapObject> getMapObjects();
 

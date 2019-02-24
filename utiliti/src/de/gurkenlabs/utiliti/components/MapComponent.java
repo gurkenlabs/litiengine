@@ -755,7 +755,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
         // to add any kind of entities
         MapObjectLayer layer = new MapObjectLayer();
         layer.setName(DEFAULT_MAPOBJECTLAYER_NAME);
-        map.addMapObjectLayer(layer);
+        map.addLayer(layer);
       }
 
       Optional<Map> current = this.maps.stream().filter(x -> x.getName().equals(map.getName())).findFirst();

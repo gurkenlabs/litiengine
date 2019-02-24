@@ -100,7 +100,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   public void setTilesetEntries(Map map) throws TmxException {
     for (Tile tile : getData()) {
-      for (ITileset tileset : map.getRawTilesets()) {
+      for (ITileset tileset : map.getTilesets()) {
         if (tileset.containsTile(tile.getGridId())) {
           tile.setTilesetEntry(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
           break;

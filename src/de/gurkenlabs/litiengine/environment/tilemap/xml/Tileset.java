@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -360,6 +361,13 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
       for (TilesetEntry entry : this.tiles) {
         entry.setTerrains(this.getTerrain(entry.getId()));
       }
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
+    if (this.source == null) {
+      this.updateTileTerrain();
     }
   }
 

@@ -114,18 +114,18 @@ public class MapTests {
     assertEquals(10.1f, object.getHeight());
     assertEquals("bar", object.getStringValue("foo"));
 
-    map.addMapObjectLayer(mock(MapObjectLayer.class));
+    map.addLayer(mock(MapObjectLayer.class));
     assertEquals(2, map.getMapObjectLayers().size());
 
     map.removeMapObject(1);
 
     assertNull(map.getMapObject(1));
 
-    map.removeMapObjectLayer(layer);
+    map.removeLayer(layer);
 
     assertEquals(1, map.getMapObjectLayers().size());
 
-    map.removeMapObjectLayer(0);
+    map.removeLayer(1);
 
     assertEquals(0, map.getMapObjectLayers().size());
   }

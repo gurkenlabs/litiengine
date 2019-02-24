@@ -52,8 +52,6 @@ public interface ILayer extends ICustomPropertyProvider {
    * @return the size in tiles
    */
   public Dimension getSizeInTiles();
-
-  public int getOrder();
   
   public IMap getMap();
 

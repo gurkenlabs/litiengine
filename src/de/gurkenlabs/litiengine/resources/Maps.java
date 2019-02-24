@@ -3,6 +3,8 @@ package de.gurkenlabs.litiengine.resources;
 import javax.xml.bind.JAXBException;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.TileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -37,12 +39,16 @@ public final class Maps extends ResourcesContainer<IMap> {
     }
 
     String basePath = FileUtilities.getParentDirPath(resourceName);
-    for (Tileset tilesets : map.getRawTilesets()) {
-      tilesets.loadFromSource(basePath);
+    for (ITileset tileset : map.getTilesets()) {
+      if (tileset instanceof Tileset) {
+        ((Tileset)tileset).loadFromSource(basePath);
+      }
     }
 
-    for (TileLayer layer : map.getRawTileLayers()) {
-      layer.setTilesetEntries(map);
+    for (ITileLayer layer : map.getTileLayers()) {
+      if (layer instanceof TileLayer) {
+        ((TileLayer)layer).setTilesetEntries(map);
+      }
     }
 
     // by default the map is named by the source file
@@ -50,7 +56,6 @@ public final class Maps extends ResourcesContainer<IMap> {
 
     map.setName(name);
     map.setPath(resourceName);
-    map.updateTileTerrain();
 
     return map;
   }
