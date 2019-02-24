@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.io.Serializable;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,8 +15,7 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 /**
  * The Class Layer.
  */
-public abstract class Layer extends CustomPropertyProvider implements ILayer, Serializable {
-  private static final long serialVersionUID = -5136089511774411328L;
+public abstract class Layer extends CustomPropertyProvider implements ILayer {
 
   @XmlAttribute
   private int id;

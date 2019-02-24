@@ -23,7 +23,6 @@ import de.gurkenlabs.litiengine.util.ColorHelper;
  * The Class ShapeLayer.
  */
 public class MapObjectLayer extends Layer implements IMapObjectLayer {
-  private static final long serialVersionUID = -6130660578937427531L;
 
   private static final Logger log = Logger.getLogger(MapObjectLayer.class.getName());
 
