@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
@@ -36,7 +37,7 @@ public abstract class MapRenderer implements IMapRenderer {
 
   @Override
   public BufferedImage getImage(IMap map, RenderType... renderTypes) {
-    final String cacheKey = getCacheKey(map) + "_" + renderTypes;
+    final String cacheKey = getCacheKey(map) + "_" + Arrays.toString(renderTypes);
     Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
     if (opt.isPresent()) {
       return opt.get();
