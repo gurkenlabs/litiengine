@@ -20,7 +20,11 @@ public abstract class MapRenderer implements IMapRenderer {
 
   @Override
   public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
-    for (final ILayer layer : map.getRenderLayers()) {
+    this.renderLayers(g, map, map, viewport, renderTypes);
+  }
+
+  private void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes) {
+    for (final ILayer layer : layers.getRenderLayers()) {
       if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
       }
@@ -31,6 +35,10 @@ public abstract class MapRenderer implements IMapRenderer {
 
       if (layer instanceof IImageLayer) {
         renderImageLayer(g, (IImageLayer) layer, viewport);
+      }
+
+      if (layer instanceof IGroupLayer) {
+        this.renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes);
       }
     }
   }
@@ -81,7 +89,7 @@ public abstract class MapRenderer implements IMapRenderer {
   protected abstract void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport);
 
   protected static boolean shouldBeRendered(ILayer layer, RenderType[] renderTypes) {
-    if (renderTypes == null || renderTypes.length == 0) {
+    if (renderTypes == null || renderTypes.length == 0 || layer instanceof IGroupLayer) {
       return isVisible(layer);
     }
 

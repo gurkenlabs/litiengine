@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
@@ -113,7 +114,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlElements({
     @XmlElement(name = "imagelayer", type = ImageLayer.class),
     @XmlElement(name = "layer", type = TileLayer.class),
-    @XmlElement(name = "objectgroup", type = MapObjectLayer.class)
+    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+    @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
 
@@ -123,10 +125,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
   private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
   private transient List<IImageLayer> rawImageLayers = new ArrayList<>();
+  private transient List<IGroupLayer> rawGroupLayers = new ArrayList<>();
 
   private transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
   private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
   private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
+  private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
   private transient Color decodedBackgroundColor;
 
@@ -308,6 +312,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
+  public List<IGroupLayer> getGroupLayers() {
+    return this.groupLayers;
+  }
+
+  @Override
   public String getName() {
     return this.name;
   }
@@ -428,8 +437,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public void addLayer(ILayer layer) {
     this.layers.add(layer);
     this.layerAdded(layer);
-    if (layer instanceof MapObjectLayer) {
-      ((MapObjectLayer)layer).setMap(this);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(this);
     }
   }
 
@@ -437,8 +446,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public void addLayer(int index, ILayer layer) {
     this.layers.add(index, layer);
     this.layerAdded(layer);
-    if (layer instanceof MapObjectLayer) {
-      ((MapObjectLayer)layer).setMap(this);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(this);
     }
   }
 
@@ -446,8 +455,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public void removeLayer(ILayer layer) {
     this.layers.remove(layer);
     this.layerRemoved(layer);
-    if (layer instanceof MapObjectLayer) {
-      ((MapObjectLayer)layer).setMap(null);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(null);
     }
   }
 
@@ -455,8 +464,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public void removeLayer(int index) {
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
-    if (removed != null && removed instanceof MapObjectLayer) {
-      ((MapObjectLayer)removed).setMap(null);
+    if (removed != null && removed instanceof Layer) {
+      ((Layer)removed).setMap(null);
     }
   }
 
@@ -469,6 +478,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     }
     if (layer instanceof IImageLayer) {
       this.rawImageLayers.remove(layer);
+    }
+    if (layer instanceof IGroupLayer) {
+      this.rawGroupLayers.remove(layer);
     }
   }
 
@@ -632,6 +644,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     }
     if (layer instanceof IImageLayer) {
       this.rawImageLayers.add((IImageLayer)layer);
+    }
+    if (layer instanceof IGroupLayer) {
+      this.rawGroupLayers.add((IGroupLayer)layer);
     }
   }
 

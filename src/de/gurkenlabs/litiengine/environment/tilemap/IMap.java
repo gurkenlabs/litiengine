@@ -4,13 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * The Interface IMap.
  */
-public interface IMap extends ICustomPropertyProvider {
+public interface IMap extends ILayerList {
 
   /**
    * Gets the tilesets.
@@ -18,13 +17,6 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the tilesets
    */
   public List<ITileset> getTilesets();
-
-  /**
-   * Gets the image layers.
-   *
-   * @return the image layers
-   */
-  public List<IImageLayer> getImageLayers();
 
   /**
    * Gets the orientation.
@@ -41,33 +33,6 @@ public interface IMap extends ICustomPropertyProvider {
    * @return the renderorder
    */
   public String getRenderOrder();
-
-  public List<ILayer> getRenderLayers();
-
-  /**
-   * Gets the shape layers.
-   *
-   * @return the shape layers
-   */
-  public List<IMapObjectLayer> getMapObjectLayers();
-
-  public void addLayer(ILayer layer);
-
-  public void addLayer(int index, ILayer layer);
-
-  public void removeLayer(ILayer layer);
-
-  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject);
-
-  public void removeLayer(int index);
-
-  public Collection<IMapObject> getMapObjects();
-
-  public Collection<IMapObject> getMapObjects(String... type);
-
-  public IMapObject getMapObject(int mapId);
-
-  public void removeMapObject(int mapId);
 
   /**
    * Gets the size in pixels.
@@ -88,13 +53,6 @@ public interface IMap extends ICustomPropertyProvider {
   public Dimension getSizeInTiles();
 
   public Rectangle2D getBounds();
-
-  /**
-   * Gets the tile layers.
-   *
-   * @return the tile layers
-   */
-  public List<ITileLayer> getTileLayers();
 
   /**
    * Gets the shape of the tile [X|Y] at its absolute location.
