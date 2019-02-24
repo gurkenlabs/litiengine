@@ -150,12 +150,11 @@ public class ImageComponent extends GuiComponent {
       ImageRenderer.render(g, bg, this.getLocation());
     }
 
-    super.render(g);
-
     final Image img = this.getImage();
     if (img != null) {
       ImageRenderer.render(g, img, this.getImageLocation(img));
     }
+    super.render(g);
   }
 
   public void setImage(final Image image) {
