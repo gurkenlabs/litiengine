@@ -32,8 +32,9 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.graphicQuality = Quality.LOW;
     this.fullscreen = false;
     this.renderDynamicShadows = false;
-    this.resolutionHeight = 900;
-    this.resolutionWidth = 1600;
+    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    this.resolutionHeight = d.getWidth();
+    this.resolutionWidth = d.getHeight() - 100;
     this.setEnableResolutionScale(true);
     this.setReduceFramesWhenNotFocused(true);
     this.setAntiAliasing(false);
