@@ -3,6 +3,7 @@ package de.gurkenlabs.litiengine.configuration;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 
 @ConfigurationGroupInfo(prefix = "gfx_")
 public class GraphicConfiguration extends ConfigurationGroup {
@@ -32,8 +33,9 @@ public class GraphicConfiguration extends ConfigurationGroup {
     this.graphicQuality = Quality.LOW;
     this.fullscreen = false;
     this.renderDynamicShadows = false;
-    this.resolutionHeight = 900;
-    this.resolutionWidth = 1600;
+    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    this.resolutionHeight = d.width;
+    this.resolutionWidth = d.height - 100;
     this.setEnableResolutionScale(true);
     this.setReduceFramesWhenNotFocused(true);
     this.setAntiAliasing(false);
