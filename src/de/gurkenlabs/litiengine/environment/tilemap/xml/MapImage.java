@@ -39,6 +39,37 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
   @XmlTransient
   private String absolutePath;
 
+  public MapImage(){
+    super();
+  }
+
+  /**
+   * Copy Constructor for copying instances of MapImage.
+   *
+   * @param original
+   *          the original we want to copy
+   *
+   * @see CustomPropertyProvider()
+   */
+  public MapImage(MapImage original) {
+    super(original);
+
+    if(original == null){
+      return;
+    }
+
+    this.source = original.source;
+    if (original.transparentcolor != null){
+      this.transparentcolor = new Color(original.transparentcolor.getRed(),
+              original.transparentcolor.getGreen(),
+              original.transparentcolor.getBlue(),
+              original.transparentcolor.getAlpha());
+    }
+    this.width = original.width;
+    this.height = original.height;
+    this.absolutePath = original.absolutePath;
+  }
+
   @Override
   public String getAbsoluteSourcePath() {
     return this.absolutePath;
@@ -84,6 +115,31 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
 
   public void setAbsolutePath(final String mapPath) {
     this.absolutePath = FileUtilities.combine(mapPath, this.getSource());
+  }
+
+  @Override
+  public void setTransparentColor(Color color) {
+    this.transparentcolor = color;
+  }
+
+  @Override
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  @Override
+  public void setAbsoluteSourcePath(String absolutePath) {
+    this.absolutePath = absolutePath;
+  }
+
+  @Override
+  public void setWidth(int width) {
+    this.width = width;
+  }
+
+  @Override
+  public void setHeight(int height) {
+    this.height = height;
   }
 
   @Override
