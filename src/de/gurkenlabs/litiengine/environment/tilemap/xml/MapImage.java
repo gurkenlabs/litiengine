@@ -48,8 +48,6 @@ public class MapImage extends CustomPropertyProvider implements IMapImage {
    *
    * @param original
    *          the original we want to copy
-   *
-   * @see CustomPropertyProvider()
    */
   public MapImage(MapImage original) {
     super(original);
