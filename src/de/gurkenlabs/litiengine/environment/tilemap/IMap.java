@@ -31,7 +31,7 @@ public interface IMap extends ILayerList {
    *
    * @return the renderorder
    */
-  public String getRenderOrder();
+  public RenderOrder getRenderOrder();
 
   /**
    * Gets the size in pixels.

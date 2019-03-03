@@ -7,6 +7,12 @@ import java.awt.geom.Point2D;
 
 public interface IMapOrientation {
   /**
+   * Gets the name of this {@code IMapOrientation}.
+   * @return The name of this orientation
+   */
+  public String getName();
+
+  /**
    * Determines the size required for all tiles within the given map to be drawn into an image. Tiles larger than the map's tile size may not fit
    * within this size.
    *

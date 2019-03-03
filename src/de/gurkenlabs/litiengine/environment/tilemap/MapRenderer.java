@@ -43,17 +43,37 @@ public abstract class MapRenderer {
 
   private static void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
     // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the staggering, and then render it right-down
-    for (int y = 0; y < map.getHeight(); y++) {
+    if (map.getRenderOrder().btt) {
+      for (int y = map.getHeight() - 1; y >= 0; y--) {
+        drawRow(g, layer, y, map, viewport);
+      }
+    } else {
+      for (int y = 0; y < map.getHeight(); y++) {
+        drawRow(g, layer, y, map, viewport);
+      }
+    }
+  }
+
+  private static void drawRow(Graphics2D g, ITileLayer layer, int y, IMap map, Rectangle2D viewport) {
+    if (map.getRenderOrder().rtl) {
+      for (int x = map.getWidth() - 1; x >= 0; x--) {
+        drawTile(g, layer, x, y, map, viewport);
+      }
+    } else {
       for (int x = 0; x < map.getWidth(); x++) {
-        ITile tile = layer.getTile(x, y);
-        Image image = getTileImage(map, tile);
-        if (image != null) {
-          Point p = map.getOrientation().getLocation(x, y, map);
-          p.y -= image.getHeight(null);
-          if (viewport.intersects(p.x, p.y, image.getWidth(null), image.getHeight(null))) {
-            ImageRenderer.render(g, image, p.x - viewport.getX(), p.y - viewport.getY());
-          }
-        }
+        drawTile(g, layer, x, y, map, viewport);
+      }
+    }
+  }
+
+  private static void drawTile(Graphics2D g, ITileLayer layer, int x, int y, IMap map, Rectangle2D viewport) {
+    ITile tile = layer.getTile(x, y);
+    Image image = getTileImage(map, tile);
+    if (image != null) {
+      Point p = map.getOrientation().getLocation(x, y, map);
+      p.y -= image.getHeight(null);
+      if (viewport.intersects(p.x, p.y, image.getWidth(null), image.getHeight(null))) {
+        ImageRenderer.render(g, image, p.x - viewport.getX(), p.y - viewport.getY());
       }
     }
   }

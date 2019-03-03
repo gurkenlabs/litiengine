@@ -126,6 +126,11 @@ public class MapOrientations {
 
   private static class Orthogonal extends Base {
     @Override
+    public String getName() {
+      return "orthogonal";
+    }
+
+    @Override
     public Dimension getSize(IMap map) {
       return new Dimension(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight());
     }
@@ -149,6 +154,11 @@ public class MapOrientations {
   }
 
   private static class Isometric extends Base {
+    @Override
+    public String getName() {
+      return "isometric";
+    }
+
     @Override
     public Dimension getSize(IMap map) {
       checkSizeParity(map);
@@ -194,6 +204,11 @@ public class MapOrientations {
   }
 
   private static class StaggeredIsometric extends Base {
+    @Override
+    public String getName() {
+      return "staggered";
+    }
+
     @Override
     public Dimension getSize(IMap map) {
       this.checkValidity(map);
@@ -301,6 +316,11 @@ public class MapOrientations {
   }
 
   private static class Hexagonal extends StaggeredIsometric {
+    @Override
+    public String getName() {
+      return "hexagonal";
+    }
+
     @Override
     public Dimension getSize(IMap map) {
       Dimension d = super.getSize(map);

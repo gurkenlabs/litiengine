@@ -15,6 +15,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapTests {
@@ -30,7 +31,7 @@ public class MapTests {
     assertEquals(1.0, map.getVersion());
     assertEquals("1.1.4", map.getTiledVersion());
     assertEquals(MapOrientations.ORTHOGONAL, map.getOrientation());
-    assertEquals("right-down", map.getRenderOrder());
+    assertEquals(RenderOrder.RIGHT_DOWN, map.getRenderOrder());
     assertEquals(256, map.getSizeInPixels().width);
     assertEquals(256, map.getSizeInPixels().height);
     assertEquals(16, map.getTileSize().width);
@@ -77,7 +78,7 @@ public class MapTests {
     map.setTileHeight(32);
     map.setTileWidth(32);
     map.setName("test");
-    map.setRenderorder("right-up");
+    map.setRenderOrder(RenderOrder.RIGHT_UP);
 
     assertEquals(64, map.getSizeInTiles().width);
     assertEquals(64, map.getSizeInTiles().height);
@@ -87,7 +88,7 @@ public class MapTests {
     assertEquals(32, map.getTileSize().width);
     assertEquals(32, map.getTileSize().height);
     assertEquals("test", map.getName());
-    assertEquals("right-up", map.getRenderOrder());
+    assertEquals(RenderOrder.RIGHT_UP, map.getRenderOrder());
   }
 
   @Test
