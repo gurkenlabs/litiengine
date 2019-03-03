@@ -117,14 +117,14 @@ public class DebugRenderer {
   }
 
   private static void drawTileBoundingBox(final Graphics2D g, final IMap map, final Point2D location) {
-    final Rectangle2D playerTile = MapUtilities.getTileBoundingBox(map, location);
+    final Rectangle2D playerTile = map.getOrientation().getEnclosingTileShape(location, map).getBounds2D();
 
     // draw rect
     g.setColor(Color.CYAN);
     Game.graphics().renderOutline(g, playerTile);
 
     // draw coords
-    final Point tileLocation = MapUtilities.getTile(map, location);
+    final Point tileLocation = map.getOrientation().getTile(location, map);
     final String locationText = tileLocation.x + ", " + tileLocation.y;
     g.setFont(g.getFont().deriveFont(3f));
     final FontMetrics fm = g.getFontMetrics();

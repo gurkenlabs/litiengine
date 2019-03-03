@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -21,11 +20,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.GameWorld;
-import de.gurkenlabs.litiengine.environment.tilemap.HexagonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
-import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 /**
@@ -51,7 +47,6 @@ public final class RenderEngine {
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
   private final List<Predicate<IEntity>> entityRenderingConditions;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-  private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
   private float baseRenderScale;
 
@@ -68,11 +63,7 @@ public final class RenderEngine {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new EnumMap<>(MapOrientation.class);
     this.entityComparator = new EntityYComparator();
-
-    this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
-    this.mapRenderer.put(MapOrientation.HEXAGONAL, new HexagonalMapRenderer());
 
     this.baseRenderScale = DEFAULT_RENDERSCALE;
   }
@@ -165,14 +156,6 @@ public final class RenderEngine {
    */
   public float getBaseRenderScale() {
     return this.baseRenderScale;
-  }
-
-  public IMapRenderer getMapRenderer(final MapOrientation mapOrientation) {
-    if (!this.mapRenderer.containsKey(mapOrientation)) {
-      throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
-    }
-
-    return this.mapRenderer.get(mapOrientation);
   }
 
   public void onEntityRendered(final Consumer<RenderEvent<IEntity>> entity) {
@@ -306,7 +289,7 @@ public final class RenderEngine {
     }
 
     // draw layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.world().camera().getViewport(), renderTypes);
+    MapRenderer.render(g, map, Game.world().camera().getViewport(), renderTypes);
   }
 
   /**

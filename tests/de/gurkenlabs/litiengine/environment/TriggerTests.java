@@ -21,7 +21,7 @@ import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.entities.Trigger;
 import de.gurkenlabs.litiengine.entities.Trigger.TriggerActivation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class TriggerTests {
@@ -44,7 +44,7 @@ public class TriggerTests {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
-    when(map.getOrientation()).thenReturn(MapOrientation.ORTHOGONAL);
+    when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
     
     this.testEnvironment = new Environment(map);

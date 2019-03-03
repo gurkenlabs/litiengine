@@ -4,10 +4,9 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Optional;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
@@ -16,21 +15,20 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
 
-public abstract class MapRenderer implements IMapRenderer {
+public abstract class MapRenderer {
 
-  @Override
-  public void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
-    this.renderLayers(g, map, map, viewport, renderTypes);
+  public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
+    renderLayers(g, map, map, viewport, renderTypes);
   }
 
-  private void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes) {
+  private static void renderLayers(final Graphics2D g, final IMap map, ILayerList layers, final Rectangle2D viewport, RenderType[] renderTypes) {
     for (final ILayer layer : layers.getRenderLayers()) {
       if (layer == null || !shouldBeRendered(layer, renderTypes)) {
         continue;
       }
 
       if (layer instanceof ITileLayer) {
-        this.renderTileLayerImage(g, (ITileLayer) layer, map, viewport);
+        renderTileLayerImage(g, (ITileLayer) layer, map, viewport);
       }
 
       if (layer instanceof IImageLayer) {
@@ -38,55 +36,27 @@ public abstract class MapRenderer implements IMapRenderer {
       }
 
       if (layer instanceof IGroupLayer) {
-        this.renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes);
+        renderLayers(g, map, (IGroupLayer)layer, viewport, renderTypes);
       }
     }
   }
 
-  @Override
-  public BufferedImage getImage(IMap map, RenderType... renderTypes) {
-    final String cacheKey = getCacheKey(map) + "_" + Arrays.toString(renderTypes);
-    Optional<BufferedImage> opt = Resources.images().tryGet(cacheKey);
-    if (opt.isPresent()) {
-      return opt.get();
-    }
-
-    final BufferedImage img = Imaging.getCompatibleImage((int) map.getSizeInPixels().getWidth(), (int) map.getSizeInPixels().getHeight());
-    final Graphics2D g = img.createGraphics();
-
-    for (final ITileLayer layer : map.getTileLayers()) {
-      if (layer == null || !shouldBeRendered(layer, renderTypes)) {
-        continue;
+  private static void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport) {
+    // TODO: possibly implement the same render order that Tiled uses for staggered maps: undo the staggering, and then render it right-down
+    for (int y = 0; y < map.getHeight(); y++) {
+      for (int x = 0; x < map.getWidth(); x++) {
+        ITile tile = layer.getTile(x, y);
+        Image image = getTileImage(map, tile);
+        if (image != null) {
+          Point p = map.getOrientation().getLocation(x, y, map);
+          p.y -= image.getHeight(null);
+          if (viewport.intersects(p.x, p.y, image.getWidth(null), image.getHeight(null))) {
+            ImageRenderer.render(g, image, p.x - viewport.getX(), p.y - viewport.getY());
+          }
+        }
       }
-
-      ImageRenderer.render(g, this.getLayerImage(layer, map, true), layer.getOffset());
     }
-
-    g.dispose();
-
-    Resources.images().add(cacheKey, img);
-    return img;
   }
-
-  @Override
-  public BufferedImage getImage(IMap map) {
-    return this.getImage(map, RenderType.BACKGROUND, RenderType.GROUND, RenderType.SURFACE, RenderType.NORMAL, RenderType.OVERLAY);
-  }
-
-  @Override
-  public void render(final Graphics2D g, final IMap map, RenderType... renderTypes) {
-    this.render(g, map, 0, 0, renderTypes);
-  }
-
-  @Override
-  public void render(final Graphics2D g, final IMap map, final double offsetX, final double offsetY, RenderType... renderTypes) {
-    final BufferedImage mapImage = this.getImage(map, renderTypes);
-    ImageRenderer.render(g, mapImage, offsetX, offsetY);
-  }
-
-  protected abstract BufferedImage getLayerImage(final ITileLayer layer, final IMap map, boolean includeAnimationTiles);
-
-  protected abstract void renderTileLayerImage(final Graphics2D g, final ITileLayer layer, final IMap map, final Rectangle2D viewport);
 
   protected static boolean shouldBeRendered(ILayer layer, RenderType[] renderTypes) {
     if (renderTypes == null || renderTypes.length == 0 || layer instanceof IGroupLayer) {
@@ -103,7 +73,7 @@ public abstract class MapRenderer implements IMapRenderer {
   }
 
   protected static boolean isVisible(ILayer layer) {
-    return layer.isVisible() && layer.getOpacity() > 0;
+    return layer.isVisible() && layer.getOpacity() > 0f;
   }
 
   protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {

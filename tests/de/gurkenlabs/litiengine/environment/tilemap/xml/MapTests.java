@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapTests {
@@ -29,7 +29,7 @@ public class MapTests {
 
     assertEquals(1.0, map.getVersion());
     assertEquals("1.1.4", map.getTiledVersion());
-    assertEquals(MapOrientation.ORTHOGONAL, map.getOrientation());
+    assertEquals(MapOrientations.ORTHOGONAL, map.getOrientation());
     assertEquals("right-down", map.getRenderOrder());
     assertEquals(256, map.getSizeInPixels().width);
     assertEquals(256, map.getSizeInPixels().height);
@@ -68,7 +68,7 @@ public class MapTests {
   @Test
   public void testSettingProperties() {
     Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-    map.setOrientation(MapOrientation.SHIFTED);
+    map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
     map.setWidth(64);
@@ -81,7 +81,7 @@ public class MapTests {
 
     assertEquals(64, map.getSizeInTiles().width);
     assertEquals(64, map.getSizeInTiles().height);
-    assertEquals(MapOrientation.SHIFTED, map.getOrientation());
+    assertEquals(MapOrientations.ISOMETRIC_STAGGERED, map.getOrientation());
     assertEquals("0.0.0", map.getTiledVersion());
     assertEquals(2.0, map.getVersion());
     assertEquals(32, map.getTileSize().width);

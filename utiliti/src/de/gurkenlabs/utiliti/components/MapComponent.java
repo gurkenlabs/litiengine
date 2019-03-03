@@ -1783,7 +1783,7 @@ public class MapComponent extends EditorComponent implements IUpdateable {
       final Stroke stroke = new BasicStroke(this.getGridStrokeFactor() / Game.world().camera().getRenderScale());
       for (int x = 0; x < map.getWidth(); x++) {
         for (int y = 0; y < map.getHeight(); y++) {
-          Shape tile = map.getTileShape(x, y);
+          Shape tile = map.getOrientation().getShape(x, y, map);
           if (Game.world().camera().getViewport().intersects(tile.getBounds2D())) {
             Game.graphics().renderOutline(g, tile, stroke);
           }

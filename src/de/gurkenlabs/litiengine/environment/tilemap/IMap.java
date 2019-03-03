@@ -2,7 +2,6 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public interface IMap extends ILayerList {
    *
    * @return the orientation
    */
-  public MapOrientation getOrientation();
+  public IMapOrientation getOrientation();
 
   public String getPath();
 
@@ -53,17 +52,6 @@ public interface IMap extends ILayerList {
   public Dimension getSizeInTiles();
 
   public Rectangle2D getBounds();
-
-  /**
-   * Gets the shape of the tile [X|Y] at its absolute location.
-   * 
-   * @param tileX
-   *          the horizontal grid index of the tile
-   * @param tileY
-   *          the vertical grid index of the tile
-   * @return the tile shape
-   */
-  public Shape getTileShape(int tileX, int tileY);
 
   /**
    * Gets the tile size.

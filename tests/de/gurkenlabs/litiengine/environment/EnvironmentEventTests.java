@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.EnumSource.Mode;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 public class EnvironmentEventTests {
@@ -44,7 +44,7 @@ public class EnvironmentEventTests {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
-    when(map.getOrientation()).thenReturn(MapOrientation.ORTHOGONAL);
+    when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
     
     this.testEnvironment = new Environment(map);

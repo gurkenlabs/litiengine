@@ -39,7 +39,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.CustomProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.MapObject;
@@ -65,7 +65,7 @@ public class MapObjectLoaderTests {
     IMap map = mock(IMap.class);
     when(map.getSizeInPixels()).thenReturn(new Dimension(100, 100));
     when(map.getSizeInTiles()).thenReturn(new Dimension(10, 10));
-    when(map.getOrientation()).thenReturn(MapOrientation.ORTHOGONAL);
+    when(map.getOrientation()).thenReturn(MapOrientations.ORTHOGONAL);
     when(map.getRenderLayers()).thenReturn(new ArrayList<>());
     
     this.testEnvironment = new Environment(map);
