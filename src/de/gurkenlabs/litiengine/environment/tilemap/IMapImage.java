@@ -57,4 +57,14 @@ public interface IMapImage extends ICustomPropertyProvider {
    * @return The hash code for this map image
    */
   public int hashCode();
+
+  public void setTransparentColor(Color color);
+
+  public void setSource(String source);
+
+  public void setAbsoluteSourcePath(String absolutePath);
+
+  public void setWidth(int width);
+
+  public void setHeight(int height);
 }
