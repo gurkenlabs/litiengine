@@ -87,7 +87,7 @@ public abstract class ColorLayer implements IRenderable {
     final IMap map = this.getEnvironment().getMap();
 
     final Rectangle2D tileSection = MapUtilities.getTileBoundingBox(map, section);
-    if (tileSection == null) {
+    if (tileSection == null || (tileSection.getWidth() == 0 && tileSection.getHeight() == 0)) {
       return;
     }
     final BufferedImage img = Imaging.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
