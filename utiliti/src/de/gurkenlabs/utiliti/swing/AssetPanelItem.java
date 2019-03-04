@@ -73,6 +73,7 @@ public class AssetPanelItem extends JPanel {
   private final JButton btnDelete;
   private final JButton btnAdd;
   private final JButton btnExport;
+  private final JButton btnRefresh;
 
   private final transient Object origin;
 
@@ -81,7 +82,7 @@ public class AssetPanelItem extends JPanel {
   }
 
   public AssetPanelItem(Object origin) {
-    setPreferredSize(new Dimension(64, 100));
+    setPreferredSize(new Dimension(100, 100));
     this.origin = origin;
     this.setBackground(AssetPanel.BACKGROUND);
     this.setBorder(normalBorder);
@@ -123,7 +124,7 @@ public class AssetPanelItem extends JPanel {
           btnDelete.setVisible(true);
           btnExport.setVisible(true);
         }
-
+        btnRefresh.setVisible(true);
       }
 
       @Override
@@ -138,6 +139,7 @@ public class AssetPanelItem extends JPanel {
         btnAdd.setVisible(false);
         btnDelete.setVisible(false);
         btnExport.setVisible(false);
+        btnRefresh.setVisible(false);
       }
     });
 
@@ -181,14 +183,14 @@ public class AssetPanelItem extends JPanel {
     this.textField.setBorder(null);
     this.textField.setEditable(false);
 
-    this.setMinimumSize(new Dimension(this.iconLabel.getWidth(), this.iconLabel.getHeight() + this.textField.getHeight()));
+    this.setMinimumSize(new Dimension(100, 64));
 
-    GridLayout buttonGridLayout = new GridLayout(0, 4, 0, 0);
+    GridLayout buttonGridLayout = new GridLayout(0, 5, 0, 0);
     buttonPanel = new JPanel(buttonGridLayout);
-    buttonPanel.setPreferredSize(new Dimension(64, 20));
-    buttonPanel.setMinimumSize(new Dimension(64, 20));
+    buttonPanel.setPreferredSize(new Dimension(100, 20));
+    buttonPanel.setMinimumSize(new Dimension(100, 20));
     buttonPanel.setOpaque(false);
-    add(buttonPanel, BorderLayout.EAST);
+    add(buttonPanel, BorderLayout.WEST);
 
     btnAdd = new JButton("");
     btnAdd.setToolTipText("Add Entity");
@@ -259,10 +261,21 @@ public class AssetPanelItem extends JPanel {
     btnExport.setIcon(Icons.EXPORT);
     btnExport.setVisible(false);
 
+    btnRefresh = new JButton("");
+    btnRefresh.setToolTipText("Refresh Asset");
+    btnRefresh.addActionListener(e -> this.refresh());
+    btnRefresh.setMaximumSize(new Dimension(16, 16));
+    btnRefresh.setMinimumSize(new Dimension(16, 16));
+    btnRefresh.setPreferredSize(new Dimension(16, 16));
+    btnRefresh.setOpaque(false);
+    btnRefresh.setIcon(Icons.REFRESH);
+    btnRefresh.setVisible(false);
+
     buttonPanel.add(btnEdit);
     buttonPanel.add(btnAdd);
     buttonPanel.add(btnDelete);
     buttonPanel.add(btnExport);
+    buttonPanel.add(btnRefresh);
   }
 
   public AssetPanelItem(Icon icon, String text, Object origin) {
@@ -394,6 +407,15 @@ public class AssetPanelItem extends JPanel {
     } else if (this.getOrigin() instanceof SoundResource) {
       this.exportSound();
     }
+  }
+
+  private boolean hasChanges() {
+
+    return true;
+  }
+
+  private void refresh() {
+
   }
 
   private void exportSpritesheet() {

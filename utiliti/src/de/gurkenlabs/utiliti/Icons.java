@@ -54,6 +54,7 @@ public final class Icons {
   public static final Icon PLAY = new ImageIcon(Resources.images().get("button-play.png"));
   public static final Icon PROP = new ImageIcon(Resources.images().get("entity.png"));
   public static final Icon REDO = new ImageIcon(Resources.images().get("button-redo.png"));
+  public static final Icon REFRESH = new ImageIcon(Resources.images().get("refresh.png"));
   public static final Icon RENAMEX16 = new ImageIcon(Resources.images().get("button-renamex16.png"));
   public static final Icon SAVE = new ImageIcon(Resources.images().get("button-save.png"));
   public static final Icon SEARCH = new ImageIcon(Resources.images().get("search.png"));
