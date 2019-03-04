@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -59,6 +60,8 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
   private JSpinner spinnerHeight;
   private boolean isUpdating;
   private transient AnimationController controller;
+
+  private static final Logger log = Logger.getLogger(SpritesheetImportPanel.class.getName());
 
   public SpritesheetImportPanel(TextureAtlas atlas) {
     this();
@@ -115,7 +118,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
         labelHeight.setText(file.getHeight() + "px");
         spinnerWidth.setModel(new SpinnerNumberModel(file.getSpriteWidth(), 1, file.getWidth(), 1));
         spinnerHeight.setModel(new SpinnerNumberModel(file.getSpriteHeight(), 1, file.getHeight(), 1));
-        
+
         this.updateKeyframeTable(file);
         textField.setText(file.getName());
 
@@ -264,10 +267,10 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
   @Override
   public void update() {
-    if(this.isUpdating || !this.isVisible()) {
+    if (this.isUpdating || !this.isVisible()) {
       return;
     }
-    
+
     BufferedImage img = this.controller.getCurrentSprite();
     if (img != null) {
       this.labelAnimationPreview.setIcon(new ImageIcon(img));
@@ -327,6 +330,9 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
 
       this.controller.setDefaultAnimation(newAnim);
       this.controller.playAnimation(newAnim.getName());
+    } catch (IllegalArgumentException e) {
+      log.warning("The sprite file '" + file.name + "' cannot be scaled correctly for the preview window. Please check if the image file's dimensions are divisible by the desired sprite dimensions without remainder.");
+      e.printStackTrace();
     } finally {
       this.isUpdating = false;
     }

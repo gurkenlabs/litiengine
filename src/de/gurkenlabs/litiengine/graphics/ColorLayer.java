@@ -101,6 +101,9 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   private void setTiles(BufferedImage img, Rectangle2D section) {
+    if (img == null) {
+      return;
+    }
     final IMap map = this.getEnvironment().getMap();
     final Point startTile = map.getOrientation().getTile(section.getX(), section.getY(), map);
     final Point endTile = map.getOrientation().getTile(section.getMaxX(), section.getMaxY(), map);
