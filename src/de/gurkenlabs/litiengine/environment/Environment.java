@@ -49,6 +49,7 @@ import de.gurkenlabs.litiengine.graphics.AmbientLight;
 import de.gurkenlabs.litiengine.graphics.DebugRenderer;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderComponent;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.StaticShadowLayer;
 import de.gurkenlabs.litiengine.graphics.StaticShadowType;
@@ -292,8 +293,8 @@ public final class Environment implements IRenderable {
 
   public void clear() {
     Game.physics().clear();
-    this.dispose(this.getEntities());
-    this.dispose(this.getTriggers());
+    dispose(this.getEntities());
+    dispose(this.getTriggers());
     this.getCombatEntities().clear();
     this.getMobileEntities().clear();
     this.getLightSources().clear();
@@ -913,6 +914,7 @@ public final class Environment implements IRenderable {
     }
   }
 
+  @Override
   public void render(final Graphics2D g) {
     g.scale(Game.world().camera().getRenderScale(), Game.world().camera().getRenderScale());
 
@@ -1079,7 +1081,7 @@ public final class Environment implements IRenderable {
     long renderStart = System.nanoTime();
 
     // 1. Render map layers
-    Game.graphics().render(g, this.getMap(), renderType);
+    RenderEngine.render(g, this.getMap(), renderType);
 
     // 2. Render renderables
     for (final IRenderable rend : this.getRenderables(renderType)) {
@@ -1111,7 +1113,7 @@ public final class Environment implements IRenderable {
     this.staticShadowLayer = new StaticShadowLayer(this, color);
   }
 
-  private void dispose(final Collection<? extends IEntity> entities) {
+  private static void dispose(final Collection<? extends IEntity> entities) {
     for (final IEntity entity : entities) {
       if (entity instanceof IUpdateable) {
         Game.loop().detach((IUpdateable) entity);
@@ -1140,10 +1142,10 @@ public final class Environment implements IRenderable {
     }
 
     // 1. add to physics engine
-    this.loadPhysicsEntity(entity);
+    loadPhysicsEntity(entity);
 
     // 2. register for update or activate
-    this.loadUpdatableOrEmitterEntity(entity);
+    loadUpdatableOrEmitterEntity(entity);
 
     // 3. if a gravity is defined, add a gravity force to the entity
     if (entity instanceof IMobileEntity && this.getGravity() != 0) {
@@ -1177,7 +1179,7 @@ public final class Environment implements IRenderable {
     }
   }
 
-  private void loadPhysicsEntity(IEntity entity) {
+  private static void loadPhysicsEntity(IEntity entity) {
     if (entity instanceof CollisionBox) {
       final CollisionBox coll = (CollisionBox) entity;
       if (coll.isObstacle()) {
@@ -1193,7 +1195,7 @@ public final class Environment implements IRenderable {
     }
   }
 
-  private void loadUpdatableOrEmitterEntity(IEntity entity) {
+  private static void loadUpdatableOrEmitterEntity(IEntity entity) {
     if (entity instanceof Emitter) {
       final Emitter emitter = (Emitter) entity;
       if (emitter.isActivateOnInit()) {

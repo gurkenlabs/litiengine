@@ -9,7 +9,7 @@ public final class GameTime implements EnvironmentLoadedListener {
   protected GameTime() {
   }
 
-  public long sinceGameStart() {
+  public static long sinceGameStart() {
     return Game.loop().convertToMs(Game.loop().getTicks());
   }
 

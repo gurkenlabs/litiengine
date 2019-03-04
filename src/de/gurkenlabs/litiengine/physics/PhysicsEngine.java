@@ -356,6 +356,7 @@ public final class PhysicsEngine implements IUpdateable {
     return this.move(entity, newPosition);
   }
 
+  @Override
   public void update() {
     this.updateAllCollisionBoxes();
   }

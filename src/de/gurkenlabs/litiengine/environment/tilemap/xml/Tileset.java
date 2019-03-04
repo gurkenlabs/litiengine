@@ -96,6 +96,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    *
    * @return the margin
    */
+  @Override
   public int getMargin() {
     if (this.sourceTileset != null) {
       return this.sourceTileset.getMargin();
@@ -123,6 +124,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
    *
    * @return the spacing
    */
+  @Override
   public int getSpacing() {
     if (this.sourceTileset != null) {
       return this.sourceTileset.getSpacing();

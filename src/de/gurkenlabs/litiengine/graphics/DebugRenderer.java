@@ -58,18 +58,18 @@ public class DebugRenderer {
 
     if (Game.config().debug().renderHitBoxes() && entity instanceof ICombatEntity) {
       g.setColor(Color.RED);
-      Game.graphics().renderOutline(g, ((ICombatEntity) entity).getHitBox());
+      RenderEngine.renderOutline(g, ((ICombatEntity) entity).getHitBox());
     }
 
     if (Game.config().debug().renderBoundingBoxes()) {
       g.setColor(Color.RED);
-      Game.graphics().renderOutline(g, entity.getBoundingBox());
+      RenderEngine.renderOutline(g, entity.getBoundingBox());
     }
 
     if (Game.config().debug().renderCollisionBoxes() && entity instanceof ICollisionEntity) {
       final ICollisionEntity collisionEntity = (ICollisionEntity) entity;
       g.setColor(collisionEntity.hasCollision() ? Color.RED : Color.ORANGE);
-      Game.graphics().renderOutline(g, collisionEntity.getCollisionBox());
+      RenderEngine.renderOutline(g, collisionEntity.getCollisionBox());
     }
 
     for (EntityDebugRenderedListener listener : entityDebugListeners) {
@@ -83,7 +83,7 @@ public class DebugRenderer {
       final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
       for (final Rectangle2D shape : Game.physics().getStaticCollisionBoxes()) {
         g.setColor(Color.RED);
-        Game.graphics().renderOutline(g, shape, shapeStroke);
+        RenderEngine.renderOutline(g, shape, shapeStroke);
       }
     }
 
@@ -121,7 +121,7 @@ public class DebugRenderer {
 
     // draw rect
     g.setColor(Color.CYAN);
-    Game.graphics().renderOutline(g, playerTile);
+    RenderEngine.renderOutline(g, playerTile);
 
     // draw coords
     final Point tileLocation = map.getOrientation().getTile(location, map);

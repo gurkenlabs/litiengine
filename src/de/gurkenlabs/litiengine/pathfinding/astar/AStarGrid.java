@@ -12,6 +12,7 @@ import java.util.List;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.Prop;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.physics.CollisionType;
 import de.gurkenlabs.litiengine.util.MathUtilities;
 
@@ -139,9 +140,9 @@ public class AStarGrid implements IRenderable {
       for (int y = startY; y <= endY; y++) {
         AStarNode node = this.getGrid()[x][y];
         if (node.isWalkable()) {
-          Game.graphics().renderShape(g, new Rectangle2D.Double(node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
+          RenderEngine.renderShape(g, new Rectangle2D.Double(node.getLocation().x - 0.25, node.getLocation().y - 0.25, 0.5, 0.5));
         } else {
-          Game.graphics().renderShape(g, node.getBounds());
+          RenderEngine.renderShape(g, node.getBounds());
         }
       }
     }

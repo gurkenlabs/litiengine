@@ -22,15 +22,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IEntityProvider;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.ImageRenderer;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.graphics.ShapeRenderer;
 import de.gurkenlabs.litiengine.sound.Sound;
 import de.gurkenlabs.litiengine.util.Imaging;
 
-public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
+public class SpeechBubble implements IUpdateable, IRenderable {
   public static final SpeechBubbleAppearance DEFAULT_APPEARANCE = new SpeechBubbleAppearance(Color.WHITE, new Color(16, 20, 19, 150), new Color(16, 20, 19), 4.0f);
 
   private static final Map<IEntity, SpeechBubble> activeSpeechBubbles = new ConcurrentHashMap<>();
@@ -115,7 +115,6 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
     return activeSpeechBubbles.containsKey(entity);
   }
 
-  @Override
   public IEntity getEntity() {
     return this.entity;
   }
@@ -164,7 +163,7 @@ public class SpeechBubble implements IUpdateable, IRenderable, IEntityProvider {
 
     if (Game.config().debug().renderGuiComponentBoundingBoxes()) {
       g.setColor(Color.RED);
-      Game.graphics().renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
+      RenderEngine.renderOutline(g, new Rectangle2D.Double(this.getEntity().getCenter().getX() - deltaX, this.getEntity().getCenter().getY() - deltaY, this.bubble.getWidth(), this.bubble.getHeight()));
     }
   }
 

@@ -32,7 +32,7 @@ public class TextureAtlas {
   @XmlElement(name = "sprite")
   private List<Sprite> sprites;
 
-  private String absolutImagePath;
+  private String absoluteImagePath;
 
   TextureAtlas() {
     // keep for serialization
@@ -46,7 +46,7 @@ public class TextureAtlas {
       }
 
       String directory = FileUtilities.getParentDirPath(textureAtlasFile);
-      atlas.absolutImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
+      atlas.absoluteImagePath = FileUtilities.combine(directory, atlas.rawImagePath);
       return atlas;
     } catch (JAXBException e) {
       log.log(Level.SEVERE, "TextureAtlas " + textureAtlasFile + " could not be read.", e);
@@ -55,8 +55,8 @@ public class TextureAtlas {
   }
   
   @XmlTransient
-  public String getAbsolutImagePath() {
-    return this.absolutImagePath;
+  public String getAbsoluteImagePath() {
+    return this.absoluteImagePath;
   }
 
   @XmlTransient

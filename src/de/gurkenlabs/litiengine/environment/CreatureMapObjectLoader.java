@@ -91,7 +91,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     for (Class<? extends Creature> customCreature : customCreatureType) {
       for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customCreature)) {
         if (prefix != null && spriteSheet.equalsIgnoreCase(prefix)) {
-          Creature created = this.createCustomCreature(customCreature, spriteSheet);
+          Creature created = createCustomCreature(customCreature, spriteSheet);
           if (created != null) {
             return created;
           }
@@ -103,7 +103,7 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     return new Creature(spriteSheet);
   }
 
-  private Creature createCustomCreature(Class<? extends Creature> customCreature, String spriteSheet) {
+  private static Creature createCustomCreature(Class<? extends Creature> customCreature, String spriteSheet) {
     try {
       return customCreature.getConstructor(String.class).newInstance(spriteSheet);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {

@@ -216,7 +216,7 @@ public class LightSource extends Entity implements IRenderable {
     return mob -> new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2).contains(mob.getCenter());
   }
 
-  private Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
+  private static Area getObstructedVisionArea(final IEntity mob, final Point2D center) {
     final Polygon shadowPolygon = new Polygon();
 
     final Ellipse2D shadowEllipse = getShadowEllipse(mob);
@@ -322,7 +322,7 @@ public class LightSource extends Entity implements IRenderable {
         continue;
       }
 
-      final Shape obstructedVision = this.getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
+      final Shape obstructedVision = getObstructedVisionArea(mob, Game.world().camera().getViewportDimensionCenter(this));
       // fill the polygon with the gradient paint
 
       ShapeRenderer.render(g, obstructedVision);

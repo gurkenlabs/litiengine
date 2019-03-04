@@ -58,7 +58,7 @@ public final class GameWindow {
       this.hostControl.setResizable(false);
       this.hostControl.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.hostControl.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-      this.initializeWinowEventListeners(this.hostControl);
+      initializeWindowEventListeners(this.hostControl);
     }
   }
 
@@ -189,7 +189,7 @@ public final class GameWindow {
 
   }
 
-  private void initializeWinowEventListeners(Window window) {
+  private static void initializeWindowEventListeners(Window window) {
 
     window.addWindowStateListener(e -> {
       if (e.getNewState() == Frame.ICONIFIED) {

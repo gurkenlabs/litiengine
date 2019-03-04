@@ -3,14 +3,13 @@ package de.gurkenlabs.litiengine.graphics.emitters;
 import java.awt.geom.Point2D;
 
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.entities.IEntityProvider;
 
 /**
  * An abstract implementation for emitters that are bound to <code>IEntity.getLocation()</code>.
  * 
  * @see IEntity#getLocation()
  */
-public abstract class EntityEmitter extends Emitter implements IEntityProvider {
+public abstract class EntityEmitter extends Emitter {
 
   private final IEntity entity;
 
@@ -26,7 +25,6 @@ public abstract class EntityEmitter extends Emitter implements IEntityProvider {
     this.setSize(this.getEntity().getWidth(), this.getEntity().getHeight());
   }
 
-  @Override
   public IEntity getEntity() {
     return this.entity;
   }

@@ -148,7 +148,7 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
   private class SpawnThread extends Thread {
 
     /** The amount of entities to spawn. */
-    private final int amount;
+    private final int remaining;
 
     /** The <code>Spawnpoint</code> where entities will be spawned. */
     private final Spawnpoint point;
@@ -163,12 +163,12 @@ public abstract class EntitySpawner<T extends IEntity> implements IEntitySpawner
      */
     public SpawnThread(final Spawnpoint point, final int amount) {
       this.point = point;
-      this.amount = amount;
+      this.remaining = amount;
     }
 
     @Override
     public void run() {
-      for (int i = 0; i < this.amount; i++) {
+      for (int i = 0; i < this.remaining; i++) {
         final T newEntity = EntitySpawner.this.createNew();
         newEntity.setLocation(this.point.getLocation());
         newEntity.setMapId(EntitySpawner.this.environment.getNextMapId());

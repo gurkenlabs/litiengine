@@ -20,7 +20,7 @@ public final class Images extends ResourcesContainer<BufferedImage> {
    *          The texture atlas that contains all the images.
    */
   public void load(TextureAtlas textureAtlas) {
-    BufferedImage atlasImage = Resources.images().get(textureAtlas.getAbsolutImagePath());
+    BufferedImage atlasImage = Resources.images().get(textureAtlas.getAbsoluteImagePath());
     if (atlasImage == null || atlasImage.getWidth() == 0 || atlasImage.getHeight() == 0) {
       return;
     }
@@ -53,9 +53,10 @@ public final class Images extends ResourcesContainer<BufferedImage> {
     // try to get image from resource folder first and as a fallback get it from
     // a normal folder
     BufferedImage img = null;
-    final InputStream imageFile = Resources.get(resourceName);
-    if (imageFile != null) {
-      img = ImageIO.read(imageFile);
+    try (final InputStream imageFile = Resources.get(resourceName)) {
+      if (imageFile != null) {
+        img = ImageIO.read(imageFile);
+      }
     }
 
     if (img == null) {

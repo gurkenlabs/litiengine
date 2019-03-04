@@ -16,7 +16,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
   public PropAnimationController(final T prop) {
     super(prop);
 
-    this.setDefaultAnimation(this.createAnimation(this.getEntity(), PropState.INTACT));
+    this.setDefaultAnimation(createAnimation(this.getEntity(), PropState.INTACT));
     this.add(createAnimation(this.getEntity(), PropState.DAMAGED));
     this.add(createAnimation(this.getEntity(), PropState.DESTROYED));
   }
@@ -97,8 +97,8 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     return sb.toString();
   }
 
-  private Animation createAnimation(final Prop prop, final PropState state) {
-    final Spritesheet spritesheet = this.findSpriteSheet(prop, state);
+  private static Animation createAnimation(final Prop prop, final PropState state) {
+    final Spritesheet spritesheet = findSpriteSheet(prop, state);
     if (spritesheet == null) {
       return null;
     }
@@ -106,7 +106,7 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     return new Animation(state.name(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
   }
 
-  private Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
+  private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
     if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
       return null;
     }

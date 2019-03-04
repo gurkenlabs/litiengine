@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.jupiter.api.Test;
@@ -53,9 +54,9 @@ public class ResourcesTests {
   }
   
   @Test
-  public void testResourceFromWeb() {
-    InputStream stream = Resources.get("https://github.com/gurkenlabs/litiengine/raw/master/resources/LITIEngine_Logo_big.png");
-    
-    assertNotNull(stream);
+  public void testResourceFromWeb() throws IOException {
+    try (InputStream stream = Resources.get("https://github.com/gurkenlabs/litiengine/raw/master/resources/LITIEngine_Logo_big.png")) {
+      assertNotNull(stream);
+    }
   }
 }

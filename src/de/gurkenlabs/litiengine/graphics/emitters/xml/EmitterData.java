@@ -241,6 +241,7 @@ public class EmitterData implements Serializable, Resource {
   }
 
   @XmlTransient
+  @Override
   public String getName() {
     return this.name;
   }
@@ -411,6 +412,7 @@ public class EmitterData implements Serializable, Resource {
     this.maxParticles = maxParticles;
   }
 
+  @Override
   public void setName(final String name) {
     this.name = name;
   }

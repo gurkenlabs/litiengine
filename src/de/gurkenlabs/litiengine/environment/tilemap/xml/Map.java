@@ -550,6 +550,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.decodedBackgroundColor;
   }
 
+  @Override
   public boolean isInfinite() {
     return this.infinite == 1;
   }

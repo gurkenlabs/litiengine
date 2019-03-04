@@ -94,7 +94,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     for (Class<? extends Prop> customProp : customPropType) {
       for (String prefix : EntityAnimationController.getDefaultSpritePrefixes(customProp)) {
         if (prefix != null && (PropAnimationController.PROP_IDENTIFIER + spriteSheet).equalsIgnoreCase(prefix)) {
-          Prop created = this.createCustomProp(customProp, spriteSheet);
+          Prop created = createCustomProp(customProp, spriteSheet);
           if (created != null) {
             return created;
           }
@@ -105,7 +105,7 @@ public class PropMapObjectLoader extends MapObjectLoader {
     return new Prop(spriteSheet);
   }
 
-  private Prop createCustomProp(Class<? extends Prop> customProp, String spriteSheet) {
+  private static Prop createCustomProp(Class<? extends Prop> customProp, String spriteSheet) {
     try {
       return customProp.getConstructor(String.class).newInstance(spriteSheet);
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {

@@ -56,8 +56,6 @@ public interface IMapObject extends ICustomPropertyProvider, Resource {
 
   public void setId(int id);
 
-  public void setName(String name);
-
   public void setType(String type);
 
   public void setX(float x);

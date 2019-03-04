@@ -26,13 +26,13 @@ public final class Sounds extends ResourcesContainer<Sound> {
    */
   @Override
   protected Sound load(String resourceName) throws Exception {
-    final InputStream is = Resources.get(resourceName);
-    if (is == null) {
-
-      log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resourceName });
-      return null;
+    try (final InputStream is = Resources.get(resourceName)) {
+      if (is == null) {
+        log.log(Level.SEVERE, "The audio file {0} could not be loaded.", new Object[] { resourceName });
+        return null;
+      }
+      return new Sound(is, resourceName);
     }
-    return new Sound(is, resourceName);
   }
 
   public Sound load(final SoundResource resource) {

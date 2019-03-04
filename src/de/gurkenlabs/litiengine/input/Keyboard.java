@@ -68,11 +68,11 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
   @Override
   public String getText(final KeyEvent e) {
     if (this.isPressed(KeyEvent.VK_SHIFT) || Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
-      return this.getShiftText(e);
+      return getShiftText(e);
     } else if (this.isPressed(KeyEvent.VK_ALT_GRAPH)) {
-      return this.getAltText(e);
+      return getAltText(e);
     } else {
-      return this.getNormalText(e);
+      return getNormalText(e);
     }
   }
 
@@ -248,7 +248,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
     }
   }
 
-  private String getNormalText(KeyEvent e) {
+  private static String getNormalText(KeyEvent e) {
     if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
       return "ß";
     }
@@ -302,7 +302,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
     }
   }
 
-  private String getAltText(KeyEvent e) {
+  private static String getAltText(KeyEvent e) {
     if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
       return "\\";
     }
@@ -332,7 +332,7 @@ public class Keyboard implements KeyEventDispatcher, IKeyboard {
     }
   }
 
-  private String getShiftText(KeyEvent e) {
+  private static String getShiftText(KeyEvent e) {
     if (e.getExtendedKeyCode() == KeyEvent.getExtendedKeyCodeForChar('ß')) {
       return "?";
     }
