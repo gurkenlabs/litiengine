@@ -305,7 +305,7 @@ public final class Imaging {
   }
 
   public static BufferedImage getCompatibleImage(final int width, final int height) {
-    if (width == 0 && height == 0) {
+    if (width == 0 || height == 0) {
       return null;
     }
 

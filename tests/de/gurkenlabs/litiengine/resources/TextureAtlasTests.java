@@ -29,7 +29,7 @@ public class TextureAtlasTests {
     assertTrue(deanIdle.isRotated());
 
     // now load the image 
-    BufferedImage image = Resources.images().get(atlas.getAbsolutImagePath());
+    BufferedImage image = Resources.images().get(atlas.getAbsoluteImagePath());
 
     assertNotNull(image);
     assertEquals(123, image.getWidth());

@@ -108,10 +108,12 @@ public abstract class Entity implements IEntity {
     this.transformListeners.add(listener);
   }
 
+  @Override
   public void attachControllers() {
     this.controllers.attachAll();
   }
 
+  @Override
   public void detachControllers() {
     this.controllers.detachAll();
   }
@@ -372,6 +374,7 @@ public abstract class Entity implements IEntity {
     }
   }
 
+  @Override
   public void setAngle(final float angle) {
     this.angle = angle;
   }

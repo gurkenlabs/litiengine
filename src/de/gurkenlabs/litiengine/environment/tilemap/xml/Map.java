@@ -3,44 +3,43 @@ package de.gurkenlabs.litiengine.environment.tilemap.xml;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.IGroupLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ILayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
+import de.gurkenlabs.litiengine.environment.tilemap.IMapOrientation;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
-import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerAxis;
 import de.gurkenlabs.litiengine.environment.tilemap.StaggerIndex;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.ColorHelper;
-import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
-import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @XmlRootElement(name = "map")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -61,7 +60,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private String orientation;
 
   @XmlTransient
-  private MapOrientation mapOrientation = MapOrientation.UNDEFINED;
+  private IMapOrientation mapOrientation;
+
+  @XmlTransient
+  private RenderOrder renderOrderEnum;
 
   @XmlAttribute
   private String renderorder;
@@ -85,10 +87,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private Integer hexsidelength;
 
   @XmlTransient
-  private StaggerAxis staggerAxisEnum = StaggerAxis.UNDEFINED;
+  private StaggerAxis staggerAxisEnum;
 
   @XmlTransient
-  private StaggerIndex staggerIndexEnum = StaggerIndex.UNDEFINED;
+  private StaggerIndex staggerIndexEnum;
 
   @XmlAttribute
   private String staggeraxis;
@@ -108,26 +110,29 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @XmlAttribute(required = false)
   private String name;
 
-  @XmlElement(name = "tileset")
-  private List<Tileset> rawTilesets;
+  @XmlElement(name = "tileset", type = Tileset.class)
+  private List<ITileset> tilesets;
 
-  @XmlElement(name = "imagelayer")
-  private List<ImageLayer> rawImageLayers;
-
-  @XmlElement(name = "layer")
-  private List<TileLayer> rawTileLayers;
-
-  @XmlElement(name = "objectgroup")
-  private List<MapObjectLayer> rawMapObjectLayers;
+  @XmlElements({
+    @XmlElement(name = "imagelayer", type = ImageLayer.class),
+    @XmlElement(name = "layer", type = TileLayer.class),
+    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+    @XmlElement(name = "group", type = GroupLayer.class)
+  })
+  private List<ILayer> layers;
 
   @XmlTransient
   private String path;
 
-  private transient List<ITileset> tilesets;
-  private transient List<ITileLayer> tileLayers;
-  private transient List<IMapObjectLayer> mapObjectLayers;
-  private transient List<IImageLayer> imageLayers;
-  private transient List<ILayer> allRenderLayers;
+  private transient List<ITileLayer> rawTileLayers = new ArrayList<>();
+  private transient List<IMapObjectLayer> rawMapObjectLayers = new ArrayList<>();
+  private transient List<IImageLayer> rawImageLayers = new ArrayList<>();
+  private transient List<IGroupLayer> rawGroupLayers = new ArrayList<>();
+
+  private transient List<ITileLayer> tileLayers = Collections.unmodifiableList(this.rawTileLayers);
+  private transient List<IMapObjectLayer> mapObjectLayers = Collections.unmodifiableList(this.rawMapObjectLayers);
+  private transient List<IImageLayer> imageLayers = Collections.unmodifiableList(this.rawImageLayers);
+  private transient List<IGroupLayer> groupLayers = Collections.unmodifiableList(this.rawGroupLayers);
 
   private transient Color decodedBackgroundColor;
 
@@ -158,9 +163,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public MapOrientation getOrientation() {
-    if (this.mapOrientation == MapOrientation.UNDEFINED) {
-      this.mapOrientation = MapOrientation.valueOf(this.orientation.toUpperCase());
+  public IMapOrientation getOrientation() {
+    if (this.mapOrientation == null) {
+      this.mapOrientation = MapOrientations.forName(this.orientation);
     }
     return this.mapOrientation;
   }
@@ -172,21 +177,12 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @Override
-  public String getRenderOrder() {
-    return this.renderorder;
+  public RenderOrder getRenderOrder() {
+    return this.renderOrderEnum;
   }
 
   @Override
   public List<IMapObjectLayer> getMapObjectLayers() {
-    if (this.mapObjectLayers == null) {
-      ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
-      if (this.rawMapObjectLayers != null) {
-        tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
-      }
-
-      this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
-    }
-
     return this.mapObjectLayers;
   }
 
@@ -222,25 +218,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public Dimension getSizeInPixels() {
-    Dimension mapSizeInPixels = new Dimension(this.width * this.tilewidth, this.height * this.tileheight);
-    switch (this.getOrientation()) {
-    case HEXAGONAL:
-      int maxX = (int) Math.max(this.getTileShape(this.getWidth() - 1, 0).getBounds2D().getMaxX(), this.getTileShape(this.getWidth() - 1, 1).getBounds2D().getMaxX());
-      int maxY = (int) Math.max(this.getTileShape(0, this.getHeight() - 1).getBounds2D().getMaxY(), this.getTileShape(1, this.getHeight() - 1).getBounds2D().getMaxY());
-      mapSizeInPixels.setSize(maxX, maxY);
-      break;
-    case ISOMETRIC:
-      break;
-    case ORTHOGONAL:
-      break;
-    case SHIFTED:
-      break;
-    case STAGGERED:
-      break;
-    case UNDEFINED:
-      break;
-    }
-    return mapSizeInPixels;
+    return this.getOrientation().getSize(this);
   }
 
   @XmlTransient
@@ -279,34 +257,6 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.tileheight;
   }
 
-  public Shape getTileShape(int tileX, int tileY) {
-    if (this.getOrientation() == MapOrientation.HEXAGONAL) {
-      final StaggerAxis staggerAxis = this.getStaggerAxis();
-      final StaggerIndex staggerIndex = this.getStaggerIndex();
-      final int s = this.getHexSideLength();
-      final int h = staggerAxis == StaggerAxis.X ? this.getTileHeight() : this.getTileWidth();
-      final int r = h / 2;
-      final int t = staggerAxis == StaggerAxis.X ? (this.getTileWidth() - s) / 2 : (this.getTileHeight() - s) / 2;
-      Polygon hex = new Polygon();
-      int widthStaggerFactor = 0;
-      int heightStaggerFactor = 0;
-      if (staggerAxis == StaggerAxis.X) {
-        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileX)) {
-          heightStaggerFactor = r;
-        }
-        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * (t + s), heightStaggerFactor + tileY * h, staggerAxis, s, r, t);
-      } else if (staggerAxis == StaggerAxis.Y) {
-        if (MapUtilities.isStaggeredRowOrColumn(staggerIndex, tileY)) {
-          widthStaggerFactor = r;
-        }
-        hex = GeometricUtilities.getHex(widthStaggerFactor + tileX * h, heightStaggerFactor + tileY * (t + s), staggerAxis, s, r, t);
-      }
-      return hex;
-    } else {
-      return new Rectangle(tileX * this.getTileWidth(), tileY * this.getTileHeight(), this.getTileWidth(), this.getTileHeight());
-    }
-  }
-
   @Override
   public double getVersion() {
     return this.version;
@@ -315,6 +265,11 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   @Override
   public String getTiledVersion() {
     return this.tiledversion;
+  }
+
+  @Override
+  public List<IGroupLayer> getGroupLayers() {
+    return this.groupLayers;
   }
 
   @Override
@@ -405,81 +360,78 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public StaggerAxis getStaggerAxis() {
-    if (this.staggerAxisEnum == StaggerAxis.UNDEFINED) {
-      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
-    }
     return this.staggerAxisEnum;
   }
 
   @Override
   public StaggerIndex getStaggerIndex() {
-    if (this.staggerIndexEnum == StaggerIndex.UNDEFINED) {
-      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
-    }
     return this.staggerIndexEnum;
   }
 
   public void setPath(final String path) {
     this.path = path;
-    if (this.rawImageLayers != null) {
-      for (final ImageLayer imgLayer : this.rawImageLayers) {
-        if (imgLayer == null) {
-          continue;
-        }
-
-        imgLayer.setMapPath(path);
+    for (ILayer layer : this.layers) {
+      if (layer instanceof ImageLayer) {
+        ((ImageLayer)layer).setMapPath(path);
       }
     }
 
-    if (this.rawTilesets != null) {
-      for (final Tileset tileSet : this.rawTilesets) {
-        if (tileSet == null) {
-          continue;
-        }
-
-        tileSet.setMapPath(FileUtilities.getParentDirPath(path));
+    for (ITileset tileset : this.tilesets) {
+      if (tileset instanceof Tileset) {
+        ((Tileset)tileset).setMapPath(path);
       }
     }
   }
 
-  public void updateTileTerrain() {
-    for (Tileset tileset : this.rawTilesets) {
-      tileset.updateTileTerrain();
+  @Override
+  public void addLayer(ILayer layer) {
+    this.layers.add(layer);
+    this.layerAdded(layer);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(this);
     }
   }
 
   @Override
-  public void addMapObjectLayer(IMapObjectLayer layer) {
-    MapObjectLayer rawLayer = (MapObjectLayer) layer;
-    this.getRawMapObjectLayers().add(rawLayer);
-    rawLayer.setMap(this);
-    this.mapObjectLayers = null;
-  }
-
-  @Override
-  public void addMapObjectLayer(int index, IMapObjectLayer layer) {
-    MapObjectLayer rawLayer = (MapObjectLayer) layer;
-    this.getRawMapObjectLayers().add(index, rawLayer);
-    rawLayer.setMap(this);
-    this.mapObjectLayers = null;
-  }
-
-  @Override
-  public void removeMapObjectLayer(IMapObjectLayer layer) {
-    MapObjectLayer rawLayer = (MapObjectLayer) layer;
-    rawLayer.setMap(null);
-    this.getRawMapObjectLayers().remove(layer);
-    this.mapObjectLayers = null;
-  }
-
-  @Override
-  public void removeMapObjectLayer(int index) {
-    MapObjectLayer removed = this.getRawMapObjectLayers().remove(index);
-    if (removed != null) {
-      removed.setMap(null);
+  public void addLayer(int index, ILayer layer) {
+    this.layers.add(index, layer);
+    this.layerAdded(layer);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(this);
     }
+  }
 
-    this.mapObjectLayers = null;
+  @Override
+  public void removeLayer(ILayer layer) {
+    this.layers.remove(layer);
+    this.layerRemoved(layer);
+    if (layer instanceof Layer) {
+      ((Layer)layer).setMap(null);
+    }
+  }
+
+  @Override
+  public void removeLayer(int index) {
+    ILayer removed = this.layers.remove(index);
+    this.layerRemoved(removed);
+    if (removed != null && removed instanceof Layer) {
+      ((Layer)removed).setMap(null);
+    }
+  }
+
+  private void layerRemoved(ILayer layer) {
+    if (layer instanceof ITileLayer) {
+      this.rawTileLayers.remove(layer);
+    }
+    if (layer instanceof IMapObjectLayer) {
+      this.rawMapObjectLayers.remove(layer);
+    }
+    if (layer instanceof IImageLayer) {
+      this.rawImageLayers.remove(layer);
+    }
+    if (layer instanceof IGroupLayer) {
+      this.rawGroupLayers.remove(layer);
+    }
   }
 
   @XmlTransient
@@ -488,14 +440,15 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
-  public void setOrientation(MapOrientation orientation) {
+  public void setOrientation(IMapOrientation orientation) {
+    Objects.requireNonNull(orientation);
     this.mapOrientation = orientation;
-    this.orientation = this.mapOrientation.name().toLowerCase();
   }
 
   @XmlTransient
-  public void setRenderorder(String renderorder) {
-    this.renderorder = renderorder;
+  public void setRenderOrder(RenderOrder renderorder) {
+    Objects.requireNonNull(renderorder);
+    this.renderOrderEnum = renderorder;
   }
 
   @XmlTransient
@@ -519,13 +472,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   }
 
   @XmlTransient
-  public void setStaggerAxis(String staggerAxis) {
-    this.staggeraxis = staggerAxis;
+  public void setStaggerAxis(StaggerAxis staggerAxis) {
+    this.staggerAxisEnum = staggerAxis;
   }
 
   @XmlTransient
-  public void setStaggerIndex(String staggerIndex) {
-    this.staggerindex = staggerIndex;
+  public void setStaggerIndex(StaggerIndex staggerIndex) {
+    this.staggerIndexEnum = staggerIndex;
   }
 
   @XmlTransient
@@ -569,26 +522,18 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   @Override
   public List<ILayer> getRenderLayers() {
-    return this.allRenderLayers;
+    return this.layers;
   }
 
   public List<Tileset> getExternalTilesets() {
     List<Tileset> externalTilesets = new ArrayList<>();
-    for (Tileset set : this.getRawTilesets()) {
-      if (set.sourceTileset != null) {
-        externalTilesets.add(set.sourceTileset);
+    for (ITileset set : this.getTilesets()) {
+      if (set instanceof Tileset && ((Tileset)set).sourceTileset != null) {
+        externalTilesets.add(((Tileset)set).sourceTileset);
       }
     }
 
     return externalTilesets;
-  }
-
-  public List<Tileset> getRawTilesets() {
-    if (this.rawTilesets == null) {
-      this.rawTilesets = new ArrayList<>();
-    }
-
-    return this.rawTilesets;
   }
 
   @Override
@@ -605,32 +550,9 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.decodedBackgroundColor;
   }
 
-  public List<TileLayer> getRawTileLayers() {
-    if (this.rawTileLayers == null) {
-      this.rawTileLayers = new ArrayList<>();
-    }
-
-    return this.rawTileLayers;
-  }
-
+  @Override
   public boolean isInfinite() {
     return this.infinite == 1;
-  }
-
-  protected List<ImageLayer> getRawImageLayers() {
-    if (this.rawImageLayers == null) {
-      this.rawImageLayers = new ArrayList<>();
-    }
-
-    return this.rawImageLayers;
-  }
-
-  protected List<MapObjectLayer> getRawMapObjectLayers() {
-    if (this.rawMapObjectLayers == null) {
-      this.rawMapObjectLayers = new ArrayList<>();
-    }
-
-    return this.rawMapObjectLayers;
   }
 
   protected int getChunkOffsetX() {
@@ -641,46 +563,67 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     return this.chunkOffsetY;
   }
 
-  void afterUnmarshal(Unmarshaller u, Object parent) {
+  @SuppressWarnings("unused")
+  private void afterUnmarshal(Unmarshaller u, Object parent) {
     this.checkVersion();
 
-    ArrayList<ITileset> tmpSets = new ArrayList<>();
-    if (this.rawTilesets != null) {
-      tmpSets.addAll(this.rawTilesets);
+    if (this.staggeraxis != null) {
+      this.staggerAxisEnum = StaggerAxis.valueOf(this.staggeraxis.toUpperCase());
+    }
+    if (this.staggerindex != null) {
+      this.staggerIndexEnum = StaggerIndex.valueOf(this.staggerindex.toUpperCase());
+    }
+    if (this.renderorder != null) {
+      this.renderOrderEnum = RenderOrder.forName(this.renderorder);
+    }
+    if (this.orientation != null) {
+      this.mapOrientation = MapOrientations.forName(this.orientation);
     }
 
-    ArrayList<ITileLayer> tmpTileLayers = new ArrayList<>();
-    if (this.rawTileLayers != null) {
-      tmpTileLayers.addAll(this.rawTileLayers);
+    if (this.renderOrderEnum == null) {
+      this.renderOrderEnum = RenderOrder.RIGHT_DOWN;
+    }
+    if (this.mapOrientation == null) {
+      this.mapOrientation = MapOrientations.ORTHOGONAL;
     }
 
-    ArrayList<IMapObjectLayer> tmpMapObjectLayers = new ArrayList<>();
-    if (this.rawMapObjectLayers != null) {
-      tmpMapObjectLayers.addAll(this.rawMapObjectLayers);
+    if (this.tilesets == null) {
+      this.tilesets = new ArrayList<>();
     }
 
-    ArrayList<IImageLayer> tmpImageLayers = new ArrayList<>();
-    if (this.rawImageLayers != null) {
-      tmpImageLayers.addAll(this.rawImageLayers);
+    if (this.layers == null) {
+      this.layers = new ArrayList<>();
     }
 
-    ArrayList<ILayer> tmprenderLayers = new ArrayList<>();
-    tmprenderLayers.addAll(tmpTileLayers);
-    tmprenderLayers.addAll(tmpImageLayers);
-    tmprenderLayers.sort(Comparator.comparing(ILayer::getOrder));
-
-    this.tilesets = Collections.unmodifiableList(tmpSets);
-    this.tileLayers = Collections.unmodifiableList(tmpTileLayers);
-    this.mapObjectLayers = Collections.unmodifiableList(tmpMapObjectLayers);
-    this.imageLayers = Collections.unmodifiableList(tmpImageLayers);
-    this.allRenderLayers = Collections.unmodifiableList(tmprenderLayers);
+    for (ILayer layer : this.layers) {
+      this.layerAdded(layer);
+    }
 
     if (this.isInfinite()) {
       this.updateDimensionsByTileLayers();
     }
+  }
 
-    if (this.getOrientation() != MapOrientation.HEXAGONAL) {
-      this.hexsidelength = null;
+  @SuppressWarnings("unused")
+  private void beforeMarshal(Marshaller m) {
+    this.staggeraxis = this.staggerAxisEnum == null ? null : this.staggerAxisEnum.name().toLowerCase();
+    this.staggerindex = this.staggerIndexEnum == null ? null : this.staggerIndexEnum.name().toLowerCase();
+    this.renderorder = this.renderOrderEnum.name;
+    this.orientation = this.mapOrientation.getName();
+  }
+
+  private void layerAdded(ILayer layer) {
+    if (layer instanceof ITileLayer) {
+      this.rawTileLayers.add((ITileLayer)layer);
+    }
+    if (layer instanceof IMapObjectLayer) {
+      this.rawMapObjectLayers.add((IMapObjectLayer)layer);
+    }
+    if (layer instanceof IImageLayer) {
+      this.rawImageLayers.add((IImageLayer)layer);
+    }
+    if (layer instanceof IGroupLayer) {
+      this.rawGroupLayers.add((IGroupLayer)layer);
     }
   }
 
@@ -714,21 +657,31 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     int minChunkOffsetX = 0;
     int minChunkOffsetY = 0;
 
-    for (TileLayer tileLayer : this.rawTileLayers) {
-      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetX() < minChunkOffsetX) {
-        minChunkOffsetX = tileLayer.getRawTileData().getOffsetX();
+    for (ITileLayer tileLayer : this.tileLayers) {
+      if (!(tileLayer instanceof TileLayer)) {
+        continue;
+      }
+      TileLayer layer = (TileLayer)tileLayer;
+
+      if (layer.getRawTileData() != null && layer.getRawTileData().getOffsetX() < minChunkOffsetX) {
+        minChunkOffsetX = layer.getRawTileData().getOffsetX();
       }
 
-      if (tileLayer.getRawTileData() != null && tileLayer.getRawTileData().getOffsetY() < minChunkOffsetY) {
-        minChunkOffsetY = tileLayer.getRawTileData().getOffsetY();
+      if (layer.getRawTileData() != null && layer.getRawTileData().getOffsetY() < minChunkOffsetY) {
+        minChunkOffsetY = layer.getRawTileData().getOffsetY();
       }
     }
 
     // update all tile layer data with the information about the layer based on which they'll position themselves in the grid
     // they need this information because they have to create an appropriately sized grid before locating their chunks in it
-    for (TileLayer tileLayer : this.rawTileLayers) {
-      if (tileLayer.getRawTileData() != null) {
-        tileLayer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
+    for (ITileLayer tileLayer : this.tileLayers) {
+      if (!(tileLayer instanceof TileLayer)) {
+        continue;
+      }
+      TileLayer layer = (TileLayer)tileLayer;
+
+      if (layer.getRawTileData() != null) {
+        layer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
       }
     }
 
@@ -738,7 +691,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     int w = 0;
     int h = 0;
 
-    for (TileLayer tileLayer : this.rawTileLayers) {
+    for (ITileLayer tileLayer : this.tileLayers) {
       if (tileLayer.getWidth() > w) {
         w = tileLayer.getWidth();
       }

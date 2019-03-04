@@ -53,8 +53,7 @@ public final class Fonts extends ResourcesContainer<Font> {
    */
   @Override
   protected Font load(String resourceName) {
-    try {
-      final InputStream fontStream = Resources.get(resourceName);
+    try (final InputStream fontStream = Resources.get(resourceName)) {
       if (fontStream == null) {
         log.log(Level.SEVERE, "font {0} could not be loaded", resourceName);
         return null;

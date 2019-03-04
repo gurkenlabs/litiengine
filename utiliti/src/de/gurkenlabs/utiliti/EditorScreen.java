@@ -1,9 +1,11 @@
 package de.gurkenlabs.utiliti;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -33,6 +35,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.environment.tilemap.IImageLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -551,7 +554,9 @@ public class EditorScreen extends Screen {
     }
 
     IMap currentMap = Game.world().environment().getMap();
-    BufferedImage img = Game.graphics().getMapRenderer(currentMap.getOrientation()).getImage(currentMap);
+    Dimension size = currentMap.getOrientation().getSize(currentMap);
+    BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+    MapRenderer.render(img.createGraphics(), currentMap, new Rectangle());
 
     try {
       final String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());

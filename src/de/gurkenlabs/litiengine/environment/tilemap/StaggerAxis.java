@@ -2,8 +2,7 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 public enum StaggerAxis {
   X,
-  Y,
-  UNDEFINED;
+  Y;
 
   public String value() {
     return this.name().toLowerCase();

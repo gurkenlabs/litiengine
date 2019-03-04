@@ -42,7 +42,7 @@ public abstract class ColorLayer implements IRenderable {
     // draw the tile on the layer image
     for (int x = 0; x < map.getWidth(); x++) {
       for (int y = 0; y < map.getHeight(); y++) {
-        Rectangle2D tileBounds = map.getTileShape(x, y).getBounds2D();
+        Rectangle2D tileBounds = map.getOrientation().getShape(x, y, map).getBounds2D();
         ITile tile = map.getTileLayers().get(0).getTile(x, y);
         if (!viewport.intersects(tileBounds)) {
           continue;
@@ -87,7 +87,7 @@ public abstract class ColorLayer implements IRenderable {
     final IMap map = this.getEnvironment().getMap();
 
     final Rectangle2D tileSection = MapUtilities.getTileBoundingBox(map, section);
-    if (tileSection == null) {
+    if (tileSection == null || (tileSection.getWidth() == 0 && tileSection.getHeight() == 0)) {
       return;
     }
     final BufferedImage img = Imaging.getCompatibleImage((int) tileSection.getWidth(), (int) tileSection.getHeight());
@@ -101,18 +101,21 @@ public abstract class ColorLayer implements IRenderable {
   }
 
   private void setTiles(BufferedImage img, Rectangle2D section) {
+    if (img == null) {
+      return;
+    }
     final IMap map = this.getEnvironment().getMap();
-    final Point startTile = MapUtilities.getTile(map, new Point2D.Double(section.getX(), section.getY()));
-    final Point endTile = MapUtilities.getTile(map, new Point2D.Double(section.getMaxX(), section.getMaxY()));
+    final Point startTile = map.getOrientation().getTile(section.getX(), section.getY(), map);
+    final Point endTile = map.getOrientation().getTile(section.getMaxX(), section.getMaxY(), map);
     final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
     final int endX = MathUtilities.clamp(endTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
     final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
 
-    final Shape startTileShape = map.getTileShape(startX, startY);
+    final Shape startTileShape = map.getOrientation().getShape(startX, startY, map);
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
-        Shape tile = map.getTileShape(x, y);
+        Shape tile = map.getOrientation().getShape(x, y, map);
         Shape translatedTile = GeometricUtilities.translateShape(tile, new Point2D.Double(0, 0));
         int subX = MathUtilities.clamp((int) (tile.getBounds().getX() - startTileShape.getBounds().getX()), 0, img.getWidth() - map.getTileWidth());
         int subY = MathUtilities.clamp((int) (tile.getBounds().getY() - startTileShape.getBounds().getY()), 0, img.getHeight() - map.getTileHeight());

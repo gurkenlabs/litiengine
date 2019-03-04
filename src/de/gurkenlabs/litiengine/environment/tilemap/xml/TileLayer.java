@@ -13,7 +13,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.ITileLayer;
 import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 
 public class TileLayer extends Layer implements ITileLayer {
-  private static final long serialVersionUID = -6588787132358068892L;
 
   @XmlElement
   private TileData data = null;
@@ -100,7 +99,7 @@ public class TileLayer extends Layer implements ITileLayer {
 
   public void setTilesetEntries(Map map) throws TmxException {
     for (Tile tile : getData()) {
-      for (ITileset tileset : map.getRawTilesets()) {
+      for (ITileset tileset : map.getTilesets()) {
         if (tileset.containsTile(tile.getGridId())) {
           tile.setTilesetEntry(tileset.getTile(tile.getGridId() - tileset.getFirstGridId()));
           break;

@@ -10,7 +10,6 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMapImage;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 
 public class ImageLayer extends Layer implements IImageLayer {
-  private static final long serialVersionUID = 3233918712579479523L;
 
   @XmlElement(name = "image")
   private MapImage image;

@@ -19,6 +19,7 @@ import de.gurkenlabs.litiengine.abilities.effects.EffectArgument;
 import de.gurkenlabs.litiengine.annotation.AbilityInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
+import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
 @AbilityInfo
@@ -184,11 +185,11 @@ public abstract class Ability implements IRenderable {
   @Override
   public void render(final Graphics2D g) {
     g.setColor(new Color(255, 255, 0, 100));
-    Game.graphics().renderShape(g, this.calculateImpactArea());
+    RenderEngine.renderShape(g, this.calculateImpactArea());
     final Stroke oldStroke = g.getStroke();
     g.setStroke(new BasicStroke(2f));
     g.setColor(new Color(255, 255, 0, 200));
-    Game.graphics().renderOutline(g, this.calculateImpactArea());
+    RenderEngine.renderOutline(g, this.calculateImpactArea());
     g.setStroke(oldStroke);
   }
 

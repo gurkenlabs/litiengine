@@ -11,6 +11,7 @@ public interface Resource extends Comparable<Resource> {
 
   public void setName(String name);
   
+  @Override
   public default int compareTo(Resource obj) {
     if (obj == null) {
       return 1;

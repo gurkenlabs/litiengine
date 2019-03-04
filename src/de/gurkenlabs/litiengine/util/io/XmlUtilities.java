@@ -94,11 +94,19 @@ public final class XmlUtilities {
     final Unmarshaller um = jaxbContext.createUnmarshaller();
 
     InputStream stream = Resources.get(path);
-    if (stream == null) {
-      return null;
+    try {
+      if (stream == null) {
+        return null;
+      }
+  
+      return cls.cast(um.unmarshal(stream));
+    } finally {
+      try {
+        stream.close();
+      } catch (IOException e) {
+        log.log(Level.WARNING, "could not close the input stream.", e);
+      }
     }
-
-    return cls.cast(um.unmarshal(stream));
   }
 
   public static <T> File save(T object, String fileName) {

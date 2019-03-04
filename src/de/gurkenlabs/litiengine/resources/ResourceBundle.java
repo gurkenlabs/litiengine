@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.gurkenlabs.litiengine.environment.tilemap.ITileset;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Blueprint;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Map;
 import de.gurkenlabs.litiengine.environment.tilemap.xml.Tileset;
@@ -85,11 +86,11 @@ public class ResourceBundle implements Serializable {
       }
 
       gameFile.getMaps().parallelStream().forEach(map -> {
-        for (final Tileset tileset : map.getRawTilesets()) {
-          tileset.load(gameFile.getTilesets());
+        for (final ITileset tileset : map.getTilesets()) {
+          if (tileset instanceof Tileset) {
+            ((Tileset)tileset).load(gameFile.getTilesets());
+          }
         }
-
-        map.updateTileTerrain();
       });
 
       return gameFile;

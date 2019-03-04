@@ -2,15 +2,13 @@ package de.gurkenlabs.litiengine.environment.tilemap;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * The Interface IMap.
  */
-public interface IMap extends ICustomPropertyProvider {
+public interface IMap extends ILayerList {
 
   /**
    * Gets the tilesets.
@@ -20,18 +18,11 @@ public interface IMap extends ICustomPropertyProvider {
   public List<ITileset> getTilesets();
 
   /**
-   * Gets the image layers.
-   *
-   * @return the image layers
-   */
-  public List<IImageLayer> getImageLayers();
-
-  /**
    * Gets the orientation.
    *
    * @return the orientation
    */
-  public MapOrientation getOrientation();
+  public IMapOrientation getOrientation();
 
   public String getPath();
 
@@ -40,34 +31,7 @@ public interface IMap extends ICustomPropertyProvider {
    *
    * @return the renderorder
    */
-  public String getRenderOrder();
-
-  public List<ILayer> getRenderLayers();
-
-  /**
-   * Gets the shape layers.
-   *
-   * @return the shape layers
-   */
-  public List<IMapObjectLayer> getMapObjectLayers();
-
-  public void addMapObjectLayer(IMapObjectLayer layer);
-
-  public void addMapObjectLayer(int index, IMapObjectLayer layer);
-
-  public void removeMapObjectLayer(IMapObjectLayer layer);
-
-  public IMapObjectLayer getMapObjectLayer(IMapObject mapObject);
-
-  public void removeMapObjectLayer(int index);
-
-  public Collection<IMapObject> getMapObjects();
-
-  public Collection<IMapObject> getMapObjects(String... type);
-
-  public IMapObject getMapObject(int mapId);
-
-  public void removeMapObject(int mapId);
+  public RenderOrder getRenderOrder();
 
   /**
    * Gets the size in pixels.
@@ -88,24 +52,6 @@ public interface IMap extends ICustomPropertyProvider {
   public Dimension getSizeInTiles();
 
   public Rectangle2D getBounds();
-
-  /**
-   * Gets the tile layers.
-   *
-   * @return the tile layers
-   */
-  public List<ITileLayer> getTileLayers();
-
-  /**
-   * Gets the shape of the tile [X|Y] at its absolute location.
-   * 
-   * @param tileX
-   *          the horizontal grid index of the tile
-   * @param tileY
-   *          the vertical grid index of the tile
-   * @return the tile shape
-   */
-  public Shape getTileShape(int tileX, int tileY);
 
   /**
    * Gets the tile size.

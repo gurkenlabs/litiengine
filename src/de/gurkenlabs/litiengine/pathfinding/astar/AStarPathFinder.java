@@ -83,7 +83,7 @@ public class AStarPathFinder extends PathFinder {
 
     while (!opened.isEmpty()) {
       // after the first iteration, this will also contained the newly found neighbors that were added in the last iteration
-      AStarNode currentNode = this.findNodeWithLowestCost(opened);
+      AStarNode currentNode = findNodeWithLowestCost(opened);
 
       // add node to closed list after checking it
       opened.remove(currentNode);
@@ -91,7 +91,7 @@ public class AStarPathFinder extends PathFinder {
 
       // when the currentNode reaches the targetNode, we've found the path
       if (currentNode.equals(targetNode)) {
-        Path path = this.retracePath(startNode, targetNode);
+        Path path = retracePath(startNode, targetNode);
         clear(opened);
         clear(closed);
         return path;
@@ -140,7 +140,7 @@ public class AStarPathFinder extends PathFinder {
     }
   }
 
-  private AStarNode findNodeWithLowestCost(List<AStarNode> openedNodes) {
+  private static AStarNode findNodeWithLowestCost(List<AStarNode> openedNodes) {
     AStarNode lowestCostNode = openedNodes.get(0);
     // find node with lowest cost
     // F-cost (aka. total costs) are considered first. If they are equal, the H-cost is checked subsequently
@@ -174,7 +174,7 @@ public class AStarPathFinder extends PathFinder {
    *          The target node for the path.
    * @return The found {@link Path}
    */
-  private Path retracePath(final AStarNode startNode, final AStarNode targetNode) {
+  private static Path retracePath(final AStarNode startNode, final AStarNode targetNode) {
     final List<AStarNode> path = new ArrayList<>();
     AStarNode currentNode = targetNode.getPredecessor();
 

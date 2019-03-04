@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -21,11 +20,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.EntityYComparator;
 import de.gurkenlabs.litiengine.entities.IEntity;
 import de.gurkenlabs.litiengine.environment.GameWorld;
-import de.gurkenlabs.litiengine.environment.tilemap.HexagonalMapRenderer;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
-import de.gurkenlabs.litiengine.environment.tilemap.IMapRenderer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
-import de.gurkenlabs.litiengine.environment.tilemap.OrthogonalMapRenderer;
+import de.gurkenlabs.litiengine.environment.tilemap.MapRenderer;
 import de.gurkenlabs.litiengine.graphics.animation.IEntityAnimationController;
 
 /**
@@ -51,7 +47,6 @@ public final class RenderEngine {
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderedConsumer;
   private final List<Predicate<IEntity>> entityRenderingConditions;
   private final List<Consumer<RenderEvent<IEntity>>> entityRenderingConsumer;
-  private final EnumMap<MapOrientation, IMapRenderer> mapRenderer;
 
   private float baseRenderScale;
 
@@ -68,11 +63,7 @@ public final class RenderEngine {
     this.entityRenderedConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConsumer = new CopyOnWriteArrayList<>();
     this.entityRenderingConditions = new CopyOnWriteArrayList<>();
-    this.mapRenderer = new EnumMap<>(MapOrientation.class);
     this.entityComparator = new EntityYComparator();
-
-    this.mapRenderer.put(MapOrientation.ORTHOGONAL, new OrthogonalMapRenderer());
-    this.mapRenderer.put(MapOrientation.HEXAGONAL, new HexagonalMapRenderer());
 
     this.baseRenderScale = DEFAULT_RENDERSCALE;
   }
@@ -89,7 +80,7 @@ public final class RenderEngine {
    * @param y
    *          The y-coordinate of the text
    */
-  public void renderText(final Graphics2D g, final String text, final double x, final double y) {
+  public static void renderText(final Graphics2D g, final String text, final double x, final double y) {
     if (text == null || text.isEmpty()) {
       return;
     }
@@ -101,11 +92,11 @@ public final class RenderEngine {
     TextRenderer.render(g, text, viewPortX, yiewPortY);
   }
 
-  public void renderText(final Graphics2D g, final String text, final Point2D location) {
-    this.renderText(g, text, location.getX(), location.getY());
+  public static void renderText(final Graphics2D g, final String text, final Point2D location) {
+    renderText(g, text, location.getX(), location.getY());
   }
 
-  public void renderShape(final Graphics2D g, final Shape shape) {
+  public static void renderShape(final Graphics2D g, final Shape shape) {
     if (shape == null) {
       return;
     }
@@ -117,11 +108,11 @@ public final class RenderEngine {
     ShapeRenderer.renderTransformed(g, shape, t);
   }
 
-  public void renderOutline(final Graphics2D g, final Shape shape) {
+  public static void renderOutline(final Graphics2D g, final Shape shape) {
     renderOutline(g, shape, new BasicStroke(1 / Game.world().camera().getRenderScale()));
   }
 
-  public void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
+  public static void renderOutline(final Graphics2D g, final Shape shape, final Stroke stroke) {
     if (shape == null) {
       return;
     }
@@ -133,11 +124,11 @@ public final class RenderEngine {
     ShapeRenderer.renderOutlineTransformed(g, shape, t, stroke);
   }
 
-  public void renderImage(Graphics2D g, final Image image, double x, double y) {
-    this.renderImage(g, image, new Point2D.Double(x, y));
+  public static void renderImage(Graphics2D g, final Image image, double x, double y) {
+    renderImage(g, image, new Point2D.Double(x, y));
   }
 
-  public void renderImage(Graphics2D g, final Image image, Point2D location) {
+  public static void renderImage(Graphics2D g, final Image image, Point2D location) {
     Point2D viewPortLocation = Game.world().camera().getViewportLocation(location); 
     ImageRenderer.render(g, image, viewPortLocation.getX() * Game.world().camera().getRenderScale(), viewPortLocation.getY() * Game.world().camera().getRenderScale());
   }
@@ -167,14 +158,6 @@ public final class RenderEngine {
     return this.baseRenderScale;
   }
 
-  public IMapRenderer getMapRenderer(final MapOrientation mapOrientation) {
-    if (!this.mapRenderer.containsKey(mapOrientation)) {
-      throw new IllegalArgumentException("The map orientation " + mapOrientation + " is not supported!");
-    }
-
-    return this.mapRenderer.get(mapOrientation);
-  }
-
   public void onEntityRendered(final Consumer<RenderEvent<IEntity>> entity) {
     if (!this.entityRenderedConsumer.contains(entity)) {
       this.entityRenderedConsumer.add(entity);
@@ -187,11 +170,11 @@ public final class RenderEngine {
     }
   }
 
-  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
-    renderables.forEach(r -> this.render(g, r));
+  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables) {
+    renderables.forEach(r -> render(g, r));
   }
 
-  public void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
+  public static void render(final Graphics2D g, final Collection<? extends IRenderable> renderables, final Shape clip) {
     // set render shape according to the vision
     final Shape oldClip = g.getClip();
 
@@ -202,7 +185,7 @@ public final class RenderEngine {
     g.setClip(oldClip);
   }
 
-  public void render(final Graphics2D g, final IRenderable renderable) {
+  public static void render(final Graphics2D g, final IRenderable renderable) {
     if (renderable == null) {
       return;
     }
@@ -300,13 +283,13 @@ public final class RenderEngine {
     }
   }
 
-  public void render(final Graphics2D g, final IMap map, final RenderType... renderTypes) {
+  public static void render(final Graphics2D g, final IMap map, final RenderType... renderTypes) {
     if (map == null) {
       return;
     }
 
     // draw layers
-    this.mapRenderer.get(map.getOrientation()).render(g, map, Game.world().camera().getViewport(), renderTypes);
+    MapRenderer.render(g, map, Game.world().camera().getViewport(), renderTypes);
   }
 
   /**

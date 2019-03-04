@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
 import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObjectLayer;
-import de.gurkenlabs.litiengine.environment.tilemap.MapOrientation;
+import de.gurkenlabs.litiengine.environment.tilemap.MapOrientations;
+import de.gurkenlabs.litiengine.environment.tilemap.RenderOrder;
 import de.gurkenlabs.litiengine.resources.Resources;
 
 public class MapTests {
@@ -29,8 +30,8 @@ public class MapTests {
 
     assertEquals(1.0, map.getVersion());
     assertEquals("1.1.4", map.getTiledVersion());
-    assertEquals(MapOrientation.ORTHOGONAL, map.getOrientation());
-    assertEquals("right-down", map.getRenderOrder());
+    assertEquals(MapOrientations.ORTHOGONAL, map.getOrientation());
+    assertEquals(RenderOrder.RIGHT_DOWN, map.getRenderOrder());
     assertEquals(256, map.getSizeInPixels().width);
     assertEquals(256, map.getSizeInPixels().height);
     assertEquals(16, map.getTileSize().width);
@@ -68,7 +69,7 @@ public class MapTests {
   @Test
   public void testSettingProperties() {
     Map map = (Map) Resources.maps().get("tests/de/gurkenlabs/litiengine/environment/tilemap/xml/test-map.tmx");
-    map.setOrientation(MapOrientation.SHIFTED);
+    map.setOrientation(MapOrientations.ISOMETRIC_STAGGERED);
     map.setTiledVersion("0.0.0");
     map.setVersion(2.0);
     map.setWidth(64);
@@ -77,17 +78,17 @@ public class MapTests {
     map.setTileHeight(32);
     map.setTileWidth(32);
     map.setName("test");
-    map.setRenderorder("right-up");
+    map.setRenderOrder(RenderOrder.RIGHT_UP);
 
     assertEquals(64, map.getSizeInTiles().width);
     assertEquals(64, map.getSizeInTiles().height);
-    assertEquals(MapOrientation.SHIFTED, map.getOrientation());
+    assertEquals(MapOrientations.ISOMETRIC_STAGGERED, map.getOrientation());
     assertEquals("0.0.0", map.getTiledVersion());
     assertEquals(2.0, map.getVersion());
     assertEquals(32, map.getTileSize().width);
     assertEquals(32, map.getTileSize().height);
     assertEquals("test", map.getName());
-    assertEquals("right-up", map.getRenderOrder());
+    assertEquals(RenderOrder.RIGHT_UP, map.getRenderOrder());
   }
 
   @Test
@@ -114,18 +115,18 @@ public class MapTests {
     assertEquals(10.1f, object.getHeight());
     assertEquals("bar", object.getStringValue("foo"));
 
-    map.addMapObjectLayer(mock(MapObjectLayer.class));
+    map.addLayer(mock(MapObjectLayer.class));
     assertEquals(2, map.getMapObjectLayers().size());
 
     map.removeMapObject(1);
 
     assertNull(map.getMapObject(1));
 
-    map.removeMapObjectLayer(layer);
+    map.removeLayer(layer);
 
     assertEquals(1, map.getMapObjectLayers().size());
 
-    map.removeMapObjectLayer(0);
+    map.removeLayer(1);
 
     assertEquals(0, map.getMapObjectLayers().size());
   }

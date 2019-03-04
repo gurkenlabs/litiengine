@@ -8,10 +8,12 @@ public abstract class NamedResource implements Resource {
   private String name;
 
   @XmlTransient
+  @Override
   public String getName() {
     return this.name;
   }
 
+  @Override
   public void setName(final String n) {
     this.name = n;
   }

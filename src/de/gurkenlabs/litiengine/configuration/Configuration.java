@@ -85,8 +85,7 @@ public class Configuration {
 
   public void save() {
     final File settingsFile = new File(this.getFileName());
-    try {
-      final OutputStream out = new FileOutputStream(settingsFile, false);
+    try (OutputStream out = new FileOutputStream(settingsFile, false)) {
       for (final ConfigurationGroup group : this.getConfigurationGroups()) {
         if (!Game.isDebug() && group.isDebug()) {
           continue;
@@ -94,7 +93,6 @@ public class Configuration {
 
         storeConfigurationGroup(out, group);
       }
-      out.close();
       log.log(Level.INFO, "Configuration " + this.getFileName() + " saved");
     } catch (final IOException e) {
       log.log(Level.SEVERE, e.getMessage(), e);
@@ -137,9 +135,9 @@ public class Configuration {
     final File settingsFile = new File(this.getFileName());
     try (InputStream settingsStream = Resources.get(this.getFileName())) {
       if (!settingsFile.exists() && settingsStream == null || !settingsFile.isFile()) {
-        final OutputStream out = new FileOutputStream(settingsFile);
-        this.createDefaultSettingsFile(out);
-        out.close();
+        try (OutputStream out = new FileOutputStream(settingsFile)) {
+          this.createDefaultSettingsFile(out);
+        }
 
         log.log(Level.INFO, "Default configuration " + this.getFileName() + " created");
         return;
