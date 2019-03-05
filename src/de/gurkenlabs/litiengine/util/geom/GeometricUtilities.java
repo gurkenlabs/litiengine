@@ -572,8 +572,7 @@ public class GeometricUtilities {
 
   public static Shape translateShape(final Shape shape, final Point2D newLocation) {
     final AffineTransform t = new AffineTransform();
-    t.translate(-shape.getBounds2D().getX(), -shape.getBounds2D().getY());
-    t.translate(newLocation.getX(), newLocation.getY());
+    t.translate(newLocation.getX() - shape.getBounds2D().getX(), newLocation.getY() - shape.getBounds2D().getY());
     return t.createTransformedShape(shape);
   }
 

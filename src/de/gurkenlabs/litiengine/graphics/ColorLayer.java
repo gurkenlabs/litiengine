@@ -116,9 +116,9 @@ public abstract class ColorLayer implements IRenderable {
     for (int x = startX; x <= endX; x++) {
       for (int y = startY; y <= endY; y++) {
         Shape tile = map.getOrientation().getShape(x, y, map);
-        Shape translatedTile = GeometricUtilities.translateShape(tile, new Point2D.Double(0, 0));
-        int subX = MathUtilities.clamp((int) (tile.getBounds().getX() - startTileShape.getBounds().getX()), 0, img.getWidth() - map.getTileWidth());
-        int subY = MathUtilities.clamp((int) (tile.getBounds().getY() - startTileShape.getBounds().getY()), 0, img.getHeight() - map.getTileHeight());
+        Shape translatedTile = GeometricUtilities.translateShape(tile, new Point2D.Double());
+        int subX = MathUtilities.clamp(tile.getBounds().x - startTileShape.getBounds().x, 0, img.getWidth() - map.getTileWidth());
+        int subY = MathUtilities.clamp(tile.getBounds().y - startTileShape.getBounds().y, 0, img.getHeight() - map.getTileHeight());
         final BufferedImage smallImage = img.getSubimage(subX, subY, map.getTileWidth(), map.getTileHeight());
         final BufferedImage clippedImage = Imaging.getCompatibleImage(smallImage.getWidth(), smallImage.getHeight());
         Graphics2D g = clippedImage.createGraphics();
