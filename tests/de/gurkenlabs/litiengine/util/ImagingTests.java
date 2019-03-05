@@ -189,7 +189,7 @@ public class ImagingTests {
   @Test
   public void testSpriteFlipHorizontally() {
     BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag.png");
-    Spritesheet sprite = new Spritesheet(image, "tests/de/gurkenlabs/litiengine/util/prop-flag.png", 15, 16);
+    Spritesheet sprite = new Spritesheet(image, 15, 16);
     BufferedImage imageFlippedHor = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-spriteflip-hor.png");
 
     int[] expectedPixels = ((DataBufferInt) imageFlippedHor.getData().getDataBuffer()).getData();
@@ -202,7 +202,7 @@ public class ImagingTests {
   @Test
   public void testSpriteFlipVertically() {
     BufferedImage image = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-2rows.png");
-    Spritesheet sprite = new Spritesheet(image, "tests/de/gurkenlabs/litiengine/util/prop-flag-2rows.png", 15, 16);
+    Spritesheet sprite = new Spritesheet(image, 15, 16);
     BufferedImage imageFlippedVer = Resources.images().get("tests/de/gurkenlabs/litiengine/util/prop-flag-spriteflip-ver.png");
 
     int[] expectedPixels = ((DataBufferInt) imageFlippedVer.getData().getDataBuffer()).getData();

@@ -55,6 +55,7 @@ public final class Resources {
   private static Tilesets tilesets = new Tilesets();
   private static Strings strings = new Strings();
   private static Images images = new Images();
+  @Deprecated
   private static Spritesheets spritesheets = new Spritesheets();
 
   private Resources() {
@@ -135,6 +136,7 @@ public final class Resources {
    * 
    * @see Spritesheet
    */
+  @Deprecated
   public static Spritesheets spritesheets() {
     return spritesheets;
   }
@@ -146,6 +148,7 @@ public final class Resources {
    * @param gameResourceFile
    *          The file name of the game resource file
    */
+  @SuppressWarnings("deprecation")
   public static void load(final String gameResourceFile) {
     final long loadStart = System.nanoTime();
 

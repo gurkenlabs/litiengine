@@ -113,6 +113,7 @@ public class CustomEmitter extends Emitter {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected Particle createNewParticle() {
     float x;
     float y;

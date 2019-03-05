@@ -21,7 +21,6 @@ public class ResourcesTests {
     assertNotNull(Resources.images());
     assertNotNull(Resources.maps());
     assertNotNull(Resources.sounds());
-    assertNotNull(Resources.spritesheets());
     assertNotNull(Resources.strings());
   }
 

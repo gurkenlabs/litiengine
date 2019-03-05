@@ -106,6 +106,7 @@ public class EmitterData implements Serializable, Resource {
   @XmlElement
   private boolean animateSprite;
 
+  @Deprecated
   @XmlElement
   private String spritesheet;
 
@@ -322,6 +323,7 @@ public class EmitterData implements Serializable, Resource {
     this.animateSprite = animateSprite;
   }
 
+  @Deprecated
   @XmlTransient
   public String getSpritesheet() {
     return spritesheet;

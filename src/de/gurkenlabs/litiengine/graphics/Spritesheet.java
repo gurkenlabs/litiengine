@@ -18,6 +18,7 @@ public final class Spritesheet {
   private final List<Integer> emptySprites = new CopyOnWriteArrayList<>();
 
   private final BufferedImage image;
+  @Deprecated
   private final String name;
   private final ImageFormat imageFormat;
 
@@ -27,7 +28,21 @@ public final class Spritesheet {
   private int spriteHeight;
   private int spriteWidth;
 
-  public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight) {
+  public Spritesheet(BufferedImage image, int spriteWidth, int spriteHeight) {
+    this(image, null, spriteWidth, spriteHeight, 0, 0);
+  }
+
+  public Spritesheet(BufferedImage image, int spriteWidth, int spriteHeight, int margin, int spacing) {
+    this(image, null, spriteWidth, spriteHeight, margin, spacing);
+  }
+
+  @Deprecated
+  public Spritesheet(BufferedImage image, String path, int spriteWidth, int spriteHeight) {
+    this(image, path, spriteWidth, spriteHeight, 0, 0);
+  }
+
+  @Deprecated
+  public Spritesheet(final BufferedImage image, final String path, final int spriteWidth, final int spriteHeight, int margin, int spacing) {
     checkImage(image, path);
     this.image = image;
     this.checkHeight(spriteHeight);
@@ -93,6 +108,7 @@ public final class Spritesheet {
    *
    * @return The name of the spritesheet.
    */
+  @Deprecated
   public String getName() {
     return this.name;
   }
@@ -105,6 +121,10 @@ public final class Spritesheet {
     return this.getSprite(index, 0, 0);
   }
 
+  /**
+   * @deprecated Margin and spacing are to be changed to fields within the spritesheet.
+   */
+  @Deprecated
   public BufferedImage getSprite(final int index, final int margin, final int spacing) {
     if (this.emptySprites.contains(index) || this.sprites.length == 0) {
       return null;
@@ -162,6 +182,7 @@ public final class Spritesheet {
     return this.getRows() * this.getColumns();
   }
 
+  @Deprecated
   public boolean isLoaded() {
     return Resources.spritesheets().contains(this.getName());
   }

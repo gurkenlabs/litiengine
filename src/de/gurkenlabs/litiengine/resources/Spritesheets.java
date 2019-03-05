@@ -18,6 +18,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.io.Codec;
 import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
+@Deprecated
 public final class Spritesheets extends ResourcesContainer<Spritesheet> {
   private final Map<String, int[]> customKeyFrameDurations = new ConcurrentHashMap<>();
   private static final Logger log = Logger.getLogger(Spritesheet.class.getName());

@@ -58,6 +58,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
 
   public Animation flipAnimation(Spritesheet spriteToFlip, String newSpriteName) {
     final BufferedImage leftIdleSprite = Imaging.flipSpritesHorizontally(spriteToFlip);
+    @SuppressWarnings("deprecation")
     Spritesheet leftIdleSpritesheet = Resources.spritesheets().load(leftIdleSprite, newSpriteName, spriteToFlip.getSpriteWidth(), spriteToFlip.getSpriteHeight());
     return new Animation(leftIdleSpritesheet, true);
   }
@@ -120,6 +121,7 @@ public class CreatureAnimationController<T extends Creature> extends EntityAnima
     return null;
   }
 
+  @Deprecated
   private void initializeAvailableAnimations() {
     for (Direction dir : Direction.values()) {
       // initialize walking animations

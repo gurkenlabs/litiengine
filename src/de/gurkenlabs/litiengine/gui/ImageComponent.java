@@ -66,6 +66,7 @@ public class ImageComponent extends GuiComponent {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public Image getBackground() {
     if (this.getSpritesheet() == null) {
       return null;

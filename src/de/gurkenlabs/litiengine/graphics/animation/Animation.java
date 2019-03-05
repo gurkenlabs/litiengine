@@ -27,18 +27,22 @@ public class Animation implements IUpdateable, ILaunchable {
   private boolean playing;
   private Spritesheet spritesheet;
 
+  @Deprecated
   public Animation(final String spriteSheetName, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(Resources.spritesheets().get(spriteSheetName), loop, randomizeStart, keyFrameDurations);
   }
 
+  @SuppressWarnings("deprecation")
   public Animation(final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, randomizeStart, keyFrameDurations);
   }
 
+  @SuppressWarnings("deprecation")
   public Animation(final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this(spritesheet.getName(), spritesheet, loop, keyFrameDurations);
   }
 
+  @Deprecated
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final boolean randomizeStart, final int... keyFrameDurations) {
     this(name, spritesheet, loop, keyFrameDurations);
 
@@ -47,6 +51,7 @@ public class Animation implements IUpdateable, ILaunchable {
     }
   }
 
+  @Deprecated
   public Animation(final String name, final Spritesheet spritesheet, final boolean loop, final int... keyFrameDurations) {
     this.name = name;
     this.spritesheet = spritesheet;
@@ -60,7 +65,7 @@ public class Animation implements IUpdateable, ILaunchable {
 
     this.initKeyFrames(keyFrameDurations);
     if (this.getKeyframes().isEmpty()) {
-      log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spitesheet: {0})", spritesheet.getName());
+      log.log(Level.WARNING, "No keyframes defined for animation " + this.getName() + " (spritesheet: {0})", spritesheet.getName());
     }
   }
 
@@ -90,6 +95,7 @@ public class Animation implements IUpdateable, ILaunchable {
     return this.name;
   }
 
+  @SuppressWarnings("deprecation")
   public Spritesheet getSpritesheet() {
     // in case the previously sprite sheet was unloaded (removed from the loaded sprite sheets),
     // try to find an updated one by the name of the previously used sprite
@@ -195,6 +201,7 @@ public class Animation implements IUpdateable, ILaunchable {
     this.elapsedTicks = 0;
   }
 
+  @SuppressWarnings("deprecation")
   private void initKeyFrames(final int... keyFrames) {
     if (this.getSpritesheet() == null) {
       return;

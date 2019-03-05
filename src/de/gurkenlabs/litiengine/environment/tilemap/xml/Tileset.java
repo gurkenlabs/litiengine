@@ -137,6 +137,7 @@ public class Tileset extends CustomPropertyProvider implements ITileset {
     return this.spacing;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   @XmlTransient
   public Spritesheet getSpritesheet() {

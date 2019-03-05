@@ -41,6 +41,7 @@ public class EntityAnimationController<T extends IEntity> extends AnimationContr
     this(entity, sprite, true);
   }
 
+  @SuppressWarnings("deprecation")
   public EntityAnimationController(final T entity, final Spritesheet sprite, boolean loop) {
     this(entity, new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }

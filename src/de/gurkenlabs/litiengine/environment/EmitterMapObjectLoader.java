@@ -106,6 +106,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
     return data;
   }
 
+  @SuppressWarnings("deprecation")
   public static IMapObject createMapObject(EmitterData emitterData) {
     MapObject newMapObject = new MapObject();
     newMapObject.setType(MapObjectType.EMITTER.toString());

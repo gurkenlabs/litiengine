@@ -97,15 +97,17 @@ public class PropAnimationController<T extends Prop> extends EntityAnimationCont
     return sb.toString();
   }
 
+  @SuppressWarnings("deprecation")
   private static Animation createAnimation(final Prop prop, final PropState state) {
     final Spritesheet spritesheet = findSpriteSheet(prop, state);
     if (spritesheet == null) {
       return null;
     }
 
-    return new Animation(state.name(), spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
+    return new Animation(spritesheet, true, true, Resources.spritesheets().getCustomKeyFrameDurations(spritesheet.getName()));
   }
 
+  @Deprecated
   private static Spritesheet findSpriteSheet(final Prop prop, final PropState state) {
     if (prop == null || prop.getSpritesheetName() == null || prop.getSpritesheetName().isEmpty()) {
       return null;

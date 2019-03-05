@@ -13,6 +13,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.io.Codec;
 
+@SuppressWarnings("deprecation")
 @XmlRootElement(name = "sprite")
 public class SpritesheetResource extends NamedResource implements Serializable {
   public static final String PLAIN_TEXT_FILE_EXTENSION = "info";

@@ -42,6 +42,7 @@ public class AnimationController implements IAnimationController {
     this(sprite, true);
   }
 
+  @SuppressWarnings("deprecation")
   public AnimationController(final Spritesheet sprite, boolean loop) {
     this(new Animation(sprite, loop, Resources.spritesheets().getCustomKeyFrameDurations(sprite)));
   }

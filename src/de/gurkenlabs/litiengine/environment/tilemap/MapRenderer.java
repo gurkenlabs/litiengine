@@ -96,6 +96,7 @@ public abstract class MapRenderer {
     return layer.isVisible() && layer.getOpacity() > 0f;
   }
 
+  @SuppressWarnings("deprecation")
   protected static void renderImageLayer(Graphics2D g, IImageLayer layer, Rectangle2D viewport) {
     Spritesheet sprite = Resources.spritesheets().get(layer.getImage().getSource());
     if (sprite == null) {
@@ -163,7 +164,7 @@ public abstract class MapRenderer {
       }
     }
 
-    BufferedImage tileImage = sprite.getSprite(index, tileset.getMargin(), tileset.getSpacing());
+    BufferedImage tileImage = sprite.getSprite(index);
     if (tile.isFlipped()) {
       if (tile.isFlippedDiagonally()) {
         tileImage = Imaging.rotate(tileImage, -Math.PI / 2);
