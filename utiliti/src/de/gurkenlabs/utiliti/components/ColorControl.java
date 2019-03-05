@@ -17,6 +17,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.ColorHelper;
 import de.gurkenlabs.utiliti.swing.panels.PropertyPanel;
 
+@SuppressWarnings("serial")
 public class ColorControl extends JPanel {
   private static final String DEFAULT_COLOR = "#ffffffff";
   private final JButton btnSelectColor;

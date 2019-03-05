@@ -201,7 +201,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject((MapObject) mapObject, true), OperationType.CHANGE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, this.changing.remove(this.changing.indexOf(trackedMapObject.get())), new MapObject((MapObject) mapObject, true), OperationType.CHANGE, this.operation);
     fireUndoStackChangedEvent(this);
   }
 
@@ -214,7 +214,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.DELETE);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.DELETE, this.operation);
     fireUndoStackChangedEvent(this);
     fireUndoManagerEvent(mapObjectRemoved, this);
   }
@@ -228,7 +228,7 @@ public class UndoManager {
     this.currentIndex++;
     this.clearRedoSteps();
 
-    this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD);
+    this.undoStack[this.currentIndex] = new UndoState(mapObject, OperationType.ADD, this.operation);
     fireUndoStackChangedEvent(this);
     fireUndoManagerEvent(mapObjectAdded, this);
   }
@@ -338,7 +338,7 @@ public class UndoManager {
     CHANGE, ADD, DELETE
   }
 
-  public class UndoState {
+  public static class UndoState {
     private final IMapObject target;
     private final IMapObject oldMapObject;
     private final IMapObject newMapObject;
@@ -346,8 +346,8 @@ public class UndoManager {
     private final OperationType operationType;
     private final int operation;
 
-    public UndoState(IMapObject target, OperationType operationType) {
-      this.operation = UndoManager.this.operation;
+    public UndoState(IMapObject target, OperationType operationType, int operation) {
+      this.operation = operation;
       this.target = target;
       this.layer = Game.world().environment().getMap().getMapObjectLayer(target);
       this.oldMapObject = null;
@@ -355,8 +355,8 @@ public class UndoManager {
       this.operationType = operationType;
     }
 
-    public UndoState(IMapObject target, IMapObject oldMapObject, IMapObject newMapObject, OperationType operationType) {
-      this.operation = UndoManager.this.operation;
+    public UndoState(IMapObject target, IMapObject oldMapObject, IMapObject newMapObject, OperationType operationType, int operation) {
+      this.operation = operation;
       this.target = target;
       this.oldMapObject = operationType != OperationType.ADD ? oldMapObject : null;
       this.newMapObject = operationType != OperationType.DELETE ? newMapObject : null;

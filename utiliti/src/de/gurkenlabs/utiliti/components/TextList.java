@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
+@SuppressWarnings("serial")
 public class TextList extends JPanel {
   private final List<ActionListener> listeners;
 

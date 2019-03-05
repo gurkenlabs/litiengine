@@ -89,6 +89,7 @@ public class AssetPanelItem extends JPanel {
 
     this.getInputMap(JPanel.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteAsset");
     this.getActionMap().put("deleteAsset", new AbstractAction() {
+      @Override
       public void actionPerformed(ActionEvent ae) {
         deleteAsset();
       }
@@ -407,11 +408,6 @@ public class AssetPanelItem extends JPanel {
     } else if (this.getOrigin() instanceof SoundResource) {
       this.exportSound();
     }
-  }
-
-  private boolean hasChanges() {
-
-    return true;
   }
 
   private void refresh() {

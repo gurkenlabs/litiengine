@@ -39,7 +39,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -169,7 +168,6 @@ public class MapSelectionPanel extends JSplitPane {
     mntmDeleteMap.setIcon(Icons.MAP_DELETE);
     mntmDeleteMap.addActionListener(a -> EditorScreen.instance().getMapComponent().deleteMap());
     popupMenu.add(mntmDeleteMap);
-    TitledBorder border = new TitledBorder(new LineBorder(new Color(128, 128, 128)), Resources.strings().get("panel_maps"), TitledBorder.LEADING, TitledBorder.TOP, null, null);
     mapScrollPane.setViewportBorder(null);
 
     layerScrollPane = new JScrollPane();
