@@ -107,10 +107,10 @@ public abstract class ColorLayer implements IRenderable {
     final IMap map = this.getEnvironment().getMap();
     final Point startTile = map.getOrientation().getTile(section.getX(), section.getY(), map);
     final Point endTile = map.getOrientation().getTile(section.getMaxX(), section.getMaxY(), map);
-    final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
-    final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
-    final int endX = MathUtilities.clamp(endTile.x, 0, Math.min(startTile.x + (endTile.x - startTile.x), tiles.length) - 1);
-    final int endY = MathUtilities.clamp(endTile.y, 0, Math.min(startTile.y + (endTile.y - startTile.y), tiles[0].length) - 1);
+    final int startX = MathUtilities.clamp(startTile.x, 0, Math.min(endTile.x, tiles.length) - 1);
+    final int startY = MathUtilities.clamp(startTile.y, 0, Math.min(endTile.y, tiles[0].length) - 1);
+    final int endX = MathUtilities.clamp(endTile.x - 1, 0, tiles.length - 1);
+    final int endY = MathUtilities.clamp(endTile.y - 1, 0, tiles[0].length - 1);
 
     final Shape startTileShape = map.getOrientation().getShape(startX, startY, map);
     for (int x = startX; x <= endX; x++) {
