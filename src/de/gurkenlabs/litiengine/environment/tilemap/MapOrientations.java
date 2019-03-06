@@ -88,7 +88,7 @@ public class MapOrientations {
     }
   }
 
-  private static abstract class Base implements IMapOrientation {
+  private abstract static class Base implements IMapOrientation {
     @Override
     public Point getLocation(Point tile, IMap map) {
       return this.getLocation(tile.x, tile.y, map);

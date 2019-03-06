@@ -6,7 +6,7 @@ public enum RenderOrder {
   LEFT_DOWN("left-down", true, false),
   LEFT_UP("left-up", true, true);
 
-  public final String name;
+  public final String savedName;
   public final boolean rtl;
   public final boolean btt;
 
@@ -25,13 +25,13 @@ public enum RenderOrder {
   }
 
   private RenderOrder(String name, boolean rtl, boolean btt) {
-    this.name = name;
+    this.savedName = name;
     this.rtl = rtl;
     this.btt = btt;
   }
 
   @Override
   public String toString() {
-    return this.name;
+    return this.savedName;
   }
 }

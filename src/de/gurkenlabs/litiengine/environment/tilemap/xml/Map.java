@@ -608,7 +608,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private void beforeMarshal(Marshaller m) {
     this.staggeraxis = this.staggerAxisEnum == null ? null : this.staggerAxisEnum.name().toLowerCase();
     this.staggerindex = this.staggerIndexEnum == null ? null : this.staggerIndexEnum.name().toLowerCase();
-    this.renderorder = this.renderOrderEnum.name;
+    this.renderorder = this.renderOrderEnum.savedName;
     this.orientation = this.mapOrientation.getName();
   }
 
