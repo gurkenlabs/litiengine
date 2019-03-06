@@ -94,11 +94,10 @@ public final class XmlUtilities {
     final Unmarshaller um = jaxbContext.createUnmarshaller();
 
     InputStream stream = Resources.get(path);
+    if (stream == null) {
+      return null;
+    }
     try {
-      if (stream == null) {
-        return null;
-      }
-  
       return cls.cast(um.unmarshal(stream));
     } finally {
       try {
