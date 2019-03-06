@@ -38,4 +38,8 @@ public final class Style {
       }
     }
   }
+
+  private Style() {
+    throw new UnsupportedOperationException();
+  }
 }
