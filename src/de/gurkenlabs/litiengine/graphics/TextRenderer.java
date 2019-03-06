@@ -83,11 +83,10 @@ public final class TextRenderer {
   }
 
   public static void renderRotated(final Graphics2D g, final String text, final double x, final double y, final double angle) {
-    // TODO: does this actually work as expected if we're rendering on the copy?
-    final Graphics2D g2 = (Graphics2D) g.create();
-    g2.rotate(Math.toRadians(angle), x, y);
-    render(g2, text, x, y);
-    g2.dispose();
+    AffineTransform oldTx = g.getTransform();
+    g.rotate(Math.toRadians(angle), x, y);
+    render(g, text, x, y);
+    g.setTransform(oldTx);
   }
 
 
