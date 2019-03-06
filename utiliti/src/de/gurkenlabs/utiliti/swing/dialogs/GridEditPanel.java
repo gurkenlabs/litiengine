@@ -35,7 +35,7 @@ public class GridEditPanel extends JPanel {
     JLabel lblWidth = new JLabel(Resources.strings().get("menu_gridWidth"));
 
     this.widthSpinner = new JSpinner();
-    this.widthSpinner.setModel(new SpinnerNumberModel(gridWidth, null, null, new Integer(1)));
+    this.widthSpinner.setModel(new SpinnerNumberModel(gridWidth, null, null, 1));
 
     JLabel lblHeight = new JLabel(Resources.strings().get("menu_gridHeight"));
 
