@@ -15,7 +15,7 @@ import de.gurkenlabs.litiengine.graphics.Spritesheet;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.util.Imaging;
 
-public abstract class MapRenderer {
+public class MapRenderer {
 
   public static void render(final Graphics2D g, final IMap map, final Rectangle2D viewport, RenderType... renderTypes) {
     renderLayers(g, map, map, viewport, renderTypes);
@@ -180,5 +180,9 @@ public abstract class MapRenderer {
     }
 
     return tileImage;
+  }
+
+  private MapRenderer() {
+    throw new UnsupportedOperationException();
   }
 }
