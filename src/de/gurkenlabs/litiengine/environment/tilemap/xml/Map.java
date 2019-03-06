@@ -114,10 +114,10 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   private List<ITileset> tilesets;
 
   @XmlElements({
-    @XmlElement(name = "imagelayer", type = ImageLayer.class),
-    @XmlElement(name = "layer", type = TileLayer.class),
-    @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
-    @XmlElement(name = "group", type = GroupLayer.class)
+      @XmlElement(name = "imagelayer", type = ImageLayer.class),
+      @XmlElement(name = "layer", type = TileLayer.class),
+      @XmlElement(name = "objectgroup", type = MapObjectLayer.class),
+      @XmlElement(name = "group", type = GroupLayer.class)
   })
   private List<ILayer> layers;
 
@@ -372,13 +372,13 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.path = path;
     for (ILayer layer : this.layers) {
       if (layer instanceof ImageLayer) {
-        ((ImageLayer)layer).setMapPath(path);
+        ((ImageLayer) layer).setMapPath(path);
       }
     }
 
     for (ITileset tileset : this.tilesets) {
       if (tileset instanceof Tileset) {
-        ((Tileset)tileset).setMapPath(path);
+        ((Tileset) tileset).setMapPath(path);
       }
     }
   }
@@ -388,7 +388,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.layers.add(layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap(this);
+      ((Layer) layer).setMap(this);
     }
   }
 
@@ -397,7 +397,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.layers.add(index, layer);
     this.layerAdded(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap(this);
+      ((Layer) layer).setMap(this);
     }
   }
 
@@ -406,7 +406,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     this.layers.remove(layer);
     this.layerRemoved(layer);
     if (layer instanceof Layer) {
-      ((Layer)layer).setMap(null);
+      ((Layer) layer).setMap(null);
     }
   }
 
@@ -415,7 +415,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
     ILayer removed = this.layers.remove(index);
     this.layerRemoved(removed);
     if (removed != null && removed instanceof Layer) {
-      ((Layer)removed).setMap(null);
+      ((Layer) removed).setMap(null);
     }
   }
 
@@ -528,8 +528,8 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
   public List<Tileset> getExternalTilesets() {
     List<Tileset> externalTilesets = new ArrayList<>();
     for (ITileset set : this.getTilesets()) {
-      if (set instanceof Tileset && ((Tileset)set).sourceTileset != null) {
-        externalTilesets.add(((Tileset)set).sourceTileset);
+      if (set instanceof Tileset && ((Tileset) set).sourceTileset != null) {
+        externalTilesets.add(((Tileset) set).sourceTileset);
       }
     }
 
@@ -614,20 +614,25 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
 
   private void layerAdded(ILayer layer) {
     if (layer instanceof ITileLayer) {
-      this.rawTileLayers.add((ITileLayer)layer);
+      this.rawTileLayers.add((ITileLayer) layer);
     }
     if (layer instanceof IMapObjectLayer) {
-      this.rawMapObjectLayers.add((IMapObjectLayer)layer);
+      this.rawMapObjectLayers.add((IMapObjectLayer) layer);
     }
     if (layer instanceof IImageLayer) {
-      this.rawImageLayers.add((IImageLayer)layer);
+      this.rawImageLayers.add((IImageLayer) layer);
     }
     if (layer instanceof IGroupLayer) {
-      this.rawGroupLayers.add((IGroupLayer)layer);
+      this.rawGroupLayers.add((IGroupLayer) layer);
     }
   }
 
   private void checkVersion() {
+    if (this.tiledversion == null || this.tiledversion.isEmpty()) {
+      log.log(Level.WARNING, "Tiled version not defined for map {0}. Could not evaluate whether the map format is supported by the engine.", new Object[] { this.getName() });
+      return;
+    }
+
     String supportedVersionString = ArrayUtilities.join(MAX_SUPPORTED_VERSION, ".");
     String[] ver = this.tiledversion.split("\\.");
     int[] vNumbers = new int[ver.length];
@@ -661,7 +666,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       if (!(tileLayer instanceof TileLayer)) {
         continue;
       }
-      TileLayer layer = (TileLayer)tileLayer;
+      TileLayer layer = (TileLayer) tileLayer;
 
       if (layer.getRawTileData() != null && layer.getRawTileData().getOffsetX() < minChunkOffsetX) {
         minChunkOffsetX = layer.getRawTileData().getOffsetX();
@@ -678,7 +683,7 @@ public final class Map extends CustomPropertyProvider implements IMap, Serializa
       if (!(tileLayer instanceof TileLayer)) {
         continue;
       }
-      TileLayer layer = (TileLayer)tileLayer;
+      TileLayer layer = (TileLayer) tileLayer;
 
       if (layer.getRawTileData() != null) {
         layer.getRawTileData().setMinChunkOffsets(minChunkOffsetX, minChunkOffsetY);
