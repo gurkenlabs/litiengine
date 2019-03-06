@@ -218,6 +218,7 @@ public class FileDrop {
       this.listener = listener;
     }
 
+    @Override
     public void dragEnter(DropTargetDragEvent evt) {
       LOG.log(Level.FINE, "FileDrop: dragEnter event.");
 
@@ -233,11 +234,13 @@ public class FileDrop {
       }
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent evt) {
       // This is called continually as long as the mouse is over the drag
       // target.
     }
 
+    @Override
     public void drop(DropTargetDropEvent evt) {
       LOG.log(Level.FINE, "FileDrop: drop event.");
       try {
@@ -304,10 +307,12 @@ public class FileDrop {
       }
     }
 
+    @Override
     public void dragExit(DropTargetEvent evt) {
       LOG.log(Level.FINE, "FileDrop: dragExit event.");
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent evt) {
       LOG.log(Level.FINE, "FileDrop: dropActionChanged event.");
       // Is this an acceptable drag event?
@@ -581,6 +586,7 @@ public class FileDrop {
      * @return An array of supported data flavors
      * @since 1.1
      */
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
       if (customFlavor != null) {
         return new DataFlavor[] { customFlavor, DATA_FLAVOR, DataFlavor.stringFlavor };
@@ -601,6 +607,7 @@ public class FileDrop {
      * @return The dropped data
      * @since 1.1
      */
+    @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
       // Native object
       if (flavor.equals(DATA_FLAVOR))
@@ -623,6 +630,7 @@ public class FileDrop {
      * @return Whether or not the flavor is supported
      * @since 1.1
      */
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
       // Native object
       if (flavor.equals(DATA_FLAVOR)) {

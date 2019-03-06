@@ -232,8 +232,10 @@ public class MapComponent extends EditorComponent implements IUpdateable {
     final List<Map> loadedMaps = new ArrayList<>();
     for (final String mapFile : files) {
       Map map = (Map) Resources.maps().get(mapFile);
-      loadedMaps.add(map);
-      log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
+      if (map != null) { // if an error occurred or it's not in the expected format
+        loadedMaps.add(map);
+        log.log(Level.INFO, "map found: {0}", new Object[] { map.getName() });
+      }
     }
 
     this.loadMaps(loadedMaps);

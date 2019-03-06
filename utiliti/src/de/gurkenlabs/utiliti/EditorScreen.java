@@ -248,7 +248,7 @@ public class EditorScreen extends Screen {
       Program.getAssetTree().forceUpdate();
 
       // load custom emitter files
-      this.loadCustomEmitters(this.getGameFile().getEmitters());
+      loadCustomEmitters(this.getGameFile().getEmitters());
 
       // update new game file by the loaded information
       this.updateGameFileMaps();
@@ -316,9 +316,7 @@ public class EditorScreen extends Screen {
       // 2. add sprite sheets by tile sets of all maps in the game file
       this.loadSpriteSheets(this.getGameFile().getSpriteSheets(), true);
 
-      this.getGameFile().getSounds().parallelStream().forEach(soundResource -> {
-        Resources.sounds().load(soundResource);
-      });
+      this.getGameFile().getSounds().parallelStream().forEach(Resources.sounds()::load);
 
       log.log(Level.INFO, "{0} maps loaded from {1}", new Object[] { this.getGameFile().getMaps().size(), this.currentResourceFile });
       log.log(Level.INFO, "{0} spritesheets loaded from {1}", new Object[] { this.getGameFile().getSpriteSheets().size(), this.currentResourceFile });
@@ -332,7 +330,7 @@ public class EditorScreen extends Screen {
       }
 
       // load custom emitter files
-      this.loadCustomEmitters(this.getGameFile().getEmitters());
+      loadCustomEmitters(this.getGameFile().getEmitters());
       Program.getAssetTree().forceUpdate();
 
       // display first available map after loading all stuff
@@ -676,7 +674,7 @@ public class EditorScreen extends Screen {
     }
   }
 
-  private void loadCustomEmitters(List<EmitterData> emitters) {
+  private static void loadCustomEmitters(List<EmitterData> emitters) {
     for (EmitterData emitter : emitters) {
       CustomEmitter.load(emitter);
     }
