@@ -26,9 +26,6 @@ public final class Input {
   private static IKeyboard keyboard;
   private static IMouse mouse;
 
-  static {
-  }
-
   private Input() {
     throw new UnsupportedOperationException();
   }
