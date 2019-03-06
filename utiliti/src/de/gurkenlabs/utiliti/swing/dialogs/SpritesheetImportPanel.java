@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -331,8 +332,7 @@ public class SpritesheetImportPanel extends JPanel implements IUpdateable {
       this.controller.setDefaultAnimation(newAnim);
       this.controller.playAnimation(newAnim.getName());
     } catch (IllegalArgumentException e) {
-      log.warning("The sprite file '" + file.name + "' cannot be scaled correctly for the preview window. Please check if the image file's dimensions are divisible by the desired sprite dimensions without remainder.");
-      e.printStackTrace();
+      log.log(Level.WARNING, "The sprite file '" + file.name + "' cannot be scaled correctly for the preview window. Please check if the image file's dimensions are divisible by the desired sprite dimensions without remainder.", e);
     } finally {
       this.isUpdating = false;
     }
