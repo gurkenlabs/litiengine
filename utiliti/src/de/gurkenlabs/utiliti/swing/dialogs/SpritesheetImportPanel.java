@@ -46,7 +46,7 @@ import de.gurkenlabs.litiengine.util.io.FileUtilities;
 
 @SuppressWarnings("serial")
 public class SpritesheetImportPanel extends JPanel implements IUpdateable {
-  private final int PREVIEW_SIZE = 128;
+  private static final int PREVIEW_SIZE = 128;
 
   private JTextField textField;
   private JTable tableKeyFrames;
