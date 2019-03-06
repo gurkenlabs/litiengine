@@ -422,7 +422,6 @@ public class MapOrientations {
           xt = frac * (ciy - 0.5) + 1;
           if (cix > xt || axis == StaggerAxis.X && cix == xt) {
             p.x++;
-          } else {
           }
         }
       }
