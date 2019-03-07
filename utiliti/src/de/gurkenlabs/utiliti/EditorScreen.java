@@ -731,7 +731,7 @@ public class EditorScreen extends Screen {
 
     this.loadSpriteSheets(infos, false);
     for (SpritesheetResource info : infos) {
-      if (!this.getGameFile().getSpriteSheets().stream().anyMatch(x -> x.getName().equals(info.getName()))) {
+      if (this.getGameFile().getSpriteSheets().stream().noneMatch(x -> x.getName().equals(info.getName()))) {
         this.getGameFile().getSpriteSheets().add(info);
       }
     }
