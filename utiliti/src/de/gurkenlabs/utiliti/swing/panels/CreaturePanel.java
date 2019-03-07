@@ -8,7 +8,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 import de.gurkenlabs.litiengine.Direction;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
@@ -23,7 +22,6 @@ import de.gurkenlabs.utiliti.swing.LabelListCellRenderer;
 public class CreaturePanel extends PropertyPanel {
   private final JComboBox<JLabel> comboBoxSpriteSheets;
   private final JComboBox<Direction> comboBoxDirection;
-  private final JTextField textFieldType;
   private final JCheckBox checkBoxScale;
 
   /**
@@ -39,9 +37,6 @@ public class CreaturePanel extends PropertyPanel {
     this.comboBoxDirection.setModel(new DefaultComboBoxModel<>(Direction.values()));
     this.checkBoxScale = new JCheckBox("stretch sprite");
     
-    this.textFieldType = new JTextField();
-    this.textFieldType.setColumns(10);
-
     setLayout(this.createLayout());
     this.setupChangedListeners();
   }
@@ -83,7 +78,6 @@ public class CreaturePanel extends PropertyPanel {
   @Override
   protected void clearControls() {
     this.comboBoxSpriteSheets.setSelectedItem(null);
-    this.textFieldType.setText(null);
     this.comboBoxDirection.setSelectedItem(Direction.UNDEFINED);
     this.checkBoxScale.setSelected(false);
   }
@@ -91,7 +85,6 @@ public class CreaturePanel extends PropertyPanel {
   @Override
   protected void setControlValues(IMapObject mapObject) {
     selectSpriteSheet(this.comboBoxSpriteSheets, mapObject);
-    this.textFieldType.setText(mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE));
     this.comboBoxDirection.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.UNDEFINED));
     this.checkBoxScale.setSelected(mapObject.getBoolValue(MapObjectProperty.SCALE_SPRITE));
   }
@@ -99,7 +92,6 @@ public class CreaturePanel extends PropertyPanel {
   private void setupChangedListeners() {
     this.setupL(this.comboBoxSpriteSheets, MapObjectProperty.SPRITESHEETNAME);
     this.setup(this.comboBoxDirection, MapObjectProperty.SPAWN_DIRECTION);
-    this.setup(this.textFieldType, MapObjectProperty.SPAWN_TYPE);
     this.setup(this.checkBoxScale, MapObjectProperty.SCALE_SPRITE);
   }
 
@@ -119,7 +111,6 @@ public class CreaturePanel extends PropertyPanel {
     LayoutItem[] layoutItems = new LayoutItem [] {
         new LayoutItem("panel_sprite", this.comboBoxSpriteSheets),
         new LayoutItem("panel_direction", this.comboBoxDirection),
-        new LayoutItem("panel_type", this.textFieldType),
     };
     
     return this.createLayout(layoutItems, this.checkBoxScale);

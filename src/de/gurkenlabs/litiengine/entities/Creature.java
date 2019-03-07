@@ -27,7 +27,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   @TmxProperty(name = MapObjectProperty.SCALE_SPRITE)
   private boolean scaling;
-  
+
   public Creature() {
     this(null);
   }
@@ -48,7 +48,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.setSpritePrefix(ArrayUtilities.getRandom(EntityAnimationController.getDefaultSpritePrefixes(this.getClass())));
     }
 
-    this.addController(new CreatureAnimationController<Creature>(this, true));
+    this.updateAnimationController();
   }
 
   @Override
@@ -154,12 +154,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   public void setSpritePrefix(String spritePrefix) {
     this.spritePrefix = spritePrefix;
+    this.updateAnimationController();
   }
 
   public void setScaling(boolean scaling) {
     this.scaling = scaling;
   }
-  
+
   @Override
   public boolean turnOnMove() {
     return this.turnOnMove;
@@ -179,5 +180,13 @@ public class Creature extends CombatEntity implements IMobileEntity {
     sb.append(") #");
     sb.append(this.getMapId());
     return sb.toString();
+  }
+
+  private void updateAnimationController() {
+    CreatureAnimationController<Creature> controller = new CreatureAnimationController<>(this, true);
+    this.getControllers().addController(controller);
+    if (Game.world().environment() != null && Game.world().environment().isLoaded()) {
+      Game.loop().attach(controller);
+    }
   }
 }

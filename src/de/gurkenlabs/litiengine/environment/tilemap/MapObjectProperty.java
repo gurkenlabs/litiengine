@@ -27,15 +27,11 @@ public final class MapObjectProperty {
   public static final String SPRITESHEETNAME = "spritesheetName";
   public static final String SCALE_SPRITE = "scaling";
   
-  // creature
-  public static final String CREATURE_TYPE = "creature-type";
-
   // mobile entity
   public static final String MOVEMENT_ACCELERATION = "acceleration";
   public static final String MOVEMENT_DECELERATION = "deceleration";
   public static final String MOVEMENT_VELOCITY = "velocity";
   public static final String MOVEMENT_TURNONMOVE = "turnOnMove";
-
   
   // combat entity
   public static final String COMBAT_HITPOINTS = "hitpoints";
