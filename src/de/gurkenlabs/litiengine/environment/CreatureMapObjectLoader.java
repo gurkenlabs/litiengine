@@ -71,18 +71,15 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
 
     Collection<IEntity> entities = new ArrayList<>();
     final String spriteSheet = mapObject.getStringValue(MapObjectProperty.SPRITESHEETNAME);
-    if (spriteSheet == null) {
-      return entities;
-    }
 
     Creature creature = this.createNewCreature(mapObject, spriteSheet, mapObject.getStringValue(MapObjectProperty.SPAWN_TYPE));
     loadDefaultProperties(creature, mapObject);
     loadCollisionProperties(creature, mapObject);
+    loadCombatProperties(creature, mapObject);
+    loadMovementProperties(creature, mapObject);
 
-    // TODO: load IMobileEntity and ICombatEntity properties
-  
-    creature.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY, 100f));
     creature.setFacingDirection(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
+
     entities.add(creature);
     return entities;
   }

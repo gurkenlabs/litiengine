@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.entities.ICollisionEntity;
+import de.gurkenlabs.litiengine.entities.ICombatEntity;
 import de.gurkenlabs.litiengine.entities.IEntity;
+import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
@@ -92,5 +94,18 @@ public abstract class MapObjectLoader implements IMapObjectLoader {
     entity.setCollisionBoxHeight(mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT, mapObject.getHeight()));
     entity.setCollisionBoxAlign(mapObject.getEnumValue(MapObjectProperty.COLLISION_ALIGN, Align.class, Align.CENTER));
     entity.setCollisionBoxValign(mapObject.getEnumValue(MapObjectProperty.COLLISION_VALIGN, Valign.class, Valign.DOWN));
+  }
+
+  public static void loadCombatProperties(ICombatEntity entity, IMapObject mapObject) {
+    entity.setIndestructible(mapObject.getBoolValue(MapObjectProperty.COMBAT_INDESTRUCTIBLE));
+    entity.getHitPoints().setBaseValue(mapObject.getIntValue(MapObjectProperty.COMBAT_HITPOINTS));
+    entity.setTeam(mapObject.getIntValue(MapObjectProperty.COMBAT_TEAM));
+  }
+
+  public static void loadMovementProperties(IMobileEntity entity, IMapObject mapObject) {
+    entity.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY, 100f));
+    entity.setAcceleration(mapObject.getIntValue(MapObjectProperty.MOVEMENT_ACCELERATION));
+    entity.setDeceleration(mapObject.getIntValue(MapObjectProperty.MOVEMENT_DECELERATION));
+    entity.setTurnOnMove(mapObject.getBoolValue(MapObjectProperty.MOVEMENT_TURNONMOVE));
   }
 }
