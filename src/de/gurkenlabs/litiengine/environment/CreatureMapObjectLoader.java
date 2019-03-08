@@ -80,6 +80,8 @@ public class CreatureMapObjectLoader extends MapObjectLoader {
     loadCollisionProperties(creature, mapObject);
 
     // TODO: load IMobileEntity and ICombatEntity properties
+  
+    creature.setVelocity(mapObject.getFloatValue(MapObjectProperty.MOVEMENT_VELOCITY, 100f));
     creature.setFacingDirection(mapObject.getEnumValue(MapObjectProperty.SPAWN_DIRECTION, Direction.class, Direction.RIGHT));
     entities.add(creature);
     return entities;

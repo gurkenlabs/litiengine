@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.animation.CreatureAnimationController;
 import de.gurkenlabs.litiengine.graphics.animation.EntityAnimationController;
 import de.gurkenlabs.litiengine.physics.IMovementController;
+import de.gurkenlabs.litiengine.physics.MovementController;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 import de.gurkenlabs.litiengine.util.geom.GeometricUtilities;
 
@@ -40,6 +41,7 @@ public class Creature extends CombatEntity implements IMobileEntity {
       this.acceleration = movementInfo.acceleration();
       this.deceleration = movementInfo.deceleration();
       this.setTurnOnMove(movementInfo.turnOnMove());
+      this.addController(new MovementController<>(this));
     }
 
     if (spritePrefix != null) {
@@ -159,6 +161,12 @@ public class Creature extends CombatEntity implements IMobileEntity {
 
   public void setScaling(boolean scaling) {
     this.scaling = scaling;
+  }
+  
+
+  @Override
+  public void setVelocity(float velocity) {
+    this.getVelocity().setBaseValue(velocity);
   }
 
   @Override
