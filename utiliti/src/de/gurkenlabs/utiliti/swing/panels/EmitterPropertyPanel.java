@@ -38,7 +38,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.graphics.emitters.Emitter;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ParticleType;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.litiengine.resources.SpritesheetResource;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
@@ -64,7 +64,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
   private final JComboBox<ParticleType> comboBoxParticleType = new JComboBox<>();
   private final JComboBox<String> comboBoxSpriteType = new JComboBox<>();
   private final JComboBox<String> comboBoxSprite = new JComboBox<>();
-  private final JComboBox<CollisionType> comboBoxCollisionType = new JComboBox<>();
+  private final JComboBox<Collision> comboBoxCollisionType = new JComboBox<>();
   private final JComboBox<Align> comboBoxAlign = new JComboBox<>();
   private final JComboBox<Valign> comboBoxValign = new JComboBox<>();
   
@@ -160,7 +160,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.btnSelectColor.setMaximumSize(new Dimension(30, 10));
 
     this.comboBoxParticleType.setModel(new DefaultComboBoxModel<ParticleType>(ParticleType.values()));
-    this.comboBoxCollisionType.setModel(new DefaultComboBoxModel<CollisionType>(CollisionType.values()));
+    this.comboBoxCollisionType.setModel(new DefaultComboBoxModel<Collision>(Collision.values()));
     this.comboBoxAlign.setModel(new DefaultComboBoxModel<Align>(Align.values()));
     this.comboBoxValign.setModel(new DefaultComboBoxModel<Valign>(Valign.values()));
     
@@ -1097,7 +1097,7 @@ public class EmitterPropertyPanel extends PropertyPanel {
     this.comboBoxParticleType.setSelectedItem(type);
     this.updateTabbedGroup();
     this.comboBoxSprite.setSelectedItem(mapObject.getStringValue(MapObjectProperty.Particle.SPRITE));
-    this.comboBoxCollisionType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
+    this.comboBoxCollisionType.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Particle.COLLISIONTYPE, Collision.class, Collision.NONE));
     this.comboBoxAlign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_ALIGN, Align.class, Align.CENTER));
     this.comboBoxValign.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.Emitter.ORIGIN_VALIGN, Valign.class, Valign.MIDDLE));
     

@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.Valign;
 import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 @CollisionInfo(collision = true)
 public abstract class CollisionEntity extends Entity implements ICollisionEntity {
@@ -33,7 +33,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   private Valign valign;
 
   @TmxProperty(name = MapObjectProperty.COLLISION_TYPE)
-  private CollisionType collisionType;
+  private Collision collisionType;
 
   private Rectangle2D collisionBox;
 
@@ -111,7 +111,7 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public CollisionType getCollisionType() {
+  public Collision getCollisionType() {
     return this.collisionType;
   }
 
@@ -185,7 +185,11 @@ public abstract class CollisionEntity extends Entity implements ICollisionEntity
   }
 
   @Override
-  public void setCollisionType(CollisionType type) {
+  public void setCollisionType(Collision type) {
+    if (type == Collision.ALL) {
+      throw new IllegalArgumentException("CollistionType.ALL is not allowed to be assigned to an entity. It may only be used for filtering in the PhysicsEngine.");
+    }
+
     if (this.getEnvironment() != null && this.getEnvironment().isLoaded()) {
       // re-add the entity to the physics engine so it will be treated with the updated collision type
       Game.physics().remove(this);

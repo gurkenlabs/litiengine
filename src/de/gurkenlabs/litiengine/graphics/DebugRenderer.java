@@ -21,6 +21,7 @@ import de.gurkenlabs.litiengine.environment.tilemap.IMap;
 import de.gurkenlabs.litiengine.environment.tilemap.ITile;
 import de.gurkenlabs.litiengine.environment.tilemap.MapUtilities;
 import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class DebugRenderer {
   private static List<Consumer<MapDebugArgs>> mapDebugConsumer;
@@ -81,7 +82,7 @@ public class DebugRenderer {
     // draw collision boxes from shape layer
     if (Game.config().debug().renderCollisionBoxes()) {
       final BasicStroke shapeStroke = new BasicStroke(1 / Game.world().camera().getRenderScale());
-      for (final Rectangle2D shape : Game.physics().getStaticCollisionBoxes()) {
+      for (final Rectangle2D shape : Game.physics().getCollisionBoxes(Collision.STATIC)) {
         g.setColor(Color.RED);
         RenderEngine.renderOutline(g, shape, shapeStroke);
       }

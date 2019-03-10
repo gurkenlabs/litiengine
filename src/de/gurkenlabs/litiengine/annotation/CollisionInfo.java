@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Valign;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,5 +24,5 @@ public @interface CollisionInfo {
 
   Valign valign() default Valign.DOWN;
   
-  CollisionType collisionType() default CollisionType.DYNAMIC;
+  Collision collisionType() default Collision.DYNAMIC;
 }

@@ -1,5 +1,5 @@
 package de.gurkenlabs.litiengine.physics;
 
-public enum CollisionType {
+public enum Collision {
   NONE, DYNAMIC, STATIC, ALL;
 }

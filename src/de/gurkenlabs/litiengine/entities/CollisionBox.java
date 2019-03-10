@@ -7,10 +7,10 @@ import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 @EntityInfo(renderType = RenderType.OVERLAY)
-@CollisionInfo(collision = true, collisionType = CollisionType.STATIC)
+@CollisionInfo(collision = true, collisionType = Collision.STATIC)
 public class CollisionBox extends CollisionEntity {
 
   @TmxProperty(name = MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS)

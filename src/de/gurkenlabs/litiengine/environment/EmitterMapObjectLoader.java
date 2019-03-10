@@ -17,7 +17,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.xml.CustomEmitter;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.EmitterData;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleColor;
 import de.gurkenlabs.litiengine.graphics.emitters.xml.ParticleParameter;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.util.ArrayUtilities;
 
 public class EmitterMapObjectLoader extends MapObjectLoader {
@@ -97,7 +97,7 @@ public class EmitterMapObjectLoader extends MapObjectLoader {
 
     data.setParticleMinTTL(mapObject.getIntValue(MapObjectProperty.Particle.MINTTL));
     data.setParticleMaxTTL(mapObject.getIntValue(MapObjectProperty.Particle.MAXTTL));
-    data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.Particle.COLLISIONTYPE, CollisionType.class, CollisionType.NONE));
+    data.setCollisionType(mapObject.getEnumValue(MapObjectProperty.Particle.COLLISIONTYPE, Collision.class, Collision.NONE));
 
     data.setParticleText(mapObject.getStringValue(MapObjectProperty.Particle.TEXT));
     data.setSpritesheet(mapObject.getStringValue(MapObjectProperty.Particle.SPRITE));

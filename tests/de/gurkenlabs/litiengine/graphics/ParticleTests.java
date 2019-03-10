@@ -20,7 +20,7 @@ import de.gurkenlabs.litiengine.graphics.emitters.particles.RectangleOutlinePart
 import de.gurkenlabs.litiengine.graphics.emitters.particles.RightLineParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.ShimmerParticle;
 import de.gurkenlabs.litiengine.graphics.emitters.particles.TextParticle;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class ParticleTests {
   @BeforeAll
@@ -49,7 +49,7 @@ public class ParticleTests {
   @Test
   public void testDeltaSize() {
     RectangleFillParticle part = new RectangleFillParticle(10, 10, Color.WHITE, 300);
-    part.setCollisionType(CollisionType.NONE);
+    part.setCollisionType(Collision.NONE);
     part.setDeltaHeight(0.1f);
     part.setDeltaWidth(0.1f);
 
@@ -62,7 +62,7 @@ public class ParticleTests {
   @Test
   public void testDeltaLocation() {
     RectangleFillParticle part = new RectangleFillParticle(10, 10, Color.WHITE, 300);
-    part.setCollisionType(CollisionType.NONE);
+    part.setCollisionType(Collision.NONE);
     part.setDeltaX(0.1f);
     part.setDeltaY(0.1f);
     part.setDeltaIncX(0.01f);

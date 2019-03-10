@@ -12,7 +12,7 @@ import de.gurkenlabs.litiengine.entities.Rotation;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.TmxProperty;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class MapObjectSerializerTests {
 
@@ -41,7 +41,7 @@ public class MapObjectSerializerTests {
 
     // prop fields
     p.setMaterial(Material.CERAMIC);
-    p.setCollisionType(CollisionType.STATIC);
+    p.setCollisionType(Collision.STATIC);
     p.setAddShadow(true);
     p.setSpriteRotation(Rotation.ROTATE_270);
     p.setFlipHorizontally(true);
@@ -66,7 +66,7 @@ public class MapObjectSerializerTests {
     assertEquals(5, mapObject.getFloatValue(MapObjectProperty.COLLISIONBOX_HEIGHT));
 
     assertEquals(Material.CERAMIC, Material.get(mapObject.getStringValue(MapObjectProperty.PROP_MATERIAL)));
-    assertEquals(CollisionType.STATIC, mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, CollisionType.class));
+    assertEquals(Collision.STATIC, mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_ADDSHADOW));
     assertEquals(Rotation.ROTATE_270, mapObject.getEnumValue(MapObjectProperty.PROP_ROTATION, Rotation.class));
     assertEquals(true, mapObject.getBoolValue(MapObjectProperty.PROP_FLIPHORIZONTALLY));

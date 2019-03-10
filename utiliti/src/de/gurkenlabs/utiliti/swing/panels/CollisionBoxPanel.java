@@ -8,20 +8,20 @@ import javax.swing.JComboBox;
 
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 import de.gurkenlabs.litiengine.resources.Resources;
 import de.gurkenlabs.utiliti.Icons;
 
 @SuppressWarnings("serial")
 public class CollisionBoxPanel extends PropertyPanel {
-  private JComboBox<CollisionType> comboBoxColl;
+  private JComboBox<Collision> comboBoxColl;
   private JCheckBox chckbxIsObstructingLights;
 
   public CollisionBoxPanel() {
     super("panel_collisionBox", Icons.COLLISIONBOX);
 
     this.comboBoxColl = new JComboBox<>();
-    this.comboBoxColl.setModel(new DefaultComboBoxModel<>(new CollisionType[] { CollisionType.DYNAMIC, CollisionType.STATIC }));
+    this.comboBoxColl.setModel(new DefaultComboBoxModel<>(new Collision[] { Collision.DYNAMIC, Collision.STATIC }));
 
     this.chckbxIsObstructingLights = new JCheckBox(Resources.strings().get("panel_isObstructingLights"));
 
@@ -31,13 +31,13 @@ public class CollisionBoxPanel extends PropertyPanel {
 
   @Override
   protected void clearControls() {
-    this.comboBoxColl.setSelectedItem(CollisionType.STATIC);
+    this.comboBoxColl.setSelectedItem(Collision.STATIC);
     this.chckbxIsObstructingLights.setSelected(false);
   }
 
   @Override
   protected void setControlValues(IMapObject mapObject) {
-    this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, CollisionType.class, CollisionType.STATIC));
+    this.comboBoxColl.setSelectedItem(mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC));
     this.chckbxIsObstructingLights.setSelected(mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS));
   }
 

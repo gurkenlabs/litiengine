@@ -9,7 +9,7 @@ import de.gurkenlabs.litiengine.entities.StaticShadow;
 import de.gurkenlabs.litiengine.environment.tilemap.IMapObject;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectProperty;
 import de.gurkenlabs.litiengine.environment.tilemap.MapObjectType;
-import de.gurkenlabs.litiengine.physics.CollisionType;
+import de.gurkenlabs.litiengine.physics.Collision;
 
 public class CollisionBoxMapObjectLoader extends MapObjectLoader {
 
@@ -23,7 +23,7 @@ public class CollisionBoxMapObjectLoader extends MapObjectLoader {
       throw new IllegalArgumentException("Cannot load a mapobject of the type " + mapObject.getType() + " with a loader of the type " + CollisionBoxMapObjectLoader.class);
     }
 
-    CollisionType collisionType = mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, CollisionType.class, CollisionType.STATIC);
+    Collision collisionType = mapObject.getEnumValue(MapObjectProperty.COLLISION_TYPE, Collision.class, Collision.STATIC);
     boolean isObstructingLight = mapObject.getBoolValue(MapObjectProperty.COLLISIONBOX_OBSTRUCTINGLIGHTS);
 
     final CollisionBox col = this.createCollisionBox(mapObject, isObstructingLight);
