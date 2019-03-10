@@ -84,9 +84,9 @@ public class PhysicsTests {
     engine.add(new CollisionBox(5, 5, 10, 10));
     engine.update();
 
-    assertNotNull(engine.collides(new Line2D.Double(0, 0, 5, 5)));
-    assertNotNull(engine.collides(new Line2D.Double(10, 10, 5, 5)));
-    assertNull(engine.collides(new Line2D.Double(15.1, 15.0, 15, 15)));
+    assertTrue(engine.collides(new Line2D.Double(0, 0, 5, 5)));
+    assertTrue(engine.collides(new Line2D.Double(10, 10, 5, 5)));
+    assertFalse(engine.collides(new Line2D.Double(15.1, 15.0, 15, 15)));
   }
 
   @Test
